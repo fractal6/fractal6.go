@@ -5,4 +5,9 @@
 // It serves as dependency injection for your app, add any dependencies you require here.
 package graph
 
-type Resolver struct{}
+import "fractal6/gin/graph/model"
+
+type Resolver struct {
+	count int
+	todos []*model.Todo
+}
