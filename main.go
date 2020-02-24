@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fractal6/cmd"
+	"fractal6/gin/cmd"
 )
 
 func main() {
-	cmd.Execute()
+	cmd.Run()
 }
