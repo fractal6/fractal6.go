@@ -15,3 +15,6 @@ build:
 
 prod:
 	go build -trimpath $(GOFLAGS_PROD) -o $(GOBIN)/$(RELEASE) main.go
+
+update:
+	go generate ./...

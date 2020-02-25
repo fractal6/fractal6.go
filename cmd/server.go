@@ -8,6 +8,7 @@ import (
     "github.com/gin-gonic/gin"
 
     "fractal6/gin/handlers"
+    "fractal6/gin/utils"
 )
 
 
@@ -24,10 +25,10 @@ var runCmd = &cobra.Command{
     },
 }
 
-
 // RunServer launch the server
 func RunServer() {
     r := gin.Default()
+	r.Use(utils.GinContextToContextMiddleware())
 
     HOST := viper.GetString("server.host")
     PORT := viper.GetString("server.port")

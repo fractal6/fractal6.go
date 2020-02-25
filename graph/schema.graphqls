@@ -2,6 +2,13 @@
 #
 # https://gqlgen.com/getting-started/
 
+directive @hasRole(role: Role!) on FIELD_DEFINITION
+
+enum Role {
+    ADMIN
+    USER
+}
+
 type Query {
   todos: [Todo!]!
 }
@@ -19,7 +26,7 @@ type Mutation {
 type Todo {
   id: ID!
   text: String!
-  done: Boolean!
+  done: Boolean! @hasRole(role: ADMIN)
   nth: Int
   user: User!
 }
