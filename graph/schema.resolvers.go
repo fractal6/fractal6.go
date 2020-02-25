@@ -6,11 +6,11 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+
 	"fractal6/gin/graph/generated"
 	"fractal6/gin/graph/model"
 	"fractal6/gin/utils"
 )
-
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
 	todo := &model.Todo{
@@ -24,13 +24,12 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-    fmt.Println(ctx)
-    c, err := utils.GinContextFromContext(ctx)
-    if err != nil {
+	fmt.Println(ctx)
+	c, err := utils.GinContextFromContext(ctx)
+	if err != nil {
 		return nil, err
 	}
-    fmt.Println(c)
-
+	fmt.Println(c)
 
 	return r.todos, nil
 }
