@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"fractal6/gin/graph/model"
+	"zerogov/fractal6.go/graph/model"
 	"strconv"
 	"sync"
 	"sync/atomic"

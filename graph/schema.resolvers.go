@@ -5,9 +5,9 @@ package graph
 import (
 	"context"
 	"fmt"
-	"fractal6/gin/graph/generated"
-	"fractal6/gin/graph/model"
-	"fractal6/gin/utils"
+	"zerogov/fractal6.go/graph/generated"
+	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/utils"
 	"math/rand"
 )
 

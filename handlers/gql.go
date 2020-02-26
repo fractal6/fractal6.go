@@ -4,8 +4,8 @@ import (
     "github.com/gin-gonic/gin"
 	"github.com/99designs/gqlgen/handler"
 
-	"fractal6/gin/graph"
-	gen "fractal6/gin/graph/generated"
+	"zerogov/fractal6.go/graph"
+	gen "zerogov/fractal6.go/graph/generated"
 )
 
 

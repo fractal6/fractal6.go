@@ -1,4 +1,4 @@
-module fractal6/gin
+module zerogov/fractal6.go
 
 go 1.13
 

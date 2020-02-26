@@ -10,8 +10,8 @@ import (
     "context"
 	"github.com/99designs/gqlgen/graphql"
 
-	"fractal6/gin/graph/model"
-	gen "fractal6/gin/graph/generated"
+	"zerogov/fractal6.go/graph/model"
+	gen "zerogov/fractal6.go/graph/generated"
 )
 
 type Resolver struct {
@@ -20,6 +20,8 @@ type Resolver struct {
 }
 
 func hasRoleMiddleware (ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
+
+    fmt.Println(ctx)
     //if !getCurrentUser(ctx).HasRole(role) {
     //    // block calling the next resolver
     //     fmt.Println(ctx)

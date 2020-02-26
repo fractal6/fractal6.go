@@ -7,13 +7,22 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/gin-gonic/contrib/static"
 
-    "fractal6/gin/handlers"
-    "fractal6/gin/utils"
+    "zerogov/fractal6.go/handlers"
+    "zerogov/fractal6.go/utils"
 )
 
+var queryPath, buildMode string
 
 func init() {
     rootCmd.AddCommand(runCmd)
+    queryPath = "/api"
+
+    if buildMode == "" {
+        buildMode = "DEV"
+    } else {
+        buildMode = "PROD"
+	}
+		
 }
 
 var runCmd = &cobra.Command{
@@ -33,16 +42,17 @@ func RunServer() {
     HOST := viper.GetString("server.host")
     PORT := viper.GetString("server.port")
 
-    queryPath := "/api"
 
     // Serve Graphql Api
     r.POST(queryPath, handlers.GraphqlHandler())
 
-    // Serve frontend static files
-    r.Use(static.Serve("/", static.LocalFile("./web/public", true)))
 
-    r.GET("/ping", handlers.Ping())
-    r.GET("/", handlers.PlaygroundHandler(queryPath))
+	if buildMode == "DEV" {
+		r.GET("/ping", handlers.Ping())
+		r.GET("/playground", handlers.PlaygroundHandler(queryPath))
+		// Serve frontend static files
+		r.Use(static.Serve("/", static.LocalFile("./web/public", false)))
+	}
 
 
     log.Println("Running @ http://" + HOST + ":" + PORT)
