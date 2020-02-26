@@ -5,11 +5,10 @@ package graph
 import (
 	"context"
 	"fmt"
-	"math/rand"
-
 	"fractal6/gin/graph/generated"
 	"fractal6/gin/graph/model"
 	"fractal6/gin/utils"
+	"math/rand"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {

@@ -1,13 +1,40 @@
-//go:generate go run github.com/99designs/gqlgen
+//go:generate go run github.com/99designs/gqlgen -v
 
 // This file will not be regenerated automatically.
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 package graph
 
-import "fractal6/gin/graph/model"
+import (
+    "fmt"
+    "context"
+	"github.com/99designs/gqlgen/graphql"
+
+	"fractal6/gin/graph/model"
+	gen "fractal6/gin/graph/generated"
+)
 
 type Resolver struct {
 	count int
 	todos []*model.Todo
 }
+
+func hasRoleMiddleware (ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
+    //if !getCurrentUser(ctx).HasRole(role) {
+    //    // block calling the next resolver
+    //     fmt.Println(ctx)
+    //    return nil, fmt.Errorf("Access denied")
+	//}
+
+	// or let it pass through
+	return next(ctx)
+}
+
+// Init initialize shema config and Directives...
+func Init() gen.Config {
+    c := gen.Config{Resolvers: &Resolver{}}
+	c.Directives.HasRole = hasRoleMiddleware
+
+    return c
+}
+

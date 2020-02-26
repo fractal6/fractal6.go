@@ -2,10 +2,10 @@ package cmd
 
 import (
     "log"
-
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
     "github.com/gin-gonic/gin"
+    "github.com/gin-gonic/contrib/static"
 
     "fractal6/gin/handlers"
     "fractal6/gin/utils"
@@ -35,9 +35,13 @@ func RunServer() {
 
     queryPath := "/api"
 
-    // Setup routes
-    r.GET("/ping", handlers.Ping())
+    // Serve Graphql Api
     r.POST(queryPath, handlers.GraphqlHandler())
+
+    // Serve frontend static files
+    r.Use(static.Serve("/", static.LocalFile("./web/public", true)))
+
+    r.GET("/ping", handlers.Ping())
     r.GET("/", handlers.PlaygroundHandler(queryPath))
 
 
