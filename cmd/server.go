@@ -4,11 +4,11 @@ import (
     "log"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
-    "github.com/gin-gonic/gin"
-    "github.com/gin-gonic/contrib/static"
+    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4/middleware"
 
     "zerogov/fractal6.go/handlers"
-    "zerogov/fractal6.go/utils"
+    "zerogov/fractal6.go/internal"
 )
 
 var queryPath, buildMode string
@@ -36,27 +36,37 @@ var runCmd = &cobra.Command{
 
 // RunServer launch the server
 func RunServer() {
-    r := gin.Default()
-	r.Use(utils.GinContextToContextMiddleware())
-
     HOST := viper.GetString("server.host")
     PORT := viper.GetString("server.port")
 
+    r := echo.New()
+
+    // Middleware
+    //r.Use(middleware.Logger())
+    r.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+        Format: `[${time_rfc3339}]  ${method}  ${status}  ${uri}  ${error}  ${latency_human}` + "\n",
+    }))
+    r.Use(middleware.Recover())
+	r.Use(internal.RouterContextToContextMiddleware)
+
+    //r.POST("signup", handler.Signup)
+    r.POST("signin", handler.Signin)
+    //r.POST("signout", handler.Signout)
+
+	if buildMode == "DEV" {
+		r.GET("/ping", handlers.Ping)
+		r.GET("/playground", handlers.PlaygroundHandler(queryPath))
+		// Serve frontend static files
+		r.Static("/", "./web/public")
+	}
 
     // Serve Graphql Api
     r.POST(queryPath, handlers.GraphqlHandler())
 
 
-	if buildMode == "DEV" {
-		r.GET("/ping", handlers.Ping())
-		r.GET("/playground", handlers.PlaygroundHandler(queryPath))
-		// Serve frontend static files
-		r.Use(static.Serve("/", static.LocalFile("./web/public", false)))
-	}
-
 
     log.Println("Running @ http://" + HOST + ":" + PORT)
-    log.Fatalln(r.Run(HOST + ":" + PORT))
+    r.Logger.Fatal(r.Start(HOST + ":" + PORT))
 }
 
 

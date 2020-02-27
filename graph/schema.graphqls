@@ -18,8 +18,14 @@ input NewTodo {
   userId: String!
 }
 
+input Cred {
+    username: String!
+    password: String!
+}
+
 type Mutation {
   createTodo(input: NewTodo!): Todo!
+  signUp(input: Cred!): Cred!
 }
 
 
@@ -33,7 +39,13 @@ type Todo {
 
 type User {
   id: ID!
-  name: String!
+  name: String
+  username: String!
+  password: String
 }
 
 
+type Cred {
+    username: String!
+    password: String!
+}

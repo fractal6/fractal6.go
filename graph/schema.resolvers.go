@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/utils"
+	"zerogov/fractal6.go/internal"
 	"math/rand"
 )
 
@@ -24,7 +24,9 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	fmt.Println(ctx)
-	c, err := utils.GinContextFromContext(ctx)
+	c, err := internal.RouterContextFromContext(ctx)
+    fmt.Println(ctx)
+    fmt.Println(c)
 	if err != nil {
 		return nil, err
 	}

@@ -2,13 +2,12 @@ package handlers
 
 import (
     "net/http"
-    "github.com/gin-gonic/gin"
+    "github.com/labstack/echo/v4"
 )
 
 // Ping is simple keep-alive/ping handler
-func Ping() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.String(http.StatusOK, "OK")
-    }
+func Ping(c echo.Context) error {
+    return c.String(http.StatusOK, "OK")
+
 }
 
