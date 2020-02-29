@@ -9,7 +9,6 @@ import (
     "fmt"
     "context"
     "github.com/99designs/gqlgen/graphql"
-    "github.com/labstack/echo/v4"
     "golang.org/x/crypto/bcrypt" 
 
     "zerogov/fractal6.go/graph/model"
@@ -70,9 +69,9 @@ func ComparePassword(hash string, password string) bool {
     return err == nil
 }
 
-func getCred(c echo.Context, input model.InputCred) (model.Cred, error) {
+func getCred(ctx context.Context, input model.InputCred) (model.Cred, error) {
     //cred := new(model.Cred)
-    //if err := c.Bind(cred); err != nil {
+    //if err := ctx.Bind(cred); err != nil {
     //    return nil, &echo.HTTPError{
     //        Code: http.StatusBadRequest,
     //        Message: "invalid email or password"

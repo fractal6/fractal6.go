@@ -1,7 +1,7 @@
 package handlers
 
 import (
-    "github.com/labstack/echo/v4"
+    "net/http"
 	"github.com/99designs/gqlgen/handler"
 
 	gen "zerogov/fractal6.go/graph/generated"
@@ -13,7 +13,7 @@ import (
 
 
 // Defining the Graphql handler
-func GraphqlHandler() echo.HandlerFunc {
+func GraphqlHandler() http.HandlerFunc {
 	// NewExecutableSchema and Config are in the generated.go file
 	// Resolver is in the resolver.go file
 	h := handler.GraphQL(
@@ -21,19 +21,13 @@ func GraphqlHandler() echo.HandlerFunc {
         handler.ComplexityLimit(50),
     )
 
-	return func(c echo.Context) error {
-        // cc := c.(*internal.GlobalContext)
-        h.ServeHTTP(c.Response(), c.Request())
-		return nil
-	}
+    return h.ServeHTTP
+
 }
 
 // Defining the Playground handler
-func PlaygroundHandler(path string) echo.HandlerFunc {
+func PlaygroundHandler(path string) http.HandlerFunc {
 	h := handler.Playground("Go GraphQL Playground", path)
 
-	return func(c echo.Context) error {
-		h.ServeHTTP(c.Response(), c.Request())
-        return nil
-	}
+    return h.ServeHTTP
 }

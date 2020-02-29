@@ -9,7 +9,6 @@ import (
 
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/internal"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
@@ -25,10 +24,10 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 func (r *mutationResolver) SignUp(ctx context.Context, input model.InputCred) (*model.Cred, error) {
 
-	c, err := internal.RouterContextFromContext(ctx)
+	//c, err := internal.RouterContextFromContext(ctx)
+    //fmt.Println(c)
     fmt.Println(ctx)
-    fmt.Println(c)
-    cred, err := getCred(c, input)
+    cred, err := getCred(ctx, input)
     if err != nil {
         fmt.Println(err, "dfzfefz ")
         return nil, err

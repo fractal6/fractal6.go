@@ -2,13 +2,15 @@ package cmd
 
 import (
     "log"
+    "time"
+    "net/http"
+    "github.com/go-chi/chi"
+    "github.com/go-chi/chi/middleware"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
-    "github.com/labstack/echo/v4"
-    "github.com/labstack/echo/v4/middleware"
 
     "zerogov/fractal6.go/handlers"
-    "zerogov/fractal6.go/internal"
+    "zerogov/fractal6.go/tools"
 )
 
 var queryPath, buildMode string
@@ -39,34 +41,37 @@ func RunServer() {
     HOST := viper.GetString("server.host")
     PORT := viper.GetString("server.port")
 
-    r := echo.New()
+    r := chi.NewRouter()
 
-    // Middleware
-    //r.Use(middleware.Logger())
-    r.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-        Format: `[${time_rfc3339}]  ${method}  ${status}  ${uri}  ${error}  ${latency_human}` + "\n",
-    }))
-    r.Use(middleware.Recover())
-	r.Use(internal.RouterContextToContextMiddleware)
+    // Middleware stack
+    r.Use(middleware.RequestID)
+    r.Use(middleware.RealIP)
+    //r.Use(internal.RouterContextToContextMiddleware)
+    r.Use(middleware.Logger)
+    r.Use(middleware.Recoverer)
+
+	// Set a timeout value on the request context (ctx), that will signal
+	// through ctx.Done() that the request has timed out and further
+	// processing should be stopped.
+	r.Use(middleware.Timeout(60 * time.Second))
 
     //r.POST("signup", handler.Signup)
     //r.POST("signin", handlers.Signin)
     //r.POST("signout", handler.Signout)
 
 	if buildMode == "DEV" {
-		r.GET("/ping", handlers.Ping)
-		r.GET("/playground", handlers.PlaygroundHandler(queryPath))
+		r.Get("/ping", handlers.Ping)
+		r.Get("/playground", handlers.PlaygroundHandler(queryPath))
+
 		// Serve frontend static files
-		r.Static("/", "./web/public")
+		tools.FileServer(r, "/", "./web/public")
 	}
 
     // Serve Graphql Api
-    r.POST(queryPath, handlers.GraphqlHandler())
-
-
+    r.Post(queryPath, handlers.GraphqlHandler())
 
     log.Println("Running @ http://" + HOST + ":" + PORT)
-    r.Logger.Fatal(r.Start(HOST + ":" + PORT))
+    http.ListenAndServe(HOST + ":" + PORT, r)
 }
 
 
