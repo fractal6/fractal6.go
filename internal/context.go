@@ -19,14 +19,14 @@ func RouterContextToContextMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func RouterContextFromContext(ctx context.Context) (*echo.Context, error) {
+func RouterContextFromContext(ctx context.Context) (echo.Context, error) {
 	routerContext := ctx.Value("RouterContextKey")
 	if routerContext == nil {
 		err := fmt.Errorf("could not retrieve router Context")
 		return nil, err
 	}
 
-	ec, ok := routerContext.(*echo.Context)
+	ec, ok := routerContext.(echo.Context)
 	if !ok {
 		err := fmt.Errorf("router Context has wrong type")
 		return nil, err

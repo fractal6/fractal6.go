@@ -11,6 +11,9 @@ MOD := "zerogov/fractal6.go"
 
 default: build
 
+run:
+	go run main.go run
+
 build:
 	go build $(GOFLAGS) -o $(GOBIN)/$(RELEASE) main.go
 

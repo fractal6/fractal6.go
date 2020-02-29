@@ -50,7 +50,7 @@ func RunServer() {
 	r.Use(internal.RouterContextToContextMiddleware)
 
     //r.POST("signup", handler.Signup)
-    r.POST("signin", handler.Signin)
+    //r.POST("signin", handlers.Signin)
     //r.POST("signout", handler.Signout)
 
 	if buildMode == "DEV" {

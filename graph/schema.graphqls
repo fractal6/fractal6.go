@@ -18,14 +18,14 @@ input NewTodo {
   userId: String!
 }
 
-input Cred {
+input inputCred {
     username: String!
     password: String!
 }
 
 type Mutation {
   createTodo(input: NewTodo!): Todo!
-  signUp(input: Cred!): Cred!
+  signUp(input: inputCred!): Cred!
 }
 
 

@@ -5,10 +5,11 @@ package graph
 import (
 	"context"
 	"fmt"
+	"math/rand"
+
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
 	"zerogov/fractal6.go/internal"
-	"math/rand"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
@@ -22,16 +23,21 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	fmt.Println(ctx)
+func (r *mutationResolver) SignUp(ctx context.Context, input model.InputCred) (*model.Cred, error) {
+
 	c, err := internal.RouterContextFromContext(ctx)
     fmt.Println(ctx)
     fmt.Println(c)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println(c)
+    cred, err := getCred(c, input)
+    if err != nil {
+        fmt.Println(err, "dfzfefz ")
+        return nil, err
+    }
 
+    return &cred, nil
+}
+
+func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
 }
 
@@ -40,7 +46,8 @@ func (r *todoResolver) Nth(ctx context.Context, obj *model.Todo) (*int, error) {
 }
 
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
-	return &model.User{ID: obj.UserId, Name: "user " + obj.UserId}, nil
+	n := "user " + obj.UserId
+	return &model.User{ID: obj.UserId, Name: &n}, nil
 }
 
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
