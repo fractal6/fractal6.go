@@ -20,5 +20,5 @@ build:
 prod:
 	go build -trimpath $(GOFLAGS_PROD) -ldflags "-X $(MOD)/cmd.buildMode=PROD"  -o $(GOBIN)/$(RELEASE) main.go
 
-update:
+generate:
 	go generate ./...

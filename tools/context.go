@@ -1,4 +1,4 @@
-package internal
+package tools
 
 import (
     "fmt"
@@ -11,7 +11,7 @@ type GlobalContext struct {
     ctx    context.Context
 }
 
-func RouterContextToContextMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func EchoContextToContextMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := context.WithValue(c.Request().Context(), "RouterContextKey", c)
 		c.SetRequest(c.Request().WithContext(ctx))
@@ -19,7 +19,7 @@ func RouterContextToContextMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func RouterContextFromContext(ctx context.Context) (echo.Context, error) {
+func EchoContextFromContext(ctx context.Context) (echo.Context, error) {
 	routerContext := ctx.Value("RouterContextKey")
 	if routerContext == nil {
 		err := fmt.Errorf("could not retrieve router Context")

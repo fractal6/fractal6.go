@@ -23,21 +23,22 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 }
 
 func (r *mutationResolver) SignUp(ctx context.Context, input model.InputCred) (*model.Cred, error) {
+	fmt.Println(ctx)
+	cred, err := getCred(ctx, input)
+	if err != nil {
+		fmt.Println(err, "dfzfefz ")
+		return nil, err
+	}
 
-	//c, err := internal.RouterContextFromContext(ctx)
-    //fmt.Println(c)
-    fmt.Println(ctx)
-    cred, err := getCred(ctx, input)
-    if err != nil {
-        fmt.Println(err, "dfzfefz ")
-        return nil, err
-    }
-
-    return &cred, nil
+	return &cred, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
+}
+
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *todoResolver) Nth(ctx context.Context, obj *model.Todo) (*int, error) {
