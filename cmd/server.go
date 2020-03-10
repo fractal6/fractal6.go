@@ -40,6 +40,7 @@ var runCmd = &cobra.Command{
 func RunServer() {
     HOST := viper.GetString("server.host")
     PORT := viper.GetString("server.port")
+    gqlConfig := viper.GetStringMap("graphql")
 
     r := chi.NewRouter()
 
@@ -68,7 +69,7 @@ func RunServer() {
 	}
 
     // Serve Graphql Api
-    r.Post(queryPath, handlers.GraphqlHandler())
+    r.Post(queryPath, handlers.GraphqlHandler(gqlConfig))
 
     log.Println("Running @ http://" + HOST + ":" + PORT)
     http.ListenAndServe(HOST + ":" + PORT, r)

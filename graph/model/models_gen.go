@@ -8,65 +8,287 @@ import (
 	"strconv"
 )
 
-type Cred struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+type Node interface {
+	IsNode()
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type Post interface {
+	IsPost()
+}
+
+type AddTensionInput struct {
+	Title       string      `json:"title"`
+	Message     *string     `json:"message"`
+	CreatedAt   *string     `json:"createdAt"`
+	Nth         *int        `json:"nth"`
+	Type        TensionType `json:"type_"`
+	Emitter     *NodeRef    `json:"emitter"`
+	Receivers   []*NodeRef  `json:"receivers"`
+	Severity    *int        `json:"severity"`
+	IsAnonymous *bool       `json:"isAnonymous"`
+}
+
+type AddTensionPayload struct {
+	Tension []*Tension `json:"tension"`
+	NumUids *int       `json:"numUids"`
+}
+
+type AddUserInput struct {
+	Username string     `json:"username"`
+	Roles    []*RoleRef `json:"roles"`
+}
+
+type AddUserPayload struct {
+	User    []*User `json:"user"`
+	NumUids *int    `json:"numUids"`
+}
+
+type Circle struct {
+	NChild      *int       `json:"n_child"`
+	NCircles    *int       `json:"n_circles"`
+	NRoles      *int       `json:"n_roles"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	Mandate     *string    `json:"mandate"`
+	CreatedAt   *string    `json:"createdAt"`
+	CreatedBy   *User      `json:"createdBy"`
+	Parent      Node       `json:"parent"`
+	Children    []Node     `json:"children"`
+	TensionsOut []*Tension `json:"tensions_out"`
+	TensionsIn  []*Tension `json:"tensions_in"`
+}
+
+func (Circle) IsNode() {}
+
+type Mandate struct {
+	Purpose          string   `json:"purpose"`
+	Responsabilities *string  `json:"responsabilities"`
+	Domains          []string `json:"domains"`
+}
+
+type NodeRef struct {
+	ID string `json:"id"`
+}
+
+type Role struct {
+	Skills      []string   `json:"skills"`
+	User        *User      `json:"user"`
+	Second      *User      `json:"second"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	Mandate     *string    `json:"mandate"`
+	CreatedAt   *string    `json:"createdAt"`
+	CreatedBy   *User      `json:"createdBy"`
+	Parent      Node       `json:"parent"`
+	Children    []Node     `json:"children"`
+	TensionsOut []*Tension `json:"tensions_out"`
+	TensionsIn  []*Tension `json:"tensions_in"`
+}
+
+func (Role) IsNode() {}
+
+type RoleRef struct {
+	ID          *string       `json:"id"`
+	Title       *string       `json:"title"`
+	Mandate     *string       `json:"mandate"`
+	CreatedAt   *string       `json:"createdAt"`
+	CreatedBy   *UserRef      `json:"createdBy"`
+	Parent      *NodeRef      `json:"parent"`
+	Children    []*NodeRef    `json:"children"`
+	TensionsOut []*TensionRef `json:"tensions_out"`
+	TensionsIn  []*TensionRef `json:"tensions_in"`
+	Skills      []string      `json:"skills"`
+	User        *UserRef      `json:"user"`
+	Second      *UserRef      `json:"second"`
+}
+
+type Tension struct {
+	Nth         *int        `json:"nth"`
+	Type        TensionType `json:"type_"`
+	Emitter     Node        `json:"emitter"`
+	Receivers   []Node      `json:"receivers"`
+	Severity    *int        `json:"severity"`
+	IsAnonymous *bool       `json:"isAnonymous"`
+	ID          string      `json:"id"`
+	Title       string      `json:"title"`
+	Message     *string     `json:"message"`
+	CreatedAt   *string     `json:"createdAt"`
+}
+
+func (Tension) IsPost() {}
+
+type TensionRef struct {
+	ID          *string      `json:"id"`
+	Title       *string      `json:"title"`
+	Message     *string      `json:"message"`
+	CreatedAt   *string      `json:"createdAt"`
+	Nth         *int         `json:"nth"`
+	Type        *TensionType `json:"type_"`
+	Emitter     *NodeRef     `json:"emitter"`
+	Receivers   []*NodeRef   `json:"receivers"`
+	Severity    *int         `json:"severity"`
+	IsAnonymous *bool        `json:"isAnonymous"`
 }
 
 type User struct {
 	ID       string  `json:"id"`
-	Name     *string `json:"name"`
 	Username string  `json:"username"`
-	Password *string `json:"password"`
+	Password string  `json:"password"`
+	Roles    []*Role `json:"roles"`
 }
 
-type InputCred struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+type UserRef struct {
+	ID       *string    `json:"id"`
+	Username *string    `json:"username"`
+	Password *string    `json:"password"`
+	Roles    []*RoleRef `json:"roles"`
 }
 
-type Role string
+type DgraphIndex string
 
 const (
-	RoleAdmin Role = "ADMIN"
-	RoleUser  Role = "USER"
+	DgraphIndexInt      DgraphIndex = "int"
+	DgraphIndexFloat    DgraphIndex = "float"
+	DgraphIndexBool     DgraphIndex = "bool"
+	DgraphIndexHash     DgraphIndex = "hash"
+	DgraphIndexExact    DgraphIndex = "exact"
+	DgraphIndexTerm     DgraphIndex = "term"
+	DgraphIndexFulltext DgraphIndex = "fulltext"
+	DgraphIndexTrigram  DgraphIndex = "trigram"
+	DgraphIndexRegexp   DgraphIndex = "regexp"
+	DgraphIndexYear     DgraphIndex = "year"
+	DgraphIndexMonth    DgraphIndex = "month"
+	DgraphIndexDay      DgraphIndex = "day"
+	DgraphIndexHour     DgraphIndex = "hour"
 )
 
-var AllRole = []Role{
-	RoleAdmin,
-	RoleUser,
+var AllDgraphIndex = []DgraphIndex{
+	DgraphIndexInt,
+	DgraphIndexFloat,
+	DgraphIndexBool,
+	DgraphIndexHash,
+	DgraphIndexExact,
+	DgraphIndexTerm,
+	DgraphIndexFulltext,
+	DgraphIndexTrigram,
+	DgraphIndexRegexp,
+	DgraphIndexYear,
+	DgraphIndexMonth,
+	DgraphIndexDay,
+	DgraphIndexHour,
 }
 
-func (e Role) IsValid() bool {
+func (e DgraphIndex) IsValid() bool {
 	switch e {
-	case RoleAdmin, RoleUser:
+	case DgraphIndexInt, DgraphIndexFloat, DgraphIndexBool, DgraphIndexHash, DgraphIndexExact, DgraphIndexTerm, DgraphIndexFulltext, DgraphIndexTrigram, DgraphIndexRegexp, DgraphIndexYear, DgraphIndexMonth, DgraphIndexDay, DgraphIndexHour:
 		return true
 	}
 	return false
 }
 
-func (e Role) String() string {
+func (e DgraphIndex) String() string {
 	return string(e)
 }
 
-func (e *Role) UnmarshalGQL(v interface{}) error {
+func (e *DgraphIndex) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = Role(str)
+	*e = DgraphIndex(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Role", str)
+		return fmt.Errorf("%s is not a valid DgraphIndex", str)
 	}
 	return nil
 }
 
-func (e Role) MarshalGQL(w io.Writer) {
+func (e DgraphIndex) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NodeType string
+
+const (
+	NodeTypeCircle NodeType = "Circle"
+	NodeTypeRole   NodeType = "Role"
+)
+
+var AllNodeType = []NodeType{
+	NodeTypeCircle,
+	NodeTypeRole,
+}
+
+func (e NodeType) IsValid() bool {
+	switch e {
+	case NodeTypeCircle, NodeTypeRole:
+		return true
+	}
+	return false
+}
+
+func (e NodeType) String() string {
+	return string(e)
+}
+
+func (e *NodeType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeType", str)
+	}
+	return nil
+}
+
+func (e NodeType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TensionType string
+
+const (
+	TensionTypeGovernance  TensionType = "Governance"
+	TensionTypeOperational TensionType = "Operational"
+	TensionTypePersonal    TensionType = "Personal"
+	TensionTypeHelp        TensionType = "Help"
+)
+
+var AllTensionType = []TensionType{
+	TensionTypeGovernance,
+	TensionTypeOperational,
+	TensionTypePersonal,
+	TensionTypeHelp,
+}
+
+func (e TensionType) IsValid() bool {
+	switch e {
+	case TensionTypeGovernance, TensionTypeOperational, TensionTypePersonal, TensionTypeHelp:
+		return true
+	}
+	return false
+}
+
+func (e TensionType) String() string {
+	return string(e)
+}
+
+func (e *TensionType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TensionType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TensionType", str)
+	}
+	return nil
+}
+
+func (e TensionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
