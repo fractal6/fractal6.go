@@ -11,19 +11,19 @@ import (
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (*model.AddUserPayload, error) {
-    for _, ipt := range input {
-        fmt.Println(ipt.Username)
-    }
+	for _, ipt := range input {
+		fmt.Println(ipt.Username)
+	}
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error) {
-    //fmt.Println(input.Title)
+	//fmt.Println(input.Title)
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) QueryUser(ctx context.Context) ([]*model.User, error) {
-    fmt.Println(ctx)
+	fmt.Println(ctx)
 	panic(fmt.Errorf("not implemented"))
 }
 

@@ -8,7 +8,7 @@ MOD := "zerogov/fractal6.go"
 # LDFLAGS see versioning, hash etc...
 
 .PHONY: build prod
-
+.ONESHELL:
 default: build
 
 run:
@@ -21,4 +21,6 @@ prod:
 	go build -trimpath $(GOFLAGS_PROD) -ldflags "-X $(MOD)/cmd.buildMode=PROD"  -o $(GOBIN)/$(RELEASE) main.go
 
 generate:
+	cd ../schema && make gen
+	cd -
 	go generate ./...

@@ -620,9 +620,45 @@ type Mutation {
 }
 
 
+#
+# Inputs
+#
+
+input AddUserInput {
+  username: String!
+  password: String!
+  roles: [RoleRef!]
+}
+
+input AddTensionInput {
+  title: String!
+  message: String
+  createdAt: DateTime
+  nth: Int
+  type_: TensionType!
+  emitter: NodeRef
+  receivers: [NodeRef!]
+  severity: Int
+  isAnonymous: Boolean
+}
 
 #
-# Inputs and payloads
+# Payloads
+#
+
+type AddUserPayload {
+  user: [User]
+  numUids: Int
+}
+
+type AddTensionPayload {
+  tension: [Tension]
+  numUids: Int
+}
+
+
+#
+# References
 #
 
 
@@ -663,33 +699,6 @@ input TensionRef {
   receivers: [NodeRef!]
   severity: Int
   isAnonymous: Boolean
-}
-
-input AddUserInput {
-  username: String!
-  roles: [RoleRef!]
-}
-
-type AddUserPayload {
-  user: [User]
-  numUids: Int
-}
-
-input AddTensionInput {
-  title: String!
-  message: String
-  createdAt: DateTime
-  nth: Int
-  type_: TensionType!
-  emitter: NodeRef
-  receivers: [NodeRef!]
-  severity: Int
-  isAnonymous: Boolean
-}
-
-type AddTensionPayload {
-  tension: [Tension]
-  numUids: Int
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "../schema/gen/type.graphql", Input: `
@@ -4156,6 +4165,12 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		case "username":
 			var err error
 			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

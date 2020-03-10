@@ -35,6 +35,7 @@ type AddTensionPayload struct {
 
 type AddUserInput struct {
 	Username string     `json:"username"`
+	Password string     `json:"password"`
 	Roles    []*RoleRef `json:"roles"`
 }
 
