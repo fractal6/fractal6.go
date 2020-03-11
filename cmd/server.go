@@ -15,6 +15,7 @@ import (
 
 var queryPath, buildMode string
 
+
 func init() {
     rootCmd.AddCommand(runCmd)
     queryPath = "/api"
@@ -23,8 +24,8 @@ func init() {
         buildMode = "DEV"
     } else {
         buildMode = "PROD"
-	}
-		
+    }
+        
 }
 
 var runCmd = &cobra.Command{
@@ -47,26 +48,30 @@ func RunServer() {
     // Middleware stack
     r.Use(middleware.RequestID)
     r.Use(middleware.RealIP)
-    //r.Use(internal.RouterContextToContextMiddleware)
+    r.Use(tools.RequestContextMiddleware)
     r.Use(middleware.Logger)
     r.Use(middleware.Recoverer)
 
-	// Set a timeout value on the request context (ctx), that will signal
-	// through ctx.Done() that the request has timed out and further
-	// processing should be stopped.
-	r.Use(middleware.Timeout(60 * time.Second))
+    // Set a timeout value on the request context (ctx), that will signal
+    // through ctx.Done() that the request has timed out and further
+    // processing should be stopped.
+    r.Use(middleware.Timeout(60 * time.Second))
 
     //r.POST("signup", handler.Signup)
     //r.POST("signin", handlers.Signin)
     //r.POST("signout", handler.Signout)
 
-	if buildMode == "DEV" {
-		r.Get("/ping", handlers.Ping)
-		r.Get("/playground", handlers.PlaygroundHandler(queryPath))
+    if buildMode == "DEV" {
+        // Serve Graphql Playground
+        r.Get("/playground", handlers.PlaygroundHandler(queryPath))
+        r.Get("/ping", handlers.Ping)
 
-		// Serve frontend static files
-		tools.FileServer(r, "/", "./web/public")
-	}
+        // Serve frontend static files
+        tools.FileServer(r, "/", "./web/public")
+
+        // Overwrite gql config
+        gqlConfig["introspection"] = true
+    }
 
     // Serve Graphql Api
     r.Post(queryPath, handlers.GraphqlHandler(gqlConfig))

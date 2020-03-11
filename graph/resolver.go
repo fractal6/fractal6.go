@@ -4,9 +4,9 @@
 package graph
 
 import (
-   // "fmt"
-   // "context"
-    //"github.com/99designs/gqlgen/graphql"
+    //"fmt"
+    "context"
+    "github.com/99designs/gqlgen/graphql"
     //"golang.org/x/crypto/bcrypt" 
 
     //"zerogov/fractal6.go/graph/model"
@@ -27,6 +27,7 @@ type Resolver struct{
 func Init() gen.Config {
     c := gen.Config{Resolvers: &Resolver{}}
     //c.Directives.HasRole = hasRoleMiddleware
+    c.Directives.Id = nothing
     return c
 }
 
@@ -35,3 +36,7 @@ func Init() gen.Config {
 * Business Logic layer methods
 *
 */
+
+func nothing (ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    return next(ctx)
+}

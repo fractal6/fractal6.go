@@ -10,4 +10,4 @@ port = ""
 
 [graphql]
 complexity_limit = 200 # 50
-introspection = true
+introspection = false

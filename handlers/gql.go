@@ -6,7 +6,6 @@ import (
 
 	gen "zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph"
-	//"zerogov/fractal6.go/internal"
 )
 
 
