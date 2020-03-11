@@ -11,6 +11,7 @@ import (
 
     //"zerogov/fractal6.go/graph/model"
     gen "zerogov/fractal6.go/graph/generated"
+	"zerogov/fractal6.go/tools"
 )
 
 /*
@@ -21,11 +22,17 @@ import (
 
 type Resolver struct{
     // pointer on dgraph
+    db tools.Dgraph
+    
 }
 
 // Init initialize shema config and Directives...
 func Init() gen.Config {
-    c := gen.Config{Resolvers: &Resolver{}}
+    db := tools.Dgraph{
+        Url: "http://localhost:8080/graphql",
+    }
+    r := Resolver{db:db}
+    c := gen.Config{Resolvers: &r}
     //c.Directives.HasRole = hasRoleMiddleware
     c.Directives.Id = nothing
     return c

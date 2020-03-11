@@ -5,25 +5,26 @@ package graph
 import (
 	"context"
 	"fmt"
-    //"encoding/json"
 
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
-	//"zerogov/fractal6.go/tools"
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (*model.AddUserPayload, error) {
-    fmt.Println(ctx.Value("body"))
+
+    body := ctx.Value("body").([]byte)
+    res := r.db.Request(body)
+
+    fmt.Println(string(body))
+    fmt.Println(string(res))
 
     var users []*model.User
 	for _, ipt := range input {
-
         user := &model.User{
             Username: ipt.Username, 
             Password: ipt.Password,
         }
         users = append(users, user)
-
 	}
 
     up := &model.AddUserPayload{

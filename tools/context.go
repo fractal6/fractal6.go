@@ -9,9 +9,6 @@ import (
     //"github.com/go-chi/chi"
 )
 
-type test_struct struct {
-	Test string
-}
 
 func RequestContextMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -30,9 +27,8 @@ func RequestContextMiddleware(next http.Handler) http.Handler {
             // Restore the io.ReadCloser to its original state
              r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
             // Forward body in context
-            ctx = context.WithValue(ctx, "body", string(body))
+            ctx = context.WithValue(ctx, "body", body)
         }
-
         next.ServeHTTP(w, r.WithContext(ctx))
     })
 }
