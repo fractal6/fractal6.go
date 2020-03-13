@@ -35,6 +35,7 @@ func Init() gen.Config {
     c := gen.Config{Resolvers: &r}
     //c.Directives.HasRole = hasRoleMiddleware
     c.Directives.Id = nothing
+    c.Directives.HasInverse = nothing2
     return c
 }
 
@@ -45,5 +46,9 @@ func Init() gen.Config {
 */
 
 func nothing (ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    return next(ctx)
+}
+
+func nothing2 (ctx context.Context, obj interface{}, next graphql.Resolver, key string) (interface{}, error) {
     return next(ctx)
 }

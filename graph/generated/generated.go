@@ -80,8 +80,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddTension func(childComplexity int, input []*model.AddTensionInput) int
-		AddUser    func(childComplexity int, input []*model.AddUserInput) int
+		AddTension func(childComplexity int, input []model.AddTensionInput) int
+		AddUser    func(childComplexity int, input []model.AddUserInput) int
 	}
 
 	Query struct {
@@ -127,8 +127,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	AddUser(ctx context.Context, input []*model.AddUserInput) (*model.AddUserPayload, error)
-	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
+	AddUser(ctx context.Context, input []model.AddUserInput) (*model.AddUserPayload, error)
+	AddTension(ctx context.Context, input []model.AddTensionInput) (*model.AddTensionPayload, error)
 }
 type QueryResolver interface {
 	QueryUser(ctx context.Context) ([]*model.User, error)
@@ -294,7 +294,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddTension(childComplexity, args["input"].([]*model.AddTensionInput)), true
+		return e.complexity.Mutation.AddTension(childComplexity, args["input"].([]model.AddTensionInput)), true
 
 	case "Mutation.addUser":
 		if e.complexity.Mutation.AddUser == nil {
@@ -306,7 +306,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddUser(childComplexity, args["input"].([]*model.AddUserInput)), true
+		return e.complexity.Mutation.AddUser(childComplexity, args["input"].([]model.AddUserInput)), true
 
 	case "Query.queryMandate":
 		if e.complexity.Query.QueryMandate == nil {
@@ -854,9 +854,9 @@ func (ec *executionContext) dir_search_args(ctx context.Context, rawArgs map[str
 func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*model.AddTensionInput
+	var arg0 []model.AddTensionInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddTensionInput2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -868,9 +868,9 @@ func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*model.AddUserInput
+	var arg0 []model.AddUserInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddUserInput2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1499,10 +1499,10 @@ func (ec *executionContext) _Circle_tensions_out(ctx context.Context, field grap
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]*model.Tension); ok {
+		if data, ok := tmp.([]model.Tension); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1511,9 +1511,9 @@ func (ec *executionContext) _Circle_tensions_out(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Tension)
+	res := resTmp.([]model.Tension)
 	fc.Result = res
-	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+	return ec.marshalOTension2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Circle_tensions_in(ctx context.Context, field graphql.CollectedField, obj *model.Circle) (ret graphql.Marshaler) {
@@ -1542,9 +1542,9 @@ func (ec *executionContext) _Circle_tensions_in(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Tension)
+	res := resTmp.([]model.Tension)
 	fc.Result = res
-	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+	return ec.marshalOTension2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_purpose(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -1691,7 +1691,7 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddUser(rctx, args["input"].([]*model.AddUserInput))
+		return ec.resolvers.Mutation().AddUser(rctx, args["input"].([]model.AddUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1729,7 +1729,7 @@ func (ec *executionContext) _Mutation_addTension(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddTension(rctx, args["input"].([]*model.AddTensionInput))
+		return ec.resolvers.Mutation().AddTension(rctx, args["input"].([]model.AddTensionInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2375,10 +2375,10 @@ func (ec *executionContext) _Role_tensions_out(ctx context.Context, field graphq
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]*model.Tension); ok {
+		if data, ok := tmp.([]model.Tension); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2387,9 +2387,9 @@ func (ec *executionContext) _Role_tensions_out(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Tension)
+	res := resTmp.([]model.Tension)
 	fc.Result = res
-	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+	return ec.marshalOTension2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Role_tensions_in(ctx context.Context, field graphql.CollectedField, obj *model.Role) (ret graphql.Marshaler) {
@@ -2418,9 +2418,9 @@ func (ec *executionContext) _Role_tensions_in(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Tension)
+	res := resTmp.([]model.Tension)
 	fc.Result = res
-	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+	return ec.marshalOTension2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_nth(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -3018,10 +3018,10 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]*model.Role); ok {
+		if data, ok := tmp.([]model.Role); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Role`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []zerogov/fractal6.go/graph/model.Role`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3030,9 +3030,9 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Role)
+	res := resTmp.([]model.Role)
 	fc.Result = res
-	return ec.marshalORole2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleᚄ(ctx, field.Selections, res)
+	return ec.marshalORole2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -4134,7 +4134,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			}
 		case "receivers":
 			var err error
-			it.Receivers, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			it.Receivers, err = ec.unmarshalONodeRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4176,7 +4176,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			}
 		case "roles":
 			var err error
-			it.Roles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
+			it.Roles, err = ec.unmarshalORoleRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4248,19 +4248,19 @@ func (ec *executionContext) unmarshalInputRoleRef(ctx context.Context, obj inter
 			}
 		case "children":
 			var err error
-			it.Children, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			it.Children, err = ec.unmarshalONodeRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "tensions_out":
 			var err error
-			it.TensionsOut, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			it.TensionsOut, err = ec.unmarshalOTensionRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "tensions_in":
 			var err error
-			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4338,7 +4338,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			}
 		case "receivers":
 			var err error
-			it.Receivers, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			it.Receivers, err = ec.unmarshalONodeRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4386,7 +4386,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			}
 		case "roles":
 			var err error
-			it.Roles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
+			it.Roles, err = ec.unmarshalORoleRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5062,7 +5062,7 @@ func (ec *executionContext) unmarshalNAddTensionInput2zerogovᚋfractal6ᚗgoᚋ
 	return ec.unmarshalInputAddTensionInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx context.Context, v interface{}) ([]*model.AddTensionInput, error) {
+func (ec *executionContext) unmarshalNAddTensionInput2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx context.Context, v interface{}) ([]model.AddTensionInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -5072,29 +5072,21 @@ func (ec *executionContext) unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6�
 		}
 	}
 	var err error
-	res := make([]*model.AddTensionInput, len(vSlice))
+	res := make([]model.AddTensionInput, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNAddTensionInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAddTensionInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddTensionInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInput(ctx context.Context, v interface{}) (*model.AddTensionInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNAddTensionInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInput(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNAddUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
 	return ec.unmarshalInputAddUserInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNAddUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserInput, error) {
+func (ec *executionContext) unmarshalNAddUserInput2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx context.Context, v interface{}) ([]model.AddUserInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -5104,22 +5096,14 @@ func (ec *executionContext) unmarshalNAddUserInput2ᚕᚖzerogovᚋfractal6ᚗgo
 		}
 	}
 	var err error
-	res := make([]*model.AddUserInput, len(vSlice))
+	res := make([]model.AddUserInput, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNAddUserInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAddUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddUserInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (*model.AddUserInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNAddUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInput(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -5173,38 +5157,12 @@ func (ec *executionContext) unmarshalNNodeRef2zerogovᚋfractal6ᚗgoᚋgraphᚋ
 	return ec.unmarshalInputNodeRef(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx context.Context, v interface{}) (*model.NodeRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNNodeRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
-	return &res, err
-}
-
 func (ec *executionContext) marshalNRole2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRole(ctx context.Context, sel ast.SelectionSet, v model.Role) graphql.Marshaler {
 	return ec._Role(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNRole2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRole(ctx context.Context, sel ast.SelectionSet, v *model.Role) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Role(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNRoleRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRef(ctx context.Context, v interface{}) (model.RoleRef, error) {
 	return ec.unmarshalInputRoleRef(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNRoleRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRef(ctx context.Context, v interface{}) (*model.RoleRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNRoleRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRef(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -5225,26 +5183,8 @@ func (ec *executionContext) marshalNTension2zerogovᚋfractal6ᚗgoᚋgraphᚋmo
 	return ec._Tension(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNTension2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx context.Context, sel ast.SelectionSet, v *model.Tension) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Tension(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNTensionRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx context.Context, v interface{}) (model.TensionRef, error) {
 	return ec.unmarshalInputTensionRef(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNTensionRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx context.Context, v interface{}) (*model.TensionRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNTensionRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNTensionType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx context.Context, v interface{}) (model.TensionType, error) {
@@ -5758,7 +5698,7 @@ func (ec *executionContext) unmarshalONodeRef2zerogovᚋfractal6ᚗgoᚋgraphᚋ
 	return ec.unmarshalInputNodeRef(ctx, v)
 }
 
-func (ec *executionContext) unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx context.Context, v interface{}) ([]*model.NodeRef, error) {
+func (ec *executionContext) unmarshalONodeRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx context.Context, v interface{}) ([]model.NodeRef, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -5768,9 +5708,9 @@ func (ec *executionContext) unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 		}
 	}
 	var err error
-	res := make([]*model.NodeRef, len(vSlice))
+	res := make([]model.NodeRef, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNNodeRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -5786,7 +5726,7 @@ func (ec *executionContext) unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 	return &res, err
 }
 
-func (ec *executionContext) marshalORole2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Role) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -5813,7 +5753,7 @@ func (ec *executionContext) marshalORole2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRole2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRole(ctx, sel, v[i])
+			ret[i] = ec.marshalNRole2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRole(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5826,7 +5766,7 @@ func (ec *executionContext) marshalORole2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 	return ret
 }
 
-func (ec *executionContext) unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx context.Context, v interface{}) ([]*model.RoleRef, error) {
+func (ec *executionContext) unmarshalORoleRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx context.Context, v interface{}) ([]model.RoleRef, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -5836,9 +5776,9 @@ func (ec *executionContext) unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 		}
 	}
 	var err error
-	res := make([]*model.RoleRef, len(vSlice))
+	res := make([]model.RoleRef, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNRoleRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRef(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNRoleRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRef(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -5905,6 +5845,46 @@ func (ec *executionContext) marshalOTension2zerogovᚋfractal6ᚗgoᚋgraphᚋmo
 	return ec._Tension(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalOTension2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Tension) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTension2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx context.Context, sel ast.SelectionSet, v []*model.Tension) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5945,46 +5925,6 @@ func (ec *executionContext) marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 	return ret
 }
 
-func (ec *executionContext) marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Tension) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNTension2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalOTension2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx context.Context, sel ast.SelectionSet, v *model.Tension) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5992,7 +5932,7 @@ func (ec *executionContext) marshalOTension2ᚖzerogovᚋfractal6ᚗgoᚋgraph�
 	return ec._Tension(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx context.Context, v interface{}) ([]*model.TensionRef, error) {
+func (ec *executionContext) unmarshalOTensionRef2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx context.Context, v interface{}) ([]model.TensionRef, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -6002,9 +5942,9 @@ func (ec *executionContext) unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 		}
 	}
 	var err error
-	res := make([]*model.TensionRef, len(vSlice))
+	res := make([]model.TensionRef, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNTensionRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNTensionRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}

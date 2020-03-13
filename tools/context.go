@@ -27,7 +27,7 @@ func RequestContextMiddleware(next http.Handler) http.Handler {
             // Restore the io.ReadCloser to its original state
              r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
             // Forward body in context
-            ctx = context.WithValue(ctx, "body", body)
+            ctx = context.WithValue(ctx, "request_body", body)
         }
         next.ServeHTTP(w, r.WithContext(ctx))
     })

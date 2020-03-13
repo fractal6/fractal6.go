@@ -5,36 +5,52 @@ package graph
 import (
 	"context"
 	"fmt"
+    "strings"
 
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
 )
 
-func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (*model.AddUserPayload, error) {
+type JsonAtom map[string]interface{}
 
-    body := ctx.Value("body").([]byte)
-    res := r.db.Request(body)
-
-    fmt.Println(string(body))
-    fmt.Println(string(res))
-
-    var users []*model.User
-	for _, ipt := range input {
-        user := &model.User{
-            Username: ipt.Username, 
-            Password: ipt.Password,
-        }
-        users = append(users, user)
-	}
-
-    up := &model.AddUserPayload{
-        User: users,
-    }
-
-    return up, nil
+type GqlResponse struct {
+	Adduser model.AddUserPayload `json:"addUser"`
+}
+type Res struct {
+	Data GqlResponse `json:"data"`
+	Errors []JsonAtom `json:"errors"` // message, locations, path
 }
 
-func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error) {
+func (r *mutationResolver) AddUser(ctx context.Context, input []model.AddUserInput) (*model.AddUserPayload, error) {
+
+
+
+	body := ctx.Value("request_body").([]byte)
+	res := &Res{} // or new(Res)
+	err := r.db.Request(body, res)
+	if err != nil {
+		panic(err)
+	}
+	//fmt.Println(string(body))
+	//fmt.Println(res)
+
+	data := res.Data
+    d := &data.Adduser
+	errors := res.Errors
+
+	if errors != nil {
+        var msg []string
+        for _, m := range res.Errors {
+            msg = append(msg, m["message"].(string))
+        }
+		err := fmt.Errorf("%s", strings.Join(msg, " | "))
+        return d, err
+    }
+
+	return d, nil
+}
+
+func (r *mutationResolver) AddTension(ctx context.Context, input []model.AddTensionInput) (*model.AddTensionPayload, error) {
 	//fmt.Println(input.Title)
 	panic(fmt.Errorf("not implemented"))
 }
@@ -57,3 +73,4 @@ func (r *Resolver) Query() generated.QueryResolver       { return &queryResolver
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
