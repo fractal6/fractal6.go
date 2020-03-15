@@ -12,8 +12,8 @@ type Dgraph struct {
     Url string
 }
 
-func (d Dgraph) Request(body []byte, res interface{}) error {
-    req, err := http.NewRequest("POST", d.Url, bytes.NewBuffer(body))
+func (d Dgraph) Request(data []byte, res interface{}) error {
+    req, err := http.NewRequest("POST", d.Url, bytes.NewBuffer(data))
     req.Header.Set("Content-Type", "application/json")
 
     client := &http.Client{}

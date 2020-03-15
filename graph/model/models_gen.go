@@ -23,7 +23,7 @@ type AddTensionInput struct {
 	Nth         *int        `json:"nth"`
 	Type        TensionType `json:"type_"`
 	Emitter     *NodeRef    `json:"emitter"`
-	Receivers   []NodeRef   `json:"receivers"`
+	Receivers   []*NodeRef  `json:"receivers"`
 	Severity    *int        `json:"severity"`
 	IsAnonymous *bool       `json:"isAnonymous"`
 }
@@ -34,9 +34,9 @@ type AddTensionPayload struct {
 }
 
 type AddUserInput struct {
-	Username string    `json:"username"`
-	Password string    `json:"password"`
-	Roles    []RoleRef `json:"roles"`
+	Username string     `json:"username"`
+	Password string     `json:"password"`
+	Roles    []*RoleRef `json:"roles"`
 }
 
 type AddUserPayload struct {
@@ -45,18 +45,18 @@ type AddUserPayload struct {
 }
 
 type Circle struct {
-	NChild      *int      `json:"n_child"`
-	NCircles    *int      `json:"n_circles"`
-	NRoles      *int      `json:"n_roles"`
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Mandate     *string   `json:"mandate"`
-	CreatedAt   *string   `json:"createdAt"`
-	CreatedBy   *User     `json:"createdBy"`
-	Parent      Node      `json:"parent"`
-	Children    []Node    `json:"children"`
-	TensionsOut []Tension `json:"tensions_out"`
-	TensionsIn  []Tension `json:"tensions_in"`
+	NChild      *int       `json:"n_child"`
+	NCircles    *int       `json:"n_circles"`
+	NRoles      *int       `json:"n_roles"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	Mandate     *string    `json:"mandate"`
+	CreatedAt   *string    `json:"createdAt"`
+	CreatedBy   *User      `json:"createdBy"`
+	Parent      Node       `json:"parent"`
+	Children    []Node     `json:"children"`
+	TensionsOut []*Tension `json:"tensions_out"`
+	TensionsIn  []*Tension `json:"tensions_in"`
 }
 
 func (Circle) IsNode() {}
@@ -72,35 +72,35 @@ type NodeRef struct {
 }
 
 type Role struct {
-	Skills      []string  `json:"skills"`
-	User        *User     `json:"user"`
-	Second      *User     `json:"second"`
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Mandate     *string   `json:"mandate"`
-	CreatedAt   *string   `json:"createdAt"`
-	CreatedBy   *User     `json:"createdBy"`
-	Parent      Node      `json:"parent"`
-	Children    []Node    `json:"children"`
-	TensionsOut []Tension `json:"tensions_out"`
-	TensionsIn  []Tension `json:"tensions_in"`
+	Skills      []string   `json:"skills"`
+	User        *User      `json:"user"`
+	Second      *User      `json:"second"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	Mandate     *string    `json:"mandate"`
+	CreatedAt   *string    `json:"createdAt"`
+	CreatedBy   *User      `json:"createdBy"`
+	Parent      Node       `json:"parent"`
+	Children    []Node     `json:"children"`
+	TensionsOut []*Tension `json:"tensions_out"`
+	TensionsIn  []*Tension `json:"tensions_in"`
 }
 
 func (Role) IsNode() {}
 
 type RoleRef struct {
-	ID          *string      `json:"id"`
-	Title       *string      `json:"title"`
-	Mandate     *string      `json:"mandate"`
-	CreatedAt   *string      `json:"createdAt"`
-	CreatedBy   *UserRef     `json:"createdBy"`
-	Parent      *NodeRef     `json:"parent"`
-	Children    []NodeRef    `json:"children"`
-	TensionsOut []TensionRef `json:"tensions_out"`
-	TensionsIn  []TensionRef `json:"tensions_in"`
-	Skills      []string     `json:"skills"`
-	User        *UserRef     `json:"user"`
-	Second      *UserRef     `json:"second"`
+	ID          *string       `json:"id"`
+	Title       *string       `json:"title"`
+	Mandate     *string       `json:"mandate"`
+	CreatedAt   *string       `json:"createdAt"`
+	CreatedBy   *UserRef      `json:"createdBy"`
+	Parent      *NodeRef      `json:"parent"`
+	Children    []*NodeRef    `json:"children"`
+	TensionsOut []*TensionRef `json:"tensions_out"`
+	TensionsIn  []*TensionRef `json:"tensions_in"`
+	Skills      []string      `json:"skills"`
+	User        *UserRef      `json:"user"`
+	Second      *UserRef      `json:"second"`
 }
 
 type Tension struct {
@@ -126,23 +126,23 @@ type TensionRef struct {
 	Nth         *int         `json:"nth"`
 	Type        *TensionType `json:"type_"`
 	Emitter     *NodeRef     `json:"emitter"`
-	Receivers   []NodeRef    `json:"receivers"`
+	Receivers   []*NodeRef   `json:"receivers"`
 	Severity    *int         `json:"severity"`
 	IsAnonymous *bool        `json:"isAnonymous"`
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Roles    []Role `json:"roles"`
+	ID       string  `json:"id"`
+	Username string  `json:"username"`
+	Password string  `json:"password"`
+	Roles    []*Role `json:"roles"`
 }
 
 type UserRef struct {
-	ID       *string   `json:"id"`
-	Username *string   `json:"username"`
-	Password *string   `json:"password"`
-	Roles    []RoleRef `json:"roles"`
+	ID       *string    `json:"id"`
+	Username *string    `json:"username"`
+	Password *string    `json:"password"`
+	Roles    []*RoleRef `json:"roles"`
 }
 
 type DgraphIndex string
