@@ -3,85 +3,93 @@
 package graph
 
 import (
-	"context"
 	"fmt"
+	"context"
 	"strings"
-    "bytes"
     "encoding/json"
-	"text/template"
-    "regexp"
 
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
 	"zerogov/fractal6.go/tools"
+	"zerogov/fractal6.go/tools/gql"
 )
 
-type JsonAtom map[string]interface{}
 
 type GqlResponse struct {
 	Adduser model.AddUserPayload `json:"addUser"`
 }
 type Res struct {
 	Data   GqlResponse `json:"data"`
-	Errors []JsonAtom  `json:"errors"` // message, locations, path
+	Errors []gql.JsonAtom  `json:"errors"` // message, locations, path
 }
 
-var MutationQT *template.Template
+var MutationQ, QueryQ gql.Query
 
 func init() {
 
-    var MutationQ string = `{
-        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
-            {{.QueryName}}( input: $input) {} 
+    MutationQ.Data = `{
+        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) { 
+            {{.QueryName}}( input: $input) {
+                {{.QueryGraph}}
+            } 
         }",
         "variables": {
             "input": {{.InputPayload}}
         }
     }`
-    MutationQ = strings.Replace(MutationQ, `\n`, "", -1)
-    MutationQ = strings.Replace(MutationQ, "\n", "", -1)
-    space := regexp.MustCompile(`\s+`)
-    MutationQ = space.ReplaceAllString(MutationQ, " ")
 
-	MutationQT = template.Must(template.New("mutationGQL").Parse(MutationQ))
+    QueryQ.Data = `{
+        "query": "query {{.QueryName}} { 
+            {{.QueryName}} {
+                {{.QueryGraph}}
+            } 
+        }"
+    }`
+
+    QueryQ.Init()
+    MutationQ.Init()
 }
 
 
 func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (*model.AddUserPayload, error) {
 
-    // Format request
-	reqq := ctx.Value("request_body").([]byte)
-    fmt.Println(string(reqq))
-    ipts := []JsonAtom{}
+    /* Rebuild the Graphql request from this context */
+
+    // Format inputs
+    ipts := []gql.JsonAtom{}
     for _, x := range input {
         ipts = append(ipts, tools.StructToMap(x))
     }
     inputs, _ := json.Marshal(ipts)
-    fieldCollections := GetPreloads(ctx)
-    fmt. Println(fieldCollections)
-    reqInput := map[string]interface{}{
+	//reqq := ctx.Value("request_body").([]byte)
+    //fmt.Println(string(reqq))
+    
+    // Format collected fields
+    queryGraph := strings.Join(GetPreloads(ctx), " ")
+
+    // Build the string request
+    reqInput := gql.JsonAtom{
         "QueryName": "addUser", 
         "InputType": "AddUserInput", 
-        "InputPayload":string(inputs),
+        "InputPayload": string(inputs),
+        "QueryGraph": queryGraph,
     }
-    buf := bytes.Buffer{}
-    MutationQT.Execute(&buf, reqInput)
-    req := buf.String()
+    req := MutationQ.Format(reqInput)
 
-    // Make dgraph request
+    /* Send the dgraph request and follow the results */
+
+    // Dgraph request
 	res := &Res{} // or new(Res)
 	err := r.db.Request([]byte(req), res)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(req))
-	fmt.Println(res)
-
+    // Get and returns the result
+	//fmt.Println(string(req))
+	//fmt.Println(res)
 	data := &res.Data.Adduser
 	errors := res.Errors
-
-
 	if errors != nil {
 		var msg []string
 		for _, m := range res.Errors {
