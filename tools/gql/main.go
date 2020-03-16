@@ -9,6 +9,11 @@ import (
 
 type JsonAtom map[string]interface{}
 
+type Res struct {
+	Data   JsonAtom `json:"data"`
+	Errors []JsonAtom  `json:"errors"` // message, locations, path
+}
+
 type Query struct {
     Data string
     Template *template.Template
@@ -27,7 +32,7 @@ func (q *Query) Init() {
 
     // Load the template
     // @DEBUG: Do we need a template name ?
-    q.Template = template.Must(template.New("a").Parse(q.Data))
+    q.Template = template.Must(template.New("graphql").Parse(q.Data))
 }
 
 func (q Query) Format(m JsonAtom) string {

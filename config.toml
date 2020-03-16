@@ -4,9 +4,11 @@ host = "localhost"
 port = "8888"
 
 
-[database]
-host = ""
-port = ""
+[db]
+host = "localhost"
+port = "8080"
+api = "graphql"
+admin = "admin"
 
 [graphql]
 complexity_limit = 200 # 50
