@@ -11,7 +11,7 @@ type JsonAtom map[string]interface{}
 
 type Res struct {
 	Data   JsonAtom `json:"data"`
-	Errors []JsonAtom  `json:"errors"` // message, locations, path
+	Errors []JsonAtom  `json:"errors"` // message, locations, path, extensions
 }
 
 type Query struct {

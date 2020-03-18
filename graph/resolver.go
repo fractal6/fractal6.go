@@ -89,8 +89,7 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, ip
     ctxRslv := graphql.GetResolverContext(ctx)
     queryName := ctxRslv.Field.Name
     inputType := strings.Split(fmt.Sprintf("%T", ctxRslv.Args["input"]), ".")[1]
-	//reqq := ctx.Value("request_body").([]byte)
-    //fmt.Println(string(reqq))
+    //fmt.Println(string(ctx.Value("request_body").([]byte)))
     // Format inputs
     inputs, _ := json.Marshal(ipts)
     

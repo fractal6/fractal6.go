@@ -48,7 +48,7 @@ func RunServer() {
     // Middleware stack
     r.Use(middleware.RequestID)
     r.Use(middleware.RealIP)
-    r.Use(tools.RequestContextMiddleware)
+    //r.Use(tools.RequestContextMiddleware)
     r.Use(middleware.Logger)
     r.Use(middleware.Recoverer)
 
