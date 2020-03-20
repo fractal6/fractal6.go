@@ -1,17 +1,17 @@
 module zerogov/fractal6.go
 
-go 1.13
+go 1.14
 
 require (
 	github.com/99designs/gqlgen v0.11.1
-	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
-	github.com/gin-gonic/gin v1.5.0
+	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607 // indirect
+	github.com/gin-gonic/gin v1.5.0 // indirect
 	github.com/go-chi/chi v3.3.2+incompatible
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
-	github.com/labstack/echo v3.3.10+incompatible
-	github.com/labstack/echo/v4 v4.1.14
+	github.com/labstack/echo v3.3.10+incompatible // indirect
+	github.com/labstack/echo/v4 v4.1.14 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/lib/pq v1.3.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
