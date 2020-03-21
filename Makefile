@@ -7,8 +7,9 @@ MOD := "zerogov/fractal6.go"
 # TODO versioning
 # LDFLAGS see versioning, hash etc...
 
-.PHONY: build prod
+.PHONY: build prod vendor
 .ONESHELL:
+
 default: build
 
 run:
@@ -20,7 +21,16 @@ build:
 prod:
 	go build -trimpath $(GOFLAGS_PROD) -ldflags "-X $(MOD)/cmd.buildMode=PROD"  -o $(GOBIN)/$(RELEASE) main.go
 
+vendor:
+	go mod vendor
+
+#
+# Generate Graphql code
+#
+
 generate:
-	cd ../schema && make gen
-	cd -
-	go generate ./...
+	cd ../schema && make gen && cd -
+	go run ./scripts/gqlgen.go
+	# Or @DEBUG: why it doesnt work anymore ?
+	#go generate ./...  
+	# go run github.com/99designs/gqlgen generate
