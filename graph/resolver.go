@@ -125,7 +125,9 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, ip
 		return errors
 	}
 
-    err = mapstructure.Decode(res.Data[queryName], data)
+    config := &mapstructure.DecoderConfig{TagName: "json", Result: data}
+    decoder, err := mapstructure.NewDecoder(config)
+    decoder.Decode(res.Data[queryName])
     if err != nil {
         panic(err)
     }
@@ -168,7 +170,9 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
 		return errors
 	}
 
-    err = mapstructure.Decode(res.Data[queryName], data)
+    config := &mapstructure.DecoderConfig{TagName: "json", Result: data}
+    decoder, err := mapstructure.NewDecoder(config)
+    decoder.Decode(res.Data[queryName])
     if err != nil {
         panic(err)
     }
