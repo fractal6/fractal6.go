@@ -105,15 +105,17 @@ type RoleRef struct {
 
 type Tension struct {
 	Nth         *int        `json:"nth"`
+	Title       string      `json:"title"`
 	Type        TensionType `json:"type_"`
 	Emitter     Node        `json:"emitter"`
 	Receivers   []Node      `json:"receivers"`
-	Severity    *int        `json:"severity"`
 	IsAnonymous *bool       `json:"isAnonymous"`
+	Severity    *int        `json:"severity"`
+	NComments   *int        `json:"n_comments"`
 	ID          string      `json:"id"`
-	Title       string      `json:"title"`
 	Message     *string     `json:"message"`
 	CreatedAt   *string     `json:"createdAt"`
+	Author      *User       `json:"author"`
 }
 
 func (Tension) IsPost() {}
