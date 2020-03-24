@@ -110,8 +110,8 @@ type Tension struct {
 	Emitter     Node        `json:"emitter"`
 	Receivers   []Node      `json:"receivers"`
 	IsAnonymous *bool       `json:"isAnonymous"`
-	Severity    *int        `json:"severity"`
-	NComments   *int        `json:"n_comments"`
+	Severity    int         `json:"severity"`
+	NComments   int         `json:"n_comments"`
 	ID          string      `json:"id"`
 	Message     *string     `json:"message"`
 	CreatedAt   *string     `json:"createdAt"`

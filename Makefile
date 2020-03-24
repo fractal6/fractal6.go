@@ -7,8 +7,8 @@ MOD := "zerogov/fractal6.go"
 # TODO versioning
 # LDFLAGS see versioning, hash etc...
 
-.PHONY: build prod vendor
 .ONESHELL:
+.PHONY: build prod vendor
 
 default: build
 
