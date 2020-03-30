@@ -8,7 +8,7 @@ package graph
 import (
     "fmt"
     "context"
-	"strings"
+    "strings"
     "encoding/json"
     "github.com/mitchellh/mapstructure"
     "github.com/spf13/viper"
@@ -16,8 +16,8 @@ import (
     //"golang.org/x/crypto/bcrypt" 
 
     //"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/tools"
-	"zerogov/fractal6.go/tools/gql"
+    "zerogov/fractal6.go/tools"
+    "zerogov/fractal6.go/tools/gql"
     "zerogov/fractal6.go/graph/model"
     gen "zerogov/fractal6.go/graph/generated"
 )
@@ -109,21 +109,21 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, ip
 
     /* Send the dgraph request and follow the results */
     // Dgraph request
-	res := &gql.Res{} // or new(Res)
+    res := &gql.Res{} // or new(Res)
     err := r.db.Request([]byte(req), res)
-	//fmt.Println(string(req))
-	//fmt.Println(res)
-	if err != nil {
-		panic(err)
-	} else if res.Errors != nil {
-		var msg []string
-		for _, m := range res.Errors {
-			msg = append(msg, m["message"].(string))
-		}
+    //fmt.Println(string(req))
+    //fmt.Println(res)
+    if err != nil {
+        panic(err)
+    } else if res.Errors != nil {
+        var msg []string
+        for _, m := range res.Errors {
+            msg = append(msg, m["message"].(string))
+        }
         //DBUG: see gqlgen doc to returns erros as list.
-		errors = fmt.Errorf("%s", strings.Join(msg, " | "))
-		return errors
-	}
+        errors = fmt.Errorf("%s", strings.Join(msg, " | "))
+        return errors
+    }
 
     config := &mapstructure.DecoderConfig{TagName: "json", Result: data}
     decoder, err := mapstructure.NewDecoder(config)
@@ -139,7 +139,7 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     /* Rebuild the Graphql inputs request from this context */
     ctxRslv := graphql.GetResolverContext(ctx)
     queryName := ctxRslv.Field.Name
-	//reqq := ctx.Value("request_body").([]byte)
+    //reqq := ctx.Value("request_body").([]byte)
     //fmt.Println(string(reqq))
     
     // Format collected fields
@@ -154,21 +154,21 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
 
     /* Send the dgraph request and follow the results */
     // Dgraph request
-	res := &gql.Res{} // or new(Res)
+    res := &gql.Res{} // or new(Res)
     err := r.db.Request([]byte(req), res)
-	//fmt.Println(string(req))
-	//fmt.Println(res)
-	if err != nil {
-		panic(err)
-	} else if res.Errors != nil {
-		var msg []string
-		for _, m := range res.Errors {
-			msg = append(msg, m["message"].(string))
-		}
+    //fmt.Println(string(req))
+    //fmt.Println(res)
+    if err != nil {
+        panic(err)
+    } else if res.Errors != nil {
+        var msg []string
+        for _, m := range res.Errors {
+            msg = append(msg, m["message"].(string))
+        }
         //DBUG: see gqlgen doc to returns erros as list.
-		errors = fmt.Errorf("%s", strings.Join(msg, " | "))
-		return errors
-	}
+        errors = fmt.Errorf("%s", strings.Join(msg, " | "))
+        return errors
+    }
 
     config := &mapstructure.DecoderConfig{TagName: "json", Result: data}
     decoder, err := mapstructure.NewDecoder(config)

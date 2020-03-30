@@ -29,7 +29,9 @@ vendor:
 #
 
 generate:
-	cd ../schema && make gqlgen && cd -
+	cd ../schema
+	make gqlgen
+	cd -
 	go run ./scripts/gqlgen.go
 	# Or @DEBUG: why it doesnt work anymore ?
 	#go generate ./...  
