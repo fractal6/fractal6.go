@@ -20,6 +20,7 @@ import (
     "zerogov/fractal6.go/tools/gql"
     "zerogov/fractal6.go/graph/model"
     gen "zerogov/fractal6.go/graph/generated"
+    //"golang.org/x/crypto/bcrypt" 
 )
 
 /*
@@ -29,6 +30,7 @@ import (
 */
 
 type Resolver struct{
+    // I/O objects
     MutationQ gql.Query
     QueryQ gql.Query
     // pointer on dgraph
@@ -86,6 +88,7 @@ func Init() gen.Config {
 * Dgraph-Gqlgen bridge logic
 *
 */
+
 func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, ipts []gql.JsonAtom, data interface{}) (errors error) {
     /* Rebuild the Graphql inputs request from this context */
     ctxRslv := graphql.GetResolverContext(ctx)
@@ -196,3 +199,54 @@ func nothing2 (ctx context.Context, obj interface{}, next graphql.Resolver, key 
 func nothing3 (ctx context.Context, obj interface{}, next graphql.Resolver, idx []model.DgraphIndex) (interface{}, error) {
     return next(ctx)
 }
+
+//func hasRoleMiddleware (ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
+//
+//    fmt.Println(ctx)
+//    //if !getCurrentUser(ctx).HasRole(role) {
+//    //    // block calling the next resolver
+//    //     fmt.Println(ctx)
+//    //    return nil, fmt.Errorf("Access denied")
+//    //}
+//
+//    // or let it pass through
+//    return next(ctx)
+//}
+//
+//
+//// HashPassword generates a hash using the bcrypt.GenerateFromPassword
+//func HashPassword(password string) string {
+//    hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+//    if err != nil {
+//        panic(err)
+//    }
+//
+//    return string(hash)
+//}
+//
+//// ComparePassword compares the hash
+//func ComparePassword(hash string, password string) bool {
+//
+//    if len(password) == 0 || len(hash) == 0 {
+//        return false
+//    }
+//
+//    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+//    return err == nil
+//}
+//
+//func getCred(ctx context.Context, input model.InputCred) (model.Cred, error) {
+//    //cred := new(model.Cred)
+//    //if err := ctx.Bind(cred); err != nil {
+//    //    return nil, &echo.HTTPError{
+//    //        Code: http.StatusBadRequest,
+//    //        Message: "invalid email or password"
+//    //    }
+//    //}
+//
+//    //hashedPassword = HashPassword(cred.Password)
+//    hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
+//    cred := model.Cred{input.Username, string(hashedPassword)}
+//    return cred, nil
+//}
+//

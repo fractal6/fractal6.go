@@ -30,7 +30,7 @@ vendor:
 
 generate:
 	cd ../schema
-	make gqlgen
+	make gqlgen2
 	cd -
 	go run ./scripts/gqlgen.go
 	# Or @DEBUG: why it doesnt work anymore ?
