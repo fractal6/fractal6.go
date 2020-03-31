@@ -40,11 +40,12 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Dgraph     func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
-	HasInverse func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
-	Id         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	MaxLength  func(ctx context.Context, obj interface{}, next graphql.Resolver, n *int) (res interface{}, err error)
-	Search     func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
+	Dgraph          func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
+	HasInverse      func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
+	Hidden          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Input_maxLength func(ctx context.Context, obj interface{}, next graphql.Resolver, n *int, f *string) (res interface{}, err error)
+	Search          func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -1448,7 +1449,8 @@ var sources = []*ast.Source{
 	&ast.Source{Name: "../schema/gen2/schema.graphql", Input: `
 
 
-directive @maxLength(n: Int) on FIELD_DEFINITION
+directive @input_maxLength(n: Int, f: String) on INPUT_FIELD_DEFINITION
+directive @hidden on FIELD_DEFINITION
 
 interface Node {
   id: ID!
@@ -1543,9 +1545,9 @@ type Mandate implements Post {
 type User {
   id: ID!
   createdAt: DateTime! @search
-  username: String! @id @maxLength(n:42)
-  fullname: String @maxLength(n:100)
-  password: String! @maxLength(n:42)
+  username: String! @id
+  fullname: String 
+  password: String! @hidden
   roles: [Role!] @hasInverse(field: user)
   backed_roles: [Role!] @hasInverse(field: second)
   bio: String
@@ -1648,9 +1650,9 @@ type AddTensionPayload {
 
 input AddUserInput {
   createdAt: DateTime!
-  username: String!
-  fullname: String
-  password: String!
+  username: String!  @input_maxLength(n: 42, f: "username")
+  fullname: String   @input_maxLength(n: 100, f: "fullname")
+  password: String!  @input_maxLength(n: 42, f: "password")
   roles: [RoleRef!]
   bio: String
 }
@@ -2236,7 +2238,7 @@ func (ec *executionContext) dir_hasInverse_args(ctx context.Context, rawArgs map
 	return args, nil
 }
 
-func (ec *executionContext) dir_maxLength_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) dir_input_maxLength_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -2247,6 +2249,14 @@ func (ec *executionContext) dir_maxLength_args(ctx context.Context, rawArgs map[
 		}
 	}
 	args["n"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["f"]; ok {
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["f"] = arg1
 	return args, nil
 }
 
@@ -7944,18 +7954,8 @@ func (ec *executionContext) _User_username(ctx context.Context, field graphql.Co
 			}
 			return ec.directives.Id(ctx, obj, directive0)
 		}
-		directive2 := func(ctx context.Context) (interface{}, error) {
-			n, err := ec.unmarshalOInt2ᚖint(ctx, 42)
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.MaxLength == nil {
-				return nil, errors.New("directive maxLength is not implemented")
-			}
-			return ec.directives.MaxLength(ctx, obj, directive1, n)
-		}
 
-		tmp, err := directive2(rctx)
+		tmp, err := directive1(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -7998,32 +7998,8 @@ func (ec *executionContext) _User_fullname(ctx context.Context, field graphql.Co
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Fullname, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			n, err := ec.unmarshalOInt2ᚖint(ctx, 100)
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.MaxLength == nil {
-				return nil, errors.New("directive maxLength is not implemented")
-			}
-			return ec.directives.MaxLength(ctx, obj, directive0, n)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return obj.Fullname, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8058,14 +8034,10 @@ func (ec *executionContext) _User_password(ctx context.Context, field graphql.Co
 			return obj.Password, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			n, err := ec.unmarshalOInt2ᚖint(ctx, 42)
-			if err != nil {
-				return nil, err
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
 			}
-			if ec.directives.MaxLength == nil {
-				return nil, errors.New("directive maxLength is not implemented")
-			}
-			return ec.directives.MaxLength(ctx, obj, directive0, n)
+			return ec.directives.Hidden(ctx, obj, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -9593,21 +9565,86 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			}
 		case "username":
 			var err error
-			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 42)
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "username")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, n, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Username = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "fullname":
 			var err error
-			it.Fullname, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "fullname")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, n, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(*string); ok {
+				it.Fullname = data
+			} else if tmp == nil {
+				it.Fullname = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "password":
 			var err error
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 42)
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "password")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, n, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Password = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "roles":
 			var err error

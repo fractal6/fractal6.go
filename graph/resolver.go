@@ -78,7 +78,8 @@ func Init() gen.Config {
     c.Directives.Search = nothing3
 
     // User defined directives
-    c.Directives.MaxLength = maxLength
+    c.Directives.Hidden = hidden
+    c.Directives.Input_maxLength = input_maxLength
     //c.Directives.HasRole = hasRoleMiddleware
     return c
 }
@@ -102,11 +103,17 @@ func nothing3 (ctx context.Context, obj interface{}, next graphql.Resolver, idx 
     return next(ctx)
 }
 
-func maxLength (ctx context.Context, obj interface{}, next graphql.Resolver, max *int) (interface{}, error) {
+func hidden (ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
-    fmt.Println(rc.Field.Name)
-    fmt.Println(obj.(*model.User).Username)
-    fmt.Println(*max)
+    f := rc.Field.Name
+    return nil, fmt.Errorf("%s field is hidden", f)
+    }
+
+func input_maxLength (ctx context.Context, obj interface{}, next graphql.Resolver, max *int, field *string) (interface{}, error) {
+    v := obj.(gql.JsonAtom)[*field].(string)
+    if len(v) > *max {
+        return nil, fmt.Errorf("%s to long. Maximum length is %d", *field, *max)
+    }
     return next(ctx)
 }
 

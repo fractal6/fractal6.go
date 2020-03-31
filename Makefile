@@ -35,7 +35,8 @@ schema:
 	make gqlgen2
 	cd -
 
-gen:
+gen: _gen _named_returns_resolver
+_gen:
 	go run ./scripts/gqlgen.go
 	# Or @DEBUG: why it doesnt work anymore ?
 	#go generate ./...  
