@@ -8,49 +8,51 @@ import (
 
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/tools"
+	"zerogov/fractal6.go/tools/gql"
 )
 
-func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (*model.UpdateNodePayload, error) {
+func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilter) (*model.DeleteNodePayload, error) {
+func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilter) (data *model.DeleteNodePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddCircle(ctx context.Context, input []*model.AddCircleInput) (*model.AddCirclePayload, error) {
+func (r *mutationResolver) AddCircle(ctx context.Context, input []*model.AddCircleInput) (data *model.AddCirclePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateCircle(ctx context.Context, input model.UpdateCircleInput) (*model.UpdateCirclePayload, error) {
+func (r *mutationResolver) UpdateCircle(ctx context.Context, input model.UpdateCircleInput) (data *model.UpdateCirclePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteCircle(ctx context.Context, filter model.CircleFilter) (*model.DeleteCirclePayload, error) {
+func (r *mutationResolver) DeleteCircle(ctx context.Context, filter model.CircleFilter) (data *model.DeleteCirclePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddRole(ctx context.Context, input []*model.AddRoleInput) (*model.AddRolePayload, error) {
+func (r *mutationResolver) AddRole(ctx context.Context, input []*model.AddRoleInput) (data *model.AddRolePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateRole(ctx context.Context, input model.UpdateRoleInput) (*model.UpdateRolePayload, error) {
+func (r *mutationResolver) UpdateRole(ctx context.Context, input model.UpdateRoleInput) (data *model.UpdateRolePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteRole(ctx context.Context, filter model.RoleFilter) (*model.DeleteRolePayload, error) {
+func (r *mutationResolver) DeleteRole(ctx context.Context, filter model.RoleFilter) (data *model.DeleteRolePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdatePost(ctx context.Context, input model.UpdatePostInput) (*model.UpdatePostPayload, error) {
+func (r *mutationResolver) UpdatePost(ctx context.Context, input model.UpdatePostInput) (data *model.UpdatePostPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilter) (*model.DeletePostPayload, error) {
+func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilter) (data *model.DeletePostPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error) {
+func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (data *model.AddTensionPayload, errors error) {
 	// Format inputs
 	var ipts []gql.JsonAtom
 	for _, ipt := range input {
@@ -61,27 +63,27 @@ func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTen
 	return data, errors
 }
 
-func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (*model.UpdateTensionPayload, error) {
+func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.TensionFilter) (*model.DeleteTensionPayload, error) {
+func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.TensionFilter) (data *model.DeleteTensionPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (*model.AddMandatePayload, error) {
+func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (data *model.AddMandatePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (*model.UpdateMandatePayload, error) {
+func (r *mutationResolver) UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (data *model.UpdateMandatePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.MandateFilter) (*model.DeleteMandatePayload, error) {
+func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.MandateFilter) (data *model.DeleteMandatePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (*model.AddUserPayload, error) {
+func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (data *model.AddUserPayload, errors error) {
 	// Format inputs
 	var ipts []gql.JsonAtom
 	for _, ipt := range input {
@@ -92,69 +94,69 @@ func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserIn
 	return data, errors
 }
 
-func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.UpdateUserPayload, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (data *model.UpdateUserPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilter) (*model.DeleteUserPayload, error) {
+func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilter) (data *model.DeleteUserPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (model.Node, error) {
+func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data model.Node, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]model.Node, error) {
+func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) (data []model.Node, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetCircle(ctx context.Context, id *string, nameid *string) (*model.Circle, error) {
+func (r *queryResolver) GetCircle(ctx context.Context, id *string, nameid *string) (data *model.Circle, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryCircle(ctx context.Context, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) ([]*model.Circle, error) {
+func (r *queryResolver) QueryCircle(ctx context.Context, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) (data []*model.Circle, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetRole(ctx context.Context, id *string, nameid *string) (*model.Role, error) {
+func (r *queryResolver) GetRole(ctx context.Context, id *string, nameid *string) (data *model.Role, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryRole(ctx context.Context, filter *model.RoleFilter, order *model.RoleOrder, first *int, offset *int) ([]*model.Role, error) {
+func (r *queryResolver) QueryRole(ctx context.Context, filter *model.RoleFilter, order *model.RoleOrder, first *int, offset *int) (data []*model.Role, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetPost(ctx context.Context, id string) (model.Post, error) {
+func (r *queryResolver) GetPost(ctx context.Context, id string) (data model.Post, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]model.Post, error) {
+func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) (data []model.Post, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetTension(ctx context.Context, id string) (*model.Tension, error) {
+func (r *queryResolver) GetTension(ctx context.Context, id string) (data *model.Tension, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) ([]*model.Tension, error) {
+func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) (data []*model.Tension, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
-func (r *queryResolver) GetMandate(ctx context.Context, id string) (*model.Mandate, error) {
+func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.Mandate, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) ([]*model.Mandate, error) {
+func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) (data []*model.Mandate, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
-func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string) (*model.User, error) {
+func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string) (data *model.User, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) ([]*model.User, error) {
+func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) (data []*model.User, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }

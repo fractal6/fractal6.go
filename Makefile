@@ -36,3 +36,6 @@ generate:
 	# Or @DEBUG: why it doesnt work anymore ?
 	#go generate ./...  
 	# go run github.com/99designs/gqlgen generate
+	
+_named_returns_resolver:
+	sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go
