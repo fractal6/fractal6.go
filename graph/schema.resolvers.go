@@ -166,4 +166,3 @@ func (r *Resolver) Query() generated.QueryResolver       { return &queryResolver
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-

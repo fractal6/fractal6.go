@@ -7,7 +7,7 @@ import (
     "text/template"
 )
 
-type JsonAtom map[string]interface{}
+type JsonAtom = map[string]interface{}
 
 type Res struct {
 	Data   JsonAtom `json:"data"`
