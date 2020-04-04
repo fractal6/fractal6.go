@@ -75,17 +75,17 @@ type ComplexityRoot struct {
 	}
 
 	Circle struct {
-		Children    func(childComplexity int) int
+		Children    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
 		ID          func(childComplexity int) int
 		IsRoot      func(childComplexity int) int
-		Mandate     func(childComplexity int) int
+		Mandate     func(childComplexity int, filter *model.MandateFilter) int
 		Name        func(childComplexity int) int
 		Nameid      func(childComplexity int) int
-		Parent      func(childComplexity int) int
-		TensionsIn  func(childComplexity int) int
-		TensionsOut func(childComplexity int) int
+		Parent      func(childComplexity int, filter *model.NodeFilter) int
+		TensionsIn  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOut func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
 	DeleteCirclePayload struct {
@@ -125,7 +125,7 @@ type ComplexityRoot struct {
 
 	Mandate struct {
 		CreatedAt        func(childComplexity int) int
-		CreatedBy        func(childComplexity int) int
+		CreatedBy        func(childComplexity int, filter *model.UserFilter) int
 		Domains          func(childComplexity int) int
 		ID               func(childComplexity int) int
 		Message          func(childComplexity int) int
@@ -173,31 +173,31 @@ type ComplexityRoot struct {
 	}
 
 	Role struct {
-		Children    func(childComplexity int) int
+		Children    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
 		ID          func(childComplexity int) int
-		Mandate     func(childComplexity int) int
+		Mandate     func(childComplexity int, filter *model.MandateFilter) int
 		Name        func(childComplexity int) int
 		Nameid      func(childComplexity int) int
-		Parent      func(childComplexity int) int
-		Second      func(childComplexity int) int
+		Parent      func(childComplexity int, filter *model.NodeFilter) int
+		Second      func(childComplexity int, filter *model.UserFilter) int
 		Skills      func(childComplexity int) int
-		TensionsIn  func(childComplexity int) int
-		TensionsOut func(childComplexity int) int
-		User        func(childComplexity int) int
+		TensionsIn  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOut func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		User        func(childComplexity int, filter *model.UserFilter) int
 	}
 
 	Tension struct {
-		Comments    func(childComplexity int) int
+		Comments    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
 		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
-		Emitter     func(childComplexity int) int
+		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
+		Emitter     func(childComplexity int, filter *model.NodeFilter) int
 		ID          func(childComplexity int) int
 		IsAnonymous func(childComplexity int) int
 		Message     func(childComplexity int) int
 		Nth         func(childComplexity int) int
-		Receivers   func(childComplexity int) int
+		Receivers   func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		Severity    func(childComplexity int) int
 		Title       func(childComplexity int) int
 		Type        func(childComplexity int) int
@@ -239,13 +239,13 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		BackedRoles func(childComplexity int) int
+		BackedRoles func(childComplexity int, filter *model.RoleFilter, order *model.RoleOrder, first *int, offset *int) int
 		Bio         func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		Fullname    func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Password    func(childComplexity int) int
-		Roles       func(childComplexity int) int
+		Roles       func(childComplexity int, filter *model.RoleFilter, order *model.RoleOrder, first *int, offset *int) int
 		Username    func(childComplexity int) int
 	}
 }
@@ -403,7 +403,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Circle.Children(childComplexity), true
+		args, err := ec.field_Circle_children_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Circle.Children(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Circle.createdAt":
 		if e.complexity.Circle.CreatedAt == nil {
@@ -417,7 +422,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Circle.CreatedBy(childComplexity), true
+		args, err := ec.field_Circle_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Circle.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Circle.id":
 		if e.complexity.Circle.ID == nil {
@@ -438,7 +448,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Circle.Mandate(childComplexity), true
+		args, err := ec.field_Circle_mandate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Circle.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
 
 	case "Circle.name":
 		if e.complexity.Circle.Name == nil {
@@ -459,21 +474,36 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Circle.Parent(childComplexity), true
+		args, err := ec.field_Circle_parent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Circle.Parent(childComplexity, args["filter"].(*model.NodeFilter)), true
 
 	case "Circle.tensions_in":
 		if e.complexity.Circle.TensionsIn == nil {
 			break
 		}
 
-		return e.complexity.Circle.TensionsIn(childComplexity), true
+		args, err := ec.field_Circle_tensions_in_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Circle.TensionsIn(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Circle.tensions_out":
 		if e.complexity.Circle.TensionsOut == nil {
 			break
 		}
 
-		return e.complexity.Circle.TensionsOut(childComplexity), true
+		args, err := ec.field_Circle_tensions_out_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Circle.TensionsOut(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeleteCirclePayload.msg":
 		if e.complexity.DeleteCirclePayload.Msg == nil {
@@ -585,7 +615,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Mandate.CreatedBy(childComplexity), true
+		args, err := ec.field_Mandate_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mandate.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Mandate.domains":
 		if e.complexity.Mandate.Domains == nil {
@@ -1023,7 +1058,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Role.Children(childComplexity), true
+		args, err := ec.field_Role_children_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.Children(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Role.createdAt":
 		if e.complexity.Role.CreatedAt == nil {
@@ -1037,7 +1077,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Role.CreatedBy(childComplexity), true
+		args, err := ec.field_Role_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Role.id":
 		if e.complexity.Role.ID == nil {
@@ -1051,7 +1096,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Role.Mandate(childComplexity), true
+		args, err := ec.field_Role_mandate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
 
 	case "Role.name":
 		if e.complexity.Role.Name == nil {
@@ -1072,14 +1122,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Role.Parent(childComplexity), true
+		args, err := ec.field_Role_parent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.Parent(childComplexity, args["filter"].(*model.NodeFilter)), true
 
 	case "Role.second":
 		if e.complexity.Role.Second == nil {
 			break
 		}
 
-		return e.complexity.Role.Second(childComplexity), true
+		args, err := ec.field_Role_second_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.Second(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Role.skills":
 		if e.complexity.Role.Skills == nil {
@@ -1093,28 +1153,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Role.TensionsIn(childComplexity), true
+		args, err := ec.field_Role_tensions_in_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.TensionsIn(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Role.tensions_out":
 		if e.complexity.Role.TensionsOut == nil {
 			break
 		}
 
-		return e.complexity.Role.TensionsOut(childComplexity), true
+		args, err := ec.field_Role_tensions_out_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.TensionsOut(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Role.user":
 		if e.complexity.Role.User == nil {
 			break
 		}
 
-		return e.complexity.Role.User(childComplexity), true
+		args, err := ec.field_Role_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Role.User(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Tension.comments":
 		if e.complexity.Tension.Comments == nil {
 			break
 		}
 
-		return e.complexity.Tension.Comments(childComplexity), true
+		args, err := ec.field_Tension_comments_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.Comments(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Tension.createdAt":
 		if e.complexity.Tension.CreatedAt == nil {
@@ -1128,14 +1208,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Tension.CreatedBy(childComplexity), true
+		args, err := ec.field_Tension_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Tension.emitter":
 		if e.complexity.Tension.Emitter == nil {
 			break
 		}
 
-		return e.complexity.Tension.Emitter(childComplexity), true
+		args, err := ec.field_Tension_emitter_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.Emitter(childComplexity, args["filter"].(*model.NodeFilter)), true
 
 	case "Tension.id":
 		if e.complexity.Tension.ID == nil {
@@ -1170,7 +1260,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Tension.Receivers(childComplexity), true
+		args, err := ec.field_Tension_receivers_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.Receivers(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Tension.severity":
 		if e.complexity.Tension.Severity == nil {
@@ -1331,7 +1426,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.User.BackedRoles(childComplexity), true
+		args, err := ec.field_User_backed_roles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.BackedRoles(childComplexity, args["filter"].(*model.RoleFilter), args["order"].(*model.RoleOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "User.bio":
 		if e.complexity.User.Bio == nil {
@@ -1373,7 +1473,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.User.Roles(childComplexity), true
+		args, err := ec.field_User_roles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Roles(childComplexity, args["filter"].(*model.RoleFilter), args["order"].(*model.RoleOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "User.username":
 		if e.complexity.User.Username == nil {
@@ -1449,22 +1554,23 @@ var sources = []*ast.Source{
 	&ast.Source{Name: "../schema/gen2/schema.graphql", Input: `
 
 
-directive @input_maxLength(n: Int, f: String) on INPUT_FIELD_DEFINITION
 directive @hidden on FIELD_DEFINITION
+
+directive @input_maxLength(n: Int, f: String) on INPUT_FIELD_DEFINITION
 
 interface Node {
   id: ID!
   createdAt: DateTime! @search
-  createdBy: User!
-  parent: Node
+  createdBy(filter: UserFilter): User!
+  parent(filter: NodeFilter): Node
 
-  children: [Node!] @hasInverse(field: parent)
+  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
   name: String! @search(by: [term])
   nameid: String! @id
-  mandate: Mandate
+  mandate(filter: MandateFilter): Mandate
 
-  tensions_out: [Tension!] @hasInverse(field: emitter)
-  tensions_in: [Tension!]
+  tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
+  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
 
 }
 
@@ -1475,37 +1581,37 @@ type Circle implements Node {
 
   id: ID!
   createdAt: DateTime! @search
-  createdBy: User!
-  parent: Node
-  children: [Node!] @hasInverse(field: parent)
+  createdBy(filter: UserFilter): User!
+  parent(filter: NodeFilter): Node
+  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
   name: String! @search(by: [term])
   nameid: String! @id
-  mandate: Mandate
-  tensions_out: [Tension!] @hasInverse(field: emitter)
-  tensions_in: [Tension!]
+  mandate(filter: MandateFilter): Mandate
+  tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
+  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
 }
 
 type Role implements Node {
-  user: User
-  second: User
+  user(filter: UserFilter): User
+  second(filter: UserFilter): User
   skills: [String!] @search(by: [term])
 
   id: ID!
   createdAt: DateTime! @search
-  createdBy: User!
-  parent: Node
-  children: [Node!] @hasInverse(field: parent)
+  createdBy(filter: UserFilter): User!
+  parent(filter: NodeFilter): Node
+  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
   name: String! @search(by: [term])
   nameid: String! @id
-  mandate: Mandate
-  tensions_out: [Tension!] @hasInverse(field: emitter)
-  tensions_in: [Tension!]
+  mandate(filter: MandateFilter): Mandate
+  tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
+  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
 }
 
 interface Post {
   id: ID!
   createdAt: DateTime! @search
-  createdBy: User!
+  createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
@@ -1514,15 +1620,15 @@ type Tension implements Post {
 
   title: String! @search(by: [term])
   type_: TensionType! @search(by: [hash])
-  emitter: Node!
-  receivers: [Node!]
+  emitter(filter: NodeFilter): Node!
+  receivers(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   isAnonymous: Boolean!
   severity: Int!
-  comments: [Post!]
+  comments(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post!]
 
   id: ID!
   createdAt: DateTime! @search
-  createdBy: User!
+  createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
@@ -1538,7 +1644,7 @@ type Mandate implements Post {
 
   id: ID!
   createdAt: DateTime! @search
-  createdBy: User!
+  createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
@@ -1546,10 +1652,10 @@ type User {
   id: ID!
   createdAt: DateTime! @search
   username: String! @id
-  fullname: String 
+  fullname: String
   password: String! @hidden
-  roles: [Role!] @hasInverse(field: user)
-  backed_roles: [Role!] @hasInverse(field: second)
+  roles(filter: RoleFilter, order: RoleOrder, first: Int, offset: Int): [Role!] @hasInverse(field: user)
+  backed_roles(filter: RoleFilter, order: RoleOrder, first: Int, offset: Int): [Role!] @hasInverse(field: second)
   bio: String
 
 }
@@ -1596,7 +1702,7 @@ type AddCirclePayload {
 
 input AddMandateInput {
   createdAt: DateTime!
-  author: UserRef!
+  createdBy: UserRef!
   message: String
   purpose: String!
   responsabilities: String
@@ -1620,7 +1726,6 @@ input AddRoleInput {
   tensions_in: [TensionRef!]
   user: UserRef
   second: UserRef
-  third: UserRef
   skills: [String!]
 }
 
@@ -1631,7 +1736,7 @@ type AddRolePayload {
 
 input AddTensionInput {
   createdAt: DateTime!
-  author: UserRef!
+  createdBy: UserRef!
   message: String
   nth: Int!
   title: String!
@@ -1650,10 +1755,11 @@ type AddTensionPayload {
 
 input AddUserInput {
   createdAt: DateTime!
-  username: String!  @input_maxLength(n: 42, f: "username")
-  fullname: String   @input_maxLength(n: 100, f: "fullname")
-  password: String!  @input_maxLength(n: 42, f: "password")
+  username: String! @input_maxLength(n:42, f:"username")
+  fullname: String @input_maxLength(n:100, f:"fullname")
+  password: String! @input_maxLength(n:42, f:"password")
   roles: [RoleRef!]
+  backed_roles: [RoleRef!]
   bio: String
 }
 
@@ -1813,7 +1919,7 @@ enum MandateOrderable {
 
 input MandatePatch {
   createdAt: DateTime
-  author: UserRef
+  createdBy: UserRef
   message: String
   purpose: String
   responsabilities: String
@@ -1823,7 +1929,7 @@ input MandatePatch {
 input MandateRef {
   id: ID
   createdAt: DateTime
-  author: UserRef
+  createdBy: UserRef
   message: String
   purpose: String
   responsabilities: String
@@ -1912,7 +2018,7 @@ enum PostOrderable {
 
 input PostPatch {
   createdAt: DateTime
-  author: UserRef
+  createdBy: UserRef
   message: String
 }
 
@@ -1972,7 +2078,6 @@ input RolePatch {
   tensions_in: [TensionRef!]
   user: UserRef
   second: UserRef
-  third: UserRef
   skills: [String!]
 }
 
@@ -1989,7 +2094,6 @@ input RoleRef {
   tensions_in: [TensionRef!]
   user: UserRef
   second: UserRef
-  third: UserRef
   skills: [String!]
 }
 
@@ -2046,7 +2150,7 @@ enum TensionOrderable {
 
 input TensionPatch {
   createdAt: DateTime
-  author: UserRef
+  createdBy: UserRef
   message: String
   nth: Int
   title: String
@@ -2061,7 +2165,7 @@ input TensionPatch {
 input TensionRef {
   id: ID
   createdAt: DateTime
-  author: UserRef
+  createdBy: UserRef
   message: String
   nth: Int
   title: String
@@ -2179,9 +2283,10 @@ enum UserOrderable {
 
 input UserPatch {
   createdAt: DateTime
-  fullname: String
-  password: String
+  fullname: String @input_maxLength(n:100, f:"fullname")
+  password: String @input_maxLength(n:42, f:"password")
   roles: [RoleRef!]
+  backed_roles: [RoleRef!]
   bio: String
 }
 
@@ -2192,6 +2297,7 @@ input UserRef {
   fullname: String
   password: String
   roles: [RoleRef!]
+  backed_roles: [RoleRef!]
   bio: String
 }
 `, BuiltIn: false},
@@ -2461,6 +2567,176 @@ func (ec *executionContext) field_AddUserPayload_user_args(ctx context.Context, 
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Circle_children_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Circle_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Circle_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MandateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Circle_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Circle_tensions_in_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Circle_tensions_out_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Mandate_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -3140,6 +3416,294 @@ func (ec *executionContext) field_Query_queryUser_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Role_children_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MandateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_second_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_tensions_in_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_tensions_out_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Role_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_comments_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PostFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PostOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_emitter_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_receivers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateCirclePayload_circle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3382,6 +3946,82 @@ func (ec *executionContext) field_UpdateUserPayload_user_args(ctx context.Contex
 	var arg1 *model.UserOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		arg1, err = ec.unmarshalOUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_User_backed_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalORoleFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.RoleOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalORoleOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_User_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalORoleFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.RoleOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalORoleOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3924,6 +4564,13 @@ func (ec *executionContext) _Circle_createdBy(ctx context.Context, field graphql
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Circle_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedBy, nil
@@ -3958,6 +4605,13 @@ func (ec *executionContext) _Circle_parent(ctx context.Context, field graphql.Co
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Circle_parent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Parent, nil
@@ -3989,6 +4643,13 @@ func (ec *executionContext) _Circle_children(ctx context.Context, field graphql.
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Circle_children_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
@@ -4156,6 +4817,13 @@ func (ec *executionContext) _Circle_mandate(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Circle_mandate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Mandate, nil
@@ -4187,6 +4855,13 @@ func (ec *executionContext) _Circle_tensions_out(ctx context.Context, field grap
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Circle_tensions_out_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
@@ -4242,6 +4917,13 @@ func (ec *executionContext) _Circle_tensions_in(ctx context.Context, field graph
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Circle_tensions_in_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TensionsIn, nil
@@ -4915,6 +5597,13 @@ func (ec *executionContext) _Mandate_createdBy(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mandate_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedBy, nil
@@ -6327,6 +7016,13 @@ func (ec *executionContext) _Role_user(ctx context.Context, field graphql.Collec
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_user_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.User, nil
@@ -6358,6 +7054,13 @@ func (ec *executionContext) _Role_second(ctx context.Context, field graphql.Coll
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_second_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Second, nil
@@ -6532,6 +7235,13 @@ func (ec *executionContext) _Role_createdBy(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedBy, nil
@@ -6566,6 +7276,13 @@ func (ec *executionContext) _Role_parent(ctx context.Context, field graphql.Coll
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_parent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Parent, nil
@@ -6597,6 +7314,13 @@ func (ec *executionContext) _Role_children(ctx context.Context, field graphql.Co
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_children_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
@@ -6764,6 +7488,13 @@ func (ec *executionContext) _Role_mandate(ctx context.Context, field graphql.Col
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_mandate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Mandate, nil
@@ -6795,6 +7526,13 @@ func (ec *executionContext) _Role_tensions_out(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_tensions_out_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
@@ -6850,6 +7588,13 @@ func (ec *executionContext) _Role_tensions_in(ctx context.Context, field graphql
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Role_tensions_in_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TensionsIn, nil
@@ -7031,6 +7776,13 @@ func (ec *executionContext) _Tension_emitter(ctx context.Context, field graphql.
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_emitter_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Emitter, nil
@@ -7065,6 +7817,13 @@ func (ec *executionContext) _Tension_receivers(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_receivers_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Receivers, nil
@@ -7164,6 +7923,13 @@ func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_comments_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Comments, nil
@@ -7283,6 +8049,13 @@ func (ec *executionContext) _Tension_createdBy(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedBy, nil
@@ -8082,6 +8855,13 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_roles_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
@@ -8137,6 +8917,13 @@ func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_backed_roles_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
@@ -9347,9 +10134,9 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9455,12 +10242,6 @@ func (ec *executionContext) unmarshalInputAddRoleInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "third":
-			var err error
-			it.Third, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "skills":
 			var err error
 			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -9485,9 +10266,9 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9649,6 +10430,12 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		case "roles":
 			var err error
 			it.Roles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "backed_roles":
+			var err error
+			it.BackedRoles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10114,9 +10901,9 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10168,9 +10955,9 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10462,9 +11249,9 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10654,12 +11441,6 @@ func (ec *executionContext) unmarshalInputRolePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "third":
-			var err error
-			it.Third, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "skills":
 			var err error
 			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -10747,12 +11528,6 @@ func (ec *executionContext) unmarshalInputRoleRef(ctx context.Context, obj inter
 		case "second":
 			var err error
 			it.Second, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "third":
-			var err error
-			it.Third, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10996,9 +11771,9 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11080,9 +11855,9 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "author":
+		case "createdBy":
 			var err error
-			it.Author, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11466,19 +12241,71 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			}
 		case "fullname":
 			var err error
-			it.Fullname, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "fullname")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, n, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(*string); ok {
+				it.Fullname = data
+			} else if tmp == nil {
+				it.Fullname = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "password":
 			var err error
-			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 42)
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "password")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, n, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Password = data
+			} else if tmp == nil {
+				it.Password = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "roles":
 			var err error
 			it.Roles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "backed_roles":
+			var err error
+			it.BackedRoles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11533,6 +12360,12 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		case "roles":
 			var err error
 			it.Roles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "backed_roles":
+			var err error
+			it.BackedRoles, err = ec.unmarshalORoleRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}

@@ -36,7 +36,7 @@ type AddCirclePayload struct {
 
 type AddMandateInput struct {
 	CreatedAt        string   `json:"createdAt"`
-	Author           *UserRef `json:"author"`
+	CreatedBy        *UserRef `json:"createdBy"`
 	Message          *string  `json:"message"`
 	Purpose          string   `json:"purpose"`
 	Responsabilities *string  `json:"responsabilities"`
@@ -60,7 +60,6 @@ type AddRoleInput struct {
 	TensionsIn  []*TensionRef `json:"tensions_in"`
 	User        *UserRef      `json:"user"`
 	Second      *UserRef      `json:"second"`
-	Third       *UserRef      `json:"third"`
 	Skills      []string      `json:"skills"`
 }
 
@@ -71,7 +70,7 @@ type AddRolePayload struct {
 
 type AddTensionInput struct {
 	CreatedAt   string      `json:"createdAt"`
-	Author      *UserRef    `json:"author"`
+	CreatedBy   *UserRef    `json:"createdBy"`
 	Message     *string     `json:"message"`
 	Nth         int         `json:"nth"`
 	Title       string      `json:"title"`
@@ -89,12 +88,13 @@ type AddTensionPayload struct {
 }
 
 type AddUserInput struct {
-	CreatedAt string     `json:"createdAt"`
-	Username  string     `json:"username"`
-	Fullname  *string    `json:"fullname"`
-	Password  string     `json:"password"`
-	Roles     []*RoleRef `json:"roles"`
-	Bio       *string    `json:"bio"`
+	CreatedAt   string     `json:"createdAt"`
+	Username    string     `json:"username"`
+	Fullname    *string    `json:"fullname"`
+	Password    string     `json:"password"`
+	Roles       []*RoleRef `json:"roles"`
+	BackedRoles []*RoleRef `json:"backed_roles"`
+	Bio         *string    `json:"bio"`
 }
 
 type AddUserPayload struct {
@@ -249,7 +249,7 @@ type MandateOrder struct {
 
 type MandatePatch struct {
 	CreatedAt        *string  `json:"createdAt"`
-	Author           *UserRef `json:"author"`
+	CreatedBy        *UserRef `json:"createdBy"`
 	Message          *string  `json:"message"`
 	Purpose          *string  `json:"purpose"`
 	Responsabilities *string  `json:"responsabilities"`
@@ -259,7 +259,7 @@ type MandatePatch struct {
 type MandateRef struct {
 	ID               *string  `json:"id"`
 	CreatedAt        *string  `json:"createdAt"`
-	Author           *UserRef `json:"author"`
+	CreatedBy        *UserRef `json:"createdBy"`
 	Message          *string  `json:"message"`
 	Purpose          *string  `json:"purpose"`
 	Responsabilities *string  `json:"responsabilities"`
@@ -315,7 +315,7 @@ type PostOrder struct {
 
 type PostPatch struct {
 	CreatedAt *string  `json:"createdAt"`
-	Author    *UserRef `json:"author"`
+	CreatedBy *UserRef `json:"createdBy"`
 	Message   *string  `json:"message"`
 }
 
@@ -369,7 +369,6 @@ type RolePatch struct {
 	TensionsIn  []*TensionRef `json:"tensions_in"`
 	User        *UserRef      `json:"user"`
 	Second      *UserRef      `json:"second"`
-	Third       *UserRef      `json:"third"`
 	Skills      []string      `json:"skills"`
 }
 
@@ -386,7 +385,6 @@ type RoleRef struct {
 	TensionsIn  []*TensionRef `json:"tensions_in"`
 	User        *UserRef      `json:"user"`
 	Second      *UserRef      `json:"second"`
-	Third       *UserRef      `json:"third"`
 	Skills      []string      `json:"skills"`
 }
 
@@ -452,7 +450,7 @@ type TensionOrder struct {
 
 type TensionPatch struct {
 	CreatedAt   *string      `json:"createdAt"`
-	Author      *UserRef     `json:"author"`
+	CreatedBy   *UserRef     `json:"createdBy"`
 	Message     *string      `json:"message"`
 	Nth         *int         `json:"nth"`
 	Title       *string      `json:"title"`
@@ -467,7 +465,7 @@ type TensionPatch struct {
 type TensionRef struct {
 	ID          *string      `json:"id"`
 	CreatedAt   *string      `json:"createdAt"`
-	Author      *UserRef     `json:"author"`
+	CreatedBy   *UserRef     `json:"createdBy"`
 	Message     *string      `json:"message"`
 	Nth         *int         `json:"nth"`
 	Title       *string      `json:"title"`
@@ -587,21 +585,23 @@ type UserOrder struct {
 }
 
 type UserPatch struct {
-	CreatedAt *string    `json:"createdAt"`
-	Fullname  *string    `json:"fullname"`
-	Password  *string    `json:"password"`
-	Roles     []*RoleRef `json:"roles"`
-	Bio       *string    `json:"bio"`
+	CreatedAt   *string    `json:"createdAt"`
+	Fullname    *string    `json:"fullname"`
+	Password    *string    `json:"password"`
+	Roles       []*RoleRef `json:"roles"`
+	BackedRoles []*RoleRef `json:"backed_roles"`
+	Bio         *string    `json:"bio"`
 }
 
 type UserRef struct {
-	ID        *string    `json:"id"`
-	CreatedAt *string    `json:"createdAt"`
-	Username  *string    `json:"username"`
-	Fullname  *string    `json:"fullname"`
-	Password  *string    `json:"password"`
-	Roles     []*RoleRef `json:"roles"`
-	Bio       *string    `json:"bio"`
+	ID          *string    `json:"id"`
+	CreatedAt   *string    `json:"createdAt"`
+	Username    *string    `json:"username"`
+	Fullname    *string    `json:"fullname"`
+	Password    *string    `json:"password"`
+	Roles       []*RoleRef `json:"roles"`
+	BackedRoles []*RoleRef `json:"backed_roles"`
+	Bio         *string    `json:"bio"`
 }
 
 type CircleOrderable string
