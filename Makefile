@@ -1,16 +1,19 @@
+.ONESHELL:
 GOFLAGS ?= $(GOFLAGS:) -v
 GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
 MOD := "zerogov/fractal6.go"
 
-# TODO versioning
+# TODO: versioning
 # LDFLAGS see versioning, hash etc...
 
-.ONESHELL:
 .PHONY: build prod vendor
-
 default: build
+
+#
+# Build commands
+#
 
 run:
 	go run main.go run
@@ -25,17 +28,18 @@ vendor:
 	go mod vendor
 
 #
-# Generate Graphql code
+# Generate Graphql code and schema
 #
 
 generate: schema gen
 
 schema:
 	cd ../schema
-	make gqlgen2
+	make
 	cd -
 
 gen: _gen _named_returns_resolver
+
 _gen:
 	go run ./scripts/gqlgen.go
 	# Or @DEBUG: why it doesnt work anymore ?

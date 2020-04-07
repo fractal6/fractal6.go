@@ -40,6 +40,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Count           func(ctx context.Context, obj interface{}, next graphql.Resolver, f *string) (res interface{}, err error)
 	Dgraph          func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	HasInverse      func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
 	Hidden          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -51,6 +52,11 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	AddCirclePayload struct {
 		Circle  func(childComplexity int, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
+	AddCommentPayload struct {
+		Comment func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
 	}
 
@@ -88,7 +94,19 @@ type ComplexityRoot struct {
 		TensionsOut func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	Comment struct {
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int, filter *model.UserFilter) int
+		ID        func(childComplexity int) int
+		Message   func(childComplexity int) int
+	}
+
 	DeleteCirclePayload struct {
+		Msg     func(childComplexity int) int
+		NumUids func(childComplexity int) int
+	}
+
+	DeleteCommentPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
@@ -135,11 +153,13 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddCircle     func(childComplexity int, input []*model.AddCircleInput) int
+		AddComment    func(childComplexity int, input []*model.AddCommentInput) int
 		AddMandate    func(childComplexity int, input []*model.AddMandateInput) int
 		AddRole       func(childComplexity int, input []*model.AddRoleInput) int
 		AddTension    func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser       func(childComplexity int, input []*model.AddUserInput) int
 		DeleteCircle  func(childComplexity int, filter model.CircleFilter) int
+		DeleteComment func(childComplexity int, filter model.CommentFilter) int
 		DeleteMandate func(childComplexity int, filter model.MandateFilter) int
 		DeleteNode    func(childComplexity int, filter model.NodeFilter) int
 		DeletePost    func(childComplexity int, filter model.PostFilter) int
@@ -147,6 +167,7 @@ type ComplexityRoot struct {
 		DeleteTension func(childComplexity int, filter model.TensionFilter) int
 		DeleteUser    func(childComplexity int, filter model.UserFilter) int
 		UpdateCircle  func(childComplexity int, input model.UpdateCircleInput) int
+		UpdateComment func(childComplexity int, input model.UpdateCommentInput) int
 		UpdateMandate func(childComplexity int, input model.UpdateMandateInput) int
 		UpdateNode    func(childComplexity int, input model.UpdateNodeInput) int
 		UpdatePost    func(childComplexity int, input model.UpdatePostInput) int
@@ -155,8 +176,29 @@ type ComplexityRoot struct {
 		UpdateUser    func(childComplexity int, input model.UpdateUserInput) int
 	}
 
+	Node struct {
+		Children    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		CreatedAt   func(childComplexity int) int
+		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
+		ID          func(childComplexity int) int
+		Mandate     func(childComplexity int, filter *model.MandateFilter) int
+		Name        func(childComplexity int) int
+		Nameid      func(childComplexity int) int
+		Parent      func(childComplexity int, filter *model.NodeFilter) int
+		TensionsIn  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOut func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+	}
+
+	Post struct {
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int, filter *model.UserFilter) int
+		ID        func(childComplexity int) int
+		Message   func(childComplexity int) int
+	}
+
 	Query struct {
 		GetCircle    func(childComplexity int, id *string, nameid *string) int
+		GetComment   func(childComplexity int, id string) int
 		GetMandate   func(childComplexity int, id string) int
 		GetNode      func(childComplexity int, id *string, nameid *string) int
 		GetPost      func(childComplexity int, id string) int
@@ -164,6 +206,7 @@ type ComplexityRoot struct {
 		GetTension   func(childComplexity int, id string) int
 		GetUser      func(childComplexity int, id *string, username *string) int
 		QueryCircle  func(childComplexity int, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) int
+		QueryComment func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		QueryMandate func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		QueryNode    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		QueryPost    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
@@ -189,13 +232,14 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Comments    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		Comments    func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
 		Emitter     func(childComplexity int, filter *model.NodeFilter) int
 		ID          func(childComplexity int) int
 		IsAnonymous func(childComplexity int) int
 		Message     func(childComplexity int) int
+		NComments   func(childComplexity int) int
 		Nth         func(childComplexity int) int
 		Receivers   func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		Severity    func(childComplexity int) int
@@ -205,6 +249,11 @@ type ComplexityRoot struct {
 
 	UpdateCirclePayload struct {
 		Circle  func(childComplexity int, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
+	UpdateCommentPayload struct {
+		Comment func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
 	}
 
@@ -264,6 +313,9 @@ type MutationResolver interface {
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
 	UpdateTension(ctx context.Context, input model.UpdateTensionInput) (*model.UpdateTensionPayload, error)
 	DeleteTension(ctx context.Context, filter model.TensionFilter) (*model.DeleteTensionPayload, error)
+	AddComment(ctx context.Context, input []*model.AddCommentInput) (*model.AddCommentPayload, error)
+	UpdateComment(ctx context.Context, input model.UpdateCommentInput) (*model.UpdateCommentPayload, error)
+	DeleteComment(ctx context.Context, filter model.CommentFilter) (*model.DeleteCommentPayload, error)
 	AddMandate(ctx context.Context, input []*model.AddMandateInput) (*model.AddMandatePayload, error)
 	UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (*model.UpdateMandatePayload, error)
 	DeleteMandate(ctx context.Context, filter model.MandateFilter) (*model.DeleteMandatePayload, error)
@@ -272,16 +324,18 @@ type MutationResolver interface {
 	DeleteUser(ctx context.Context, filter model.UserFilter) (*model.DeleteUserPayload, error)
 }
 type QueryResolver interface {
-	GetNode(ctx context.Context, id *string, nameid *string) (model.Node, error)
-	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]model.Node, error)
+	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
+	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]*model.Node, error)
 	GetCircle(ctx context.Context, id *string, nameid *string) (*model.Circle, error)
 	QueryCircle(ctx context.Context, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) ([]*model.Circle, error)
 	GetRole(ctx context.Context, id *string, nameid *string) (*model.Role, error)
 	QueryRole(ctx context.Context, filter *model.RoleFilter, order *model.RoleOrder, first *int, offset *int) ([]*model.Role, error)
-	GetPost(ctx context.Context, id string) (model.Post, error)
-	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]model.Post, error)
+	GetPost(ctx context.Context, id string) (*model.Post, error)
+	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]*model.Post, error)
 	GetTension(ctx context.Context, id string) (*model.Tension, error)
 	QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) ([]*model.Tension, error)
+	GetComment(ctx context.Context, id string) (*model.Comment, error)
+	QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) ([]*model.Comment, error)
 	GetMandate(ctx context.Context, id string) (*model.Mandate, error)
 	QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) ([]*model.Mandate, error)
 	GetUser(ctx context.Context, id *string, username *string) (*model.User, error)
@@ -321,6 +375,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddCirclePayload.NumUids(childComplexity), true
+
+	case "AddCommentPayload.comment":
+		if e.complexity.AddCommentPayload.Comment == nil {
+			break
+		}
+
+		args, err := ec.field_AddCommentPayload_comment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddCommentPayload.Comment(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddCommentPayload.numUids":
+		if e.complexity.AddCommentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddCommentPayload.NumUids(childComplexity), true
 
 	case "AddMandatePayload.mandate":
 		if e.complexity.AddMandatePayload.Mandate == nil {
@@ -505,6 +578,39 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Circle.TensionsOut(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Comment.createdAt":
+		if e.complexity.Comment.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Comment.CreatedAt(childComplexity), true
+
+	case "Comment.createdBy":
+		if e.complexity.Comment.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "Comment.id":
+		if e.complexity.Comment.ID == nil {
+			break
+		}
+
+		return e.complexity.Comment.ID(childComplexity), true
+
+	case "Comment.message":
+		if e.complexity.Comment.Message == nil {
+			break
+		}
+
+		return e.complexity.Comment.Message(childComplexity), true
+
 	case "DeleteCirclePayload.msg":
 		if e.complexity.DeleteCirclePayload.Msg == nil {
 			break
@@ -518,6 +624,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteCirclePayload.NumUids(childComplexity), true
+
+	case "DeleteCommentPayload.msg":
+		if e.complexity.DeleteCommentPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteCommentPayload.Msg(childComplexity), true
+
+	case "DeleteCommentPayload.numUids":
+		if e.complexity.DeleteCommentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteCommentPayload.NumUids(childComplexity), true
 
 	case "DeleteMandatePayload.msg":
 		if e.complexity.DeleteMandatePayload.Msg == nil {
@@ -669,6 +789,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddCircle(childComplexity, args["input"].([]*model.AddCircleInput)), true
 
+	case "Mutation.addComment":
+		if e.complexity.Mutation.AddComment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddComment(childComplexity, args["input"].([]*model.AddCommentInput)), true
+
 	case "Mutation.addMandate":
 		if e.complexity.Mutation.AddMandate == nil {
 			break
@@ -728,6 +860,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteCircle(childComplexity, args["filter"].(model.CircleFilter)), true
+
+	case "Mutation.deleteComment":
+		if e.complexity.Mutation.DeleteComment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteComment(childComplexity, args["filter"].(model.CommentFilter)), true
 
 	case "Mutation.deleteMandate":
 		if e.complexity.Mutation.DeleteMandate == nil {
@@ -813,6 +957,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateCircle(childComplexity, args["input"].(model.UpdateCircleInput)), true
 
+	case "Mutation.updateComment":
+		if e.complexity.Mutation.UpdateComment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateComment(childComplexity, args["input"].(model.UpdateCommentInput)), true
+
 	case "Mutation.updateMandate":
 		if e.complexity.Mutation.UpdateMandate == nil {
 			break
@@ -885,6 +1041,139 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(model.UpdateUserInput)), true
 
+	case "Node.children":
+		if e.complexity.Node.Children == nil {
+			break
+		}
+
+		args, err := ec.field_Node_children_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Children(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.createdAt":
+		if e.complexity.Node.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Node.CreatedAt(childComplexity), true
+
+	case "Node.createdBy":
+		if e.complexity.Node.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_Node_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "Node.id":
+		if e.complexity.Node.ID == nil {
+			break
+		}
+
+		return e.complexity.Node.ID(childComplexity), true
+
+	case "Node.mandate":
+		if e.complexity.Node.Mandate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_mandate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
+
+	case "Node.name":
+		if e.complexity.Node.Name == nil {
+			break
+		}
+
+		return e.complexity.Node.Name(childComplexity), true
+
+	case "Node.nameid":
+		if e.complexity.Node.Nameid == nil {
+			break
+		}
+
+		return e.complexity.Node.Nameid(childComplexity), true
+
+	case "Node.parent":
+		if e.complexity.Node.Parent == nil {
+			break
+		}
+
+		args, err := ec.field_Node_parent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Parent(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "Node.tensions_in":
+		if e.complexity.Node.TensionsIn == nil {
+			break
+		}
+
+		args, err := ec.field_Node_tensions_in_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.TensionsIn(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.tensions_out":
+		if e.complexity.Node.TensionsOut == nil {
+			break
+		}
+
+		args, err := ec.field_Node_tensions_out_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.TensionsOut(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Post.createdAt":
+		if e.complexity.Post.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Post.CreatedAt(childComplexity), true
+
+	case "Post.createdBy":
+		if e.complexity.Post.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_Post_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Post.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "Post.id":
+		if e.complexity.Post.ID == nil {
+			break
+		}
+
+		return e.complexity.Post.ID(childComplexity), true
+
+	case "Post.message":
+		if e.complexity.Post.Message == nil {
+			break
+		}
+
+		return e.complexity.Post.Message(childComplexity), true
+
 	case "Query.getCircle":
 		if e.complexity.Query.GetCircle == nil {
 			break
@@ -896,6 +1185,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetCircle(childComplexity, args["id"].(*string), args["nameid"].(*string)), true
+
+	case "Query.getComment":
+		if e.complexity.Query.GetComment == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetComment(childComplexity, args["id"].(string)), true
 
 	case "Query.getMandate":
 		if e.complexity.Query.GetMandate == nil {
@@ -980,6 +1281,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryCircle(childComplexity, args["filter"].(*model.CircleFilter), args["order"].(*model.CircleOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryComment":
+		if e.complexity.Query.QueryComment == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryComment(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryMandate":
 		if e.complexity.Query.QueryMandate == nil {
@@ -1194,7 +1507,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Tension.Comments(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Tension.Comments(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Tension.createdAt":
 		if e.complexity.Tension.CreatedAt == nil {
@@ -1247,6 +1560,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.Message(childComplexity), true
+
+	case "Tension.n_comments":
+		if e.complexity.Tension.NComments == nil {
+			break
+		}
+
+		return e.complexity.Tension.NComments(childComplexity), true
 
 	case "Tension.nth":
 		if e.complexity.Tension.Nth == nil {
@@ -1306,6 +1626,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateCirclePayload.NumUids(childComplexity), true
+
+	case "UpdateCommentPayload.comment":
+		if e.complexity.UpdateCommentPayload.Comment == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateCommentPayload_comment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateCommentPayload.Comment(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateCommentPayload.numUids":
+		if e.complexity.UpdateCommentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateCommentPayload.NumUids(childComplexity), true
 
 	case "UpdateMandatePayload.mandate":
 		if e.complexity.UpdateMandatePayload.Mandate == nil {
@@ -1556,29 +1895,25 @@ var sources = []*ast.Source{
 
 directive @hidden on FIELD_DEFINITION
 
+directive @count(f: String) on FIELD_DEFINITION
+
 directive @input_maxLength(n: Int, f: String) on INPUT_FIELD_DEFINITION
 
-interface Node {
+type Node {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   parent(filter: NodeFilter): Node
-
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
   name: String! @search(by: [term])
   nameid: String! @id
   mandate(filter: MandateFilter): Mandate
-
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-
 }
 
-type Circle implements Node {
+type Circle {
   isRoot: Boolean!
-
-
-
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
@@ -1591,11 +1926,10 @@ type Circle implements Node {
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
 }
 
-type Role implements Node {
+type Role {
   user(filter: UserFilter): User
   second(filter: UserFilter): User
   skills: [String!] @search(by: [term])
-
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
@@ -1608,40 +1942,40 @@ type Role implements Node {
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
 }
 
-interface Post {
+type Post {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
-type Tension implements Post {
+type Tension {
   nth: Int!
-
   title: String! @search(by: [term])
   type_: TensionType! @search(by: [hash])
   emitter(filter: NodeFilter): Node!
   receivers(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   isAnonymous: Boolean!
   severity: Int!
-  comments(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post!]
-
+  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
+  n_comments: Int @count(f: comments)
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
-type Mandate implements Post {
+type Comment {
+  message: String! @search(by: [fulltext])
+  id: ID!
+  createdAt: DateTime! @search
+  createdBy(filter: UserFilter): User!
+}
+
+type Mandate {
   purpose: String! @search(by: [fulltext])
   responsabilities: String
   domains: [String!]
-
-
-
-
-
-
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
@@ -1657,7 +1991,6 @@ type User {
   roles(filter: RoleFilter, order: RoleOrder, first: Int, offset: Int): [Role!] @hasInverse(field: user)
   backed_roles(filter: RoleFilter, order: RoleOrder, first: Int, offset: Int): [Role!] @hasInverse(field: second)
   bio: String
-
 }
 
 enum NodeType {
@@ -1697,6 +2030,18 @@ input AddCircleInput {
 
 type AddCirclePayload {
   circle(filter: CircleFilter, order: CircleOrder, first: Int, offset: Int): [Circle]
+  numUids: Int
+}
+
+input AddCommentInput {
+  createdAt: DateTime!
+  createdBy: UserRef!
+  message: String
+  _VOID: String
+}
+
+type AddCommentPayload {
+  comment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment]
   numUids: Int
 }
 
@@ -1745,7 +2090,8 @@ input AddTensionInput {
   receivers: [NodeRef!]
   isAnonymous: Boolean!
   severity: Int!
-  comments: [PostRef!]
+  comments: [CommentRef!]
+  n_comments: Int
 }
 
 type AddTensionPayload {
@@ -1816,6 +2162,42 @@ input CircleRef {
   isRoot: Boolean
 }
 
+input CommentFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  message: StringFullTextFilter
+  and: CommentFilter
+  or: CommentFilter
+  not: CommentFilter
+}
+
+input CommentOrder {
+  asc: CommentOrderable
+  desc: CommentOrderable
+  then: CommentOrder
+}
+
+enum CommentOrderable {
+  createdAt
+  message
+  _VOID
+}
+
+input CommentPatch {
+  createdAt: DateTime
+  createdBy: UserRef
+  message: String
+  _VOID: String
+}
+
+input CommentRef {
+  id: ID
+  createdAt: DateTime
+  createdBy: UserRef
+  message: String
+  _VOID: String
+}
+
 scalar DateTime
 
 input DateTimeFilter {
@@ -1827,6 +2209,11 @@ input DateTimeFilter {
 }
 
 type DeleteCirclePayload {
+  msg: String
+  numUids: Int
+}
+
+type DeleteCommentPayload {
   msg: String
   numUids: Int
 }
@@ -1950,6 +2337,9 @@ type Mutation {
   addTension(input: [AddTensionInput!]!): AddTensionPayload
   updateTension(input: UpdateTensionInput!): UpdateTensionPayload
   deleteTension(filter: TensionFilter!): DeleteTensionPayload
+  addComment(input: [AddCommentInput!]!): AddCommentPayload
+  updateComment(input: UpdateCommentInput!): UpdateCommentPayload
+  deleteComment(filter: CommentFilter!): DeleteCommentPayload
   addMandate(input: [AddMandateInput!]!): AddMandatePayload
   updateMandate(input: UpdateMandateInput!): UpdateMandatePayload
   deleteMandate(filter: MandateFilter!): DeleteMandatePayload
@@ -2037,6 +2427,8 @@ type Query {
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   getTension(id: ID!): Tension
   queryTension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  getComment(id: ID!): Comment
+  queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment]
   getMandate(id: ID!): Mandate
   queryMandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
   getUser(id: ID, username: String): User
@@ -2146,6 +2538,7 @@ enum TensionOrderable {
   nth
   title
   severity
+  n_comments
 }
 
 input TensionPatch {
@@ -2159,7 +2552,8 @@ input TensionPatch {
   receivers: [NodeRef!]
   isAnonymous: Boolean
   severity: Int
-  comments: [PostRef!]
+  comments: [CommentRef!]
+  n_comments: Int
 }
 
 input TensionRef {
@@ -2174,7 +2568,8 @@ input TensionRef {
   receivers: [NodeRef!]
   isAnonymous: Boolean
   severity: Int
-  comments: [PostRef!]
+  comments: [CommentRef!]
+  n_comments: Int
 }
 
 input TensionType_hash {
@@ -2189,6 +2584,17 @@ input UpdateCircleInput {
 
 type UpdateCirclePayload {
   circle(filter: CircleFilter, order: CircleOrder, first: Int, offset: Int): [Circle]
+  numUids: Int
+}
+
+input UpdateCommentInput {
+  filter: CommentFilter!
+  set: CommentPatch
+  remove: CommentPatch
+}
+
+type UpdateCommentPayload {
+  comment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment]
   numUids: Int
 }
 
@@ -2308,6 +2714,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) dir_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["f"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["f"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) dir_dgraph_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2394,6 +2814,44 @@ func (ec *executionContext) field_AddCirclePayload_circle_args(ctx context.Conte
 	var arg1 *model.CircleOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		arg1, err = ec.unmarshalOCircleOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCircleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_AddCommentPayload_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.CommentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2726,6 +3184,20 @@ func (ec *executionContext) field_Circle_tensions_out_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Comment_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mandate_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2746,6 +3218,20 @@ func (ec *executionContext) field_Mutation_addCircle_args(ctx context.Context, r
 	var arg0 []*model.AddCircleInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNAddCircleInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCircleInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddCommentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNAddCommentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2816,6 +3302,20 @@ func (ec *executionContext) field_Mutation_deleteCircle_args(ctx context.Context
 	var arg0 model.CircleFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		arg0, err = ec.unmarshalNCircleFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCircleFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalNCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2922,6 +3422,20 @@ func (ec *executionContext) field_Mutation_updateCircle_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateCommentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNUpdateCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateMandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3006,6 +3520,176 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_children_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MandateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_tensions_in_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_tensions_out_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Post_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3039,6 +3723,20 @@ func (ec *executionContext) field_Query_getCircle_args(ctx context.Context, rawA
 		}
 	}
 	args["nameid"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -3164,6 +3862,44 @@ func (ec *executionContext) field_Query_queryCircle_args(ctx context.Context, ra
 	var arg1 *model.CircleOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		arg1, err = ec.unmarshalOCircleOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCircleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.CommentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3603,17 +4339,17 @@ func (ec *executionContext) field_Role_user_args(ctx context.Context, rawArgs ma
 func (ec *executionContext) field_Tension_comments_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.PostFilter
+	var arg0 *model.CommentFilter
 	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.PostOrder
+	var arg1 *model.CommentOrder
 	if tmp, ok := rawArgs["order"]; ok {
-		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3718,6 +4454,44 @@ func (ec *executionContext) field_UpdateCirclePayload_circle_args(ctx context.Co
 	var arg1 *model.CircleOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		arg1, err = ec.unmarshalOCircleOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCircleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdateCommentPayload_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.CommentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4129,6 +4903,75 @@ func (ec *executionContext) _AddCirclePayload_numUids(ctx context.Context, field
 	}()
 	fc := &graphql.FieldContext{
 		Object:   "AddCirclePayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddCommentPayload_comment(ctx context.Context, field graphql.CollectedField, obj *model.AddCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AddCommentPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddCommentPayload_comment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comment, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddCommentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AddCommentPayload",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -4623,9 +5466,9 @@ func (ec *executionContext) _Circle_parent(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(*model.Node)
 	fc.Result = res
-	return ec.marshalONode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Circle_children(ctx context.Context, field graphql.CollectedField, obj *model.Circle) (ret graphql.Marshaler) {
@@ -4673,10 +5516,10 @@ func (ec *executionContext) _Circle_children(ctx context.Context, field graphql.
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]model.Node); ok {
+		if data, ok := tmp.([]*model.Node); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []zerogov/fractal6.go/graph/model.Node`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Node`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4685,9 +5528,9 @@ func (ec *executionContext) _Circle_children(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Node)
+	res := resTmp.([]*model.Node)
 	fc.Result = res
-	return ec.marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Circle_name(ctx context.Context, field graphql.CollectedField, obj *model.Circle) (ret graphql.Marshaler) {
@@ -4940,6 +5783,193 @@ func (ec *executionContext) _Circle_tensions_in(ctx context.Context, field graph
 	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Comment_message(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Message, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Comment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.CreatedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Comment_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteCirclePayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCirclePayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4980,6 +6010,68 @@ func (ec *executionContext) _DeleteCirclePayload_numUids(ctx context.Context, fi
 	}()
 	fc := &graphql.FieldContext{
 		Object:   "DeleteCirclePayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteCommentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteCommentPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteCommentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteCommentPayload",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -6172,6 +7264,120 @@ func (ec *executionContext) _Mutation_deleteTension(ctx context.Context, field g
 	return ec.marshalODeleteTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteTensionPayload(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addComment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddComment(rctx, args["input"].([]*model.AddCommentInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddCommentPayload)
+	fc.Result = res
+	return ec.marshalOAddCommentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateComment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateComment(rctx, args["input"].(model.UpdateCommentInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateCommentPayload)
+	fc.Result = res
+	return ec.marshalOUpdateCommentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteComment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteComment(rctx, args["filter"].(model.CommentFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteCommentPayload)
+	fc.Result = res
+	return ec.marshalODeleteCommentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteCommentPayload(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addMandate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6400,6 +7606,669 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	return ec.marshalODeleteUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserPayload(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_id(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.CreatedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_parent(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_parent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Parent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_children(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_children_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Children, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "parent")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Node); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Node`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_name(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Name, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"term"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_nameid(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Nameid, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Id == nil {
+				return nil, errors.New("directive id is not implemented")
+			}
+			return ec.directives.Id(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_mandate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_mandate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mandate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Mandate)
+	fc.Result = res
+	return ec.marshalOMandate2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_tensions_out(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_tensions_out_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.TensionsOut, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "emitter")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_tensions_in_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsIn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Post_id(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Post_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.CreatedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Post_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Post_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Post_message(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Message, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6433,9 +8302,9 @@ func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(*model.Node)
 	fc.Result = res
-	return ec.marshalONode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6471,9 +8340,9 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Node)
+	res := resTmp.([]*model.Node)
 	fc.Result = res
-	return ec.marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getCircle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6661,9 +8530,9 @@ func (ec *executionContext) _Query_getPost(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Post)
+	res := resTmp.(*model.Post)
 	fc.Result = res
-	return ec.marshalOPost2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_queryPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6699,9 +8568,9 @@ func (ec *executionContext) _Query_queryPost(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Post)
+	res := resTmp.([]*model.Post)
 	fc.Result = res
-	return ec.marshalOPost2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalOPost2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6778,6 +8647,82 @@ func (ec *executionContext) _Query_queryTension(ctx context.Context, field graph
 	res := resTmp.([]*model.Tension)
 	fc.Result = res
 	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getComment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetComment(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryComment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryComment(rctx, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getMandate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7294,9 +9239,9 @@ func (ec *executionContext) _Role_parent(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(*model.Node)
 	fc.Result = res
-	return ec.marshalONode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Role_children(ctx context.Context, field graphql.CollectedField, obj *model.Role) (ret graphql.Marshaler) {
@@ -7344,10 +9289,10 @@ func (ec *executionContext) _Role_children(ctx context.Context, field graphql.Co
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]model.Node); ok {
+		if data, ok := tmp.([]*model.Node); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []zerogov/fractal6.go/graph/model.Node`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Node`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7356,9 +9301,9 @@ func (ec *executionContext) _Role_children(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Node)
+	res := resTmp.([]*model.Node)
 	fc.Result = res
-	return ec.marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Role_name(ctx context.Context, field graphql.CollectedField, obj *model.Role) (ret graphql.Marshaler) {
@@ -7797,9 +9742,9 @@ func (ec *executionContext) _Tension_emitter(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(*model.Node)
 	fc.Result = res
-	return ec.marshalNNode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_receivers(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -7835,9 +9780,9 @@ func (ec *executionContext) _Tension_receivers(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Node)
+	res := resTmp.([]*model.Node)
 	fc.Result = res
-	return ec.marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_isAnonymous(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -7941,9 +9886,64 @@ func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Post)
+	res := resTmp.([]*model.Comment)
 	fc.Result = res
-	return ec.marshalOPost2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostᚄ(ctx, field.Selections, res)
+	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.NComments, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalOString2ᚖstring(ctx, "comments")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Count == nil {
+				return nil, errors.New("directive count is not implemented")
+			}
+			return ec.directives.Count(ctx, obj, directive0, f)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*int); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_id(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -8199,6 +10199,75 @@ func (ec *executionContext) _UpdateCirclePayload_numUids(ctx context.Context, fi
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UpdateCommentPayload_comment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "UpdateCommentPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdateCommentPayload_comment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comment, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateCommentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "UpdateCommentPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UpdateMandatePayload_mandate(ctx context.Context, field graphql.CollectedField, obj *model.UpdateMandatePayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8301,9 +10370,9 @@ func (ec *executionContext) _UpdateNodePayload_node(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Node)
+	res := resTmp.([]*model.Node)
 	fc.Result = res
-	return ec.marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UpdateNodePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNodePayload) (ret graphql.Marshaler) {
@@ -8370,9 +10439,9 @@ func (ec *executionContext) _UpdatePostPayload_post(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]model.Post)
+	res := resTmp.([]*model.Post)
 	fc.Result = res
-	return ec.marshalOPost2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalOPost2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UpdatePostPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdatePostPayload) (ret graphql.Marshaler) {
@@ -10122,6 +12191,42 @@ func (ec *executionContext) unmarshalInputAddCircleInput(ctx context.Context, ob
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, obj interface{}) (model.AddCommentInput, error) {
+	var it model.AddCommentInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "message":
+			var err error
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_VOID":
+			var err error
+			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, obj interface{}) (model.AddMandateInput, error) {
 	var it model.AddMandateInput
 	var asMap = obj.(map[string]interface{})
@@ -10322,7 +12427,13 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			}
 		case "comments":
 			var err error
-			it.Comments, err = ec.unmarshalOPostRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRefᚄ(ctx, v)
+			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_comments":
+			var err error
+			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10670,6 +12781,162 @@ func (ec *executionContext) unmarshalInputCircleRef(ctx context.Context, obj int
 		case "isRoot":
 			var err error
 			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj interface{}) (model.CommentFilter, error) {
+	var it model.CommentFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "message":
+			var err error
+			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+			it.And, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+			it.Or, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+			it.Not, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCommentOrder(ctx context.Context, obj interface{}) (model.CommentOrder, error) {
+	var it model.CommentOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+			it.Asc, err = ec.unmarshalOCommentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalOCommentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+			it.Then, err = ec.unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj interface{}) (model.CommentPatch, error) {
+	var it model.CommentPatch
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "message":
+			var err error
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_VOID":
+			var err error
+			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj interface{}) (model.CommentRef, error) {
+	var it model.CommentRef
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "message":
+			var err error
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_VOID":
+			var err error
+			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11827,7 +14094,13 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			}
 		case "comments":
 			var err error
-			it.Comments, err = ec.unmarshalOPostRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRefᚄ(ctx, v)
+			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_comments":
+			var err error
+			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11911,7 +14184,13 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			}
 		case "comments":
 			var err error
-			it.Comments, err = ec.unmarshalOPostRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRefᚄ(ctx, v)
+			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_comments":
+			var err error
+			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11960,6 +14239,36 @@ func (ec *executionContext) unmarshalInputUpdateCircleInput(ctx context.Context,
 		case "remove":
 			var err error
 			it.Remove, err = ec.unmarshalOCirclePatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCirclePatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context, obj interface{}) (model.UpdateCommentInput, error) {
+	var it model.UpdateCommentInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+			it.Filter, err = ec.unmarshalNCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+			it.Set, err = ec.unmarshalOCommentPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+			it.Remove, err = ec.unmarshalOCommentPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12385,52 +14694,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 
 // region    ************************** interface.gotpl ***************************
 
-func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj model.Node) graphql.Marshaler {
-	switch obj := (obj).(type) {
-	case nil:
-		return graphql.Null
-	case model.Circle:
-		return ec._Circle(ctx, sel, &obj)
-	case *model.Circle:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Circle(ctx, sel, obj)
-	case model.Role:
-		return ec._Role(ctx, sel, &obj)
-	case *model.Role:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Role(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
-func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj model.Post) graphql.Marshaler {
-	switch obj := (obj).(type) {
-	case nil:
-		return graphql.Null
-	case model.Tension:
-		return ec._Tension(ctx, sel, &obj)
-	case *model.Tension:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Tension(ctx, sel, obj)
-	case model.Mandate:
-		return ec._Mandate(ctx, sel, &obj)
-	case *model.Mandate:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Mandate(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -12450,6 +14713,32 @@ func (ec *executionContext) _AddCirclePayload(ctx context.Context, sel ast.Selec
 			out.Values[i] = ec._AddCirclePayload_circle(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._AddCirclePayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addCommentPayloadImplementors = []string{"AddCommentPayload"}
+
+func (ec *executionContext) _AddCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddCommentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addCommentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddCommentPayload")
+		case "comment":
+			out.Values[i] = ec._AddCommentPayload_comment(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddCommentPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12565,7 +14854,7 @@ func (ec *executionContext) _AddUserPayload(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var circleImplementors = []string{"Circle", "Node"}
+var circleImplementors = []string{"Circle"}
 
 func (ec *executionContext) _Circle(ctx context.Context, sel ast.SelectionSet, obj *model.Circle) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, circleImplementors)
@@ -12627,6 +14916,48 @@ func (ec *executionContext) _Circle(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var commentImplementors = []string{"Comment"}
+
+func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, commentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Comment")
+		case "message":
+			out.Values[i] = ec._Comment_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "id":
+			out.Values[i] = ec._Comment_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Comment_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdBy":
+			out.Values[i] = ec._Comment_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteCirclePayloadImplementors = []string{"DeleteCirclePayload"}
 
 func (ec *executionContext) _DeleteCirclePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteCirclePayload) graphql.Marshaler {
@@ -12642,6 +14973,32 @@ func (ec *executionContext) _DeleteCirclePayload(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._DeleteCirclePayload_msg(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._DeleteCirclePayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteCommentPayloadImplementors = []string{"DeleteCommentPayload"}
+
+func (ec *executionContext) _DeleteCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteCommentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteCommentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteCommentPayload")
+		case "msg":
+			out.Values[i] = ec._DeleteCommentPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteCommentPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12809,7 +15166,7 @@ func (ec *executionContext) _DeleteUserPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var mandateImplementors = []string{"Mandate", "Post"}
+var mandateImplementors = []string{"Mandate"}
 
 func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, obj *model.Mandate) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mandateImplementors)
@@ -12898,6 +15255,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateTension(ctx, field)
 		case "deleteTension":
 			out.Values[i] = ec._Mutation_deleteTension(ctx, field)
+		case "addComment":
+			out.Values[i] = ec._Mutation_addComment(ctx, field)
+		case "updateComment":
+			out.Values[i] = ec._Mutation_updateComment(ctx, field)
+		case "deleteComment":
+			out.Values[i] = ec._Mutation_deleteComment(ctx, field)
 		case "addMandate":
 			out.Values[i] = ec._Mutation_addMandate(ctx, field)
 		case "updateMandate":
@@ -12910,6 +15273,102 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateUser(ctx, field)
 		case "deleteUser":
 			out.Values[i] = ec._Mutation_deleteUser(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var nodeImplementors = []string{"Node"}
+
+func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj *model.Node) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, nodeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Node")
+		case "id":
+			out.Values[i] = ec._Node_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Node_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdBy":
+			out.Values[i] = ec._Node_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "parent":
+			out.Values[i] = ec._Node_parent(ctx, field, obj)
+		case "children":
+			out.Values[i] = ec._Node_children(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Node_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "nameid":
+			out.Values[i] = ec._Node_nameid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mandate":
+			out.Values[i] = ec._Node_mandate(ctx, field, obj)
+		case "tensions_out":
+			out.Values[i] = ec._Node_tensions_out(ctx, field, obj)
+		case "tensions_in":
+			out.Values[i] = ec._Node_tensions_in(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var postImplementors = []string{"Post"}
+
+func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *model.Post) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, postImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Post")
+		case "id":
+			out.Values[i] = ec._Post_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Post_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdBy":
+			out.Values[i] = ec._Post_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._Post_message(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13046,6 +15505,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_queryTension(ctx, field)
 				return res
 			})
+		case "getComment":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getComment(ctx, field)
+				return res
+			})
+		case "queryComment":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryComment(ctx, field)
+				return res
+			})
 		case "getMandate":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -13105,7 +15586,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var roleImplementors = []string{"Role", "Node"}
+var roleImplementors = []string{"Role"}
 
 func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj *model.Role) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, roleImplementors)
@@ -13168,7 +15649,7 @@ func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var tensionImplementors = []string{"Tension", "Post"}
+var tensionImplementors = []string{"Tension"}
 
 func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, obj *model.Tension) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tensionImplementors)
@@ -13213,6 +15694,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "comments":
 			out.Values[i] = ec._Tension_comments(ctx, field, obj)
+		case "n_comments":
+			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Tension_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -13256,6 +15739,32 @@ func (ec *executionContext) _UpdateCirclePayload(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._UpdateCirclePayload_circle(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdateCirclePayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateCommentPayloadImplementors = []string{"UpdateCommentPayload"}
+
+func (ec *executionContext) _UpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateCommentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateCommentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateCommentPayload")
+		case "comment":
+			out.Values[i] = ec._UpdateCommentPayload_comment(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateCommentPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13750,6 +16259,38 @@ func (ec *executionContext) unmarshalNAddCircleInput2ᚖzerogovᚋfractal6ᚗgo�
 	return &res, err
 }
 
+func (ec *executionContext) unmarshalNAddCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInput(ctx context.Context, v interface{}) (model.AddCommentInput, error) {
+	return ec.unmarshalInputAddCommentInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNAddCommentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddCommentInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AddCommentInput, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNAddCommentInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddCommentInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInput(ctx context.Context, v interface{}) (*model.AddCommentInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNAddCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInput(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) unmarshalNAddMandateInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddMandateInput(ctx context.Context, v interface{}) (model.AddMandateInput, error) {
 	return ec.unmarshalInputAddMandateInput(ctx, v)
 }
@@ -13904,6 +16445,44 @@ func (ec *executionContext) unmarshalNCircleFilter2ᚖzerogovᚋfractal6ᚗgoᚋ
 	return &res, err
 }
 
+func (ec *executionContext) marshalNComment2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v model.Comment) graphql.Marshaler {
+	return ec._Comment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNComment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Comment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx context.Context, v interface{}) (model.CommentFilter, error) {
+	return ec.unmarshalInputCommentFilter(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx context.Context, v interface{}) (*model.CommentFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalNCommentRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx context.Context, v interface{}) (model.CommentRef, error) {
+	return ec.unmarshalInputCommentRef(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNCommentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx context.Context, v interface{}) (*model.CommentRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNCommentRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) unmarshalNDateTime2string(ctx context.Context, v interface{}) (string, error) {
 	return graphql.UnmarshalString(v)
 }
@@ -13968,6 +16547,10 @@ func (ec *executionContext) unmarshalNMandateFilter2ᚖzerogovᚋfractal6ᚗgo�
 }
 
 func (ec *executionContext) marshalNNode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v model.Node) graphql.Marshaler {
+	return ec._Node(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v *model.Node) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -14001,16 +16584,6 @@ func (ec *executionContext) unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 	return &res, err
 }
 
-func (ec *executionContext) marshalNPost2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Post(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNPostFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx context.Context, v interface{}) (model.PostFilter, error) {
 	return ec.unmarshalInputPostFilter(ctx, v)
 }
@@ -14020,18 +16593,6 @@ func (ec *executionContext) unmarshalNPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgr
 		return nil, nil
 	}
 	res, err := ec.unmarshalNPostFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) unmarshalNPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx context.Context, v interface{}) (model.PostRef, error) {
-	return ec.unmarshalInputPostRef(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx context.Context, v interface{}) (*model.PostRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 	return &res, err
 }
 
@@ -14136,6 +16697,10 @@ func (ec *executionContext) marshalNTensionType2zerogovᚋfractal6ᚗgoᚋgraph�
 
 func (ec *executionContext) unmarshalNUpdateCircleInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCircleInput(ctx context.Context, v interface{}) (model.UpdateCircleInput, error) {
 	return ec.unmarshalInputUpdateCircleInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentInput(ctx context.Context, v interface{}) (model.UpdateCommentInput, error) {
+	return ec.unmarshalInputUpdateCommentInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateMandateInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateMandateInput(ctx context.Context, v interface{}) (model.UpdateMandateInput, error) {
@@ -14437,6 +17002,17 @@ func (ec *executionContext) marshalOAddCirclePayload2ᚖzerogovᚋfractal6ᚗgo�
 	return ec._AddCirclePayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOAddCommentPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentPayload(ctx context.Context, sel ast.SelectionSet, v model.AddCommentPayload) graphql.Marshaler {
+	return ec._AddCommentPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOAddCommentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddCommentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddCommentPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOAddMandatePayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddMandatePayload(ctx context.Context, sel ast.SelectionSet, v model.AddMandatePayload) graphql.Marshaler {
 	return ec._AddMandatePayload(ctx, sel, &v)
 }
@@ -14615,6 +17191,177 @@ func (ec *executionContext) unmarshalOCirclePatch2ᚖzerogovᚋfractal6ᚗgoᚋg
 	return &res, err
 }
 
+func (ec *executionContext) marshalOComment2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v model.Comment) graphql.Marshaler {
+	return ec._Comment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOComment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNComment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOComment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Comment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx context.Context, v interface{}) (model.CommentFilter, error) {
+	return ec.unmarshalInputCommentFilter(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx context.Context, v interface{}) (*model.CommentFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOCommentOrder2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx context.Context, v interface{}) (model.CommentOrder, error) {
+	return ec.unmarshalInputCommentOrder(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx context.Context, v interface{}) (*model.CommentOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOCommentOrder2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOCommentOrderable2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx context.Context, v interface{}) (model.CommentOrderable, error) {
+	var res model.CommentOrderable
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalOCommentOrderable2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx context.Context, sel ast.SelectionSet, v model.CommentOrderable) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalOCommentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx context.Context, v interface{}) (*model.CommentOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOCommentOrderable2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOCommentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx context.Context, sel ast.SelectionSet, v *model.CommentOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOCommentPatch2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx context.Context, v interface{}) (model.CommentPatch, error) {
+	return ec.unmarshalInputCommentPatch(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOCommentPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx context.Context, v interface{}) (*model.CommentPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOCommentPatch2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx context.Context, v interface{}) ([]*model.CommentRef, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.CommentRef, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNCommentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalODateTime2string(ctx context.Context, v interface{}) (string, error) {
 	return graphql.UnmarshalString(v)
 }
@@ -14659,6 +17406,17 @@ func (ec *executionContext) marshalODeleteCirclePayload2ᚖzerogovᚋfractal6ᚗ
 		return graphql.Null
 	}
 	return ec._DeleteCirclePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteCommentPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteCommentPayload(ctx context.Context, sel ast.SelectionSet, v model.DeleteCommentPayload) graphql.Marshaler {
+	return ec._DeleteCommentPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalODeleteCommentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteCommentPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteCommentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteCommentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteMandatePayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteMandatePayload(ctx context.Context, sel ast.SelectionSet, v model.DeleteMandatePayload) graphql.Marshaler {
@@ -15012,90 +17770,94 @@ func (ec *executionContext) unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgr
 }
 
 func (ec *executionContext) marshalONode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v model.Node) graphql.Marshaler {
+	return ec._Node(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v []*model.Node) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Node) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v *model.Node) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Node(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v []model.Node) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalONode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalONode2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Node) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNNode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
 }
 
 func (ec *executionContext) unmarshalONodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx context.Context, v interface{}) (model.NodeFilter, error) {
@@ -15191,90 +17953,54 @@ func (ec *executionContext) unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 }
 
 func (ec *executionContext) marshalOPost2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {
+	return ec._Post(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOPost2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Post(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOPost2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v []model.Post) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOPost2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalOPost2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Post) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNPost2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
 }
 
 func (ec *executionContext) unmarshalOPostFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx context.Context, v interface{}) (model.PostFilter, error) {
@@ -15335,26 +18061,6 @@ func (ec *executionContext) unmarshalOPostPatch2ᚖzerogovᚋfractal6ᚗgoᚋgra
 	}
 	res, err := ec.unmarshalOPostPatch2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
 	return &res, err
-}
-
-func (ec *executionContext) unmarshalOPostRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRefᚄ(ctx context.Context, v interface{}) ([]*model.PostRef, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.PostRef, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) marshalORole2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRole(ctx context.Context, sel ast.SelectionSet, v model.Role) graphql.Marshaler {
@@ -15835,6 +18541,17 @@ func (ec *executionContext) marshalOUpdateCirclePayload2ᚖzerogovᚋfractal6ᚗ
 		return graphql.Null
 	}
 	return ec._UpdateCirclePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateCommentPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateCommentPayload) graphql.Marshaler {
+	return ec._UpdateCommentPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOUpdateCommentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateCommentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateCommentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateMandatePayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateMandatePayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateMandatePayload) graphql.Marshaler {

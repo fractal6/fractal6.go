@@ -8,7 +8,7 @@ package graph
 import (
     "fmt"
     "context"
-    "github.com/spf13/viper"
+    "reflect"
     "github.com/99designs/gqlgen/graphql"
     //"golang.org/x/crypto/bcrypt" 
 
@@ -36,10 +36,6 @@ type Resolver struct{
 // Init initialize shema config and Directives...
 func Init() gen.Config {
     var MutationQ, QueryQ gql.Query
-    HOSTDB := viper.GetString("db.host")
-    PORTDB := viper.GetString("db.port")
-    APIDB := viper.GetString("db.api")
-    dgraphApiUrl := "http://"+HOSTDB+":"+PORTDB+"/"+APIDB
 
     MutationQ.Data = `{
         "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) { 
@@ -64,9 +60,7 @@ func Init() gen.Config {
 
 
     r := Resolver{
-        db:tools.Dgraph{
-            Url: dgraphApiUrl,
-        },
+        db:tools.InitDB(),
         QueryQ: QueryQ,
         MutationQ: MutationQ,
     }
@@ -79,7 +73,8 @@ func Init() gen.Config {
 
     // User defined directives
     c.Directives.Hidden = hidden
-    c.Directives.Input_maxLength = input_maxLength
+    c.Directives.Count = count
+    c.Directives.Input_maxLength = inputMaxLength
     //c.Directives.HasRole = hasRoleMiddleware
     return c
 }
@@ -105,14 +100,32 @@ func nothing3 (ctx context.Context, obj interface{}, next graphql.Resolver, idx 
 
 func hidden (ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
-    f := rc.Field.Name
-    return nil, fmt.Errorf("%s field is hidden", f)
+    fieldDef := rc.Field.Name
+    return nil, fmt.Errorf("%s field is hidden", fieldDef)
     }
 
-func input_maxLength (ctx context.Context, obj interface{}, next graphql.Resolver, max *int, field *string) (interface{}, error) {
-    v := obj.(gql.JsonAtom)[*field].(string)
-    if len(v) > *max {
-        return nil, fmt.Errorf("%s to long. Maximum length is %d", *field, *max)
+func count (ctx context.Context, obj interface{}, next graphql.Resolver, _field *string) (interface{}, error) {
+    rc := graphql.GetResolverContext(ctx)
+    fieldDef := rc.Field.Name
+    goFieldfDef := tools.ToGoNameFormat(fieldDef)
+    field := *_field
+
+    // Reflect to get obj data info
+    // DEBUG: use type switch instead ? (less modular but faster?)
+    id := reflect.ValueOf(obj).Elem().FieldByName("ID").String()
+    typeName := tools.ToTypeName(reflect.TypeOf(obj).String())
+    db := tools.InitDB()
+    v := db.Count(id, typeName, field)
+    reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
+    return next(ctx)
+}
+
+func inputMaxLength (ctx context.Context, obj interface{}, next graphql.Resolver, _max *int, _field *string) (interface{}, error) {
+    field := *_field
+    max := *_max
+    v := obj.(gql.JsonAtom)[field].(string)
+    if len(v) > max {
+        return nil, fmt.Errorf("%s to long. Maximum length is %d", field, max)
     }
     return next(ctx)
 }

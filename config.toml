@@ -6,7 +6,8 @@ port = "8888"
 
 [db]
 host = "localhost"
-port = "8080"
+port_gql = "8080"
+port_grpc = "9080"
 api = "graphql"
 admin = "admin"
 

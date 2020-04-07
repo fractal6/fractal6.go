@@ -2,7 +2,23 @@ package tools
 
 import (
 	"reflect"
+    "strings"
 )
+
+func ToGoNameFormat(name string) string {
+    var l  []string
+    for _, s := range strings.Split(name, "_") {
+        l = append(l, strings.Title(s))
+    }
+    goName := strings.Join(l, "")
+    return goName
+}
+
+func ToTypeName(name string) string {
+    l := strings.Split(name, ".")
+    typeName := l[len(l)-1]
+    return typeName 
+}
 
 
 /*

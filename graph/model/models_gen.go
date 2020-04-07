@@ -8,14 +8,6 @@ import (
 	"strconv"
 )
 
-type Node interface {
-	IsNode()
-}
-
-type Post interface {
-	IsPost()
-}
-
 type AddCircleInput struct {
 	CreatedAt   string        `json:"createdAt"`
 	CreatedBy   *UserRef      `json:"createdBy"`
@@ -32,6 +24,18 @@ type AddCircleInput struct {
 type AddCirclePayload struct {
 	Circle  []*Circle `json:"circle"`
 	NumUids *int      `json:"numUids"`
+}
+
+type AddCommentInput struct {
+	CreatedAt string   `json:"createdAt"`
+	CreatedBy *UserRef `json:"createdBy"`
+	Message   *string  `json:"message"`
+	Void      *string  `json:"_VOID"`
+}
+
+type AddCommentPayload struct {
+	Comment []*Comment `json:"comment"`
+	NumUids *int       `json:"numUids"`
 }
 
 type AddMandateInput struct {
@@ -69,17 +73,18 @@ type AddRolePayload struct {
 }
 
 type AddTensionInput struct {
-	CreatedAt   string      `json:"createdAt"`
-	CreatedBy   *UserRef    `json:"createdBy"`
-	Message     *string     `json:"message"`
-	Nth         int         `json:"nth"`
-	Title       string      `json:"title"`
-	Type        TensionType `json:"type_"`
-	Emitter     *NodeRef    `json:"emitter"`
-	Receivers   []*NodeRef  `json:"receivers"`
-	IsAnonymous bool        `json:"isAnonymous"`
-	Severity    int         `json:"severity"`
-	Comments    []*PostRef  `json:"comments"`
+	CreatedAt   string        `json:"createdAt"`
+	CreatedBy   *UserRef      `json:"createdBy"`
+	Message     *string       `json:"message"`
+	Nth         int           `json:"nth"`
+	Title       string        `json:"title"`
+	Type        TensionType   `json:"type_"`
+	Emitter     *NodeRef      `json:"emitter"`
+	Receivers   []*NodeRef    `json:"receivers"`
+	IsAnonymous bool          `json:"isAnonymous"`
+	Severity    int           `json:"severity"`
+	Comments    []*CommentRef `json:"comments"`
+	NComments   *int          `json:"n_comments"`
 }
 
 type AddTensionPayload struct {
@@ -107,16 +112,14 @@ type Circle struct {
 	ID          string     `json:"id"`
 	CreatedAt   string     `json:"createdAt"`
 	CreatedBy   *User      `json:"createdBy"`
-	Parent      Node       `json:"parent"`
-	Children    []Node     `json:"children"`
+	Parent      *Node      `json:"parent"`
+	Children    []*Node    `json:"children"`
 	Name        string     `json:"name"`
 	Nameid      string     `json:"nameid"`
 	Mandate     *Mandate   `json:"mandate"`
 	TensionsOut []*Tension `json:"tensions_out"`
 	TensionsIn  []*Tension `json:"tensions_in"`
 }
-
-func (Circle) IsNode() {}
 
 type CircleFilter struct {
 	ID        []string          `json:"id"`
@@ -160,6 +163,43 @@ type CircleRef struct {
 	IsRoot      *bool         `json:"isRoot"`
 }
 
+type Comment struct {
+	Message   string `json:"message"`
+	ID        string `json:"id"`
+	CreatedAt string `json:"createdAt"`
+	CreatedBy *User  `json:"createdBy"`
+}
+
+type CommentFilter struct {
+	ID        []string              `json:"id"`
+	CreatedAt *DateTimeFilter       `json:"createdAt"`
+	Message   *StringFullTextFilter `json:"message"`
+	And       *CommentFilter        `json:"and"`
+	Or        *CommentFilter        `json:"or"`
+	Not       *CommentFilter        `json:"not"`
+}
+
+type CommentOrder struct {
+	Asc  *CommentOrderable `json:"asc"`
+	Desc *CommentOrderable `json:"desc"`
+	Then *CommentOrder     `json:"then"`
+}
+
+type CommentPatch struct {
+	CreatedAt *string  `json:"createdAt"`
+	CreatedBy *UserRef `json:"createdBy"`
+	Message   *string  `json:"message"`
+	Void      *string  `json:"_VOID"`
+}
+
+type CommentRef struct {
+	ID        *string  `json:"id"`
+	CreatedAt *string  `json:"createdAt"`
+	CreatedBy *UserRef `json:"createdBy"`
+	Message   *string  `json:"message"`
+	Void      *string  `json:"_VOID"`
+}
+
 type DateTimeFilter struct {
 	Eq *string `json:"eq"`
 	Le *string `json:"le"`
@@ -169,6 +209,11 @@ type DateTimeFilter struct {
 }
 
 type DeleteCirclePayload struct {
+	Msg     *string `json:"msg"`
+	NumUids *int    `json:"numUids"`
+}
+
+type DeleteCommentPayload struct {
 	Msg     *string `json:"msg"`
 	NumUids *int    `json:"numUids"`
 }
@@ -229,8 +274,6 @@ type Mandate struct {
 	Message          *string  `json:"message"`
 }
 
-func (Mandate) IsPost() {}
-
 type MandateFilter struct {
 	ID        []string              `json:"id"`
 	CreatedAt *DateTimeFilter       `json:"createdAt"`
@@ -266,6 +309,19 @@ type MandateRef struct {
 	Domains          []string `json:"domains"`
 }
 
+type Node struct {
+	ID          string     `json:"id"`
+	CreatedAt   string     `json:"createdAt"`
+	CreatedBy   *User      `json:"createdBy"`
+	Parent      *Node      `json:"parent"`
+	Children    []*Node    `json:"children"`
+	Name        string     `json:"name"`
+	Nameid      string     `json:"nameid"`
+	Mandate     *Mandate   `json:"mandate"`
+	TensionsOut []*Tension `json:"tensions_out"`
+	TensionsIn  []*Tension `json:"tensions_in"`
+}
+
 type NodeFilter struct {
 	ID        []string          `json:"id"`
 	CreatedAt *DateTimeFilter   `json:"createdAt"`
@@ -296,6 +352,13 @@ type NodePatch struct {
 type NodeRef struct {
 	ID     *string `json:"id"`
 	Nameid *string `json:"nameid"`
+}
+
+type Post struct {
+	ID        string  `json:"id"`
+	CreatedAt string  `json:"createdAt"`
+	CreatedBy *User   `json:"createdBy"`
+	Message   *string `json:"message"`
 }
 
 type PostFilter struct {
@@ -330,16 +393,14 @@ type Role struct {
 	ID          string     `json:"id"`
 	CreatedAt   string     `json:"createdAt"`
 	CreatedBy   *User      `json:"createdBy"`
-	Parent      Node       `json:"parent"`
-	Children    []Node     `json:"children"`
+	Parent      *Node      `json:"parent"`
+	Children    []*Node    `json:"children"`
 	Name        string     `json:"name"`
 	Nameid      string     `json:"nameid"`
 	Mandate     *Mandate   `json:"mandate"`
 	TensionsOut []*Tension `json:"tensions_out"`
 	TensionsIn  []*Tension `json:"tensions_in"`
 }
-
-func (Role) IsNode() {}
 
 type RoleFilter struct {
 	ID        []string          `json:"id"`
@@ -418,18 +479,17 @@ type Tension struct {
 	Nth         int         `json:"nth"`
 	Title       string      `json:"title"`
 	Type        TensionType `json:"type_"`
-	Emitter     Node        `json:"emitter"`
-	Receivers   []Node      `json:"receivers"`
+	Emitter     *Node       `json:"emitter"`
+	Receivers   []*Node     `json:"receivers"`
 	IsAnonymous bool        `json:"isAnonymous"`
 	Severity    int         `json:"severity"`
-	Comments    []Post      `json:"comments"`
+	Comments    []*Comment  `json:"comments"`
+	NComments   *int        `json:"n_comments"`
 	ID          string      `json:"id"`
 	CreatedAt   string      `json:"createdAt"`
 	CreatedBy   *User       `json:"createdBy"`
 	Message     *string     `json:"message"`
 }
-
-func (Tension) IsPost() {}
 
 type TensionFilter struct {
 	ID        []string              `json:"id"`
@@ -449,32 +509,34 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
-	CreatedAt   *string      `json:"createdAt"`
-	CreatedBy   *UserRef     `json:"createdBy"`
-	Message     *string      `json:"message"`
-	Nth         *int         `json:"nth"`
-	Title       *string      `json:"title"`
-	Type        *TensionType `json:"type_"`
-	Emitter     *NodeRef     `json:"emitter"`
-	Receivers   []*NodeRef   `json:"receivers"`
-	IsAnonymous *bool        `json:"isAnonymous"`
-	Severity    *int         `json:"severity"`
-	Comments    []*PostRef   `json:"comments"`
+	CreatedAt   *string       `json:"createdAt"`
+	CreatedBy   *UserRef      `json:"createdBy"`
+	Message     *string       `json:"message"`
+	Nth         *int          `json:"nth"`
+	Title       *string       `json:"title"`
+	Type        *TensionType  `json:"type_"`
+	Emitter     *NodeRef      `json:"emitter"`
+	Receivers   []*NodeRef    `json:"receivers"`
+	IsAnonymous *bool         `json:"isAnonymous"`
+	Severity    *int          `json:"severity"`
+	Comments    []*CommentRef `json:"comments"`
+	NComments   *int          `json:"n_comments"`
 }
 
 type TensionRef struct {
-	ID          *string      `json:"id"`
-	CreatedAt   *string      `json:"createdAt"`
-	CreatedBy   *UserRef     `json:"createdBy"`
-	Message     *string      `json:"message"`
-	Nth         *int         `json:"nth"`
-	Title       *string      `json:"title"`
-	Type        *TensionType `json:"type_"`
-	Emitter     *NodeRef     `json:"emitter"`
-	Receivers   []*NodeRef   `json:"receivers"`
-	IsAnonymous *bool        `json:"isAnonymous"`
-	Severity    *int         `json:"severity"`
-	Comments    []*PostRef   `json:"comments"`
+	ID          *string       `json:"id"`
+	CreatedAt   *string       `json:"createdAt"`
+	CreatedBy   *UserRef      `json:"createdBy"`
+	Message     *string       `json:"message"`
+	Nth         *int          `json:"nth"`
+	Title       *string       `json:"title"`
+	Type        *TensionType  `json:"type_"`
+	Emitter     *NodeRef      `json:"emitter"`
+	Receivers   []*NodeRef    `json:"receivers"`
+	IsAnonymous *bool         `json:"isAnonymous"`
+	Severity    *int          `json:"severity"`
+	Comments    []*CommentRef `json:"comments"`
+	NComments   *int          `json:"n_comments"`
 }
 
 type TensionTypeHash struct {
@@ -490,6 +552,17 @@ type UpdateCircleInput struct {
 type UpdateCirclePayload struct {
 	Circle  []*Circle `json:"circle"`
 	NumUids *int      `json:"numUids"`
+}
+
+type UpdateCommentInput struct {
+	Filter *CommentFilter `json:"filter"`
+	Set    *CommentPatch  `json:"set"`
+	Remove *CommentPatch  `json:"remove"`
+}
+
+type UpdateCommentPayload struct {
+	Comment []*Comment `json:"comment"`
+	NumUids *int       `json:"numUids"`
 }
 
 type UpdateMandateInput struct {
@@ -510,8 +583,8 @@ type UpdateNodeInput struct {
 }
 
 type UpdateNodePayload struct {
-	Node    []Node `json:"node"`
-	NumUids *int   `json:"numUids"`
+	Node    []*Node `json:"node"`
+	NumUids *int    `json:"numUids"`
 }
 
 type UpdatePostInput struct {
@@ -521,8 +594,8 @@ type UpdatePostInput struct {
 }
 
 type UpdatePostPayload struct {
-	Post    []Post `json:"post"`
-	NumUids *int   `json:"numUids"`
+	Post    []*Post `json:"post"`
+	NumUids *int    `json:"numUids"`
 }
 
 type UpdateRoleInput struct {
@@ -644,6 +717,49 @@ func (e *CircleOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e CircleOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type CommentOrderable string
+
+const (
+	CommentOrderableCreatedAt CommentOrderable = "createdAt"
+	CommentOrderableMessage   CommentOrderable = "message"
+	CommentOrderableVoid      CommentOrderable = "_VOID"
+)
+
+var AllCommentOrderable = []CommentOrderable{
+	CommentOrderableCreatedAt,
+	CommentOrderableMessage,
+	CommentOrderableVoid,
+}
+
+func (e CommentOrderable) IsValid() bool {
+	switch e {
+	case CommentOrderableCreatedAt, CommentOrderableMessage, CommentOrderableVoid:
+		return true
+	}
+	return false
+}
+
+func (e CommentOrderable) String() string {
+	return string(e)
+}
+
+func (e *CommentOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = CommentOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid CommentOrderable", str)
+	}
+	return nil
+}
+
+func (e CommentOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -935,6 +1051,7 @@ const (
 	TensionOrderableNth       TensionOrderable = "nth"
 	TensionOrderableTitle     TensionOrderable = "title"
 	TensionOrderableSeverity  TensionOrderable = "severity"
+	TensionOrderableNComments TensionOrderable = "n_comments"
 )
 
 var AllTensionOrderable = []TensionOrderable{
@@ -943,11 +1060,12 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableNth,
 	TensionOrderableTitle,
 	TensionOrderableSeverity,
+	TensionOrderableNComments,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableSeverity:
+	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableSeverity, TensionOrderableNComments:
 		return true
 	}
 	return false

@@ -71,6 +71,18 @@ func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.Tensi
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCommentInput) (data *model.AddCommentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.CommentFilter) (data *model.DeleteCommentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (data *model.AddMandatePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -102,11 +114,11 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data model.Node, errors error) {
+func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data *model.Node, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) (data []model.Node, errors error) {
+func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) (data []*model.Node, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -126,11 +138,11 @@ func (r *queryResolver) QueryRole(ctx context.Context, filter *model.RoleFilter,
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetPost(ctx context.Context, id string) (data model.Post, errors error) {
+func (r *queryResolver) GetPost(ctx context.Context, id string) (data *model.Post, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) (data []model.Post, errors error) {
+func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) (data []*model.Post, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -141,6 +153,14 @@ func (r *queryResolver) GetTension(ctx context.Context, id string) (data *model.
 func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) (data []*model.Tension, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
+}
+
+func (r *queryResolver) GetComment(ctx context.Context, id string) (data *model.Comment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) (data []*model.Comment, errors error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.Mandate, errors error) {
