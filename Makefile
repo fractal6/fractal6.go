@@ -9,7 +9,7 @@ MOD := "zerogov/fractal6.go"
 # LDFLAGS see versioning, hash etc...
 
 .PHONY: build prod vendor
-default: build
+default: build gen
 
 #
 # Build commands
@@ -35,7 +35,7 @@ generate: schema gen
 
 schema:
 	cd ../schema
-	make
+	make schema # Do not alter dgraph
 	cd -
 
 gen: _gen _named_returns_resolver
@@ -45,7 +45,6 @@ _gen:
 	# Or @DEBUG: why it doesnt work anymore ?
 	#go generate ./...  
 	# go run github.com/99designs/gqlgen generate
-	#
 	
 _named_returns_resolver:
 	sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go

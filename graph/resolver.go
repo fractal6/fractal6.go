@@ -86,33 +86,37 @@ func Init() gen.Config {
 *
 */
 
-func nothing (ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func nothing(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     return next(ctx)
 }
 
-func nothing2 (ctx context.Context, obj interface{}, next graphql.Resolver, key string) (interface{}, error) {
+func nothing2(ctx context.Context, obj interface{}, next graphql.Resolver, key string) (interface{}, error) {
     return next(ctx)
 }
 
-func nothing3 (ctx context.Context, obj interface{}, next graphql.Resolver, idx []model.DgraphIndex) (interface{}, error) {
+func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx []model.DgraphIndex) (interface{}, error) {
     return next(ctx)
 }
 
-func hidden (ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
     fieldDef := rc.Field.Name
-    return nil, fmt.Errorf("%s field is hidden", fieldDef)
+    return nil, fmt.Errorf("`%s' field is hidden", fieldDef)
     }
 
-func count (ctx context.Context, obj interface{}, next graphql.Resolver, _field *string) (interface{}, error) {
+func count(ctx context.Context, obj interface{}, next graphql.Resolver, _field *string) (interface{}, error) {
+    field := *_field
     rc := graphql.GetResolverContext(ctx)
     fieldDef := rc.Field.Name
     goFieldfDef := tools.ToGoNameFormat(fieldDef)
-    field := *_field
 
     // Reflect to get obj data info
     // DEBUG: use type switch instead ? (less modular but faster?)
     id := reflect.ValueOf(obj).Elem().FieldByName("ID").String()
+	if id == "" {
+        err := fmt.Errorf("`id' field is needed to query `%s'", fieldDef)
+        return nil, err
+    }
     typeName := tools.ToTypeName(reflect.TypeOf(obj).String())
     db := tools.InitDB()
     v := db.Count(id, typeName, field)
@@ -120,17 +124,17 @@ func count (ctx context.Context, obj interface{}, next graphql.Resolver, _field 
     return next(ctx)
 }
 
-func inputMaxLength (ctx context.Context, obj interface{}, next graphql.Resolver, _max *int, _field *string) (interface{}, error) {
+func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, _max *int, _field *string) (interface{}, error) {
     field := *_field
     max := *_max
     v := obj.(gql.JsonAtom)[field].(string)
     if len(v) > max {
-        return nil, fmt.Errorf("%s to long. Maximum length is %d", field, max)
+        return nil, fmt.Errorf("`%s' to long. Maximum length is %d", field, max)
     }
     return next(ctx)
 }
 
-//func hasRoleMiddleware (ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
+//func hasRoleMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
 //
 //    fmt.Println(ctx)
 //    //if !getCurrentUser(ctx).HasRole(role) {

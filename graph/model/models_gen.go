@@ -9,16 +9,18 @@ import (
 )
 
 type AddCircleInput struct {
-	CreatedAt   string        `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        string        `json:"name"`
-	Nameid      string        `json:"nameid"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
-	IsRoot      bool          `json:"isRoot"`
+	CreatedAt    string        `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         string        `json:"name"`
+	Nameid       string        `json:"nameid"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
+	IsRoot       bool          `json:"isRoot"`
 }
 
 type AddCirclePayload struct {
@@ -38,6 +40,15 @@ type AddCommentPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
+type AddLabelInput struct {
+	Name string `json:"name"`
+}
+
+type AddLabelPayload struct {
+	Label   []*Label `json:"label"`
+	NumUids *int     `json:"numUids"`
+}
+
 type AddMandateInput struct {
 	CreatedAt        string   `json:"createdAt"`
 	CreatedBy        *UserRef `json:"createdBy"`
@@ -53,18 +64,20 @@ type AddMandatePayload struct {
 }
 
 type AddRoleInput struct {
-	CreatedAt   string        `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        string        `json:"name"`
-	Nameid      string        `json:"nameid"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
-	User        *UserRef      `json:"user"`
-	Second      *UserRef      `json:"second"`
-	Skills      []string      `json:"skills"`
+	CreatedAt    string        `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         string        `json:"name"`
+	Nameid       string        `json:"nameid"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
+	User         *UserRef      `json:"user"`
+	Second       *UserRef      `json:"second"`
+	Skills       []string      `json:"skills"`
 }
 
 type AddRolePayload struct {
@@ -82,8 +95,8 @@ type AddTensionInput struct {
 	Emitter     *NodeRef      `json:"emitter"`
 	Receivers   []*NodeRef    `json:"receivers"`
 	IsAnonymous bool          `json:"isAnonymous"`
-	Severity    int           `json:"severity"`
 	Comments    []*CommentRef `json:"comments"`
+	Labels      []*LabelRef   `json:"labels"`
 	NComments   *int          `json:"n_comments"`
 }
 
@@ -108,17 +121,19 @@ type AddUserPayload struct {
 }
 
 type Circle struct {
-	IsRoot      bool       `json:"isRoot"`
-	ID          string     `json:"id"`
-	CreatedAt   string     `json:"createdAt"`
-	CreatedBy   *User      `json:"createdBy"`
-	Parent      *Node      `json:"parent"`
-	Children    []*Node    `json:"children"`
-	Name        string     `json:"name"`
-	Nameid      string     `json:"nameid"`
-	Mandate     *Mandate   `json:"mandate"`
-	TensionsOut []*Tension `json:"tensions_out"`
-	TensionsIn  []*Tension `json:"tensions_in"`
+	IsRoot       bool       `json:"isRoot"`
+	ID           string     `json:"id"`
+	CreatedAt    string     `json:"createdAt"`
+	CreatedBy    *User      `json:"createdBy"`
+	Parent       *Node      `json:"parent"`
+	Children     []*Node    `json:"children"`
+	Name         string     `json:"name"`
+	Nameid       string     `json:"nameid"`
+	Mandate      *Mandate   `json:"mandate"`
+	TensionsOut  []*Tension `json:"tensions_out"`
+	TensionsIn   []*Tension `json:"tensions_in"`
+	NTensionsOut *int       `json:"n_tensions_out"`
+	NTensionsIn  *int       `json:"n_tensions_in"`
 }
 
 type CircleFilter struct {
@@ -138,29 +153,33 @@ type CircleOrder struct {
 }
 
 type CirclePatch struct {
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        *string       `json:"name"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
-	IsRoot      *bool         `json:"isRoot"`
+	CreatedAt    *string       `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         *string       `json:"name"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
+	IsRoot       *bool         `json:"isRoot"`
 }
 
 type CircleRef struct {
-	ID          *string       `json:"id"`
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        *string       `json:"name"`
-	Nameid      *string       `json:"nameid"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
-	IsRoot      *bool         `json:"isRoot"`
+	ID           *string       `json:"id"`
+	CreatedAt    *string       `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         *string       `json:"name"`
+	Nameid       *string       `json:"nameid"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
+	IsRoot       *bool         `json:"isRoot"`
 }
 
 type Comment struct {
@@ -218,6 +237,11 @@ type DeleteCommentPayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
+type DeleteLabelPayload struct {
+	Msg     *string `json:"msg"`
+	NumUids *int    `json:"numUids"`
+}
+
 type DeleteMandatePayload struct {
 	Msg     *string `json:"msg"`
 	NumUids *int    `json:"numUids"`
@@ -262,6 +286,30 @@ type IntFilter struct {
 	Lt *int `json:"lt"`
 	Ge *int `json:"ge"`
 	Gt *int `json:"gt"`
+}
+
+type Label struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type LabelFilter struct {
+	ID   []string          `json:"id"`
+	Name *StringHashFilter `json:"name"`
+	And  *LabelFilter      `json:"and"`
+	Or   *LabelFilter      `json:"or"`
+	Not  *LabelFilter      `json:"not"`
+}
+
+type LabelOrder struct {
+	Asc  *LabelOrderable `json:"asc"`
+	Desc *LabelOrderable `json:"desc"`
+	Then *LabelOrder     `json:"then"`
+}
+
+type LabelRef struct {
+	ID   *string `json:"id"`
+	Name *string `json:"name"`
 }
 
 type Mandate struct {
@@ -310,16 +358,18 @@ type MandateRef struct {
 }
 
 type Node struct {
-	ID          string     `json:"id"`
-	CreatedAt   string     `json:"createdAt"`
-	CreatedBy   *User      `json:"createdBy"`
-	Parent      *Node      `json:"parent"`
-	Children    []*Node    `json:"children"`
-	Name        string     `json:"name"`
-	Nameid      string     `json:"nameid"`
-	Mandate     *Mandate   `json:"mandate"`
-	TensionsOut []*Tension `json:"tensions_out"`
-	TensionsIn  []*Tension `json:"tensions_in"`
+	ID           string     `json:"id"`
+	CreatedAt    string     `json:"createdAt"`
+	CreatedBy    *User      `json:"createdBy"`
+	Parent       *Node      `json:"parent"`
+	Children     []*Node    `json:"children"`
+	Name         string     `json:"name"`
+	Nameid       string     `json:"nameid"`
+	Mandate      *Mandate   `json:"mandate"`
+	TensionsOut  []*Tension `json:"tensions_out"`
+	TensionsIn   []*Tension `json:"tensions_in"`
+	NTensionsOut *int       `json:"n_tensions_out"`
+	NTensionsIn  *int       `json:"n_tensions_in"`
 }
 
 type NodeFilter struct {
@@ -339,14 +389,16 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        *string       `json:"name"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
+	CreatedAt    *string       `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         *string       `json:"name"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
 }
 
 type NodeRef struct {
@@ -387,19 +439,21 @@ type PostRef struct {
 }
 
 type Role struct {
-	User        *User      `json:"user"`
-	Second      *User      `json:"second"`
-	Skills      []string   `json:"skills"`
-	ID          string     `json:"id"`
-	CreatedAt   string     `json:"createdAt"`
-	CreatedBy   *User      `json:"createdBy"`
-	Parent      *Node      `json:"parent"`
-	Children    []*Node    `json:"children"`
-	Name        string     `json:"name"`
-	Nameid      string     `json:"nameid"`
-	Mandate     *Mandate   `json:"mandate"`
-	TensionsOut []*Tension `json:"tensions_out"`
-	TensionsIn  []*Tension `json:"tensions_in"`
+	User         *User      `json:"user"`
+	Second       *User      `json:"second"`
+	Skills       []string   `json:"skills"`
+	ID           string     `json:"id"`
+	CreatedAt    string     `json:"createdAt"`
+	CreatedBy    *User      `json:"createdBy"`
+	Parent       *Node      `json:"parent"`
+	Children     []*Node    `json:"children"`
+	Name         string     `json:"name"`
+	Nameid       string     `json:"nameid"`
+	Mandate      *Mandate   `json:"mandate"`
+	TensionsOut  []*Tension `json:"tensions_out"`
+	TensionsIn   []*Tension `json:"tensions_in"`
+	NTensionsOut *int       `json:"n_tensions_out"`
+	NTensionsIn  *int       `json:"n_tensions_in"`
 }
 
 type RoleFilter struct {
@@ -420,33 +474,37 @@ type RoleOrder struct {
 }
 
 type RolePatch struct {
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        *string       `json:"name"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
-	User        *UserRef      `json:"user"`
-	Second      *UserRef      `json:"second"`
-	Skills      []string      `json:"skills"`
+	CreatedAt    *string       `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         *string       `json:"name"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
+	User         *UserRef      `json:"user"`
+	Second       *UserRef      `json:"second"`
+	Skills       []string      `json:"skills"`
 }
 
 type RoleRef struct {
-	ID          *string       `json:"id"`
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Parent      *NodeRef      `json:"parent"`
-	Children    []*NodeRef    `json:"children"`
-	Name        *string       `json:"name"`
-	Nameid      *string       `json:"nameid"`
-	Mandate     *MandateRef   `json:"mandate"`
-	TensionsOut []*TensionRef `json:"tensions_out"`
-	TensionsIn  []*TensionRef `json:"tensions_in"`
-	User        *UserRef      `json:"user"`
-	Second      *UserRef      `json:"second"`
-	Skills      []string      `json:"skills"`
+	ID           *string       `json:"id"`
+	CreatedAt    *string       `json:"createdAt"`
+	CreatedBy    *UserRef      `json:"createdBy"`
+	Parent       *NodeRef      `json:"parent"`
+	Children     []*NodeRef    `json:"children"`
+	Name         *string       `json:"name"`
+	Nameid       *string       `json:"nameid"`
+	Mandate      *MandateRef   `json:"mandate"`
+	TensionsOut  []*TensionRef `json:"tensions_out"`
+	TensionsIn   []*TensionRef `json:"tensions_in"`
+	NTensionsOut *int          `json:"n_tensions_out"`
+	NTensionsIn  *int          `json:"n_tensions_in"`
+	User         *UserRef      `json:"user"`
+	Second       *UserRef      `json:"second"`
+	Skills       []string      `json:"skills"`
 }
 
 type StringExactFilter struct {
@@ -482,8 +540,8 @@ type Tension struct {
 	Emitter     *Node       `json:"emitter"`
 	Receivers   []*Node     `json:"receivers"`
 	IsAnonymous bool        `json:"isAnonymous"`
-	Severity    int         `json:"severity"`
 	Comments    []*Comment  `json:"comments"`
+	Labels      []*Label    `json:"labels"`
 	NComments   *int        `json:"n_comments"`
 	ID          string      `json:"id"`
 	CreatedAt   string      `json:"createdAt"`
@@ -518,8 +576,8 @@ type TensionPatch struct {
 	Emitter     *NodeRef      `json:"emitter"`
 	Receivers   []*NodeRef    `json:"receivers"`
 	IsAnonymous *bool         `json:"isAnonymous"`
-	Severity    *int          `json:"severity"`
 	Comments    []*CommentRef `json:"comments"`
+	Labels      []*LabelRef   `json:"labels"`
 	NComments   *int          `json:"n_comments"`
 }
 
@@ -534,8 +592,8 @@ type TensionRef struct {
 	Emitter     *NodeRef      `json:"emitter"`
 	Receivers   []*NodeRef    `json:"receivers"`
 	IsAnonymous *bool         `json:"isAnonymous"`
-	Severity    *int          `json:"severity"`
 	Comments    []*CommentRef `json:"comments"`
+	Labels      []*LabelRef   `json:"labels"`
 	NComments   *int          `json:"n_comments"`
 }
 
@@ -680,20 +738,24 @@ type UserRef struct {
 type CircleOrderable string
 
 const (
-	CircleOrderableCreatedAt CircleOrderable = "createdAt"
-	CircleOrderableName      CircleOrderable = "name"
-	CircleOrderableNameid    CircleOrderable = "nameid"
+	CircleOrderableCreatedAt    CircleOrderable = "createdAt"
+	CircleOrderableName         CircleOrderable = "name"
+	CircleOrderableNameid       CircleOrderable = "nameid"
+	CircleOrderableNTensionsOut CircleOrderable = "n_tensions_out"
+	CircleOrderableNTensionsIn  CircleOrderable = "n_tensions_in"
 )
 
 var AllCircleOrderable = []CircleOrderable{
 	CircleOrderableCreatedAt,
 	CircleOrderableName,
 	CircleOrderableNameid,
+	CircleOrderableNTensionsOut,
+	CircleOrderableNTensionsIn,
 }
 
 func (e CircleOrderable) IsValid() bool {
 	switch e {
-	case CircleOrderableCreatedAt, CircleOrderableName, CircleOrderableNameid:
+	case CircleOrderableCreatedAt, CircleOrderableName, CircleOrderableNameid, CircleOrderableNTensionsOut, CircleOrderableNTensionsIn:
 		return true
 	}
 	return false
@@ -826,6 +888,45 @@ func (e DgraphIndex) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type LabelOrderable string
+
+const (
+	LabelOrderableName LabelOrderable = "name"
+)
+
+var AllLabelOrderable = []LabelOrderable{
+	LabelOrderableName,
+}
+
+func (e LabelOrderable) IsValid() bool {
+	switch e {
+	case LabelOrderableName:
+		return true
+	}
+	return false
+}
+
+func (e LabelOrderable) String() string {
+	return string(e)
+}
+
+func (e *LabelOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = LabelOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid LabelOrderable", str)
+	}
+	return nil
+}
+
+func (e LabelOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type MandateOrderable string
 
 const (
@@ -876,20 +977,24 @@ func (e MandateOrderable) MarshalGQL(w io.Writer) {
 type NodeOrderable string
 
 const (
-	NodeOrderableCreatedAt NodeOrderable = "createdAt"
-	NodeOrderableName      NodeOrderable = "name"
-	NodeOrderableNameid    NodeOrderable = "nameid"
+	NodeOrderableCreatedAt    NodeOrderable = "createdAt"
+	NodeOrderableName         NodeOrderable = "name"
+	NodeOrderableNameid       NodeOrderable = "nameid"
+	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
+	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
 )
 
 var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableCreatedAt,
 	NodeOrderableName,
 	NodeOrderableNameid,
+	NodeOrderableNTensionsOut,
+	NodeOrderableNTensionsIn,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid:
+	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn:
 		return true
 	}
 	return false
@@ -1001,22 +1106,26 @@ func (e PostOrderable) MarshalGQL(w io.Writer) {
 type RoleOrderable string
 
 const (
-	RoleOrderableCreatedAt RoleOrderable = "createdAt"
-	RoleOrderableName      RoleOrderable = "name"
-	RoleOrderableNameid    RoleOrderable = "nameid"
-	RoleOrderableSkills    RoleOrderable = "skills"
+	RoleOrderableCreatedAt    RoleOrderable = "createdAt"
+	RoleOrderableName         RoleOrderable = "name"
+	RoleOrderableNameid       RoleOrderable = "nameid"
+	RoleOrderableNTensionsOut RoleOrderable = "n_tensions_out"
+	RoleOrderableNTensionsIn  RoleOrderable = "n_tensions_in"
+	RoleOrderableSkills       RoleOrderable = "skills"
 )
 
 var AllRoleOrderable = []RoleOrderable{
 	RoleOrderableCreatedAt,
 	RoleOrderableName,
 	RoleOrderableNameid,
+	RoleOrderableNTensionsOut,
+	RoleOrderableNTensionsIn,
 	RoleOrderableSkills,
 }
 
 func (e RoleOrderable) IsValid() bool {
 	switch e {
-	case RoleOrderableCreatedAt, RoleOrderableName, RoleOrderableNameid, RoleOrderableSkills:
+	case RoleOrderableCreatedAt, RoleOrderableName, RoleOrderableNameid, RoleOrderableNTensionsOut, RoleOrderableNTensionsIn, RoleOrderableSkills:
 		return true
 	}
 	return false
@@ -1050,7 +1159,6 @@ const (
 	TensionOrderableMessage   TensionOrderable = "message"
 	TensionOrderableNth       TensionOrderable = "nth"
 	TensionOrderableTitle     TensionOrderable = "title"
-	TensionOrderableSeverity  TensionOrderable = "severity"
 	TensionOrderableNComments TensionOrderable = "n_comments"
 )
 
@@ -1059,13 +1167,12 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableMessage,
 	TensionOrderableNth,
 	TensionOrderableTitle,
-	TensionOrderableSeverity,
 	TensionOrderableNComments,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableSeverity, TensionOrderableNComments:
+	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments:
 		return true
 	}
 	return false
