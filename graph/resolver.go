@@ -13,7 +13,6 @@ import (
     //"golang.org/x/crypto/bcrypt" 
 
     "zerogov/fractal6.go/tools"
-    "zerogov/fractal6.go/tools/gql"
     "zerogov/fractal6.go/graph/model"
     gen "zerogov/fractal6.go/graph/generated"
     //"golang.org/x/crypto/bcrypt" 
@@ -25,21 +24,49 @@ import (
 *
 */
 
+type mutationType string
+
+const (
+    AddMut mutationType = "Add"
+    UpdateMut mutationType = "Update"
+    DelMut mutationType = "Delete"
+)
+type MutationContext struct  {
+    type_ mutationType
+    argName string
+}
+
 type Resolver struct{
     // I/O objects
-    MutationQ gql.Query
-    QueryQ gql.Query
+    QueryQ Query
+    RawQueryQ Query
+    AddMutationQ Query
+    UpdateMutationQ Query
+    DelMutationQ Query
+
     // pointer on dgraph
     db tools.Dgraph
 }
 
 // Init initialize shema config and Directives...
 func Init() gen.Config {
-    var MutationQ, QueryQ gql.Query
+    var QueryQ, RawQueryQ Query
+    var AddMutationQ, UpdateMutationQ, DelMutationQ Query
 
-    MutationQ.Data = `{
+    QueryQ.Data = `{
+        "query": "query {{.Args}} {{.QueryName}} { 
+            {{.QueryName}} {
+                {{.QueryGraph}}
+            } 
+        }"
+    }`
+    RawQueryQ.Data = `{
+        "query": "{{.RawQuery}}"
+    }`
+
+    AddMutationQ.Data = `{
         "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) { 
-            {{.QueryName}}( input: $input) {
+            {{.QueryName}}(input: $input) {
                 {{.QueryGraph}}
             } 
         }",
@@ -47,22 +74,40 @@ func Init() gen.Config {
             "input": {{.InputPayload}}
         }
     }`
-    MutationQ.Init()
-
-    QueryQ.Data = `{
-        "query": "query {{.QueryName}} { 
-            {{.QueryName}} {
+    UpdateMutationQ.Data = `{
+        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
+            {{.QueryName}}(input: $input) {
                 {{.QueryGraph}}
             } 
-        }"
+        }",
+        "variables": {
+            "input": {{.InputPayload}}
+        }
     }`
-    QueryQ.Init()
+    DelMutationQ.Data = `{
+        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
+            {{.QueryName}}(filter: $input) {
+                {{.QueryGraph}}
+            } 
+        }",
+        "variables": {
+            "input": {{.InputPayload}}
+        }
+    }`
 
+    QueryQ.Init()
+    RawQueryQ.Init()
+    AddMutationQ.Init()
+    UpdateMutationQ.Init()
+    DelMutationQ.Init()
 
     r := Resolver{
         db:tools.InitDB(),
         QueryQ: QueryQ,
-        MutationQ: MutationQ,
+        RawQueryQ: RawQueryQ,
+        AddMutationQ: AddMutationQ,
+        UpdateMutationQ: UpdateMutationQ,
+        DelMutationQ: DelMutationQ,
     }
 
     // Dgraph directives
@@ -75,6 +120,7 @@ func Init() gen.Config {
     c.Directives.Hidden = hidden
     c.Directives.Count = count
     c.Directives.Input_maxLength = inputMaxLength
+    c.Directives.Input_ensureType = ensureType
     //c.Directives.HasRole = hasRoleMiddleware
     return c
 }
@@ -104,8 +150,7 @@ func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interf
     return nil, fmt.Errorf("`%s' field is hidden", fieldDef)
     }
 
-func count(ctx context.Context, obj interface{}, next graphql.Resolver, _field *string) (interface{}, error) {
-    field := *_field
+func count(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
     fieldDef := rc.Field.Name
     goFieldfDef := tools.ToGoNameFormat(fieldDef)
@@ -120,17 +165,25 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, _field *
     typeName := tools.ToTypeName(reflect.TypeOf(obj).String())
     db := tools.InitDB()
     v := db.Count(id, typeName, field)
-    reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
+    if v >= 0 {
+        reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
+    }
     return next(ctx)
 }
 
-func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, _max *int, _field *string) (interface{}, error) {
-    field := *_field
-    max := *_max
-    v := obj.(gql.JsonAtom)[field].(string)
+func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
+    v := obj.(JsonAtom)[field].(string)
     if len(v) > max {
         return nil, fmt.Errorf("`%s' to long. Maximum length is %d", field, max)
     }
+    return next(ctx)
+}
+
+func ensureType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
+    v := obj.(JsonAtom)[field].(JsonAtom)
+    fmt.Println(v)
+    fmt.Println("Sould be a list of Node (checl that type_ == v.type_ !")
+    panic("not implemented")
     return next(ctx)
 }
 

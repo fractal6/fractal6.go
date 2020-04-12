@@ -1,6 +1,7 @@
+package graph
+
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
-package graph
 
 import (
 	"context"
@@ -8,44 +9,28 @@ import (
 
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/tools"
-	"zerogov/fractal6.go/tools/gql"
 )
 
+func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput) (data *model.AddNodePayload, errors error) {
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
+}
+
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilter) (data *model.DeleteNodePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddCircle(ctx context.Context, input []*model.AddCircleInput) (data *model.AddCirclePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) UpdateCircle(ctx context.Context, input model.UpdateCircleInput) (data *model.UpdateCirclePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteCircle(ctx context.Context, filter model.CircleFilter) (data *model.DeleteCirclePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) AddRole(ctx context.Context, input []*model.AddRoleInput) (data *model.AddRolePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) UpdateRole(ctx context.Context, input model.UpdateRoleInput) (data *model.UpdateRolePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteRole(ctx context.Context, filter model.RoleFilter) (data *model.DeleteRolePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *mutationResolver) UpdatePost(ctx context.Context, input model.UpdatePostInput) (data *model.UpdatePostPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilter) (data *model.DeletePostPayload, errors error) {
@@ -53,18 +38,15 @@ func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilt
 }
 
 func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (data *model.AddTensionPayload, errors error) {
-	// Format inputs
-	var ipts []gql.JsonAtom
-	for _, ipt := range input {
-		ipts = append(ipts, tools.StructToMap(ipt))
-	}
-
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, ipts, &data)
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
 	return data, errors
 }
 
 func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.TensionFilter) (data *model.DeleteTensionPayload, errors error) {
@@ -72,11 +54,15 @@ func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.Tensi
 }
 
 func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCommentInput) (data *model.AddCommentPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.CommentFilter) (data *model.DeleteCommentPayload, errors error) {
@@ -84,7 +70,9 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 }
 
 func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (data *model.AddMandatePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (data *model.UpdateMandatePayload, errors error) {
@@ -96,18 +84,15 @@ func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.Manda
 }
 
 func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (data *model.AddUserPayload, errors error) {
-	// Format inputs
-	var ipts []gql.JsonAtom
-	for _, ipt := range input {
-		ipts = append(ipts, tools.StructToMap(ipt))
-	}
-
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, ipts, &data)
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
 	return data, errors
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (data *model.UpdateUserPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilter) (data *model.DeleteUserPayload, errors error) {
@@ -115,7 +100,15 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilt
 }
 
 func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
+}
+
+func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
@@ -127,31 +120,18 @@ func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string)
 }
 
 func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) (data []*model.Node, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) GetCircle(ctx context.Context, id *string, nameid *string) (data *model.Circle, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) QueryCircle(ctx context.Context, filter *model.CircleFilter, order *model.CircleOrder, first *int, offset *int) (data []*model.Circle, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) GetRole(ctx context.Context, id *string, nameid *string) (data *model.Role, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) QueryRole(ctx context.Context, filter *model.RoleFilter, order *model.RoleOrder, first *int, offset *int) (data []*model.Role, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) GetPost(ctx context.Context, id string) (data *model.Post, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) (data []*model.Post, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) GetTension(ctx context.Context, id string) (data *model.Tension, errors error) {
@@ -168,7 +148,8 @@ func (r *queryResolver) GetComment(ctx context.Context, id string) (data *model.
 }
 
 func (r *queryResolver) QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) (data []*model.Comment, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.Mandate, errors error) {
@@ -194,11 +175,15 @@ func (r *queryResolver) GetLabel(ctx context.Context, id *string, name *string) 
 }
 
 func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) (data []*model.Label, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
+// Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
-func (r *Resolver) Query() generated.QueryResolver       { return &queryResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

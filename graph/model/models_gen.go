@@ -8,778 +8,609 @@ import (
 	"strconv"
 )
 
-type AddCircleInput struct {
-	CreatedAt    string        `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         string        `json:"name"`
-	Nameid       string        `json:"nameid"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
-	IsRoot       bool          `json:"isRoot"`
-}
-
-type AddCirclePayload struct {
-	Circle  []*Circle `json:"circle"`
-	NumUids *int      `json:"numUids"`
-}
-
 type AddCommentInput struct {
-	CreatedAt string   `json:"createdAt"`
-	CreatedBy *UserRef `json:"createdBy"`
-	Message   *string  `json:"message"`
-	Void      *string  `json:"_VOID"`
+	CreatedAt string   `json:"createdAt,omitempty"`
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
+	Message   *string  `json:"message,omitempty"`
+	Void      *string  `json:"_VOID,omitempty"`
 }
 
 type AddCommentPayload struct {
-	Comment []*Comment `json:"comment"`
-	NumUids *int       `json:"numUids"`
+	Comment []*Comment `json:"comment,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddLabelInput struct {
-	Name string `json:"name"`
+	Name  string  `json:"name,omitempty"`
+	Color *string `json:"color,omitempty"`
 }
 
 type AddLabelPayload struct {
-	Label   []*Label `json:"label"`
-	NumUids *int     `json:"numUids"`
+	Label   []*Label `json:"label,omitempty"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type AddMandateInput struct {
-	CreatedAt        string   `json:"createdAt"`
-	CreatedBy        *UserRef `json:"createdBy"`
-	Message          *string  `json:"message"`
-	Purpose          string   `json:"purpose"`
-	Responsabilities *string  `json:"responsabilities"`
-	Domains          []string `json:"domains"`
+	CreatedAt        string   `json:"createdAt,omitempty"`
+	CreatedBy        *UserRef `json:"createdBy,omitempty"`
+	Message          *string  `json:"message,omitempty"`
+	Purpose          string   `json:"purpose,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          []string `json:"domains,omitempty"`
 }
 
 type AddMandatePayload struct {
-	Mandate []*Mandate `json:"mandate"`
-	NumUids *int       `json:"numUids"`
+	Mandate []*Mandate `json:"mandate,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
-type AddRoleInput struct {
-	CreatedAt    string        `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         string        `json:"name"`
-	Nameid       string        `json:"nameid"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
-	User         *UserRef      `json:"user"`
-	Second       *UserRef      `json:"second"`
-	Skills       []string      `json:"skills"`
+type AddNodeInput struct {
+	CreatedAt    string        `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef      `json:"createdBy,omitempty"`
+	Root         *NodeRef      `json:"root,omitempty"`
+	Parent       *NodeRef      `json:"parent,omitempty"`
+	Children     []*NodeRef    `json:"children,omitempty"`
+	Type         NodeType      `json:"type_,omitempty"`
+	Name         string        `json:"name,omitempty"`
+	Nameid       string        `json:"nameid,omitempty"`
+	Mandate      *MandateRef   `json:"mandate,omitempty"`
+	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
+	TensionsIn   []*TensionRef `json:"tensions_in,omitempty"`
+	NTensionsOut *int          `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int          `json:"n_tensions_in,omitempty"`
+	NChildren    *int          `json:"n_children,omitempty"`
+	IsRoot       bool          `json:"isRoot"`
+	User         *UserRef      `json:"user,omitempty"`
+	Second       *UserRef      `json:"second,omitempty"`
+	Skills       []string      `json:"skills,omitempty"`
 }
 
-type AddRolePayload struct {
-	Role    []*Role `json:"role"`
-	NumUids *int    `json:"numUids"`
+type AddNodePayload struct {
+	Node    []*Node `json:"node,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AddTensionInput struct {
-	CreatedAt   string        `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Message     *string       `json:"message"`
-	Nth         int           `json:"nth"`
-	Title       string        `json:"title"`
-	Type        TensionType   `json:"type_"`
-	Emitter     *NodeRef      `json:"emitter"`
-	Receivers   []*NodeRef    `json:"receivers"`
+	CreatedAt   string        `json:"createdAt,omitempty"`
+	CreatedBy   *UserRef      `json:"createdBy,omitempty"`
+	Message     *string       `json:"message,omitempty"`
+	Nth         int           `json:"nth,omitempty"`
+	Title       string        `json:"title,omitempty"`
+	Type        TensionType   `json:"type_,omitempty"`
+	Emitter     *NodeRef      `json:"emitter,omitempty"`
+	Receivers   []*NodeRef    `json:"receivers,omitempty"`
 	IsAnonymous bool          `json:"isAnonymous"`
-	Comments    []*CommentRef `json:"comments"`
-	Labels      []*LabelRef   `json:"labels"`
-	NComments   *int          `json:"n_comments"`
+	Comments    []*CommentRef `json:"comments,omitempty"`
+	Labels      []*LabelRef   `json:"labels,omitempty"`
+	NComments   *int          `json:"n_comments,omitempty"`
 }
 
 type AddTensionPayload struct {
-	Tension []*Tension `json:"tension"`
-	NumUids *int       `json:"numUids"`
+	Tension []*Tension `json:"tension,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddUserInput struct {
-	CreatedAt   string     `json:"createdAt"`
-	Username    string     `json:"username"`
-	Fullname    *string    `json:"fullname"`
-	Password    string     `json:"password"`
-	Roles       []*RoleRef `json:"roles"`
-	BackedRoles []*RoleRef `json:"backed_roles"`
-	Bio         *string    `json:"bio"`
+	CreatedAt   string     `json:"createdAt,omitempty"`
+	Username    string     `json:"username,omitempty"`
+	Fullname    *string    `json:"fullname,omitempty"`
+	Password    string     `json:"password,omitempty"`
+	Roles       []*NodeRef `json:"roles,omitempty"`
+	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
+	Bio         *string    `json:"bio,omitempty"`
 }
 
 type AddUserPayload struct {
-	User    []*User `json:"user"`
-	NumUids *int    `json:"numUids"`
-}
-
-type Circle struct {
-	IsRoot       bool       `json:"isRoot"`
-	ID           string     `json:"id"`
-	CreatedAt    string     `json:"createdAt"`
-	CreatedBy    *User      `json:"createdBy"`
-	Parent       *Node      `json:"parent"`
-	Children     []*Node    `json:"children"`
-	Name         string     `json:"name"`
-	Nameid       string     `json:"nameid"`
-	Mandate      *Mandate   `json:"mandate"`
-	TensionsOut  []*Tension `json:"tensions_out"`
-	TensionsIn   []*Tension `json:"tensions_in"`
-	NTensionsOut *int       `json:"n_tensions_out"`
-	NTensionsIn  *int       `json:"n_tensions_in"`
-}
-
-type CircleFilter struct {
-	ID        []string          `json:"id"`
-	CreatedAt *DateTimeFilter   `json:"createdAt"`
-	Name      *StringTermFilter `json:"name"`
-	Nameid    *StringHashFilter `json:"nameid"`
-	And       *CircleFilter     `json:"and"`
-	Or        *CircleFilter     `json:"or"`
-	Not       *CircleFilter     `json:"not"`
-}
-
-type CircleOrder struct {
-	Asc  *CircleOrderable `json:"asc"`
-	Desc *CircleOrderable `json:"desc"`
-	Then *CircleOrder     `json:"then"`
-}
-
-type CirclePatch struct {
-	CreatedAt    *string       `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         *string       `json:"name"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
-	IsRoot       *bool         `json:"isRoot"`
-}
-
-type CircleRef struct {
-	ID           *string       `json:"id"`
-	CreatedAt    *string       `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         *string       `json:"name"`
-	Nameid       *string       `json:"nameid"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
-	IsRoot       *bool         `json:"isRoot"`
+	User    []*User `json:"user,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type Comment struct {
-	Message   string `json:"message"`
-	ID        string `json:"id"`
-	CreatedAt string `json:"createdAt"`
-	CreatedBy *User  `json:"createdBy"`
+	Message   string `json:"message,omitempty"`
+	ID        string `json:"id,omitempty"`
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy *User  `json:"createdBy,omitempty"`
 }
 
 type CommentFilter struct {
-	ID        []string              `json:"id"`
-	CreatedAt *DateTimeFilter       `json:"createdAt"`
-	Message   *StringFullTextFilter `json:"message"`
-	And       *CommentFilter        `json:"and"`
-	Or        *CommentFilter        `json:"or"`
-	Not       *CommentFilter        `json:"not"`
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	And       *CommentFilter        `json:"and,omitempty"`
+	Or        *CommentFilter        `json:"or,omitempty"`
+	Not       *CommentFilter        `json:"not,omitempty"`
 }
 
 type CommentOrder struct {
-	Asc  *CommentOrderable `json:"asc"`
-	Desc *CommentOrderable `json:"desc"`
-	Then *CommentOrder     `json:"then"`
+	Asc  *CommentOrderable `json:"asc,omitempty"`
+	Desc *CommentOrderable `json:"desc,omitempty"`
+	Then *CommentOrder     `json:"then,omitempty"`
 }
 
 type CommentPatch struct {
-	CreatedAt *string  `json:"createdAt"`
-	CreatedBy *UserRef `json:"createdBy"`
-	Message   *string  `json:"message"`
-	Void      *string  `json:"_VOID"`
+	CreatedAt *string  `json:"createdAt,omitempty"`
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
+	Message   *string  `json:"message,omitempty"`
+	Void      *string  `json:"_VOID,omitempty"`
 }
 
 type CommentRef struct {
-	ID        *string  `json:"id"`
-	CreatedAt *string  `json:"createdAt"`
-	CreatedBy *UserRef `json:"createdBy"`
-	Message   *string  `json:"message"`
-	Void      *string  `json:"_VOID"`
+	ID        *string  `json:"id,omitempty"`
+	CreatedAt *string  `json:"createdAt,omitempty"`
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
+	Message   *string  `json:"message,omitempty"`
+	Void      *string  `json:"_VOID,omitempty"`
 }
 
 type DateTimeFilter struct {
-	Eq *string `json:"eq"`
-	Le *string `json:"le"`
-	Lt *string `json:"lt"`
-	Ge *string `json:"ge"`
-	Gt *string `json:"gt"`
-}
-
-type DeleteCirclePayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Eq *string `json:"eq,omitempty"`
+	Le *string `json:"le,omitempty"`
+	Lt *string `json:"lt,omitempty"`
+	Ge *string `json:"ge,omitempty"`
+	Gt *string `json:"gt,omitempty"`
 }
 
 type DeleteCommentPayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteLabelPayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteMandatePayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteNodePayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeletePostPayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
-}
-
-type DeleteRolePayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteTensionPayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteUserPayload struct {
-	Msg     *string `json:"msg"`
-	NumUids *int    `json:"numUids"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type FloatFilter struct {
-	Eq *float64 `json:"eq"`
-	Le *float64 `json:"le"`
-	Lt *float64 `json:"lt"`
-	Ge *float64 `json:"ge"`
-	Gt *float64 `json:"gt"`
+	Eq *float64 `json:"eq,omitempty"`
+	Le *float64 `json:"le,omitempty"`
+	Lt *float64 `json:"lt,omitempty"`
+	Ge *float64 `json:"ge,omitempty"`
+	Gt *float64 `json:"gt,omitempty"`
 }
 
 type IntFilter struct {
-	Eq *int `json:"eq"`
-	Le *int `json:"le"`
-	Lt *int `json:"lt"`
-	Ge *int `json:"ge"`
-	Gt *int `json:"gt"`
+	Eq *int `json:"eq,omitempty"`
+	Le *int `json:"le,omitempty"`
+	Lt *int `json:"lt,omitempty"`
+	Ge *int `json:"ge,omitempty"`
+	Gt *int `json:"gt,omitempty"`
 }
 
 type Label struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string  `json:"id,omitempty"`
+	Name  string  `json:"name,omitempty"`
+	Color *string `json:"color,omitempty"`
 }
 
 type LabelFilter struct {
-	ID   []string          `json:"id"`
-	Name *StringHashFilter `json:"name"`
-	And  *LabelFilter      `json:"and"`
-	Or   *LabelFilter      `json:"or"`
-	Not  *LabelFilter      `json:"not"`
+	ID   []string          `json:"id,omitempty"`
+	Name *StringHashFilter `json:"name,omitempty"`
+	And  *LabelFilter      `json:"and,omitempty"`
+	Or   *LabelFilter      `json:"or,omitempty"`
+	Not  *LabelFilter      `json:"not,omitempty"`
 }
 
 type LabelOrder struct {
-	Asc  *LabelOrderable `json:"asc"`
-	Desc *LabelOrderable `json:"desc"`
-	Then *LabelOrder     `json:"then"`
+	Asc  *LabelOrderable `json:"asc,omitempty"`
+	Desc *LabelOrderable `json:"desc,omitempty"`
+	Then *LabelOrder     `json:"then,omitempty"`
+}
+
+type LabelPatch struct {
+	Color *string `json:"color,omitempty"`
 }
 
 type LabelRef struct {
-	ID   *string `json:"id"`
-	Name *string `json:"name"`
+	ID    *string `json:"id,omitempty"`
+	Name  *string `json:"name,omitempty"`
+	Color *string `json:"color,omitempty"`
 }
 
 type Mandate struct {
-	Purpose          string   `json:"purpose"`
-	Responsabilities *string  `json:"responsabilities"`
-	Domains          []string `json:"domains"`
-	ID               string   `json:"id"`
-	CreatedAt        string   `json:"createdAt"`
-	CreatedBy        *User    `json:"createdBy"`
-	Message          *string  `json:"message"`
+	Purpose          string   `json:"purpose,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          []string `json:"domains,omitempty"`
+	ID               string   `json:"id,omitempty"`
+	CreatedAt        string   `json:"createdAt,omitempty"`
+	CreatedBy        *User    `json:"createdBy,omitempty"`
+	Message          *string  `json:"message,omitempty"`
 }
 
 type MandateFilter struct {
-	ID        []string              `json:"id"`
-	CreatedAt *DateTimeFilter       `json:"createdAt"`
-	Message   *StringFullTextFilter `json:"message"`
-	Purpose   *StringFullTextFilter `json:"purpose"`
-	And       *MandateFilter        `json:"and"`
-	Or        *MandateFilter        `json:"or"`
-	Not       *MandateFilter        `json:"not"`
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Purpose   *StringFullTextFilter `json:"purpose,omitempty"`
+	And       *MandateFilter        `json:"and,omitempty"`
+	Or        *MandateFilter        `json:"or,omitempty"`
+	Not       *MandateFilter        `json:"not,omitempty"`
 }
 
 type MandateOrder struct {
-	Asc  *MandateOrderable `json:"asc"`
-	Desc *MandateOrderable `json:"desc"`
-	Then *MandateOrder     `json:"then"`
+	Asc  *MandateOrderable `json:"asc,omitempty"`
+	Desc *MandateOrderable `json:"desc,omitempty"`
+	Then *MandateOrder     `json:"then,omitempty"`
 }
 
 type MandatePatch struct {
-	CreatedAt        *string  `json:"createdAt"`
-	CreatedBy        *UserRef `json:"createdBy"`
-	Message          *string  `json:"message"`
-	Purpose          *string  `json:"purpose"`
-	Responsabilities *string  `json:"responsabilities"`
-	Domains          []string `json:"domains"`
+	CreatedAt        *string  `json:"createdAt,omitempty"`
+	CreatedBy        *UserRef `json:"createdBy,omitempty"`
+	Message          *string  `json:"message,omitempty"`
+	Purpose          *string  `json:"purpose,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          []string `json:"domains,omitempty"`
 }
 
 type MandateRef struct {
-	ID               *string  `json:"id"`
-	CreatedAt        *string  `json:"createdAt"`
-	CreatedBy        *UserRef `json:"createdBy"`
-	Message          *string  `json:"message"`
-	Purpose          *string  `json:"purpose"`
-	Responsabilities *string  `json:"responsabilities"`
-	Domains          []string `json:"domains"`
+	ID               *string  `json:"id,omitempty"`
+	CreatedAt        *string  `json:"createdAt,omitempty"`
+	CreatedBy        *UserRef `json:"createdBy,omitempty"`
+	Message          *string  `json:"message,omitempty"`
+	Purpose          *string  `json:"purpose,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          []string `json:"domains,omitempty"`
 }
 
 type Node struct {
-	ID           string     `json:"id"`
-	CreatedAt    string     `json:"createdAt"`
-	CreatedBy    *User      `json:"createdBy"`
-	Parent       *Node      `json:"parent"`
-	Children     []*Node    `json:"children"`
-	Name         string     `json:"name"`
-	Nameid       string     `json:"nameid"`
-	Mandate      *Mandate   `json:"mandate"`
-	TensionsOut  []*Tension `json:"tensions_out"`
-	TensionsIn   []*Tension `json:"tensions_in"`
-	NTensionsOut *int       `json:"n_tensions_out"`
-	NTensionsIn  *int       `json:"n_tensions_in"`
+	ID           string     `json:"id,omitempty"`
+	CreatedAt    string     `json:"createdAt,omitempty"`
+	CreatedBy    *User      `json:"createdBy,omitempty"`
+	Root         *Node      `json:"root,omitempty"`
+	Parent       *Node      `json:"parent,omitempty"`
+	Children     []*Node    `json:"children,omitempty"`
+	Type         NodeType   `json:"type_,omitempty"`
+	Name         string     `json:"name,omitempty"`
+	Nameid       string     `json:"nameid,omitempty"`
+	Mandate      *Mandate   `json:"mandate,omitempty"`
+	TensionsOut  []*Tension `json:"tensions_out,omitempty"`
+	TensionsIn   []*Tension `json:"tensions_in,omitempty"`
+	NTensionsOut *int       `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int       `json:"n_tensions_in,omitempty"`
+	NChildren    *int       `json:"n_children,omitempty"`
+	IsRoot       bool       `json:"isRoot"`
+	User         *User      `json:"user,omitempty"`
+	Second       *User      `json:"second,omitempty"`
+	Skills       []string   `json:"skills,omitempty"`
 }
 
 type NodeFilter struct {
-	ID        []string          `json:"id"`
-	CreatedAt *DateTimeFilter   `json:"createdAt"`
-	Name      *StringTermFilter `json:"name"`
-	Nameid    *StringHashFilter `json:"nameid"`
-	And       *NodeFilter       `json:"and"`
-	Or        *NodeFilter       `json:"or"`
-	Not       *NodeFilter       `json:"not"`
+	ID        []string          `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter   `json:"createdAt,omitempty"`
+	Type      *NodeTypeHash     `json:"type_,omitempty"`
+	Name      *StringTermFilter `json:"name,omitempty"`
+	Nameid    *StringHashFilter `json:"nameid,omitempty"`
+	IsRoot    *bool             `json:"isRoot"`
+	Skills    *StringTermFilter `json:"skills,omitempty"`
+	And       *NodeFilter       `json:"and,omitempty"`
+	Or        *NodeFilter       `json:"or,omitempty"`
+	Not       *NodeFilter       `json:"not,omitempty"`
 }
 
 type NodeOrder struct {
-	Asc  *NodeOrderable `json:"asc"`
-	Desc *NodeOrderable `json:"desc"`
-	Then *NodeOrder     `json:"then"`
+	Asc  *NodeOrderable `json:"asc,omitempty"`
+	Desc *NodeOrderable `json:"desc,omitempty"`
+	Then *NodeOrder     `json:"then,omitempty"`
 }
 
 type NodePatch struct {
-	CreatedAt    *string       `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         *string       `json:"name"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
+	CreatedAt    *string       `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef      `json:"createdBy,omitempty"`
+	Root         *NodeRef      `json:"root,omitempty"`
+	Parent       *NodeRef      `json:"parent,omitempty"`
+	Children     []*NodeRef    `json:"children,omitempty"`
+	Type         *NodeType     `json:"type_,omitempty"`
+	Name         *string       `json:"name,omitempty"`
+	Mandate      *MandateRef   `json:"mandate,omitempty"`
+	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
+	TensionsIn   []*TensionRef `json:"tensions_in,omitempty"`
+	NTensionsOut *int          `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int          `json:"n_tensions_in,omitempty"`
+	NChildren    *int          `json:"n_children,omitempty"`
+	IsRoot       *bool         `json:"isRoot"`
+	User         *UserRef      `json:"user,omitempty"`
+	Second       *UserRef      `json:"second,omitempty"`
+	Skills       []string      `json:"skills,omitempty"`
 }
 
 type NodeRef struct {
-	ID     *string `json:"id"`
-	Nameid *string `json:"nameid"`
+	ID           *string       `json:"id,omitempty"`
+	CreatedAt    *string       `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef      `json:"createdBy,omitempty"`
+	Root         *NodeRef      `json:"root,omitempty"`
+	Parent       *NodeRef      `json:"parent,omitempty"`
+	Children     []*NodeRef    `json:"children,omitempty"`
+	Type         *NodeType     `json:"type_,omitempty"`
+	Name         *string       `json:"name,omitempty"`
+	Nameid       *string       `json:"nameid,omitempty"`
+	Mandate      *MandateRef   `json:"mandate,omitempty"`
+	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
+	TensionsIn   []*TensionRef `json:"tensions_in,omitempty"`
+	NTensionsOut *int          `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int          `json:"n_tensions_in,omitempty"`
+	NChildren    *int          `json:"n_children,omitempty"`
+	IsRoot       *bool         `json:"isRoot"`
+	User         *UserRef      `json:"user,omitempty"`
+	Second       *UserRef      `json:"second,omitempty"`
+	Skills       []string      `json:"skills,omitempty"`
+}
+
+type NodeTypeHash struct {
+	Eq NodeType `json:"eq,omitempty"`
 }
 
 type Post struct {
-	ID        string  `json:"id"`
-	CreatedAt string  `json:"createdAt"`
-	CreatedBy *User   `json:"createdBy"`
-	Message   *string `json:"message"`
+	ID        string  `json:"id,omitempty"`
+	CreatedAt string  `json:"createdAt,omitempty"`
+	CreatedBy *User   `json:"createdBy,omitempty"`
+	Message   *string `json:"message,omitempty"`
 }
 
 type PostFilter struct {
-	ID        []string              `json:"id"`
-	CreatedAt *DateTimeFilter       `json:"createdAt"`
-	Message   *StringFullTextFilter `json:"message"`
-	And       *PostFilter           `json:"and"`
-	Or        *PostFilter           `json:"or"`
-	Not       *PostFilter           `json:"not"`
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	And       *PostFilter           `json:"and,omitempty"`
+	Or        *PostFilter           `json:"or,omitempty"`
+	Not       *PostFilter           `json:"not,omitempty"`
 }
 
 type PostOrder struct {
-	Asc  *PostOrderable `json:"asc"`
-	Desc *PostOrderable `json:"desc"`
-	Then *PostOrder     `json:"then"`
+	Asc  *PostOrderable `json:"asc,omitempty"`
+	Desc *PostOrderable `json:"desc,omitempty"`
+	Then *PostOrder     `json:"then,omitempty"`
 }
 
 type PostPatch struct {
-	CreatedAt *string  `json:"createdAt"`
-	CreatedBy *UserRef `json:"createdBy"`
-	Message   *string  `json:"message"`
+	CreatedAt *string  `json:"createdAt,omitempty"`
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
+	Message   *string  `json:"message,omitempty"`
 }
 
 type PostRef struct {
-	ID string `json:"id"`
-}
-
-type Role struct {
-	User         *User      `json:"user"`
-	Second       *User      `json:"second"`
-	Skills       []string   `json:"skills"`
-	ID           string     `json:"id"`
-	CreatedAt    string     `json:"createdAt"`
-	CreatedBy    *User      `json:"createdBy"`
-	Parent       *Node      `json:"parent"`
-	Children     []*Node    `json:"children"`
-	Name         string     `json:"name"`
-	Nameid       string     `json:"nameid"`
-	Mandate      *Mandate   `json:"mandate"`
-	TensionsOut  []*Tension `json:"tensions_out"`
-	TensionsIn   []*Tension `json:"tensions_in"`
-	NTensionsOut *int       `json:"n_tensions_out"`
-	NTensionsIn  *int       `json:"n_tensions_in"`
-}
-
-type RoleFilter struct {
-	ID        []string          `json:"id"`
-	CreatedAt *DateTimeFilter   `json:"createdAt"`
-	Name      *StringTermFilter `json:"name"`
-	Nameid    *StringHashFilter `json:"nameid"`
-	Skills    *StringTermFilter `json:"skills"`
-	And       *RoleFilter       `json:"and"`
-	Or        *RoleFilter       `json:"or"`
-	Not       *RoleFilter       `json:"not"`
-}
-
-type RoleOrder struct {
-	Asc  *RoleOrderable `json:"asc"`
-	Desc *RoleOrderable `json:"desc"`
-	Then *RoleOrder     `json:"then"`
-}
-
-type RolePatch struct {
-	CreatedAt    *string       `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         *string       `json:"name"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
-	User         *UserRef      `json:"user"`
-	Second       *UserRef      `json:"second"`
-	Skills       []string      `json:"skills"`
-}
-
-type RoleRef struct {
-	ID           *string       `json:"id"`
-	CreatedAt    *string       `json:"createdAt"`
-	CreatedBy    *UserRef      `json:"createdBy"`
-	Parent       *NodeRef      `json:"parent"`
-	Children     []*NodeRef    `json:"children"`
-	Name         *string       `json:"name"`
-	Nameid       *string       `json:"nameid"`
-	Mandate      *MandateRef   `json:"mandate"`
-	TensionsOut  []*TensionRef `json:"tensions_out"`
-	TensionsIn   []*TensionRef `json:"tensions_in"`
-	NTensionsOut *int          `json:"n_tensions_out"`
-	NTensionsIn  *int          `json:"n_tensions_in"`
-	User         *UserRef      `json:"user"`
-	Second       *UserRef      `json:"second"`
-	Skills       []string      `json:"skills"`
+	ID string `json:"id,omitempty"`
 }
 
 type StringExactFilter struct {
-	Eq *string `json:"eq"`
-	Le *string `json:"le"`
-	Lt *string `json:"lt"`
-	Ge *string `json:"ge"`
-	Gt *string `json:"gt"`
+	Eq *string `json:"eq,omitempty"`
+	Le *string `json:"le,omitempty"`
+	Lt *string `json:"lt,omitempty"`
+	Ge *string `json:"ge,omitempty"`
+	Gt *string `json:"gt,omitempty"`
 }
 
 type StringFullTextFilter struct {
-	Alloftext *string `json:"alloftext"`
-	Anyoftext *string `json:"anyoftext"`
+	Alloftext *string `json:"alloftext,omitempty"`
+	Anyoftext *string `json:"anyoftext,omitempty"`
 }
 
 type StringHashFilter struct {
-	Eq *string `json:"eq"`
+	Eq *string `json:"eq,omitempty"`
 }
 
 type StringRegExpFilter struct {
-	Regexp *string `json:"regexp"`
+	Regexp *string `json:"regexp,omitempty"`
 }
 
 type StringTermFilter struct {
-	Allofterms *string `json:"allofterms"`
-	Anyofterms *string `json:"anyofterms"`
+	Allofterms *string `json:"allofterms,omitempty"`
+	Anyofterms *string `json:"anyofterms,omitempty"`
 }
 
 type Tension struct {
-	Nth         int         `json:"nth"`
-	Title       string      `json:"title"`
-	Type        TensionType `json:"type_"`
-	Emitter     *Node       `json:"emitter"`
-	Receivers   []*Node     `json:"receivers"`
+	Nth         int         `json:"nth,omitempty"`
+	Title       string      `json:"title,omitempty"`
+	Type        TensionType `json:"type_,omitempty"`
+	Emitter     *Node       `json:"emitter,omitempty"`
+	Receivers   []*Node     `json:"receivers,omitempty"`
 	IsAnonymous bool        `json:"isAnonymous"`
-	Comments    []*Comment  `json:"comments"`
-	Labels      []*Label    `json:"labels"`
-	NComments   *int        `json:"n_comments"`
-	ID          string      `json:"id"`
-	CreatedAt   string      `json:"createdAt"`
-	CreatedBy   *User       `json:"createdBy"`
-	Message     *string     `json:"message"`
+	Comments    []*Comment  `json:"comments,omitempty"`
+	Labels      []*Label    `json:"labels,omitempty"`
+	NComments   *int        `json:"n_comments,omitempty"`
+	ID          string      `json:"id,omitempty"`
+	CreatedAt   string      `json:"createdAt,omitempty"`
+	CreatedBy   *User       `json:"createdBy,omitempty"`
+	Message     *string     `json:"message,omitempty"`
 }
 
 type TensionFilter struct {
-	ID        []string              `json:"id"`
-	CreatedAt *DateTimeFilter       `json:"createdAt"`
-	Message   *StringFullTextFilter `json:"message"`
-	Title     *StringTermFilter     `json:"title"`
-	Type      *TensionTypeHash      `json:"type_"`
-	And       *TensionFilter        `json:"and"`
-	Or        *TensionFilter        `json:"or"`
-	Not       *TensionFilter        `json:"not"`
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Nth       *IntFilter            `json:"nth,omitempty"`
+	Title     *StringTermFilter     `json:"title,omitempty"`
+	Type      *TensionTypeHash      `json:"type_,omitempty"`
+	And       *TensionFilter        `json:"and,omitempty"`
+	Or        *TensionFilter        `json:"or,omitempty"`
+	Not       *TensionFilter        `json:"not,omitempty"`
 }
 
 type TensionOrder struct {
-	Asc  *TensionOrderable `json:"asc"`
-	Desc *TensionOrderable `json:"desc"`
-	Then *TensionOrder     `json:"then"`
+	Asc  *TensionOrderable `json:"asc,omitempty"`
+	Desc *TensionOrderable `json:"desc,omitempty"`
+	Then *TensionOrder     `json:"then,omitempty"`
 }
 
 type TensionPatch struct {
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Message     *string       `json:"message"`
-	Nth         *int          `json:"nth"`
-	Title       *string       `json:"title"`
-	Type        *TensionType  `json:"type_"`
-	Emitter     *NodeRef      `json:"emitter"`
-	Receivers   []*NodeRef    `json:"receivers"`
+	CreatedAt   *string       `json:"createdAt,omitempty"`
+	CreatedBy   *UserRef      `json:"createdBy,omitempty"`
+	Message     *string       `json:"message,omitempty"`
+	Nth         *int          `json:"nth,omitempty"`
+	Title       *string       `json:"title,omitempty"`
+	Type        *TensionType  `json:"type_,omitempty"`
+	Emitter     *NodeRef      `json:"emitter,omitempty"`
+	Receivers   []*NodeRef    `json:"receivers,omitempty"`
 	IsAnonymous *bool         `json:"isAnonymous"`
-	Comments    []*CommentRef `json:"comments"`
-	Labels      []*LabelRef   `json:"labels"`
-	NComments   *int          `json:"n_comments"`
+	Comments    []*CommentRef `json:"comments,omitempty"`
+	Labels      []*LabelRef   `json:"labels,omitempty"`
+	NComments   *int          `json:"n_comments,omitempty"`
 }
 
 type TensionRef struct {
-	ID          *string       `json:"id"`
-	CreatedAt   *string       `json:"createdAt"`
-	CreatedBy   *UserRef      `json:"createdBy"`
-	Message     *string       `json:"message"`
-	Nth         *int          `json:"nth"`
-	Title       *string       `json:"title"`
-	Type        *TensionType  `json:"type_"`
-	Emitter     *NodeRef      `json:"emitter"`
-	Receivers   []*NodeRef    `json:"receivers"`
+	ID          *string       `json:"id,omitempty"`
+	CreatedAt   *string       `json:"createdAt,omitempty"`
+	CreatedBy   *UserRef      `json:"createdBy,omitempty"`
+	Message     *string       `json:"message,omitempty"`
+	Nth         *int          `json:"nth,omitempty"`
+	Title       *string       `json:"title,omitempty"`
+	Type        *TensionType  `json:"type_,omitempty"`
+	Emitter     *NodeRef      `json:"emitter,omitempty"`
+	Receivers   []*NodeRef    `json:"receivers,omitempty"`
 	IsAnonymous *bool         `json:"isAnonymous"`
-	Comments    []*CommentRef `json:"comments"`
-	Labels      []*LabelRef   `json:"labels"`
-	NComments   *int          `json:"n_comments"`
+	Comments    []*CommentRef `json:"comments,omitempty"`
+	Labels      []*LabelRef   `json:"labels,omitempty"`
+	NComments   *int          `json:"n_comments,omitempty"`
 }
 
 type TensionTypeHash struct {
-	Eq TensionType `json:"eq"`
-}
-
-type UpdateCircleInput struct {
-	Filter *CircleFilter `json:"filter"`
-	Set    *CirclePatch  `json:"set"`
-	Remove *CirclePatch  `json:"remove"`
-}
-
-type UpdateCirclePayload struct {
-	Circle  []*Circle `json:"circle"`
-	NumUids *int      `json:"numUids"`
+	Eq TensionType `json:"eq,omitempty"`
 }
 
 type UpdateCommentInput struct {
-	Filter *CommentFilter `json:"filter"`
-	Set    *CommentPatch  `json:"set"`
-	Remove *CommentPatch  `json:"remove"`
+	Filter *CommentFilter `json:"filter,omitempty"`
+	Set    *CommentPatch  `json:"set,omitempty"`
+	Remove *CommentPatch  `json:"remove,omitempty"`
 }
 
 type UpdateCommentPayload struct {
-	Comment []*Comment `json:"comment"`
-	NumUids *int       `json:"numUids"`
+	Comment []*Comment `json:"comment,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type UpdateLabelInput struct {
+	Filter *LabelFilter `json:"filter,omitempty"`
+	Set    *LabelPatch  `json:"set,omitempty"`
+	Remove *LabelPatch  `json:"remove,omitempty"`
+}
+
+type UpdateLabelPayload struct {
+	Label   []*Label `json:"label,omitempty"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type UpdateMandateInput struct {
-	Filter *MandateFilter `json:"filter"`
-	Set    *MandatePatch  `json:"set"`
-	Remove *MandatePatch  `json:"remove"`
+	Filter *MandateFilter `json:"filter,omitempty"`
+	Set    *MandatePatch  `json:"set,omitempty"`
+	Remove *MandatePatch  `json:"remove,omitempty"`
 }
 
 type UpdateMandatePayload struct {
-	Mandate []*Mandate `json:"mandate"`
-	NumUids *int       `json:"numUids"`
+	Mandate []*Mandate `json:"mandate,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateNodeInput struct {
-	Filter *NodeFilter `json:"filter"`
-	Set    *NodePatch  `json:"set"`
-	Remove *NodePatch  `json:"remove"`
+	Filter *NodeFilter `json:"filter,omitempty"`
+	Set    *NodePatch  `json:"set,omitempty"`
+	Remove *NodePatch  `json:"remove,omitempty"`
 }
 
 type UpdateNodePayload struct {
-	Node    []*Node `json:"node"`
-	NumUids *int    `json:"numUids"`
+	Node    []*Node `json:"node,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdatePostInput struct {
-	Filter *PostFilter `json:"filter"`
-	Set    *PostPatch  `json:"set"`
-	Remove *PostPatch  `json:"remove"`
+	Filter *PostFilter `json:"filter,omitempty"`
+	Set    *PostPatch  `json:"set,omitempty"`
+	Remove *PostPatch  `json:"remove,omitempty"`
 }
 
 type UpdatePostPayload struct {
-	Post    []*Post `json:"post"`
-	NumUids *int    `json:"numUids"`
-}
-
-type UpdateRoleInput struct {
-	Filter *RoleFilter `json:"filter"`
-	Set    *RolePatch  `json:"set"`
-	Remove *RolePatch  `json:"remove"`
-}
-
-type UpdateRolePayload struct {
-	Role    []*Role `json:"role"`
-	NumUids *int    `json:"numUids"`
+	Post    []*Post `json:"post,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdateTensionInput struct {
-	Filter *TensionFilter `json:"filter"`
-	Set    *TensionPatch  `json:"set"`
-	Remove *TensionPatch  `json:"remove"`
+	Filter *TensionFilter `json:"filter,omitempty"`
+	Set    *TensionPatch  `json:"set,omitempty"`
+	Remove *TensionPatch  `json:"remove,omitempty"`
 }
 
 type UpdateTensionPayload struct {
-	Tension []*Tension `json:"tension"`
-	NumUids *int       `json:"numUids"`
+	Tension []*Tension `json:"tension,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateUserInput struct {
-	Filter *UserFilter `json:"filter"`
-	Set    *UserPatch  `json:"set"`
-	Remove *UserPatch  `json:"remove"`
+	Filter *UserFilter `json:"filter,omitempty"`
+	Set    *UserPatch  `json:"set,omitempty"`
+	Remove *UserPatch  `json:"remove,omitempty"`
 }
 
 type UpdateUserPayload struct {
-	User    []*User `json:"user"`
-	NumUids *int    `json:"numUids"`
+	User    []*User `json:"user,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type User struct {
-	ID          string  `json:"id"`
-	CreatedAt   string  `json:"createdAt"`
-	Username    string  `json:"username"`
-	Fullname    *string `json:"fullname"`
-	Password    string  `json:"password"`
-	Roles       []*Role `json:"roles"`
-	BackedRoles []*Role `json:"backed_roles"`
-	Bio         *string `json:"bio"`
+	ID          string  `json:"id,omitempty"`
+	CreatedAt   string  `json:"createdAt,omitempty"`
+	Username    string  `json:"username,omitempty"`
+	Fullname    *string `json:"fullname,omitempty"`
+	Password    string  `json:"password,omitempty"`
+	Roles       []*Node `json:"roles,omitempty"`
+	BackedRoles []*Node `json:"backed_roles,omitempty"`
+	Bio         *string `json:"bio,omitempty"`
 }
 
 type UserFilter struct {
-	ID        []string          `json:"id"`
-	CreatedAt *DateTimeFilter   `json:"createdAt"`
-	Username  *StringHashFilter `json:"username"`
-	And       *UserFilter       `json:"and"`
-	Or        *UserFilter       `json:"or"`
-	Not       *UserFilter       `json:"not"`
+	ID        []string          `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter   `json:"createdAt,omitempty"`
+	Username  *StringHashFilter `json:"username,omitempty"`
+	And       *UserFilter       `json:"and,omitempty"`
+	Or        *UserFilter       `json:"or,omitempty"`
+	Not       *UserFilter       `json:"not,omitempty"`
 }
 
 type UserOrder struct {
-	Asc  *UserOrderable `json:"asc"`
-	Desc *UserOrderable `json:"desc"`
-	Then *UserOrder     `json:"then"`
+	Asc  *UserOrderable `json:"asc,omitempty"`
+	Desc *UserOrderable `json:"desc,omitempty"`
+	Then *UserOrder     `json:"then,omitempty"`
 }
 
 type UserPatch struct {
-	CreatedAt   *string    `json:"createdAt"`
-	Fullname    *string    `json:"fullname"`
-	Password    *string    `json:"password"`
-	Roles       []*RoleRef `json:"roles"`
-	BackedRoles []*RoleRef `json:"backed_roles"`
-	Bio         *string    `json:"bio"`
+	CreatedAt   *string    `json:"createdAt,omitempty"`
+	Fullname    *string    `json:"fullname,omitempty"`
+	Password    *string    `json:"password,omitempty"`
+	Roles       []*NodeRef `json:"roles,omitempty"`
+	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
+	Bio         *string    `json:"bio,omitempty"`
 }
 
 type UserRef struct {
-	ID          *string    `json:"id"`
-	CreatedAt   *string    `json:"createdAt"`
-	Username    *string    `json:"username"`
-	Fullname    *string    `json:"fullname"`
-	Password    *string    `json:"password"`
-	Roles       []*RoleRef `json:"roles"`
-	BackedRoles []*RoleRef `json:"backed_roles"`
-	Bio         *string    `json:"bio"`
-}
-
-type CircleOrderable string
-
-const (
-	CircleOrderableCreatedAt    CircleOrderable = "createdAt"
-	CircleOrderableName         CircleOrderable = "name"
-	CircleOrderableNameid       CircleOrderable = "nameid"
-	CircleOrderableNTensionsOut CircleOrderable = "n_tensions_out"
-	CircleOrderableNTensionsIn  CircleOrderable = "n_tensions_in"
-)
-
-var AllCircleOrderable = []CircleOrderable{
-	CircleOrderableCreatedAt,
-	CircleOrderableName,
-	CircleOrderableNameid,
-	CircleOrderableNTensionsOut,
-	CircleOrderableNTensionsIn,
-}
-
-func (e CircleOrderable) IsValid() bool {
-	switch e {
-	case CircleOrderableCreatedAt, CircleOrderableName, CircleOrderableNameid, CircleOrderableNTensionsOut, CircleOrderableNTensionsIn:
-		return true
-	}
-	return false
-}
-
-func (e CircleOrderable) String() string {
-	return string(e)
-}
-
-func (e *CircleOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = CircleOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid CircleOrderable", str)
-	}
-	return nil
-}
-
-func (e CircleOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
+	ID          *string    `json:"id,omitempty"`
+	CreatedAt   *string    `json:"createdAt,omitempty"`
+	Username    *string    `json:"username,omitempty"`
+	Fullname    *string    `json:"fullname,omitempty"`
+	Password    *string    `json:"password,omitempty"`
+	Roles       []*NodeRef `json:"roles,omitempty"`
+	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
+	Bio         *string    `json:"bio,omitempty"`
 }
 
 type CommentOrderable string
@@ -891,16 +722,18 @@ func (e DgraphIndex) MarshalGQL(w io.Writer) {
 type LabelOrderable string
 
 const (
-	LabelOrderableName LabelOrderable = "name"
+	LabelOrderableName  LabelOrderable = "name"
+	LabelOrderableColor LabelOrderable = "color"
 )
 
 var AllLabelOrderable = []LabelOrderable{
 	LabelOrderableName,
+	LabelOrderableColor,
 }
 
 func (e LabelOrderable) IsValid() bool {
 	switch e {
-	case LabelOrderableName:
+	case LabelOrderableName, LabelOrderableColor:
 		return true
 	}
 	return false
@@ -982,6 +815,8 @@ const (
 	NodeOrderableNameid       NodeOrderable = "nameid"
 	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
 	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
+	NodeOrderableNChildren    NodeOrderable = "n_children"
+	NodeOrderableSkills       NodeOrderable = "skills"
 )
 
 var AllNodeOrderable = []NodeOrderable{
@@ -990,11 +825,13 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableNameid,
 	NodeOrderableNTensionsOut,
 	NodeOrderableNTensionsIn,
+	NodeOrderableNChildren,
+	NodeOrderableSkills,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn:
+	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
 		return true
 	}
 	return false
@@ -1100,55 +937,6 @@ func (e *PostOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PostOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type RoleOrderable string
-
-const (
-	RoleOrderableCreatedAt    RoleOrderable = "createdAt"
-	RoleOrderableName         RoleOrderable = "name"
-	RoleOrderableNameid       RoleOrderable = "nameid"
-	RoleOrderableNTensionsOut RoleOrderable = "n_tensions_out"
-	RoleOrderableNTensionsIn  RoleOrderable = "n_tensions_in"
-	RoleOrderableSkills       RoleOrderable = "skills"
-)
-
-var AllRoleOrderable = []RoleOrderable{
-	RoleOrderableCreatedAt,
-	RoleOrderableName,
-	RoleOrderableNameid,
-	RoleOrderableNTensionsOut,
-	RoleOrderableNTensionsIn,
-	RoleOrderableSkills,
-}
-
-func (e RoleOrderable) IsValid() bool {
-	switch e {
-	case RoleOrderableCreatedAt, RoleOrderableName, RoleOrderableNameid, RoleOrderableNTensionsOut, RoleOrderableNTensionsIn, RoleOrderableSkills:
-		return true
-	}
-	return false
-}
-
-func (e RoleOrderable) String() string {
-	return string(e)
-}
-
-func (e *RoleOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = RoleOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid RoleOrderable", str)
-	}
-	return nil
-}
-
-func (e RoleOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

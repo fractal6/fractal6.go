@@ -1,15 +1,15 @@
-package gql
+package graph
 
 import (
-    "regexp"
-    "strings"
     "bytes"
     "text/template"
+
+	"zerogov/fractal6.go/tools"
 )
 
 type JsonAtom = map[string]interface{}
 
-type Res struct {
+type GqlRes struct {
 	Data   JsonAtom `json:"data"`
 	Errors []JsonAtom  `json:"errors"` // message, locations, path, extensions
 }
@@ -23,12 +23,7 @@ type Query struct {
 func (q *Query) Init() {
     d := q.Data
 
-    // Clean the query 
-    d = strings.Replace(d, `\n`, "", -1)
-    d = strings.Replace(d, "\n", "", -1)
-    space := regexp.MustCompile(`\s+`)
-    d = space.ReplaceAllString(d, " ")
-    q.Data = d
+    q.Data = tools.CleanString(d)
 
     // Load the template
     // @DEBUG: Do we need a template name ?

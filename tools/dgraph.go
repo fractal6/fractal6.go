@@ -75,6 +75,8 @@ func (d Dgraph) Request(data []byte, res interface{}) error {
     return json.NewDecoder(resp.Body).Decode(res)
 }
 
+// Count the number of object in fieldName attribute for given type and id.
+// Returns -1 is nothing is found.
 func (d Dgraph) Count(id string, typeName string, fieldName string) (int) {
 	dg, cancel := d.getDgraphClient()
     defer cancel()
@@ -98,6 +100,10 @@ func (d Dgraph) Count(id string, typeName string, fieldName string) (int) {
 	if err != nil {
 		panic(err)
 	}
+
+    if len(r.All) == 0 {
+        return -1
+    }
 
 	values := make([]int, 0, len(r.All[0]))
 	for _, v := range r.All[0] {

@@ -9,21 +9,25 @@ func GetPreloads(ctx context.Context) []string {
     return GetNestedPreloads(
 	graphql.GetRequestContext(ctx),
 	graphql.CollectFieldsCtx(ctx, nil),
-	"",
+	"", true,
     )
 }
 
-func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string) (preloads []string) {
-    //fmt.Println(ctx.OperationName) // user define name of operation
-    //fmt.Println(ctx.Operation.Operation) // query|mutation|etc
+func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string, first bool) (preloads []string) {
+    if first {
+        //fmt.Println(ctx.OperationName) // user define name of operation
+        //fmt.Println(ctx.Operation.Operation) // query|mutation|etc
+		// @DEBUG: empty see: https://github.com/99designs/gqlgen/issues/1144
+       //fmt.Println("variables ->", ctx.Variables, len(ctx.Variables)==0)
+    }
     for _, column := range fields {
-	//prefixColumn := GetPreloadString(prefix, column.Name)
-	prefixColumn := column.Name
-	preloads = append(preloads, prefixColumn)
-	if len(column.SelectionSet) > 0 {
-	    preloads = append(preloads, "{")
-	    preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.SelectionSet, nil), prefixColumn)...)
-	    //preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.Selections, nil), prefixColumn)...)
+        //prefixColumn := GetPreloadString(prefix, column.Name)
+        prefixColumn := column.Name
+        preloads = append(preloads, prefixColumn)
+        if len(column.SelectionSet) > 0 {
+            preloads = append(preloads, "{")
+            preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.SelectionSet, nil), prefixColumn, false)...)
+            //preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.Selections, nil), prefixColumn, false)...)
 	    preloads = append(preloads, "}")
 	}
     }
