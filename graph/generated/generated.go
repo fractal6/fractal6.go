@@ -176,7 +176,7 @@ type ComplexityRoot struct {
 		Name         func(childComplexity int) int
 		Nameid       func(childComplexity int) int
 		Parent       func(childComplexity int, filter *model.NodeFilter) int
-		Root         func(childComplexity int, filter *model.NodeFilter) int
+		Rootnameid   func(childComplexity int) int
 		Second       func(childComplexity int, filter *model.UserFilter) int
 		Skills       func(childComplexity int) int
 		TensionsIn   func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -990,17 +990,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Parent(childComplexity, args["filter"].(*model.NodeFilter)), true
 
-	case "Node.root":
-		if e.complexity.Node.Root == nil {
+	case "Node.rootnameid":
+		if e.complexity.Node.Rootnameid == nil {
 			break
 		}
 
-		args, err := ec.field_Node_root_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.Root(childComplexity, args["filter"].(*model.NodeFilter)), true
+		return e.complexity.Node.Rootnameid(childComplexity), true
 
 	case "Node.second":
 		if e.complexity.Node.Second == nil {
@@ -1659,12 +1654,12 @@ type Node {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
-  root(filter: NodeFilter): Node
   parent(filter: NodeFilter): Node
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
   type_: NodeType! @search
   name: String! @search(by: [term])
   nameid: String! @id
+  rootnameid: String! @search(by: [hash])
   mandate(filter: MandateFilter): Mandate
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: receivers)
@@ -1797,12 +1792,12 @@ type AddMandatePayload {
 input AddNodeInput {
   createdAt: DateTime!
   createdBy: UserRef!
-  root: NodeRef
   parent: NodeRef
   children: [NodeRef!]
   type_: NodeType!
   name: String!
   nameid: String!
+  rootnameid: String!
   mandate: MandateRef
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
@@ -2069,6 +2064,7 @@ input NodeFilter {
   type_: NodeType_hash
   name: StringTermFilter
   nameid: StringHashFilter
+  rootnameid: StringHashFilter
   isRoot: Boolean
   skills: StringTermFilter
   and: NodeFilter
@@ -2086,6 +2082,7 @@ enum NodeOrderable {
   createdAt
   name
   nameid
+  rootnameid
   n_tensions_out
   n_tensions_in
   n_children
@@ -2095,11 +2092,11 @@ enum NodeOrderable {
 input NodePatch {
   createdAt: DateTime
   createdBy: UserRef
-  root: NodeRef
   parent: NodeRef
   children: [NodeRef!]
   type_: NodeType
   name: String
+  rootnameid: String
   mandate: MandateRef
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
@@ -2116,12 +2113,12 @@ input NodeRef {
   id: ID
   createdAt: DateTime
   createdBy: UserRef
-  root: NodeRef
   parent: NodeRef
   children: [NodeRef!]
   type_: NodeType
   name: String
   nameid: String
+  rootnameid: String
   mandate: MandateRef
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
@@ -3132,20 +3129,6 @@ func (ec *executionContext) field_Node_mandate_args(ctx context.Context, rawArgs
 }
 
 func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_root_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.NodeFilter
@@ -6556,44 +6539,6 @@ func (ec *executionContext) _Node_createdBy(ctx context.Context, field graphql.C
 	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_root(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Node",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_root_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Root, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Node)
-	fc.Result = res
-	return ec.marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Node_parent(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6831,6 +6776,64 @@ func (ec *executionContext) _Node_nameid(ctx context.Context, field graphql.Coll
 				return nil, errors.New("directive id is not implemented")
 			}
 			return ec.directives.Id(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_rootnameid(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Rootnameid, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10797,12 +10800,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "root":
-			var err error
-			it.Root, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "parent":
 			var err error
 			it.Parent, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -10830,6 +10827,12 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		case "nameid":
 			var err error
 			it.Nameid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rootnameid":
+			var err error
+			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11772,6 +11775,12 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "rootnameid":
+			var err error
+			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isRoot":
 			var err error
 			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -11856,12 +11865,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "root":
-			var err error
-			it.Root, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "parent":
 			var err error
 			it.Parent, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -11883,6 +11886,12 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		case "name":
 			var err error
 			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rootnameid":
+			var err error
+			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11976,12 +11985,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "root":
-			var err error
-			it.Root, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "parent":
 			var err error
 			it.Parent, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -12009,6 +12012,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		case "nameid":
 			var err error
 			it.Nameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rootnameid":
+			var err error
+			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13686,8 +13695,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "root":
-			out.Values[i] = ec._Node_root(ctx, field, obj)
 		case "parent":
 			out.Values[i] = ec._Node_parent(ctx, field, obj)
 		case "children":
@@ -13704,6 +13711,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "nameid":
 			out.Values[i] = ec._Node_nameid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "rootnameid":
+			out.Values[i] = ec._Node_rootnameid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

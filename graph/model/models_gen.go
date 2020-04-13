@@ -47,12 +47,12 @@ type AddMandatePayload struct {
 type AddNodeInput struct {
 	CreatedAt    string        `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef      `json:"createdBy,omitempty"`
-	Root         *NodeRef      `json:"root,omitempty"`
 	Parent       *NodeRef      `json:"parent,omitempty"`
 	Children     []*NodeRef    `json:"children,omitempty"`
 	Type         NodeType      `json:"type_,omitempty"`
 	Name         string        `json:"name,omitempty"`
 	Nameid       string        `json:"nameid,omitempty"`
+	Rootnameid   string        `json:"rootnameid,omitempty"`
 	Mandate      *MandateRef   `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef `json:"tensions_in,omitempty"`
@@ -280,12 +280,12 @@ type Node struct {
 	ID           string     `json:"id,omitempty"`
 	CreatedAt    string     `json:"createdAt,omitempty"`
 	CreatedBy    *User      `json:"createdBy,omitempty"`
-	Root         *Node      `json:"root,omitempty"`
 	Parent       *Node      `json:"parent,omitempty"`
 	Children     []*Node    `json:"children,omitempty"`
 	Type         NodeType   `json:"type_,omitempty"`
 	Name         string     `json:"name,omitempty"`
 	Nameid       string     `json:"nameid,omitempty"`
+	Rootnameid   string     `json:"rootnameid,omitempty"`
 	Mandate      *Mandate   `json:"mandate,omitempty"`
 	TensionsOut  []*Tension `json:"tensions_out,omitempty"`
 	TensionsIn   []*Tension `json:"tensions_in,omitempty"`
@@ -299,16 +299,17 @@ type Node struct {
 }
 
 type NodeFilter struct {
-	ID        []string          `json:"id,omitempty"`
-	CreatedAt *DateTimeFilter   `json:"createdAt,omitempty"`
-	Type      *NodeTypeHash     `json:"type_,omitempty"`
-	Name      *StringTermFilter `json:"name,omitempty"`
-	Nameid    *StringHashFilter `json:"nameid,omitempty"`
-	IsRoot    *bool             `json:"isRoot"`
-	Skills    *StringTermFilter `json:"skills,omitempty"`
-	And       *NodeFilter       `json:"and,omitempty"`
-	Or        *NodeFilter       `json:"or,omitempty"`
-	Not       *NodeFilter       `json:"not,omitempty"`
+	ID         []string          `json:"id,omitempty"`
+	CreatedAt  *DateTimeFilter   `json:"createdAt,omitempty"`
+	Type       *NodeTypeHash     `json:"type_,omitempty"`
+	Name       *StringTermFilter `json:"name,omitempty"`
+	Nameid     *StringHashFilter `json:"nameid,omitempty"`
+	Rootnameid *StringHashFilter `json:"rootnameid,omitempty"`
+	IsRoot     *bool             `json:"isRoot"`
+	Skills     *StringTermFilter `json:"skills,omitempty"`
+	And        *NodeFilter       `json:"and,omitempty"`
+	Or         *NodeFilter       `json:"or,omitempty"`
+	Not        *NodeFilter       `json:"not,omitempty"`
 }
 
 type NodeOrder struct {
@@ -320,11 +321,11 @@ type NodeOrder struct {
 type NodePatch struct {
 	CreatedAt    *string       `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef      `json:"createdBy,omitempty"`
-	Root         *NodeRef      `json:"root,omitempty"`
 	Parent       *NodeRef      `json:"parent,omitempty"`
 	Children     []*NodeRef    `json:"children,omitempty"`
 	Type         *NodeType     `json:"type_,omitempty"`
 	Name         *string       `json:"name,omitempty"`
+	Rootnameid   *string       `json:"rootnameid,omitempty"`
 	Mandate      *MandateRef   `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef `json:"tensions_in,omitempty"`
@@ -341,12 +342,12 @@ type NodeRef struct {
 	ID           *string       `json:"id,omitempty"`
 	CreatedAt    *string       `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef      `json:"createdBy,omitempty"`
-	Root         *NodeRef      `json:"root,omitempty"`
 	Parent       *NodeRef      `json:"parent,omitempty"`
 	Children     []*NodeRef    `json:"children,omitempty"`
 	Type         *NodeType     `json:"type_,omitempty"`
 	Name         *string       `json:"name,omitempty"`
 	Nameid       *string       `json:"nameid,omitempty"`
+	Rootnameid   *string       `json:"rootnameid,omitempty"`
 	Mandate      *MandateRef   `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef `json:"tensions_in,omitempty"`
@@ -813,6 +814,7 @@ const (
 	NodeOrderableCreatedAt    NodeOrderable = "createdAt"
 	NodeOrderableName         NodeOrderable = "name"
 	NodeOrderableNameid       NodeOrderable = "nameid"
+	NodeOrderableRootnameid   NodeOrderable = "rootnameid"
 	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
 	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
 	NodeOrderableNChildren    NodeOrderable = "n_children"
@@ -823,6 +825,7 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableCreatedAt,
 	NodeOrderableName,
 	NodeOrderableNameid,
+	NodeOrderableRootnameid,
 	NodeOrderableNTensionsOut,
 	NodeOrderableNTensionsIn,
 	NodeOrderableNChildren,
@@ -831,7 +834,7 @@ var AllNodeOrderable = []NodeOrderable{
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
+	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
 		return true
 	}
 	return false
