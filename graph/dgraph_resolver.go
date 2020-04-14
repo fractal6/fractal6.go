@@ -4,6 +4,7 @@ import (
     "fmt"
     "context"
     "strings"
+	"reflect"
     "encoding/json"
     "github.com/mitchellh/mapstructure"
     "github.com/99designs/gqlgen/graphql"
@@ -78,7 +79,7 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
 
     /* Rebuild the Graphql inputs request from this context */
     rslvCtx := graphql.GetResolverContext(ctx)
-    queryName := rslvCtx.Field.Name
+    queryName := rslvCtx.Path().String() // rslvCtx.Field.Name
 
     // How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
     ////var queryArgs string
@@ -142,11 +143,39 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
         return fmt.Errorf(string(e))
     }
 
-    config := &mapstructure.DecoderConfig{TagName: "json", Result: data}
-    decoder, err := mapstructure.NewDecoder(config)
-    decoder.Decode(res.Data[queryName])
-    if err != nil {
-        panic(err)
+    var config *mapstructure.DecoderConfig
+    var decodeHook interface{}
+    if tools.IsDigit(queryName[len(queryName)-1]) {
+        decodeHook = func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+        if to == reflect.Struct {
+            nv := tools.CleanAliasedMap(v.(map[string]interface{}))
+            return nv, nil
+        }
+		return v, nil
+	}
+
+        config = &mapstructure.DecoderConfig{
+            Result: data,
+            TagName: "json",
+            DecodeHook: decodeHook,
+        }
+    } else {
+        config = &mapstructure.DecoderConfig{
+            Result: data,
+            TagName: "json",
+        }
     }
-    return 
+
+	decoder, err := mapstructure.NewDecoder(config)
+	decoder.Decode(res.Data[queryName])
+	if err != nil {
+		panic(err)
+	}
+	return 
 }
+
+/*
+*
+* Format/Marshal Request
+*
+*/

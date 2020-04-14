@@ -1,9 +1,11 @@
 package tools
 
 import (
+    "fmt"
     "reflect"
     "strings"
     "regexp"
+    "unicode"
 )
 
 func CleanString(data string) string {
@@ -60,4 +62,37 @@ func StructToMap(item interface{}) map[string]interface{} {
         }
     }
     return res
+}
+
+// CleanAliasedMap copy the input map by renaming all the keys
+// recursively by removing trailing integers.
+// @DEBUG: Assume either all keys or no one are aliased.
+func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
+    
+    out := make(map[string]interface{}, len(m))
+    for k, v := range m {
+        var nk string
+        if IsDigit(k[len(k)-1]) {
+            endDigits := regexp.MustCompile(`[0-9]+$`)
+            nk = endDigits.ReplaceAllString(k, "")
+        } else {
+            panic(fmt.Errorf("map should be aliased."))
+        }
+
+        var nv interface{}
+        switch t := v.(type) {
+        case map[string]interface{}:
+            nv = CleanAliasedMap(t)
+        default:
+            nv = t
+        }
+        out[nk] =  nv
+    }
+
+    return out
+
+}
+
+func IsDigit(s byte) bool {
+    return unicode.IsDigit(rune(s))
 }
