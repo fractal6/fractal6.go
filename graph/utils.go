@@ -23,7 +23,7 @@ type Query struct {
 func (q *Query) Init() {
     d := q.Data
 
-    q.Data = tools.CleanString(d)
+    q.Data = tools.CleanString(d, false)
 
     // Load the template
     // @DEBUG: Do we need a template name ?

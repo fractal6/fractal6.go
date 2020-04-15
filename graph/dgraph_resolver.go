@@ -125,7 +125,7 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     //}
     //req := r.QueryQ.Format(reqInput)
     reqInput := JsonAtom{
-        "RawQuery": tools.CleanString(graphql.GetRequestContext(ctx).RawQuery),
+        "RawQuery": tools.CleanString(graphql.GetRequestContext(ctx).RawQuery, true),
     }
     req := r.RawQueryQ.Format(reqInput)
 

@@ -5,15 +5,22 @@ import (
     "reflect"
     "strings"
     "regexp"
+    "strconv"
     "unicode"
 )
 
-func CleanString(data string) string {
+func CleanString(data string, quote bool) string {
     var d string = data
     d = strings.Replace(d, `\n`, "", -1)
     d = strings.Replace(d, "\n", "", -1)
     space := regexp.MustCompile(`\s+`)
     d = space.ReplaceAllString(d, " ")
+    if quote {
+        // @DEBUG: better way to encode a json string ?
+        d = strconv.Quote(d)
+        // remove surrounding quote !
+        d = d[1:len(d)-1]
+    }
     return d
 }
 
