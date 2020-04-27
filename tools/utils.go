@@ -1,7 +1,6 @@
 package tools
 
 import (
-    "fmt"
     "reflect"
     "strings"
     "regexp"
@@ -73,7 +72,7 @@ func StructToMap(item interface{}) map[string]interface{} {
 
 // CleanAliasedMap copy the input map by renaming all the keys
 // recursively by removing trailing integers.
-// @DEBUG: Assume either all keys or no one are aliased.
+// @DEBUG: how to better handle aliasing (check gqlgen)
 func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
     
     out := make(map[string]interface{}, len(m))
@@ -83,7 +82,7 @@ func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
             endDigits := regexp.MustCompile(`[0-9]+$`)
             nk = endDigits.ReplaceAllString(k, "")
         } else {
-            panic(fmt.Errorf("map should be aliased."))
+            nk = k
         }
 
         var nv interface{}

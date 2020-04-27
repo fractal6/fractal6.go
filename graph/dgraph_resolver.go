@@ -145,27 +145,19 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
 
     var config *mapstructure.DecoderConfig
     var decodeHook interface{}
-    if tools.IsDigit(queryName[len(queryName)-1]) {
-        decodeHook = func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+    decodeHook = func(from, to reflect.Kind, v interface{}) (interface{}, error) {
         if to == reflect.Struct {
             nv := tools.CleanAliasedMap(v.(map[string]interface{}))
             return nv, nil
         }
-		return v, nil
-	}
-
-        config = &mapstructure.DecoderConfig{
-            Result: data,
-            TagName: "json",
-            DecodeHook: decodeHook,
-        }
-    } else {
-        config = &mapstructure.DecoderConfig{
-            Result: data,
-            TagName: "json",
-        }
+        return v, nil
     }
 
+    config = &mapstructure.DecoderConfig{
+        Result: data,
+        TagName: "json",
+        DecodeHook: decodeHook,
+    }
 	decoder, err := mapstructure.NewDecoder(config)
 	decoder.Decode(res.Data[queryName])
 	if err != nil {

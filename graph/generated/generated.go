@@ -167,6 +167,7 @@ type ComplexityRoot struct {
 		Children     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		CreatedAt    func(childComplexity int) int
 		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
+		FirstLink    func(childComplexity int, filter *model.UserFilter) int
 		ID           func(childComplexity int) int
 		IsRoot       func(childComplexity int) int
 		Mandate      func(childComplexity int, filter *model.MandateFilter) int
@@ -177,12 +178,11 @@ type ComplexityRoot struct {
 		Nameid       func(childComplexity int) int
 		Parent       func(childComplexity int, filter *model.NodeFilter) int
 		Rootnameid   func(childComplexity int) int
-		Second       func(childComplexity int, filter *model.UserFilter) int
+		SecondLink   func(childComplexity int, filter *model.UserFilter) int
 		Skills       func(childComplexity int) int
 		TensionsIn   func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		TensionsOut  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		Type         func(childComplexity int) int
-		User         func(childComplexity int, filter *model.UserFilter) int
 	}
 
 	Post struct {
@@ -210,19 +210,17 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Comments    func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
-		Emitter     func(childComplexity int, filter *model.NodeFilter) int
-		ID          func(childComplexity int) int
-		IsAnonymous func(childComplexity int) int
-		Labels      func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		Message     func(childComplexity int) int
-		NComments   func(childComplexity int) int
-		Nth         func(childComplexity int) int
-		Receivers   func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		Title       func(childComplexity int) int
-		Type        func(childComplexity int) int
+		Comments  func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int, filter *model.UserFilter) int
+		Emitter   func(childComplexity int, filter *model.NodeFilter) int
+		ID        func(childComplexity int) int
+		Labels    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		Message   func(childComplexity int) int
+		NComments func(childComplexity int) int
+		Receiver  func(childComplexity int, filter *model.NodeFilter) int
+		Title     func(childComplexity int) int
+		Type      func(childComplexity int) int
 	}
 
 	UpdateCommentPayload struct {
@@ -917,6 +915,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
+	case "Node.first_link":
+		if e.complexity.Node.FirstLink == nil {
+			break
+		}
+
+		args, err := ec.field_Node_first_link_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.FirstLink(childComplexity, args["filter"].(*model.UserFilter)), true
+
 	case "Node.id":
 		if e.complexity.Node.ID == nil {
 			break
@@ -997,17 +1007,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Rootnameid(childComplexity), true
 
-	case "Node.second":
-		if e.complexity.Node.Second == nil {
+	case "Node.second_link":
+		if e.complexity.Node.SecondLink == nil {
 			break
 		}
 
-		args, err := ec.field_Node_second_args(context.TODO(), rawArgs)
+		args, err := ec.field_Node_second_link_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Node.Second(childComplexity, args["filter"].(*model.UserFilter)), true
+		return e.complexity.Node.SecondLink(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Node.skills":
 		if e.complexity.Node.Skills == nil {
@@ -1046,18 +1056,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Type(childComplexity), true
-
-	case "Node.user":
-		if e.complexity.Node.User == nil {
-			break
-		}
-
-		args, err := ec.field_Node_user_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.User(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Post.createdAt":
 		if e.complexity.Post.CreatedAt == nil {
@@ -1310,13 +1308,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.ID(childComplexity), true
 
-	case "Tension.isAnonymous":
-		if e.complexity.Tension.IsAnonymous == nil {
-			break
-		}
-
-		return e.complexity.Tension.IsAnonymous(childComplexity), true
-
 	case "Tension.labels":
 		if e.complexity.Tension.Labels == nil {
 			break
@@ -1343,24 +1334,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.NComments(childComplexity), true
 
-	case "Tension.nth":
-		if e.complexity.Tension.Nth == nil {
+	case "Tension.receiver":
+		if e.complexity.Tension.Receiver == nil {
 			break
 		}
 
-		return e.complexity.Tension.Nth(childComplexity), true
-
-	case "Tension.receivers":
-		if e.complexity.Tension.Receivers == nil {
-			break
-		}
-
-		args, err := ec.field_Tension_receivers_args(context.TODO(), rawArgs)
+		args, err := ec.field_Tension_receiver_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Tension.Receivers(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Tension.Receiver(childComplexity, args["filter"].(*model.NodeFilter)), true
 
 	case "Tension.title":
 		if e.complexity.Tension.Title == nil {
@@ -1662,13 +1646,13 @@ type Node {
   rootnameid: String! @search(by: [hash])
   mandate(filter: MandateFilter): Mandate
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
-  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: receivers)
+  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: receiver)
   n_tensions_out: Int @count(f: tensions_out)
   n_tensions_in: Int @count(f: tensions_in)
   n_children: Int @count(f: children)
   isRoot: Boolean! @search
-  user(filter: UserFilter): User
-  second(filter: UserFilter): User
+  first_link(filter: UserFilter): User
+  second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
 }
 
@@ -1680,12 +1664,10 @@ type Post {
 }
 
 type Tension {
-  nth: Int! @search
   title: String! @search(by: [term])
   type_: TensionType! @search
   emitter(filter: NodeFilter): Node!
-  receivers(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  isAnonymous: Boolean!
+  receiver(filter: NodeFilter): Node!
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   n_comments: Int @count(f: comments)
@@ -1718,8 +1700,8 @@ type User {
   username: String! @id
   fullname: String
   password: String! @hidden
-  roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: user)
-  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second)
+  roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
+  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second_link)
   bio: String
 }
 
@@ -1743,6 +1725,8 @@ enum TensionType {
 
 }
 
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
@@ -1750,8 +1734,6 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -1805,8 +1787,8 @@ input AddNodeInput {
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean!
-  user: UserRef
-  second: UserRef
+  first_link: UserRef
+  second_link: UserRef
   skills: [String!]
 }
 
@@ -1819,12 +1801,10 @@ input AddTensionInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
-  nth: Int!
   title: String!
   type_: TensionType!
   emitter: NodeRef!
-  receivers: [NodeRef!]
-  isAnonymous: Boolean!
+  receiver: NodeRef!
   comments: [CommentRef!]
   labels: [LabelRef!]
   n_comments: Int
@@ -2104,8 +2084,8 @@ input NodePatch {
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean
-  user: UserRef
-  second: UserRef
+  first_link: UserRef
+  second_link: UserRef
   skills: [String!]
 }
 
@@ -2126,8 +2106,8 @@ input NodeRef {
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean
-  user: UserRef
-  second: UserRef
+  first_link: UserRef
+  second_link: UserRef
   skills: [String!]
 }
 
@@ -2212,7 +2192,6 @@ input TensionFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  nth: IntFilter
   title: StringTermFilter
   type_: TensionType_hash
   and: TensionFilter
@@ -2229,7 +2208,6 @@ input TensionOrder {
 enum TensionOrderable {
   createdAt
   message
-  nth
   title
   n_comments
 }
@@ -2238,12 +2216,10 @@ input TensionPatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  nth: Int
   title: String
   type_: TensionType
   emitter: NodeRef
-  receivers: [NodeRef!]
-  isAnonymous: Boolean
+  receiver: NodeRef
   comments: [CommentRef!]
   labels: [LabelRef!]
   n_comments: Int
@@ -2254,12 +2230,10 @@ input TensionRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  nth: Int
   title: String
   type_: TensionType
   emitter: NodeRef
-  receivers: [NodeRef!]
-  isAnonymous: Boolean
+  receiver: NodeRef
   comments: [CommentRef!]
   labels: [LabelRef!]
   n_comments: Int
@@ -3114,6 +3088,20 @@ func (ec *executionContext) field_Node_createdBy_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_first_link_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3142,7 +3130,7 @@ func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
-func (ec *executionContext) field_Node_second_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Node_second_link_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.UserFilter
@@ -3229,20 +3217,6 @@ func (ec *executionContext) field_Node_tensions_out_args(ctx context.Context, ra
 		}
 	}
 	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.UserFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
 	return args, nil
 }
 
@@ -3766,7 +3740,7 @@ func (ec *executionContext) field_Tension_labels_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Tension_receivers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Tension_receiver_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.NodeFilter
@@ -3777,30 +3751,6 @@ func (ec *executionContext) field_Tension_receivers_args(ctx context.Context, ra
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.NodeOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
 	return args, nil
 }
 
@@ -6991,7 +6941,7 @@ func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql
 			return obj.TensionsIn, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			field, err := ec.unmarshalNString2string(ctx, "receivers")
+			field, err := ec.unmarshalNString2string(ctx, "receiver")
 			if err != nil {
 				return nil, err
 			}
@@ -7244,7 +7194,7 @@ func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.Coll
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_user(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+func (ec *executionContext) _Node_first_link(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7260,7 +7210,7 @@ func (ec *executionContext) _Node_user(ctx context.Context, field graphql.Collec
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_user_args(ctx, rawArgs)
+	args, err := ec.field_Node_first_link_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -7268,7 +7218,7 @@ func (ec *executionContext) _Node_user(ctx context.Context, field graphql.Collec
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
+		return obj.FirstLink, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7282,7 +7232,7 @@ func (ec *executionContext) _Node_user(ctx context.Context, field graphql.Collec
 	return ec.marshalOUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_second(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+func (ec *executionContext) _Node_second_link(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7298,7 +7248,7 @@ func (ec *executionContext) _Node_second(ctx context.Context, field graphql.Coll
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_second_args(ctx, rawArgs)
+	args, err := ec.field_Node_second_link_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -7306,7 +7256,7 @@ func (ec *executionContext) _Node_second(ctx context.Context, field graphql.Coll
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Second, nil
+		return obj.SecondLink, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8160,60 +8110,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_nth(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Tension",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Nth, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be int`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Tension_title(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8367,7 +8263,7 @@ func (ec *executionContext) _Tension_emitter(ctx context.Context, field graphql.
 	return ec.marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_receivers(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tension_receiver(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8383,7 +8279,7 @@ func (ec *executionContext) _Tension_receivers(ctx context.Context, field graphq
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Tension_receivers_args(ctx, rawArgs)
+	args, err := ec.field_Tension_receiver_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -8391,38 +8287,7 @@ func (ec *executionContext) _Tension_receivers(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Receivers, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Node)
-	fc.Result = res
-	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Tension_isAnonymous(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Tension",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsAnonymous, nil
+		return obj.Receiver, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8434,9 +8299,9 @@ func (ec *executionContext) _Tension_isAnonymous(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.Node)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -9492,7 +9357,7 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 			return obj.Roles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			field, err := ec.unmarshalNString2string(ctx, "user")
+			field, err := ec.unmarshalNString2string(ctx, "first_link")
 			if err != nil {
 				return nil, err
 			}
@@ -9554,7 +9419,7 @@ func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphq
 			return obj.BackedRoles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			field, err := ec.unmarshalNString2string(ctx, "second")
+			field, err := ec.unmarshalNString2string(ctx, "second_link")
 			if err != nil {
 				return nil, err
 			}
@@ -10878,15 +10743,15 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "user":
+		case "first_link":
 			var err error
-			it.User, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "second":
+		case "second_link":
 			var err error
-			it.Second, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.SecondLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10926,12 +10791,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "nth":
-			var err error
-			it.Nth, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "title":
 			var err error
 			it.Title, err = ec.unmarshalNString2string(ctx, v)
@@ -10950,15 +10809,9 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "receivers":
+		case "receiver":
 			var err error
-			it.Receivers, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isAnonymous":
-			var err error
-			it.IsAnonymous, err = ec.unmarshalNBoolean2bool(ctx, v)
+			it.Receiver, err = ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11937,15 +11790,15 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "user":
+		case "first_link":
 			var err error
-			it.User, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "second":
+		case "second_link":
 			var err error
-			it.Second, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.SecondLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12063,15 +11916,15 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "user":
+		case "first_link":
 			var err error
-			it.User, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "second":
+		case "second_link":
 			var err error
-			it.Second, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.SecondLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12381,12 +12234,6 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "nth":
-			var err error
-			it.Nth, err = ec.unmarshalOIntFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "title":
 			var err error
 			it.Title, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
@@ -12477,12 +12324,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "nth":
-			var err error
-			it.Nth, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "title":
 			var err error
 			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12501,15 +12342,9 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "receivers":
+		case "receiver":
 			var err error
-			it.Receivers, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isAnonymous":
-			var err error
-			it.IsAnonymous, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			it.Receiver, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12567,12 +12402,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "nth":
-			var err error
-			it.Nth, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "title":
 			var err error
 			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12591,15 +12420,9 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "receivers":
+		case "receiver":
 			var err error
-			it.Receivers, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isAnonymous":
-			var err error
-			it.IsAnonymous, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			it.Receiver, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13736,10 +13559,10 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "user":
-			out.Values[i] = ec._Node_user(ctx, field, obj)
-		case "second":
-			out.Values[i] = ec._Node_second(ctx, field, obj)
+		case "first_link":
+			out.Values[i] = ec._Node_first_link(ctx, field, obj)
+		case "second_link":
+			out.Values[i] = ec._Node_second_link(ctx, field, obj)
 		case "skills":
 			out.Values[i] = ec._Node_skills(ctx, field, obj)
 		default:
@@ -13987,11 +13810,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Tension")
-		case "nth":
-			out.Values[i] = ec._Tension_nth(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "title":
 			out.Values[i] = ec._Tension_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -14007,10 +13825,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "receivers":
-			out.Values[i] = ec._Tension_receivers(ctx, field, obj)
-		case "isAnonymous":
-			out.Values[i] = ec._Tension_isAnonymous(ctx, field, obj)
+		case "receiver":
+			out.Values[i] = ec._Tension_receiver(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15813,18 +15629,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return ec.marshalOInt2int(ctx, sel, *v)
-}
-
-func (ec *executionContext) unmarshalOIntFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntFilter(ctx context.Context, v interface{}) (model.IntFilter, error) {
-	return ec.unmarshalInputIntFilter(ctx, v)
-}
-
-func (ec *executionContext) unmarshalOIntFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntFilter(ctx context.Context, v interface{}) (*model.IntFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOIntFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntFilter(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) marshalOLabel2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabel(ctx context.Context, sel ast.SelectionSet, v model.Label) graphql.Marshaler {
