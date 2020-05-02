@@ -12,6 +12,7 @@ type AddCommentInput struct {
 	CreatedAt string   `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
+	Items     []string `json:"items,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
@@ -34,9 +35,10 @@ type AddMandateInput struct {
 	CreatedAt        string   `json:"createdAt,omitempty"`
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
+	Items            []string `json:"items,omitempty"`
 	Purpose          string   `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          []string `json:"domains,omitempty"`
+	Responsabilities *PostRef `json:"responsabilities,omitempty"`
+	Domains          *PostRef `json:"domains,omitempty"`
 }
 
 type AddMandatePayload struct {
@@ -74,6 +76,8 @@ type AddTensionInput struct {
 	CreatedAt string        `json:"createdAt,omitempty"`
 	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
+	Items     []string      `json:"items,omitempty"`
+	Nth       *string       `json:"nth,omitempty"`
 	Title     string        `json:"title,omitempty"`
 	Type      TensionType   `json:"type_,omitempty"`
 	Emitter   *NodeRef      `json:"emitter,omitempty"`
@@ -96,6 +100,7 @@ type AddUserInput struct {
 	Roles       []*NodeRef `json:"roles,omitempty"`
 	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
 	Bio         *string    `json:"bio,omitempty"`
+	Utc         *string    `json:"utc,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -104,16 +109,18 @@ type AddUserPayload struct {
 }
 
 type Comment struct {
-	Message   string `json:"message,omitempty"`
-	ID        string `json:"id,omitempty"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	CreatedBy *User  `json:"createdBy,omitempty"`
+	Message   string   `json:"message,omitempty"`
+	ID        string   `json:"id,omitempty"`
+	CreatedAt string   `json:"createdAt,omitempty"`
+	CreatedBy *User    `json:"createdBy,omitempty"`
+	Items     []string `json:"items,omitempty"`
 }
 
 type CommentFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Items     *StringFullTextFilter `json:"items,omitempty"`
 	And       *CommentFilter        `json:"and,omitempty"`
 	Or        *CommentFilter        `json:"or,omitempty"`
 	Not       *CommentFilter        `json:"not,omitempty"`
@@ -129,6 +136,7 @@ type CommentPatch struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
+	Items     []string `json:"items,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
@@ -137,6 +145,7 @@ type CommentRef struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
+	Items     []string `json:"items,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
@@ -231,18 +240,20 @@ type LabelRef struct {
 
 type Mandate struct {
 	Purpose          string   `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          []string `json:"domains,omitempty"`
+	Responsabilities *Post    `json:"responsabilities,omitempty"`
+	Domains          *Post    `json:"domains,omitempty"`
 	ID               string   `json:"id,omitempty"`
 	CreatedAt        string   `json:"createdAt,omitempty"`
 	CreatedBy        *User    `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
+	Items            []string `json:"items,omitempty"`
 }
 
 type MandateFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Items     *StringFullTextFilter `json:"items,omitempty"`
 	Purpose   *StringFullTextFilter `json:"purpose,omitempty"`
 	And       *MandateFilter        `json:"and,omitempty"`
 	Or        *MandateFilter        `json:"or,omitempty"`
@@ -259,9 +270,10 @@ type MandatePatch struct {
 	CreatedAt        *string  `json:"createdAt,omitempty"`
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
+	Items            []string `json:"items,omitempty"`
 	Purpose          *string  `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          []string `json:"domains,omitempty"`
+	Responsabilities *PostRef `json:"responsabilities,omitempty"`
+	Domains          *PostRef `json:"domains,omitempty"`
 }
 
 type MandateRef struct {
@@ -269,9 +281,10 @@ type MandateRef struct {
 	CreatedAt        *string  `json:"createdAt,omitempty"`
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
+	Items            []string `json:"items,omitempty"`
 	Purpose          *string  `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          []string `json:"domains,omitempty"`
+	Responsabilities *PostRef `json:"responsabilities,omitempty"`
+	Domains          *PostRef `json:"domains,omitempty"`
 }
 
 type Node struct {
@@ -363,16 +376,18 @@ type NodeTypeHash struct {
 }
 
 type Post struct {
-	ID        string  `json:"id,omitempty"`
-	CreatedAt string  `json:"createdAt,omitempty"`
-	CreatedBy *User   `json:"createdBy,omitempty"`
-	Message   *string `json:"message,omitempty"`
+	ID        string   `json:"id,omitempty"`
+	CreatedAt string   `json:"createdAt,omitempty"`
+	CreatedBy *User    `json:"createdBy,omitempty"`
+	Message   *string  `json:"message,omitempty"`
+	Items     []string `json:"items,omitempty"`
 }
 
 type PostFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Items     *StringFullTextFilter `json:"items,omitempty"`
 	And       *PostFilter           `json:"and,omitempty"`
 	Or        *PostFilter           `json:"or,omitempty"`
 	Not       *PostFilter           `json:"not,omitempty"`
@@ -388,6 +403,7 @@ type PostPatch struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
+	Items     []string `json:"items,omitempty"`
 }
 
 type PostRef struct {
@@ -421,6 +437,7 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
+	Nth       *string     `json:"nth,omitempty"`
 	Title     string      `json:"title,omitempty"`
 	Type      TensionType `json:"type_,omitempty"`
 	Emitter   *Node       `json:"emitter,omitempty"`
@@ -432,12 +449,15 @@ type Tension struct {
 	CreatedAt string      `json:"createdAt,omitempty"`
 	CreatedBy *User       `json:"createdBy,omitempty"`
 	Message   *string     `json:"message,omitempty"`
+	Items     []string    `json:"items,omitempty"`
 }
 
 type TensionFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Items     *StringFullTextFilter `json:"items,omitempty"`
+	Nth       *StringTermFilter     `json:"nth,omitempty"`
 	Title     *StringTermFilter     `json:"title,omitempty"`
 	Type      *TensionTypeHash      `json:"type_,omitempty"`
 	And       *TensionFilter        `json:"and,omitempty"`
@@ -455,6 +475,8 @@ type TensionPatch struct {
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
+	Items     []string      `json:"items,omitempty"`
+	Nth       *string       `json:"nth,omitempty"`
 	Title     *string       `json:"title,omitempty"`
 	Type      *TensionType  `json:"type_,omitempty"`
 	Emitter   *NodeRef      `json:"emitter,omitempty"`
@@ -469,6 +491,8 @@ type TensionRef struct {
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
+	Items     []string      `json:"items,omitempty"`
+	Nth       *string       `json:"nth,omitempty"`
 	Title     *string       `json:"title,omitempty"`
 	Type      *TensionType  `json:"type_,omitempty"`
 	Emitter   *NodeRef      `json:"emitter,omitempty"`
@@ -568,6 +592,7 @@ type User struct {
 	Roles       []*Node `json:"roles,omitempty"`
 	BackedRoles []*Node `json:"backed_roles,omitempty"`
 	Bio         *string `json:"bio,omitempty"`
+	Utc         *string `json:"utc,omitempty"`
 }
 
 type UserFilter struct {
@@ -592,6 +617,7 @@ type UserPatch struct {
 	Roles       []*NodeRef `json:"roles,omitempty"`
 	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
 	Bio         *string    `json:"bio,omitempty"`
+	Utc         *string    `json:"utc,omitempty"`
 }
 
 type UserRef struct {
@@ -603,6 +629,7 @@ type UserRef struct {
 	Roles       []*NodeRef `json:"roles,omitempty"`
 	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
 	Bio         *string    `json:"bio,omitempty"`
+	Utc         *string    `json:"utc,omitempty"`
 }
 
 type CommentOrderable string
@@ -610,18 +637,20 @@ type CommentOrderable string
 const (
 	CommentOrderableCreatedAt CommentOrderable = "createdAt"
 	CommentOrderableMessage   CommentOrderable = "message"
+	CommentOrderableItems     CommentOrderable = "items"
 	CommentOrderableVoid      CommentOrderable = "_VOID"
 )
 
 var AllCommentOrderable = []CommentOrderable{
 	CommentOrderableCreatedAt,
 	CommentOrderableMessage,
+	CommentOrderableItems,
 	CommentOrderableVoid,
 }
 
 func (e CommentOrderable) IsValid() bool {
 	switch e {
-	case CommentOrderableCreatedAt, CommentOrderableMessage, CommentOrderableVoid:
+	case CommentOrderableCreatedAt, CommentOrderableMessage, CommentOrderableItems, CommentOrderableVoid:
 		return true
 	}
 	return false
@@ -755,24 +784,22 @@ func (e LabelOrderable) MarshalGQL(w io.Writer) {
 type MandateOrderable string
 
 const (
-	MandateOrderableCreatedAt        MandateOrderable = "createdAt"
-	MandateOrderableMessage          MandateOrderable = "message"
-	MandateOrderablePurpose          MandateOrderable = "purpose"
-	MandateOrderableResponsabilities MandateOrderable = "responsabilities"
-	MandateOrderableDomains          MandateOrderable = "domains"
+	MandateOrderableCreatedAt MandateOrderable = "createdAt"
+	MandateOrderableMessage   MandateOrderable = "message"
+	MandateOrderableItems     MandateOrderable = "items"
+	MandateOrderablePurpose   MandateOrderable = "purpose"
 )
 
 var AllMandateOrderable = []MandateOrderable{
 	MandateOrderableCreatedAt,
 	MandateOrderableMessage,
+	MandateOrderableItems,
 	MandateOrderablePurpose,
-	MandateOrderableResponsabilities,
-	MandateOrderableDomains,
 }
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains:
+	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderableItems, MandateOrderablePurpose:
 		return true
 	}
 	return false
@@ -898,16 +925,18 @@ type PostOrderable string
 const (
 	PostOrderableCreatedAt PostOrderable = "createdAt"
 	PostOrderableMessage   PostOrderable = "message"
+	PostOrderableItems     PostOrderable = "items"
 )
 
 var AllPostOrderable = []PostOrderable{
 	PostOrderableCreatedAt,
 	PostOrderableMessage,
+	PostOrderableItems,
 }
 
 func (e PostOrderable) IsValid() bool {
 	switch e {
-	case PostOrderableCreatedAt, PostOrderableMessage:
+	case PostOrderableCreatedAt, PostOrderableMessage, PostOrderableItems:
 		return true
 	}
 	return false
@@ -939,6 +968,8 @@ type TensionOrderable string
 const (
 	TensionOrderableCreatedAt TensionOrderable = "createdAt"
 	TensionOrderableMessage   TensionOrderable = "message"
+	TensionOrderableItems     TensionOrderable = "items"
+	TensionOrderableNth       TensionOrderable = "nth"
 	TensionOrderableTitle     TensionOrderable = "title"
 	TensionOrderableNComments TensionOrderable = "n_comments"
 )
@@ -946,13 +977,15 @@ const (
 var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableCreatedAt,
 	TensionOrderableMessage,
+	TensionOrderableItems,
+	TensionOrderableNth,
 	TensionOrderableTitle,
 	TensionOrderableNComments,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableTitle, TensionOrderableNComments:
+	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableItems, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments:
 		return true
 	}
 	return false
@@ -986,7 +1019,6 @@ const (
 	TensionTypeOperational TensionType = "Operational"
 	TensionTypePersonal    TensionType = "Personal"
 	TensionTypeHelp        TensionType = "Help"
-	TensionTypeAlert       TensionType = "Alert"
 )
 
 var AllTensionType = []TensionType{
@@ -994,12 +1026,11 @@ var AllTensionType = []TensionType{
 	TensionTypeOperational,
 	TensionTypePersonal,
 	TensionTypeHelp,
-	TensionTypeAlert,
 }
 
 func (e TensionType) IsValid() bool {
 	switch e {
-	case TensionTypeGovernance, TensionTypeOperational, TensionTypePersonal, TensionTypeHelp, TensionTypeAlert:
+	case TensionTypeGovernance, TensionTypeOperational, TensionTypePersonal, TensionTypeHelp:
 		return true
 	}
 	return false
@@ -1034,6 +1065,7 @@ const (
 	UserOrderableFullname  UserOrderable = "fullname"
 	UserOrderablePassword  UserOrderable = "password"
 	UserOrderableBio       UserOrderable = "bio"
+	UserOrderableUtc       UserOrderable = "utc"
 )
 
 var AllUserOrderable = []UserOrderable{
@@ -1042,11 +1074,12 @@ var AllUserOrderable = []UserOrderable{
 	UserOrderableFullname,
 	UserOrderablePassword,
 	UserOrderableBio,
+	UserOrderableUtc,
 }
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableFullname, UserOrderablePassword, UserOrderableBio:
+	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableFullname, UserOrderablePassword, UserOrderableBio, UserOrderableUtc:
 		return true
 	}
 	return false

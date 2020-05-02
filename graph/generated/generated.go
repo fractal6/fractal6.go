@@ -86,6 +86,7 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
+		Items     func(childComplexity int) int
 		Message   func(childComplexity int) int
 	}
 
@@ -133,11 +134,12 @@ type ComplexityRoot struct {
 	Mandate struct {
 		CreatedAt        func(childComplexity int) int
 		CreatedBy        func(childComplexity int, filter *model.UserFilter) int
-		Domains          func(childComplexity int) int
+		Domains          func(childComplexity int, filter *model.PostFilter) int
 		ID               func(childComplexity int) int
+		Items            func(childComplexity int) int
 		Message          func(childComplexity int) int
 		Purpose          func(childComplexity int) int
-		Responsabilities func(childComplexity int) int
+		Responsabilities func(childComplexity int, filter *model.PostFilter) int
 	}
 
 	Mutation struct {
@@ -189,6 +191,7 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
+		Items     func(childComplexity int) int
 		Message   func(childComplexity int) int
 	}
 
@@ -215,9 +218,11 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		Emitter   func(childComplexity int, filter *model.NodeFilter) int
 		ID        func(childComplexity int) int
+		Items     func(childComplexity int) int
 		Labels    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		Message   func(childComplexity int) int
 		NComments func(childComplexity int) int
+		Nth       func(childComplexity int) int
 		Receiver  func(childComplexity int, filter *model.NodeFilter) int
 		Title     func(childComplexity int) int
 		Type      func(childComplexity int) int
@@ -267,6 +272,7 @@ type ComplexityRoot struct {
 		Password    func(childComplexity int) int
 		Roles       func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		Username    func(childComplexity int) int
+		Utc         func(childComplexity int) int
 	}
 }
 
@@ -464,6 +470,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.ID(childComplexity), true
 
+	case "Comment.items":
+		if e.complexity.Comment.Items == nil {
+			break
+		}
+
+		return e.complexity.Comment.Items(childComplexity), true
+
 	case "Comment.message":
 		if e.complexity.Comment.Message == nil {
 			break
@@ -614,7 +627,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Mandate.Domains(childComplexity), true
+		args, err := ec.field_Mandate_domains_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mandate.Domains(childComplexity, args["filter"].(*model.PostFilter)), true
 
 	case "Mandate.id":
 		if e.complexity.Mandate.ID == nil {
@@ -622,6 +640,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mandate.ID(childComplexity), true
+
+	case "Mandate.items":
+		if e.complexity.Mandate.Items == nil {
+			break
+		}
+
+		return e.complexity.Mandate.Items(childComplexity), true
 
 	case "Mandate.message":
 		if e.complexity.Mandate.Message == nil {
@@ -642,7 +667,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Mandate.Responsabilities(childComplexity), true
+		args, err := ec.field_Mandate_responsabilities_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mandate.Responsabilities(childComplexity, args["filter"].(*model.PostFilter)), true
 
 	case "Mutation.addComment":
 		if e.complexity.Mutation.AddComment == nil {
@@ -1083,6 +1113,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Post.ID(childComplexity), true
 
+	case "Post.items":
+		if e.complexity.Post.Items == nil {
+			break
+		}
+
+		return e.complexity.Post.Items(childComplexity), true
+
 	case "Post.message":
 		if e.complexity.Post.Message == nil {
 			break
@@ -1308,6 +1345,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.ID(childComplexity), true
 
+	case "Tension.items":
+		if e.complexity.Tension.Items == nil {
+			break
+		}
+
+		return e.complexity.Tension.Items(childComplexity), true
+
 	case "Tension.labels":
 		if e.complexity.Tension.Labels == nil {
 			break
@@ -1333,6 +1377,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.NComments(childComplexity), true
+
+	case "Tension.nth":
+		if e.complexity.Tension.Nth == nil {
+			break
+		}
+
+		return e.complexity.Tension.Nth(childComplexity), true
 
 	case "Tension.receiver":
 		if e.complexity.Tension.Receiver == nil {
@@ -1559,6 +1610,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Username(childComplexity), true
 
+	case "User.utc":
+		if e.complexity.User.Utc == nil {
+			break
+		}
+
+		return e.complexity.User.Utc(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -1661,9 +1719,11 @@ type Post {
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
+  items: [String!] @search(by: [fulltext])
 }
 
 type Tension {
+  nth: String @search
   title: String! @search(by: [term])
   type_: TensionType! @search
   emitter(filter: NodeFilter): Node!
@@ -1675,6 +1735,7 @@ type Tension {
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
+  items: [String!] @search(by: [fulltext])
 }
 
 type Comment {
@@ -1682,16 +1743,18 @@ type Comment {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
+  items: [String!] @search(by: [fulltext])
 }
 
 type Mandate {
   purpose: String! @search(by: [fulltext])
-  responsabilities: String
-  domains: [String!]
+  responsabilities(filter: PostFilter): Post
+  domains(filter: PostFilter): Post
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
+  items: [String!] @search(by: [fulltext])
 }
 
 type User {
@@ -1703,6 +1766,7 @@ type User {
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second_link)
   bio: String
+  utc: String
 }
 
 type Label {
@@ -1721,11 +1785,9 @@ enum TensionType {
   Operational
   Personal
   Help
-  Alert
+
 
 }
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
@@ -1735,10 +1797,13 @@ directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITI
 
 directive @id on FIELD_DEFINITION
 
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
 input AddCommentInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
+  items: [String!]
   _VOID: String
 }
 
@@ -1761,9 +1826,10 @@ input AddMandateInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
+  items: [String!]
   purpose: String!
-  responsabilities: String
-  domains: [String!]
+  responsabilities: PostRef
+  domains: PostRef
 }
 
 type AddMandatePayload {
@@ -1801,6 +1867,8 @@ input AddTensionInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
+  items: [String!]
+  nth: String
   title: String!
   type_: TensionType!
   emitter: NodeRef!
@@ -1823,6 +1891,7 @@ input AddUserInput {
   roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
   backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
   bio: String
+  utc: String
 }
 
 type AddUserPayload {
@@ -1834,6 +1903,7 @@ input CommentFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  items: StringFullTextFilter
   and: CommentFilter
   or: CommentFilter
   not: CommentFilter
@@ -1848,6 +1918,7 @@ input CommentOrder {
 enum CommentOrderable {
   createdAt
   message
+  items
   _VOID
 }
 
@@ -1855,6 +1926,7 @@ input CommentPatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
   _VOID: String
 }
 
@@ -1863,6 +1935,7 @@ input CommentRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
   _VOID: String
 }
 
@@ -1976,6 +2049,7 @@ input MandateFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  items: StringFullTextFilter
   purpose: StringFullTextFilter
   and: MandateFilter
   or: MandateFilter
@@ -1991,18 +2065,18 @@ input MandateOrder {
 enum MandateOrderable {
   createdAt
   message
+  items
   purpose
-  responsabilities
-  domains
 }
 
 input MandatePatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
   purpose: String
-  responsabilities: String
-  domains: [String!]
+  responsabilities: PostRef
+  domains: PostRef
 }
 
 input MandateRef {
@@ -2010,9 +2084,10 @@ input MandateRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
   purpose: String
-  responsabilities: String
-  domains: [String!]
+  responsabilities: PostRef
+  domains: PostRef
 }
 
 type Mutation {
@@ -2119,6 +2194,7 @@ input PostFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  items: StringFullTextFilter
   and: PostFilter
   or: PostFilter
   not: PostFilter
@@ -2133,12 +2209,14 @@ input PostOrder {
 enum PostOrderable {
   createdAt
   message
+  items
 }
 
 input PostPatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
 }
 
 input PostRef {
@@ -2192,6 +2270,8 @@ input TensionFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  items: StringFullTextFilter
+  nth: StringTermFilter
   title: StringTermFilter
   type_: TensionType_hash
   and: TensionFilter
@@ -2208,6 +2288,8 @@ input TensionOrder {
 enum TensionOrderable {
   createdAt
   message
+  items
+  nth
   title
   n_comments
 }
@@ -2216,6 +2298,8 @@ input TensionPatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
+  nth: String
   title: String
   type_: TensionType
   emitter: NodeRef
@@ -2230,6 +2314,8 @@ input TensionRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
+  items: [String!]
+  nth: String
   title: String
   type_: TensionType
   emitter: NodeRef
@@ -2341,6 +2427,7 @@ enum UserOrderable {
   fullname
   password
   bio
+  utc
 }
 
 input UserPatch {
@@ -2350,6 +2437,7 @@ input UserPatch {
   roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
   backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
   bio: String
+  utc: String
 }
 
 input UserRef {
@@ -2361,6 +2449,7 @@ input UserRef {
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   bio: String
+  utc: String
 }
 `, BuiltIn: false},
 }
@@ -2748,6 +2837,34 @@ func (ec *executionContext) field_Mandate_createdBy_args(ctx context.Context, ra
 	var arg0 *model.UserFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mandate_domains_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PostFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mandate_responsabilities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PostFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4733,6 +4850,61 @@ func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphq
 	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Comment_items(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Items, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteCommentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCommentPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5369,6 +5541,13 @@ func (ec *executionContext) _Mandate_responsabilities(ctx context.Context, field
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mandate_responsabilities_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Responsabilities, nil
@@ -5380,9 +5559,9 @@ func (ec *executionContext) _Mandate_responsabilities(ctx context.Context, field
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*model.Post)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -5400,6 +5579,13 @@ func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mandate_domains_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Domains, nil
@@ -5411,9 +5597,9 @@ func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.(*model.Post)
 	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -5598,6 +5784,61 @@ func (ec *executionContext) _Mandate_message(ctx context.Context, field graphql.
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mandate_items(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mandate",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Items, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7509,6 +7750,61 @@ func (ec *executionContext) _Post_message(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Post_items(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Items, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8110,6 +8406,57 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Tension_nth(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Nth, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Tension_title(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8617,6 +8964,61 @@ func (ec *executionContext) _Tension_message(ctx context.Context, field graphql.
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_items(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Items, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UpdateCommentPayload_comment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateCommentPayload) (ret graphql.Marshaler) {
@@ -9471,6 +9873,37 @@ func (ec *executionContext) _User_bio(ctx context.Context, field graphql.Collect
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Bio, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_utc(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Utc, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10563,6 +10996,12 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "_VOID":
 			var err error
 			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -10623,6 +11062,12 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalNString2string(ctx, v)
@@ -10631,13 +11076,13 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 			}
 		case "responsabilities":
 			var err error
-			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Responsabilities, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "domains":
 			var err error
-			it.Domains, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.Domains, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10788,6 +11233,18 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nth":
+			var err error
+			it.Nth, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10998,6 +11455,12 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "utc":
+			var err error
+			it.Utc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -11025,6 +11488,12 @@ func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11106,6 +11575,12 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "_VOID":
 			var err error
 			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -11145,6 +11620,12 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11430,6 +11911,12 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
@@ -11514,6 +12001,12 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -11522,13 +12015,13 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			}
 		case "responsabilities":
 			var err error
-			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Responsabilities, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "domains":
 			var err error
-			it.Domains, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.Domains, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11568,6 +12061,12 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -11576,13 +12075,13 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 			}
 		case "responsabilities":
 			var err error
-			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Responsabilities, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "domains":
 			var err error
-			it.Domains, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.Domains, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11982,6 +12481,12 @@ func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "and":
 			var err error
 			it.And, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
@@ -12057,6 +12562,12 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12234,6 +12745,18 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nth":
+			var err error
+			it.Nth, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "title":
 			var err error
 			it.Title, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
@@ -12324,6 +12847,18 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nth":
+			var err error
+			it.Nth, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "title":
 			var err error
 			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12399,6 +12934,18 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "items":
+			var err error
+			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nth":
+			var err error
+			it.Nth, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12890,6 +13437,12 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "utc":
+			var err error
+			it.Utc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -12947,6 +13500,12 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		case "bio":
 			var err error
 			it.Bio, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "utc":
+			var err error
+			it.Utc, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13151,6 +13710,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "items":
+			out.Values[i] = ec._Comment_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13415,6 +13976,8 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "message":
 			out.Values[i] = ec._Mandate_message(ctx, field, obj)
+		case "items":
+			out.Values[i] = ec._Mandate_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13604,6 +14167,8 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "message":
 			out.Values[i] = ec._Post_message(ctx, field, obj)
+		case "items":
+			out.Values[i] = ec._Post_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13810,6 +14375,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Tension")
+		case "nth":
+			out.Values[i] = ec._Tension_nth(ctx, field, obj)
 		case "title":
 			out.Values[i] = ec._Tension_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -13853,6 +14420,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "message":
 			out.Values[i] = ec._Tension_message(ctx, field, obj)
+		case "items":
+			out.Values[i] = ec._Tension_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14085,6 +14654,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_backed_roles(ctx, field, obj)
 		case "bio":
 			out.Values[i] = ec._User_bio(ctx, field, obj)
+		case "utc":
+			out.Values[i] = ec._User_utc(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16252,6 +16823,18 @@ func (ec *executionContext) unmarshalOPostPatch2ᚖzerogovᚋfractal6ᚗgoᚋgra
 		return nil, nil
 	}
 	res, err := ec.unmarshalOPostPatch2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx context.Context, v interface{}) (model.PostRef, error) {
+	return ec.unmarshalInputPostRef(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx context.Context, v interface{}) (*model.PostRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 	return &res, err
 }
 
