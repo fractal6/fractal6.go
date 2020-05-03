@@ -10,12 +10,11 @@ import (
     "context"
     "reflect"
     "github.com/99designs/gqlgen/graphql"
-    //"golang.org/x/crypto/bcrypt" 
 
-    "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/graph/model"
     gen "zerogov/fractal6.go/graph/generated"
-    //"golang.org/x/crypto/bcrypt" 
+    "zerogov/fractal6.go/tools"
+    "zerogov/fractal6.go/db"
 )
 
 /*
@@ -24,8 +23,8 @@ import (
 *
 */
 
+// Mutation type Enum
 type mutationType string
-
 const (
     AddMut mutationType = "Add"
     UpdateMut mutationType = "Update"
@@ -45,7 +44,7 @@ type Resolver struct{
     DelMutationQ Query
 
     // pointer on dgraph
-    db tools.Dgraph
+    db db.Dgraph
 }
 
 // Init initialize shema config and Directives...
@@ -102,7 +101,7 @@ func Init() gen.Config {
     DelMutationQ.Init()
 
     r := Resolver{
-        db:tools.InitDB(),
+        db:db.InitDB(),
         QueryQ: QueryQ,
         RawQueryQ: RawQueryQ,
         AddMutationQ: AddMutationQ,
@@ -163,7 +162,7 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
         return nil, err
     }
     typeName := tools.ToTypeName(reflect.TypeOf(obj).String())
-    db := tools.InitDB()
+    db := db.InitDB()
     v := db.Count(id, typeName, field)
     if v >= 0 {
         reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
@@ -199,41 +198,3 @@ func ensureType(ctx context.Context, obj interface{}, next graphql.Resolver, fie
 //    // or let it pass through
 //    return next(ctx)
 //}
-//
-//
-//// HashPassword generates a hash using the bcrypt.GenerateFromPassword
-//func HashPassword(password string) string {
-//    hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-//    if err != nil {
-//        panic(err)
-//    }
-//
-//    return string(hash)
-//}
-//
-//// ComparePassword compares the hash
-//func ComparePassword(hash string, password string) bool {
-//
-//    if len(password) == 0 || len(hash) == 0 {
-//        return false
-//    }
-//
-//    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-//    return err == nil
-//}
-//
-//func getCred(ctx context.Context, input model.InputCred) (model.Cred, error) {
-//    //cred := new(model.Cred)
-//    //if err := ctx.Bind(cred); err != nil {
-//    //    return nil, &echo.HTTPError{
-//    //        Code: http.StatusBadRequest,
-//    //        Message: "invalid email or password"
-//    //    }
-//    //}
-//
-//    //hashedPassword = HashPassword(cred.Password)
-//    hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
-//    cred := model.Cred{input.Username, string(hashedPassword)}
-//    return cred, nil
-//}
-//

@@ -7,20 +7,30 @@ import (
     "github.com/go-chi/chi"
     "github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
+    "github.com/go-chi/jwtauth"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    "zerogov/fractal6.go/handlers"
-    "zerogov/fractal6.go/tools"
+    //"zerogov/fractal6.go/web"
+    "zerogov/fractal6.go/web/auth"
+    handle6 "zerogov/fractal6.go/web/handlers"
+    middle6 "zerogov/fractal6.go/web/middleware"
 )
 
 var queryPath, buildMode string
-
+var tokenMaster *auth.Jwt
 
 func init() {
-    rootCmd.AddCommand(runCmd)
+    // Api URI
     queryPath = "/api"
 
+    // Jwt init
+    tokenMaster = auth.GetTokenMaster()
+
+    // Cli init
+    rootCmd.AddCommand(runCmd)
+
+    // Set dev mode
     if buildMode == "" {
         buildMode = "DEV"
     } else {
@@ -62,33 +72,41 @@ func RunServer() {
     r.Use(middleware.RequestID)
     r.Use(middleware.RealIP)
 	r.Use(cors.Handler)
-    //r.Use(tools.RequestContextMiddleware)
+    //r.Use(middle6.RequestContextMiddleware) // Set context info
+    // JWT
+    r.Use(jwtauth.Verifier(tokenMaster.GetAuth())) // Seek, verify and validate JWT token
+    r.Use(middle6.JwtDecode) // Set user claims
+    // Log request
     r.Use(middleware.Logger)
+    // Recover from panic
     r.Use(middleware.Recoverer)
-
     // Set a timeout value on the request context (ctx), that will signal
     // through ctx.Done() that the request has timed out and further
     // processing should be stopped.
     r.Use(middleware.Timeout(60 * time.Second))
 
-    //r.POST("signup", handler.Signup)
-    //r.POST("signin", handlers.Signin)
-    //r.POST("signout", handler.Signout)
+    // Auth handlers 
+    r.Group(func(r chi.Router) {
+        //r.Use(middle6.EnsurePostMethod)
+        r.Post("/login", handle6.Login)
+        //r.Post("/logout", handle6.Logout)
+        //r.Ppst("/signup", handle6.Signup)
+    })
 
     if buildMode == "DEV" {
         // Serve Graphql Playground
-        r.Get("/playground", handlers.PlaygroundHandler(queryPath))
-        r.Get("/ping", handlers.Ping)
+        r.Get("/playground", handle6.PlaygroundHandler(queryPath))
+        r.Get("/ping", handle6.Ping)
 
         // Serve frontend static files
-        tools.FileServer(r, "/", "./web/public")
+        //web.FileServer(r, "/", "./public")
 
         // Overwrite gql config
         gqlConfig["introspection"] = true
     }
 
     // Serve Graphql Api
-    r.Post(queryPath, handlers.GraphqlHandler(gqlConfig))
+    r.Post(queryPath, handle6.GraphqlHandler(gqlConfig))
 
     log.Println("Running @ http://" + HOST + ":" + PORT)
     http.ListenAndServe(HOST + ":" + PORT, r)

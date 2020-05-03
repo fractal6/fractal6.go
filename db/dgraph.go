@@ -1,4 +1,4 @@
-package tools
+package db
 
 import (
     "net/http"
@@ -20,7 +20,7 @@ import (
 type Dgraph struct {
     gqlUrl string
     grpcUrl string
-    countTmp *template.Template
+    countTemplate *template.Template
 }
 
 
@@ -48,7 +48,7 @@ func InitDB() Dgraph {
     return Dgraph{
         gqlUrl: dgraphApiUrl,
         grpcUrl: grpcUrl,
-        countTmp: template.Must(template.New("dgraph").Parse(countQ)),
+        countTemplate: template.Must(template.New("dgraph").Parse(countQ)),
     }
 }
 
@@ -87,7 +87,7 @@ func (d Dgraph) Count(id string, typeName string, fieldName string) (int) {
     // Format Query
     field := strings.Join([]string{typeName, fieldName}, ".")
     buf := bytes.Buffer{}
-    d.countTmp.Execute(&buf, map[string]string{"id":id, "field":field})
+    d.countTemplate.Execute(&buf, map[string]string{"id":id, "field":field})
     q := buf.String()
 
 	res, err := txn.Query(ctx, q)
