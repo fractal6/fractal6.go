@@ -3,8 +3,23 @@ package tools
 import (
     "reflect"
     "regexp"
+    "github.com/spf13/viper"
 )
 
+//
+// Read Config file
+//
+func InitViper() {
+	configName := "config"
+	viper.AddConfigPath("./")
+	viper.SetConfigName(configName) // name of config file (without extension)
+	//viper.AutomaticEnv() // read in environment variables that match
+    if err := viper.ReadInConfig(); err != nil {
+        // Panic on config reading error
+        panic(err)
+    }
+
+}
 
 
 /*

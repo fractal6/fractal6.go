@@ -41,7 +41,6 @@ func JwtDecode(next http.Handler) http.Handler {
             fmt.Println("Got jwt error:", err)
         }
 
-
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

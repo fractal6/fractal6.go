@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"zerogov/fractal6.go/tools"
 )
 
 var (
@@ -26,28 +28,9 @@ func Run() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
+	cobra.OnInitialize(tools.InitViper)
     rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
-
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 
 }
 
-
-func initConfig() {
-
-	configName := "config"
-	
-	viper.SetConfigName(configName) // name of config file (without extension)
-	viper.AddConfigPath(".")
-	// 	viper.AutomaticEnv() // read in environment variables that match
-
-    // If a config file is found, read it in.
-    if err := viper.ReadInConfig(); err == nil {
-        fmt.Println("Using config file:", viper.ConfigFileUsed())
-    } else {
-        fmt.Println(err)
-    }
-
-}

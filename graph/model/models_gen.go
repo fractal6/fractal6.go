@@ -65,11 +65,27 @@ type AddNodeInput struct {
 	FirstLink    *UserRef      `json:"first_link,omitempty"`
 	SecondLink   *UserRef      `json:"second_link,omitempty"`
 	Skills       []string      `json:"skills,omitempty"`
+	RoleType     *RoleType     `json:"role_type,omitempty"`
 }
 
 type AddNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type AddRightsInput struct {
+	OpenTension  *bool `json:"open_tension"`
+	CloseTension *bool `json:"close_tension"`
+	CreateCircle *bool `json:"create_circle"`
+	RemoveCircle *bool `json:"remove_circle"`
+	CreateRole   *bool `json:"create_role"`
+	DetachRole   *bool `json:"detach_role"`
+	RemoveRole   *bool `json:"remove_role"`
+}
+
+type AddRightsPayload struct {
+	Rights  []*Rights `json:"rights,omitempty"`
+	NumUids *int      `json:"numUids,omitempty"`
 }
 
 type AddTensionInput struct {
@@ -95,6 +111,7 @@ type AddTensionPayload struct {
 type AddUserInput struct {
 	CreatedAt   string     `json:"createdAt,omitempty"`
 	Username    string     `json:"username,omitempty"`
+	Email       string     `json:"email,omitempty"`
 	Fullname    *string    `json:"fullname,omitempty"`
 	Password    string     `json:"password,omitempty"`
 	Roles       []*NodeRef `json:"roles,omitempty"`
@@ -307,6 +324,7 @@ type Node struct {
 	FirstLink    *User      `json:"first_link,omitempty"`
 	SecondLink   *User      `json:"second_link,omitempty"`
 	Skills       []string   `json:"skills,omitempty"`
+	RoleType     *RoleType  `json:"role_type,omitempty"`
 }
 
 type NodeFilter struct {
@@ -347,6 +365,7 @@ type NodePatch struct {
 	FirstLink    *UserRef      `json:"first_link,omitempty"`
 	SecondLink   *UserRef      `json:"second_link,omitempty"`
 	Skills       []string      `json:"skills,omitempty"`
+	RoleType     *RoleType     `json:"role_type,omitempty"`
 }
 
 type NodeRef struct {
@@ -369,6 +388,7 @@ type NodeRef struct {
 	FirstLink    *UserRef      `json:"first_link,omitempty"`
 	SecondLink   *UserRef      `json:"second_link,omitempty"`
 	Skills       []string      `json:"skills,omitempty"`
+	RoleType     *RoleType     `json:"role_type,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -408,6 +428,26 @@ type PostPatch struct {
 
 type PostRef struct {
 	ID string `json:"id,omitempty"`
+}
+
+type Rights struct {
+	OpenTension  *bool `json:"open_tension"`
+	CloseTension *bool `json:"close_tension"`
+	CreateCircle *bool `json:"create_circle"`
+	RemoveCircle *bool `json:"remove_circle"`
+	CreateRole   *bool `json:"create_role"`
+	DetachRole   *bool `json:"detach_role"`
+	RemoveRole   *bool `json:"remove_role"`
+}
+
+type RightsRef struct {
+	OpenTension  *bool `json:"open_tension"`
+	CloseTension *bool `json:"close_tension"`
+	CreateCircle *bool `json:"create_circle"`
+	RemoveCircle *bool `json:"remove_circle"`
+	CreateRole   *bool `json:"create_role"`
+	DetachRole   *bool `json:"detach_role"`
+	RemoveRole   *bool `json:"remove_role"`
 }
 
 type StringExactFilter struct {
@@ -587,6 +627,7 @@ type User struct {
 	ID          string  `json:"id,omitempty"`
 	CreatedAt   string  `json:"createdAt,omitempty"`
 	Username    string  `json:"username,omitempty"`
+	Email       string  `json:"email,omitempty"`
 	Fullname    *string `json:"fullname,omitempty"`
 	Password    string  `json:"password,omitempty"`
 	Roles       []*Node `json:"roles,omitempty"`
@@ -612,6 +653,7 @@ type UserOrder struct {
 
 type UserPatch struct {
 	CreatedAt   *string    `json:"createdAt,omitempty"`
+	Email       *string    `json:"email,omitempty"`
 	Fullname    *string    `json:"fullname,omitempty"`
 	Password    *string    `json:"password,omitempty"`
 	Roles       []*NodeRef `json:"roles,omitempty"`
@@ -624,6 +666,7 @@ type UserRef struct {
 	ID          *string    `json:"id,omitempty"`
 	CreatedAt   *string    `json:"createdAt,omitempty"`
 	Username    *string    `json:"username,omitempty"`
+	Email       *string    `json:"email,omitempty"`
 	Fullname    *string    `json:"fullname,omitempty"`
 	Password    *string    `json:"password,omitempty"`
 	Roles       []*NodeRef `json:"roles,omitempty"`
@@ -963,6 +1006,49 @@ func (e PostOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type RoleType string
+
+const (
+	RoleTypeCoordinator RoleType = "Coordinator"
+	RoleTypeMember      RoleType = "Member"
+	RoleTypeGuest       RoleType = "Guest"
+)
+
+var AllRoleType = []RoleType{
+	RoleTypeCoordinator,
+	RoleTypeMember,
+	RoleTypeGuest,
+}
+
+func (e RoleType) IsValid() bool {
+	switch e {
+	case RoleTypeCoordinator, RoleTypeMember, RoleTypeGuest:
+		return true
+	}
+	return false
+}
+
+func (e RoleType) String() string {
+	return string(e)
+}
+
+func (e *RoleType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = RoleType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid RoleType", str)
+	}
+	return nil
+}
+
+func (e RoleType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type TensionOrderable string
 
 const (
@@ -1062,6 +1148,7 @@ type UserOrderable string
 const (
 	UserOrderableCreatedAt UserOrderable = "createdAt"
 	UserOrderableUsername  UserOrderable = "username"
+	UserOrderableEmail     UserOrderable = "email"
 	UserOrderableFullname  UserOrderable = "fullname"
 	UserOrderablePassword  UserOrderable = "password"
 	UserOrderableBio       UserOrderable = "bio"
@@ -1071,6 +1158,7 @@ const (
 var AllUserOrderable = []UserOrderable{
 	UserOrderableCreatedAt,
 	UserOrderableUsername,
+	UserOrderableEmail,
 	UserOrderableFullname,
 	UserOrderablePassword,
 	UserOrderableBio,
@@ -1079,7 +1167,7 @@ var AllUserOrderable = []UserOrderable{
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableFullname, UserOrderablePassword, UserOrderableBio, UserOrderableUtc:
+	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableEmail, UserOrderableFullname, UserOrderablePassword, UserOrderableBio, UserOrderableUtc:
 		return true
 	}
 	return false

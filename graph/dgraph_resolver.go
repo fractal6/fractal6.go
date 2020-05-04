@@ -56,7 +56,7 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
     // Dgraph request
     res := &GqlRes{} // or new(Res)
     //fmt.Println("request ->", string(req))
-    err := r.db.Request([]byte(req), res)
+    err := r.db.Post([]byte(req), res)
     //fmt.Println("response ->", res)
     if err != nil {
         panic(err)
@@ -133,7 +133,7 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     // Dgraph request
     res := &GqlRes{} // or new(Res)
     //fmt.Println("request ->", string(req))
-    err := r.db.Request([]byte(req), res)
+    err := r.db.Post([]byte(req), res)
     //fmt.Println("response ->", res)
     if err != nil {
         panic(err)

@@ -44,7 +44,7 @@ type Resolver struct{
     DelMutationQ Query
 
     // pointer on dgraph
-    db db.Dgraph
+    db *db.Dgraph
 }
 
 // Init initialize shema config and Directives...
@@ -101,7 +101,7 @@ func Init() gen.Config {
     DelMutationQ.Init()
 
     r := Resolver{
-        db:db.InitDB(),
+        db:db.GetDB(),
         QueryQ: QueryQ,
         RawQueryQ: RawQueryQ,
         AddMutationQ: AddMutationQ,
@@ -162,7 +162,7 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
         return nil, err
     }
     typeName := tools.ToTypeName(reflect.TypeOf(obj).String())
-    db := db.InitDB()
+    db := db.GetDB()
     v := db.Count(id, typeName, field)
     if v >= 0 {
         reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))

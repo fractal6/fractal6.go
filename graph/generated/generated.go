@@ -72,6 +72,11 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
+	AddRightsPayload struct {
+		NumUids func(childComplexity int) int
+		Rights  func(childComplexity int, first *int, offset *int) int
+	}
+
 	AddTensionPayload struct {
 		NumUids func(childComplexity int) int
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -147,6 +152,7 @@ type ComplexityRoot struct {
 		AddLabel      func(childComplexity int, input []*model.AddLabelInput) int
 		AddMandate    func(childComplexity int, input []*model.AddMandateInput) int
 		AddNode       func(childComplexity int, input []*model.AddNodeInput) int
+		AddRights     func(childComplexity int, input []*model.AddRightsInput) int
 		AddTension    func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser       func(childComplexity int, input []*model.AddUserInput) int
 		DeleteComment func(childComplexity int, filter model.CommentFilter) int
@@ -179,6 +185,7 @@ type ComplexityRoot struct {
 		Name         func(childComplexity int) int
 		Nameid       func(childComplexity int) int
 		Parent       func(childComplexity int, filter *model.NodeFilter) int
+		RoleType     func(childComplexity int) int
 		Rootnameid   func(childComplexity int) int
 		SecondLink   func(childComplexity int, filter *model.UserFilter) int
 		Skills       func(childComplexity int) int
@@ -208,8 +215,19 @@ type ComplexityRoot struct {
 		QueryMandate func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		QueryNode    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		QueryPost    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		QueryRights  func(childComplexity int, first *int, offset *int) int
 		QueryTension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		QueryUser    func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+	}
+
+	Rights struct {
+		CloseTension func(childComplexity int) int
+		CreateCircle func(childComplexity int) int
+		CreateRole   func(childComplexity int) int
+		DetachRole   func(childComplexity int) int
+		OpenTension  func(childComplexity int) int
+		RemoveCircle func(childComplexity int) int
+		RemoveRole   func(childComplexity int) int
 	}
 
 	Tension struct {
@@ -267,6 +285,7 @@ type ComplexityRoot struct {
 		BackedRoles func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		Bio         func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
+		Email       func(childComplexity int) int
 		Fullname    func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Password    func(childComplexity int) int
@@ -280,6 +299,7 @@ type MutationResolver interface {
 	AddNode(ctx context.Context, input []*model.AddNodeInput) (*model.AddNodePayload, error)
 	UpdateNode(ctx context.Context, input model.UpdateNodeInput) (*model.UpdateNodePayload, error)
 	DeleteNode(ctx context.Context, filter model.NodeFilter) (*model.DeleteNodePayload, error)
+	AddRights(ctx context.Context, input []*model.AddRightsInput) (*model.AddRightsPayload, error)
 	UpdatePost(ctx context.Context, input model.UpdatePostInput) (*model.UpdatePostPayload, error)
 	DeletePost(ctx context.Context, filter model.PostFilter) (*model.DeletePostPayload, error)
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
@@ -301,6 +321,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
 	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]*model.Node, error)
+	QueryRights(ctx context.Context, first *int, offset *int) ([]*model.Rights, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
 	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]*model.Post, error)
 	GetTension(ctx context.Context, id string) (*model.Tension, error)
@@ -405,6 +426,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddNodePayload.NumUids(childComplexity), true
+
+	case "AddRightsPayload.numUids":
+		if e.complexity.AddRightsPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddRightsPayload.NumUids(childComplexity), true
+
+	case "AddRightsPayload.rights":
+		if e.complexity.AddRightsPayload.Rights == nil {
+			break
+		}
+
+		args, err := ec.field_AddRightsPayload_rights_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddRightsPayload.Rights(childComplexity, args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddTensionPayload.numUids":
 		if e.complexity.AddTensionPayload.NumUids == nil {
@@ -722,6 +762,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddNode(childComplexity, args["input"].([]*model.AddNodeInput)), true
 
+	case "Mutation.addRights":
+		if e.complexity.Mutation.AddRights == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addRights_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddRights(childComplexity, args["input"].([]*model.AddRightsInput)), true
+
 	case "Mutation.addTension":
 		if e.complexity.Mutation.AddTension == nil {
 			break
@@ -1030,6 +1082,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Parent(childComplexity, args["filter"].(*model.NodeFilter)), true
 
+	case "Node.role_type":
+		if e.complexity.Node.RoleType == nil {
+			break
+		}
+
+		return e.complexity.Node.RoleType(childComplexity), true
+
 	case "Node.rootnameid":
 		if e.complexity.Node.Rootnameid == nil {
 			break
@@ -1271,6 +1330,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryPost(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Query.queryRights":
+		if e.complexity.Query.QueryRights == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryRights_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryRights(childComplexity, args["first"].(*int), args["offset"].(*int)), true
+
 	case "Query.queryTension":
 		if e.complexity.Query.QueryTension == nil {
 			break
@@ -1294,6 +1365,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryUser(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Rights.close_tension":
+		if e.complexity.Rights.CloseTension == nil {
+			break
+		}
+
+		return e.complexity.Rights.CloseTension(childComplexity), true
+
+	case "Rights.create_circle":
+		if e.complexity.Rights.CreateCircle == nil {
+			break
+		}
+
+		return e.complexity.Rights.CreateCircle(childComplexity), true
+
+	case "Rights.create_role":
+		if e.complexity.Rights.CreateRole == nil {
+			break
+		}
+
+		return e.complexity.Rights.CreateRole(childComplexity), true
+
+	case "Rights.detach_role":
+		if e.complexity.Rights.DetachRole == nil {
+			break
+		}
+
+		return e.complexity.Rights.DetachRole(childComplexity), true
+
+	case "Rights.open_tension":
+		if e.complexity.Rights.OpenTension == nil {
+			break
+		}
+
+		return e.complexity.Rights.OpenTension(childComplexity), true
+
+	case "Rights.remove_circle":
+		if e.complexity.Rights.RemoveCircle == nil {
+			break
+		}
+
+		return e.complexity.Rights.RemoveCircle(childComplexity), true
+
+	case "Rights.remove_role":
+		if e.complexity.Rights.RemoveRole == nil {
+			break
+		}
+
+		return e.complexity.Rights.RemoveRole(childComplexity), true
 
 	case "Tension.comments":
 		if e.complexity.Tension.Comments == nil {
@@ -1570,6 +1690,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.CreatedAt(childComplexity), true
 
+	case "User.email":
+		if e.complexity.User.Email == nil {
+			break
+		}
+
+		return e.complexity.User.Email(childComplexity), true
+
 	case "User.fullname":
 		if e.complexity.User.Fullname == nil {
 			break
@@ -1712,6 +1839,17 @@ type Node {
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
+  role_type: RoleType
+}
+
+type Rights {
+  open_tension: Boolean
+  close_tension: Boolean
+  create_circle: Boolean
+  remove_circle: Boolean
+  create_role: Boolean
+  detach_role: Boolean
+  remove_role: Boolean
 }
 
 type Post {
@@ -1761,6 +1899,7 @@ type User {
   id: ID!
   createdAt: DateTime! @search
   username: String! @id
+  email: String! @hidden
   fullname: String
   password: String! @hidden
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
@@ -1780,6 +1919,13 @@ enum NodeType {
   Role
 }
 
+enum RoleType {
+  Coordinator
+  Member
+  Guest
+
+}
+
 enum TensionType {
   Governance
   Operational
@@ -1789,8 +1935,6 @@ enum TensionType {
 
 }
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
@@ -1798,6 +1942,8 @@ directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITI
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -1856,10 +2002,26 @@ input AddNodeInput {
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
+  role_type: RoleType
 }
 
 type AddNodePayload {
   node(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
+  numUids: Int
+}
+
+input AddRightsInput {
+  open_tension: Boolean
+  close_tension: Boolean
+  create_circle: Boolean
+  remove_circle: Boolean
+  create_role: Boolean
+  detach_role: Boolean
+  remove_role: Boolean
+}
+
+type AddRightsPayload {
+  rights(first: Int, offset: Int): [Rights]
   numUids: Int
 }
 
@@ -1886,8 +2048,9 @@ type AddTensionPayload {
 input AddUserInput {
   createdAt: DateTime!
   username: String! @input_maxLength(f:"username", n:42)
+  email: String! @input_maxLength(f:"email", n:100)
   fullname: String @input_maxLength(f:"fullname", n:100)
-  password: String! @input_maxLength(f:"password", n:42)
+  password: String! @input_maxLength(f:"password", n:100)
   roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
   backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
   bio: String
@@ -2094,6 +2257,7 @@ type Mutation {
   addNode(input: [AddNodeInput!]!): AddNodePayload
   updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
+  addRights(input: [AddRightsInput!]!): AddRightsPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]!): AddTensionPayload
@@ -2162,6 +2326,7 @@ input NodePatch {
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
+  role_type: RoleType
 }
 
 input NodeRef {
@@ -2184,6 +2349,7 @@ input NodeRef {
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
+  role_type: RoleType
 }
 
 input NodeType_hash {
@@ -2226,6 +2392,7 @@ input PostRef {
 type Query {
   getNode(id: ID, nameid: String): Node
   queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
+  queryRights(first: Int, offset: Int): [Rights]
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   getTension(id: ID!): Tension
@@ -2238,6 +2405,16 @@ type Query {
   queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   getLabel(id: ID, name: String): Label
   queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label]
+}
+
+input RightsRef {
+  open_tension: Boolean
+  close_tension: Boolean
+  create_circle: Boolean
+  remove_circle: Boolean
+  create_role: Boolean
+  detach_role: Boolean
+  remove_role: Boolean
 }
 
 input StringExactFilter {
@@ -2424,6 +2601,7 @@ input UserOrder {
 enum UserOrderable {
   createdAt
   username
+  email
   fullname
   password
   bio
@@ -2432,8 +2610,9 @@ enum UserOrderable {
 
 input UserPatch {
   createdAt: DateTime
+  email: String @input_maxLength(f:"email", n:100)
   fullname: String @input_maxLength(f:"fullname", n:100)
-  password: String @input_maxLength(f:"password", n:42)
+  password: String @input_maxLength(f:"password", n:100)
   roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
   backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
   bio: String
@@ -2444,6 +2623,7 @@ input UserRef {
   id: ID
   createdAt: DateTime
   username: String
+  email: String
   fullname: String
   password: String
   roles: [NodeRef!]
@@ -2741,6 +2921,28 @@ func (ec *executionContext) field_AddNodePayload_node_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_AddRightsPayload_rights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_AddTensionPayload_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2921,6 +3123,20 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	var arg0 []*model.AddNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddRightsInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNAddRightsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3674,6 +3890,28 @@ func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
 	return args, nil
 }
 
@@ -4503,6 +4741,75 @@ func (ec *executionContext) _AddNodePayload_numUids(ctx context.Context, field g
 	}()
 	fc := &graphql.FieldContext{
 		Object:   "AddNodePayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddRightsPayload_rights(ctx context.Context, field graphql.CollectedField, obj *model.AddRightsPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AddRightsPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddRightsPayload_rights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rights, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Rights)
+	fc.Result = res
+	return ec.marshalORights2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddRightsPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddRightsPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AddRightsPayload",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -5953,6 +6260,44 @@ func (ec *executionContext) _Mutation_deleteNode(ctx context.Context, field grap
 	res := resTmp.(*model.DeleteNodePayload)
 	fc.Result = res
 	return ec.marshalODeleteNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddRights(rctx, args["input"].([]*model.AddRightsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddRightsPayload)
+	fc.Result = res
+	return ec.marshalOAddRightsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updatePost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7566,6 +7911,37 @@ func (ec *executionContext) _Node_skills(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_role_type(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoleType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.RoleType)
+	fc.Result = res
+	return ec.marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Post_id(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7879,6 +8255,44 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 	res := resTmp.([]*model.Node)
 	fc.Result = res
 	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryRights(rctx, args["first"].(*int), args["offset"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Rights)
+	fc.Result = res
+	return ec.marshalORights2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8404,6 +8818,223 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_open_tension(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OpenTension, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_close_tension(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CloseTension, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_create_circle(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateCircle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_remove_circle(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RemoveCircle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_create_role(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateRole, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_detach_role(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DetachRole, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Rights_remove_role(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Rights",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RemoveRole, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_nth(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -9617,6 +10248,60 @@ func (ec *executionContext) _User_username(ctx context.Context, field graphql.Co
 				return nil, errors.New("directive id is not implemented")
 			}
 			return ec.directives.Id(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Email, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11206,6 +11891,66 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "role_type":
+			var err error
+			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddRightsInput(ctx context.Context, obj interface{}) (model.AddRightsInput, error) {
+	var it model.AddRightsInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "open_tension":
+			var err error
+			it.OpenTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "close_tension":
+			var err error
+			it.CloseTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "create_circle":
+			var err error
+			it.CreateCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove_circle":
+			var err error
+			it.RemoveCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "create_role":
+			var err error
+			it.CreateRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "detach_role":
+			var err error
+			it.DetachRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove_role":
+			var err error
+			it.RemoveRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -11335,6 +12080,33 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
+		case "email":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "email")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalNInt2int(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, f, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Email = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+			}
 		case "fullname":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -11372,7 +12144,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				n, err := ec.unmarshalNInt2int(ctx, 42)
+				n, err := ec.unmarshalNInt2int(ctx, 100)
 				if err != nil {
 					return nil, err
 				}
@@ -12307,6 +13079,12 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "role_type":
+			var err error
+			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -12430,6 +13208,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		case "skills":
 			var err error
 			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role_type":
+			var err error
+			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12586,6 +13370,60 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 		case "id":
 			var err error
 			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRightsRef(ctx context.Context, obj interface{}) (model.RightsRef, error) {
+	var it model.RightsRef
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "open_tension":
+			var err error
+			it.OpenTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "close_tension":
+			var err error
+			it.CloseTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "create_circle":
+			var err error
+			it.CreateCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove_circle":
+			var err error
+			it.RemoveCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "create_role":
+			var err error
+			it.CreateRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "detach_role":
+			var err error
+			it.DetachRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove_role":
+			var err error
+			it.RemoveRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13315,6 +14153,35 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "email":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "email")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalNInt2int(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_maxLength == nil {
+					return nil, errors.New("directive input_maxLength is not implemented")
+				}
+				return ec.directives.Input_maxLength(ctx, obj, directive0, f, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Email = data
+			} else if tmp == nil {
+				it.Email = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "fullname":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -13352,7 +14219,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				n, err := ec.unmarshalNInt2int(ctx, 42)
+				n, err := ec.unmarshalNInt2int(ctx, 100)
 				if err != nil {
 					return nil, err
 				}
@@ -13470,6 +14337,12 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		case "username":
 			var err error
 			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13616,6 +14489,32 @@ func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._AddNodePayload_node(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._AddNodePayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addRightsPayloadImplementors = []string{"AddRightsPayload"}
+
+func (ec *executionContext) _AddRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRightsPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addRightsPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddRightsPayload")
+		case "rights":
+			out.Values[i] = ec._AddRightsPayload_rights(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddRightsPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14010,6 +14909,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateNode(ctx, field)
 		case "deleteNode":
 			out.Values[i] = ec._Mutation_deleteNode(ctx, field)
+		case "addRights":
+			out.Values[i] = ec._Mutation_addRights(ctx, field)
 		case "updatePost":
 			out.Values[i] = ec._Mutation_updatePost(ctx, field)
 		case "deletePost":
@@ -14128,6 +15029,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_second_link(ctx, field, obj)
 		case "skills":
 			out.Values[i] = ec._Node_skills(ctx, field, obj)
+		case "role_type":
+			out.Values[i] = ec._Node_role_type(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14215,6 +15118,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_queryNode(ctx, field)
+				return res
+			})
+		case "queryRights":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryRights(ctx, field)
 				return res
 			})
 		case "getPost":
@@ -14353,6 +15267,42 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var rightsImplementors = []string{"Rights"}
+
+func (ec *executionContext) _Rights(ctx context.Context, sel ast.SelectionSet, obj *model.Rights) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, rightsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Rights")
+		case "open_tension":
+			out.Values[i] = ec._Rights_open_tension(ctx, field, obj)
+		case "close_tension":
+			out.Values[i] = ec._Rights_close_tension(ctx, field, obj)
+		case "create_circle":
+			out.Values[i] = ec._Rights_create_circle(ctx, field, obj)
+		case "remove_circle":
+			out.Values[i] = ec._Rights_remove_circle(ctx, field, obj)
+		case "create_role":
+			out.Values[i] = ec._Rights_create_role(ctx, field, obj)
+		case "detach_role":
+			out.Values[i] = ec._Rights_detach_role(ctx, field, obj)
+		case "remove_role":
+			out.Values[i] = ec._Rights_remove_role(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14638,6 +15588,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "username":
 			out.Values[i] = ec._User_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "email":
+			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15037,6 +15992,38 @@ func (ec *executionContext) unmarshalNAddNodeInput2ᚖzerogovᚋfractal6ᚗgoᚋ
 		return nil, nil
 	}
 	res, err := ec.unmarshalNAddNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInput(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalNAddRightsInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx context.Context, v interface{}) (model.AddRightsInput, error) {
+	return ec.unmarshalInputAddRightsInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNAddRightsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInputᚄ(ctx context.Context, v interface{}) ([]*model.AddRightsInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AddRightsInput, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNAddRightsInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddRightsInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx context.Context, v interface{}) (*model.AddRightsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNAddRightsInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx, v)
 	return &res, err
 }
 
@@ -15711,6 +16698,17 @@ func (ec *executionContext) marshalOAddNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋ
 		return graphql.Null
 	}
 	return ec._AddNodePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddRightsPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsPayload(ctx context.Context, sel ast.SelectionSet, v model.AddRightsPayload) graphql.Marshaler {
+	return ec._AddRightsPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOAddRightsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddRightsPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddRightsPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddTensionPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionPayload(ctx context.Context, sel ast.SelectionSet, v model.AddTensionPayload) graphql.Marshaler {
@@ -16836,6 +17834,81 @@ func (ec *executionContext) unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 	}
 	res, err := ec.unmarshalOPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) marshalORights2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx context.Context, sel ast.SelectionSet, v model.Rights) graphql.Marshaler {
+	return ec._Rights(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalORights2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx context.Context, sel ast.SelectionSet, v []*model.Rights) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalORights2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalORights2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx context.Context, sel ast.SelectionSet, v *model.Rights) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Rights(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalORoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, v interface{}) (model.RoleType, error) {
+	var res model.RoleType
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalORoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, sel ast.SelectionSet, v model.RoleType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, v interface{}) (*model.RoleType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalORoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, sel ast.SelectionSet, v *model.RoleType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
