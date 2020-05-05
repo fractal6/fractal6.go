@@ -301,11 +301,14 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
 
     // Send the dgraph request and follow the results
     res := &GqlRes{}
+    //fmt.Println("request ->", string(q))
     err := dg.post([]byte(q), res)
+    //fmt.Println("response ->", res)
     if err != nil {
         return err
     } else if res.Errors != nil {
         err, _ := json.Marshal(res.Errors)
+        //return fmt.Errorf(string(err))
         return &GraphQLError{string(err)}
     }
 

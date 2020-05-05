@@ -1953,15 +1953,15 @@ enum TensionType {
 
 }
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
