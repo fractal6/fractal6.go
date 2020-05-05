@@ -5,6 +5,8 @@ import (
     "time"
     jwt "github.com/dgrijalva/jwt-go"
     "github.com/go-chi/jwtauth"
+
+	"zerogov/fractal6.go/graph/model"
 )
 
 var tokenMaster *Jwt
@@ -27,7 +29,7 @@ func (Jwt) New() *Jwt {
         tokenClaim: "user_ctx",
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
 	}
-    token, _ := tk.issue(UserCtx{Username:"debugger"}, time.Hour*1)
+    token, _ := tk.issue(model.UserCtx{Username:"debugger"}, time.Hour*1)
 	log.Println("DEBUG JWT:", token)
 	return tk
 }
@@ -37,7 +39,7 @@ func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
 }
 
 // Issue generate and encode a new token
-func (tk *Jwt) issue(d UserCtx, t time.Duration) (string, error){
+func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error){
     claims := jwt.MapClaims{ tk.tokenClaim: d }
     jwtauth.SetExpiry(claims, time.Now().Add(t))
 	_, tokenString, err := tk.tokenAuth.Encode(claims)
@@ -53,7 +55,7 @@ func GetTokenMaster() *Jwt {
 }
 
 // NewUserToken create a new user token from master key
-func NewUserToken(userCtx UserCtx) (string, error) {
+func NewUserToken(userCtx model.UserCtx) (string, error) {
     token, err := tokenMaster.issue(userCtx, time.Hour*1)
     return token, err
 }

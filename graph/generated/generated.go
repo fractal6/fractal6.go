@@ -282,16 +282,18 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		BackedRoles func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		Bio         func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		Email       func(childComplexity int) int
-		Fullname    func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Password    func(childComplexity int) int
-		Roles       func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		Username    func(childComplexity int) int
-		Utc         func(childComplexity int) int
+		BackedRoles    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		Bio            func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		Email          func(childComplexity int) int
+		EmailHash      func(childComplexity int) int
+		EmailValidated func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Password       func(childComplexity int) int
+		Roles          func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		Username       func(childComplexity int) int
+		Utc            func(childComplexity int) int
 	}
 }
 
@@ -1697,12 +1699,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Email(childComplexity), true
 
-	case "User.fullname":
-		if e.complexity.User.Fullname == nil {
+	case "User.emailHash":
+		if e.complexity.User.EmailHash == nil {
 			break
 		}
 
-		return e.complexity.User.Fullname(childComplexity), true
+		return e.complexity.User.EmailHash(childComplexity), true
+
+	case "User.emailValidated":
+		if e.complexity.User.EmailValidated == nil {
+			break
+		}
+
+		return e.complexity.User.EmailValidated(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -1710,6 +1719,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.ID(childComplexity), true
+
+	case "User.name":
+		if e.complexity.User.Name == nil {
+			break
+		}
+
+		return e.complexity.User.Name(childComplexity), true
 
 	case "User.password":
 		if e.complexity.User.Password == nil {
@@ -1899,8 +1915,10 @@ type User {
   id: ID!
   createdAt: DateTime! @search
   username: String! @id
-  email: String! @hidden
-  fullname: String
+  email: String! @search(by: [hash]) @hidden
+  emailHash: String
+  emailValidated: Boolean!
+  name: String
   password: String! @hidden
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second_link)
@@ -1910,7 +1928,7 @@ type User {
 
 type Label {
   id: ID!
-  name: String! @id @search(by: [hash])
+  name: String! @id
   color: String
 }
 
@@ -1935,8 +1953,6 @@ enum TensionType {
 
 }
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
@@ -1944,6 +1960,8 @@ directive @id on FIELD_DEFINITION
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2049,7 +2067,9 @@ input AddUserInput {
   createdAt: DateTime!
   username: String! @input_maxLength(f:"username", n:42)
   email: String! @input_maxLength(f:"email", n:100)
-  fullname: String @input_maxLength(f:"fullname", n:100)
+  emailHash: String
+  emailValidated: Boolean!
+  name: String @input_maxLength(f:"name", n:100)
   password: String! @input_maxLength(f:"password", n:100)
   roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
   backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
@@ -2587,6 +2607,7 @@ input UserFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   username: StringHashFilter
+  email: StringHashFilter
   and: UserFilter
   or: UserFilter
   not: UserFilter
@@ -2602,7 +2623,8 @@ enum UserOrderable {
   createdAt
   username
   email
-  fullname
+  emailHash
+  name
   password
   bio
   utc
@@ -2611,7 +2633,9 @@ enum UserOrderable {
 input UserPatch {
   createdAt: DateTime
   email: String @input_maxLength(f:"email", n:100)
-  fullname: String @input_maxLength(f:"fullname", n:100)
+  emailHash: String
+  emailValidated: Boolean
+  name: String @input_maxLength(f:"name", n:100)
   password: String @input_maxLength(f:"password", n:100)
   roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
   backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
@@ -2624,7 +2648,9 @@ input UserRef {
   createdAt: DateTime
   username: String
   email: String
-  fullname: String
+  emailHash: String
+  emailValidated: Boolean
+  name: String
   password: String
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
@@ -5706,18 +5732,8 @@ func (ec *executionContext) _Label_name(ctx context.Context, field graphql.Colle
 			}
 			return ec.directives.Id(ctx, obj, directive0)
 		}
-		directive2 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive1, by)
-		}
 
-		tmp, err := directive2(rctx)
+		tmp, err := directive1(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -10298,13 +10314,23 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 			return obj.Email, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hidden == nil {
 				return nil, errors.New("directive hidden is not implemented")
 			}
-			return ec.directives.Hidden(ctx, obj, directive0)
+			return ec.directives.Hidden(ctx, obj, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -10331,7 +10357,7 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_fullname(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_emailHash(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10348,7 +10374,72 @@ func (ec *executionContext) _User_fullname(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Fullname, nil
+		return obj.EmailHash, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_emailValidated(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailValidated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12107,11 +12198,23 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
-		case "fullname":
+		case "emailHash":
+			var err error
+			it.EmailHash, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "emailValidated":
+			var err error
+			it.EmailValidated, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "fullname")
+				f, err := ec.unmarshalNString2string(ctx, "name")
 				if err != nil {
 					return nil, err
 				}
@@ -12130,9 +12233,9 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, err
 			}
 			if data, ok := tmp.(*string); ok {
-				it.Fullname = data
+				it.Name = data
 			} else if tmp == nil {
-				it.Fullname = nil
+				it.Name = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
@@ -14087,6 +14190,12 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "and":
 			var err error
 			it.And, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
@@ -14182,11 +14291,23 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
-		case "fullname":
+		case "emailHash":
+			var err error
+			it.EmailHash, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "emailValidated":
+			var err error
+			it.EmailValidated, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "fullname")
+				f, err := ec.unmarshalNString2string(ctx, "name")
 				if err != nil {
 					return nil, err
 				}
@@ -14205,9 +14326,9 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, err
 			}
 			if data, ok := tmp.(*string); ok {
-				it.Fullname = data
+				it.Name = data
 			} else if tmp == nil {
-				it.Fullname = nil
+				it.Name = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
@@ -14346,9 +14467,21 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "fullname":
+		case "emailHash":
 			var err error
-			it.Fullname, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.EmailHash, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "emailValidated":
+			var err error
+			it.EmailValidated, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15596,8 +15729,15 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "fullname":
-			out.Values[i] = ec._User_fullname(ctx, field, obj)
+		case "emailHash":
+			out.Values[i] = ec._User_emailHash(ctx, field, obj)
+		case "emailValidated":
+			out.Values[i] = ec._User_emailValidated(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._User_name(ctx, field, obj)
 		case "password":
 			out.Values[i] = ec._User_password(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

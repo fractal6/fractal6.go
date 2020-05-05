@@ -2,10 +2,12 @@ package auth
 
 import (
     //"fmt"
+    "time"
     "errors"
-    "golang.org/x/crypto/bcrypt" 
 
     "zerogov/fractal6.go/db"
+    "zerogov/fractal6.go/tools"
+    "zerogov/fractal6.go/graph/model"
 )
 
 // Library errors
@@ -22,6 +24,18 @@ var (
             "msg":"Bad email""
         }
     }`)
+    ErrBadName = errors.New(`{
+        "user_ctx":{
+            "field": "name",
+            "msg":"Bad name""
+        }
+    }`)
+    ErrBadPassword = errors.New(`{
+        "user_ctx":{
+            "field": "password",
+            "msg":"Bad Password""
+        }
+    }`)
     ErrUsernameExist = errors.New(`{
         "user_ctx":{
             "field": "username",
@@ -34,58 +48,41 @@ var (
             "msg":"Email already exists""
         }
     }`)
-    ErrBadPassword = errors.New(`{
+    ErrPasswordTooShort = errors.New(`{
         "user_ctx":{
             "field": "password",
-            "msg":"Bad Password""
+            "msg":"Password too short""
+        }
+    }`)
+    ErrPasswordTooLong = errors.New(`{
+        "user_ctx":{
+            "field": "password",
+            "msg":"Password too long""
         }
     }`)
 )
 
 
-//
-// User Data structure
-//
-
-// UserCtx are data encoded in the thoken (e.g Jwt claims)
-type UserCtx struct {
-    Username string `json:"User.username"`
-    Name string     `json:"User.name"`
-    Passwd string   `json:"User.password"`
-	Roles []Role    `json:"User.roles"`
-}
-type Role struct {
-    Nameid string    `json:"Node.nameid"` // the node identifier
-    RoleType string  `json:"Node.role_type"` // the role type
-}
 
 //
 // Public methods
 //
 
-// UserCreds are data sink for login request
-type UserCreds struct {
-    Username string `json:"username"`
-    Email string `json:"email"`
-    Password string `json:"password"`
-}
-
-// GetUser returns the user ctx **if they are authencitated** against their
-// hashed password.
-func GetUserCtx(creds UserCreds) (*UserCtx, error) {
-    // 1. get username or email
-    // 2. if not present, throw error 
-    // 3. compare pasword
-    // 4. if good, return UsertCtx from db request, else throw error
-    
+// GetUser returns the user ctx from a db.grpc request,
+// **if they are authencitated** against their hashed password.
+func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
+    // 1. get username/email or throw error 
+    // 3. if pass compare pasword or throw error
+    // 4. if pass, returns UsertCtx from db request or throw error
     var fieldId string
     var userId string
-    var userCtx UserCtx
+    var userCtx model.UserCtx
 
     username := creds.Username
     email := creds.Email
     password := creds.Password
 
+    // Validate signin form
     if password == "" {
         return nil, ErrBadPassword
     } else if username != "" {
@@ -98,45 +95,103 @@ func GetUserCtx(creds UserCreds) (*UserCtx, error) {
         return nil, ErrBadUsername
     }
 
+    // Try getting usetCtx
     DB := db.GetDB()
-    //
-    // @TODO: check if user exists
-    //        before getting it.
-    //
     err := DB.GetUser(fieldId, userId, &userCtx)
     if err != nil {
         return nil, err 
     }
 
-    // Compared hashed password:
-    ok := VerifyPassword(userCtx.Passwd, password)
+    // Compare hashed password.
+    ok := tools.VerifyPassword(userCtx.Passwd, password)
     if !ok {
         return nil, ErrBadPassword
     }
-
+    // Hide the password !
     userCtx.Passwd = ""
     return &userCtx, nil
 }
 
-// HashPassword generates a hash using the bcrypt.GenerateFromPassword
-func HashPassword(password string) string {
-    hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+
+// ValidateNewuser check that an user doesn't exist,
+// from a db.grpc request.
+func ValidateNewUser(creds model.UserCreds) error {
+    username := creds.Username
+    email := creds.Email
+    name := creds.Name
+    password := creds.Password
+
+    // Structure check
+    if len(username) < 2 || len(username) > 42 {
+        return ErrBadUsername
+    }
+    if len(email) < 3 || len(email) > 42 {
+        return ErrBadEmail
+    }
+    if name != nil && len(*name) > 100 {
+        return ErrBadName
+    }
+    if len(password) < 8 {
+        return ErrPasswordTooShort
+    }
+    if len(password) > 100 {
+        return ErrPasswordTooLong
+    }
+    // TODO: password complexity check
+
+    DB := db.GetDB()
+
+    // Chech username existence
+    ex1, err1 := DB.Exists("User", "username", username)
+    if err1 != nil {
+        return err1
+    }
+    if ex1 {
+        return ErrUsernameExist
+    }
+    // Chech email existence
+    ex2, err2 := DB.Exists("User", "email", email)
+    if err2 != nil {
+        return err2
+    }
+    if ex2 {
+        return ErrEmailExist
+    }
+
+    // New user can be created !
+    return nil
+}
+
+// CreateNewUser Upsert an user, 
+// using db.graphql request.
+func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
+    var userCtx model.UserCtx
+
+    user := model.AddUserInput{                                 
+        CreatedAt:      time.Now().Format(time.RFC3339),
+        Username:       creds.Username,
+        Email:          creds.Email,
+        //EmailHash:      *string,
+        EmailValidated: false,
+        Name:           creds.Name,
+        Password:       tools.HashPassword(creds.Password),
+        //Roles:          []*NodeRef 
+        //BackedRoles:    []*NodeRef 
+        //Bio            *string    
+        //Utc            *string    
+    }
+
+    // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
+    DB := db.GetDB()
+    err := DB.AddUser(user, &userCtx)
     if err != nil {
-        panic(err)
-    }
-    return string(hash)
-}
-
-// VerifyPassword compares the hash of a password with the password
-func VerifyPassword(hash string, password string) bool {
-    if len(password) == 0 || len(hash) == 0 {
-        return false
+        return nil, err 
     }
 
-    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-    return err == nil
+    // Hide the password !
+    userCtx.Passwd = ""
+    return &userCtx, nil
 }
-
 
 
 

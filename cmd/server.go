@@ -89,7 +89,6 @@ func RunServer() {
     r.Group(func(r chi.Router) {
         //r.Use(middle6.EnsurePostMethod)
         r.Post("/login", handle6.Login)
-        r.Post("/logout", handle6.Logout)
         r.Post("/signup", handle6.Signup)
     })
 

@@ -109,15 +109,17 @@ type AddTensionPayload struct {
 }
 
 type AddUserInput struct {
-	CreatedAt   string     `json:"createdAt,omitempty"`
-	Username    string     `json:"username,omitempty"`
-	Email       string     `json:"email,omitempty"`
-	Fullname    *string    `json:"fullname,omitempty"`
-	Password    string     `json:"password,omitempty"`
-	Roles       []*NodeRef `json:"roles,omitempty"`
-	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
-	Bio         *string    `json:"bio,omitempty"`
-	Utc         *string    `json:"utc,omitempty"`
+	CreatedAt      string     `json:"createdAt,omitempty"`
+	Username       string     `json:"username,omitempty"`
+	Email          string     `json:"email,omitempty"`
+	EmailHash      *string    `json:"emailHash,omitempty"`
+	EmailValidated bool       `json:"emailValidated"`
+	Name           *string    `json:"name,omitempty"`
+	Password       string     `json:"password,omitempty"`
+	Roles          []*NodeRef `json:"roles,omitempty"`
+	BackedRoles    []*NodeRef `json:"backed_roles,omitempty"`
+	Bio            *string    `json:"bio,omitempty"`
+	Utc            *string    `json:"utc,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -624,22 +626,25 @@ type UpdateUserPayload struct {
 }
 
 type User struct {
-	ID          string  `json:"id,omitempty"`
-	CreatedAt   string  `json:"createdAt,omitempty"`
-	Username    string  `json:"username,omitempty"`
-	Email       string  `json:"email,omitempty"`
-	Fullname    *string `json:"fullname,omitempty"`
-	Password    string  `json:"password,omitempty"`
-	Roles       []*Node `json:"roles,omitempty"`
-	BackedRoles []*Node `json:"backed_roles,omitempty"`
-	Bio         *string `json:"bio,omitempty"`
-	Utc         *string `json:"utc,omitempty"`
+	ID             string  `json:"id,omitempty"`
+	CreatedAt      string  `json:"createdAt,omitempty"`
+	Username       string  `json:"username,omitempty"`
+	Email          string  `json:"email,omitempty"`
+	EmailHash      *string `json:"emailHash,omitempty"`
+	EmailValidated bool    `json:"emailValidated"`
+	Name           *string `json:"name,omitempty"`
+	Password       string  `json:"password,omitempty"`
+	Roles          []*Node `json:"roles,omitempty"`
+	BackedRoles    []*Node `json:"backed_roles,omitempty"`
+	Bio            *string `json:"bio,omitempty"`
+	Utc            *string `json:"utc,omitempty"`
 }
 
 type UserFilter struct {
 	ID        []string          `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter   `json:"createdAt,omitempty"`
 	Username  *StringHashFilter `json:"username,omitempty"`
+	Email     *StringHashFilter `json:"email,omitempty"`
 	And       *UserFilter       `json:"and,omitempty"`
 	Or        *UserFilter       `json:"or,omitempty"`
 	Not       *UserFilter       `json:"not,omitempty"`
@@ -652,27 +657,31 @@ type UserOrder struct {
 }
 
 type UserPatch struct {
-	CreatedAt   *string    `json:"createdAt,omitempty"`
-	Email       *string    `json:"email,omitempty"`
-	Fullname    *string    `json:"fullname,omitempty"`
-	Password    *string    `json:"password,omitempty"`
-	Roles       []*NodeRef `json:"roles,omitempty"`
-	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
-	Bio         *string    `json:"bio,omitempty"`
-	Utc         *string    `json:"utc,omitempty"`
+	CreatedAt      *string    `json:"createdAt,omitempty"`
+	Email          *string    `json:"email,omitempty"`
+	EmailHash      *string    `json:"emailHash,omitempty"`
+	EmailValidated *bool      `json:"emailValidated"`
+	Name           *string    `json:"name,omitempty"`
+	Password       *string    `json:"password,omitempty"`
+	Roles          []*NodeRef `json:"roles,omitempty"`
+	BackedRoles    []*NodeRef `json:"backed_roles,omitempty"`
+	Bio            *string    `json:"bio,omitempty"`
+	Utc            *string    `json:"utc,omitempty"`
 }
 
 type UserRef struct {
-	ID          *string    `json:"id,omitempty"`
-	CreatedAt   *string    `json:"createdAt,omitempty"`
-	Username    *string    `json:"username,omitempty"`
-	Email       *string    `json:"email,omitempty"`
-	Fullname    *string    `json:"fullname,omitempty"`
-	Password    *string    `json:"password,omitempty"`
-	Roles       []*NodeRef `json:"roles,omitempty"`
-	BackedRoles []*NodeRef `json:"backed_roles,omitempty"`
-	Bio         *string    `json:"bio,omitempty"`
-	Utc         *string    `json:"utc,omitempty"`
+	ID             *string    `json:"id,omitempty"`
+	CreatedAt      *string    `json:"createdAt,omitempty"`
+	Username       *string    `json:"username,omitempty"`
+	Email          *string    `json:"email,omitempty"`
+	EmailHash      *string    `json:"emailHash,omitempty"`
+	EmailValidated *bool      `json:"emailValidated"`
+	Name           *string    `json:"name,omitempty"`
+	Password       *string    `json:"password,omitempty"`
+	Roles          []*NodeRef `json:"roles,omitempty"`
+	BackedRoles    []*NodeRef `json:"backed_roles,omitempty"`
+	Bio            *string    `json:"bio,omitempty"`
+	Utc            *string    `json:"utc,omitempty"`
 }
 
 type CommentOrderable string
@@ -1149,7 +1158,8 @@ const (
 	UserOrderableCreatedAt UserOrderable = "createdAt"
 	UserOrderableUsername  UserOrderable = "username"
 	UserOrderableEmail     UserOrderable = "email"
-	UserOrderableFullname  UserOrderable = "fullname"
+	UserOrderableEmailHash UserOrderable = "emailHash"
+	UserOrderableName      UserOrderable = "name"
 	UserOrderablePassword  UserOrderable = "password"
 	UserOrderableBio       UserOrderable = "bio"
 	UserOrderableUtc       UserOrderable = "utc"
@@ -1159,7 +1169,8 @@ var AllUserOrderable = []UserOrderable{
 	UserOrderableCreatedAt,
 	UserOrderableUsername,
 	UserOrderableEmail,
-	UserOrderableFullname,
+	UserOrderableEmailHash,
+	UserOrderableName,
 	UserOrderablePassword,
 	UserOrderableBio,
 	UserOrderableUtc,
@@ -1167,7 +1178,7 @@ var AllUserOrderable = []UserOrderable{
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableEmail, UserOrderableFullname, UserOrderablePassword, UserOrderableBio, UserOrderableUtc:
+	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableEmail, UserOrderableEmailHash, UserOrderableName, UserOrderablePassword, UserOrderableBio, UserOrderableUtc:
 		return true
 	}
 	return false

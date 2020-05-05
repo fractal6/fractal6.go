@@ -11,17 +11,15 @@ import (
     "reflect"
     "github.com/99designs/gqlgen/graphql"
 
-    "zerogov/fractal6.go/graph/model"
     gen "zerogov/fractal6.go/graph/generated"
+    "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/db"
 )
 
-/*
-*
-* Data structures initialisation
-*
-*/
+//
+// Resolver initialisation
+//
 
 // Mutation type Enum
 type mutationType string
@@ -36,77 +34,14 @@ type MutationContext struct  {
 }
 
 type Resolver struct{
-    // I/O objects
-    QueryQ Query
-    RawQueryQ Query
-    AddMutationQ Query
-    UpdateMutationQ Query
-    DelMutationQ Query
-
-    // pointer on dgraph
+    // Pointer on Dgraph client
     db *db.Dgraph
 }
 
 // Init initialize shema config and Directives...
 func Init() gen.Config {
-    var QueryQ, RawQueryQ Query
-    var AddMutationQ, UpdateMutationQ, DelMutationQ Query
-
-    QueryQ.Data = `{
-        "query": "query {{.Args}} {{.QueryName}} { 
-            {{.QueryName}} {
-                {{.QueryGraph}}
-            } 
-        }"
-    }`
-    RawQueryQ.Data = `{
-        "query": "{{.RawQuery}}"
-    }`
-
-    AddMutationQ.Data = `{
-        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) { 
-            {{.QueryName}}(input: $input) {
-                {{.QueryGraph}}
-            } 
-        }",
-        "variables": {
-            "input": {{.InputPayload}}
-        }
-    }`
-    UpdateMutationQ.Data = `{
-        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
-            {{.QueryName}}(input: $input) {
-                {{.QueryGraph}}
-            } 
-        }",
-        "variables": {
-            "input": {{.InputPayload}}
-        }
-    }`
-    DelMutationQ.Data = `{
-        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
-            {{.QueryName}}(filter: $input) {
-                {{.QueryGraph}}
-            } 
-        }",
-        "variables": {
-            "input": {{.InputPayload}}
-        }
-    }`
-
-    QueryQ.Init()
-    RawQueryQ.Init()
-    AddMutationQ.Init()
-    UpdateMutationQ.Init()
-    DelMutationQ.Init()
-
     r := Resolver{
         db:db.GetDB(),
-        QueryQ: QueryQ,
-        RawQueryQ: RawQueryQ,
-        AddMutationQ: AddMutationQ,
-        UpdateMutationQ: UpdateMutationQ,
-        DelMutationQ: DelMutationQ,
     }
 
     // Dgraph directives
@@ -171,7 +106,7 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
 }
 
 func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
-    v := obj.(JsonAtom)[field].(string)
+    v := obj.(model.JsonAtom)[field].(string)
     if len(v) > max {
         return nil, fmt.Errorf("`%s' to long. Maximum length is %d", field, max)
     }
@@ -179,7 +114,7 @@ func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver,
 }
 
 func ensureType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
-    v := obj.(JsonAtom)[field].(JsonAtom)
+    v := obj.(model.JsonAtom)[field].(model.JsonAtom)
     fmt.Println(v)
     fmt.Println("Sould be a list of Node (checl that type_ == v.type_ !")
     panic("not implemented")
