@@ -178,7 +178,7 @@ func initDB() *Dgraph {
                 "input": {{.InputPayload}}
             }
         }`,
-        "del": `{
+        "delete": `{
             "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
                 {{.QueryName}}(filter: $input) {
                     {{.QueryGraph}}
@@ -316,7 +316,7 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
     // @TODO: handle graphql alias with mapstructure handlers (see hook in dgraph_resolver
     var config *mapstructure.DecoderConfig
     var decodeHook interface{}
-    if op == "query" || op == "queryRaw" {
+    if op == "query" || op == "rawQuery" {
         // Decoder config to handle aliased request
         decodeHook = func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {

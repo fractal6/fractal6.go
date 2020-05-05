@@ -24,9 +24,9 @@ import (
 // Mutation type Enum
 type mutationType string
 const (
-    AddMut mutationType = "Add"
-    UpdateMut mutationType = "Update"
-    DelMut mutationType = "Delete"
+    AddMut mutationType = "add"
+    UpdateMut mutationType = "update"
+    DelMut mutationType = "delete"
 )
 type MutationContext struct  {
     type_ mutationType

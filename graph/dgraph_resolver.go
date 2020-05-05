@@ -16,7 +16,7 @@ import (
 *
 */
 
-func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) (errors error) {
+func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
     // How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
     ////var queryArgs string
     ////var args []string
@@ -73,12 +73,13 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     op := "rawQuery"
     err := r.db.QueryGql(op, reqInput, data)
     if err != nil {
-        panic(err)
+        //panic(err)
+        return err
     }
-    return
+    return nil
 }
 
-func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, data interface{}, ipts interface{}) (errors error) {
+func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, data interface{}, ipts interface{}) error {
     mutCtx := ctx.Value("mutation_context").(MutationContext)
 
     /* Rebuild the Graphql inputs request from this context */
@@ -105,8 +106,9 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
     op := string(mutCtx.type_)
     err := r.db.QueryGql(op, reqInput, data)
     if err != nil {
-        panic(err)
+        //panic(err)
+        return err
     }
-    return
+    return nil
 }
 
