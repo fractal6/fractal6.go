@@ -4,6 +4,7 @@ import (
     //"fmt"
     "time"
     "errors"
+    "strings"
 
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/tools"
@@ -86,11 +87,12 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     if password == "" {
         return nil, ErrBadPassword
     } else if username != "" {
-        fieldId = "username"
         userId = username
-    } else if email != "" {
-        fieldId = "email"
-        userId = email
+        if strings.Contains(user, "@") {
+            fieldId = "email"
+        } else {
+            fieldId = "username"
+        }
     } else {
         return nil, ErrBadUsername
     }
@@ -126,6 +128,9 @@ func ValidateNewUser(creds model.UserCreds) error {
         return ErrBadUsername
     }
     if len(email) < 3 || len(email) > 42 {
+        return ErrBadEmail
+    }
+    if !strings.Contains(email, ".") || !strings.Contains(email, "@") {
         return ErrBadEmail
     }
     if name != nil && len(*name) > 100 {
