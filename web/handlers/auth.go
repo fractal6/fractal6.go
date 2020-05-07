@@ -48,6 +48,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		//Expires: expirationTime,
 	})
+
+    data := `["OK"]`
+    w.Write([]byte(data))
 }
 
 
@@ -97,6 +100,9 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		//Expires: expirationTime,
 	})
+
+    data := `["OK"]`
+    w.Write([]byte(data))
 }
 
 // Logout deletes the user token.

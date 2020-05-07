@@ -80,19 +80,18 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     var userCtx model.UserCtx
 
     username := creds.Username
-    email := creds.Email
     password := creds.Password
 
     // Validate signin form
     if password == "" {
         return nil, ErrBadPassword
     } else if username != "" {
-        userId = username
-        if strings.Contains(user, "@") {
+        if strings.Contains(username, "@") {
             fieldId = "email"
         } else {
             fieldId = "username"
         }
+        userId = username
     } else {
         return nil, ErrBadUsername
     }

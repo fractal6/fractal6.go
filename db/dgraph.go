@@ -120,18 +120,18 @@ func initDB() *Dgraph {
     // GPRC/Graphql+- Request Template
     gpmQueries := map[string]string{
         "count": `{
-            all(func: uid({{.id}})) {
+            all(func: uid("{{.id}}")) {
                 count({{.typeName}}.{{.fieldName}})
             }
         }`,
         "exists": `{
-            all(func: eq({{.typeName}}.{{.fieldName}}, {{.value}})) {
+            all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {
                 uid
             }
         }`,
         // getUser with UserCtx payload
         "getUser": `{
-            all(func: eq(User.{{.fieldid}}, {{.userid}})) {
+            all(func: eq(User.{{.fieldid}}, "{{.userid}}")) {
                 User.username
                 User.name
                 User.password
