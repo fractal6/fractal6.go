@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    //"fmt"
     "net/http"
     "encoding/json"
 
@@ -12,8 +13,10 @@ import (
 
 // Login create and pass a token to the authenticated user.
 func Login(w http.ResponseWriter, r *http.Request) {
-	// Get the JSON body and decode into UserCreds
 	var creds model.UserCreds
+    var userCtx *model.UserCtx
+
+	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
 		// Body structure error
@@ -24,7 +27,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
     // === This is protected ===
     // Returns the user ctx if authenticated.
-    userCtx, err := auth.GetAuthUserCtx(creds)
+    userCtx, err = auth.GetAuthUserCtx(creds)
     if err != nil {
 		// Credentials validation error
 		//w.WriteHeader(http.StatusUnauthorized)
@@ -49,15 +52,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		//Expires: expirationTime,
 	})
 
-    data := `["OK"]`
-    w.Write([]byte(data))
+    // Return the user context
+    data, err := json.Marshal(userCtx)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(data)
 }
 
 
 // Signup register a new user and gives it a token.
 func Signup(w http.ResponseWriter, r *http.Request) {
-	// Get the JSON body and decode into UserCreds
 	var creds model.UserCreds
+    var userCtx *model.UserCtx
+
+	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
 		// Body structure error
@@ -73,7 +83,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
     }
 
     // Upsert new user
-    userCtx, err := auth.CreateNewUser(creds)
+    userCtx, err = auth.CreateNewUser(creds)
     if err != nil {
 		// Credentials validation error
         switch err.(type) {
@@ -101,8 +111,13 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		//Expires: expirationTime,
 	})
 
-    data := `["OK"]`
-    w.Write([]byte(data))
+    // Return the user context
+    data, err := json.Marshal(userCtx)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(data)
 }
 
 // Logout deletes the user token.

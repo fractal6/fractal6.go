@@ -66,7 +66,7 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     queryName := rslvCtx.Path().String() // rslvCtx.Field.Name
 
     reqInput := map[string]string{
-        "queryName": queryName,
+        "QueryName": queryName,
         "RawQuery": tools.CleanString(graphql.GetRequestContext(ctx).RawQuery, true),
     }
 

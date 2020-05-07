@@ -291,7 +291,7 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
 // Run a query Dgraph Graphql endpoing and map the result in the given data structure
 func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{}) error {
     // Get the query
-    queryName := reqInput["queryName"]
+    queryName := reqInput["QueryName"]
     var q string
     if _q, ok := dg.gqlTemplates[op]; ok {
         q = _q.Format(reqInput)
@@ -407,9 +407,10 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
 //
 
 
-// Returns user with grpc
-// TODO: moves the query to the template queries interface
-func (dg Dgraph) GetUser(fieldid string, userid string, user interface{}) error {
+// Returns user with Graphql+-
+//func (dg Dgraph) GetUser(fieldid string, userid string, user interface{}) error {
+func (dg Dgraph) GetUser(fieldid string, userid string ) (*model.UserCtx, error) {
+    var user model.UserCtx
     // Format Query
     maps := map[string]string{
         "fieldid":fieldid,
@@ -418,36 +419,43 @@ func (dg Dgraph) GetUser(fieldid string, userid string, user interface{}) error 
     // Send query
     res, err := dg.QueryGpm("getUser", maps)
     if err != nil {
-        return  err
+        return  nil, err
     }
 
     // Decode response
     var r Resp
 	err = json.Unmarshal(res.Json, &r)
 	if err != nil {
-        return err
+        return nil, err
 	}
 
     if len(r.All) > 1 {
-        return fmt.Errorf("Got multiple user with same @id: %s, %s", fieldid, userid)
+        return nil, fmt.Errorf("Got multiple user with same @id: %s, %s", fieldid, userid)
     } else if len(r.All) == 1 {
         rRaw, err := json.Marshal(r.All[0])
         if err != nil {
-            return err
+            return nil, err
         }
-        json.Unmarshal(rRaw, user)
+        userDg := model.UserCtxDg{}
+        err = json.Unmarshal(rRaw, &userDg)
+        if err != nil {
+            return nil, err
+        }
+        user = model.UserCtx(userDg)
     }
-    return nil
+    return &user, nil
 }
 
-// AddUser add user with dgraph graphql and generated input
-func (dg Dgraph) AddUser(input model.AddUserInput, user interface{})  error {
+// AddUser add user with a Graphql
+func (dg Dgraph) AddUser(input model.AddUserInput) (*model.UserCtx,  error) {
+    var user model.UserCtx
+
     queryName := "addUser"
     inputType := "AddUserInput"
     queryGraph := `user {
         username name password
         roles {
-            nameid role_type
+            rootnameid nameid role_type
         }
     } `
 
@@ -462,11 +470,20 @@ func (dg Dgraph) AddUser(input model.AddUserInput, user interface{})  error {
         "InputPayload": string(inputs), // inputs data
     }
 
-    err := dg.QueryGql("add", reqInput, user)
+    userDGql := model.AddUserPayload{}
+    err := dg.QueryGql("add", reqInput, &userDGql)
     if err != nil {
-        return err
+        return nil, err
     }
-    return nil
+    rRaw, err := json.Marshal(userDGql.User[0])
+    if err != nil {
+        return nil, err
+    }
+    err = json.Unmarshal(rRaw, &user)
+    if err != nil {
+        return nil, err
+    }
+    return &user, nil
 }
 
 

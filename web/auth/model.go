@@ -77,7 +77,6 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     // 4. if pass, returns UsertCtx from db request or throw error
     var fieldId string
     var userId string
-    var userCtx model.UserCtx
 
     username := creds.Username
     password := creds.Password
@@ -98,7 +97,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
 
     // Try getting usetCtx
     DB := db.GetDB()
-    err := DB.GetUser(fieldId, userId, &userCtx)
+    userCtx, err := DB.GetUser(fieldId, userId)
     if err != nil {
         return nil, err 
     }
@@ -110,7 +109,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     }
     // Hide the password !
     userCtx.Passwd = ""
-    return &userCtx, nil
+    return userCtx, nil
 }
 
 
@@ -169,7 +168,6 @@ func ValidateNewUser(creds model.UserCreds) error {
 // CreateNewUser Upsert an user, 
 // using db.graphql request.
 func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
-    var userCtx model.UserCtx
 
     user := model.AddUserInput{                                 
         CreatedAt:      time.Now().Format(time.RFC3339),
@@ -187,14 +185,15 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
 
     // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
     DB := db.GetDB()
-    err := DB.AddUser(user, &userCtx)
+    userCtx, err := DB.AddUser(user)
     if err != nil {
         return nil, err 
+
     }
 
     // Hide the password !
     userCtx.Passwd = ""
-    return &userCtx, nil
+    return userCtx, nil
 }
 
 
