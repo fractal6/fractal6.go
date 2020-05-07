@@ -16,49 +16,49 @@ var (
     ErrBadUsername = errors.New(`{
         "user_ctx":{
             "field": "username",
-            "msg":"Bad username""
+            "msg":"Bad username"
         }
     }`)
     ErrBadEmail = errors.New(`{
         "user_ctx":{
             "field": "email",
-            "msg":"Bad email""
+            "msg":"Bad email"
         }
     }`)
     ErrBadName = errors.New(`{
         "user_ctx":{
             "field": "name",
-            "msg":"Bad name""
+            "msg":"Bad name"
         }
     }`)
     ErrBadPassword = errors.New(`{
         "user_ctx":{
             "field": "password",
-            "msg":"Bad Password""
+            "msg":"Bad Password"
         }
     }`)
     ErrUsernameExist = errors.New(`{
         "user_ctx":{
             "field": "username",
-            "msg":"Username already exists""
+            "msg":"Username already exists"
         }
     }`)
     ErrEmailExist = errors.New(`{
         "user_ctx":{
             "field": "email",
-            "msg":"Email already exists""
+            "msg":"Email already exists"
         }
     }`)
     ErrPasswordTooShort = errors.New(`{
         "user_ctx":{
             "field": "password",
-            "msg":"Password too short""
+            "msg":"Password too short"
         }
     }`)
     ErrPasswordTooLong = errors.New(`{
         "user_ctx":{
             "field": "password",
-            "msg":"Password too long""
+            "msg":"Password too long"
         }
     }`)
 )
@@ -83,9 +83,9 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     password := creds.Password
 
     // Validate signin form
-    if password == "" {
+    if len(password) < 8 {
         return nil, ErrBadPassword
-    } else if username != "" {
+    } else if len(username) > 1 {
         if strings.Contains(username, "@") {
             fieldId = "email"
         } else {
