@@ -188,7 +188,6 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     userCtx, err := DB.AddUser(user)
     if err != nil {
         return nil, err 
-
     }
 
     // Hide the password !

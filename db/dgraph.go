@@ -357,7 +357,7 @@ func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
     maps := map[string]string{
         "typeName": typeName, "fieldName":fieldName, "id":id,
     }
-    // Send Query
+    // Send request
     res, err := dg.QueryGpm("count", maps)
 	if err != nil {
         panic(err)
@@ -388,12 +388,13 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
     maps := map[string]string{
         "typeName": typeName, "fieldName":fieldName, "value": value,
     }
-    // Send query
+    // Send request
     res, err := dg.QueryGpm("exists", maps)
     if err != nil {
         return false, err
     }
 
+    // Decode response
     var r Resp
 	err = json.Unmarshal(res.Json, &r)
 	if err != nil {
@@ -416,7 +417,7 @@ func (dg Dgraph) GetUser(fieldid string, userid string ) (*model.UserCtx, error)
         "fieldid":fieldid,
         "userid":userid,
     }
-    // Send query
+    // Send request
     res, err := dg.QueryGpm("getUser", maps)
     if err != nil {
         return  nil, err
@@ -470,11 +471,14 @@ func (dg Dgraph) AddUser(input model.AddUserInput) (*model.UserCtx,  error) {
         "InputPayload": string(inputs), // inputs data
     }
 
+    // Send request
     userDGql := model.AddUserPayload{}
     err := dg.QueryGql("add", reqInput, &userDGql)
     if err != nil {
         return nil, err
     }
+
+    // Decode response
     rRaw, err := json.Marshal(userDGql.User[0])
     if err != nil {
         return nil, err

@@ -65,11 +65,13 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     rslvCtx := graphql.GetResolverContext(ctx)
     queryName := rslvCtx.Path().String() // rslvCtx.Field.Name
 
+    // Build the graphql raw request
     reqInput := map[string]string{
         "QueryName": queryName,
         "RawQuery": tools.CleanString(graphql.GetRequestContext(ctx).RawQuery, true),
     }
 
+    // Send request
     op := "rawQuery"
     err := r.db.QueryGql(op, reqInput, data)
     if err != nil {
@@ -103,6 +105,7 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
         "InputPayload": string(inputs), // inputs data
     }
 
+    // Send request
     op := string(mutCtx.type_)
     err := r.db.QueryGql(op, reqInput, data)
     if err != nil {
