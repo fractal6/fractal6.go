@@ -47,9 +47,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
+		Name: "jwt",
+		Value: tokenString,
+        Path: "/", 
+        //HttpOnly: true,
+        //Secure: true, // Do Someone know what this flag do ???
 		//Expires: expirationTime,
+        //MaxAge: 90000,
 	})
 
     // Return the user context
@@ -106,9 +110,13 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
+		Name: "jwt",
+		Value: tokenString,
+        Path: "/", 
+        //HttpOnly: true,
+        //Secure: true, // Do Someone know what this flag do ???
 		//Expires: expirationTime,
+        //MaxAge: 90000,
 	})
 
     // Return the user context
