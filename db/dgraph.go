@@ -16,8 +16,8 @@ import (
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"google.golang.org/grpc"
 
-	"zerogov/fractal6.go/tools"
 	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/tools"
 )
 
 // Draph database clients

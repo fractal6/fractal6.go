@@ -1,28 +1,31 @@
 package auth
 
 import (
+    //"fmt"
     "log"
     "time"
     "errors"
     "context"
-    "github.com/mitchellh/mapstructure"
+    "encoding/json"
+    //"github.com/mitchellh/mapstructure"
     jwt "github.com/dgrijalva/jwt-go"
     "github.com/go-chi/jwtauth"
 
 	"zerogov/fractal6.go/graph/model"
 )
 
-var tokenMaster *Jwt
+var tkMaster *Jwt
 
 func init () {
-    tokenMaster = Jwt{}.New()
+    tkMaster = Jwt{}.New()
 }
 
 type Jwt struct {
     // @FIX: How to initialize mapClaims with another map
     // in order to node decode evething at each request
-    tokenClaim string 
 	tokenAuth  *jwtauth.JWTAuth
+    tokenClaim string 
+    tokenClaimErr string 
 }
 
 // New create a token auth master
@@ -30,9 +33,19 @@ func (Jwt) New() *Jwt {
     secret := "frctl6"
 	tk := &Jwt{
         tokenClaim: "user_ctx",
+        tokenClaimErr: "user_ctx_err",
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
 	}
-    token, _ := tk.issue(model.UserCtx{Username:"debugger"}, time.Hour*1)
+    uctx := model.UserCtx{
+        Username: "debugger",
+        Roles: []model.Role{
+            {Nameid:"SKU", Rootnameid:"SKU", RoleType:"Coordinator"},
+            //{Nameid:"SKU", Rootnameid:"SKU", RoleType:model.RoleTypeCoordinator},
+            //{Nameid:"SKU", Rootnameid:"SKU", RoleType:"Coordinator"},
+        },
+    }
+    token, _ := tk.issue(uctx, time.Hour*24)
+    //token, _ := tk.issue(model.UserCtx{Username:"debugger"}, time.Hour*24)
 	log.Println("DEBUG JWT:", token)
 	return tk
 }
@@ -42,7 +55,7 @@ func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
 }
 
 // Issue generate and encode a new token
-func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error){
+func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
     claims := jwt.MapClaims{ tk.tokenClaim: d }
     jwtauth.SetExpiry(claims, time.Now().Add(t))
 	_, tokenString, err := tk.tokenAuth.Encode(claims)
@@ -54,16 +67,16 @@ func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error){
 //
 
 func GetTokenMaster() *Jwt {
-    return tokenMaster
+    return tkMaster 
 }
 
 // NewUserToken create a new user token from master key
 func NewUserToken(userCtx model.UserCtx) (string, error) {
-    token, err := tokenMaster.issue(userCtx, time.Hour*1)
+    token, err := tkMaster.issue(userCtx, time.Hour*1)
     return token, err
 }
 
-func GetAuthContext(ctx context.Context) context.Context {
+func ContextWithUserCtx(ctx context.Context) context.Context {
     token, claims, err := jwtauth.FromContext(ctx)
 
     if err != nil {
@@ -80,16 +93,31 @@ func GetAuthContext(ctx context.Context) context.Context {
         //return
     } else if token == nil || !token.Valid {
         err = errors.New("jwtauth: token is invalid")
-    } else if claims[tokenMaster.tokenClaim] == nil {
+    } else if claims[tkMaster.tokenClaim] == nil {
         err = errors.New("auth: user claim is invalid")
     }
 
     if err == nil {
         userCtx := model.UserCtx{}
-        mapstructure.Decode(claims[tokenMaster.tokenClaim], &userCtx)
-        ctx = context.WithValue(ctx, "user_context", userCtx)
+        uRaw, err := json.Marshal(claims[tkMaster.tokenClaim])
+        if err != nil {
+            panic(err)
+        }
+        json.Unmarshal(uRaw, &userCtx)
+        // @DEBUG: mapstructure seems to not decode enum (RoleType) !
+        //mapstructure.Decode(claims[tkMaster.tokenClaim], &userCtx)
+        ctx = context.WithValue(ctx, tkMaster.tokenClaim, userCtx)
     } else {
-        ctx = context.WithValue(ctx, "user_context_error", err)
+        ctx = context.WithValue(ctx, tkMaster.tokenClaimErr, err)
     }
     return ctx
+}
+
+func UserCtxFromContext(ctx context.Context) (model.UserCtx, error) {
+    userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
+    if userCtxErr != nil {
+        return model.UserCtx{}, userCtxErr.(error)
+    } 
+    return ctx.Value(tkMaster.tokenClaim).(model.UserCtx), nil
+
 }

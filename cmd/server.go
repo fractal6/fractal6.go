@@ -18,14 +18,14 @@ import (
 )
 
 var queryPath, buildMode string
-var tokenMaster *auth.Jwt
+var tkMaster *auth.Jwt
 
 func init() {
     // Api URI
     queryPath = "/api"
 
     // Jwt init
-    tokenMaster = auth.GetTokenMaster()
+    tkMaster = auth.GetTokenMaster()
 
     // Cli init
     rootCmd.AddCommand(runCmd)
@@ -74,7 +74,7 @@ func RunServer() {
 	r.Use(cors.Handler)
     //r.Use(middle6.RequestContextMiddleware) // Set context info
     // JWT
-    r.Use(jwtauth.Verifier(tokenMaster.GetAuth())) // Seek, verify and validate JWT token
+    r.Use(jwtauth.Verifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
     r.Use(middle6.JwtDecode) // Set user claims
     // Log request
     r.Use(middleware.Logger)

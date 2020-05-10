@@ -40,6 +40,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Auth             func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, role model.RoleType) (res interface{}, err error)
 	Count            func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
 	Dgraph           func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	HasInverse       func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
@@ -1829,6 +1830,7 @@ var sources = []*ast.Source{
 
 directive @hidden on FIELD_DEFINITION
 
+directive @auth(f: String!, role: RoleType!) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 directive @count(f: String!) on FIELD_DEFINITION
 
 directive @input_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
@@ -2004,7 +2006,7 @@ type AddMandatePayload {
 input AddNodeInput {
   createdAt: DateTime!
   createdBy: UserRef!
-  parent: NodeRef
+  parent: NodeRef  @auth(f: "parent", role: Coordinator)
   children: [NodeRef!]
   type_: NodeType!
   name: String!
@@ -2063,7 +2065,7 @@ type AddTensionPayload {
   numUids: Int
 }
 
-input AddUserInput {
+input AddUserInput  {
   createdAt: DateTime!
   username: String! @input_maxLength(f:"username", n:42)
   email: String! @input_maxLength(f:"email", n:100)
@@ -2274,7 +2276,7 @@ input MandateRef {
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]!): AddNodePayload
+  addNode(input: [AddNodeInput!]!): AddNodePayload  
   updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
   addRights(input: [AddRightsInput!]!): AddRightsPayload
@@ -2664,6 +2666,28 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) dir_auth_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["f"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["f"] = arg0
+	var arg1 model.RoleType
+	if tmp, ok := rawArgs["role"]; ok {
+		arg1, err = ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["role"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) dir_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -11888,9 +11912,34 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "parent":
 			var err error
-			it.Parent, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "parent")
+				if err != nil {
+					return nil, err
+				}
+				role, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Auth == nil {
+					return nil, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, obj, directive0, f, role)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Parent = data
+			} else if tmp == nil {
+				it.Parent = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "children":
 			var err error
@@ -16441,6 +16490,15 @@ func (ec *executionContext) unmarshalNPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgr
 	}
 	res, err := ec.unmarshalNPostFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, v interface{}) (model.RoleType, error) {
+	var res model.RoleType
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, sel ast.SelectionSet, v model.RoleType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

@@ -7,12 +7,15 @@ package graph
 
 import (
     "fmt"
+    "log"
     "context"
     "reflect"
     "github.com/99designs/gqlgen/graphql"
+    "github.com/mitchellh/mapstructure"
 
     gen "zerogov/fractal6.go/graph/generated"
     "zerogov/fractal6.go/graph/model"
+    "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/db"
 )
@@ -55,7 +58,7 @@ func Init() gen.Config {
     c.Directives.Count = count
     c.Directives.Input_maxLength = inputMaxLength
     c.Directives.Input_ensureType = ensureType
-    //c.Directives.HasRole = hasRoleMiddleware
+    c.Directives.Auth = authorize
     return c
 }
 
@@ -115,21 +118,48 @@ func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver,
 
 func ensureType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
     v := obj.(model.JsonAtom)[field].(model.JsonAtom)
-    fmt.Println(v)
-    fmt.Println("Sould be a list of Node (checl that type_ == v.type_ !")
-    panic("not implemented")
-    return next(ctx)
+    return nil, fmt.Errorf("Only Node type is supported, this is not: %T", v )
 }
 
-//func hasRoleMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
-//
-//    fmt.Println(ctx)
-//    //if !getCurrentUser(ctx).HasRole(role) {
-//    //    // block calling the next resolver
-//    //     fmt.Println(ctx)
-//    //    return nil, fmt.Errorf("Access denied")
-//    //}
-//
-//    // or let it pass through
-//    return next(ctx)
-//}
+// Authorize Search for authorized user by comparing the node source agains the roles of the user.
+func authorize(ctx context.Context, obj interface{}, next graphql.Resolver, nodeField string, role model.RoleType ) (interface{}, error) {
+    // Retrive userCtx from token
+    userCtx, err := auth.UserCtxFromContext(ctx)
+    if err != nil {
+        e := fmt.Errorf("Access denied: %s", err.Error())
+        log.Println("@auth/"+e.Error())
+        return nil, e
+        ///return nil, fmt.Errorf("Access denied: Login or signup to perform this action.")
+    }
+
+    // Verify format is correct
+    nodeSource_ :=  obj.(model.JsonAtom)
+    nodeTarget_ :=  nodeSource_[nodeField]
+    var nodeTarget model.Node
+    if nodeTarget_ == nil {
+        e := fmt.Errorf("Access denied: Node undefined for input %s", nodeField)
+        log.Println("@auth/"+e.Error())
+        return nil, e
+    }
+    mapstructure.Decode(nodeTarget_, &nodeTarget)
+    rootnameid := nodeSource_["rootnameid"].(string)
+    nameid := nodeTarget.Nameid
+    if nameid == "" || rootnameid == "" {
+        e := fmt.Errorf("Access denied: Node IDs undefined for input %s", nodeField)
+        log.Println("@auth/"+e.Error())
+        return nil, e
+    }
+
+    // Search for rights
+    for _, ur := range userCtx.Roles {
+        if ur.Rootnameid == rootnameid && ur.Nameid == nameid && ur.RoleType == role {
+            return next(ctx)
+        }
+    }
+
+    // Format output to get to be able to format a links in a frontend.
+    e := fmt.Errorf("Access denied: Please contact the %s's coordinator to perform this action.", rootnameid +"/"+ nameid)
+    log.Println("@auth/"+e.Error())
+    return nil, e
+}
+
