@@ -3,6 +3,9 @@ package auth
 import (
     "log"
     "time"
+    "errors"
+    "context"
+    "github.com/mitchellh/mapstructure"
     jwt "github.com/dgrijalva/jwt-go"
     "github.com/go-chi/jwtauth"
 
@@ -60,3 +63,33 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
     return token, err
 }
 
+func GetAuthContext(ctx context.Context) context.Context {
+    token, claims, err := jwtauth.FromContext(ctx)
+
+    if err != nil {
+        //errMsg := fmt.Errorf("%v", err)
+        switch err {
+        case jwtauth.ErrUnauthorized:
+        case jwtauth.ErrExpired:
+        case jwtauth.ErrNBFInvalid:
+        case jwtauth.ErrIATInvalid:
+        case jwtauth.ErrNoTokenFound:
+        case jwtauth.ErrAlgoInvalid:
+        }
+        //http.Error(w, http.StatusText(401), 401)
+        //return
+    } else if token == nil || !token.Valid {
+        err = errors.New("jwtauth: token is invalid")
+    } else if claims[tokenMaster.tokenClaim] == nil {
+        err = errors.New("auth: user claim is invalid")
+    }
+
+    if err == nil {
+        userCtx := model.UserCtx{}
+        mapstructure.Decode(claims[tokenMaster.tokenClaim], &userCtx)
+        ctx = context.WithValue(ctx, "user_context", userCtx)
+    } else {
+        ctx = context.WithValue(ctx, "user_context_error", err)
+    }
+    return ctx
+}
