@@ -12,7 +12,6 @@ type AddCommentInput struct {
 	CreatedAt string   `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
-	Items     []string `json:"items,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
@@ -35,7 +34,6 @@ type AddMandateInput struct {
 	CreatedAt        string   `json:"createdAt,omitempty"`
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
-	Items            []string `json:"items,omitempty"`
 	Purpose          string   `json:"purpose,omitempty"`
 	Responsabilities *PostRef `json:"responsabilities,omitempty"`
 	Domains          *PostRef `json:"domains,omitempty"`
@@ -73,26 +71,10 @@ type AddNodePayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
-type AddRightsInput struct {
-	OpenTension  *bool `json:"open_tension"`
-	CloseTension *bool `json:"close_tension"`
-	CreateCircle *bool `json:"create_circle"`
-	RemoveCircle *bool `json:"remove_circle"`
-	CreateRole   *bool `json:"create_role"`
-	DetachRole   *bool `json:"detach_role"`
-	RemoveRole   *bool `json:"remove_role"`
-}
-
-type AddRightsPayload struct {
-	Rights  []*Rights `json:"rights,omitempty"`
-	NumUids *int      `json:"numUids,omitempty"`
-}
-
 type AddTensionInput struct {
 	CreatedAt string        `json:"createdAt,omitempty"`
 	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
-	Items     []string      `json:"items,omitempty"`
 	Nth       *string       `json:"nth,omitempty"`
 	Title     string        `json:"title,omitempty"`
 	Type      TensionType   `json:"type_,omitempty"`
@@ -128,18 +110,16 @@ type AddUserPayload struct {
 }
 
 type Comment struct {
-	Message   string   `json:"message,omitempty"`
-	ID        string   `json:"id,omitempty"`
-	CreatedAt string   `json:"createdAt,omitempty"`
-	CreatedBy *User    `json:"createdBy,omitempty"`
-	Items     []string `json:"items,omitempty"`
+	Message   string `json:"message,omitempty"`
+	ID        string `json:"id,omitempty"`
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy *User  `json:"createdBy,omitempty"`
 }
 
 type CommentFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	Items     *StringFullTextFilter `json:"items,omitempty"`
 	And       *CommentFilter        `json:"and,omitempty"`
 	Or        *CommentFilter        `json:"or,omitempty"`
 	Not       *CommentFilter        `json:"not,omitempty"`
@@ -155,7 +135,6 @@ type CommentPatch struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
-	Items     []string `json:"items,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
@@ -164,7 +143,6 @@ type CommentRef struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
-	Items     []string `json:"items,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
@@ -258,21 +236,19 @@ type LabelRef struct {
 }
 
 type Mandate struct {
-	Purpose          string   `json:"purpose,omitempty"`
-	Responsabilities *Post    `json:"responsabilities,omitempty"`
-	Domains          *Post    `json:"domains,omitempty"`
-	ID               string   `json:"id,omitempty"`
-	CreatedAt        string   `json:"createdAt,omitempty"`
-	CreatedBy        *User    `json:"createdBy,omitempty"`
-	Message          *string  `json:"message,omitempty"`
-	Items            []string `json:"items,omitempty"`
+	Purpose          string  `json:"purpose,omitempty"`
+	Responsabilities *Post   `json:"responsabilities,omitempty"`
+	Domains          *Post   `json:"domains,omitempty"`
+	ID               string  `json:"id,omitempty"`
+	CreatedAt        string  `json:"createdAt,omitempty"`
+	CreatedBy        *User   `json:"createdBy,omitempty"`
+	Message          *string `json:"message,omitempty"`
 }
 
 type MandateFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	Items     *StringFullTextFilter `json:"items,omitempty"`
 	Purpose   *StringFullTextFilter `json:"purpose,omitempty"`
 	And       *MandateFilter        `json:"and,omitempty"`
 	Or        *MandateFilter        `json:"or,omitempty"`
@@ -289,7 +265,6 @@ type MandatePatch struct {
 	CreatedAt        *string  `json:"createdAt,omitempty"`
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
-	Items            []string `json:"items,omitempty"`
 	Purpose          *string  `json:"purpose,omitempty"`
 	Responsabilities *PostRef `json:"responsabilities,omitempty"`
 	Domains          *PostRef `json:"domains,omitempty"`
@@ -300,7 +275,6 @@ type MandateRef struct {
 	CreatedAt        *string  `json:"createdAt,omitempty"`
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
-	Items            []string `json:"items,omitempty"`
 	Purpose          *string  `json:"purpose,omitempty"`
 	Responsabilities *PostRef `json:"responsabilities,omitempty"`
 	Domains          *PostRef `json:"domains,omitempty"`
@@ -398,18 +372,16 @@ type NodeTypeHash struct {
 }
 
 type Post struct {
-	ID        string   `json:"id,omitempty"`
-	CreatedAt string   `json:"createdAt,omitempty"`
-	CreatedBy *User    `json:"createdBy,omitempty"`
-	Message   *string  `json:"message,omitempty"`
-	Items     []string `json:"items,omitempty"`
+	ID        string  `json:"id,omitempty"`
+	CreatedAt string  `json:"createdAt,omitempty"`
+	CreatedBy *User   `json:"createdBy,omitempty"`
+	Message   *string `json:"message,omitempty"`
 }
 
 type PostFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	Items     *StringFullTextFilter `json:"items,omitempty"`
 	And       *PostFilter           `json:"and,omitempty"`
 	Or        *PostFilter           `json:"or,omitempty"`
 	Not       *PostFilter           `json:"not,omitempty"`
@@ -425,31 +397,10 @@ type PostPatch struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
-	Items     []string `json:"items,omitempty"`
 }
 
 type PostRef struct {
 	ID string `json:"id,omitempty"`
-}
-
-type Rights struct {
-	OpenTension  *bool `json:"open_tension"`
-	CloseTension *bool `json:"close_tension"`
-	CreateCircle *bool `json:"create_circle"`
-	RemoveCircle *bool `json:"remove_circle"`
-	CreateRole   *bool `json:"create_role"`
-	DetachRole   *bool `json:"detach_role"`
-	RemoveRole   *bool `json:"remove_role"`
-}
-
-type RightsRef struct {
-	OpenTension  *bool `json:"open_tension"`
-	CloseTension *bool `json:"close_tension"`
-	CreateCircle *bool `json:"create_circle"`
-	RemoveCircle *bool `json:"remove_circle"`
-	CreateRole   *bool `json:"create_role"`
-	DetachRole   *bool `json:"detach_role"`
-	RemoveRole   *bool `json:"remove_role"`
 }
 
 type StringExactFilter struct {
@@ -491,14 +442,12 @@ type Tension struct {
 	CreatedAt string      `json:"createdAt,omitempty"`
 	CreatedBy *User       `json:"createdBy,omitempty"`
 	Message   *string     `json:"message,omitempty"`
-	Items     []string    `json:"items,omitempty"`
 }
 
 type TensionFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	Items     *StringFullTextFilter `json:"items,omitempty"`
 	Nth       *StringTermFilter     `json:"nth,omitempty"`
 	Title     *StringTermFilter     `json:"title,omitempty"`
 	Type      *TensionTypeHash      `json:"type_,omitempty"`
@@ -517,7 +466,6 @@ type TensionPatch struct {
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
-	Items     []string      `json:"items,omitempty"`
 	Nth       *string       `json:"nth,omitempty"`
 	Title     *string       `json:"title,omitempty"`
 	Type      *TensionType  `json:"type_,omitempty"`
@@ -533,7 +481,6 @@ type TensionRef struct {
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
-	Items     []string      `json:"items,omitempty"`
 	Nth       *string       `json:"nth,omitempty"`
 	Title     *string       `json:"title,omitempty"`
 	Type      *TensionType  `json:"type_,omitempty"`
@@ -641,13 +588,12 @@ type User struct {
 }
 
 type UserFilter struct {
-	ID        []string          `json:"id,omitempty"`
-	CreatedAt *DateTimeFilter   `json:"createdAt,omitempty"`
-	Username  *StringHashFilter `json:"username,omitempty"`
-	Email     *StringHashFilter `json:"email,omitempty"`
-	And       *UserFilter       `json:"and,omitempty"`
-	Or        *UserFilter       `json:"or,omitempty"`
-	Not       *UserFilter       `json:"not,omitempty"`
+	ID       []string          `json:"id,omitempty"`
+	Username *StringHashFilter `json:"username,omitempty"`
+	Email    *StringHashFilter `json:"email,omitempty"`
+	And      *UserFilter       `json:"and,omitempty"`
+	Or       *UserFilter       `json:"or,omitempty"`
+	Not      *UserFilter       `json:"not,omitempty"`
 }
 
 type UserOrder struct {
@@ -689,20 +635,18 @@ type CommentOrderable string
 const (
 	CommentOrderableCreatedAt CommentOrderable = "createdAt"
 	CommentOrderableMessage   CommentOrderable = "message"
-	CommentOrderableItems     CommentOrderable = "items"
 	CommentOrderableVoid      CommentOrderable = "_VOID"
 )
 
 var AllCommentOrderable = []CommentOrderable{
 	CommentOrderableCreatedAt,
 	CommentOrderableMessage,
-	CommentOrderableItems,
 	CommentOrderableVoid,
 }
 
 func (e CommentOrderable) IsValid() bool {
 	switch e {
-	case CommentOrderableCreatedAt, CommentOrderableMessage, CommentOrderableItems, CommentOrderableVoid:
+	case CommentOrderableCreatedAt, CommentOrderableMessage, CommentOrderableVoid:
 		return true
 	}
 	return false
@@ -838,20 +782,18 @@ type MandateOrderable string
 const (
 	MandateOrderableCreatedAt MandateOrderable = "createdAt"
 	MandateOrderableMessage   MandateOrderable = "message"
-	MandateOrderableItems     MandateOrderable = "items"
 	MandateOrderablePurpose   MandateOrderable = "purpose"
 )
 
 var AllMandateOrderable = []MandateOrderable{
 	MandateOrderableCreatedAt,
 	MandateOrderableMessage,
-	MandateOrderableItems,
 	MandateOrderablePurpose,
 }
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderableItems, MandateOrderablePurpose:
+	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderablePurpose:
 		return true
 	}
 	return false
@@ -977,18 +919,16 @@ type PostOrderable string
 const (
 	PostOrderableCreatedAt PostOrderable = "createdAt"
 	PostOrderableMessage   PostOrderable = "message"
-	PostOrderableItems     PostOrderable = "items"
 )
 
 var AllPostOrderable = []PostOrderable{
 	PostOrderableCreatedAt,
 	PostOrderableMessage,
-	PostOrderableItems,
 }
 
 func (e PostOrderable) IsValid() bool {
 	switch e {
-	case PostOrderableCreatedAt, PostOrderableMessage, PostOrderableItems:
+	case PostOrderableCreatedAt, PostOrderableMessage:
 		return true
 	}
 	return false
@@ -1063,7 +1003,6 @@ type TensionOrderable string
 const (
 	TensionOrderableCreatedAt TensionOrderable = "createdAt"
 	TensionOrderableMessage   TensionOrderable = "message"
-	TensionOrderableItems     TensionOrderable = "items"
 	TensionOrderableNth       TensionOrderable = "nth"
 	TensionOrderableTitle     TensionOrderable = "title"
 	TensionOrderableNComments TensionOrderable = "n_comments"
@@ -1072,7 +1011,6 @@ const (
 var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableCreatedAt,
 	TensionOrderableMessage,
-	TensionOrderableItems,
 	TensionOrderableNth,
 	TensionOrderableTitle,
 	TensionOrderableNComments,
@@ -1080,7 +1018,7 @@ var AllTensionOrderable = []TensionOrderable{
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableItems, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments:
+	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments:
 		return true
 	}
 	return false

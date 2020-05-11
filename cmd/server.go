@@ -107,8 +107,9 @@ func RunServer() {
     // Serve Graphql Api
     r.Post(queryPath, handle6.GraphqlHandler(gqlConfig))
 
-    log.Println("Running @ http://" + HOST + ":" + PORT)
-    http.ListenAndServe(HOST + ":" + PORT, r)
+    address := HOST + ":" + PORT
+    log.Printf("Running @ http://%s", address)
+    http.ListenAndServe(address, r)
 }
 
 

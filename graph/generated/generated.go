@@ -40,14 +40,18 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Auth             func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, role model.RoleType) (res interface{}, err error)
 	Count            func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
 	Dgraph           func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	HasInverse       func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
 	Hidden           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	InputP_RO        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	InputP_isOwner   func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Input_ensureType func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
+	Input_hasRole    func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Input_hasRoot    func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
 	Input_maxLength  func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
+	IsAuth           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Search           func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
 	Secret           func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
 }
@@ -73,11 +77,6 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	AddRightsPayload struct {
-		NumUids func(childComplexity int) int
-		Rights  func(childComplexity int, first *int, offset *int) int
-	}
-
 	AddTensionPayload struct {
 		NumUids func(childComplexity int) int
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -92,7 +91,6 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
-		Items     func(childComplexity int) int
 		Message   func(childComplexity int) int
 	}
 
@@ -142,7 +140,6 @@ type ComplexityRoot struct {
 		CreatedBy        func(childComplexity int, filter *model.UserFilter) int
 		Domains          func(childComplexity int, filter *model.PostFilter) int
 		ID               func(childComplexity int) int
-		Items            func(childComplexity int) int
 		Message          func(childComplexity int) int
 		Purpose          func(childComplexity int) int
 		Responsabilities func(childComplexity int, filter *model.PostFilter) int
@@ -153,7 +150,6 @@ type ComplexityRoot struct {
 		AddLabel      func(childComplexity int, input []*model.AddLabelInput) int
 		AddMandate    func(childComplexity int, input []*model.AddMandateInput) int
 		AddNode       func(childComplexity int, input []*model.AddNodeInput) int
-		AddRights     func(childComplexity int, input []*model.AddRightsInput) int
 		AddTension    func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser       func(childComplexity int, input []*model.AddUserInput) int
 		DeleteComment func(childComplexity int, filter model.CommentFilter) int
@@ -199,7 +195,6 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
-		Items     func(childComplexity int) int
 		Message   func(childComplexity int) int
 	}
 
@@ -216,19 +211,8 @@ type ComplexityRoot struct {
 		QueryMandate func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		QueryNode    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		QueryPost    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-		QueryRights  func(childComplexity int, first *int, offset *int) int
 		QueryTension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		QueryUser    func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-	}
-
-	Rights struct {
-		CloseTension func(childComplexity int) int
-		CreateCircle func(childComplexity int) int
-		CreateRole   func(childComplexity int) int
-		DetachRole   func(childComplexity int) int
-		OpenTension  func(childComplexity int) int
-		RemoveCircle func(childComplexity int) int
-		RemoveRole   func(childComplexity int) int
 	}
 
 	Tension struct {
@@ -237,7 +221,6 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		Emitter   func(childComplexity int, filter *model.NodeFilter) int
 		ID        func(childComplexity int) int
-		Items     func(childComplexity int) int
 		Labels    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		Message   func(childComplexity int) int
 		NComments func(childComplexity int) int
@@ -302,7 +285,6 @@ type MutationResolver interface {
 	AddNode(ctx context.Context, input []*model.AddNodeInput) (*model.AddNodePayload, error)
 	UpdateNode(ctx context.Context, input model.UpdateNodeInput) (*model.UpdateNodePayload, error)
 	DeleteNode(ctx context.Context, filter model.NodeFilter) (*model.DeleteNodePayload, error)
-	AddRights(ctx context.Context, input []*model.AddRightsInput) (*model.AddRightsPayload, error)
 	UpdatePost(ctx context.Context, input model.UpdatePostInput) (*model.UpdatePostPayload, error)
 	DeletePost(ctx context.Context, filter model.PostFilter) (*model.DeletePostPayload, error)
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
@@ -324,7 +306,6 @@ type MutationResolver interface {
 type QueryResolver interface {
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
 	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]*model.Node, error)
-	QueryRights(ctx context.Context, first *int, offset *int) ([]*model.Rights, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
 	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]*model.Post, error)
 	GetTension(ctx context.Context, id string) (*model.Tension, error)
@@ -430,25 +411,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AddNodePayload.NumUids(childComplexity), true
 
-	case "AddRightsPayload.numUids":
-		if e.complexity.AddRightsPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.AddRightsPayload.NumUids(childComplexity), true
-
-	case "AddRightsPayload.rights":
-		if e.complexity.AddRightsPayload.Rights == nil {
-			break
-		}
-
-		args, err := ec.field_AddRightsPayload_rights_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.AddRightsPayload.Rights(childComplexity, args["first"].(*int), args["offset"].(*int)), true
-
 	case "AddTensionPayload.numUids":
 		if e.complexity.AddTensionPayload.NumUids == nil {
 			break
@@ -512,13 +474,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.ID(childComplexity), true
-
-	case "Comment.items":
-		if e.complexity.Comment.Items == nil {
-			break
-		}
-
-		return e.complexity.Comment.Items(childComplexity), true
 
 	case "Comment.message":
 		if e.complexity.Comment.Message == nil {
@@ -684,13 +639,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mandate.ID(childComplexity), true
 
-	case "Mandate.items":
-		if e.complexity.Mandate.Items == nil {
-			break
-		}
-
-		return e.complexity.Mandate.Items(childComplexity), true
-
 	case "Mandate.message":
 		if e.complexity.Mandate.Message == nil {
 			break
@@ -764,18 +712,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddNode(childComplexity, args["input"].([]*model.AddNodeInput)), true
-
-	case "Mutation.addRights":
-		if e.complexity.Mutation.AddRights == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addRights_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddRights(childComplexity, args["input"].([]*model.AddRightsInput)), true
 
 	case "Mutation.addTension":
 		if e.complexity.Mutation.AddTension == nil {
@@ -1175,13 +1111,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Post.ID(childComplexity), true
 
-	case "Post.items":
-		if e.complexity.Post.Items == nil {
-			break
-		}
-
-		return e.complexity.Post.Items(childComplexity), true
-
 	case "Post.message":
 		if e.complexity.Post.Message == nil {
 			break
@@ -1333,18 +1262,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryPost(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
-	case "Query.queryRights":
-		if e.complexity.Query.QueryRights == nil {
-			break
-		}
-
-		args, err := ec.field_Query_queryRights_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.QueryRights(childComplexity, args["first"].(*int), args["offset"].(*int)), true
-
 	case "Query.queryTension":
 		if e.complexity.Query.QueryTension == nil {
 			break
@@ -1368,55 +1285,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryUser(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "Rights.close_tension":
-		if e.complexity.Rights.CloseTension == nil {
-			break
-		}
-
-		return e.complexity.Rights.CloseTension(childComplexity), true
-
-	case "Rights.create_circle":
-		if e.complexity.Rights.CreateCircle == nil {
-			break
-		}
-
-		return e.complexity.Rights.CreateCircle(childComplexity), true
-
-	case "Rights.create_role":
-		if e.complexity.Rights.CreateRole == nil {
-			break
-		}
-
-		return e.complexity.Rights.CreateRole(childComplexity), true
-
-	case "Rights.detach_role":
-		if e.complexity.Rights.DetachRole == nil {
-			break
-		}
-
-		return e.complexity.Rights.DetachRole(childComplexity), true
-
-	case "Rights.open_tension":
-		if e.complexity.Rights.OpenTension == nil {
-			break
-		}
-
-		return e.complexity.Rights.OpenTension(childComplexity), true
-
-	case "Rights.remove_circle":
-		if e.complexity.Rights.RemoveCircle == nil {
-			break
-		}
-
-		return e.complexity.Rights.RemoveCircle(childComplexity), true
-
-	case "Rights.remove_role":
-		if e.complexity.Rights.RemoveRole == nil {
-			break
-		}
-
-		return e.complexity.Rights.RemoveRole(childComplexity), true
 
 	case "Tension.comments":
 		if e.complexity.Tension.Comments == nil {
@@ -1467,13 +1335,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.ID(childComplexity), true
-
-	case "Tension.items":
-		if e.complexity.Tension.Items == nil {
-			break
-		}
-
-		return e.complexity.Tension.Items(childComplexity), true
 
 	case "Tension.labels":
 		if e.complexity.Tension.Labels == nil {
@@ -1830,12 +1691,21 @@ var sources = []*ast.Source{
 
 directive @hidden on FIELD_DEFINITION
 
-directive @auth(f: String!, role: RoleType!) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 directive @count(f: String!) on FIELD_DEFINITION
 
 directive @input_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
 
 directive @input_ensureType(f: String!, t: NodeType!) on INPUT_FIELD_DEFINITION
+
+directive @isAuth on OBJECT|FIELD_DEFINITION
+
+directive @input_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
+
+directive @input_hasRoot(n: [String!]!) on INPUT_FIELD_DEFINITION
+
+directive @inputP_isOwner(u: String) on INPUT_FIELD_DEFINITION
+
+directive @inputP_RO on INPUT_FIELD_DEFINITION
 
 type Node {
   id: ID!
@@ -1860,22 +1730,11 @@ type Node {
   role_type: RoleType
 }
 
-type Rights {
-  open_tension: Boolean
-  close_tension: Boolean
-  create_circle: Boolean
-  remove_circle: Boolean
-  create_role: Boolean
-  detach_role: Boolean
-  remove_role: Boolean
-}
-
 type Post {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
-  items: [String!] @search(by: [fulltext])
 }
 
 type Tension {
@@ -1891,7 +1750,6 @@ type Tension {
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
-  items: [String!] @search(by: [fulltext])
 }
 
 type Comment {
@@ -1899,7 +1757,6 @@ type Comment {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
-  items: [String!] @search(by: [fulltext])
 }
 
 type Mandate {
@@ -1910,16 +1767,15 @@ type Mandate {
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
-  items: [String!] @search(by: [fulltext])
 }
 
 type User {
   id: ID!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   username: String! @id
-  email: String! @search(by: [hash]) @hidden
-  emailHash: String
-  emailValidated: Boolean!
+  email: String! @hidden @search(by: [hash])
+  emailHash: String @hidden
+  emailValidated: Boolean! @hidden
   name: String
   password: String! @hidden
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
@@ -1939,18 +1795,19 @@ enum NodeType {
   Role
 }
 
-enum RoleType {
-  Coordinator
-  Member
-  Guest
-
-}
-
 enum TensionType {
   Governance
   Operational
   Personal
   Help
+
+
+}
+
+enum RoleType {
+  Coordinator
+  Member
+  Guest
 
 
 }
@@ -1969,7 +1826,6 @@ input AddCommentInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
-  items: [String!]
   _VOID: String
 }
 
@@ -1992,7 +1848,6 @@ input AddMandateInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
-  items: [String!]
   purpose: String!
   responsabilities: PostRef
   domains: PostRef
@@ -2006,23 +1861,23 @@ type AddMandatePayload {
 input AddNodeInput {
   createdAt: DateTime!
   createdBy: UserRef!
-  parent: NodeRef  @auth(f: "parent", role: Coordinator)
-  children: [NodeRef!]
-  type_: NodeType!
-  name: String!
+  parent: NodeRef @input_hasRole(n:["parent"], r: Coordinator)
+  children: [NodeRef!] @input_hasRole(n:["parent"], r: Coordinator)
+  type_: NodeType! @input_hasRole(n:["parent"], r: Coordinator)
+  name: String! @input_hasRole(n:["parent"], r: Coordinator)
   nameid: String!
   rootnameid: String!
-  mandate: MandateRef
+  mandate: MandateRef @input_hasRole(n:["parent"], r: Coordinator)
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
   n_tensions_out: Int
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean!
-  first_link: UserRef
-  second_link: UserRef
-  skills: [String!]
-  role_type: RoleType
+  first_link: UserRef @input_hasRole(n:["parent"], r: Coordinator)
+  second_link: UserRef @input_hasRole(n:["parent"], r: Coordinator)
+  skills: [String!] @input_hasRole(n:["parent"], r: Coordinator)
+  role_type: RoleType @input_hasRole(n:["parent"], r: Coordinator)
 }
 
 type AddNodePayload {
@@ -2030,33 +1885,17 @@ type AddNodePayload {
   numUids: Int
 }
 
-input AddRightsInput {
-  open_tension: Boolean
-  close_tension: Boolean
-  create_circle: Boolean
-  remove_circle: Boolean
-  create_role: Boolean
-  detach_role: Boolean
-  remove_role: Boolean
-}
-
-type AddRightsPayload {
-  rights(first: Int, offset: Int): [Rights]
-  numUids: Int
-}
-
 input AddTensionInput {
   createdAt: DateTime!
   createdBy: UserRef!
   message: String
-  items: [String!]
   nth: String
-  title: String!
-  type_: TensionType!
-  emitter: NodeRef!
-  receiver: NodeRef!
-  comments: [CommentRef!]
-  labels: [LabelRef!]
+  title: String! @input_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
+  type_: TensionType! @input_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
+  emitter: NodeRef! @input_hasRoot(n:["emitter"])
+  receiver: NodeRef! @input_hasRoot(n:["receiver"]) @input_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
+  comments: [CommentRef!] @input_hasRoot(n:["emitter","receiver"])
+  labels: [LabelRef!] @input_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
 
@@ -2065,7 +1904,7 @@ type AddTensionPayload {
   numUids: Int
 }
 
-input AddUserInput  {
+input AddUserInput {
   createdAt: DateTime!
   username: String! @input_maxLength(f:"username", n:42)
   email: String! @input_maxLength(f:"email", n:100)
@@ -2088,7 +1927,6 @@ input CommentFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  items: StringFullTextFilter
   and: CommentFilter
   or: CommentFilter
   not: CommentFilter
@@ -2103,15 +1941,13 @@ input CommentOrder {
 enum CommentOrderable {
   createdAt
   message
-  items
   _VOID
 }
 
 input CommentPatch {
   createdAt: DateTime
   createdBy: UserRef
-  message: String
-  items: [String!]
+  message: String @inputP_isOwner(u:"createdBy")
   _VOID: String
 }
 
@@ -2120,7 +1956,6 @@ input CommentRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  items: [String!]
   _VOID: String
 }
 
@@ -2234,7 +2069,6 @@ input MandateFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  items: StringFullTextFilter
   purpose: StringFullTextFilter
   and: MandateFilter
   or: MandateFilter
@@ -2250,7 +2084,6 @@ input MandateOrder {
 enum MandateOrderable {
   createdAt
   message
-  items
   purpose
 }
 
@@ -2258,10 +2091,9 @@ input MandatePatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  items: [String!]
-  purpose: String
-  responsabilities: PostRef
-  domains: PostRef
+  purpose: String @inputP_RO
+  responsabilities: PostRef @inputP_RO
+  domains: PostRef @inputP_RO
 }
 
 input MandateRef {
@@ -2269,17 +2101,15 @@ input MandateRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  items: [String!]
   purpose: String
   responsabilities: PostRef
   domains: PostRef
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]!): AddNodePayload  
+  addNode(input: [AddNodeInput!]!): AddNodePayload
   updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
-  addRights(input: [AddRightsInput!]!): AddRightsPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]!): AddTensionPayload
@@ -2331,24 +2161,24 @@ enum NodeOrderable {
 }
 
 input NodePatch {
-  createdAt: DateTime
-  createdBy: UserRef
-  parent: NodeRef
-  children: [NodeRef!]
-  type_: NodeType
-  name: String
-  rootnameid: String
-  mandate: MandateRef
-  tensions_out: [TensionRef!]
-  tensions_in: [TensionRef!]
+  createdAt: DateTime @inputP_RO
+  createdBy: UserRef @inputP_RO
+  parent: NodeRef @input_hasRole(n:["parent"], r: Coordinator)
+  children: [NodeRef!] @input_hasRole(n:["parent"], r: Coordinator)
+  type_: NodeType @input_hasRole(n:["parent"], r: Coordinator)
+  name: String @input_hasRole(n:["parent"], r: Coordinator)
+  rootnameid: String @inputP_RO
+  mandate: MandateRef @input_hasRole(n:["parent"], r: Coordinator)
+  tensions_out: [TensionRef!] @inputP_RO
+  tensions_in: [TensionRef!] @inputP_RO
   n_tensions_out: Int
   n_tensions_in: Int
   n_children: Int
-  isRoot: Boolean
-  first_link: UserRef
-  second_link: UserRef
-  skills: [String!]
-  role_type: RoleType
+  isRoot: Boolean @inputP_RO
+  first_link: UserRef @input_hasRole(n:["parent"], r: Coordinator)
+  second_link: UserRef @input_hasRole(n:["parent"], r: Coordinator)
+  skills: [String!] @input_hasRole(n:["parent"], r: Coordinator)
+  role_type: RoleType @input_hasRole(n:["parent"], r: Coordinator)
 }
 
 input NodeRef {
@@ -2382,7 +2212,6 @@ input PostFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  items: StringFullTextFilter
   and: PostFilter
   or: PostFilter
   not: PostFilter
@@ -2397,14 +2226,12 @@ input PostOrder {
 enum PostOrderable {
   createdAt
   message
-  items
 }
 
 input PostPatch {
-  createdAt: DateTime
-  createdBy: UserRef
-  message: String
-  items: [String!]
+  createdAt: DateTime @inputP_RO
+  createdBy: UserRef @inputP_RO
+  message: String @inputP_isOwner(u:"createdBy")
 }
 
 input PostRef {
@@ -2414,7 +2241,6 @@ input PostRef {
 type Query {
   getNode(id: ID, nameid: String): Node
   queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
-  queryRights(first: Int, offset: Int): [Rights]
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   getTension(id: ID!): Tension
@@ -2427,16 +2253,6 @@ type Query {
   queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   getLabel(id: ID, name: String): Label
   queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label]
-}
-
-input RightsRef {
-  open_tension: Boolean
-  close_tension: Boolean
-  create_circle: Boolean
-  remove_circle: Boolean
-  create_role: Boolean
-  detach_role: Boolean
-  remove_role: Boolean
 }
 
 input StringExactFilter {
@@ -2469,7 +2285,6 @@ input TensionFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  items: StringFullTextFilter
   nth: StringTermFilter
   title: StringTermFilter
   type_: TensionType_hash
@@ -2487,7 +2302,6 @@ input TensionOrder {
 enum TensionOrderable {
   createdAt
   message
-  items
   nth
   title
   n_comments
@@ -2497,14 +2311,13 @@ input TensionPatch {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  items: [String!]
   nth: String
-  title: String
-  type_: TensionType
-  emitter: NodeRef
-  receiver: NodeRef
-  comments: [CommentRef!]
-  labels: [LabelRef!]
+  title: String @input_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
+  type_: TensionType @input_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
+  emitter: NodeRef @inputP_RO @input_hasRoot(n:["emitter"])
+  receiver: NodeRef @input_hasRoot(n:["receiver"]) @input_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
+  comments: [CommentRef!] @input_hasRoot(n:["emitter","receiver"])
+  labels: [LabelRef!] @input_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
 
@@ -2513,7 +2326,6 @@ input TensionRef {
   createdAt: DateTime
   createdBy: UserRef
   message: String
-  items: [String!]
   nth: String
   title: String
   type_: TensionType
@@ -2607,7 +2419,6 @@ type UpdateUserPayload {
 
 input UserFilter {
   id: [ID!]
-  createdAt: DateTimeFilter
   username: StringHashFilter
   email: StringHashFilter
   and: UserFilter
@@ -2633,16 +2444,16 @@ enum UserOrderable {
 }
 
 input UserPatch {
-  createdAt: DateTime
-  email: String @input_maxLength(f:"email", n:100)
-  emailHash: String
-  emailValidated: Boolean
-  name: String @input_maxLength(f:"name", n:100)
-  password: String @input_maxLength(f:"password", n:100)
-  roles: [NodeRef!] @input_ensureType(f:"roles", t: Role)
-  backed_roles: [NodeRef!] @input_ensureType(f:"backed_roles", t: Role)
-  bio: String
-  utc: String
+  createdAt: DateTime @inputP_RO
+  email: String @inputP_isOwner @input_maxLength(f:"email", n:100)
+  emailHash: String @inputP_RO
+  emailValidated: Boolean @inputP_RO
+  name: String @inputP_isOwner @input_maxLength(f:"name", n:100)
+  password: String @inputP_isOwner @input_maxLength(f:"password", n:100)
+  roles: [NodeRef!] @inputP_RO @input_ensureType(f:"roles", t: Role)
+  backed_roles: [NodeRef!] @inputP_RO @input_ensureType(f:"backed_roles", t: Role)
+  bio: String @inputP_isOwner
+  utc: String @inputP_isOwner
 }
 
 input UserRef {
@@ -2666,28 +2477,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
-
-func (ec *executionContext) dir_auth_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["f"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["f"] = arg0
-	var arg1 model.RoleType
-	if tmp, ok := rawArgs["role"]; ok {
-		arg1, err = ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["role"] = arg1
-	return args, nil
-}
 
 func (ec *executionContext) dir_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -2739,6 +2528,20 @@ func (ec *executionContext) dir_hasInverse_args(ctx context.Context, rawArgs map
 	return args, nil
 }
 
+func (ec *executionContext) dir_inputP_isOwner_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["u"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["u"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) dir_input_ensureType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2758,6 +2561,50 @@ func (ec *executionContext) dir_input_ensureType_args(ctx context.Context, rawAr
 		}
 	}
 	args["t"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) dir_input_hasRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["n"]; ok {
+		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["n"] = arg0
+	var arg1 model.RoleType
+	if tmp, ok := rawArgs["r"]; ok {
+		arg1, err = ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["r"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["u"]; ok {
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["u"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) dir_input_hasRoot_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["n"]; ok {
+		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["n"] = arg0
 	return args, nil
 }
 
@@ -2971,28 +2818,6 @@ func (ec *executionContext) field_AddNodePayload_node_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_AddRightsPayload_rights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_AddTensionPayload_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3173,20 +2998,6 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	var arg0 []*model.AddNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_addRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []*model.AddRightsInput
-	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddRightsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3940,28 +3751,6 @@ func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_queryRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg1
 	return args, nil
 }
 
@@ -4813,75 +4602,6 @@ func (ec *executionContext) _AddNodePayload_numUids(ctx context.Context, field g
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AddRightsPayload_rights(ctx context.Context, field graphql.CollectedField, obj *model.AddRightsPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "AddRightsPayload",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_AddRightsPayload_rights_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Rights, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Rights)
-	fc.Result = res
-	return ec.marshalORights2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AddRightsPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddRightsPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "AddRightsPayload",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _AddTensionPayload_tension(ctx context.Context, field graphql.CollectedField, obj *model.AddTensionPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5205,61 +4925,6 @@ func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphq
 	res := resTmp.(*model.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Comment_items(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Comment",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Items, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteCommentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCommentPayload) (ret graphql.Marshaler) {
@@ -6133,61 +5798,6 @@ func (ec *executionContext) _Mandate_message(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mandate_items(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mandate",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Items, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mutation_addNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6300,44 +5910,6 @@ func (ec *executionContext) _Mutation_deleteNode(ctx context.Context, field grap
 	res := resTmp.(*model.DeleteNodePayload)
 	fc.Result = res
 	return ec.marshalODeleteNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodePayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_addRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addRights_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddRights(rctx, args["input"].([]*model.AddRightsInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.AddRightsPayload)
-	fc.Result = res
-	return ec.marshalOAddRightsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updatePost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8166,61 +7738,6 @@ func (ec *executionContext) _Post_message(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Post_items(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Post",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Items, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8295,44 +7812,6 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 	res := resTmp.([]*model.Node)
 	fc.Result = res
 	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_queryRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Query",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_queryRights_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryRights(rctx, args["first"].(*int), args["offset"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Rights)
-	fc.Result = res
-	return ec.marshalORights2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8858,223 +8337,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_open_tension(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OpenTension, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_close_tension(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CloseTension, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_create_circle(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreateCircle, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_remove_circle(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RemoveCircle, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_create_role(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreateRole, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_detach_role(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DetachRole, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Rights_remove_role(ctx context.Context, field graphql.CollectedField, obj *model.Rights) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Rights",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RemoveRole, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_nth(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -9637,61 +8899,6 @@ func (ec *executionContext) _Tension_message(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_items(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Tension",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Items, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _UpdateCommentPayload_comment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateCommentPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10225,28 +9432,8 @@ func (ec *executionContext) _User_createdAt(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.CreatedAt, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10338,6 +9525,12 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 			return obj.Email, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
 			if err != nil {
 				return nil, err
@@ -10345,13 +9538,7 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 			if ec.directives.Search == nil {
 				return nil, errors.New("directive search is not implemented")
 			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-		directive2 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hidden == nil {
-				return nil, errors.New("directive hidden is not implemented")
-			}
-			return ec.directives.Hidden(ctx, obj, directive1)
+			return ec.directives.Search(ctx, obj, directive1, by)
 		}
 
 		tmp, err := directive2(rctx)
@@ -10397,8 +9584,28 @@ func (ec *executionContext) _User_emailHash(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EmailHash, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.EmailHash, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10428,8 +9635,28 @@ func (ec *executionContext) _User_emailValidated(ctx context.Context, field grap
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EmailValidated, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.EmailValidated, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11796,12 +11023,6 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "_VOID":
 			var err error
 			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -11862,12 +11083,6 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalNString2string(ctx, v)
@@ -11916,18 +11131,18 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "parent")
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
 				if err != nil {
 					return nil, err
 				}
-				role, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Auth == nil {
-					return nil, errors.New("directive auth is not implemented")
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
 				}
-				return ec.directives.Auth(ctx, obj, directive0, f, role)
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -11943,21 +11158,88 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "children":
 			var err error
-			it.Children, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Children = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "type_":
 			var err error
-			it.Type, err = ec.unmarshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(model.NodeType); ok {
+				it.Type = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.NodeType`, tmp)
+			}
 		case "name":
 			var err error
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "nameid":
 			var err error
@@ -11973,9 +11255,34 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "mandate":
 			var err error
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.MandateRef); ok {
+				it.Mandate = data
+			} else if tmp == nil {
+				it.Mandate = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.MandateRef`, tmp)
 			}
 		case "tensions_out":
 			var err error
@@ -12015,81 +11322,123 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "first_link":
 			var err error
-			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.FirstLink = data
+			} else if tmp == nil {
+				it.FirstLink = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "second_link":
 			var err error
-			it.SecondLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.SecondLink = data
+			} else if tmp == nil {
+				it.SecondLink = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "skills":
 			var err error
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Skills = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
 			}
 		case "role_type":
 			var err error
-			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			}
-		}
-	}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
 
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputAddRightsInput(ctx context.Context, obj interface{}) (model.AddRightsInput, error) {
-	var it model.AddRightsInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "open_tension":
-			var err error
-			it.OpenTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
-		case "close_tension":
-			var err error
-			it.CloseTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "create_circle":
-			var err error
-			it.CreateCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove_circle":
-			var err error
-			it.RemoveCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "create_role":
-			var err error
-			it.CreateRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "detach_role":
-			var err error
-			it.DetachRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove_role":
-			var err error
-			it.RemoveRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
+			if data, ok := tmp.(*model.RoleType); ok {
+				it.RoleType = data
+			} else if tmp == nil {
+				it.RoleType = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 			}
 		}
 	}
@@ -12121,12 +11470,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "nth":
 			var err error
 			it.Nth, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12135,39 +11478,197 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			}
 		case "title":
 			var err error
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Title = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "type_":
 			var err error
-			it.Type, err = ec.unmarshalNTensionType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNTensionType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(model.TensionType); ok {
+				it.Type = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.TensionType`, tmp)
 			}
 		case "emitter":
 			var err error
-			it.Emitter, err = ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRoot == nil {
+					return nil, errors.New("directive input_hasRoot is not implemented")
+				}
+				return ec.directives.Input_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Emitter = data
+			} else if tmp == nil {
+				it.Emitter = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "receiver":
 			var err error
-			it.Receiver, err = ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRoot == nil {
+					return nil, errors.New("directive input_hasRoot is not implemented")
+				}
+				return ec.directives.Input_hasRoot(ctx, obj, directive0, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive1, n, r, u)
+			}
+
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Receiver = data
+			} else if tmp == nil {
+				it.Receiver = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "comments":
 			var err error
-			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRoot == nil {
+					return nil, errors.New("directive input_hasRoot is not implemented")
+				}
+				return ec.directives.Input_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.([]*model.CommentRef); ok {
+				it.Comments = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
+			}
 		case "labels":
 			var err error
-			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.LabelRef); ok {
+				it.Labels = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.LabelRef`, tmp)
 			}
 		case "n_comments":
 			var err error
@@ -12415,12 +11916,6 @@ func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "and":
 			var err error
 			it.And, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
@@ -12495,15 +11990,28 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 			}
 		case "message":
 			var err error
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "_VOID":
 			var err error
@@ -12544,12 +12052,6 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12835,12 +12337,6 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
@@ -12925,29 +12421,72 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "items":
+		case "purpose":
 			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
-		case "purpose":
-			var err error
-			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
+			if data, ok := tmp.(*string); ok {
+				it.Purpose = data
+			} else if tmp == nil {
+				it.Purpose = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "responsabilities":
 			var err error
-			it.Responsabilities, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(*model.PostRef); ok {
+				it.Responsabilities = data
+			} else if tmp == nil {
+				it.Responsabilities = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.PostRef`, tmp)
+			}
 		case "domains":
 			var err error
-			it.Domains, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.PostRef); ok {
+				it.Domains = data
+			} else if tmp == nil {
+				it.Domains = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.PostRef`, tmp)
 			}
 		}
 	}
@@ -12982,12 +12521,6 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13131,63 +12664,261 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		switch k {
 		case "createdAt":
 			var err error
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "createdBy":
 			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.CreatedBy = data
+			} else if tmp == nil {
+				it.CreatedBy = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "parent":
 			var err error
-			it.Parent, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Parent = data
+			} else if tmp == nil {
+				it.Parent = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "children":
 			var err error
-			it.Children, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Children = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "type_":
 			var err error
-			it.Type, err = ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeType); ok {
+				it.Type = data
+			} else if tmp == nil {
+				it.Type = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeType`, tmp)
 			}
 		case "name":
 			var err error
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Name = data
+			} else if tmp == nil {
+				it.Name = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "rootnameid":
 			var err error
-			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Rootnameid = data
+			} else if tmp == nil {
+				it.Rootnameid = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "mandate":
 			var err error
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.MandateRef); ok {
+				it.Mandate = data
+			} else if tmp == nil {
+				it.Mandate = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.MandateRef`, tmp)
 			}
 		case "tensions_out":
 			var err error
-			it.TensionsOut, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.TensionsOut = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+			}
 		case "tensions_in":
 			var err error
-			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.TensionsIn = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
 			}
 		case "n_tensions_out":
 			var err error
@@ -13209,33 +12940,144 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			}
 		case "isRoot":
 			var err error
-			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsRoot = data
+			} else if tmp == nil {
+				it.IsRoot = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 			}
 		case "first_link":
 			var err error
-			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.FirstLink = data
+			} else if tmp == nil {
+				it.FirstLink = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "second_link":
 			var err error
-			it.SecondLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.SecondLink = data
+			} else if tmp == nil {
+				it.SecondLink = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "skills":
 			var err error
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.([]string); ok {
+				it.Skills = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+			}
 		case "role_type":
 			var err error
-			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.RoleType); ok {
+				it.RoleType = data
+			} else if tmp == nil {
+				it.RoleType = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 			}
 		}
 	}
@@ -13417,12 +13259,6 @@ func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "and":
 			var err error
 			it.And, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
@@ -13485,27 +13321,72 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 		switch k {
 		case "createdAt":
 			var err error
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "createdBy":
 			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.CreatedBy = data
+			} else if tmp == nil {
+				it.CreatedBy = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "message":
 			var err error
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		}
 	}
@@ -13522,60 +13403,6 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 		case "id":
 			var err error
 			it.ID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputRightsRef(ctx context.Context, obj interface{}) (model.RightsRef, error) {
-	var it model.RightsRef
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "open_tension":
-			var err error
-			it.OpenTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "close_tension":
-			var err error
-			it.CloseTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "create_circle":
-			var err error
-			it.CreateCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove_circle":
-			var err error
-			it.RemoveCircle, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "create_role":
-			var err error
-			it.CreateRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "detach_role":
-			var err error
-			it.DetachRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove_role":
-			var err error
-			it.RemoveRole, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13735,12 +13562,6 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "nth":
 			var err error
 			it.Nth, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
@@ -13837,12 +13658,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "nth":
 			var err error
 			it.Nth, err = ec.unmarshalOString2ᚖstring(ctx, v)
@@ -13851,39 +13666,207 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			}
 		case "title":
 			var err error
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Title = data
+			} else if tmp == nil {
+				it.Title = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "type_":
 			var err error
-			it.Type, err = ec.unmarshalOTensionType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.TensionType); ok {
+				it.Type = data
+			} else if tmp == nil {
+				it.Type = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.TensionType`, tmp)
 			}
 		case "emitter":
 			var err error
-			it.Emitter, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRoot == nil {
+					return nil, errors.New("directive input_hasRoot is not implemented")
+				}
+				return ec.directives.Input_hasRoot(ctx, obj, directive1, n)
+			}
+
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Emitter = data
+			} else if tmp == nil {
+				it.Emitter = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "receiver":
 			var err error
-			it.Receiver, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRoot == nil {
+					return nil, errors.New("directive input_hasRoot is not implemented")
+				}
+				return ec.directives.Input_hasRoot(ctx, obj, directive0, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive1, n, r, u)
+			}
+
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Receiver = data
+			} else if tmp == nil {
+				it.Receiver = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
 		case "comments":
 			var err error
-			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRoot == nil {
+					return nil, errors.New("directive input_hasRoot is not implemented")
+				}
+				return ec.directives.Input_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.([]*model.CommentRef); ok {
+				it.Comments = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
+			}
 		case "labels":
 			var err error
-			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Input_hasRole == nil {
+					return nil, errors.New("directive input_hasRole is not implemented")
+				}
+				return ec.directives.Input_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.LabelRef); ok {
+				it.Labels = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.LabelRef`, tmp)
 			}
 		case "n_comments":
 			var err error
@@ -13924,12 +13907,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "message":
 			var err error
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "items":
-			var err error
-			it.Items, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14227,12 +14204,6 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "createdAt":
-			var err error
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "username":
 			var err error
 			it.Username, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
@@ -14307,14 +14278,35 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		switch k {
 		case "createdAt":
 			var err error
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "email":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				f, err := ec.unmarshalNString2string(ctx, "email")
 				if err != nil {
 					return nil, err
@@ -14326,10 +14318,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				if ec.directives.Input_maxLength == nil {
 					return nil, errors.New("directive input_maxLength is not implemented")
 				}
-				return ec.directives.Input_maxLength(ctx, obj, directive0, f, n)
+				return ec.directives.Input_maxLength(ctx, obj, directive1, f, n)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -14342,20 +14334,56 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			}
 		case "emailHash":
 			var err error
-			it.EmailHash, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(*string); ok {
+				it.EmailHash = data
+			} else if tmp == nil {
+				it.EmailHash = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "emailValidated":
 			var err error
-			it.EmailValidated, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.EmailValidated = data
+			} else if tmp == nil {
+				it.EmailValidated = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 			}
 		case "name":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				f, err := ec.unmarshalNString2string(ctx, "name")
 				if err != nil {
 					return nil, err
@@ -14367,10 +14395,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				if ec.directives.Input_maxLength == nil {
 					return nil, errors.New("directive input_maxLength is not implemented")
 				}
-				return ec.directives.Input_maxLength(ctx, obj, directive0, f, n)
+				return ec.directives.Input_maxLength(ctx, obj, directive1, f, n)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -14385,6 +14413,12 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				f, err := ec.unmarshalNString2string(ctx, "password")
 				if err != nil {
 					return nil, err
@@ -14396,10 +14430,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				if ec.directives.Input_maxLength == nil {
 					return nil, errors.New("directive input_maxLength is not implemented")
 				}
-				return ec.directives.Input_maxLength(ctx, obj, directive0, f, n)
+				return ec.directives.Input_maxLength(ctx, obj, directive1, f, n)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -14416,6 +14450,12 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				f, err := ec.unmarshalNString2string(ctx, "roles")
 				if err != nil {
 					return nil, err
@@ -14427,10 +14467,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				if ec.directives.Input_ensureType == nil {
 					return nil, errors.New("directive input_ensureType is not implemented")
 				}
-				return ec.directives.Input_ensureType(ctx, obj, directive0, f, t)
+				return ec.directives.Input_ensureType(ctx, obj, directive1, f, t)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -14445,6 +14485,12 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_RO == nil {
+					return nil, errors.New("directive inputP_RO is not implemented")
+				}
+				return ec.directives.InputP_RO(ctx, obj, directive0)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				f, err := ec.unmarshalNString2string(ctx, "backed_roles")
 				if err != nil {
 					return nil, err
@@ -14456,10 +14502,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				if ec.directives.Input_ensureType == nil {
 					return nil, errors.New("directive input_ensureType is not implemented")
 				}
-				return ec.directives.Input_ensureType(ctx, obj, directive0, f, t)
+				return ec.directives.Input_ensureType(ctx, obj, directive1, f, t)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -14470,15 +14516,45 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			}
 		case "bio":
 			var err error
-			it.Bio, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(*string); ok {
+				it.Bio = data
+			} else if tmp == nil {
+				it.Bio = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "utc":
 			var err error
-			it.Utc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.InputP_isOwner == nil {
+					return nil, errors.New("directive inputP_isOwner is not implemented")
+				}
+				return ec.directives.InputP_isOwner(ctx, obj, directive0, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Utc = data
+			} else if tmp == nil {
+				it.Utc = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		}
 	}
@@ -14682,32 +14758,6 @@ func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var addRightsPayloadImplementors = []string{"AddRightsPayload"}
-
-func (ec *executionContext) _AddRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRightsPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addRightsPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddRightsPayload")
-		case "rights":
-			out.Values[i] = ec._AddRightsPayload_rights(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._AddRightsPayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var addTensionPayloadImplementors = []string{"AddTensionPayload"}
 
 func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddTensionPayload) graphql.Marshaler {
@@ -14791,8 +14841,6 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "items":
-			out.Values[i] = ec._Comment_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15057,8 +15105,6 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "message":
 			out.Values[i] = ec._Mandate_message(ctx, field, obj)
-		case "items":
-			out.Values[i] = ec._Mandate_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15091,8 +15137,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateNode(ctx, field)
 		case "deleteNode":
 			out.Values[i] = ec._Mutation_deleteNode(ctx, field)
-		case "addRights":
-			out.Values[i] = ec._Mutation_addRights(ctx, field)
 		case "updatePost":
 			out.Values[i] = ec._Mutation_updatePost(ctx, field)
 		case "deletePost":
@@ -15252,8 +15296,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "message":
 			out.Values[i] = ec._Post_message(ctx, field, obj)
-		case "items":
-			out.Values[i] = ec._Post_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15300,17 +15342,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_queryNode(ctx, field)
-				return res
-			})
-		case "queryRights":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_queryRights(ctx, field)
 				return res
 			})
 		case "getPost":
@@ -15460,42 +15491,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var rightsImplementors = []string{"Rights"}
-
-func (ec *executionContext) _Rights(ctx context.Context, sel ast.SelectionSet, obj *model.Rights) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, rightsImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Rights")
-		case "open_tension":
-			out.Values[i] = ec._Rights_open_tension(ctx, field, obj)
-		case "close_tension":
-			out.Values[i] = ec._Rights_close_tension(ctx, field, obj)
-		case "create_circle":
-			out.Values[i] = ec._Rights_create_circle(ctx, field, obj)
-		case "remove_circle":
-			out.Values[i] = ec._Rights_remove_circle(ctx, field, obj)
-		case "create_role":
-			out.Values[i] = ec._Rights_create_role(ctx, field, obj)
-		case "detach_role":
-			out.Values[i] = ec._Rights_detach_role(ctx, field, obj)
-		case "remove_role":
-			out.Values[i] = ec._Rights_remove_role(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var tensionImplementors = []string{"Tension"}
 
 func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, obj *model.Tension) graphql.Marshaler {
@@ -15552,8 +15547,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "message":
 			out.Values[i] = ec._Tension_message(ctx, field, obj)
-		case "items":
-			out.Values[i] = ec._Tension_items(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16184,38 +16177,6 @@ func (ec *executionContext) unmarshalNAddNodeInput2ᚖzerogovᚋfractal6ᚗgoᚋ
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalNAddRightsInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx context.Context, v interface{}) (model.AddRightsInput, error) {
-	return ec.unmarshalInputAddRightsInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNAddRightsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInputᚄ(ctx context.Context, v interface{}) ([]*model.AddRightsInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.AddRightsInput, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNAddRightsInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddRightsInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx context.Context, v interface{}) (*model.AddRightsInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNAddRightsInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsInput(ctx, v)
-	return &res, err
-}
-
 func (ec *executionContext) unmarshalNAddTensionInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInput(ctx context.Context, v interface{}) (model.AddTensionInput, error) {
 	return ec.unmarshalInputAddTensionInput(ctx, v)
 }
@@ -16513,6 +16474,35 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNTension2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx context.Context, sel ast.SelectionSet, v model.Tension) graphql.Marshaler {
@@ -16896,17 +16886,6 @@ func (ec *executionContext) marshalOAddNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋ
 		return graphql.Null
 	}
 	return ec._AddNodePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOAddRightsPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsPayload(ctx context.Context, sel ast.SelectionSet, v model.AddRightsPayload) graphql.Marshaler {
-	return ec._AddRightsPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalOAddRightsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRightsPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddRightsPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._AddRightsPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddTensionPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionPayload(ctx context.Context, sel ast.SelectionSet, v model.AddTensionPayload) graphql.Marshaler {
@@ -18032,57 +18011,6 @@ func (ec *executionContext) unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 	}
 	res, err := ec.unmarshalOPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 	return &res, err
-}
-
-func (ec *executionContext) marshalORights2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx context.Context, sel ast.SelectionSet, v model.Rights) graphql.Marshaler {
-	return ec._Rights(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalORights2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx context.Context, sel ast.SelectionSet, v []*model.Rights) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalORights2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalORights2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRights(ctx context.Context, sel ast.SelectionSet, v *model.Rights) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Rights(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalORoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, v interface{}) (model.RoleType, error) {
