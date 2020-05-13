@@ -38,10 +38,9 @@ func (Jwt) New() *Jwt {
 	}
     uctx := model.UserCtx{
         Username: "debugger",
+        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true},
         Roles: []model.Role{
-            {Nameid:"SKU", Rootnameid:"SKU", RoleType:"Coordinator"},
-            //{Nameid:"SKU", Rootnameid:"SKU", RoleType:model.RoleTypeCoordinator},
-            //{Nameid:"SKU", Rootnameid:"SKU", RoleType:"Coordinator"},
+            {Rootnameid:"SKU", Nameid:"SKU", RoleType:model.RoleTypeCoordinator},
         },
     }
     token, _ := tk.issue(uctx, time.Hour*24)

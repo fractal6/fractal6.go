@@ -168,8 +168,11 @@ func ValidateNewUser(creds model.UserCreds) error {
 // CreateNewUser Upsert an user, 
 // using db.graphql request.
 func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
+    // Rights
+    canLogin := true
+    canCreateRoot := false
 
-    user := model.AddUserInput{                                 
+    userInput := model.AddUserInput{                                 
         CreatedAt:      time.Now().Format(time.RFC3339),
         Username:       creds.Username,
         Email:          creds.Email,
@@ -177,15 +180,22 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         EmailValidated: false,
         Name:           creds.Name,
         Password:       tools.HashPassword(creds.Password),
-        //Roles:          []*NodeRef 
-        //BackedRoles:    []*NodeRef 
-        //Bio            *string    
+        Rights: &model.UserRightsRef{
+            CanLogin: &canLogin,
+            CanCreateRoot: &canCreateRoot,
+        },
         //Utc            *string    
     }
 
     // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
     DB := db.GetDB()
-    userCtx, err := DB.AddUser(user)
+    err := DB.AddUser(userInput)
+    if err != nil {
+        return nil, err 
+    }
+
+    // Try getting usetCtx
+    userCtx, err := DB.GetUser("username", creds.Username)
     if err != nil {
         return nil, err 
     }

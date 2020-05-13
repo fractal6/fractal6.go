@@ -122,12 +122,37 @@ func ensureType(ctx context.Context, obj interface{}, next graphql.Resolver, fie
     return nil, fmt.Errorf("Only Node type is supported, this is not: %T", v )
 }
 
-// HasRole search for authorized user by checking if user has the required role on the given node (or is owner)
+// HasRole search for authorized user by checking if user satisfy at least one of 
+// 1. user rights
+// 2. user ownership (u field)
+// 3. check user role, (n r field)
 func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFields []string, role model.RoleType, userField *string) (interface{}, error) {
     // Retrive userCtx from token
     userCtx, err := auth.UserCtxFromContext(ctx)
     if err != nil {
         return nil, tools.LogErr("@hasRole/userCtx", "Access denied", err)  // Login or signup
+    }
+
+    // Check user right for special query
+    rc := graphql.GetResolverContext(ctx)
+    queryName := rc.Field.Name 
+    if queryName == "addNode" {
+        if userCtx.Rights.CanCreateRoot {
+            node := obj.(model.JsonAtom)
+            isRoot :=  node["isRoot"]
+            if isRoot != nil && isRoot.(bool)  {
+
+                if node["parent"] != nil {
+                    return nil, tools.LogErr("@hasRole/rights", "Access denied", fmt.Errorf("Root node can't have a parent."))
+                }
+                if node["nameid"] != node["rootnameid"] {
+                    return nil, tools.LogErr("@hasRole/rights", "Access denied", fmt.Errorf("Root node nameid and rootnameid are different."))
+                }
+
+                println("New orga created !!!")
+                return next(ctx)
+            }
+        }
     }
 
     // If userField is given check if the current user
@@ -156,7 +181,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     }
     // Format output to get to be able to format a links in a frontend.
     // @DEBUG: get rootnameid from nameid
-    e := fmt.Errorf("Contaact a coordinator to grant rights")
+    e := fmt.Errorf("Contact a coordinator to access this ressource")
     return nil, tools.LogErr("@hasRole", "Access denied", e)
 }
 
@@ -247,8 +272,9 @@ func checkUserRole(userCtx model.UserCtx, nodeField string, nodeObj interface{},
     // Check that nodes are present
     objSource :=  nodeObj.(model.JsonAtom)
     nodeTarget_ :=  objSource[nodeField]
+
     if nodeTarget_ == nil {
-        err := fmt.Errorf("node target  unknown, need a database request here !!!")
+        err := fmt.Errorf("node target unknown, need a database request here !!!")
         return false, tools.LogErr(fmt.Sprintf("@hasRole/node undefined (n:%s)", nodeField), "Access denied", err)
     }
     nodeTarget := nodeTarget_.(model.JsonAtom)
@@ -256,7 +282,7 @@ func checkUserRole(userCtx model.UserCtx, nodeField string, nodeObj interface{},
     // Extract node identifier
     nameid := nodeTarget["nameid"]
     if nameid == "" {
-        err := fmt.Errorf("node target  unknown, need a database request here !!!")
+        err := fmt.Errorf("node target unknown, need a database request here !!!")
         return false, tools.LogErr(fmt.Sprintf("@hasRole/fieldid undefined (n:%s)", nodeField), "Access denied", err)
     }
 
@@ -274,7 +300,7 @@ func checkUserRoot(userCtx model.UserCtx, nodeField string, nodeObj interface{})
     objSource :=  nodeObj.(model.JsonAtom)
     nodeTarget_ :=  objSource[nodeField]
     if nodeTarget_ == nil {
-        err := fmt.Errorf("node target  unknown, need a database request here !!!")
+        err := fmt.Errorf("node target unknown, need a database request here !!!")
         return false, tools.LogErr(fmt.Sprintf("@hasRole/node undefined (n:%s)", nodeField), "Access denied", err)
     }
     nodeTarget := nodeTarget_.(model.JsonAtom)
@@ -282,7 +308,7 @@ func checkUserRoot(userCtx model.UserCtx, nodeField string, nodeObj interface{})
     // Extract node identifiers
     rootnameid := nodeTarget["rootnameid"].(string)
     if rootnameid == "" {
-        err := fmt.Errorf("node target  unknown, need a database request here !!!")
+        err := fmt.Errorf("node target unknown, need a database request here !!!")
         return false, tools.LogErr(fmt.Sprintf("@hasRole/fieldid undefined (n:%s)", nodeField), "Access denied", err)
     }
 

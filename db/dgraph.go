@@ -35,11 +35,11 @@ type Dgraph struct {
 // GRPC/Graphql+- response
 //
 
-type Resp struct {
+type GpmResp struct {
 	All []map[string]interface{} `json:"all"`
 }
 
-type RespCount struct {
+type GpmRespCount struct {
 	All []map[string]int `json:"all"`
 }
 
@@ -131,15 +131,8 @@ func initDB() *Dgraph {
         }`,
         // getUser with UserCtx payload
         "getUser": `{
-            all(func: eq(User.{{.fieldid}}, "{{.userid}}")) {
-                User.username
-                User.name
-                User.password
-                User.roles {
-                    Node.nameid
-                    Node.role_type
-                }
-            }
+            all(func: eq(User.{{.fieldid}}, "{{.userid}}")) 
+                {{.payload}}
         }`,
     }
 
@@ -288,6 +281,10 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     return res, nil
 }
 
+//
+// GraphQL Interface
+//
+
 // Run a query Dgraph Graphql endpoing and map the result in the given data structure
 func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{}) error {
     // Get the query
@@ -312,31 +309,30 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
         return &GraphQLError{string(err)}
     }
 
-    // @TODO: compare performance betweeb marshall/unmarshall vs mapstructure.:
-    // @TODO: handle graphql alias with mapstructure handlers (see hook in dgraph_resolver
     var config *mapstructure.DecoderConfig
-    var decodeHook interface{}
     if op == "query" || op == "rawQuery" {
         // Decoder config to handle aliased request
-        decodeHook = func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-            if to == reflect.Struct {
-                nv := tools.CleanAliasedMap(v.(map[string]interface{}))
-                return nv, nil
-            }
-            return v, nil
-        }
-
+        // @DEBUG: see bug #3c3f1f7
         config = &mapstructure.DecoderConfig{
             Result: data,
             TagName: "json",
-            DecodeHook: decodeHook,
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanAliasedMap(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
         }
     } else {
         config = &mapstructure.DecoderConfig{TagName: "json", Result: data}
     }
     
     decoder, err := mapstructure.NewDecoder(config)
-    decoder.Decode(res.Data[queryName])
+    if err != nil {
+        return err
+    }
+    err = decoder.Decode(res.Data[queryName])
     if err != nil {
         return err
     }
@@ -345,12 +341,10 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
 
 
 //
-// Gprc/Graphql+- methods
+// Gprc/Graphql+- requests
 //
 
-
-// Count count the number of object in fieldName attribute for given type and id,
-// by using the gprc/Grapql+- client.
+// Count count the number of object in fieldName attribute for given type and id
 // Returns: int or -1 if nothing is found.
 func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
     // Format Query
@@ -364,7 +358,7 @@ func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
 	}
 
     // Decode response
-	var r RespCount
+	var r GpmRespCount
 	err = json.Unmarshal(res.Json, &r)
 	if err != nil {
 		panic(err)
@@ -382,7 +376,7 @@ func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
     return values[0]
 }
 
-// Probe if an object exists using the gprc/Grapql+- client
+// Probe if an object exists.
 func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, error) {
     // Format Query
     maps := map[string]string{
@@ -395,7 +389,7 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
     }
 
     // Decode response
-    var r Resp
+    var r GpmResp
 	err = json.Unmarshal(res.Json, &r)
 	if err != nil {
         return false, err
@@ -403,19 +397,13 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
     return len(r.All) > 0, nil
 }
 
-//
-// User methods
-//
-
-
-// Returns user with Graphql+-
-//func (dg Dgraph) GetUser(fieldid string, userid string, user interface{}) error {
-func (dg Dgraph) GetUser(fieldid string, userid string ) (*model.UserCtx, error) {
-    var user model.UserCtx
+// Returns the user context
+func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) {
     // Format Query
     maps := map[string]string{
         "fieldid":fieldid,
         "userid":userid,
+        "payload": model.UserCtxPayloadDg,
     }
     // Send request
     res, err := dg.QueryGpm("getUser", maps)
@@ -424,41 +412,48 @@ func (dg Dgraph) GetUser(fieldid string, userid string ) (*model.UserCtx, error)
     }
 
     // Decode response
-    var r Resp
+    var r GpmResp
 	err = json.Unmarshal(res.Json, &r)
 	if err != nil {
         return nil, err
 	}
 
+    var user model.UserCtx
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple user with same @id: %s, %s", fieldid, userid)
     } else if len(r.All) == 1 {
-        rRaw, err := json.Marshal(r.All[0])
+        config := &mapstructure.DecoderConfig{
+            Result: &user,
+            TagName: "json",
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
+        }
+        decoder, err := mapstructure.NewDecoder(config)
         if err != nil {
             return nil, err
         }
-        userDg := model.UserCtxDg{}
-        err = json.Unmarshal(rRaw, &userDg)
+        err = decoder.Decode(r.All[0])
         if err != nil {
             return nil, err
         }
-        user = model.UserCtx(userDg)
     }
     return &user, nil
 }
 
-// AddUser add user with a Graphql
-func (dg Dgraph) AddUser(input model.AddUserInput) (*model.UserCtx,  error) {
-    var user model.UserCtx
+//
+// Graphql requests
+//
 
+// AddUser add a new user
+func (dg Dgraph) AddUser(input model.AddUserInput) error {
     queryName := "addUser"
     inputType := "AddUserInput"
-    queryGraph := `user {
-        username name password
-        roles {
-            rootnameid nameid role_type
-        }
-    } `
+    queryGraph := `user { id } `
 
     // Just One User
     inputs, _ := json.Marshal([]model.AddUserInput{input})
@@ -475,19 +470,21 @@ func (dg Dgraph) AddUser(input model.AddUserInput) (*model.UserCtx,  error) {
     userDGql := model.AddUserPayload{}
     err := dg.QueryGql("add", reqInput, &userDGql)
     if err != nil {
-        return nil, err
+        return err
     }
 
     // Decode response
-    rRaw, err := json.Marshal(userDGql.User[0])
-    if err != nil {
-        return nil, err
-    }
-    err = json.Unmarshal(rRaw, &user)
-    if err != nil {
-        return nil, err
-    }
-    return &user, nil
+    //var user model.UserCtx
+    //rRaw, err := json.Marshal(userDGql.User[0])
+    //if err != nil {
+    //    return nil, err
+    //}
+    //err = json.Unmarshal(rRaw, &user)
+    //if err != nil {
+    //    return nil, err
+    //}
+    //return &user, nil
+    return nil
 }
 
 

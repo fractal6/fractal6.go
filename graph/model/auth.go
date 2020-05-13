@@ -18,31 +18,31 @@ type UserCreds struct {
     Password string  `json:"password"`
 }
 
-// UserCtx are data encoded in the thoken 
-// (e.g Jwt claims)
+// UserCtx are data encoded in the token (e.g Jwt claims)
 type UserCtx struct {
-    Username string   `json:"username"`
-    Name     *string  `json:"name"`
-    Passwd   string   `json:"password"` // hash
-	Roles    []Role   `json:"roles"`
+    Username string     `json:"username"`
+    Name     *string    `json:"name"`
+    Passwd   string     `json:"password"` // hash
+    Rights   UserRights `json:"rights"`
+	Roles    []Role     `json:"roles"`
 }
 type Role struct {
     Rootnameid string  `json:"rootnameid"` 
     Nameid string      `json:"nameid"` 
+    Name string        `json:"name"` 
     RoleType RoleType  `json:"role_type"` 
 }
 
-//
-// Dgraph copy with their own json tag
-//
-type UserCtxDg struct {
-    Username string   `json:"User.username"`
-    Name     *string  `json:"User.name"`
-    Passwd   string   `json:"User.password"` // hash
-	Roles    []Role   `json:"User.roles"`
-}
-type RoleDg struct {
-    Rootnameid string  `json:"Node.rootnameid"` 
-    Nameid string      `json:"Node.nameid"` 
-    RoleType string    `json:"Node.role_type"` 
-}
+// UserCtx Payload for Dgraph query
+var UserCtxPayloadDg string = `{
+    User.username
+    User.name
+    User.password
+    User.rights {expand(_all_)}
+    User.roles {
+        Node.rootnameid
+        Node.nameid
+        Node.name
+        Node.role_type
+    }
+}`

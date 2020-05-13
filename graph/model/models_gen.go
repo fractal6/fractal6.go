@@ -50,8 +50,8 @@ type AddNodeInput struct {
 	Parent       *NodeRef      `json:"parent,omitempty"`
 	Children     []*NodeRef    `json:"children,omitempty"`
 	Type         NodeType      `json:"type_,omitempty"`
-	Name         string        `json:"name,omitempty"`
 	Nameid       string        `json:"nameid,omitempty"`
+	Name         string        `json:"name,omitempty"`
 	Rootnameid   string        `json:"rootnameid,omitempty"`
 	Mandate      *MandateRef   `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
@@ -91,22 +91,33 @@ type AddTensionPayload struct {
 }
 
 type AddUserInput struct {
-	CreatedAt      string     `json:"createdAt,omitempty"`
-	Username       string     `json:"username,omitempty"`
-	Email          string     `json:"email,omitempty"`
-	EmailHash      *string    `json:"emailHash,omitempty"`
-	EmailValidated bool       `json:"emailValidated"`
-	Name           *string    `json:"name,omitempty"`
-	Password       string     `json:"password,omitempty"`
-	Roles          []*NodeRef `json:"roles,omitempty"`
-	BackedRoles    []*NodeRef `json:"backed_roles,omitempty"`
-	Bio            *string    `json:"bio,omitempty"`
-	Utc            *string    `json:"utc,omitempty"`
+	CreatedAt      string         `json:"createdAt,omitempty"`
+	Username       string         `json:"username,omitempty"`
+	Email          string         `json:"email,omitempty"`
+	EmailHash      *string        `json:"emailHash,omitempty"`
+	EmailValidated bool           `json:"emailValidated"`
+	Name           *string        `json:"name,omitempty"`
+	Password       string         `json:"password,omitempty"`
+	Rights         *UserRightsRef `json:"rights,omitempty"`
+	Roles          []*NodeRef     `json:"roles,omitempty"`
+	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
+	Bio            *string        `json:"bio,omitempty"`
+	Utc            *string        `json:"utc,omitempty"`
 }
 
 type AddUserPayload struct {
 	User    []*User `json:"user,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type AddUserRightsInput struct {
+	CanLogin      bool `json:"canLogin"`
+	CanCreateRoot bool `json:"canCreateRoot"`
+}
+
+type AddUserRightsPayload struct {
+	Userrights []*UserRights `json:"userrights,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type Comment struct {
@@ -287,8 +298,8 @@ type Node struct {
 	Parent       *Node      `json:"parent,omitempty"`
 	Children     []*Node    `json:"children,omitempty"`
 	Type         NodeType   `json:"type_,omitempty"`
-	Name         string     `json:"name,omitempty"`
 	Nameid       string     `json:"nameid,omitempty"`
+	Name         string     `json:"name,omitempty"`
 	Rootnameid   string     `json:"rootnameid,omitempty"`
 	Mandate      *Mandate   `json:"mandate,omitempty"`
 	TensionsOut  []*Tension `json:"tensions_out,omitempty"`
@@ -307,8 +318,8 @@ type NodeFilter struct {
 	ID         []string          `json:"id,omitempty"`
 	CreatedAt  *DateTimeFilter   `json:"createdAt,omitempty"`
 	Type       *NodeTypeHash     `json:"type_,omitempty"`
-	Name       *StringTermFilter `json:"name,omitempty"`
 	Nameid     *StringHashFilter `json:"nameid,omitempty"`
+	Name       *StringTermFilter `json:"name,omitempty"`
 	Rootnameid *StringHashFilter `json:"rootnameid,omitempty"`
 	IsRoot     *bool             `json:"isRoot"`
 	Skills     *StringTermFilter `json:"skills,omitempty"`
@@ -351,8 +362,8 @@ type NodeRef struct {
 	Parent       *NodeRef      `json:"parent,omitempty"`
 	Children     []*NodeRef    `json:"children,omitempty"`
 	Type         *NodeType     `json:"type_,omitempty"`
-	Name         *string       `json:"name,omitempty"`
 	Nameid       *string       `json:"nameid,omitempty"`
+	Name         *string       `json:"name,omitempty"`
 	Rootnameid   *string       `json:"rootnameid,omitempty"`
 	Mandate      *MandateRef   `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef `json:"tensions_out,omitempty"`
@@ -573,18 +584,19 @@ type UpdateUserPayload struct {
 }
 
 type User struct {
-	ID             string  `json:"id,omitempty"`
-	CreatedAt      string  `json:"createdAt,omitempty"`
-	Username       string  `json:"username,omitempty"`
-	Email          string  `json:"email,omitempty"`
-	EmailHash      *string `json:"emailHash,omitempty"`
-	EmailValidated bool    `json:"emailValidated"`
-	Name           *string `json:"name,omitempty"`
-	Password       string  `json:"password,omitempty"`
-	Roles          []*Node `json:"roles,omitempty"`
-	BackedRoles    []*Node `json:"backed_roles,omitempty"`
-	Bio            *string `json:"bio,omitempty"`
-	Utc            *string `json:"utc,omitempty"`
+	ID             string      `json:"id,omitempty"`
+	CreatedAt      string      `json:"createdAt,omitempty"`
+	Username       string      `json:"username,omitempty"`
+	Email          string      `json:"email,omitempty"`
+	EmailHash      *string     `json:"emailHash,omitempty"`
+	EmailValidated bool        `json:"emailValidated"`
+	Name           *string     `json:"name,omitempty"`
+	Password       string      `json:"password,omitempty"`
+	Rights         *UserRights `json:"rights,omitempty"`
+	Roles          []*Node     `json:"roles,omitempty"`
+	BackedRoles    []*Node     `json:"backed_roles,omitempty"`
+	Bio            *string     `json:"bio,omitempty"`
+	Utc            *string     `json:"utc,omitempty"`
 }
 
 type UserFilter struct {
@@ -603,31 +615,43 @@ type UserOrder struct {
 }
 
 type UserPatch struct {
-	CreatedAt      *string    `json:"createdAt,omitempty"`
-	Email          *string    `json:"email,omitempty"`
-	EmailHash      *string    `json:"emailHash,omitempty"`
-	EmailValidated *bool      `json:"emailValidated"`
-	Name           *string    `json:"name,omitempty"`
-	Password       *string    `json:"password,omitempty"`
-	Roles          []*NodeRef `json:"roles,omitempty"`
-	BackedRoles    []*NodeRef `json:"backed_roles,omitempty"`
-	Bio            *string    `json:"bio,omitempty"`
-	Utc            *string    `json:"utc,omitempty"`
+	CreatedAt      *string        `json:"createdAt,omitempty"`
+	Email          *string        `json:"email,omitempty"`
+	EmailHash      *string        `json:"emailHash,omitempty"`
+	EmailValidated *bool          `json:"emailValidated"`
+	Name           *string        `json:"name,omitempty"`
+	Password       *string        `json:"password,omitempty"`
+	Rights         *UserRightsRef `json:"rights,omitempty"`
+	Roles          []*NodeRef     `json:"roles,omitempty"`
+	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
+	Bio            *string        `json:"bio,omitempty"`
+	Utc            *string        `json:"utc,omitempty"`
 }
 
 type UserRef struct {
-	ID             *string    `json:"id,omitempty"`
-	CreatedAt      *string    `json:"createdAt,omitempty"`
-	Username       *string    `json:"username,omitempty"`
-	Email          *string    `json:"email,omitempty"`
-	EmailHash      *string    `json:"emailHash,omitempty"`
-	EmailValidated *bool      `json:"emailValidated"`
-	Name           *string    `json:"name,omitempty"`
-	Password       *string    `json:"password,omitempty"`
-	Roles          []*NodeRef `json:"roles,omitempty"`
-	BackedRoles    []*NodeRef `json:"backed_roles,omitempty"`
-	Bio            *string    `json:"bio,omitempty"`
-	Utc            *string    `json:"utc,omitempty"`
+	ID             *string        `json:"id,omitempty"`
+	CreatedAt      *string        `json:"createdAt,omitempty"`
+	Username       *string        `json:"username,omitempty"`
+	Email          *string        `json:"email,omitempty"`
+	EmailHash      *string        `json:"emailHash,omitempty"`
+	EmailValidated *bool          `json:"emailValidated"`
+	Name           *string        `json:"name,omitempty"`
+	Password       *string        `json:"password,omitempty"`
+	Rights         *UserRightsRef `json:"rights,omitempty"`
+	Roles          []*NodeRef     `json:"roles,omitempty"`
+	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
+	Bio            *string        `json:"bio,omitempty"`
+	Utc            *string        `json:"utc,omitempty"`
+}
+
+type UserRights struct {
+	CanLogin      bool `json:"canLogin"`
+	CanCreateRoot bool `json:"canCreateRoot"`
+}
+
+type UserRightsRef struct {
+	CanLogin      *bool `json:"canLogin"`
+	CanCreateRoot *bool `json:"canCreateRoot"`
 }
 
 type CommentOrderable string
@@ -824,8 +848,8 @@ type NodeOrderable string
 
 const (
 	NodeOrderableCreatedAt    NodeOrderable = "createdAt"
-	NodeOrderableName         NodeOrderable = "name"
 	NodeOrderableNameid       NodeOrderable = "nameid"
+	NodeOrderableName         NodeOrderable = "name"
 	NodeOrderableRootnameid   NodeOrderable = "rootnameid"
 	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
 	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
@@ -835,8 +859,8 @@ const (
 
 var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableCreatedAt,
-	NodeOrderableName,
 	NodeOrderableNameid,
+	NodeOrderableName,
 	NodeOrderableRootnameid,
 	NodeOrderableNTensionsOut,
 	NodeOrderableNTensionsIn,
@@ -846,7 +870,7 @@ var AllNodeOrderable = []NodeOrderable{
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
+	case NodeOrderableCreatedAt, NodeOrderableNameid, NodeOrderableName, NodeOrderableRootnameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
 		return true
 	}
 	return false

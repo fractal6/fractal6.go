@@ -3,6 +3,7 @@ package tools
 import (
     "reflect"
     "regexp"
+    "strings"
     "github.com/spf13/viper"
 )
 
@@ -22,10 +23,9 @@ func InitViper() {
 }
 
 
-/*
-This function will help you to convert your object from struct to map[string]interface{} based on your JSON tag in your structs.
-Example how to use posted in sample_test.go file.
-*/
+// This function will help you to convert your object from struct to map[string]interface{} based on your JSON tag in your structs.
+// Example how to use posted in sample_test.go file.
+// Use mapstructure instead ?
 func StructToMap(item interface{}) map[string]interface{} {
 
     res := map[string]interface{}{}
@@ -67,6 +67,28 @@ func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
         } else {
             nk = k
         }
+
+        var nv interface{}
+        switch t := v.(type) {
+        case map[string]interface{}:
+            nv = CleanAliasedMap(t)
+        default:
+            nv = t
+        }
+        out[nk] =  nv
+    }
+
+    return out
+
+}
+
+// Keep that last key name name when separated by dot (eg [a.key.name: 10] -> [name: 10])
+func CleanCompositeName(m map[string]interface{})  map[string]interface{} {
+    
+    out := make(map[string]interface{}, len(m))
+    for k, v := range m {
+        ks := strings.Split(k, ".")
+        nk := ks[len(ks) -1]
 
         var nv interface{}
         switch t := v.(type) {

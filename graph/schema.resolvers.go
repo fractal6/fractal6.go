@@ -84,10 +84,7 @@ func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.Manda
 }
 
 func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (data *model.AddUserPayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
-	return data, errors
-	//panic(fmt.Errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (data *model.UpdateUserPayload, errors error) {
@@ -100,6 +97,10 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (data *model.AddUserRightsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
@@ -109,9 +110,6 @@ func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabel
 
 func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
-	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
-	//errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
-	//return data, errors
 }
 
 func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
@@ -172,6 +170,10 @@ func (r *queryResolver) GetUser(ctx context.Context, id *string, username *strin
 func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) (data []*model.User, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
+}
+
+func (r *queryResolver) QueryUserRights(ctx context.Context, first *int, offset *int) (data []*model.UserRights, errors error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetLabel(ctx context.Context, id *string, name *string) (data *model.Label, errors error) {
