@@ -9,6 +9,7 @@ import (
     "fmt"
     "context"
     "reflect"
+    "strings"
     "github.com/99designs/gqlgen/graphql"
 
     gen "zerogov/fractal6.go/graph/generated"
@@ -54,12 +55,13 @@ func Init() gen.Config {
     // User defined directives
     c.Directives.Hidden = hidden
     c.Directives.Count = count
-    c.Directives.Input_maxLength = inputMaxLength
-    c.Directives.Input_ensureType = ensureType
-    c.Directives.Input_hasRole = hasRole 
-    c.Directives.Input_hasRoot = hasRoot
-    c.Directives.InputP_isOwner = isOwner
-    c.Directives.InputP_RO = readOnly
+    c.Directives.Alter_maxLength = inputMaxLength
+    c.Directives.Alter_assertType = assertType
+    c.Directives.Alter_hasRole = hasRole 
+    c.Directives.Alter_hasRoot = hasRoot
+    c.Directives.Add_isOwner = isOwner
+    c.Directives.Patch_isOwner = isOwner
+    c.Directives.Patch_RO = readOnly
     return c
 }
 
@@ -117,7 +119,7 @@ func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver,
     return next(ctx)
 }
 
-func ensureType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
+func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
     v := obj.(model.JsonAtom)[field].(model.JsonAtom)
     return nil, fmt.Errorf("Only Node type is supported, this is not: %T", v )
 }
@@ -133,25 +135,20 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
         return nil, tools.LogErr("@hasRole/userCtx", "Access denied", err)  // Login or signup
     }
 
+    // Special HOOK for:
+    // * addNode: New Orga (Root creation) -> check UserRight.CanCreateRoot
+    // * addNode/updateNode?: Join orga (push Node) -> check if NodeCharac.UserCanJoin is True and if user is not already a member
+    // * addNode/updateNode: Add role and subcircle
     // Check user right for special query
     rc := graphql.GetResolverContext(ctx)
     queryName := rc.Field.Name 
     if queryName == "addNode" {
-        if userCtx.Rights.CanCreateRoot {
-            node := obj.(model.JsonAtom)
-            isRoot :=  node["isRoot"]
-            if isRoot != nil && isRoot.(bool)  {
-
-                if node["parent"] != nil {
-                    return nil, tools.LogErr("@hasRole/rights", "Access denied", fmt.Errorf("Root node can't have a parent."))
-                }
-                if node["nameid"] != node["rootnameid"] {
-                    return nil, tools.LogErr("@hasRole/rights", "Access denied", fmt.Errorf("Root node nameid and rootnameid are different."))
-                }
-
-                println("New orga created !!!")
-                return next(ctx)
-            }
+        ok, err := addNodeHook(userCtx, obj)
+        if ok {
+            return next(ctx)
+        }
+        if err != nil {
+            return nil, tools.LogErr("@hasRole/addNode", "Access denied", err)
         }
     }
 
@@ -174,14 +171,14 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
         if ok {
             return next(ctx)
         }
+        if err != nil {
+            return nil, tools.LogErr("@hasRole/checkRole", "Access denied", err)
+        }
     }
 
-    if err != nil {
-        return nil, tools.LogErr("@hasRole/checkRole", "Access denied", err)
-    }
     // Format output to get to be able to format a links in a frontend.
     // @DEBUG: get rootnameid from nameid
-    e := fmt.Errorf("Contact a coordinator to access this ressource")
+    e := fmt.Errorf("Please, join this organisation or contact a coordinator to access this ressource.")
     return nil, tools.LogErr("@hasRole", "Access denied", e)
 }
 
@@ -200,13 +197,13 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
         if ok {
             return next(ctx)
         }
+        if err != nil {
+            return nil, tools.LogErr("@hasRoot", "Access denied", err)
+        }
     }
 
-    if err != nil {
-        return nil, tools.LogErr("@hasRoot", "Access denied", err)
-    }
     // Format output to get to be able to format a links in a frontend.
-    e := fmt.Errorf("Contact a coordinator to access this ressource")
+    e := fmt.Errorf("Please, join this organisation or contact a coordinator to access this ressource.")
     return nil, tools.LogErr("@hasRoot", "Access denied", e)
 }
 
@@ -222,13 +219,14 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, userFi
     }
 
     // Get attributes and check everything is ok
-    var userObj map[string]interface{}
+    var userObj model.JsonAtom
     var f string
     if userField == nil {
         f = "user"
         userObj[f] = obj
     } else {
         f = *userField
+        userObj = obj.(model.JsonAtom)
     }
 
     ok, err := checkUserOwnership(userCtx, f, userObj)
@@ -256,7 +254,7 @@ func checkUserOwnership(userCtx model.UserCtx, userField string, userObj interfa
     user := userObj.(model.JsonAtom)[userField]
     var userid string
     if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        println("user unknown, need a database request here !!!")
+        println("User unknown, need a database request here...")
         return false, nil
     } else {
         userid = user.(model.JsonAtom)["username"].(string)
@@ -270,23 +268,19 @@ func checkUserOwnership(userCtx model.UserCtx, userField string, userObj interfa
 
 func checkUserRole(userCtx model.UserCtx, nodeField string, nodeObj interface{}, role model.RoleType) (bool, error) {
     // Check that nodes are present
-    objSource :=  nodeObj.(model.JsonAtom)
-    nodeTarget_ :=  objSource[nodeField]
-
+    nodeTarget_ := getNestedObj(nodeObj, nodeField)
     if nodeTarget_ == nil {
-        err := fmt.Errorf("node target unknown, need a database request here !!!")
-        return false, tools.LogErr(fmt.Sprintf("@hasRole/node undefined (n:%s)", nodeField), "Access denied", err)
+        return false, fmt.Errorf("Node target unknown(%s), need a database request here...", nodeField)
     }
-    nodeTarget := nodeTarget_.(model.JsonAtom)
 
     // Extract node identifier
-    nameid := nodeTarget["nameid"]
-    if nameid == "" {
-        err := fmt.Errorf("node target unknown, need a database request here !!!")
-        return false, tools.LogErr(fmt.Sprintf("@hasRole/fieldid undefined (n:%s)", nodeField), "Access denied", err)
+    nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
+    if nameid_ == nil {
+        return false, fmt.Errorf("Node target unknown(nameid), need a database request here...")
     }
 
     // Search for rights
+    nameid := nameid_.(string)
     for _, ur := range userCtx.Roles {
         if ur.Nameid == nameid && ur.RoleType == role {
             return true, nil
@@ -297,22 +291,19 @@ func checkUserRole(userCtx model.UserCtx, nodeField string, nodeObj interface{},
 
 func checkUserRoot(userCtx model.UserCtx, nodeField string, nodeObj interface{}) (bool, error) {
     // Check that nodes are present
-    objSource :=  nodeObj.(model.JsonAtom)
-    nodeTarget_ :=  objSource[nodeField]
+    nodeTarget_ := getNestedObj(nodeObj, nodeField)
     if nodeTarget_ == nil {
-        err := fmt.Errorf("node target unknown, need a database request here !!!")
-        return false, tools.LogErr(fmt.Sprintf("@hasRole/node undefined (n:%s)", nodeField), "Access denied", err)
+        return false, fmt.Errorf("Node target unknown(%s), need a database request here...", nodeField)
     }
-    nodeTarget := nodeTarget_.(model.JsonAtom)
 
     // Extract node identifiers
-    rootnameid := nodeTarget["rootnameid"].(string)
-    if rootnameid == "" {
-        err := fmt.Errorf("node target unknown, need a database request here !!!")
-        return false, tools.LogErr(fmt.Sprintf("@hasRole/fieldid undefined (n:%s)", nodeField), "Access denied", err)
+    rootnameid_ := nodeTarget_.(model.JsonAtom)["rootnameid"]
+    if rootnameid_ == nil {
+        return false, fmt.Errorf("node target unknown (rootnameid), need a database request here !!!")
     }
 
     // Search for rights
+    rootnameid := rootnameid_.(string)
     for _, ur := range userCtx.Roles {
         if ur.Rootnameid == rootnameid  {
             return true, nil
@@ -320,4 +311,52 @@ func checkUserRoot(userCtx model.UserCtx, nodeField string, nodeObj interface{})
     }
 
     return false, nil
+}
+
+func addNodeHook(u model.UserCtx, nodeObj interface{}) (bool, error) {
+    var ok bool = false
+    var err error
+
+    node := nodeObj.(model.JsonAtom)
+    isRoot := node["isRoot"]
+    if isRoot != nil && isRoot.(bool) {
+        // Create new organisation
+        if u.Rights.CanCreateRoot {
+            if node["parent"] != nil {
+                err = fmt.Errorf("Root node can't have a parent.")
+            } else if node["nameid"] != node["rootnameid"] {
+                err = fmt.Errorf("Root node nameid and rootnameid are different.")
+            } else {
+                ok = true
+            }
+        } else {
+            err = fmt.Errorf("You are not authorized to create new organisation.")
+        }
+    } else {
+        // Push a new node
+        // pass
+    }
+
+    return ok, err
+}
+
+//
+// Utils
+//
+func getNestedObj(obj interface {}, field string) interface{} {
+    var source model.JsonAtom
+    var target interface{}
+
+    source =  obj.(model.JsonAtom)
+    fields := strings.Split(field, ".")
+
+    for _, f := range fields {
+        target = source[f]
+        if target == nil {
+            return nil
+        }
+        source = target.(model.JsonAtom)
+    }
+
+    return target
 }

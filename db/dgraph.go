@@ -102,7 +102,6 @@ func GetDB() *Dgraph {
 
 func initDB() *Dgraph {
     tools.InitViper()
-
     HOSTDB := viper.GetString("db.host")
     PORTDB := viper.GetString("db.port_graphql")
     PORTGRPC := viper.GetString("db.port_grpc")

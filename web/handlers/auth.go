@@ -11,10 +11,11 @@ import (
 )
 
 
+
 // Login create and pass a token to the authenticated user.
 func Login(w http.ResponseWriter, r *http.Request) {
 	var creds model.UserCreds
-    var userCtx *model.UserCtx
+    var uctx *model.UserCtx
 
 	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
@@ -27,7 +28,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
     // === This is protected ===
     // Returns the user ctx if authenticated.
-    userCtx, err = auth.GetAuthUserCtx(creds)
+    uctx, err = auth.GetAuthUserCtx(creds)
     if err != nil {
 		// Credentials validation error
 		//w.WriteHeader(http.StatusUnauthorized)
@@ -35,8 +36,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-	// Create a new token string
-	tokenString, err := auth.NewUserToken(*userCtx)
+    // Check if the user has login right
+    if !uctx.Rights.CanLogin  {
+        http.Error(w, auth.ErrCantLogin.Error(), 401)
+    }
+
+	// Create a new cookie with token
+    httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
 		//w.WriteHeader(http.StatusInternalServerError)
@@ -46,18 +52,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
-	http.SetCookie(w, &http.Cookie{
-		Name: "jwt",
-		Value: tokenString,
-        Path: "/", 
-        //HttpOnly: true,
-        //Secure: true, // Do Someone know what this flag do ???
-		//Expires: expirationTime,
-        //MaxAge: 90000,
-	})
+	http.SetCookie(w, httpCookie)
 
     // Return the user context
-    data, err := json.Marshal(userCtx)
+    data, err := json.Marshal(uctx)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -69,7 +67,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 // Signup register a new user and gives it a token.
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var creds model.UserCreds
-    var userCtx *model.UserCtx
+    var uctx *model.UserCtx
 
 	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
@@ -87,7 +85,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
     }
 
     // Upsert new user
-    userCtx, err = auth.CreateNewUser(creds)
+    uctx, err = auth.CreateNewUser(creds)
     if err != nil {
 		// Credentials validation error
         switch err.(type) {
@@ -99,8 +97,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-	// Create a new token string
-	tokenString, err := auth.NewUserToken(*userCtx)
+	// Create a new cookie with token
+    httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
         http.Error(w, err.Error(), 500)
@@ -109,18 +107,10 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
-	http.SetCookie(w, &http.Cookie{
-		Name: "jwt",
-		Value: tokenString,
-        Path: "/", 
-        //HttpOnly: true,
-        //Secure: true, // Do Someone know what this flag do ???
-		//Expires: expirationTime,
-        //MaxAge: 90000,
-	})
+	http.SetCookie(w, httpCookie)
 
     // Return the user context
-    data, err := json.Marshal(userCtx)
+    data, err := json.Marshal(uctx)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return

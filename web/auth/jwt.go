@@ -7,6 +7,7 @@ import (
     "errors"
     "context"
     "encoding/json"
+    "net/http"
     //"github.com/mitchellh/mapstructure"
     jwt "github.com/dgrijalva/jwt-go"
     "github.com/go-chi/jwtauth"
@@ -37,14 +38,13 @@ func (Jwt) New() *Jwt {
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
 	}
     uctx := model.UserCtx{
-        Username: "debugger",
+        Username: "yoda",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true},
         Roles: []model.Role{
             {Rootnameid:"SKU", Nameid:"SKU", RoleType:model.RoleTypeCoordinator},
         },
     }
     token, _ := tk.issue(uctx, time.Hour*24)
-    //token, _ := tk.issue(model.UserCtx{Username:"debugger"}, time.Hour*24)
 	log.Println("DEBUG JWT:", token)
 	return tk
 }
@@ -73,6 +73,26 @@ func GetTokenMaster() *Jwt {
 func NewUserToken(userCtx model.UserCtx) (string, error) {
     token, err := tkMaster.issue(userCtx, time.Hour*1)
     return token, err
+}
+
+// NexuserCookie create an http cookie that embed a token
+func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
+    tokenString, err := NewUserToken(userCtx)
+    if err != nil {
+        return nil, err
+    }
+
+    httpCookie := http.Cookie{
+            Name: "jwt",
+            Value: tokenString,
+            Path: "/", 
+            //HttpOnly: true,
+            //Secure: true, 
+            //Expires: expirationTime,
+            //MaxAge: 90000,
+        }
+
+    return &httpCookie, nil
 }
 
 func ContextWithUserCtx(ctx context.Context) context.Context {

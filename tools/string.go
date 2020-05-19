@@ -27,7 +27,7 @@ func CleanString(data string, quote bool) string {
 }
 
 func ToGoNameFormat(name string) string {
-    var l  []string
+    var l []string
     for _, s := range strings.Split(name, "_") {
         l = append(l, strings.Title(s))
     }

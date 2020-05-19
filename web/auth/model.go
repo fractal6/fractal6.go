@@ -14,52 +14,58 @@ import (
 // Library errors
 var (
     ErrBadUsername = errors.New(`{
-        "user_ctx":{
-            "field": "username",
-            "msg":"Bad username"
-        }
+        "errors":[{
+            "message":"Bad username"
+            "location": "username",
+        }]
     }`)
     ErrBadEmail = errors.New(`{
-        "user_ctx":{
-            "field": "email",
-            "msg":"Bad email"
-        }
+        "errors":[{
+            "message":"Bad email"
+            "location": "email",
+        }]
     }`)
     ErrBadName = errors.New(`{
-        "user_ctx":{
-            "field": "name",
-            "msg":"Bad name"
-        }
+        "errors":[{
+            "message":"Bad name"
+            "location": "name",
+        }]
     }`)
     ErrBadPassword = errors.New(`{
-        "user_ctx":{
-            "field": "password",
-            "msg":"Bad Password"
-        }
+        "errors":[{
+            "message":"Bad Password"
+            "location": "password",
+        }]
     }`)
     ErrUsernameExist = errors.New(`{
-        "user_ctx":{
-            "field": "username",
-            "msg":"Username already exists"
-        }
+        "errors":[{
+            "message":"Username already exists"
+            "location": "username",
+        }]
     }`)
     ErrEmailExist = errors.New(`{
-        "user_ctx":{
-            "field": "email",
-            "msg":"Email already exists"
-        }
+        "errors":[{
+            "message":"Email already exists"
+            "location": "email",
+        }]
     }`)
     ErrPasswordTooShort = errors.New(`{
-        "user_ctx":{
-            "field": "password",
-            "msg":"Password too short"
-        }
+        "errors":[{
+            "message":"Password too short"
+            "location": "password",
+        }]
     }`)
     ErrPasswordTooLong = errors.New(`{
-        "user_ctx":{
-            "field": "password",
-            "msg":"Password too long"
-        }
+        "errors":[{
+            "message":"Password too long"
+            "location": "password",
+        }]
+    }`)
+    // User Rights
+    ErrCantLogin = errors.New(`{
+        "errors":[{
+            "message": "You are not authorized to login",
+        }]
     }`)
 )
 
