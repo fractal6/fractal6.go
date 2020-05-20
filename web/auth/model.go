@@ -15,56 +15,57 @@ import (
 var (
     ErrBadUsername = errors.New(`{
         "errors":[{
-            "message":"Bad username"
-            "location": "username",
+            "message":"Bad username",
+            "location": "username"
         }]
     }`)
     ErrBadEmail = errors.New(`{
         "errors":[{
-            "message":"Bad email"
-            "location": "email",
+            "message":"Bad email",
+            "location": "email"
         }]
     }`)
     ErrBadName = errors.New(`{
         "errors":[{
-            "message":"Bad name"
-            "location": "name",
+            "message":"Bad name",
+            "location": "name"
         }]
     }`)
     ErrBadPassword = errors.New(`{
         "errors":[{
-            "message":"Bad Password"
-            "location": "password",
+            "message":"Bad Password",
+            "location": "password"
         }]
     }`)
     ErrUsernameExist = errors.New(`{
         "errors":[{
-            "message":"Username already exists"
-            "location": "username",
+            "message":"Username already exists",
+            "location": "username"
         }]
     }`)
     ErrEmailExist = errors.New(`{
         "errors":[{
-            "message":"Email already exists"
-            "location": "email",
+            "message":"Email already exists",
+            "location": "email"
         }]
     }`)
     ErrPasswordTooShort = errors.New(`{
         "errors":[{
-            "message":"Password too short"
-            "location": "password",
+            "message":"Password too short",
+            "location": "password"
         }]
     }`)
     ErrPasswordTooLong = errors.New(`{
         "errors":[{
-            "message":"Password too long"
-            "location": "password",
+            "message":"Password too long",
+            "location": "password"
         }]
     }`)
     // User Rights
     ErrCantLogin = errors.New(`{
         "errors":[{
             "message": "You are not authorized to login",
+            "location": ""
         }]
     }`)
 )

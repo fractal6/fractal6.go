@@ -141,7 +141,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     // * addNode/updateNode: Add role and subcircle
     // Check user right for special query
     rc := graphql.GetResolverContext(ctx)
-    queryName := rc.Field.Name 
+    queryName := rc.Field.Name
     if queryName == "addNode" {
         ok, err := addNodeHook(userCtx, obj)
         if ok {
@@ -316,15 +316,18 @@ func checkUserRoot(userCtx model.UserCtx, nodeField string, nodeObj interface{})
 func addNodeHook(u model.UserCtx, nodeObj interface{}) (bool, error) {
     var ok bool = false
     var err error
-
     node := nodeObj.(model.JsonAtom)
-    isRoot := node["isRoot"]
-    if isRoot != nil && isRoot.(bool) {
-        // Create new organisation
+
+    isRoot := get(node, "isRoot", bool)
+    nameid := get(node, "nameid", string)
+    rootnameid := get(node, "rootnameid", string)
+
+    // Create new organisation Hook
+    if isRoot{
         if u.Rights.CanCreateRoot {
             if node["parent"] != nil {
                 err = fmt.Errorf("Root node can't have a parent.")
-            } else if node["nameid"] != node["rootnameid"] {
+            } else if nameid != rootnameid {
                 err = fmt.Errorf("Root node nameid and rootnameid are different.")
             } else {
                 ok = true
@@ -332,12 +335,27 @@ func addNodeHook(u model.UserCtx, nodeObj interface{}) (bool, error) {
         } else {
             err = fmt.Errorf("You are not authorized to create new organisation.")
         }
-    } else {
-        // Push a new node
-        // pass
+        return ok, err
+    } 
+    
+    // New member hook
+    nodeType := get(node, "type_", model.NodeType)
+    roleType := get(node, "role_type", model.RoleType)
+    parent := get(node, "parent", model.JsonAtom)
+    //charac := node["charac"] // Get node characteristic with a DB request and set it in the Ctx !
+    if roleType == string(model.RoleTypeGuest) {
+        if rootnameid != parent["nameid"] {
+            err = fmt.Errorf("Guest user can only join the root circle.")
+        } else if nodeType != model.NodeTypeRole {
+            // @DEBUG; this will be obsolete with union schema
+            err = fmt.Errorf("Circle role with role_type field set should of type RoleType.")
+        } else {
+            ok = true
+        }
+        return ok, err
     }
 
-    return ok, err
+    return false, fmt.Errorf("Not implemented addNode request.")
 }
 
 //
@@ -359,4 +377,12 @@ func getNestedObj(obj interface {}, field string) interface{} {
     }
 
     return target
+}
+
+func get(obj model.JsonAtom, field string, t interface{}) interface{} {
+    v := obj[field]
+    if v == nil {
+        return new t
+
+    return t{}
 }

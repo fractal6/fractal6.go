@@ -18,11 +18,12 @@ import (
 
 func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
     // How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
-    // for k, a := range rslvCtx.Args {
+    // for k, a := range rc.Args {
     
     /* Rebuild the Graphql inputs request from this context */
-    rslvCtx := graphql.GetResolverContext(ctx)
-    queryName := rslvCtx.Path().String() // rslvCtx.Field.Name
+    rc := graphql.GetResolverContext(ctx)
+    // rc.Field.Name
+    queryName := rc.Path().String()
 
     // Build the graphql raw request
     reqInput := map[string]string{
@@ -44,8 +45,8 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
     mutCtx := ctx.Value("mutation_context").(MutationContext)
 
     /* Rebuild the Graphql inputs request from this context */
-    rslvCtx := graphql.GetResolverContext(ctx)
-    queryName := rslvCtx.Field.Name
+    rc := graphql.GetResolverContext(ctx)
+    queryName := rc.Field.Name
 
     // Format inputs
     inputs, _ := json.Marshal(ipts)
@@ -53,7 +54,7 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
     // in order to to get the struct in the scema.resolver caller.
 
     // Format collected fields
-    inputType := strings.Split(fmt.Sprintf("%T", rslvCtx.Args[mutCtx.argName]), ".")[1]
+    inputType := strings.Split(fmt.Sprintf("%T", rc.Args[mutCtx.argName]), ".")[1]
     queryGraph := strings.Join(GetPreloads(ctx), " ")
 
     // Build the graphql raw request
