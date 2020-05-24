@@ -318,9 +318,9 @@ func addNodeHook(u model.UserCtx, nodeObj interface{}) (bool, error) {
     var err error
     node := nodeObj.(model.JsonAtom)
 
-    isRoot := get(node, "isRoot", bool)
-    nameid := get(node, "nameid", string)
-    rootnameid := get(node, "rootnameid", string)
+    isRoot := get(node, "isRoot", false).(bool)
+    nameid := get(node, "nameid", "").(string)
+    rootnameid := get(node, "rootnameid", "").(string)
 
     // Create new organisation Hook
     if isRoot{
@@ -339,11 +339,11 @@ func addNodeHook(u model.UserCtx, nodeObj interface{}) (bool, error) {
     } 
     
     // New member hook
-    nodeType := get(node, "type_", model.NodeType)
-    roleType := get(node, "role_type", model.RoleType)
-    parent := get(node, "parent", model.JsonAtom)
+    nodeType := model.NodeType(get(node, "type_", "Circle").(string))
+    roleType := model.RoleType(get(node, "role_type", "Guest").(string))
+    parent := get(node, "parent", model.JsonAtom{}).(model.JsonAtom)
     //charac := node["charac"] // Get node characteristic with a DB request and set it in the Ctx !
-    if roleType == string(model.RoleTypeGuest) {
+    if roleType == model.RoleTypeGuest {
         if rootnameid != parent["nameid"] {
             err = fmt.Errorf("Guest user can only join the root circle.")
         } else if nodeType != model.NodeTypeRole {
@@ -379,10 +379,13 @@ func getNestedObj(obj interface {}, field string) interface{} {
     return target
 }
 
-func get(obj model.JsonAtom, field string, t interface{}) interface{} {
+func get(obj model.JsonAtom, field string, deflt interface{}) interface{} {
     v := obj[field]
     if v == nil {
-        return new t
+        return deflt
+    }
 
-    return t{}
+    return v
+
+
 }

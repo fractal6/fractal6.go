@@ -212,5 +212,20 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     return userCtx, nil
 }
 
+// GetAuthUserFromCtx returns the user ctx from a db.grpc request, 
+// from the given user context.
+func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
+    fieldId := "username"
+    userId := uctx.Username
 
+    // Try getting userCtx
+    DB := db.GetDB()
+    userCtx, err := DB.GetUser(fieldId, userId)
+    if err != nil {
+        return nil, err 
+    }
 
+    // Hide the password !
+    userCtx.Passwd = ""
+    return userCtx, nil
+}

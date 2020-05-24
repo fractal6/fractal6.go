@@ -88,8 +88,9 @@ func RunServer() {
     // Auth handlers 
     r.Group(func(r chi.Router) {
         //r.Use(middle6.EnsurePostMethod)
-        r.Post("/login", handle6.Login)
         r.Post("/signup", handle6.Signup)
+        r.Post("/login", handle6.Login)
+        r.Post("/tokenack", handle6.TokenAck)
     })
 
     if buildMode == "DEV" {
