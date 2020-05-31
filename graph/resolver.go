@@ -251,15 +251,15 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
 //
 
 func checkUserOwnership(userCtx model.UserCtx, userField string, userObj interface{}) (bool, error) {
+    // Get user ID
     user := userObj.(model.JsonAtom)[userField]
-    var userid string
     if user == nil || user.(model.JsonAtom)["username"] == nil  {
         println("User unknown, need a database request here...")
         return false, nil
-    } else {
-        userid = user.(model.JsonAtom)["username"].(string)
-    }
+    } 
 
+    // Check user ID match
+    userid := user.(model.JsonAtom)["username"].(string)
     if userCtx.Username == userid {
         return true, nil
     }
@@ -321,6 +321,12 @@ func addNodeHook(u model.UserCtx, nodeObj interface{}) (bool, error) {
     isRoot := get(node, "isRoot", false).(bool)
     nameid := get(node, "nameid", "").(string)
     rootnameid := get(node, "rootnameid", "").(string)
+    name := get(node, "name", "").(string)
+
+    err = auth.ValidateNameid(nameid, rootnameid, name)
+    if err != nil {
+        return false, err
+    }
 
     // Create new organisation Hook
     if isRoot{

@@ -13,21 +13,45 @@ import (
 
 // Library errors
 var (
-    ErrBadUsername = errors.New(`{
+    ErrBadNameidFormat = errors.New(`{
         "errors":[{
-            "message":"Bad username",
+            "message":"Bad formating.",
+            "location": "nameid"
+        }]
+    }`)
+    ErrBadUsernameFormat = errors.New(`{
+        "errors":[{
+            "message":"Bad formating.",
             "location": "username"
         }]
     }`)
-    ErrBadEmail = errors.New(`{
+    ErrUsernameTooLong = errors.New(`{
         "errors":[{
-            "message":"Bad email",
+            "message":"Username too long",
+            "location": "username"
+        }]
+    }`)
+    ErrBadNameFormat = errors.New(`{
+        "errors":[{
+            "message":"Bad formating",
+            "location": "name"
+        }]
+    }`)
+    ErrNameTooLong = errors.New(`{
+        "errors":[{
+            "message":"Name too long",
+            "location": "name"
+        }]
+    }`)
+    ErrBadEmailFormat = errors.New(`{
+        "errors":[{
+            "message":"Bad formating",
             "location": "email"
         }]
     }`)
-    ErrBadName = errors.New(`{
+    ErrEmailTooLong = errors.New(`{
         "errors":[{
-            "message":"Bad name",
+            "message":"Name too long",
             "location": "name"
         }]
     }`)
@@ -35,18 +59,6 @@ var (
         "errors":[{
             "message":"Bad Password",
             "location": "password"
-        }]
-    }`)
-    ErrUsernameExist = errors.New(`{
-        "errors":[{
-            "message":"Username already exists",
-            "location": "username"
-        }]
-    }`)
-    ErrEmailExist = errors.New(`{
-        "errors":[{
-            "message":"Email already exists",
-            "location": "email"
         }]
     }`)
     ErrPasswordTooShort = errors.New(`{
@@ -61,6 +73,19 @@ var (
             "location": "password"
         }]
     }`)
+    // Upsert error
+    ErrUsernameExist = errors.New(`{
+        "errors":[{
+            "message":"Username already exists",
+            "location": "username"
+        }]
+    }`)
+    ErrEmailExist = errors.New(`{
+        "errors":[{
+            "message":"Email already exists",
+            "location": "email"
+        }]
+    }`)
     // User Rights
     ErrCantLogin = errors.New(`{
         "errors":[{
@@ -69,8 +94,6 @@ var (
         }]
     }`)
 )
-
-
 
 //
 // Public methods
@@ -89,8 +112,9 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     password := creds.Password
 
     // Validate signin form
-    if len(password) < 8 {
-        return nil, ErrBadPassword
+    err := ValidatePassword(password)
+    if err != nil {
+        return nil, err
     } else if len(username) > 1 {
         if strings.Contains(username, "@") {
             fieldId = "email"
@@ -99,7 +123,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
         }
         userId = username
     } else {
-        return nil, ErrBadUsername
+        return nil, ErrBadUsernameFormat
     }
 
     // Try getting usetCtx
@@ -128,24 +152,27 @@ func ValidateNewUser(creds model.UserCreds) error {
     name := creds.Name
     password := creds.Password
 
-    // Structure check
-    if len(username) < 2 || len(username) > 42 {
-        return ErrBadUsername
+    // Username validation
+    err := ValidateUsername(username)
+    if err != nil { 
+        return err
     }
-    if len(email) < 3 || len(email) > 42 {
-        return ErrBadEmail
+    // Email validation
+    err = ValidateEmail(email)
+    if err != nil { 
+        return err
     }
-    if !strings.Contains(email, ".") || !strings.Contains(email, "@") {
-        return ErrBadEmail
+    // Password validation
+    err = ValidatePassword(password)
+    if err != nil { 
+        return err
     }
-    if name != nil && len(*name) > 100 {
-        return ErrBadName
-    }
-    if len(password) < 8 {
-        return ErrPasswordTooShort
-    }
-    if len(password) > 100 {
-        return ErrPasswordTooLong
+    // Name validation
+    if name != nil {
+        err = ValidateName(*name)
+        if err != nil { 
+            return err
+        }
     }
     // TODO: password complexity check
 
