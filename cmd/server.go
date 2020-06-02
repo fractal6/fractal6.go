@@ -7,12 +7,12 @@ import (
     "github.com/go-chi/chi"
     "github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
-    "github.com/go-chi/jwtauth"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
     //"zerogov/fractal6.go/web"
     "zerogov/fractal6.go/web/auth"
+    "zerogov/fractal6.go/web/middleware/jwtauth"
     handle6 "zerogov/fractal6.go/web/handlers"
     middle6 "zerogov/fractal6.go/web/middleware"
 )

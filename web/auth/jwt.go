@@ -10,9 +10,10 @@ import (
     "net/http"
     //"github.com/mitchellh/mapstructure"
     jwt "github.com/dgrijalva/jwt-go"
-    "github.com/go-chi/jwtauth"
 
+    "zerogov/fractal6.go/web/middleware/jwtauth"
 	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/tools"
 )
 
 var tkMaster *Jwt
@@ -58,7 +59,7 @@ func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
     claims := jwt.MapClaims{ tk.tokenClaim: d }
     jwtauth.SetExpiry(claims, time.Now().Add(t))
 	_, tokenString, err := tk.tokenAuth.Encode(claims)
-	return tokenString, err
+	return tools.Pack64(tokenString), err
 }
 
 //
