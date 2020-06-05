@@ -133,6 +133,10 @@ func initDB() *Dgraph {
             all(func: eq(User.{{.fieldid}}, "{{.userid}}")) 
                 {{.payload}}
         }`,
+        "getNodeCharac": `{
+            all(func: eq(Node.{{.fieldid}}, "{{.objid}}")) 
+                {{.payload}}
+        }`,
     }
 
     // HTTP/Graphql Request Template
@@ -444,6 +448,54 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
     return &user, nil
 }
 
+// Returns the node charac
+func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid":fieldid,
+        "objid":objid,
+        "payload": model.NodeCharacPayloadDg,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getNodeCharac", maps)
+    if err != nil {
+        return  nil, err
+    }
+
+    // Decode response
+    var r GpmResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+        return nil, err
+	}
+
+    var obj model.NodeCharac
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple node charac for @id: %s, %s", fieldid, objid)
+    } else if len(r.All) == 1 {
+        config := &mapstructure.DecoderConfig{
+            Result: &obj,
+            TagName: "json",
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
+        }
+        decoder, err := mapstructure.NewDecoder(config)
+        if err != nil {
+            return nil, err
+        }
+        err = decoder.Decode(r.All[0][model.NodeCharacNF])
+        if err != nil {
+            return nil, err
+        }
+    }
+    return &obj, nil
+}
+
 //
 // Graphql requests
 //
@@ -486,4 +538,31 @@ func (dg Dgraph) AddUser(input model.AddUserInput) error {
     return nil
 }
 
+
+// AddNode add a new node
+func (dg Dgraph) AddNode(input model.AddNodeInput) error {
+    queryName := "addNode"
+    inputType := "AddNodeInput"
+    queryGraph := `node { id } `
+
+    // Just One Node
+    inputs, _ := json.Marshal([]model.AddNodeInput{input})
+
+    // Build the string request
+    reqInput := map[string]string{
+        "QueryName": queryName, // function name (e.g addUser)
+        "InputType": inputType, // input type name (e.g AddUserInput)
+        "QueryGraph": tools.CleanString(queryGraph, true), // output data
+        "InputPayload": string(inputs), // inputs data
+    }
+
+    // Send request
+    nodeDGql := model.AddNodePayload{}
+    err := dg.QueryGql("add", reqInput, &nodeDGql)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
 

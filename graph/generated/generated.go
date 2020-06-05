@@ -40,6 +40,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Add_addNodeHook  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Add_isOwner      func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Alter_assertType func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
 	Alter_hasRole    func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
@@ -73,9 +74,9 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	AddNodeCharachPayload struct {
-		Nodecharach func(childComplexity int, first *int, offset *int) int
-		NumUids     func(childComplexity int) int
+	AddNodeCharacPayload struct {
+		Nodecharac func(childComplexity int, first *int, offset *int) int
+		NumUids    func(childComplexity int) int
 	}
 
 	AddNodePayload struct {
@@ -149,40 +150,40 @@ type ComplexityRoot struct {
 	Mandate struct {
 		CreatedAt        func(childComplexity int) int
 		CreatedBy        func(childComplexity int, filter *model.UserFilter) int
-		Domains          func(childComplexity int, filter *model.PostFilter) int
+		Domains          func(childComplexity int) int
 		ID               func(childComplexity int) int
 		Message          func(childComplexity int) int
 		Purpose          func(childComplexity int) int
-		Responsabilities func(childComplexity int, filter *model.PostFilter) int
+		Responsabilities func(childComplexity int) int
 	}
 
 	Mutation struct {
-		AddComment     func(childComplexity int, input []*model.AddCommentInput) int
-		AddLabel       func(childComplexity int, input []*model.AddLabelInput) int
-		AddMandate     func(childComplexity int, input []*model.AddMandateInput) int
-		AddNode        func(childComplexity int, input []*model.AddNodeInput) int
-		AddNodeCharach func(childComplexity int, input []*model.AddNodeCharachInput) int
-		AddTension     func(childComplexity int, input []*model.AddTensionInput) int
-		AddUser        func(childComplexity int, input []*model.AddUserInput) int
-		AddUserRights  func(childComplexity int, input []*model.AddUserRightsInput) int
-		DeleteComment  func(childComplexity int, filter model.CommentFilter) int
-		DeleteLabel    func(childComplexity int, filter model.LabelFilter) int
-		DeleteMandate  func(childComplexity int, filter model.MandateFilter) int
-		DeleteNode     func(childComplexity int, filter model.NodeFilter) int
-		DeletePost     func(childComplexity int, filter model.PostFilter) int
-		DeleteTension  func(childComplexity int, filter model.TensionFilter) int
-		DeleteUser     func(childComplexity int, filter model.UserFilter) int
-		UpdateComment  func(childComplexity int, input model.UpdateCommentInput) int
-		UpdateLabel    func(childComplexity int, input model.UpdateLabelInput) int
-		UpdateMandate  func(childComplexity int, input model.UpdateMandateInput) int
-		UpdateNode     func(childComplexity int, input model.UpdateNodeInput) int
-		UpdatePost     func(childComplexity int, input model.UpdatePostInput) int
-		UpdateTension  func(childComplexity int, input model.UpdateTensionInput) int
-		UpdateUser     func(childComplexity int, input model.UpdateUserInput) int
+		AddComment    func(childComplexity int, input []*model.AddCommentInput) int
+		AddLabel      func(childComplexity int, input []*model.AddLabelInput) int
+		AddMandate    func(childComplexity int, input []*model.AddMandateInput) int
+		AddNode       func(childComplexity int, input []*model.AddNodeInput) int
+		AddNodeCharac func(childComplexity int, input []*model.AddNodeCharacInput) int
+		AddTension    func(childComplexity int, input []*model.AddTensionInput) int
+		AddUser       func(childComplexity int, input []*model.AddUserInput) int
+		AddUserRights func(childComplexity int, input []*model.AddUserRightsInput) int
+		DeleteComment func(childComplexity int, filter model.CommentFilter) int
+		DeleteLabel   func(childComplexity int, filter model.LabelFilter) int
+		DeleteMandate func(childComplexity int, filter model.MandateFilter) int
+		DeleteNode    func(childComplexity int, filter model.NodeFilter) int
+		DeletePost    func(childComplexity int, filter model.PostFilter) int
+		DeleteTension func(childComplexity int, filter model.TensionFilter) int
+		DeleteUser    func(childComplexity int, filter model.UserFilter) int
+		UpdateComment func(childComplexity int, input model.UpdateCommentInput) int
+		UpdateLabel   func(childComplexity int, input model.UpdateLabelInput) int
+		UpdateMandate func(childComplexity int, input model.UpdateMandateInput) int
+		UpdateNode    func(childComplexity int, input model.UpdateNodeInput) int
+		UpdatePost    func(childComplexity int, input model.UpdatePostInput) int
+		UpdateTension func(childComplexity int, input model.UpdateTensionInput) int
+		UpdateUser    func(childComplexity int, input model.UpdateUserInput) int
 	}
 
 	Node struct {
-		Charach      func(childComplexity int) int
+		Charac       func(childComplexity int) int
 		Children     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		CreatedAt    func(childComplexity int) int
 		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
@@ -205,7 +206,7 @@ type ComplexityRoot struct {
 		Type         func(childComplexity int) int
 	}
 
-	NodeCharach struct {
+	NodeCharac struct {
 		Mode        func(childComplexity int) int
 		UserCanJoin func(childComplexity int) int
 	}
@@ -218,22 +219,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetComment       func(childComplexity int, id string) int
-		GetLabel         func(childComplexity int, id *string, name *string) int
-		GetMandate       func(childComplexity int, id string) int
-		GetNode          func(childComplexity int, id *string, nameid *string) int
-		GetPost          func(childComplexity int, id string) int
-		GetTension       func(childComplexity int, id string) int
-		GetUser          func(childComplexity int, id *string, username *string) int
-		QueryComment     func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		QueryLabel       func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		QueryMandate     func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
-		QueryNode        func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		QueryNodeCharach func(childComplexity int, first *int, offset *int) int
-		QueryPost        func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-		QueryTension     func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		QueryUser        func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		QueryUserRights  func(childComplexity int, first *int, offset *int) int
+		GetComment      func(childComplexity int, id string) int
+		GetLabel        func(childComplexity int, id *string, name *string) int
+		GetMandate      func(childComplexity int, id string) int
+		GetNode         func(childComplexity int, id *string, nameid *string) int
+		GetPost         func(childComplexity int, id string) int
+		GetTension      func(childComplexity int, id string) int
+		GetUser         func(childComplexity int, id *string, username *string) int
+		QueryComment    func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		QueryLabel      func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		QueryMandate    func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
+		QueryNode       func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		QueryNodeCharac func(childComplexity int, first *int, offset *int) int
+		QueryPost       func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		QueryTension    func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		QueryUser       func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		QueryUserRights func(childComplexity int, first *int, offset *int) int
 	}
 
 	Tension struct {
@@ -313,7 +314,7 @@ type MutationResolver interface {
 	AddNode(ctx context.Context, input []*model.AddNodeInput) (*model.AddNodePayload, error)
 	UpdateNode(ctx context.Context, input model.UpdateNodeInput) (*model.UpdateNodePayload, error)
 	DeleteNode(ctx context.Context, filter model.NodeFilter) (*model.DeleteNodePayload, error)
-	AddNodeCharach(ctx context.Context, input []*model.AddNodeCharachInput) (*model.AddNodeCharachPayload, error)
+	AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (*model.AddNodeCharacPayload, error)
 	UpdatePost(ctx context.Context, input model.UpdatePostInput) (*model.UpdatePostPayload, error)
 	DeletePost(ctx context.Context, filter model.PostFilter) (*model.DeletePostPayload, error)
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
@@ -336,7 +337,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
 	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]*model.Node, error)
-	QueryNodeCharach(ctx context.Context, first *int, offset *int) ([]*model.NodeCharach, error)
+	QueryNodeCharac(ctx context.Context, first *int, offset *int) ([]*model.NodeCharac, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
 	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]*model.Post, error)
 	GetTension(ctx context.Context, id string) (*model.Tension, error)
@@ -424,24 +425,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AddMandatePayload.NumUids(childComplexity), true
 
-	case "AddNodeCharachPayload.nodecharach":
-		if e.complexity.AddNodeCharachPayload.Nodecharach == nil {
+	case "AddNodeCharacPayload.nodecharac":
+		if e.complexity.AddNodeCharacPayload.Nodecharac == nil {
 			break
 		}
 
-		args, err := ec.field_AddNodeCharachPayload_nodecharach_args(context.TODO(), rawArgs)
+		args, err := ec.field_AddNodeCharacPayload_nodecharac_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.AddNodeCharachPayload.Nodecharach(childComplexity, args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.AddNodeCharacPayload.Nodecharac(childComplexity, args["first"].(*int), args["offset"].(*int)), true
 
-	case "AddNodeCharachPayload.numUids":
-		if e.complexity.AddNodeCharachPayload.NumUids == nil {
+	case "AddNodeCharacPayload.numUids":
+		if e.complexity.AddNodeCharacPayload.NumUids == nil {
 			break
 		}
 
-		return e.complexity.AddNodeCharachPayload.NumUids(childComplexity), true
+		return e.complexity.AddNodeCharacPayload.NumUids(childComplexity), true
 
 	case "AddNodePayload.node":
 		if e.complexity.AddNodePayload.Node == nil {
@@ -695,12 +696,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mandate_domains_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mandate.Domains(childComplexity, args["filter"].(*model.PostFilter)), true
+		return e.complexity.Mandate.Domains(childComplexity), true
 
 	case "Mandate.id":
 		if e.complexity.Mandate.ID == nil {
@@ -728,12 +724,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mandate_responsabilities_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mandate.Responsabilities(childComplexity, args["filter"].(*model.PostFilter)), true
+		return e.complexity.Mandate.Responsabilities(childComplexity), true
 
 	case "Mutation.addComment":
 		if e.complexity.Mutation.AddComment == nil {
@@ -783,17 +774,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddNode(childComplexity, args["input"].([]*model.AddNodeInput)), true
 
-	case "Mutation.addNodeCharach":
-		if e.complexity.Mutation.AddNodeCharach == nil {
+	case "Mutation.addNodeCharac":
+		if e.complexity.Mutation.AddNodeCharac == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_addNodeCharach_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addNodeCharac_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddNodeCharach(childComplexity, args["input"].([]*model.AddNodeCharachInput)), true
+		return e.complexity.Mutation.AddNodeCharac(childComplexity, args["input"].([]*model.AddNodeCharacInput)), true
 
 	case "Mutation.addTension":
 		if e.complexity.Mutation.AddTension == nil {
@@ -999,12 +990,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(model.UpdateUserInput)), true
 
-	case "Node.charach":
-		if e.complexity.Node.Charach == nil {
+	case "Node.charac":
+		if e.complexity.Node.Charac == nil {
 			break
 		}
 
-		return e.complexity.Node.Charach(childComplexity), true
+		return e.complexity.Node.Charac(childComplexity), true
 
 	case "Node.children":
 		if e.complexity.Node.Children == nil {
@@ -1186,19 +1177,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Type(childComplexity), true
 
-	case "NodeCharach.mode":
-		if e.complexity.NodeCharach.Mode == nil {
+	case "NodeCharac.mode":
+		if e.complexity.NodeCharac.Mode == nil {
 			break
 		}
 
-		return e.complexity.NodeCharach.Mode(childComplexity), true
+		return e.complexity.NodeCharac.Mode(childComplexity), true
 
-	case "NodeCharach.userCanJoin":
-		if e.complexity.NodeCharach.UserCanJoin == nil {
+	case "NodeCharac.userCanJoin":
+		if e.complexity.NodeCharac.UserCanJoin == nil {
 			break
 		}
 
-		return e.complexity.NodeCharach.UserCanJoin(childComplexity), true
+		return e.complexity.NodeCharac.UserCanJoin(childComplexity), true
 
 	case "Post.createdAt":
 		if e.complexity.Post.CreatedAt == nil {
@@ -1365,17 +1356,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryNode(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
-	case "Query.queryNodeCharach":
-		if e.complexity.Query.QueryNodeCharach == nil {
+	case "Query.queryNodeCharac":
+		if e.complexity.Query.QueryNodeCharac == nil {
 			break
 		}
 
-		args, err := ec.field_Query_queryNodeCharach_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_queryNodeCharac_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.QueryNodeCharach(childComplexity, args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.QueryNodeCharac(childComplexity, args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryPost":
 		if e.complexity.Query.QueryPost == nil {
@@ -1860,6 +1851,8 @@ directive @hidden on FIELD_DEFINITION
 
 directive @count(f: String!) on FIELD_DEFINITION
 
+directive @add_addNodeHook on ARGUMENT_DEFINITION
+
 directive @alter_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
 
 directive @alter_assertType(f: String!, t: NodeType!) on INPUT_FIELD_DEFINITION
@@ -1897,10 +1890,10 @@ type Node {
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
   role_type: RoleType
-  charach: NodeCharach
+  charac: NodeCharac!
 }
 
-type NodeCharach {
+type NodeCharac {
   userCanJoin: Boolean!
   mode: NodeMode!
 }
@@ -1937,8 +1930,8 @@ type Comment {
 
 type Mandate {
   purpose: String! @search(by: [fulltext])
-  responsabilities(filter: PostFilter): Post
-  domains(filter: PostFilter): Post
+  responsabilities: String
+  domains: String
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
@@ -2009,15 +2002,15 @@ enum TensionAction {
 
 }
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2046,8 +2039,8 @@ input AddMandateInput {
   createdBy: UserRef!
   message: String
   purpose: String!
-  responsabilities: PostRef
-  domains: PostRef
+  responsabilities: String
+  domains: String
 }
 
 type AddMandatePayload {
@@ -2055,13 +2048,13 @@ type AddMandatePayload {
   numUids: Int
 }
 
-input AddNodeCharachInput {
+input AddNodeCharacInput {
   userCanJoin: Boolean!
   mode: NodeMode!
 }
 
-type AddNodeCharachPayload {
-  nodecharach(first: Int, offset: Int): [NodeCharach]
+type AddNodeCharacPayload {
+  nodecharac(first: Int, offset: Int): [NodeCharac]
   numUids: Int
 }
 
@@ -2085,7 +2078,7 @@ input AddNodeInput {
   second_link: UserRef @alter_hasRole(n:["parent"], r: Coordinator)
   skills: [String!] @alter_hasRole(n:["parent"], r: Coordinator)
   role_type: RoleType @alter_hasRole(n:["parent"], r: Coordinator)
-  charach: NodeCharachRef @alter_hasRole(n:["parent"], r: Coordinator)
+  charac: NodeCharacRef! @alter_hasRole(n:["parent"], r: Coordinator)
 }
 
 type AddNodePayload {
@@ -2305,6 +2298,8 @@ enum MandateOrderable {
   createdAt
   message
   purpose
+  responsabilities
+  domains
 }
 
 input MandatePatch {
@@ -2312,8 +2307,8 @@ input MandatePatch {
   createdBy: UserRef
   message: String
   purpose: String @patch_RO
-  responsabilities: PostRef @patch_RO
-  domains: PostRef @patch_RO
+  responsabilities: String @patch_RO
+  domains: String @patch_RO
 }
 
 input MandateRef {
@@ -2322,15 +2317,15 @@ input MandateRef {
   createdBy: UserRef
   message: String
   purpose: String
-  responsabilities: PostRef
-  domains: PostRef
+  responsabilities: String
+  domains: String
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]!): AddNodePayload
+  addNode(input: [AddNodeInput!]! @add_addNodeHook): AddNodePayload
   updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
-  addNodeCharach(input: [AddNodeCharachInput!]!): AddNodeCharachPayload
+  addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]!): AddTensionPayload
@@ -2351,7 +2346,7 @@ type Mutation {
   deleteLabel(filter: LabelFilter!): DeleteLabelPayload
 }
 
-input NodeCharachRef {
+input NodeCharacRef {
   userCanJoin: Boolean
   mode: NodeMode
 }
@@ -2406,7 +2401,7 @@ input NodePatch {
   second_link: UserRef @alter_hasRole(n:["parent"], r: Coordinator)
   skills: [String!] @alter_hasRole(n:["parent"], r: Coordinator)
   role_type: RoleType @alter_hasRole(n:["parent"], r: Coordinator)
-  charach: NodeCharachRef @alter_hasRole(n:["parent"], r: Coordinator)
+  charac: NodeCharacRef @alter_hasRole(n:["parent"], r: Coordinator)
 }
 
 input NodeRef {
@@ -2430,7 +2425,7 @@ input NodeRef {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
-  charach: NodeCharachRef
+  charac: NodeCharacRef
 }
 
 input NodeType_hash {
@@ -2470,7 +2465,7 @@ input PostRef {
 type Query {
   getNode(id: ID, nameid: String): Node
   queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
-  queryNodeCharach(first: Int, offset: Int): [NodeCharach]
+  queryNodeCharac(first: Int, offset: Int): [NodeCharac]
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   getTension(id: ID!): Tension
@@ -3034,7 +3029,7 @@ func (ec *executionContext) field_AddMandatePayload_mandate_args(ctx context.Con
 	return args, nil
 }
 
-func (ec *executionContext) field_AddNodeCharachPayload_nodecharach_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_AddNodeCharacPayload_nodecharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -3220,34 +3215,6 @@ func (ec *executionContext) field_Mandate_createdBy_args(ctx context.Context, ra
 	return args, nil
 }
 
-func (ec *executionContext) field_Mandate_domains_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.PostFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mandate_responsabilities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.PostFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_addComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3290,12 +3257,12 @@ func (ec *executionContext) field_Mutation_addMandate_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_addNodeCharach_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_addNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*model.AddNodeCharachInput
+	var arg0 []*model.AddNodeCharacInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddNodeCharachInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddNodeCharacInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3309,9 +3276,24 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	args := map[string]interface{}{}
 	var arg0 []*model.AddNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Add_addNodeHook == nil {
+				return nil, errors.New("directive add_addNodeHook is not implemented")
+			}
+			return ec.directives.Add_addNodeHook(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
 			return nil, err
+		}
+		if data, ok := tmp.([]*model.AddNodeInput); ok {
+			arg0 = data
+		} else {
+			return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddNodeInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -4004,7 +3986,7 @@ func (ec *executionContext) field_Query_queryMandate_args(ctx context.Context, r
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_queryNodeCharach_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_queryNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -4903,7 +4885,7 @@ func (ec *executionContext) _AddMandatePayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AddNodeCharachPayload_nodecharach(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeCharachPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _AddNodeCharacPayload_nodecharac(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeCharacPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4911,7 +4893,7 @@ func (ec *executionContext) _AddNodeCharachPayload_nodecharach(ctx context.Conte
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "AddNodeCharachPayload",
+		Object:   "AddNodeCharacPayload",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -4919,7 +4901,7 @@ func (ec *executionContext) _AddNodeCharachPayload_nodecharach(ctx context.Conte
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_AddNodeCharachPayload_nodecharach_args(ctx, rawArgs)
+	args, err := ec.field_AddNodeCharacPayload_nodecharac_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -4927,7 +4909,7 @@ func (ec *executionContext) _AddNodeCharachPayload_nodecharach(ctx context.Conte
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Nodecharach, nil
+		return obj.Nodecharac, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4936,12 +4918,12 @@ func (ec *executionContext) _AddNodeCharachPayload_nodecharach(ctx context.Conte
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NodeCharach)
+	res := resTmp.([]*model.NodeCharac)
 	fc.Result = res
-	return ec.marshalONodeCharach2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx, field.Selections, res)
+	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AddNodeCharachPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeCharachPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _AddNodeCharacPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeCharacPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4949,7 +4931,7 @@ func (ec *executionContext) _AddNodeCharachPayload_numUids(ctx context.Context, 
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "AddNodeCharachPayload",
+		Object:   "AddNodeCharacPayload",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -6061,13 +6043,6 @@ func (ec *executionContext) _Mandate_responsabilities(ctx context.Context, field
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mandate_responsabilities_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Responsabilities, nil
@@ -6079,9 +6054,9 @@ func (ec *executionContext) _Mandate_responsabilities(ctx context.Context, field
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Post)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -6099,13 +6074,6 @@ func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mandate_domains_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Domains, nil
@@ -6117,9 +6085,9 @@ func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Post)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOPost2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -6420,7 +6388,7 @@ func (ec *executionContext) _Mutation_deleteNode(ctx context.Context, field grap
 	return ec.marshalODeleteNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodePayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_addNodeCharach(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_addNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6436,7 +6404,7 @@ func (ec *executionContext) _Mutation_addNodeCharach(ctx context.Context, field 
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addNodeCharach_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_addNodeCharac_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -6444,7 +6412,7 @@ func (ec *executionContext) _Mutation_addNodeCharach(ctx context.Context, field 
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddNodeCharach(rctx, args["input"].([]*model.AddNodeCharachInput))
+		return ec.resolvers.Mutation().AddNodeCharac(rctx, args["input"].([]*model.AddNodeCharacInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6453,9 +6421,9 @@ func (ec *executionContext) _Mutation_addNodeCharach(ctx context.Context, field 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.AddNodeCharachPayload)
+	res := resTmp.(*model.AddNodeCharacPayload)
 	fc.Result = res
-	return ec.marshalOAddNodeCharachPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachPayload(ctx, field.Selections, res)
+	return ec.marshalOAddNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updatePost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8138,7 +8106,7 @@ func (ec *executionContext) _Node_role_type(ctx context.Context, field graphql.C
 	return ec.marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_charach(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+func (ec *executionContext) _Node_charac(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8155,21 +8123,24 @@ func (ec *executionContext) _Node_charach(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Charach, nil
+		return obj.Charac, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.NodeCharach)
+	res := resTmp.(*model.NodeCharac)
 	fc.Result = res
-	return ec.marshalONodeCharach2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx, field.Selections, res)
+	return ec.marshalNNodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeCharach_userCanJoin(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharach) (ret graphql.Marshaler) {
+func (ec *executionContext) _NodeCharac_userCanJoin(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8177,7 +8148,7 @@ func (ec *executionContext) _NodeCharach_userCanJoin(ctx context.Context, field 
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "NodeCharach",
+		Object:   "NodeCharac",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -8203,7 +8174,7 @@ func (ec *executionContext) _NodeCharach_userCanJoin(ctx context.Context, field 
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeCharach_mode(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharach) (ret graphql.Marshaler) {
+func (ec *executionContext) _NodeCharac_mode(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8211,7 +8182,7 @@ func (ec *executionContext) _NodeCharach_mode(ctx context.Context, field graphql
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:   "NodeCharach",
+		Object:   "NodeCharac",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -8497,7 +8468,7 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_queryNodeCharach(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_queryNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8513,7 +8484,7 @@ func (ec *executionContext) _Query_queryNodeCharach(ctx context.Context, field g
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_queryNodeCharach_args(ctx, rawArgs)
+	args, err := ec.field_Query_queryNodeCharac_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -8521,7 +8492,7 @@ func (ec *executionContext) _Query_queryNodeCharach(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryNodeCharach(rctx, args["first"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().QueryNodeCharac(rctx, args["first"].(*int), args["offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8530,9 +8501,9 @@ func (ec *executionContext) _Query_queryNodeCharach(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NodeCharach)
+	res := resTmp.([]*model.NodeCharac)
 	fc.Result = res
-	return ec.marshalONodeCharach2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx, field.Selections, res)
+	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -11983,13 +11954,13 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 			}
 		case "responsabilities":
 			var err error
-			it.Responsabilities, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "domains":
 			var err error
-			it.Domains, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11999,8 +11970,8 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddNodeCharachInput(ctx context.Context, obj interface{}) (model.AddNodeCharachInput, error) {
-	var it model.AddNodeCharachInput
+func (ec *executionContext) unmarshalInputAddNodeCharacInput(ctx context.Context, obj interface{}) (model.AddNodeCharacInput, error) {
+	var it model.AddNodeCharacInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -12306,10 +12277,10 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 			}
-		case "charach":
+		case "charac":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeCharachRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharachRef(ctx, v)
+				return ec.unmarshalNNodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
@@ -12330,12 +12301,12 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-			if data, ok := tmp.(*model.NodeCharachRef); ok {
-				it.Charach = data
+			if data, ok := tmp.(*model.NodeCharacRef); ok {
+				it.Charac = data
 			} else if tmp == nil {
-				it.Charach = nil
+				it.Charac = nil
 			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeCharachRef`, tmp)
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeCharacRef`, tmp)
 			}
 		}
 	}
@@ -13406,9 +13377,7 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			}
 		case "responsabilities":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
-			}
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.Patch_RO == nil {
 					return nil, errors.New("directive patch_RO is not implemented")
@@ -13420,18 +13389,16 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-			if data, ok := tmp.(*model.PostRef); ok {
+			if data, ok := tmp.(*string); ok {
 				it.Responsabilities = data
 			} else if tmp == nil {
 				it.Responsabilities = nil
 			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.PostRef`, tmp)
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "domains":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
-			}
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.Patch_RO == nil {
 					return nil, errors.New("directive patch_RO is not implemented")
@@ -13443,12 +13410,12 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-			if data, ok := tmp.(*model.PostRef); ok {
+			if data, ok := tmp.(*string); ok {
 				it.Domains = data
 			} else if tmp == nil {
 				it.Domains = nil
 			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.PostRef`, tmp)
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		}
 	}
@@ -13494,13 +13461,13 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 			}
 		case "responsabilities":
 			var err error
-			it.Responsabilities, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "domains":
 			var err error
-			it.Domains, err = ec.unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
+			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13510,8 +13477,8 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNodeCharachRef(ctx context.Context, obj interface{}) (model.NodeCharachRef, error) {
-	var it model.NodeCharachRef
+func (ec *executionContext) unmarshalInputNodeCharacRef(ctx context.Context, obj interface{}) (model.NodeCharacRef, error) {
+	var it model.NodeCharacRef
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -14041,10 +14008,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 			}
-		case "charach":
+		case "charac":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeCharachRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharachRef(ctx, v)
+				return ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
@@ -14065,12 +14032,12 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-			if data, ok := tmp.(*model.NodeCharachRef); ok {
-				it.Charach = data
+			if data, ok := tmp.(*model.NodeCharacRef); ok {
+				it.Charac = data
 			} else if tmp == nil {
-				it.Charach = nil
+				it.Charac = nil
 			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeCharachRef`, tmp)
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeCharacRef`, tmp)
 			}
 		}
 	}
@@ -14204,9 +14171,9 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "charach":
+		case "charac":
 			var err error
-			it.Charach, err = ec.unmarshalONodeCharachRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharachRef(ctx, v)
+			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15825,21 +15792,21 @@ func (ec *executionContext) _AddMandatePayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var addNodeCharachPayloadImplementors = []string{"AddNodeCharachPayload"}
+var addNodeCharacPayloadImplementors = []string{"AddNodeCharacPayload"}
 
-func (ec *executionContext) _AddNodeCharachPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeCharachPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addNodeCharachPayloadImplementors)
+func (ec *executionContext) _AddNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeCharacPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addNodeCharacPayloadImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddNodeCharachPayload")
-		case "nodecharach":
-			out.Values[i] = ec._AddNodeCharachPayload_nodecharach(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("AddNodeCharacPayload")
+		case "nodecharac":
+			out.Values[i] = ec._AddNodeCharacPayload_nodecharac(ctx, field, obj)
 		case "numUids":
-			out.Values[i] = ec._AddNodeCharachPayload_numUids(ctx, field, obj)
+			out.Values[i] = ec._AddNodeCharacPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16282,8 +16249,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateNode(ctx, field)
 		case "deleteNode":
 			out.Values[i] = ec._Mutation_deleteNode(ctx, field)
-		case "addNodeCharach":
-			out.Values[i] = ec._Mutation_addNodeCharach(ctx, field)
+		case "addNodeCharac":
+			out.Values[i] = ec._Mutation_addNodeCharac(ctx, field)
 		case "updatePost":
 			out.Values[i] = ec._Mutation_updatePost(ctx, field)
 		case "deletePost":
@@ -16406,8 +16373,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_skills(ctx, field, obj)
 		case "role_type":
 			out.Values[i] = ec._Node_role_type(ctx, field, obj)
-		case "charach":
-			out.Values[i] = ec._Node_charach(ctx, field, obj)
+		case "charac":
+			out.Values[i] = ec._Node_charac(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16419,24 +16389,24 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var nodeCharachImplementors = []string{"NodeCharach"}
+var nodeCharacImplementors = []string{"NodeCharac"}
 
-func (ec *executionContext) _NodeCharach(ctx context.Context, sel ast.SelectionSet, obj *model.NodeCharach) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, nodeCharachImplementors)
+func (ec *executionContext) _NodeCharac(ctx context.Context, sel ast.SelectionSet, obj *model.NodeCharac) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, nodeCharacImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("NodeCharach")
+			out.Values[i] = graphql.MarshalString("NodeCharac")
 		case "userCanJoin":
-			out.Values[i] = ec._NodeCharach_userCanJoin(ctx, field, obj)
+			out.Values[i] = ec._NodeCharac_userCanJoin(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "mode":
-			out.Values[i] = ec._NodeCharach_mode(ctx, field, obj)
+			out.Values[i] = ec._NodeCharac_mode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16527,7 +16497,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_queryNode(ctx, field)
 				return res
 			})
-		case "queryNodeCharach":
+		case "queryNodeCharac":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -16535,7 +16505,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_queryNodeCharach(ctx, field)
+				res = ec._Query_queryNodeCharac(ctx, field)
 				return res
 			})
 		case "getPost":
@@ -17389,11 +17359,11 @@ func (ec *executionContext) unmarshalNAddMandateInput2ᚖzerogovᚋfractal6ᚗgo
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalNAddNodeCharachInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachInput(ctx context.Context, v interface{}) (model.AddNodeCharachInput, error) {
-	return ec.unmarshalInputAddNodeCharachInput(ctx, v)
+func (ec *executionContext) unmarshalNAddNodeCharacInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInput(ctx context.Context, v interface{}) (model.AddNodeCharacInput, error) {
+	return ec.unmarshalInputAddNodeCharacInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNAddNodeCharachInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeCharachInput, error) {
+func (ec *executionContext) unmarshalNAddNodeCharacInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeCharacInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -17403,9 +17373,9 @@ func (ec *executionContext) unmarshalNAddNodeCharachInput2ᚕᚖzerogovᚋfracta
 		}
 	}
 	var err error
-	res := make([]*model.AddNodeCharachInput, len(vSlice))
+	res := make([]*model.AddNodeCharacInput, len(vSlice))
 	for i := range vSlice {
-		res[i], err = ec.unmarshalNAddNodeCharachInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAddNodeCharacInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -17413,11 +17383,11 @@ func (ec *executionContext) unmarshalNAddNodeCharachInput2ᚕᚖzerogovᚋfracta
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNAddNodeCharachInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachInput(ctx context.Context, v interface{}) (*model.AddNodeCharachInput, error) {
+func (ec *executionContext) unmarshalNAddNodeCharacInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInput(ctx context.Context, v interface{}) (*model.AddNodeCharacInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalNAddNodeCharachInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachInput(ctx, v)
+	res, err := ec.unmarshalNAddNodeCharacInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInput(ctx, v)
 	return &res, err
 }
 
@@ -17714,6 +17684,32 @@ func (ec *executionContext) marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmo
 		return graphql.Null
 	}
 	return ec._Node(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNNodeCharac2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v model.NodeCharac) graphql.Marshaler {
+	return ec._NodeCharac(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNNodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharac) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._NodeCharac(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNNodeCharacRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx context.Context, v interface{}) (model.NodeCharacRef, error) {
+	return ec.unmarshalInputNodeCharacRef(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx context.Context, v interface{}) (*model.NodeCharacRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNNodeCharacRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalNNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx context.Context, v interface{}) (model.NodeFilter, error) {
@@ -18220,15 +18216,15 @@ func (ec *executionContext) marshalOAddMandatePayload2ᚖzerogovᚋfractal6ᚗgo
 	return ec._AddMandatePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOAddNodeCharachPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachPayload(ctx context.Context, sel ast.SelectionSet, v model.AddNodeCharachPayload) graphql.Marshaler {
-	return ec._AddNodeCharachPayload(ctx, sel, &v)
+func (ec *executionContext) marshalOAddNodeCharacPayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, v model.AddNodeCharacPayload) graphql.Marshaler {
+	return ec._AddNodeCharacPayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOAddNodeCharachPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharachPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddNodeCharachPayload) graphql.Marshaler {
+func (ec *executionContext) marshalOAddNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddNodeCharacPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._AddNodeCharachPayload(ctx, sel, v)
+	return ec._AddNodeCharacPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddNodePayload2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodePayload(ctx context.Context, sel ast.SelectionSet, v model.AddNodePayload) graphql.Marshaler {
@@ -19127,11 +19123,11 @@ func (ec *executionContext) marshalONode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmo
 	return ec._Node(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalONodeCharach2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx context.Context, sel ast.SelectionSet, v model.NodeCharach) graphql.Marshaler {
-	return ec._NodeCharach(ctx, sel, &v)
+func (ec *executionContext) marshalONodeCharac2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v model.NodeCharac) graphql.Marshaler {
+	return ec._NodeCharac(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalONodeCharach2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx context.Context, sel ast.SelectionSet, v []*model.NodeCharach) graphql.Marshaler {
+func (ec *executionContext) marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v []*model.NodeCharac) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -19158,7 +19154,7 @@ func (ec *executionContext) marshalONodeCharach2ᚕᚖzerogovᚋfractal6ᚗgoᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalONodeCharach2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx, sel, v[i])
+			ret[i] = ec.marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -19171,22 +19167,22 @@ func (ec *executionContext) marshalONodeCharach2ᚕᚖzerogovᚋfractal6ᚗgoᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalONodeCharach2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharach(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharach) graphql.Marshaler {
+func (ec *executionContext) marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharac) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._NodeCharach(ctx, sel, v)
+	return ec._NodeCharac(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalONodeCharachRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharachRef(ctx context.Context, v interface{}) (model.NodeCharachRef, error) {
-	return ec.unmarshalInputNodeCharachRef(ctx, v)
+func (ec *executionContext) unmarshalONodeCharacRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx context.Context, v interface{}) (model.NodeCharacRef, error) {
+	return ec.unmarshalInputNodeCharacRef(ctx, v)
 }
 
-func (ec *executionContext) unmarshalONodeCharachRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharachRef(ctx context.Context, v interface{}) (*model.NodeCharachRef, error) {
+func (ec *executionContext) unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx context.Context, v interface{}) (*model.NodeCharacRef, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalONodeCharachRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharachRef(ctx, v)
+	res, err := ec.unmarshalONodeCharacRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 	return &res, err
 }
 
@@ -19450,18 +19446,6 @@ func (ec *executionContext) unmarshalOPostPatch2ᚖzerogovᚋfractal6ᚗgoᚋgra
 		return nil, nil
 	}
 	res, err := ec.unmarshalOPostPatch2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) unmarshalOPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx context.Context, v interface{}) (model.PostRef, error) {
-	return ec.unmarshalInputPostRef(ctx, v)
-}
-
-func (ec *executionContext) unmarshalOPostRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx context.Context, v interface{}) (*model.PostRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOPostRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostRef(ctx, v)
 	return &res, err
 }
 

@@ -82,7 +82,7 @@ func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
 
 }
 
-// Keep that last key name name when separated by dot (eg [a.key.name: 10] -> [name: 10])
+// Keep the last key string when separated by dot (eg [a.key.name: 10] -> [name: 10])
 func CleanCompositeName(m map[string]interface{})  map[string]interface{} {
     
     out := make(map[string]interface{}, len(m))

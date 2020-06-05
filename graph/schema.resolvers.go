@@ -27,7 +27,7 @@ func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddNodeCharach(ctx context.Context, input []*model.AddNodeCharachInput) (data *model.AddNodeCharachPayload, errors error) {
+func (r *mutationResolver) AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (data *model.AddNodeCharacPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -130,7 +130,7 @@ func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter,
 	return data, errors
 }
 
-func (r *queryResolver) QueryNodeCharach(ctx context.Context, first *int, offset *int) (data []*model.NodeCharach, errors error) {
+func (r *queryResolver) QueryNodeCharac(ctx context.Context, first *int, offset *int) (data []*model.NodeCharac, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

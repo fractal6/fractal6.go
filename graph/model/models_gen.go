@@ -35,8 +35,8 @@ type AddMandateInput struct {
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
 	Purpose          string   `json:"purpose,omitempty"`
-	Responsabilities *PostRef `json:"responsabilities,omitempty"`
-	Domains          *PostRef `json:"domains,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          *string  `json:"domains,omitempty"`
 }
 
 type AddMandatePayload struct {
@@ -44,37 +44,37 @@ type AddMandatePayload struct {
 	NumUids *int       `json:"numUids,omitempty"`
 }
 
-type AddNodeCharachInput struct {
+type AddNodeCharacInput struct {
 	UserCanJoin bool     `json:"userCanJoin"`
 	Mode        NodeMode `json:"mode,omitempty"`
 }
 
-type AddNodeCharachPayload struct {
-	Nodecharach []*NodeCharach `json:"nodecharach,omitempty"`
-	NumUids     *int           `json:"numUids,omitempty"`
+type AddNodeCharacPayload struct {
+	Nodecharac []*NodeCharac `json:"nodecharac,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type AddNodeInput struct {
-	CreatedAt    string          `json:"createdAt,omitempty"`
-	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
-	Parent       *NodeRef        `json:"parent,omitempty"`
-	Children     []*NodeRef      `json:"children,omitempty"`
-	Type         NodeType        `json:"type_,omitempty"`
-	Name         string          `json:"name,omitempty"`
-	Nameid       string          `json:"nameid,omitempty"`
-	Rootnameid   string          `json:"rootnameid,omitempty"`
-	Mandate      *MandateRef     `json:"mandate,omitempty"`
-	TensionsOut  []*TensionRef   `json:"tensions_out,omitempty"`
-	TensionsIn   []*TensionRef   `json:"tensions_in,omitempty"`
-	NTensionsOut *int            `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int            `json:"n_tensions_in,omitempty"`
-	NChildren    *int            `json:"n_children,omitempty"`
-	IsRoot       bool            `json:"isRoot"`
-	FirstLink    *UserRef        `json:"first_link,omitempty"`
-	SecondLink   *UserRef        `json:"second_link,omitempty"`
-	Skills       []string        `json:"skills,omitempty"`
-	RoleType     *RoleType       `json:"role_type,omitempty"`
-	Charach      *NodeCharachRef `json:"charach,omitempty"`
+	CreatedAt    string         `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	Parent       *NodeRef       `json:"parent,omitempty"`
+	Children     []*NodeRef     `json:"children,omitempty"`
+	Type         NodeType       `json:"type_,omitempty"`
+	Name         string         `json:"name,omitempty"`
+	Nameid       string         `json:"nameid,omitempty"`
+	Rootnameid   string         `json:"rootnameid,omitempty"`
+	Mandate      *MandateRef    `json:"mandate,omitempty"`
+	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
+	NChildren    *int           `json:"n_children,omitempty"`
+	IsRoot       bool           `json:"isRoot"`
+	FirstLink    *UserRef       `json:"first_link,omitempty"`
+	SecondLink   *UserRef       `json:"second_link,omitempty"`
+	Skills       []string       `json:"skills,omitempty"`
+	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Charac       *NodeCharacRef `json:"charac,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -260,8 +260,8 @@ type LabelRef struct {
 
 type Mandate struct {
 	Purpose          string  `json:"purpose,omitempty"`
-	Responsabilities *Post   `json:"responsabilities,omitempty"`
-	Domains          *Post   `json:"domains,omitempty"`
+	Responsabilities *string `json:"responsabilities,omitempty"`
+	Domains          *string `json:"domains,omitempty"`
 	ID               string  `json:"id,omitempty"`
 	CreatedAt        string  `json:"createdAt,omitempty"`
 	CreatedBy        *User   `json:"createdBy,omitempty"`
@@ -289,8 +289,8 @@ type MandatePatch struct {
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
 	Purpose          *string  `json:"purpose,omitempty"`
-	Responsabilities *PostRef `json:"responsabilities,omitempty"`
-	Domains          *PostRef `json:"domains,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          *string  `json:"domains,omitempty"`
 }
 
 type MandateRef struct {
@@ -299,40 +299,40 @@ type MandateRef struct {
 	CreatedBy        *UserRef `json:"createdBy,omitempty"`
 	Message          *string  `json:"message,omitempty"`
 	Purpose          *string  `json:"purpose,omitempty"`
-	Responsabilities *PostRef `json:"responsabilities,omitempty"`
-	Domains          *PostRef `json:"domains,omitempty"`
+	Responsabilities *string  `json:"responsabilities,omitempty"`
+	Domains          *string  `json:"domains,omitempty"`
 }
 
 type Node struct {
-	ID           string       `json:"id,omitempty"`
-	CreatedAt    string       `json:"createdAt,omitempty"`
-	CreatedBy    *User        `json:"createdBy,omitempty"`
-	Parent       *Node        `json:"parent,omitempty"`
-	Children     []*Node      `json:"children,omitempty"`
-	Type         NodeType     `json:"type_,omitempty"`
-	Name         string       `json:"name,omitempty"`
-	Nameid       string       `json:"nameid,omitempty"`
-	Rootnameid   string       `json:"rootnameid,omitempty"`
-	Mandate      *Mandate     `json:"mandate,omitempty"`
-	TensionsOut  []*Tension   `json:"tensions_out,omitempty"`
-	TensionsIn   []*Tension   `json:"tensions_in,omitempty"`
-	NTensionsOut *int         `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int         `json:"n_tensions_in,omitempty"`
-	NChildren    *int         `json:"n_children,omitempty"`
-	IsRoot       bool         `json:"isRoot"`
-	FirstLink    *User        `json:"first_link,omitempty"`
-	SecondLink   *User        `json:"second_link,omitempty"`
-	Skills       []string     `json:"skills,omitempty"`
-	RoleType     *RoleType    `json:"role_type,omitempty"`
-	Charach      *NodeCharach `json:"charach,omitempty"`
+	ID           string      `json:"id,omitempty"`
+	CreatedAt    string      `json:"createdAt,omitempty"`
+	CreatedBy    *User       `json:"createdBy,omitempty"`
+	Parent       *Node       `json:"parent,omitempty"`
+	Children     []*Node     `json:"children,omitempty"`
+	Type         NodeType    `json:"type_,omitempty"`
+	Name         string      `json:"name,omitempty"`
+	Nameid       string      `json:"nameid,omitempty"`
+	Rootnameid   string      `json:"rootnameid,omitempty"`
+	Mandate      *Mandate    `json:"mandate,omitempty"`
+	TensionsOut  []*Tension  `json:"tensions_out,omitempty"`
+	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
+	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
+	NChildren    *int        `json:"n_children,omitempty"`
+	IsRoot       bool        `json:"isRoot"`
+	FirstLink    *User       `json:"first_link,omitempty"`
+	SecondLink   *User       `json:"second_link,omitempty"`
+	Skills       []string    `json:"skills,omitempty"`
+	RoleType     *RoleType   `json:"role_type,omitempty"`
+	Charac       *NodeCharac `json:"charac,omitempty"`
 }
 
-type NodeCharach struct {
+type NodeCharac struct {
 	UserCanJoin bool     `json:"userCanJoin"`
 	Mode        NodeMode `json:"mode,omitempty"`
 }
 
-type NodeCharachRef struct {
+type NodeCharacRef struct {
 	UserCanJoin *bool     `json:"userCanJoin"`
 	Mode        *NodeMode `json:"mode,omitempty"`
 }
@@ -358,49 +358,49 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedAt    *string         `json:"createdAt,omitempty"`
-	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
-	Parent       *NodeRef        `json:"parent,omitempty"`
-	Children     []*NodeRef      `json:"children,omitempty"`
-	Type         *NodeType       `json:"type_,omitempty"`
-	Name         *string         `json:"name,omitempty"`
-	Rootnameid   *string         `json:"rootnameid,omitempty"`
-	Mandate      *MandateRef     `json:"mandate,omitempty"`
-	TensionsOut  []*TensionRef   `json:"tensions_out,omitempty"`
-	TensionsIn   []*TensionRef   `json:"tensions_in,omitempty"`
-	NTensionsOut *int            `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int            `json:"n_tensions_in,omitempty"`
-	NChildren    *int            `json:"n_children,omitempty"`
-	IsRoot       *bool           `json:"isRoot"`
-	FirstLink    *UserRef        `json:"first_link,omitempty"`
-	SecondLink   *UserRef        `json:"second_link,omitempty"`
-	Skills       []string        `json:"skills,omitempty"`
-	RoleType     *RoleType       `json:"role_type,omitempty"`
-	Charach      *NodeCharachRef `json:"charach,omitempty"`
+	CreatedAt    *string        `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	Parent       *NodeRef       `json:"parent,omitempty"`
+	Children     []*NodeRef     `json:"children,omitempty"`
+	Type         *NodeType      `json:"type_,omitempty"`
+	Name         *string        `json:"name,omitempty"`
+	Rootnameid   *string        `json:"rootnameid,omitempty"`
+	Mandate      *MandateRef    `json:"mandate,omitempty"`
+	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
+	NChildren    *int           `json:"n_children,omitempty"`
+	IsRoot       *bool          `json:"isRoot"`
+	FirstLink    *UserRef       `json:"first_link,omitempty"`
+	SecondLink   *UserRef       `json:"second_link,omitempty"`
+	Skills       []string       `json:"skills,omitempty"`
+	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Charac       *NodeCharacRef `json:"charac,omitempty"`
 }
 
 type NodeRef struct {
-	ID           *string         `json:"id,omitempty"`
-	CreatedAt    *string         `json:"createdAt,omitempty"`
-	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
-	Parent       *NodeRef        `json:"parent,omitempty"`
-	Children     []*NodeRef      `json:"children,omitempty"`
-	Type         *NodeType       `json:"type_,omitempty"`
-	Name         *string         `json:"name,omitempty"`
-	Nameid       *string         `json:"nameid,omitempty"`
-	Rootnameid   *string         `json:"rootnameid,omitempty"`
-	Mandate      *MandateRef     `json:"mandate,omitempty"`
-	TensionsOut  []*TensionRef   `json:"tensions_out,omitempty"`
-	TensionsIn   []*TensionRef   `json:"tensions_in,omitempty"`
-	NTensionsOut *int            `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int            `json:"n_tensions_in,omitempty"`
-	NChildren    *int            `json:"n_children,omitempty"`
-	IsRoot       *bool           `json:"isRoot"`
-	FirstLink    *UserRef        `json:"first_link,omitempty"`
-	SecondLink   *UserRef        `json:"second_link,omitempty"`
-	Skills       []string        `json:"skills,omitempty"`
-	RoleType     *RoleType       `json:"role_type,omitempty"`
-	Charach      *NodeCharachRef `json:"charach,omitempty"`
+	ID           *string        `json:"id,omitempty"`
+	CreatedAt    *string        `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	Parent       *NodeRef       `json:"parent,omitempty"`
+	Children     []*NodeRef     `json:"children,omitempty"`
+	Type         *NodeType      `json:"type_,omitempty"`
+	Name         *string        `json:"name,omitempty"`
+	Nameid       *string        `json:"nameid,omitempty"`
+	Rootnameid   *string        `json:"rootnameid,omitempty"`
+	Mandate      *MandateRef    `json:"mandate,omitempty"`
+	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
+	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
+	NChildren    *int           `json:"n_children,omitempty"`
+	IsRoot       *bool          `json:"isRoot"`
+	FirstLink    *UserRef       `json:"first_link,omitempty"`
+	SecondLink   *UserRef       `json:"second_link,omitempty"`
+	Skills       []string       `json:"skills,omitempty"`
+	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Charac       *NodeCharacRef `json:"charac,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -832,20 +832,24 @@ func (e LabelOrderable) MarshalGQL(w io.Writer) {
 type MandateOrderable string
 
 const (
-	MandateOrderableCreatedAt MandateOrderable = "createdAt"
-	MandateOrderableMessage   MandateOrderable = "message"
-	MandateOrderablePurpose   MandateOrderable = "purpose"
+	MandateOrderableCreatedAt        MandateOrderable = "createdAt"
+	MandateOrderableMessage          MandateOrderable = "message"
+	MandateOrderablePurpose          MandateOrderable = "purpose"
+	MandateOrderableResponsabilities MandateOrderable = "responsabilities"
+	MandateOrderableDomains          MandateOrderable = "domains"
 )
 
 var AllMandateOrderable = []MandateOrderable{
 	MandateOrderableCreatedAt,
 	MandateOrderableMessage,
 	MandateOrderablePurpose,
+	MandateOrderableResponsabilities,
+	MandateOrderableDomains,
 }
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderablePurpose:
+	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains:
 		return true
 	}
 	return false

@@ -33,7 +33,11 @@ type Role struct {
     RoleType RoleType  `json:"role_type"` 
 }
 
-// UserCtx Payload for Dgraph query
+//
+// Dgraph Payload for Gpm query
+//
+
+// UserCtx Payload
 var UserCtxPayloadDg string = `{
     User.username
     User.name
@@ -46,3 +50,13 @@ var UserCtxPayloadDg string = `{
         Node.role_type
     }
 }`
+
+// NodeCharac Payload
+var NodeCharacNF string = "Node.charac"
+var NodeCharacPayloadDg string = `{
+    Node.charac {
+        NodeCharac.userCanJoin
+        NodeCharac.mode
+    }
+}`
+
