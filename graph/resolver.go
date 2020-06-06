@@ -7,7 +7,7 @@ package graph
 
 import (
     "fmt"
-    "time"
+    //"time"
     "context"
     "reflect"
     "strings"
@@ -176,35 +176,35 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             return nil, tools.LogErr("@addNodeHook/doAddNodeHook", "Access denied", err)
         }
         if ok {
-            // Add the default node
-            userCanJoin := false
-            typeCo := model.NodeTypeRole
-            roleTypeCo := model.RoleTypeCoordinator
-            nameCo := "Coordinator"
-            nameidCo := node.Nameid + "#" + "coordo1"
-            nowCo := time.Now().Format(time.RFC3339)
-            isRootCo := false
+            //// Add the default node
+            //userCanJoin := false
+            //typeCo := model.NodeTypeRole
+            //roleTypeCo := model.RoleTypeCoordinator
+            //nameCo := "Coordinator"
+            //nameidCo := node.Nameid + "#" + "coordo1"
+            //nowCo := time.Now().Format(time.RFC3339)
+            //isRootCo := false
 
-            co := model.NodeRef{
-                CreatedAt:      &nowCo,
-                CreatedBy:      &model.UserRef{Username: &uctx.Username},
-                IsRoot: &isRootCo,
-                Type: &typeCo,
-                RoleType: &roleTypeCo,
-                Name:           &nameCo,
-                Nameid: &nameidCo,
-                Rootnameid: &node.Rootnameid,
-                //Parent: &model.NodeRef{Nameid: &nameid},
-                //Mandate: ... // @Debug: todo default mandate for basic Role
-                FirstLink: &model.UserRef{Username: &uctx.Username},
-                Charac: &model.NodeCharacRef{
-                    UserCanJoin: &userCanJoin,
-                    Mode: &charac.Mode, // Inherit mode
-                },
-            }
-            node.Children = []*model.NodeRef{&co}
-            newInput := []*model.AddNodeInput{&node}
-            return newInput, nil
+            //co := model.NodeRef{
+            //    CreatedAt:  & nowCo,
+            //    CreatedBy:  & model.UserRef{Username: & uctx.Username},
+            //    IsRoot:     & isRootCo,
+            //    Type:       & typeCo,
+            //    RoleType:   & roleTypeCo,
+            //    Name:       & nameCo,
+            //    Nameid:     & nameidCo,
+            //    Rootnameid: & node.Rootnameid,
+            //    Charac: &model.NodeCharacRef{
+            //        UserCanJoin: &userCanJoin,
+            //        Mode: &charac.Mode, // Inherit mode
+            //    },
+            //    //Mandate: ... // @Debug: todo default mandate for basic Role
+            //    FirstLink:  & model.UserRef{Username: & uctx.Username},
+            //}
+            //node.Children = []*model.NodeRef{&co}
+            //newInput := []*model.AddNodeInput{&node}
+            //return newInput, nil
+            return input_, nil
         }
     }
 
@@ -490,7 +490,7 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
     for _, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
-            panic("Bade nameid format: "+ ur.Nameid)
+            panic("Bad nameid format for coordo test: "+ ur.Nameid)
         }
         if pid == nameid && ur.RoleType == model.RoleTypeCoordinator {
             return true
@@ -505,11 +505,11 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
 func nid2pid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")
-    if len(parts) != 3 {
-        return pid, fmt.Errorf("Bade nameid format: " + nid)
+    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
+        return pid, fmt.Errorf("Bad nameid format for nid2pid: " + nid)
     }
 
-    if parts[1] == "" {
+    if len(parts) == 1 || parts[1] == "" {
         pid = parts[0]
     } else {
         pid = strings.Join(parts[:len(parts)-1],  "#")
