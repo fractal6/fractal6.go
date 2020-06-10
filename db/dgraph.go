@@ -118,6 +118,7 @@ func initDB() *Dgraph {
 
     // GPRC/Graphql+- Request Template
     gpmQueries := map[string]string{
+        // Queries
         "count": `{
             all(func: uid("{{.id}}")) {
                 count({{.typeName}}.{{.fieldName}})
@@ -137,6 +138,7 @@ func initDB() *Dgraph {
             all(func: eq(Node.{{.fieldid}}, "{{.objid}}")) 
                 {{.payload}}
         }`,
+        // Mutations
     }
 
     // HTTP/Graphql Request Template
@@ -217,8 +219,7 @@ func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
 		log.Fatal("While trying to dial gRPC")
 	}
 
-	dc := api.NewDgraphClient(conn)
-	dgClient = dgo.NewDgraphClient(dc)
+	dgClient = dgo.NewDgraphClient(api.NewDgraphClient(conn))
 	//ctx := context.Background()
 
 	//// Perform login call. If the Dgraph cluster does not have ACL and
@@ -264,7 +265,7 @@ func (dg Dgraph) post(data []byte, res interface{}) error {
 //
 
 
-// Run a query on dgraph, using grpc channel (Graphql+-)
+// QueryGpm runs a query on dgraph, using grpc channel (Graphql+-)
 // Returns: data res
 func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, error) {
     // init client
@@ -284,11 +285,34 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     return res, nil
 }
 
+//MutateGpm runs an upsert block mutation by first querying query 
+//and then mutate based on the result.
+func (dg Dgraph) MutateGpm(query string, mu *api.Mutation) (error) {
+    // init client
+	dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+	txn := dgc.NewTxn()
+	defer txn.Discard(ctx)
+
+	req := &api.Request{
+		Query: query,
+		Mutations: []*api.Mutation{mu},
+		CommitNow:true,
+	}
+
+	if _, err := txn.Do(ctx, req); err != nil {
+		return err
+	}
+	return nil
+}
+
 //
 // GraphQL Interface
 //
 
-// Run a query Dgraph Graphql endpoing and map the result in the given data structure
+// QueryGql query the Dgraph Graphql endpoint by following a http request.
+// It map the result in to given data structure
 func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{}) error {
     // Get the query
     queryName := reqInput["QueryName"]
@@ -496,6 +520,32 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
     return &obj, nil
 }
 
+// Mutation
+
+// UpdateRoleType update the rolet of a node given the nameid uqing upsert block.
+func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
+
+	query := fmt.Sprintf(`query {
+		node as var(func: eq(Node.nameid, "%s"))
+	}`, nameid)
+
+    mu := fmt.Sprintf(`
+        uid(node) <Node.role_type> "%s" .
+        uid(node) <Node.name> "Member" .
+    `, roleType)
+
+	mutation := &api.Mutation{
+		SetNquads: []byte(mu),
+	}
+	
+    err := dg.MutateGpm(query, mutation)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
 //
 // Graphql requests
 //
@@ -543,7 +593,7 @@ func (dg Dgraph) AddUser(input model.AddUserInput) error {
 func (dg Dgraph) AddNode(input model.AddNodeInput) error {
     queryName := "addNode"
     inputType := "AddNodeInput"
-    queryGraph := `node { id } `
+    queryGraph := `node { id }`
 
     // Just One Node
     inputs, _ := json.Marshal([]model.AddNodeInput{input})

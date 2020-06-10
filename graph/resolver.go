@@ -62,13 +62,14 @@ func Init() gen.Config {
     // for update or remove inputs...
     c.Directives.Patch_isOwner = isOwner
     c.Directives.Patch_RO = readOnly
+    c.Directives.Patch_hasRole = hasRole 
     // for add, update and remove inputs...
     c.Directives.Alter_maxLength = inputMaxLength
     c.Directives.Alter_assertType = assertType
     c.Directives.Alter_hasRole = hasRole 
     c.Directives.Alter_hasRoot = hasRoot
     // For mutation hook
-    c.Directives.Add_addNodeHook = addNodeHook
+    c.Directives.Hook_addNode = addNodeHook
 
     return c
 }
@@ -155,7 +156,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
 
     rc := graphql.GetResolverContext(ctx)
     queryName := rc.Field.Name
-    if queryName == "addNode" { 
+    if queryName == "addNode" {  // @obsolete with ARGUMENT_DEFINITION directive ?
 
         // Get the Node Characteristics of the **Parent Node**
         if node.Parent == nil && (*node.Parent).Nameid == nil {
@@ -212,7 +213,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     return nil, tools.LogErr("@addNodeHook", "Access denied", e)
 }
 
-// HasRole check the user has the authorisatiion to access a ressource by checking if it satisfies at least one of 
+// HasRole check the user has the authorisation to update a ressource by checking if it satisfies at least one of 
 // 1. user rights
 // 2. user ownership (u field)
 // 3. check user role, (n r field)
@@ -222,13 +223,6 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     if err != nil {
         return nil, tools.LogErr("@hasRole/userCtx", "Access denied", err)  // Login or signup
     }
-
-    rc := graphql.GetResolverContext(ctx)
-    queryName := rc.Field.Name
-    if queryName == "addNode" {
-        // Manage this authorization in the addNodeHook
-        return next(ctx)
-    } // else => Update or Remove queries
 
     // If userField is given check if the current user
     // is the owner of the ressource
@@ -382,7 +376,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     var err error
 
     isRoot := node.IsRoot
-    nameid := node.Nameid
+    nameid := node.Nameid // @TODO (nameid @codec): verify that nameid match parentid
     rootnameid := node.Rootnameid
     name := node.Name
     parent_ := node.Parent
@@ -430,18 +424,46 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     }
 
     //
-    // New sub-circle hook
+    // New Role hook
     // 
-    if nodeType == model.NodeTypeCircle {
-        // @TODO (nameid @codec): verify that nameid match parentid
+    if nodeType == model.NodeTypeRole {
+        if roleType == nil {
+            err = fmt.Errorf("Role should have a RoleType.")
+        }
         if charac.Mode == model.NodeModeChaos {
             ok = userIsMember(uctx, parentid)
         } else if charac.Mode == model.NodeModeCoordinated {
             ok = userIsCoordo(uctx, parentid)
         }
 
+        // Change Guest to member if user got its first role
+        if ok && node.FirstLink != nil {
+            err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
+
+        }
+
         return ok, err
     }
+
+    //
+    // New sub-circle hook
+    // 
+    if nodeType == model.NodeTypeCircle {
+        if charac.Mode == model.NodeModeChaos {
+            ok = userIsMember(uctx, parentid)
+        } else if charac.Mode == model.NodeModeCoordinated {
+            ok = userIsCoordo(uctx, parentid)
+        }
+
+        for _, child := range node.Children {
+            if ok && child.FirstLink != nil {
+                err = maybeUpdateGuest2Peer(uctx, rootnameid, *child.FirstLink)
+            }
+        }
+
+        return ok, err
+    }
+
 
     return false, fmt.Errorf("Not implemented addNode request.")
 }
@@ -451,10 +473,10 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 //
 
 
-// useHasRoot return true if the user has at least one rool in above given node
-func userHasRoot(uctx model.UserCtx, nameid string) bool {
+// useHasRoot return true if the user has at least one role in above given node
+func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
     for _, ur := range uctx.Roles {
-        if ur.Rootnameid == nameid  {
+        if ur.Rootnameid == rootnameid  {
             return true
         }
     }
@@ -497,6 +519,31 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
         }
     }
     return false
+}
+
+// userIsGuest return true if the user is a guest (has only one role) in the given organisation
+func userIsGuest(uctx model.UserCtx, rootnameid string) bool {
+    if len(uctx.Roles) == 1 {
+        r := uctx.Roles[0]
+        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
+            return true
+        }
+    }
+
+    return false
+}
+
+// maybeUpdateGuest2Peer check if Guest should be upgrade to Member role type
+func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, firstLink model.UserRef) error {
+    if userIsGuest(uctx, rootnameid) && uctx.Username == *(firstLink).Username {
+        // Update RolType to Member
+        DB := db.GetDB()
+        err := DB.UpgradeGuest(uctx.Roles[0].Nameid, model.RoleTypeMember)
+        if err != nil {
+            return err
+        }
+    }
+    return nil
 }
 
 //

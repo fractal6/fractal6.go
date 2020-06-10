@@ -31,12 +31,11 @@ type AddLabelPayload struct {
 }
 
 type AddMandateInput struct {
-	CreatedAt        string   `json:"createdAt,omitempty"`
-	CreatedBy        *UserRef `json:"createdBy,omitempty"`
-	Message          *string  `json:"message,omitempty"`
-	Purpose          string   `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          *string  `json:"domains,omitempty"`
+	Tensions         []*TensionRef `json:"tensions,omitempty"`
+	Purpose          string        `json:"purpose,omitempty"`
+	Responsabilities *string       `json:"responsabilities,omitempty"`
+	Domains          *string       `json:"domains,omitempty"`
+	Policies         *string       `json:"policies,omitempty"`
 }
 
 type AddMandatePayload struct {
@@ -93,7 +92,9 @@ type AddTensionInput struct {
 	Receiver  *NodeRef       `json:"receiver,omitempty"`
 	Comments  []*CommentRef  `json:"comments,omitempty"`
 	Labels    []*LabelRef    `json:"labels,omitempty"`
+	Status    TensionStatus  `json:"status,omitempty"`
 	Action    *TensionAction `json:"action,omitempty"`
+	Mandate   *MandateRef    `json:"mandate,omitempty"`
 	NComments *int           `json:"n_comments,omitempty"`
 }
 
@@ -259,23 +260,20 @@ type LabelRef struct {
 }
 
 type Mandate struct {
-	Purpose          string  `json:"purpose,omitempty"`
-	Responsabilities *string `json:"responsabilities,omitempty"`
-	Domains          *string `json:"domains,omitempty"`
-	ID               string  `json:"id,omitempty"`
-	CreatedAt        string  `json:"createdAt,omitempty"`
-	CreatedBy        *User   `json:"createdBy,omitempty"`
-	Message          *string `json:"message,omitempty"`
+	ID               string     `json:"id,omitempty"`
+	Tensions         []*Tension `json:"tensions,omitempty"`
+	Purpose          string     `json:"purpose,omitempty"`
+	Responsabilities *string    `json:"responsabilities,omitempty"`
+	Domains          *string    `json:"domains,omitempty"`
+	Policies         *string    `json:"policies,omitempty"`
 }
 
 type MandateFilter struct {
-	ID        []string              `json:"id,omitempty"`
-	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
-	Message   *StringFullTextFilter `json:"message,omitempty"`
-	Purpose   *StringFullTextFilter `json:"purpose,omitempty"`
-	And       *MandateFilter        `json:"and,omitempty"`
-	Or        *MandateFilter        `json:"or,omitempty"`
-	Not       *MandateFilter        `json:"not,omitempty"`
+	ID      []string              `json:"id,omitempty"`
+	Purpose *StringFullTextFilter `json:"purpose,omitempty"`
+	And     *MandateFilter        `json:"and,omitempty"`
+	Or      *MandateFilter        `json:"or,omitempty"`
+	Not     *MandateFilter        `json:"not,omitempty"`
 }
 
 type MandateOrder struct {
@@ -285,22 +283,20 @@ type MandateOrder struct {
 }
 
 type MandatePatch struct {
-	CreatedAt        *string  `json:"createdAt,omitempty"`
-	CreatedBy        *UserRef `json:"createdBy,omitempty"`
-	Message          *string  `json:"message,omitempty"`
-	Purpose          *string  `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          *string  `json:"domains,omitempty"`
+	Tensions         []*TensionRef `json:"tensions,omitempty"`
+	Purpose          *string       `json:"purpose,omitempty"`
+	Responsabilities *string       `json:"responsabilities,omitempty"`
+	Domains          *string       `json:"domains,omitempty"`
+	Policies         *string       `json:"policies,omitempty"`
 }
 
 type MandateRef struct {
-	ID               *string  `json:"id,omitempty"`
-	CreatedAt        *string  `json:"createdAt,omitempty"`
-	CreatedBy        *UserRef `json:"createdBy,omitempty"`
-	Message          *string  `json:"message,omitempty"`
-	Purpose          *string  `json:"purpose,omitempty"`
-	Responsabilities *string  `json:"responsabilities,omitempty"`
-	Domains          *string  `json:"domains,omitempty"`
+	ID               *string       `json:"id,omitempty"`
+	Tensions         []*TensionRef `json:"tensions,omitempty"`
+	Purpose          *string       `json:"purpose,omitempty"`
+	Responsabilities *string       `json:"responsabilities,omitempty"`
+	Domains          *string       `json:"domains,omitempty"`
+	Policies         *string       `json:"policies,omitempty"`
 }
 
 type Node struct {
@@ -346,6 +342,7 @@ type NodeFilter struct {
 	Rootnameid *StringHashFilter `json:"rootnameid,omitempty"`
 	IsRoot     *bool             `json:"isRoot"`
 	Skills     *StringTermFilter `json:"skills,omitempty"`
+	RoleType   *RoleTypeHash     `json:"role_type,omitempty"`
 	And        *NodeFilter       `json:"and,omitempty"`
 	Or         *NodeFilter       `json:"or,omitempty"`
 	Not        *NodeFilter       `json:"not,omitempty"`
@@ -439,6 +436,10 @@ type PostRef struct {
 	ID string `json:"id,omitempty"`
 }
 
+type RoleTypeHash struct {
+	Eq *RoleType `json:"eq,omitempty"`
+}
+
 type StringExactFilter struct {
 	Eq *string `json:"eq,omitempty"`
 	Le *string `json:"le,omitempty"`
@@ -473,7 +474,9 @@ type Tension struct {
 	Receiver  *Node          `json:"receiver,omitempty"`
 	Comments  []*Comment     `json:"comments,omitempty"`
 	Labels    []*Label       `json:"labels,omitempty"`
+	Status    TensionStatus  `json:"status,omitempty"`
 	Action    *TensionAction `json:"action,omitempty"`
+	Mandate   *Mandate       `json:"mandate,omitempty"`
 	NComments *int           `json:"n_comments,omitempty"`
 	ID        string         `json:"id,omitempty"`
 	CreatedAt string         `json:"createdAt,omitempty"`
@@ -488,6 +491,7 @@ type TensionFilter struct {
 	Nth       *StringTermFilter     `json:"nth,omitempty"`
 	Title     *StringTermFilter     `json:"title,omitempty"`
 	Type      *TensionTypeHash      `json:"type_,omitempty"`
+	Status    *TensionStatusHash    `json:"status,omitempty"`
 	And       *TensionFilter        `json:"and,omitempty"`
 	Or        *TensionFilter        `json:"or,omitempty"`
 	Not       *TensionFilter        `json:"not,omitempty"`
@@ -510,7 +514,9 @@ type TensionPatch struct {
 	Receiver  *NodeRef       `json:"receiver,omitempty"`
 	Comments  []*CommentRef  `json:"comments,omitempty"`
 	Labels    []*LabelRef    `json:"labels,omitempty"`
+	Status    *TensionStatus `json:"status,omitempty"`
 	Action    *TensionAction `json:"action,omitempty"`
+	Mandate   *MandateRef    `json:"mandate,omitempty"`
 	NComments *int           `json:"n_comments,omitempty"`
 }
 
@@ -526,8 +532,14 @@ type TensionRef struct {
 	Receiver  *NodeRef       `json:"receiver,omitempty"`
 	Comments  []*CommentRef  `json:"comments,omitempty"`
 	Labels    []*LabelRef    `json:"labels,omitempty"`
+	Status    *TensionStatus `json:"status,omitempty"`
 	Action    *TensionAction `json:"action,omitempty"`
+	Mandate   *MandateRef    `json:"mandate,omitempty"`
 	NComments *int           `json:"n_comments,omitempty"`
+}
+
+type TensionStatusHash struct {
+	Eq TensionStatus `json:"eq,omitempty"`
 }
 
 type TensionTypeHash struct {
@@ -832,24 +844,22 @@ func (e LabelOrderable) MarshalGQL(w io.Writer) {
 type MandateOrderable string
 
 const (
-	MandateOrderableCreatedAt        MandateOrderable = "createdAt"
-	MandateOrderableMessage          MandateOrderable = "message"
 	MandateOrderablePurpose          MandateOrderable = "purpose"
 	MandateOrderableResponsabilities MandateOrderable = "responsabilities"
 	MandateOrderableDomains          MandateOrderable = "domains"
+	MandateOrderablePolicies         MandateOrderable = "policies"
 )
 
 var AllMandateOrderable = []MandateOrderable{
-	MandateOrderableCreatedAt,
-	MandateOrderableMessage,
 	MandateOrderablePurpose,
 	MandateOrderableResponsabilities,
 	MandateOrderableDomains,
+	MandateOrderablePolicies,
 }
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderableCreatedAt, MandateOrderableMessage, MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains:
+	case MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies:
 		return true
 	}
 	return false
@@ -1056,19 +1066,21 @@ type RoleType string
 
 const (
 	RoleTypeCoordinator RoleType = "Coordinator"
+	RoleTypePeer        RoleType = "Peer"
 	RoleTypeMember      RoleType = "Member"
 	RoleTypeGuest       RoleType = "Guest"
 )
 
 var AllRoleType = []RoleType{
 	RoleTypeCoordinator,
+	RoleTypePeer,
 	RoleTypeMember,
 	RoleTypeGuest,
 }
 
 func (e RoleType) IsValid() bool {
 	switch e {
-	case RoleTypeCoordinator, RoleTypeMember, RoleTypeGuest:
+	case RoleTypeCoordinator, RoleTypePeer, RoleTypeMember, RoleTypeGuest:
 		return true
 	}
 	return false
@@ -1180,6 +1192,47 @@ func (e *TensionOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e TensionOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TensionStatus string
+
+const (
+	TensionStatusOpen   TensionStatus = "Open"
+	TensionStatusClosed TensionStatus = "Closed"
+)
+
+var AllTensionStatus = []TensionStatus{
+	TensionStatusOpen,
+	TensionStatusClosed,
+}
+
+func (e TensionStatus) IsValid() bool {
+	switch e {
+	case TensionStatusOpen, TensionStatusClosed:
+		return true
+	}
+	return false
+}
+
+func (e TensionStatus) String() string {
+	return string(e)
+}
+
+func (e *TensionStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TensionStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TensionStatus", str)
+	}
+	return nil
+}
+
+func (e TensionStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

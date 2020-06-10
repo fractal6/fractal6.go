@@ -40,7 +40,6 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Add_addNodeHook  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Add_isOwner      func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Alter_assertType func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
 	Alter_hasRole    func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
@@ -50,9 +49,11 @@ type DirectiveRoot struct {
 	Dgraph           func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	HasInverse       func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
 	Hidden           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addNode     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	IsAuth           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Patch_RO         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_hasRole    func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
 	Patch_isOwner    func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Search           func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
 	Secret           func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
@@ -148,13 +149,12 @@ type ComplexityRoot struct {
 	}
 
 	Mandate struct {
-		CreatedAt        func(childComplexity int) int
-		CreatedBy        func(childComplexity int, filter *model.UserFilter) int
 		Domains          func(childComplexity int) int
 		ID               func(childComplexity int) int
-		Message          func(childComplexity int) int
+		Policies         func(childComplexity int) int
 		Purpose          func(childComplexity int) int
 		Responsabilities func(childComplexity int) int
+		Tensions         func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
 	Mutation struct {
@@ -245,10 +245,12 @@ type ComplexityRoot struct {
 		Emitter   func(childComplexity int, filter *model.NodeFilter) int
 		ID        func(childComplexity int) int
 		Labels    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		Mandate   func(childComplexity int, filter *model.MandateFilter) int
 		Message   func(childComplexity int) int
 		NComments func(childComplexity int) int
 		Nth       func(childComplexity int) int
 		Receiver  func(childComplexity int, filter *model.NodeFilter) int
+		Status    func(childComplexity int) int
 		Title     func(childComplexity int) int
 		Type      func(childComplexity int) int
 	}
@@ -672,25 +674,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Label.Name(childComplexity), true
 
-	case "Mandate.createdAt":
-		if e.complexity.Mandate.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.Mandate.CreatedAt(childComplexity), true
-
-	case "Mandate.createdBy":
-		if e.complexity.Mandate.CreatedBy == nil {
-			break
-		}
-
-		args, err := ec.field_Mandate_createdBy_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mandate.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
-
 	case "Mandate.domains":
 		if e.complexity.Mandate.Domains == nil {
 			break
@@ -705,12 +688,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mandate.ID(childComplexity), true
 
-	case "Mandate.message":
-		if e.complexity.Mandate.Message == nil {
+	case "Mandate.policies":
+		if e.complexity.Mandate.Policies == nil {
 			break
 		}
 
-		return e.complexity.Mandate.Message(childComplexity), true
+		return e.complexity.Mandate.Policies(childComplexity), true
 
 	case "Mandate.purpose":
 		if e.complexity.Mandate.Purpose == nil {
@@ -725,6 +708,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mandate.Responsabilities(childComplexity), true
+
+	case "Mandate.tensions":
+		if e.complexity.Mandate.Tensions == nil {
+			break
+		}
+
+		args, err := ec.field_Mandate_tensions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mandate.Tensions(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Mutation.addComment":
 		if e.complexity.Mutation.AddComment == nil {
@@ -1485,6 +1480,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Labels(childComplexity, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Tension.mandate":
+		if e.complexity.Tension.Mandate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_mandate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
+
 	case "Tension.message":
 		if e.complexity.Tension.Message == nil {
 			break
@@ -1517,6 +1524,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.Receiver(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "Tension.status":
+		if e.complexity.Tension.Status == nil {
+			break
+		}
+
+		return e.complexity.Tension.Status(childComplexity), true
 
 	case "Tension.title":
 		if e.complexity.Tension.Title == nil {
@@ -1851,7 +1865,7 @@ directive @hidden on FIELD_DEFINITION
 
 directive @count(f: String!) on FIELD_DEFINITION
 
-directive @add_addNodeHook on ARGUMENT_DEFINITION
+directive @hook_addNode on ARGUMENT_DEFINITION
 
 directive @alter_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
 
@@ -1860,6 +1874,8 @@ directive @alter_assertType(f: String!, t: NodeType!) on INPUT_FIELD_DEFINITION
 directive @isAuth on OBJECT|FIELD_DEFINITION
 
 directive @alter_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
+
+directive @patch_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
 
 directive @alter_hasRoot(n: [String!]!) on INPUT_FIELD_DEFINITION
 
@@ -1889,7 +1905,7 @@ type Node {
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
-  role_type: RoleType
+  role_type: RoleType @search
   charac: NodeCharac!
 }
 
@@ -1913,7 +1929,9 @@ type Tension {
   receiver(filter: NodeFilter): Node!
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  status: TensionStatus! @search
   action: TensionAction
+  mandate(filter: MandateFilter): Mandate
   n_comments: Int @count(f: comments)
   id: ID!
   createdAt: DateTime! @search
@@ -1929,13 +1947,12 @@ type Comment {
 }
 
 type Mandate {
+  id: ID!
+  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]! @hasInverse(field: mandate)
   purpose: String! @search(by: [fulltext])
   responsabilities: String
   domains: String
-  id: ID!
-  createdAt: DateTime! @search
-  createdBy(filter: UserFilter): User!
-  message: String @search(by: [fulltext])
+  policies: String
 }
 
 type User {
@@ -1980,8 +1997,12 @@ enum TensionType {
 }
 
 enum RoleType {
+
   Coordinator
+  Peer
+
   Member
+
   Guest
 
 
@@ -1990,6 +2011,11 @@ enum RoleType {
 enum NodeMode {
   Chaos
   Coordinated
+}
+
+enum TensionStatus {
+  Open
+  Closed
 }
 
 enum TensionAction {
@@ -2002,15 +2028,15 @@ enum TensionAction {
 
 }
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2035,12 +2061,11 @@ type AddLabelPayload {
 }
 
 input AddMandateInput {
-  createdAt: DateTime!
-  createdBy: UserRef!
-  message: String
+  tensions: [TensionRef!]!
   purpose: String!
   responsabilities: String
   domains: String
+  policies: String
 }
 
 type AddMandatePayload {
@@ -2064,21 +2089,21 @@ input AddNodeInput {
   parent: NodeRef
   children: [NodeRef!]
   type_: NodeType!
-  name: String! @alter_hasRole(n:["parent"], r: Coordinator)
+  name: String!
   nameid: String!
   rootnameid: String!
-  mandate: MandateRef @alter_hasRole(n:["parent"], r: Coordinator)
+  mandate: MandateRef
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
   n_tensions_out: Int
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean!
-  first_link: UserRef @alter_hasRole(n:["parent"], r: Coordinator)
-  second_link: UserRef @alter_hasRole(n:["parent"], r: Coordinator)
-  skills: [String!] @alter_hasRole(n:["parent"], r: Coordinator)
-  role_type: RoleType @alter_hasRole(n:["parent"], r: Coordinator)
-  charac: NodeCharacRef! @alter_hasRole(n:["parent"], r: Coordinator)
+  first_link: UserRef
+  second_link: UserRef
+  skills: [String!]
+  role_type: RoleType
+  charac: NodeCharacRef!
 }
 
 type AddNodePayload {
@@ -2097,7 +2122,9 @@ input AddTensionInput {
   receiver: NodeRef! @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  status: TensionStatus! @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  mandate: MandateRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
 
@@ -2280,8 +2307,6 @@ input LabelRef {
 
 input MandateFilter {
   id: [ID!]
-  createdAt: DateTimeFilter
-  message: StringFullTextFilter
   purpose: StringFullTextFilter
   and: MandateFilter
   or: MandateFilter
@@ -2295,34 +2320,31 @@ input MandateOrder {
 }
 
 enum MandateOrderable {
-  createdAt
-  message
   purpose
   responsabilities
   domains
+  policies
 }
 
 input MandatePatch {
-  createdAt: DateTime
-  createdBy: UserRef
-  message: String
+  tensions: [TensionRef!]
   purpose: String @patch_RO
   responsabilities: String @patch_RO
   domains: String @patch_RO
+  policies: String @patch_RO
 }
 
 input MandateRef {
   id: ID
-  createdAt: DateTime
-  createdBy: UserRef
-  message: String
+  tensions: [TensionRef!]
   purpose: String
   responsabilities: String
   domains: String
+  policies: String
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]! @add_addNodeHook): AddNodePayload
+  addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload
   updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
   addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
@@ -2360,6 +2382,7 @@ input NodeFilter {
   rootnameid: StringHashFilter
   isRoot: Boolean
   skills: StringTermFilter
+  role_type: RoleType_hash
   and: NodeFilter
   or: NodeFilter
   not: NodeFilter
@@ -2388,20 +2411,20 @@ input NodePatch {
   parent: NodeRef @patch_RO
   children: [NodeRef!] @patch_RO
   type_: NodeType @patch_RO
-  name: String @alter_hasRole(n:["parent"], r: Coordinator)
+  name: String @patch_hasRole(n:["parent"], r: Coordinator)
   rootnameid: String @patch_RO
-  mandate: MandateRef @alter_hasRole(n:["parent"], r: Coordinator)
+  mandate: MandateRef @patch_hasRole(n:["parent"], r: Coordinator)
   tensions_out: [TensionRef!] @patch_RO
   tensions_in: [TensionRef!] @patch_RO
   n_tensions_out: Int
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean @patch_RO
-  first_link: UserRef @alter_hasRole(n:["parent"], r: Coordinator)
-  second_link: UserRef @alter_hasRole(n:["parent"], r: Coordinator)
-  skills: [String!] @alter_hasRole(n:["parent"], r: Coordinator)
-  role_type: RoleType @alter_hasRole(n:["parent"], r: Coordinator)
-  charac: NodeCharacRef @alter_hasRole(n:["parent"], r: Coordinator)
+  first_link: UserRef @patch_hasRole(n:["parent"], r: Coordinator)
+  second_link: UserRef @patch_hasRole(n:["parent"], r: Coordinator)
+  skills: [String!] @patch_hasRole(n:["parent"], r: Coordinator)
+  role_type: RoleType @patch_hasRole(n:["parent"], r: Coordinator)
+  charac: NodeCharacRef @patch_hasRole(n:["parent"], r: Coordinator)
 }
 
 input NodeRef {
@@ -2481,6 +2504,10 @@ type Query {
   queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label]
 }
 
+input RoleType_hash {
+  eq: RoleType
+}
+
 input StringExactFilter {
   eq: String
   le: String
@@ -2514,6 +2541,7 @@ input TensionFilter {
   nth: StringTermFilter
   title: StringTermFilter
   type_: TensionType_hash
+  status: TensionStatus_hash
   and: TensionFilter
   or: TensionFilter
   not: TensionFilter
@@ -2544,7 +2572,9 @@ input TensionPatch {
   receiver: NodeRef @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  status: TensionStatus @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  mandate: MandateRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
 
@@ -2560,8 +2590,14 @@ input TensionRef {
   receiver: NodeRef
   comments: [CommentRef!]
   labels: [LabelRef!]
+  status: TensionStatus
   action: TensionAction
+  mandate: MandateRef
   n_comments: Int
+}
+
+input TensionStatus_hash {
+  eq: TensionStatus!
 }
 
 input TensionType_hash {
@@ -2862,6 +2898,36 @@ func (ec *executionContext) dir_hasInverse_args(ctx context.Context, rawArgs map
 		}
 	}
 	args["field"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) dir_patch_hasRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["n"]; ok {
+		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["n"] = arg0
+	var arg1 model.RoleType
+	if tmp, ok := rawArgs["r"]; ok {
+		arg1, err = ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["r"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["u"]; ok {
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["u"] = arg2
 	return args, nil
 }
 
@@ -3201,17 +3267,41 @@ func (ec *executionContext) field_Comment_createdBy_args(ctx context.Context, ra
 	return args, nil
 }
 
-func (ec *executionContext) field_Mandate_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mandate_tensions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.UserFilter
+	var arg0 *model.TensionFilter
 	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -3280,10 +3370,10 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 			return ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Add_addNodeHook == nil {
-				return nil, errors.New("directive add_addNodeHook is not implemented")
+			if ec.directives.Hook_addNode == nil {
+				return nil, errors.New("directive hook_addNode is not implemented")
 			}
-			return ec.directives.Add_addNodeHook(ctx, rawArgs, directive0)
+			return ec.directives.Hook_addNode(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -4283,6 +4373,20 @@ func (ec *executionContext) field_Tension_labels_args(ctx context.Context, rawAr
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MandateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -5970,6 +6074,105 @@ func (ec *executionContext) _Label_color(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mandate",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mandate_tensions(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mandate",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mandate_tensions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Tensions, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "mandate")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalNTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mandate_purpose(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6090,7 +6293,7 @@ func (ec *executionContext) _Mandate_domains(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mandate_policies(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6107,160 +6310,7 @@ func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.Colle
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mandate_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mandate",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.CreatedAt, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNDateTime2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mandate_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mandate",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mandate_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mandate_message(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mandate",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Message, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+		return obj.Policies, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8091,8 +8141,28 @@ func (ec *executionContext) _Node_role_type(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RoleType, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.RoleType, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.RoleType); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9390,6 +9460,60 @@ func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.C
 	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Tension_status(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Status, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(model.TensionStatus); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.TensionStatus`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.TensionStatus)
+	fc.Result = res
+	return ec.marshalNTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Tension_action(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9419,6 +9543,44 @@ func (ec *executionContext) _Tension_action(ctx context.Context, field graphql.C
 	res := resTmp.(*model.TensionAction)
 	fc.Result = res
 	return ec.marshalOTensionAction2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_mandate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_mandate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mandate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Mandate)
+	fc.Result = res
+	return ec.marshalOMandate2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -11928,21 +12090,9 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 
 	for k, v := range asMap {
 		switch k {
-		case "createdAt":
+		case "tensions":
 			var err error
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "message":
-			var err error
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Tensions, err = ec.unmarshalNTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11961,6 +12111,12 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 		case "domains":
 			var err error
 			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "policies":
+			var err error
+			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12053,30 +12209,9 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "name":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(string); ok {
-				it.Name = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "nameid":
 			var err error
@@ -12092,34 +12227,9 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "mandate":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(*model.MandateRef); ok {
-				it.Mandate = data
-			} else if tmp == nil {
-				it.Mandate = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.MandateRef`, tmp)
 			}
 		case "tensions_out":
 			var err error
@@ -12159,154 +12269,33 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "first_link":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(*model.UserRef); ok {
-				it.FirstLink = data
-			} else if tmp == nil {
-				it.FirstLink = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "second_link":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.SecondLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(*model.UserRef); ok {
-				it.SecondLink = data
-			} else if tmp == nil {
-				it.SecondLink = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "skills":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.([]string); ok {
-				it.Skills = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
 			}
 		case "role_type":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(*model.RoleType); ok {
-				it.RoleType = data
-			} else if tmp == nil {
-				it.RoleType = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 			}
 		case "charac":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNNodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Charac, err = ec.unmarshalNNodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(*model.NodeCharacRef); ok {
-				it.Charac = data
-			} else if tmp == nil {
-				it.Charac = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeCharacRef`, tmp)
 			}
 		}
 	}
@@ -12538,6 +12527,39 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.LabelRef`, tmp)
 			}
+		case "status":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(model.TensionStatus); ok {
+				it.Status = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.TensionStatus`, tmp)
+			}
 		case "action":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -12572,6 +12594,41 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				it.Action = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.TensionAction`, tmp)
+			}
+		case "mandate":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*model.MandateRef); ok {
+				it.Mandate = data
+			} else if tmp == nil {
+				it.Mandate = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.MandateRef`, tmp)
 			}
 		case "n_comments":
 			var err error
@@ -13258,18 +13315,6 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "createdAt":
-			var err error
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "message":
-			var err error
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
@@ -13336,21 +13381,9 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
-		case "createdAt":
+		case "tensions":
 			var err error
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "message":
-			var err error
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13417,6 +13450,27 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
+		case "policies":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Policies = data
+			} else if tmp == nil {
+				it.Policies = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		}
 	}
 
@@ -13435,21 +13489,9 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "createdAt":
+		case "tensions":
 			var err error
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "message":
-			var err error
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13468,6 +13510,12 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		case "domains":
 			var err error
 			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "policies":
+			var err error
+			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13552,6 +13600,12 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 		case "skills":
 			var err error
 			it.Skills, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role_type":
+			var err error
+			it.RoleType, err = ec.unmarshalORoleType_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13738,10 +13792,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -13790,10 +13844,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -13902,10 +13956,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -13933,10 +13987,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -13962,10 +14016,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -13991,10 +14045,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -14022,10 +14076,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -14378,6 +14432,24 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRoleType_hash(ctx context.Context, obj interface{}) (model.RoleTypeHash, error) {
+	var it model.RoleTypeHash
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+			it.Eq, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStringExactFilter(ctx context.Context, obj interface{}) (model.StringExactFilter, error) {
 	var it model.StringExactFilter
 	var asMap = obj.(map[string]interface{})
@@ -14543,6 +14615,12 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 		case "type_":
 			var err error
 			it.Type, err = ec.unmarshalOTensionType_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTypeHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+			it.Status, err = ec.unmarshalOTensionStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14834,6 +14912,41 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.LabelRef`, tmp)
 			}
+		case "status":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionStatus2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*model.TensionStatus); ok {
+				it.Status = data
+			} else if tmp == nil {
+				it.Status = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.TensionStatus`, tmp)
+			}
 		case "action":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -14868,6 +14981,41 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				it.Action = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.TensionAction`, tmp)
+			}
+		case "mandate":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*model.MandateRef); ok {
+				it.Mandate = data
+			} else if tmp == nil {
+				it.Mandate = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.MandateRef`, tmp)
 			}
 		case "n_comments":
 			var err error
@@ -14953,15 +15101,45 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "status":
+			var err error
+			it.Status, err = ec.unmarshalOTensionStatus2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "action":
 			var err error
 			it.Action, err = ec.unmarshalOTensionAction2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
 			if err != nil {
 				return it, err
 			}
+		case "mandate":
+			var err error
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "n_comments":
 			var err error
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTensionStatus_hash(ctx context.Context, obj interface{}) (model.TensionStatusHash, error) {
+	var it model.TensionStatusHash
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+			it.Eq, err = ec.unmarshalNTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16191,6 +16369,16 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mandate")
+		case "id":
+			out.Values[i] = ec._Mandate_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tensions":
+			out.Values[i] = ec._Mandate_tensions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "purpose":
 			out.Values[i] = ec._Mandate_purpose(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16200,23 +16388,8 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Mandate_responsabilities(ctx, field, obj)
 		case "domains":
 			out.Values[i] = ec._Mandate_domains(ctx, field, obj)
-		case "id":
-			out.Values[i] = ec._Mandate_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createdAt":
-			out.Values[i] = ec._Mandate_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createdBy":
-			out.Values[i] = ec._Mandate_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "message":
-			out.Values[i] = ec._Mandate_message(ctx, field, obj)
+		case "policies":
+			out.Values[i] = ec._Mandate_policies(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16703,8 +16876,15 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_comments(ctx, field, obj)
 		case "labels":
 			out.Values[i] = ec._Tension_labels(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._Tension_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "action":
 			out.Values[i] = ec._Tension_action(ctx, field, obj)
+		case "mandate":
+			out.Values[i] = ec._Tension_mandate(ctx, field, obj)
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
 		case "id":
@@ -17822,6 +18002,43 @@ func (ec *executionContext) marshalNTension2zerogovᚋfractal6ᚗgoᚋgraphᚋmo
 	return ec._Tension(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Tension) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTension2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNTension2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx context.Context, sel ast.SelectionSet, v *model.Tension) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -17848,12 +18065,41 @@ func (ec *executionContext) unmarshalNTensionRef2zerogovᚋfractal6ᚗgoᚋgraph
 	return ec.unmarshalInputTensionRef(ctx, v)
 }
 
+func (ec *executionContext) unmarshalNTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx context.Context, v interface{}) ([]*model.TensionRef, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.TensionRef, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNTensionRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalNTensionRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx context.Context, v interface{}) (*model.TensionRef, error) {
 	if v == nil {
 		return nil, nil
 	}
 	res, err := ec.unmarshalNTensionRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) unmarshalNTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx context.Context, v interface{}) (model.TensionStatus, error) {
+	var res model.TensionStatus
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx context.Context, sel ast.SelectionSet, v model.TensionStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNTensionType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx context.Context, v interface{}) (model.TensionType, error) {
@@ -19473,6 +19719,18 @@ func (ec *executionContext) marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraph�
 	return v
 }
 
+func (ec *executionContext) unmarshalORoleType_hash2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx context.Context, v interface{}) (model.RoleTypeHash, error) {
+	return ec.unmarshalInputRoleType_hash(ctx, v)
+}
+
+func (ec *executionContext) unmarshalORoleType_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx context.Context, v interface{}) (*model.RoleTypeHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalORoleType_hash2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	return graphql.UnmarshalString(v)
 }
@@ -19757,6 +20015,42 @@ func (ec *executionContext) unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx context.Context, v interface{}) (model.TensionStatus, error) {
+	var res model.TensionStatus
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalOTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx context.Context, sel ast.SelectionSet, v model.TensionStatus) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalOTensionStatus2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx context.Context, v interface{}) (*model.TensionStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOTensionStatus2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx context.Context, sel ast.SelectionSet, v *model.TensionStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOTensionStatus_hash2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx context.Context, v interface{}) (model.TensionStatusHash, error) {
+	return ec.unmarshalInputTensionStatus_hash(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOTensionStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx context.Context, v interface{}) (*model.TensionStatusHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOTensionStatus_hash2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOTensionType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx context.Context, v interface{}) (model.TensionType, error) {
