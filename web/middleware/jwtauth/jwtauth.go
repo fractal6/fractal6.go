@@ -20,12 +20,36 @@ var (
 
 // Library errors
 var (
-	ErrUnauthorized = errors.New("jwtauth: token is unauthorized")
-	ErrExpired      = errors.New("jwtauth: token is expired")
-	ErrNBFInvalid   = errors.New("jwtauth: token nbf validation failed")
-	ErrIATInvalid   = errors.New("jwtauth: token iat validation failed")
-	ErrNoTokenFound = errors.New("jwtauth: no token found")
-	ErrAlgoInvalid  = errors.New("jwtauth: algorithm mismatch")
+	ErrUnauthorized = errors.New(`{
+        "errors":[{
+            "location": "jwtauth",
+            "message": "token is unauthorized"
+    }]}`)
+	ErrExpired      = errors.New(`{
+        "errors":[{
+            "location": "jwtauth",
+            "message": "token is expired"
+    }]}`)
+	ErrNBFInvalid   = errors.New(`{
+        "errors":[{
+            "location": "jwtauth",
+            "message": "token nbf validation failed"
+    }]}`)
+	ErrIATInvalid   = errors.New(`{
+        "errors":[{
+            "location": "jwtauth",
+            "message": "token iat validation failed"
+    }]}`)
+	ErrNoTokenFound = errors.New(`{
+        "errors":[{
+            "location": "jwtauth",
+            "message": "no token found"
+    }]}`)
+	ErrAlgoInvalid  = errors.New(`{
+        "errors":[{
+            "location": "jwtauth",
+            "message": "algorithm mismatch"
+    }]}`)
 )
 
 type JWTAuth struct {

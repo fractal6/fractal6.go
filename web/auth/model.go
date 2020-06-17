@@ -27,25 +27,25 @@ var (
     }`)
     ErrUsernameTooLong = errors.New(`{
         "errors":[{
-            "message":"Username too long",
+            "message":"Username too long.",
             "location": "username"
         }]
     }`)
     ErrBadNameFormat = errors.New(`{
         "errors":[{
-            "message":"Bad formating",
+            "message":"Bad formating.",
             "location": "name"
         }]
     }`)
     ErrNameTooLong = errors.New(`{
         "errors":[{
-            "message":"Name too long",
+            "message":"Name too long.",
             "location": "name"
         }]
     }`)
     ErrBadEmailFormat = errors.New(`{
         "errors":[{
-            "message":"Bad formating",
+            "message":"Bad formating.",
             "location": "email"
         }]
     }`)
@@ -57,39 +57,39 @@ var (
     }`)
     ErrBadPassword = errors.New(`{
         "errors":[{
-            "message":"Bad Password",
+            "message":"Bad Password.",
             "location": "password"
         }]
     }`)
     ErrPasswordTooShort = errors.New(`{
         "errors":[{
-            "message":"Password too short",
+            "message":"Password too short.",
             "location": "password"
         }]
     }`)
     ErrPasswordTooLong = errors.New(`{
         "errors":[{
-            "message":"Password too long",
+            "message":"Password too long.",
             "location": "password"
         }]
     }`)
     // Upsert error
     ErrUsernameExist = errors.New(`{
         "errors":[{
-            "message":"Username already exists",
+            "message":"Username already exists.",
             "location": "username"
         }]
     }`)
     ErrEmailExist = errors.New(`{
         "errors":[{
-            "message":"Email already exists",
+            "message":"Email already exists.",
             "location": "email"
         }]
     }`)
     // User Rights
     ErrCantLogin = errors.New(`{
         "errors":[{
-            "message": "You are not authorized to login",
+            "message": "You are not authorized to login.",
             "location": ""
         }]
     }`)

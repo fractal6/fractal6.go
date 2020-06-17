@@ -141,7 +141,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     // Retrieve userCtx from token
     uctx, err := auth.UserCtxFromContext(ctx)
     if err != nil {
-        return nil, tools.LogErr("@hasRole/userCtx", "Access denied", err)  // Login or signup
+        return nil, tools.LogErr("@addNodeHook/userCtx", "Access denied", err)  // Login or signup
     }
 
     input_, err := next(ctx)
@@ -212,6 +212,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     e := fmt.Errorf("Operation not allowed. Please, contact a coordinator to access this ressource.")
     return nil, tools.LogErr("@addNodeHook", "Access denied", e)
 }
+
 
 // HasRole check the user has the authorisation to update a ressource by checking if it satisfies at least one of 
 // 1. user rights
@@ -439,7 +440,6 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
         // Change Guest to member if user got its first role
         if ok && node.FirstLink != nil {
             err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
-
         }
 
         return ok, err
