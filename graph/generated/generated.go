@@ -238,21 +238,23 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Action    func(childComplexity int) int
-		Comments  func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int, filter *model.UserFilter) int
-		Emitter   func(childComplexity int, filter *model.NodeFilter) int
-		ID        func(childComplexity int) int
-		Labels    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		Mandate   func(childComplexity int, filter *model.MandateFilter) int
-		Message   func(childComplexity int) int
-		NComments func(childComplexity int) int
-		Nth       func(childComplexity int) int
-		Receiver  func(childComplexity int, filter *model.NodeFilter) int
-		Status    func(childComplexity int) int
-		Title     func(childComplexity int) int
-		Type      func(childComplexity int) int
+		Action     func(childComplexity int) int
+		Comments   func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CreatedAt  func(childComplexity int) int
+		CreatedBy  func(childComplexity int, filter *model.UserFilter) int
+		Emitter    func(childComplexity int, filter *model.NodeFilter) int
+		Emitterid  func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Labels     func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		Mandate    func(childComplexity int, filter *model.MandateFilter) int
+		Message    func(childComplexity int) int
+		NComments  func(childComplexity int) int
+		Nth        func(childComplexity int) int
+		Receiver   func(childComplexity int, filter *model.NodeFilter) int
+		Receiverid func(childComplexity int) int
+		Status     func(childComplexity int) int
+		Title      func(childComplexity int) int
+		Type       func(childComplexity int) int
 	}
 
 	UpdateCommentPayload struct {
@@ -1461,6 +1463,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Emitter(childComplexity, args["filter"].(*model.NodeFilter)), true
 
+	case "Tension.emitterid":
+		if e.complexity.Tension.Emitterid == nil {
+			break
+		}
+
+		return e.complexity.Tension.Emitterid(childComplexity), true
+
 	case "Tension.id":
 		if e.complexity.Tension.ID == nil {
 			break
@@ -1524,6 +1533,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.Receiver(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "Tension.receiverid":
+		if e.complexity.Tension.Receiverid == nil {
+			break
+		}
+
+		return e.complexity.Tension.Receiverid(childComplexity), true
 
 	case "Tension.status":
 		if e.complexity.Tension.Status == nil {
@@ -1923,7 +1939,7 @@ type Post {
 
 type Tension {
   nth: String @search
-  title: String! @search(by: [term])
+  title: String! @search(by: [fulltext])
   type_: TensionType! @search
   emitter(filter: NodeFilter): Node!
   receiver(filter: NodeFilter): Node!
@@ -1933,6 +1949,8 @@ type Tension {
   action: TensionAction
   mandate(filter: MandateFilter): Mandate
   n_comments: Int @count(f: comments)
+  emitterid: String! @search(by: [hash, regexp])
+  receiverid: String! @search(by: [hash, regexp])
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
@@ -2028,15 +2046,15 @@ enum TensionAction {
 
 }
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2126,6 +2144,8 @@ input AddTensionInput {
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   mandate: MandateRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
+  emitterid: String!
+  receiverid: String!
 }
 
 type AddTensionPayload {
@@ -2525,6 +2545,11 @@ input StringHashFilter {
   eq: String
 }
 
+input StringHashFilter_StringRegExpFilter {
+  eq: String
+  regexp: String
+}
+
 input StringRegExpFilter {
   regexp: String
 }
@@ -2539,9 +2564,11 @@ input TensionFilter {
   createdAt: DateTimeFilter
   message: StringFullTextFilter
   nth: StringTermFilter
-  title: StringTermFilter
+  title: StringFullTextFilter
   type_: TensionType_hash
   status: TensionStatus_hash
+  emitterid: StringHashFilter_StringRegExpFilter
+  receiverid: StringHashFilter_StringRegExpFilter
   and: TensionFilter
   or: TensionFilter
   not: TensionFilter
@@ -2559,6 +2586,8 @@ enum TensionOrderable {
   nth
   title
   n_comments
+  emitterid
+  receiverid
 }
 
 input TensionPatch {
@@ -2576,6 +2605,8 @@ input TensionPatch {
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   mandate: MandateRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
+  emitterid: String
+  receiverid: String
 }
 
 input TensionRef {
@@ -2594,6 +2625,8 @@ input TensionRef {
   action: TensionAction
   mandate: MandateRef
   n_comments: Int
+  emitterid: String
+  receiverid: String
 }
 
 input TensionStatus_hash {
@@ -9211,7 +9244,7 @@ func (ec *executionContext) _Tension_title(ctx context.Context, field graphql.Co
 			return obj.Title, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"term"})
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
 			if err != nil {
 				return nil, err
 			}
@@ -9636,6 +9669,122 @@ func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graph
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_emitterid(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Emitterid, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash", "regexp"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_receiverid(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Receiverid, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash", "regexp"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_id(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -12636,6 +12785,18 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "emitterid":
+			var err error
+			it.Emitterid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "receiverid":
+			var err error
+			it.Receiverid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14534,6 +14695,30 @@ func (ec *executionContext) unmarshalInputStringHashFilter(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputStringHashFilter_StringRegExpFilter(ctx context.Context, obj interface{}) (model.StringHashFilterStringRegExpFilter, error) {
+	var it model.StringHashFilterStringRegExpFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+			it.Eq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "regexp":
+			var err error
+			it.Regexp, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStringRegExpFilter(ctx context.Context, obj interface{}) (model.StringRegExpFilter, error) {
 	var it model.StringRegExpFilter
 	var asMap = obj.(map[string]interface{})
@@ -14608,7 +14793,7 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 			}
 		case "title":
 			var err error
-			it.Title, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			it.Title, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14621,6 +14806,18 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 		case "status":
 			var err error
 			it.Status, err = ec.unmarshalOTensionStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "emitterid":
+			var err error
+			it.Emitterid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "receiverid":
+			var err error
+			it.Receiverid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15023,6 +15220,18 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "emitterid":
+			var err error
+			it.Emitterid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "receiverid":
+			var err error
+			it.Receiverid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -15122,6 +15331,18 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "n_comments":
 			var err error
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "emitterid":
+			var err error
+			it.Emitterid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "receiverid":
+			var err error
+			it.Receiverid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16887,6 +17108,16 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_mandate(ctx, field, obj)
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
+		case "emitterid":
+			out.Values[i] = ec._Tension_emitterid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "receiverid":
+			out.Values[i] = ec._Tension_receiverid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "id":
 			out.Values[i] = ec._Tension_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19807,6 +20038,18 @@ func (ec *executionContext) unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗg
 		return nil, nil
 	}
 	res, err := ec.unmarshalOStringHashFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOStringHashFilter_StringRegExpFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx context.Context, v interface{}) (model.StringHashFilterStringRegExpFilter, error) {
+	return ec.unmarshalInputStringHashFilter_StringRegExpFilter(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx context.Context, v interface{}) (*model.StringHashFilterStringRegExpFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOStringHashFilter_StringRegExpFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 	return &res, err
 }
 
