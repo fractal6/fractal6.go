@@ -1,9 +1,5 @@
 package model
 
-// JsonAtom is a general interface 
-// for decoding unknonw structure
-type JsonAtom = map[string]interface{}
-
 
 //
 // User Auth Data structure

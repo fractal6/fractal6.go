@@ -17,13 +17,10 @@ import (
     middle6 "zerogov/fractal6.go/web/middleware"
 )
 
-var queryPath, buildMode string
+var buildMode string
 var tkMaster *auth.Jwt
 
 func init() {
-    // Api URI
-    queryPath = "/api"
-
     // Jwt init
     tkMaster = auth.GetTokenMaster()
 
@@ -93,9 +90,20 @@ func RunServer() {
         r.Post("/tokenack", handle6.TokenAck)
     })
 
+    // Http API
+    r.Group(func(r chi.Router) {
+        r.Route("/q", func(r chi.Router) {
+            //r.Use(middle6.EnsurePostMethod)
+            r.Post("/sub_children", handle6.SubChildren)
+        })
+    })
+
+    // Graphql API
+    r.Post("/api", handle6.GraphqlHandler(gqlConfig))
+
     if buildMode == "DEV" {
         // Serve Graphql Playground
-        r.Get("/playground", handle6.PlaygroundHandler(queryPath))
+        r.Get("/playground", handle6.PlaygroundHandler("/api"))
         r.Get("/ping", handle6.Ping)
 
         // Serve frontend static files
@@ -104,9 +112,6 @@ func RunServer() {
         // Overwrite gql config
         gqlConfig["introspection"] = true
     }
-
-    // Serve Graphql Api
-    r.Post(queryPath, handle6.GraphqlHandler(gqlConfig))
 
     address := HOST + ":" + PORT
     log.Printf("Running @ http://%s", address)

@@ -118,18 +118,19 @@ func initDB() *Dgraph {
 
     // GPRC/Graphql+- Request Template
     gpmQueries := map[string]string{
-        // Queries
+        // Count objects
         "count": `{
             all(func: uid("{{.id}}")) {
                 count({{.typeName}}.{{.fieldName}})
             }
         }`,
+		// Query existance
         "exists": `{
             all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {
                 uid
             }
         }`,
-        // getUser with UserCtx payload
+        // Get single object
         "getUser": `{
             all(func: eq(User.{{.fieldid}}, "{{.userid}}")) 
                 {{.payload}}
@@ -138,6 +139,16 @@ func initDB() *Dgraph {
             all(func: eq(Node.{{.fieldid}}, "{{.objid}}")) 
                 {{.payload}}
         }`,
+		// Get multiple objects
+		"getAllChildren": `{
+			var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+				o as Node.children
+			}
+
+			all(func: uid(o)) {
+				Node.{{.fieldid}}
+			}
+		}`,
         // Mutations
     }
 
@@ -278,7 +289,9 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.gpmTemplates[op].Format(maps)
     // Send Request
+    //fmt.Println(string(q))
 	res, err := txn.Query(ctx, q)
+    //fmt.Println(res)
 	if err != nil {
         return nil, err
 	}
@@ -518,6 +531,51 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
         }
     }
     return &obj, nil
+}
+
+// Get all sub children
+func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid":fieldid,
+        "objid":objid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getAllChildren", maps)
+    if err != nil {
+        return  nil, err
+    }
+
+    // Decode response
+    var r GpmResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+        return nil, err
+	}
+
+    var data []model.NodeId
+    //if len(r.All) > 1 {
+        config := &mapstructure.DecoderConfig{
+            Result: &data,
+            TagName: "json",
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
+        }
+        decoder, err := mapstructure.NewDecoder(config)
+        if err != nil {
+            return nil, err
+        }
+        err = decoder.Decode(r.All)
+        if err != nil {
+            return nil, err
+        }
+    //}
+    return data, nil
 }
 
 // Mutation
