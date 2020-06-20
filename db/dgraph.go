@@ -149,6 +149,26 @@ func initDB() *Dgraph {
 				Node.{{.fieldid}}
 			}
 		}`,
+        "getAllMembers": `{
+            var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+                o as Node.children
+            }
+
+            all(func: uid(o)) @filter(has(Node.role_type)) {
+                Node.createdAt
+                Node.name
+                Node.nameid
+                Node.rootnameid
+                Node.role_type
+                Node.first_link {
+                    User.username
+                    User.name
+                }
+                Node.parent {
+                    Node.nameid
+                }
+            }
+        }`,
         // Mutations
     }
 
@@ -554,6 +574,51 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
 	}
 
     var data []model.NodeId
+    //if len(r.All) > 1 {
+        config := &mapstructure.DecoderConfig{
+            Result: &data,
+            TagName: "json",
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
+        }
+        decoder, err := mapstructure.NewDecoder(config)
+        if err != nil {
+            return nil, err
+        }
+        err = decoder.Decode(r.All)
+        if err != nil {
+            return nil, err
+        }
+    //}
+    return data, nil
+}
+
+// Get all sub children
+func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid":fieldid,
+        "objid":objid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getAllMembers", maps)
+    if err != nil {
+        return  nil, err
+    }
+
+    // Decode response
+    var r GpmResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+        return nil, err
+	}
+
+    var data []model.MemberNode
     //if len(r.All) > 1 {
         config := &mapstructure.DecoderConfig{
             Result: &data,

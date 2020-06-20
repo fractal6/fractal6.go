@@ -145,7 +145,8 @@ func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter,
 }
 
 func (r *queryResolver) GetTension(ctx context.Context, id string) (data *model.Tension, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) (data []*model.Tension, errors error) {

@@ -93,8 +93,8 @@ func RunServer() {
     // Http API
     r.Group(func(r chi.Router) {
         r.Route("/q", func(r chi.Router) {
-            //r.Use(middle6.EnsurePostMethod)
             r.Post("/sub_children", handle6.SubChildren)
+            r.Post("/sub_members", handle6.SubMembers)
         })
     })
 
