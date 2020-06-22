@@ -131,6 +131,13 @@ func initDB() *Dgraph {
             }
         }`,
         // Get single object
+        "getSubFieldById": `{
+            all(func: uid("{{.id}}")) {
+                {{.typeNameSource}}.{{.fieldNameSource}} {
+                    {{.typeNameTarget}}.{{.fieldNameTarget}}
+                }
+            }
+        }`,
         "getUser": `{
             all(func: eq(User.{{.fieldid}}, "{{.userid}}")) 
                 {{.payload}}
@@ -455,6 +462,42 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
         return false, err
 	}
     return len(r.All) > 0, nil
+}
+
+// Returns the user context
+func (dg Dgraph) GetSubFieldById(id string, typeNameSource string, fieldNameSource string, typeNameTarget string, fieldNameTarget string) (interface{}, error) {
+    // Format Query
+    maps := map[string]string{
+        "id":id,
+        "typeNameSource":typeNameSource,
+        "fieldNameSource":fieldNameSource,
+        "typeNameTarget":typeNameTarget,
+        "fieldNameTarget":fieldNameTarget,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getSubFieldById", maps)
+    if err != nil {
+        return  nil, err
+    }
+
+    // Decode response
+    var r GpmResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+        return nil, err
+	}
+
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple in gpm query")
+    } else if len(r.All) == 1 {
+        f1 := typeNameSource +"."+ fieldNameSource
+        f2 := typeNameTarget +"."+ fieldNameTarget
+        x := r.All[0][f1].(model.JsonAtom)
+        if x != nil {
+            return x[f2], nil
+        }
+    }
+    return nil, err
 }
 
 // Returns the user context

@@ -70,6 +70,7 @@ func Init() gen.Config {
     c.Directives.Alter_hasRoot = hasRoot
     // For mutation hook
     c.Directives.Hook_addNode = addNodeHook
+    c.Directives.Hook_updateTension = updateTensionHook
 
     return c
 }
@@ -129,10 +130,10 @@ func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver,
 
 func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
     v := obj.(model.JsonAtom)[field].(model.JsonAtom)
-    return nil, fmt.Errorf("Only Node type is supported, this is not: %T", v )
+    return nil, fmt.Errorf("only Node type is supported, this is not: %T", v )
 }
 
-// Special HOOK for:
+// Add Node Hook:
 // * addNode: New Orga (Root creation) -> check UserRight.CanCreateRoot
 // * addNode/updateNode?: Join orga (push Node) -> check if NodeCharac.UserCanJoin is True and if user is not already a member
 // * addNode/updateNode: Add role and subcircle
@@ -209,9 +210,25 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
         }
     }
 
-    e := fmt.Errorf("Operation not allowed. Please, contact a coordinator to access this ressource.")
+    e := fmt.Errorf("contact a coordinator to access this ressource.")
     return nil, tools.LogErr("@addNodeHook", "Access denied", e)
 }
+
+// Update Tension hook
+// * add the id field in the context for further inspection in new resolver
+func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
+    ids := filter["id"].([]interface{})
+    if len(ids) > 1 {
+        return nil, tools.LogErr("@addNodeHook/NodeCharac", "not implemented", fmt.Errorf("multiple tension not supported"))
+    }
+
+    ctx = context.WithValue(ctx, "id", ids[0].(string))
+
+    input_, err := next(ctx)
+    return input_, err
+}
+
 
 
 // HasRole check the user has the authorisation to update a ressource by checking if it satisfies at least one of 
@@ -251,7 +268,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
 
     // Format output to get to be able to format a links in a frontend.
     // @DEBUG: get rootnameid from nameid
-    e := fmt.Errorf("Please, join this organisation or contact a coordinator to access this ressource.")
+    e := fmt.Errorf("join this organisation or contact a coordinator to access this ressource")
     return nil, tools.LogErr("@hasRole", "Access denied", e)
 }
 
@@ -266,7 +283,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     // Check that user has the given role on the asked node
     var ok bool
     for _, nodeField := range nodeFields {
-        ok, err = checkUserRoot(uctx, nodeField, obj)
+        ok, err = checkUserRoot(ctx, uctx, nodeField, obj)
         if err != nil {
             return nil, tools.LogErr("@hasRoot", "Access denied", err)
         }
@@ -276,7 +293,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     }
 
     // Format output to get to be able to format a links in a frontend.
-    e := fmt.Errorf("Please, join this organisation or contact a coordinator to access this ressource.")
+    e := fmt.Errorf("join this organisation or contact a coordinator to access this ressource")
     return nil, tools.LogErr("@hasRoot", "Access denied", e)
 }
 
@@ -340,13 +357,13 @@ func checkUserRole(uctx model.UserCtx, nodeField string, nodeObj interface{}, ro
     // Check that nodes are present
     nodeTarget_ := getNestedObj(nodeObj, nodeField)
     if nodeTarget_ == nil {
-        return false, fmt.Errorf("Node target unknown(%s), need a database request here...", nodeField)
+        return false, fmt.Errorf("node target unknown(%s), need a database request here...", nodeField)
     }
 
     // Extract node identifier
     nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
     if nameid_ == nil {
-        return false, fmt.Errorf("Node target unknown(nameid), need a database request here...")
+        return false, fmt.Errorf("node target unknown(nameid), need a database request here...")
     }
 
     // Search for rights
@@ -354,21 +371,42 @@ func checkUserRole(uctx model.UserCtx, nodeField string, nodeObj interface{}, ro
     return ok, nil
 }
 
-func checkUserRoot(uctx model.UserCtx, nodeField string, nodeObj interface{}) (bool, error) {
+func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, nodeObj interface{}) (bool, error) {
     // Check that nodes are present
     nodeTarget_ := getNestedObj(nodeObj, nodeField)
+    var rootnameid string
+    var err error
     if nodeTarget_ == nil {
-        return false, fmt.Errorf("Node target unknown(%s), need a database request here...", nodeField)
-    }
+        //id := get(nodeObj.(model.JsonAtom), "uid", "").(string)
+        id := ctx.Value("id").(string)
+        if id == "" {
+            return false, fmt.Errorf("node target unknown(id), need a database request here...")
+        }
+        // @DEBUG: how to get the type of the object to update for a more generic function hre ?
+        //typeName := tools.ToTypeName(reflect.TypeOf(nodeObj).String())
+        typeName := "Tension"
+        rootnameid_, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "Node", "rootnameid")
+        if err != nil {
+            return false, err
+        }
+        if rootnameid_ != nil {
+            rootnameid = rootnameid_.(string)
+        }
+    } else {
 
-    // Extract node identifiers
-    rootnameid_ := nodeTarget_.(model.JsonAtom)["rootnameid"]
-    if rootnameid_ == nil {
-        return false, fmt.Errorf("node target unknown (rootnameid), need a database request here !!!")
+        // Extract node identifiers
+        nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
+        if nameid_ == nil {
+            return false, fmt.Errorf("node target unknown (nameid), need a database request here ...")
+        }
+        rootnameid, err = nid2rootid(nameid_.(string))
+        if err != nil {
+            panic(err.Error())
+        }
     }
 
     // Search for rights
-    ok := userHasRoot(uctx, rootnameid_.(string))
+    ok := userHasRoot(uctx, rootnameid)
     return ok, nil
 }
 
@@ -393,14 +431,14 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     if isRoot{
         if uctx.Rights.CanCreateRoot {
             if parent_ != nil {
-                err = fmt.Errorf("Root node can't have a parent.")
+                err = fmt.Errorf("root node can't have a parent")
             } else if nameid != rootnameid {
-                err = fmt.Errorf("Root node nameid and rootnameid are different.")
+                err = fmt.Errorf("root node nameid and rootnameid are different")
             } else {
                 ok = true
             }
         } else {
-            err = fmt.Errorf("You are not authorized to create new organisation.")
+            err = fmt.Errorf("you are not authorized to create new organisation")
         }
         return ok, err
     } 
@@ -412,12 +450,12 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     roleType := node.RoleType
     if roleType != nil && *roleType == model.RoleTypeGuest {
         if !charac.UserCanJoin {
-            err = fmt.Errorf("This organisation does not accept new members.")
+            err = fmt.Errorf("this organisation does not accept new members")
         } else if rootnameid != parentid {
-            err = fmt.Errorf("Guest user can only join the root circle.")
+            err = fmt.Errorf("guest user can only join the root circle")
         } else if nodeType != model.NodeTypeRole {
             // @DEBUG; this will be obsolete with union schema
-            err = fmt.Errorf("Circle with role_type defined should be of type RoleType.")
+            err = fmt.Errorf("circle with role_type defined should be of type RoleType")
         } else {
             ok = true
         }
@@ -429,7 +467,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     // 
     if nodeType == model.NodeTypeRole {
         if roleType == nil {
-            err = fmt.Errorf("Role should have a RoleType.")
+            err = fmt.Errorf("role should have a RoleType")
         }
         if charac.Mode == model.NodeModeChaos {
             ok = userIsMember(uctx, parentid)
@@ -465,7 +503,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     }
 
 
-    return false, fmt.Errorf("Not implemented addNode request.")
+    return false, fmt.Errorf("not implemented addNode request")
 }
 
 //
@@ -512,7 +550,7 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
     for _, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
-            panic("Bad nameid format for coordo test: "+ ur.Nameid)
+            panic("bad nameid format for coordo test: "+ ur.Nameid)
         }
         if pid == nameid && ur.RoleType == model.RoleTypeCoordinator {
             return true
@@ -537,8 +575,7 @@ func userIsGuest(uctx model.UserCtx, rootnameid string) bool {
 func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, firstLink model.UserRef) error {
     if userIsGuest(uctx, rootnameid) && uctx.Username == *(firstLink).Username {
         // Update RolType to Member
-        DB := db.GetDB()
-        err := DB.UpgradeGuest(uctx.Roles[0].Nameid, model.RoleTypeMember)
+        err := db.GetDB().UpgradeGuest(uctx.Roles[0].Nameid, model.RoleTypeMember)
         if err != nil {
             return err
         }
@@ -553,7 +590,7 @@ func nid2pid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")
     if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("Bad nameid format for nid2pid: " + nid)
+        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
     }
 
     if len(parts) == 1 || parts[1] == "" {
@@ -562,6 +599,16 @@ func nid2pid(nid string) (string, error) {
         pid = strings.Join(parts[:len(parts)-1],  "#")
     }
     return pid, nil
+}
+
+func nid2rootid(nid string) (string, error) {
+    var pid string
+    parts := strings.Split(nid, "#")
+    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
+        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
+    }
+
+    return parts[0], nil
 }
 
 

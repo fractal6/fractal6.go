@@ -478,15 +478,15 @@ type Tension struct {
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
 	Emitter    *Node          `json:"emitter,omitempty"`
+	Emitterid  string         `json:"emitterid,omitempty"`
 	Receiver   *Node          `json:"receiver,omitempty"`
+	Receiverid string         `json:"receiverid,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Mandate    *Mandate       `json:"mandate,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
-	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	CreatedBy  *User          `json:"createdBy,omitempty"`
