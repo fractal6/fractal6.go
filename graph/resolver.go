@@ -246,7 +246,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     // is the owner of the ressource
     var ok bool
     if userField != nil {
-        ok, err = checkUserOwnership(uctx, *userField, obj)
+        ok, err = checkUserOwnership(ctx, uctx, *userField, obj)
         if err != nil {
             return nil, tools.LogErr("@hasRole/checkOwn", "Access denied", err)
         }
@@ -257,7 +257,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     
     // Check that user has the given role on the asked node
     for _, nodeField := range nodeFields {
-        ok, err = checkUserRole(uctx, nodeField, obj, role)
+        ok, err = checkUserRole(ctx, uctx, nodeField, obj, role)
         if err != nil {
             return nil, tools.LogErr("@hasRole/checkRole", "Access denied", err)
         }
@@ -316,7 +316,7 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, userFi
         userObj = obj.(model.JsonAtom)
     }
 
-    ok, err := checkUserOwnership(uctx, f, userObj)
+    ok, err := checkUserOwnership(ctx, uctx, f, userObj)
     if err != nil {
         return nil, tools.LogErr("@isOwner/auth", "Access denied", err)
     }
@@ -337,37 +337,52 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
 // Private auth methods
 //
 
-func checkUserOwnership(uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
+func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
     // Get user ID
     user := userObj.(model.JsonAtom)[userField]
     if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        println("User unknown, need a database request here...")
-        return false, nil
+        // Database request
+        id := ctx.Value("id").(string)
+        if id == "" {
+            return false, fmt.Errorf("node target unknown(id), need a database request here...")
+        }
+        // Request the database to get the field
+        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
+        typeName := "Post" // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface ....
+        username, err := db.GetDB().GetSubFieldById(id, typeName, userField, "User", "username")
+        if err != nil {
+            return false, err
+        }
+        return uctx.Username == username, nil
     } 
 
     // Check user ID match
-    userid := user.(model.JsonAtom)["username"].(string)
-    if uctx.Username == userid {
-        return true, nil
-    }
-    return false, nil
+    username := user.(model.JsonAtom)["username"].(string)
+    return uctx.Username == username, nil
 }
 
-func checkUserRole(uctx model.UserCtx, nodeField string, nodeObj interface{}, role model.RoleType) (bool, error) {
+func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, nodeObj interface{}, role model.RoleType) (bool, error) {
     // Check that nodes are present
-    nodeTarget_ := getNestedObj(nodeObj, nodeField)
-    if nodeTarget_ == nil {
-        return false, fmt.Errorf("node target unknown(%s), need a database request here...", nodeField)
-    }
-
-    // Extract node identifier
-    nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
-    if nameid_ == nil {
-        return false, fmt.Errorf("node target unknown(nameid), need a database request here...")
+    node := nodeObj.(model.JsonAtom)[nodeField]
+    if node == nil || node.(model.JsonAtom)["nameid"] == nil {
+        // Database request
+        id := ctx.Value("id").(string)
+        if id == "" {
+            return false, fmt.Errorf("node target unknown(id), need a database request here...")
+        }
+        // Request the database to get the field
+        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
+        typeName := "Tension"
+        username, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "User", "username")
+        if err != nil {
+            return false, err
+        }
+        return uctx.Username == username, nil
     }
 
     // Search for rights
-    ok := userHasRole(uctx, role, nameid_.(string))
+    nameid := node.(model.JsonAtom)["nameid"].(string)
+    ok := userHasRole(uctx, role, nameid)
     return ok, nil
 }
 
@@ -377,12 +392,12 @@ func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, no
     var rootnameid string
     var err error
     if nodeTarget_ == nil {
-        //id := get(nodeObj.(model.JsonAtom), "uid", "").(string)
+        // Database request
         id := ctx.Value("id").(string)
         if id == "" {
             return false, fmt.Errorf("node target unknown(id), need a database request here...")
         }
-        // @DEBUG: how to get the type of the object to update for a more generic function hre ?
+        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
         //typeName := tools.ToTypeName(reflect.TypeOf(nodeObj).String())
         typeName := "Tension"
         rootnameid_, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "Node", "rootnameid")
@@ -393,7 +408,6 @@ func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, no
             rootnameid = rootnameid_.(string)
         }
     } else {
-
         // Extract node identifiers
         nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
         if nameid_ == nil {
