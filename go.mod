@@ -7,7 +7,6 @@ require (
 	github.com/dgraph-io/dgo/v200 v200.0.0-20200502013902-3336867fe8a1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
-	github.com/go-chi/jwtauth v4.0.4+incompatible
 	github.com/mitchellh/mapstructure v1.3.0
 	github.com/rs/cors v1.7.0
 	github.com/spf13/cobra v1.0.0
