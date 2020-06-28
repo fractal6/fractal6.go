@@ -53,22 +53,28 @@ func Init() gen.Config {
     c.Directives.HasInverse = nothing2
     c.Directives.Search = nothing3
 
-    // User defined directives
+    /* Query */
+    // Objects directives
+    c.Directives.HidePrivate = hidePrivate
+
+    // Fields directives
     c.Directives.Hidden = hidden
     c.Directives.Count = count
 
-    // for add inputs...
+    /* Mutation */
+
+    // Add inputs directives
     c.Directives.Add_isOwner = isOwner
-    // for update or remove inputs...
+    // Update or Remove inputs directives
     c.Directives.Patch_isOwner = isOwner
     c.Directives.Patch_RO = readOnly
     c.Directives.Patch_hasRole = hasRole 
-    // for add, update and remove inputs...
+    // Add, Update and Remove inputs directives
     c.Directives.Alter_maxLength = inputMaxLength
     c.Directives.Alter_assertType = assertType
     c.Directives.Alter_hasRole = hasRole 
     c.Directives.Alter_hasRoot = hasRoot
-    // For mutation hook
+    // Mutation Hook directives
     c.Directives.Hook_addNode = addNodeHook
     c.Directives.Hook_updateTension = updateTensionHook
 
@@ -91,6 +97,15 @@ func nothing2(ctx context.Context, obj interface{}, next graphql.Resolver, key s
 }
 
 func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx []model.DgraphIndex) (interface{}, error) {
+    return next(ctx)
+}
+
+//
+// Query
+//
+
+func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    fmt.Println("hey")
     return next(ctx)
 }
 
@@ -119,6 +134,10 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
     }
     return next(ctx)
 }
+
+//
+// Mutation
+//
 
 func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
     v := obj.(model.JsonAtom)[field].(string)

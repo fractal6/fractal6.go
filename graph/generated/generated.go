@@ -49,6 +49,7 @@ type DirectiveRoot struct {
 	Dgraph             func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	HasInverse         func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
 	Hidden             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	HidePrivate        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addNode       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTension func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -190,6 +191,7 @@ type ComplexityRoot struct {
 		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
 		FirstLink    func(childComplexity int, filter *model.UserFilter) int
 		ID           func(childComplexity int) int
+		IsPrivate    func(childComplexity int) int
 		IsRoot       func(childComplexity int) int
 		Mandate      func(childComplexity int, filter *model.MandateFilter) int
 		NChildren    func(childComplexity int) int
@@ -1045,6 +1047,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.ID(childComplexity), true
 
+	case "Node.isPrivate":
+		if e.complexity.Node.IsPrivate == nil {
+			break
+		}
+
+		return e.complexity.Node.IsPrivate(childComplexity), true
+
 	case "Node.isRoot":
 		if e.complexity.Node.IsRoot == nil {
 			break
@@ -1890,6 +1899,8 @@ directive @alter_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
 
 directive @alter_assertType(f: String!, t: NodeType!) on INPUT_FIELD_DEFINITION
 
+directive @hidePrivate on OBJECT
+
 directive @isAuth on OBJECT|FIELD_DEFINITION
 
 directive @alter_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
@@ -1904,7 +1915,7 @@ directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
 
 directive @patch_RO on INPUT_FIELD_DEFINITION
 
-type Node {
+type Node @hidePrivate {
   id: ID!
   createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
@@ -1921,6 +1932,7 @@ type Node {
   n_tensions_in: Int @count(f: tensions_in)
   n_children: Int @count(f: children)
   isRoot: Boolean! @search
+  isPrivate: Boolean!
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
@@ -2047,9 +2059,15 @@ enum TensionAction {
 
 
 
-}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+
+
+
+
+
+
+}
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
@@ -2058,6 +2076,8 @@ directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITI
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2120,6 +2140,7 @@ input AddNodeInput {
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean!
+  isPrivate: Boolean!
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
@@ -2140,15 +2161,15 @@ input AddTensionInput {
   title: String! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
   type_: TensionType! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
   emitter: NodeRef! @alter_hasRoot(n:["emitter"])
+  emitterid: String! @alter_hasRoot(n:["emitter"])
   receiver: NodeRef! @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
+  receiverid: String! @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   status: TensionStatus! @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   mandate: MandateRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
-  emitterid: String! @alter_hasRoot(n:["emitter"])
-  receiverid: String! @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
 }
 
 type AddTensionPayload {
@@ -2367,14 +2388,14 @@ input MandateRef {
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload
+  addNode(input: [AddNodeInput!]!): AddNodePayload
   updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
   addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]!): AddTensionPayload
-  updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload
+  updateTension(input: UpdateTensionInput!): UpdateTensionPayload
   deleteTension(filter: TensionFilter!): DeleteTensionPayload
   addComment(input: [AddCommentInput!]!): AddCommentPayload
   updateComment(input: UpdateCommentInput!): UpdateCommentPayload
@@ -2443,6 +2464,7 @@ input NodePatch {
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean @patch_RO
+  isPrivate: Boolean
   first_link: UserRef @patch_hasRole(n:["parent"], r: Coordinator)
   second_link: UserRef @patch_hasRole(n:["parent"], r: Coordinator)
   skills: [String!] @patch_hasRole(n:["parent"], r: Coordinator)
@@ -2467,6 +2489,7 @@ input NodeRef {
   n_tensions_in: Int
   n_children: Int
   isRoot: Boolean
+  isPrivate: Boolean
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
@@ -2569,9 +2592,9 @@ input TensionFilter {
   nth: StringTermFilter
   title: StringFullTextFilter
   type_: TensionType_hash
-  status: TensionStatus_hash
   emitterid: StringHashFilter_StringRegExpFilter
   receiverid: StringHashFilter_StringRegExpFilter
+  status: TensionStatus_hash
   and: TensionFilter
   or: TensionFilter
   not: TensionFilter
@@ -2588,9 +2611,9 @@ enum TensionOrderable {
   message
   nth
   title
-  n_comments
   emitterid
   receiverid
+  n_comments
 }
 
 input TensionPatch {
@@ -2601,15 +2624,15 @@ input TensionPatch {
   title: String @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
   type_: TensionType @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
   emitter: NodeRef @patch_RO @alter_hasRoot(n:["emitter"])
+  emitterid: String @patch_RO @alter_hasRoot(n:["emitter"])
   receiver: NodeRef @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
+  receiverid: String @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   status: TensionStatus @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   mandate: MandateRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
-  emitterid: String @patch_RO @alter_hasRoot(n:["emitter"])
-  receiverid: String @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
 }
 
 input TensionRef {
@@ -2621,15 +2644,15 @@ input TensionRef {
   title: String
   type_: TensionType
   emitter: NodeRef
+  emitterid: String
   receiver: NodeRef
+  receiverid: String
   comments: [CommentRef!]
   labels: [LabelRef!]
   status: TensionStatus
   action: TensionAction
   mandate: MandateRef
   n_comments: Int
-  emitterid: String
-  receiverid: String
 }
 
 input TensionStatus_hash {
@@ -3402,24 +3425,9 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	args := map[string]interface{}{}
 	var arg0 []*model.AddNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
-		directive0 := func(ctx context.Context) (interface{}, error) {
-			return ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addNode == nil {
-				return nil, errors.New("directive hook_addNode is not implemented")
-			}
-			return ec.directives.Hook_addNode(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
-		}
-		if data, ok := tmp.([]*model.AddNodeInput); ok {
-			arg0 = data
-		} else {
-			return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddNodeInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -3641,24 +3649,9 @@ func (ec *executionContext) field_Mutation_updateTension_args(ctx context.Contex
 	args := map[string]interface{}{}
 	var arg0 model.UpdateTensionInput
 	if tmp, ok := rawArgs["input"]; ok {
-		directive0 := func(ctx context.Context) (interface{}, error) {
-			return ec.unmarshalNUpdateTensionInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionInput(ctx, tmp)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateTension == nil {
-				return nil, errors.New("directive hook_updateTension is not implemented")
-			}
-			return ec.directives.Hook_updateTension(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNUpdateTensionInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
-		}
-		if data, ok := tmp.(model.UpdateTensionInput); ok {
-			arg0 = data
-		} else {
-			return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateTensionInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -8029,6 +8022,40 @@ func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.Coll
 			return data, nil
 		}
 		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_isPrivate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsPrivate, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12434,6 +12461,12 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "isPrivate":
+			var err error
+			it.IsPrivate, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "first_link":
 			var err error
 			it.FirstLink, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -12591,6 +12624,29 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
+		case "emitterid":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Emitterid = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+			}
 		case "receiver":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -12635,6 +12691,47 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				it.Receiver = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
+			}
+		case "receiverid":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive1, n, r, u)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Receiverid = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "comments":
 			var err error
@@ -12802,70 +12899,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
-			}
-		case "emitterid":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(string); ok {
-				it.Emitterid = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
-			}
-		case "receiverid":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive1, n, r, u)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(string); ok {
-				it.Receiverid = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		}
 	}
@@ -14173,6 +14206,12 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 			}
+		case "isPrivate":
+			var err error
+			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "first_link":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -14429,6 +14468,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		case "isRoot":
 			var err error
 			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPrivate":
+			var err error
+			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14873,12 +14918,6 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "status":
-			var err error
-			it.Status, err = ec.unmarshalOTensionStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "emitterid":
 			var err error
 			it.Emitterid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
@@ -14888,6 +14927,12 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 		case "receiverid":
 			var err error
 			it.Receiverid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+			it.Status, err = ec.unmarshalOTensionStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15076,6 +15121,37 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
 			}
+		case "emitterid":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive1, n)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Emitterid = data
+			} else if tmp == nil {
+				it.Emitterid = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "receiver":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -15120,6 +15196,49 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				it.Receiver = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeRef`, tmp)
+			}
+		case "receiverid":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive1, n, r, u)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Receiverid = data
+			} else if tmp == nil {
+				it.Receiverid = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "comments":
 			var err error
@@ -15290,80 +15409,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "emitterid":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive1, n)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Emitterid = data
-			} else if tmp == nil {
-				it.Emitterid = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
-		case "receiverid":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive1, n, r, u)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Receiverid = data
-			} else if tmp == nil {
-				it.Receiverid = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
 		}
 	}
 
@@ -15424,9 +15469,21 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "emitterid":
+			var err error
+			it.Emitterid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "receiver":
 			var err error
 			it.Receiver, err = ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "receiverid":
+			var err error
+			it.Receiverid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15463,18 +15520,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "n_comments":
 			var err error
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "emitterid":
-			var err error
-			it.Emitterid, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "receiverid":
-			var err error
-			it.Receiverid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16888,6 +16933,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_n_children(ctx, field, obj)
 		case "isRoot":
 			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isPrivate":
+			out.Values[i] = ec._Node_isPrivate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

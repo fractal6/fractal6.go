@@ -69,6 +69,7 @@ type AddNodeInput struct {
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
 	IsRoot       bool           `json:"isRoot"`
+	IsPrivate    bool           `json:"isPrivate"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
@@ -89,15 +90,15 @@ type AddTensionInput struct {
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Emitterid  string         `json:"emitterid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Receiverid string         `json:"receiverid,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Mandate    *MandateRef    `json:"mandate,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
-	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -318,6 +319,7 @@ type Node struct {
 	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
 	NChildren    *int        `json:"n_children,omitempty"`
 	IsRoot       bool        `json:"isRoot"`
+	IsPrivate    bool        `json:"isPrivate"`
 	FirstLink    *User       `json:"first_link,omitempty"`
 	SecondLink   *User       `json:"second_link,omitempty"`
 	Skills       []string    `json:"skills,omitempty"`
@@ -371,6 +373,7 @@ type NodePatch struct {
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
+	IsPrivate    *bool          `json:"isPrivate"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
@@ -395,6 +398,7 @@ type NodeRef struct {
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
+	IsPrivate    *bool          `json:"isPrivate"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
@@ -500,9 +504,9 @@ type TensionFilter struct {
 	Nth        *StringTermFilter                   `json:"nth,omitempty"`
 	Title      *StringFullTextFilter               `json:"title,omitempty"`
 	Type       *TensionTypeHash                    `json:"type_,omitempty"`
-	Status     *TensionStatusHash                  `json:"status,omitempty"`
 	Emitterid  *StringHashFilterStringRegExpFilter `json:"emitterid,omitempty"`
 	Receiverid *StringHashFilterStringRegExpFilter `json:"receiverid,omitempty"`
+	Status     *TensionStatusHash                  `json:"status,omitempty"`
 	And        *TensionFilter                      `json:"and,omitempty"`
 	Or         *TensionFilter                      `json:"or,omitempty"`
 	Not        *TensionFilter                      `json:"not,omitempty"`
@@ -522,15 +526,15 @@ type TensionPatch struct {
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Emitterid  *string        `json:"emitterid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Receiverid *string        `json:"receiverid,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Mandate    *MandateRef    `json:"mandate,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
-	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
 }
 
 type TensionRef struct {
@@ -542,15 +546,15 @@ type TensionRef struct {
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Emitterid  *string        `json:"emitterid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Receiverid *string        `json:"receiverid,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Mandate    *MandateRef    `json:"mandate,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
-	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -1170,9 +1174,9 @@ const (
 	TensionOrderableMessage    TensionOrderable = "message"
 	TensionOrderableNth        TensionOrderable = "nth"
 	TensionOrderableTitle      TensionOrderable = "title"
-	TensionOrderableNComments  TensionOrderable = "n_comments"
 	TensionOrderableEmitterid  TensionOrderable = "emitterid"
 	TensionOrderableReceiverid TensionOrderable = "receiverid"
+	TensionOrderableNComments  TensionOrderable = "n_comments"
 )
 
 var AllTensionOrderable = []TensionOrderable{
@@ -1180,14 +1184,14 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableMessage,
 	TensionOrderableNth,
 	TensionOrderableTitle,
-	TensionOrderableNComments,
 	TensionOrderableEmitterid,
 	TensionOrderableReceiverid,
+	TensionOrderableNComments,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableEmitterid, TensionOrderableReceiverid:
+	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNComments:
 		return true
 	}
 	return false
