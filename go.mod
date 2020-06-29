@@ -3,7 +3,7 @@ module zerogov/fractal6.go
 go 1.14
 
 require (
-	github.com/99designs/gqlgen v0.11.3
+	github.com/99designs/gqlgen v0.11.4-0.20200619032736-a3c38c6574b7
 	github.com/dgraph-io/dgo/v200 v200.0.0-20200502013902-3336867fe8a1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible

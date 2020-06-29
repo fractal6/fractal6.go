@@ -49,7 +49,7 @@ type AddNodeCharacInput struct {
 }
 
 type AddNodeCharacPayload struct {
-	Nodecharac []*NodeCharac `json:"nodecharac,omitempty"`
+	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
 	NumUids    *int          `json:"numUids,omitempty"`
 }
 
@@ -62,9 +62,9 @@ type AddNodeInput struct {
 	Name         string         `json:"name,omitempty"`
 	Nameid       string         `json:"nameid,omitempty"`
 	Rootnameid   string         `json:"rootnameid,omitempty"`
-	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -109,11 +109,11 @@ type AddTensionPayload struct {
 type AddUserInput struct {
 	CreatedAt      string         `json:"createdAt,omitempty"`
 	Username       string         `json:"username,omitempty"`
-	EmailValidated bool           `json:"emailValidated"`
-	EmailHash      *string        `json:"emailHash,omitempty"`
-	Email          string         `json:"email,omitempty"`
 	Name           *string        `json:"name,omitempty"`
 	Password       string         `json:"password,omitempty"`
+	Email          string         `json:"email,omitempty"`
+	EmailHash      *string        `json:"emailHash,omitempty"`
+	EmailValidated bool           `json:"emailValidated"`
 	Rights         *UserRightsRef `json:"rights,omitempty"`
 	Roles          []*NodeRef     `json:"roles,omitempty"`
 	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
@@ -132,8 +132,15 @@ type AddUserRightsInput struct {
 }
 
 type AddUserRightsPayload struct {
-	Userrights []*UserRights `json:"userrights,omitempty"`
+	UserRights []*UserRights `json:"userRights,omitempty"`
 	NumUids    *int          `json:"numUids,omitempty"`
+}
+
+type AuthRule struct {
+	And  []*AuthRule `json:"and,omitempty"`
+	Or   []*AuthRule `json:"or,omitempty"`
+	Not  *AuthRule   `json:"not,omitempty"`
+	Rule *string     `json:"rule,omitempty"`
 }
 
 type Comment struct {
@@ -173,6 +180,17 @@ type CommentRef struct {
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
+type CustomHTTP struct {
+	URL               string     `json:"url,omitempty"`
+	Method            HTTPMethod `json:"method,omitempty"`
+	Body              *string    `json:"body,omitempty"`
+	Graphql           *string    `json:"graphql,omitempty"`
+	Mode              *Mode      `json:"mode,omitempty"`
+	ForwardHeaders    []string   `json:"forwardHeaders,omitempty"`
+	SecretHeaders     []string   `json:"secretHeaders,omitempty"`
+	SkipIntrospection *bool      `json:"skipIntrospection"`
+}
+
 type DateTimeFilter struct {
 	Eq *string `json:"eq,omitempty"`
 	Le *string `json:"le,omitempty"`
@@ -192,6 +210,11 @@ type DeleteLabelPayload struct {
 }
 
 type DeleteMandatePayload struct {
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteNodeCharacPayload struct {
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
@@ -312,9 +335,9 @@ type Node struct {
 	Name         string      `json:"name,omitempty"`
 	Nameid       string      `json:"nameid,omitempty"`
 	Rootnameid   string      `json:"rootnameid,omitempty"`
-	Mandate      *Mandate    `json:"mandate,omitempty"`
 	TensionsOut  []*Tension  `json:"tensions_out,omitempty"`
 	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
+	Mandate      *Mandate    `json:"mandate,omitempty"`
 	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
 	NChildren    *int        `json:"n_children,omitempty"`
@@ -328,11 +351,27 @@ type Node struct {
 }
 
 type NodeCharac struct {
+	ID          string   `json:"id,omitempty"`
 	UserCanJoin bool     `json:"userCanJoin"`
 	Mode        NodeMode `json:"mode,omitempty"`
 }
 
+type NodeCharacFilter struct {
+	ID          []string          `json:"id,omitempty"`
+	UserCanJoin *bool             `json:"userCanJoin"`
+	Mode        *NodeModeHash     `json:"mode,omitempty"`
+	And         *NodeCharacFilter `json:"and,omitempty"`
+	Or          *NodeCharacFilter `json:"or,omitempty"`
+	Not         *NodeCharacFilter `json:"not,omitempty"`
+}
+
+type NodeCharacPatch struct {
+	UserCanJoin *bool     `json:"userCanJoin"`
+	Mode        *NodeMode `json:"mode,omitempty"`
+}
+
 type NodeCharacRef struct {
+	ID          *string   `json:"id,omitempty"`
 	UserCanJoin *bool     `json:"userCanJoin"`
 	Mode        *NodeMode `json:"mode,omitempty"`
 }
@@ -345,11 +384,16 @@ type NodeFilter struct {
 	Nameid     *StringHashFilter `json:"nameid,omitempty"`
 	Rootnameid *StringHashFilter `json:"rootnameid,omitempty"`
 	IsRoot     *bool             `json:"isRoot"`
+	IsPrivate  *bool             `json:"isPrivate"`
 	Skills     *StringTermFilter `json:"skills,omitempty"`
 	RoleType   *RoleTypeHash     `json:"role_type,omitempty"`
 	And        *NodeFilter       `json:"and,omitempty"`
 	Or         *NodeFilter       `json:"or,omitempty"`
 	Not        *NodeFilter       `json:"not,omitempty"`
+}
+
+type NodeModeHash struct {
+	Eq NodeMode `json:"eq,omitempty"`
 }
 
 type NodeOrder struct {
@@ -366,9 +410,9 @@ type NodePatch struct {
 	Type         *NodeType      `json:"type_,omitempty"`
 	Name         *string        `json:"name,omitempty"`
 	Rootnameid   *string        `json:"rootnameid,omitempty"`
-	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -391,9 +435,9 @@ type NodeRef struct {
 	Name         *string        `json:"name,omitempty"`
 	Nameid       *string        `json:"nameid,omitempty"`
 	Rootnameid   *string        `json:"rootnameid,omitempty"`
-	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -598,6 +642,17 @@ type UpdateMandatePayload struct {
 	NumUids *int       `json:"numUids,omitempty"`
 }
 
+type UpdateNodeCharacInput struct {
+	Filter *NodeCharacFilter `json:"filter,omitempty"`
+	Set    *NodeCharacPatch  `json:"set,omitempty"`
+	Remove *NodeCharacPatch  `json:"remove,omitempty"`
+}
+
+type UpdateNodeCharacPayload struct {
+	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
+}
+
 type UpdateNodeInput struct {
 	Filter *NodeFilter `json:"filter,omitempty"`
 	Set    *NodePatch  `json:"set,omitempty"`
@@ -646,11 +701,11 @@ type User struct {
 	ID             string      `json:"id,omitempty"`
 	CreatedAt      string      `json:"createdAt,omitempty"`
 	Username       string      `json:"username,omitempty"`
-	EmailValidated bool        `json:"emailValidated"`
-	EmailHash      *string     `json:"emailHash,omitempty"`
-	Email          string      `json:"email,omitempty"`
 	Name           *string     `json:"name,omitempty"`
 	Password       string      `json:"password,omitempty"`
+	Email          string      `json:"email,omitempty"`
+	EmailHash      *string     `json:"emailHash,omitempty"`
+	EmailValidated bool        `json:"emailValidated"`
 	Rights         *UserRights `json:"rights,omitempty"`
 	Roles          []*Node     `json:"roles,omitempty"`
 	BackedRoles    []*Node     `json:"backed_roles,omitempty"`
@@ -675,11 +730,11 @@ type UserOrder struct {
 
 type UserPatch struct {
 	CreatedAt      *string        `json:"createdAt,omitempty"`
-	EmailValidated *bool          `json:"emailValidated"`
-	EmailHash      *string        `json:"emailHash,omitempty"`
-	Email          *string        `json:"email,omitempty"`
 	Name           *string        `json:"name,omitempty"`
 	Password       *string        `json:"password,omitempty"`
+	Email          *string        `json:"email,omitempty"`
+	EmailHash      *string        `json:"emailHash,omitempty"`
+	EmailValidated *bool          `json:"emailValidated"`
 	Rights         *UserRightsRef `json:"rights,omitempty"`
 	Roles          []*NodeRef     `json:"roles,omitempty"`
 	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
@@ -691,11 +746,11 @@ type UserRef struct {
 	ID             *string        `json:"id,omitempty"`
 	CreatedAt      *string        `json:"createdAt,omitempty"`
 	Username       *string        `json:"username,omitempty"`
-	EmailValidated *bool          `json:"emailValidated"`
-	EmailHash      *string        `json:"emailHash,omitempty"`
-	Email          *string        `json:"email,omitempty"`
 	Name           *string        `json:"name,omitempty"`
 	Password       *string        `json:"password,omitempty"`
+	Email          *string        `json:"email,omitempty"`
+	EmailHash      *string        `json:"emailHash,omitempty"`
+	EmailValidated *bool          `json:"emailValidated"`
 	Rights         *UserRightsRef `json:"rights,omitempty"`
 	Roles          []*NodeRef     `json:"roles,omitempty"`
 	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
@@ -819,6 +874,53 @@ func (e DgraphIndex) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type HTTPMethod string
+
+const (
+	HTTPMethodGet    HTTPMethod = "GET"
+	HTTPMethodPost   HTTPMethod = "POST"
+	HTTPMethodPut    HTTPMethod = "PUT"
+	HTTPMethodPatch  HTTPMethod = "PATCH"
+	HTTPMethodDelete HTTPMethod = "DELETE"
+)
+
+var AllHTTPMethod = []HTTPMethod{
+	HTTPMethodGet,
+	HTTPMethodPost,
+	HTTPMethodPut,
+	HTTPMethodPatch,
+	HTTPMethodDelete,
+}
+
+func (e HTTPMethod) IsValid() bool {
+	switch e {
+	case HTTPMethodGet, HTTPMethodPost, HTTPMethodPut, HTTPMethodPatch, HTTPMethodDelete:
+		return true
+	}
+	return false
+}
+
+func (e HTTPMethod) String() string {
+	return string(e)
+}
+
+func (e *HTTPMethod) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = HTTPMethod(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid HTTPMethod", str)
+	}
+	return nil
+}
+
+func (e HTTPMethod) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type LabelOrderable string
 
 const (
@@ -902,6 +1004,47 @@ func (e *MandateOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e MandateOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Mode string
+
+const (
+	ModeBatch  Mode = "BATCH"
+	ModeSingle Mode = "SINGLE"
+)
+
+var AllMode = []Mode{
+	ModeBatch,
+	ModeSingle,
+}
+
+func (e Mode) IsValid() bool {
+	switch e {
+	case ModeBatch, ModeSingle:
+		return true
+	}
+	return false
+}
+
+func (e Mode) String() string {
+	return string(e)
+}
+
+func (e *Mode) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Mode(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Mode", str)
+	}
+	return nil
+}
+
+func (e Mode) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -1309,10 +1452,10 @@ type UserOrderable string
 const (
 	UserOrderableCreatedAt UserOrderable = "createdAt"
 	UserOrderableUsername  UserOrderable = "username"
-	UserOrderableEmailHash UserOrderable = "emailHash"
-	UserOrderableEmail     UserOrderable = "email"
 	UserOrderableName      UserOrderable = "name"
 	UserOrderablePassword  UserOrderable = "password"
+	UserOrderableEmail     UserOrderable = "email"
+	UserOrderableEmailHash UserOrderable = "emailHash"
 	UserOrderableBio       UserOrderable = "bio"
 	UserOrderableUtc       UserOrderable = "utc"
 )
@@ -1320,17 +1463,17 @@ const (
 var AllUserOrderable = []UserOrderable{
 	UserOrderableCreatedAt,
 	UserOrderableUsername,
-	UserOrderableEmailHash,
-	UserOrderableEmail,
 	UserOrderableName,
 	UserOrderablePassword,
+	UserOrderableEmail,
+	UserOrderableEmailHash,
 	UserOrderableBio,
 	UserOrderableUtc,
 }
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableEmailHash, UserOrderableEmail, UserOrderableName, UserOrderablePassword, UserOrderableBio, UserOrderableUtc:
+	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableEmailHash, UserOrderableBio, UserOrderableUtc:
 		return true
 	}
 	return false

@@ -105,8 +105,76 @@ func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx [
 //
 
 func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    fmt.Println("hey")
-    return next(ctx)
+    //if obj != nil {
+    //    switch v := obj.(type) {
+    //    case *model.Node:
+    //        nameid := v.Nameid
+    //        if nameid == "" {
+    //            return nil, tools.LogErr("@hidePrivate/node", "Access denied", fmt.Errorf("nameid not provided"))
+    //        } else {
+    //            fmt.Println("Get da node a private")
+    //        }
+    //    case *model.Tension:
+    //            // pass for now
+    //            // isPrivate should be inherited by the tension, and user right check if orivate
+    //    default:
+    //        fmt.Printf("%T\n", v)
+    //        panic("type unknonw for @hidePrivate directive.")
+    //    }
+    //    return next(ctx)
+    //} 
+    node_, err := next(ctx)
+    if obj == nil {
+        switch v := node_.(type) {
+        case *model.Node:
+            if v == nil {
+                break
+            }
+            yes, err := isHidePrivate(ctx, v.Nameid)
+            if err != nil { return nil, err }
+            if yes { return nil, tools.LogErr("@hidePrivate/getNode", "Access denied", fmt.Errorf("private node")) }
+        case []*model.Node:
+            for _, node := range(v) {
+                yes, err := isHidePrivate(ctx, node.Nameid)
+                if err != nil { return nil, err }
+                if yes { return nil,  tools.LogErr("@hidePrivate/queryNode", "Access denied", fmt.Errorf("private node")) }
+            }
+        default:
+            panic("@isPrivate: node type unknonwn.")
+        }
+    }
+    return node_, err
+}
+
+func isHidePrivate(ctx context.Context, nameid string) (bool, error) {
+    var yes bool = true
+    var err error
+    if nameid == "" {
+        err = tools.LogErr("@hidePrivate", "Access denied", fmt.Errorf("nameid not provided"))
+    } else {
+        // Get the public status of the node
+        isPrivate, err :=  db.GetDB().GetFieldByEq("Node", "nameid", nameid, "isPrivate")
+        if err != nil {
+            return yes, tools.LogErr("@hidePrivate", "Access denied", err)
+        }
+        if isPrivate.(bool) {
+            // check user role.
+            uctx, err := auth.UserCtxFromContext(ctx)
+            if err != nil {
+                return yes, tools.LogErr("@hidePrivate/userCtx", "Access denied", err)  // Login or signup
+            }
+            rootnameid, err := nid2pid(nameid)
+            for _, ur := range uctx.Roles {
+                if ur.Rootnameid == rootnameid  {
+                    return false, err
+                }
+            }
+        } else {
+            yes = false
+        }
+    }
+
+    return yes, err
 }
 
 func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
@@ -267,10 +335,10 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     if userField != nil {
         ok, err = checkUserOwnership(ctx, uctx, *userField, obj)
         if err != nil {
-            return nil, tools.LogErr("@hasRole/checkOwn", "Access denied", err)
+            return nil, tools.LogErr("@hasRole/checkOwn", "Access denied", err) 
         }
         if ok {
-            return next(ctx)
+            return next(ctx) 
         }
     }
     
@@ -296,7 +364,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     // Retrieve userCtx from token
     uctx, err := auth.UserCtxFromContext(ctx)
     if err != nil {
-        return nil, tools.LogErr("@hasRoot/userCtx", "Access denied", err)  // Login or signup
+        return nil, tools.LogErr("@hasRoot/userCtx", "Access denied", err)  // Login or signup 
     }
 
     // Check that user has the given role on the asked node
@@ -304,10 +372,10 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     for _, nodeField := range nodeFields {
         ok, err = checkUserRoot(ctx, uctx, nodeField, obj)
         if err != nil {
-            return nil, tools.LogErr("@hasRoot", "Access denied", err)
+            return nil, tools.LogErr("@hasRoot", "Access denied", err) 
         }
         if ok {
-            return next(ctx)
+            return next(ctx) 
         }
     }
 
@@ -356,8 +424,10 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
 // Private auth methods
 //
 
+// Check if the an user owns the given object
 func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
     // Get user ID
+    var username string
     user := userObj.(model.JsonAtom)[userField]
     if user == nil || user.(model.JsonAtom)["username"] == nil  {
         // Database request
@@ -368,20 +438,23 @@ func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField strin
         // Request the database to get the field
         // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
         typeName := "Post" // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface ....
-        username, err := db.GetDB().GetSubFieldById(id, typeName, userField, "User", "username")
+        username_, err := db.GetDB().GetSubFieldById(id, typeName, userField, "User", "username")
         if err != nil {
             return false, err
         }
-        return uctx.Username == username, nil
-    } 
+        username = username_.(string)
+    } else {
+        username = user.(model.JsonAtom)["username"].(string)
+    }
 
     // Check user ID match
-    username := user.(model.JsonAtom)["username"].(string)
     return uctx.Username == username, nil
 }
 
+// check if the an user has the given role of the given (nested) node
 func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, nodeObj interface{}, role model.RoleType) (bool, error) {
     // Check that nodes are present
+    var nameid string
     node := nodeObj.(model.JsonAtom)[nodeField]
     if node == nil || node.(model.JsonAtom)["nameid"] == nil {
         // Database request
@@ -392,24 +465,26 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
         // Request the database to get the field
         // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
         typeName := "Tension"
-        username, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "User", "username")
+        nameid_, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "Node", "nameid")
         if err != nil {
             return false, err
         }
-        return uctx.Username == username, nil
+        nameid = nameid_.(string)
+    } else {
+        nameid = node.(model.JsonAtom)["nameid"].(string)
     }
 
     // Search for rights
-    nameid := node.(model.JsonAtom)["nameid"].(string)
     ok := userHasRole(uctx, role, nameid)
     return ok, nil
 }
 
+// check if an user as at least one of his role whithin the given root.
 func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, nodeObj interface{}) (bool, error) {
     // Check that nodes are present
-    nodeTarget_ := getNestedObj(nodeObj, nodeField)
     var rootnameid string
     var err error
+    nodeTarget_ := getNestedObj(nodeObj, nodeField)
     if nodeTarget_ == nil {
         // Database request
         id := ctx.Value("id").(string)
@@ -473,6 +548,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
         } else {
             err = fmt.Errorf("you are not authorized to create new organisation")
         }
+
         return ok, err
     } 
 
@@ -492,6 +568,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
         } else {
             ok = true
         }
+
         return ok, err
     }
 
@@ -534,7 +611,6 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 
         return ok, err
     }
-
 
     return false, fmt.Errorf("not implemented addNode request")
 }
@@ -589,6 +665,7 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
             return true
         }
     }
+
     return false
 }
 
@@ -613,6 +690,7 @@ func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, firstLink mode
             return err
         }
     }
+
     return nil
 }
 
@@ -673,6 +751,4 @@ func get(obj model.JsonAtom, field string, deflt interface{}) interface{} {
     }
 
     return v
-
-
 }

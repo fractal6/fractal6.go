@@ -83,11 +83,9 @@ func (q QueryString) Format(maps map[string]string) string {
     return buf.String()
 }
 
-
 //
 // Initialization
 //
-
 
 // Database client
 var DB *Dgraph
@@ -131,6 +129,11 @@ func initDB() *Dgraph {
             }
         }`,
         // Get single object
+        "getFieldByEq": `{
+            all(func: eq({{.typeName}}.{{.fieldid}}, "{{.objid}}")) {
+                {{.typeName}}.{{.fieldName}}
+            }
+        }`,
         "getSubFieldById": `{
             all(func: uid("{{.id}}")) {
                 {{.typeNameSource}}.{{.fieldNameSource}} {
@@ -139,11 +142,11 @@ func initDB() *Dgraph {
             }
         }`,
         "getUser": `{
-            all(func: eq(User.{{.fieldid}}, "{{.userid}}")) 
+            all(func: eq(User.{{.fieldid}}, "{{.userid}}"))
                 {{.payload}}
         }`,
         "getNodeCharac": `{
-            all(func: eq(Node.{{.fieldid}}, "{{.objid}}")) 
+            all(func: eq(Node.{{.fieldid}}, "{{.objid}}"))
                 {{.payload}}
         }`,
 		// Get multiple objects
@@ -464,7 +467,39 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
     return len(r.All) > 0, nil
 }
 
-// Returns the user context
+// Returns a field from objid
+func (dg Dgraph) GetFieldByEq(typeName string, fieldid string, objid string, fieldName string) (interface{}, error) {
+    // Format Query
+    maps := map[string]string{
+        "typeName":typeName,
+        "fieldid": fieldid,
+        "objid":objid,
+        "fieldName":fieldName,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getFieldByEq", maps)
+    if err != nil {
+        return  nil, err
+    }
+
+    // Decode response
+    var r GpmResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+        return nil, err
+	}
+
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple in gpm query")
+    } else if len(r.All) == 1 {
+        f1 := typeName +"."+ fieldName
+        x := r.All[0][f1]
+        return x, nil
+    }
+    return nil, err
+}
+
+// Returns a subfield from uid
 func (dg Dgraph) GetSubFieldById(id string, typeNameSource string, fieldNameSource string, typeNameTarget string, fieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{

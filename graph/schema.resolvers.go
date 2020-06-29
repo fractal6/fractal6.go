@@ -28,11 +28,11 @@ func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilt
 }
 
 func (r *mutationResolver) AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (data *model.AddNodeCharacPayload, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdatePost(ctx context.Context, input model.UpdatePostInput) (data *model.UpdatePostPayload, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilter) (data *model.DeletePostPayload, errors error) {
@@ -56,11 +56,11 @@ func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.Tensi
 }
 
 func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCommentInput) (data *model.AddCommentPayload, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.CommentFilter) (data *model.DeleteCommentPayload, errors error) {
@@ -68,7 +68,7 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 }
 
 func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (data *model.AddMandatePayload, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (data *model.UpdateMandatePayload, errors error) {
@@ -84,7 +84,7 @@ func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserIn
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (data *model.UpdateUserPayload, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilter) (data *model.DeleteUserPayload, errors error) {
@@ -120,16 +120,20 @@ func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter,
 	return data, errors
 }
 
-func (r *queryResolver) QueryNodeCharac(ctx context.Context, first *int, offset *int) (data []*model.NodeCharac, errors error) {
+func (r *queryResolver) GetNodeCharac(ctx context.Context, id string) (data *model.NodeCharac, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryNodeCharac(ctx context.Context, filter *model.NodeCharacFilter, first *int, offset *int) (data []*model.NodeCharac, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetPost(ctx context.Context, id string) (data *model.Post, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) (data []*model.Post, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetTension(ctx context.Context, id string) (data *model.Tension, errors error) {
@@ -155,7 +159,7 @@ func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.
 }
 
 func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) (data []*model.Mandate, errors error) {
-	panic(fmt.errorf("not implemented"))
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string) (data *model.User, errors error) {
