@@ -250,7 +250,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
         if node.Parent == nil && (*node.Parent).Nameid == nil {
             return nil, tools.LogErr("@addNodeHook", "Access denied", fmt.Errorf("Parent node not found"))
         }
-        parentid := *(*node.Parent).Nameid
+        parentid := *(node.Parent).Nameid
         charac_, err := db.GetDB().GetNodeCharac("nameid", parentid)
         //nodeCHarac := getLut(nameid, "getNodeCharac")
         if err != nil {
@@ -553,7 +553,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     } 
 
     //
-    // New member hook
+    // New member hook (Guest)
     // 
     nodeType := node.Type
     roleType := node.RoleType
@@ -579,6 +579,8 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
         if roleType == nil {
             err = fmt.Errorf("role should have a RoleType")
         }
+
+        // Add node Policies
         if charac.Mode == model.NodeModeChaos {
             ok = userIsMember(uctx, parentid)
         } else if charac.Mode == model.NodeModeCoordinated {
@@ -597,6 +599,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     // New sub-circle hook
     // 
     if nodeType == model.NodeTypeCircle {
+        // Add node Policies
         if charac.Mode == model.NodeModeChaos {
             ok = userIsMember(uctx, parentid)
         } else if charac.Mode == model.NodeModeCoordinated {
@@ -670,24 +673,26 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
 }
 
 // userIsGuest return true if the user is a guest (has only one role) in the given organisation
-func userIsGuest(uctx model.UserCtx, rootnameid string) bool {
-    if len(uctx.Roles) == 1 {
-        r := uctx.Roles[0]
+func userIsGuest(uctx model.UserCtx, rootnameid string) int {
+    for i, r := range uctx.Roles {
         if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
-            return true
+            return i
         }
     }
 
-    return false
+    return -1
 }
 
 // maybeUpdateGuest2Peer check if Guest should be upgrade to Member role type
 func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, firstLink model.UserRef) error {
-    if userIsGuest(uctx, rootnameid) && uctx.Username == *(firstLink).Username {
-        // Update RolType to Member
-        err := db.GetDB().UpgradeGuest(uctx.Roles[0].Nameid, model.RoleTypeMember)
-        if err != nil {
-            return err
+    if uctx.Username == *(firstLink).Username {
+        i := userIsGuest(uctx, rootnameid)
+        if i >= 0 {
+            // Update RoleType to Member
+            err := db.GetDB().UpgradeGuest(uctx.Roles[i].Nameid, model.RoleTypeMember)
+            if err != nil {
+                return err
+            }
         }
     }
 
