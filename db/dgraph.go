@@ -108,7 +108,7 @@ func initDB() *Dgraph {
     grpcUrl := HOSTDB+":"+PORTGRPC
 
     if HOSTDB == "" {
-        panic("viper error: not host found.")
+        panic("Viper error: not host found")
     } else {
         fmt.Println("Dgraph Graphql addr:", dgraphApiUrl)
         fmt.Println("Dgraph Grpc addr:", grpcUrl)
@@ -122,6 +122,35 @@ func initDB() *Dgraph {
                 count({{.typeName}}.{{.fieldName}})
             }
         }`,
+		"getNodeStats": `{
+			var(func: eq(Node.nameid, "{{.nameid}}"))  {
+				Node.children @filter(eq(Node.role_type, "Guest")) {
+					guest as count(uid)
+				}
+			}
+			var(func: eq(Node.nameid, "{{.nameid}}"))  {
+				Node.children @filter(eq(Node.role_type, "Member")) {
+					member as count(uid)
+				}
+			}
+
+			var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+				c as Node.children
+			}
+			var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
+				circle as count(uid)
+			}
+			var(func: uid(c)) @filter(eq(Node.type_, "Role")) {
+				role as count(uid)
+			}
+
+			all() {
+				n_member: sum(val(member))
+				n_guest: sum(val(guest))
+				n_role: sum(val(role))
+				n_circle: sum(val(circle))
+			}
+		}`,
 		// Query existance
         "exists": `{
             all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {
@@ -419,7 +448,7 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
 func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
     // Format Query
     maps := map[string]string{
-        "typeName": typeName, "fieldName":fieldName, "id":id,
+       "id":id, "typeName": typeName, "fieldName":fieldName, 
     }
     // Send request
     res, err := dg.QueryGpm("count", maps)
@@ -443,7 +472,40 @@ func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
 	for _, v := range r.All[0] {
 		values = append(values, v)
 	}
+
     return values[0]
+}
+
+func (dg Dgraph) GetNodeStats(nameid string) map[string]int {
+    // Format Query
+    maps := map[string]string{
+        "nameid": nameid, 
+    }
+    // Send request
+    res, err := dg.QueryGpm("getNodeStats", maps)
+	if err != nil {
+        panic(err)
+	}
+
+    // Decode response
+	var r GpmRespCount
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+		panic(err)
+	}
+
+    // Extract result
+    if len(r.All) == 0 {
+        panic("no stats for: "+ nameid)
+    }
+	stats := make(map[string]int, len(r.All))
+    for _, s := range r.All {
+        for k, v := range s {
+            stats[k] = v
+        }
+    }
+
+    return stats
 }
 
 // Probe if an object exists.

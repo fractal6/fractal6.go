@@ -68,6 +68,7 @@ type AddNodeInput struct {
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
+	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       bool           `json:"isRoot"`
 	IsPrivate    bool           `json:"isPrivate"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
@@ -80,6 +81,18 @@ type AddNodeInput struct {
 type AddNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type AddNodeStatsInput struct {
+	NMember *int `json:"n_member,omitempty"`
+	NGuest  *int `json:"n_guest,omitempty"`
+	NCircle *int `json:"n_circle,omitempty"`
+	NRole   *int `json:"n_role,omitempty"`
+}
+
+type AddNodeStatsPayload struct {
+	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
+	NumUids   *int         `json:"numUids,omitempty"`
 }
 
 type AddTensionInput struct {
@@ -341,6 +354,7 @@ type Node struct {
 	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
 	NChildren    *int        `json:"n_children,omitempty"`
+	Stats        *NodeStats  `json:"stats,omitempty"`
 	IsRoot       bool        `json:"isRoot"`
 	IsPrivate    bool        `json:"isPrivate"`
 	FirstLink    *User       `json:"first_link,omitempty"`
@@ -416,6 +430,7 @@ type NodePatch struct {
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
+	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
 	IsPrivate    *bool          `json:"isPrivate"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
@@ -441,6 +456,7 @@ type NodeRef struct {
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
+	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
 	IsPrivate    *bool          `json:"isPrivate"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
@@ -448,6 +464,26 @@ type NodeRef struct {
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+}
+
+type NodeStats struct {
+	NMember *int `json:"n_member,omitempty"`
+	NGuest  *int `json:"n_guest,omitempty"`
+	NCircle *int `json:"n_circle,omitempty"`
+	NRole   *int `json:"n_role,omitempty"`
+}
+
+type NodeStatsOrder struct {
+	Asc  *NodeStatsOrderable `json:"asc,omitempty"`
+	Desc *NodeStatsOrderable `json:"desc,omitempty"`
+	Then *NodeStatsOrder     `json:"then,omitempty"`
+}
+
+type NodeStatsRef struct {
+	NMember *int `json:"n_member,omitempty"`
+	NGuest  *int `json:"n_guest,omitempty"`
+	NCircle *int `json:"n_circle,omitempty"`
+	NRole   *int `json:"n_role,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -1139,6 +1175,51 @@ func (e *NodeOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NodeStatsOrderable string
+
+const (
+	NodeStatsOrderableNMember NodeStatsOrderable = "n_member"
+	NodeStatsOrderableNGuest  NodeStatsOrderable = "n_guest"
+	NodeStatsOrderableNCircle NodeStatsOrderable = "n_circle"
+	NodeStatsOrderableNRole   NodeStatsOrderable = "n_role"
+)
+
+var AllNodeStatsOrderable = []NodeStatsOrderable{
+	NodeStatsOrderableNMember,
+	NodeStatsOrderableNGuest,
+	NodeStatsOrderableNCircle,
+	NodeStatsOrderableNRole,
+}
+
+func (e NodeStatsOrderable) IsValid() bool {
+	switch e {
+	case NodeStatsOrderableNMember, NodeStatsOrderableNGuest, NodeStatsOrderableNCircle, NodeStatsOrderableNRole:
+		return true
+	}
+	return false
+}
+
+func (e NodeStatsOrderable) String() string {
+	return string(e)
+}
+
+func (e *NodeStatsOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeStatsOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeStatsOrderable", str)
+	}
+	return nil
+}
+
+func (e NodeStatsOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

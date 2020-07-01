@@ -60,6 +60,7 @@ func Init() gen.Config {
     // Fields directives
     c.Directives.Hidden = hidden
     c.Directives.Count = count
+    c.Directives.Meta_getNodeStats = getNodeStats
 
     /* Mutation */
 
@@ -200,6 +201,32 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
     if v >= 0 {
         reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
     }
+    return next(ctx)
+}
+
+func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    rc := graphql.GetResolverContext(ctx)
+    fieldName := rc.Field.Name
+
+    // Reflect to get obj data info
+    // DEBUG: use type switch instead ? (less modular but faster?)
+    nameid := reflect.ValueOf(obj).Elem().FieldByName("Nameid").String()
+	if nameid == "" {
+        err := fmt.Errorf("`nameid' field is needed to query `%s'", fieldName)
+        return nil, err
+    }
+    stats := db.GetDB().GetNodeStats(nameid)
+    n_guest := stats["n_guest"]
+    n_member := stats["n_member"]
+    stats_ := model.NodeStats{
+        NGuest: &n_guest,
+        NMember: &n_member,
+    }
+    reflect.ValueOf(obj).Elem().FieldByName("Stats").Set(reflect.ValueOf(&stats_))
+    //for k, v := range stats {
+    //    goFieldfDef := tools.ToGoNameFormat(k)
+    //    reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&stats))
+    //}
     return next(ctx)
 }
 

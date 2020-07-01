@@ -31,6 +31,18 @@ func (r *mutationResolver) AddNodeCharac(ctx context.Context, input []*model.Add
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) UpdateNodeCharac(ctx context.Context, input model.UpdateNodeCharacInput) (data *model.UpdateNodeCharacPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteNodeCharac(ctx context.Context, filter model.NodeCharacFilter) (data *model.DeleteNodeCharacPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddNodeStats(ctx context.Context, input []*model.AddNodeStatsInput) (data *model.AddNodeStatsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) UpdatePost(ctx context.Context, input model.UpdatePostInput) (data *model.UpdatePostPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -125,6 +137,10 @@ func (r *queryResolver) GetNodeCharac(ctx context.Context, id string) (data *mod
 }
 
 func (r *queryResolver) QueryNodeCharac(ctx context.Context, filter *model.NodeCharacFilter, first *int, offset *int) (data []*model.NodeCharac, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryNodeStats(ctx context.Context, order *model.NodeStatsOrder, first *int, offset *int) (data []*model.NodeStats, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
