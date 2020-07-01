@@ -2123,8 +2123,8 @@ type Node @hidePrivate {
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
   type_: NodeType! @search
   name: String! @search(by: [term])
-  nameid: String! @id
-  rootnameid: String! @search(by: [hash])
+  nameid: String! @id @search(by: [hash, regexp])
+  rootnameid: String! @search(by: [hash, regexp])
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: receiver)
   mandate(filter: MandateFilter): Mandate
@@ -2278,23 +2278,23 @@ enum TensionAction {
 
 }
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2706,8 +2706,8 @@ input NodeFilter {
   createdAt: DateTimeFilter
   type_: NodeType_hash
   name: StringTermFilter
-  nameid: StringHashFilter
-  rootnameid: StringHashFilter
+  nameid: StringHashFilter_StringRegExpFilter
+  rootnameid: StringHashFilter_StringRegExpFilter
   isRoot: Boolean
   isPrivate: Boolean
   skills: StringTermFilter
@@ -8229,8 +8229,18 @@ func (ec *executionContext) _Node_nameid(ctx context.Context, field graphql.Coll
 			}
 			return ec.directives.Id(ctx, obj, directive0)
 		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash", "regexp"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive1, by)
+		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -8275,7 +8285,7 @@ func (ec *executionContext) _Node_rootnameid(ctx context.Context, field graphql.
 			return obj.Rootnameid, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash", "regexp"})
 			if err != nil {
 				return nil, err
 			}
@@ -14871,13 +14881,13 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			}
 		case "nameid":
 			var err error
-			it.Nameid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			it.Nameid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "rootnameid":
 			var err error
-			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			it.Rootnameid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}

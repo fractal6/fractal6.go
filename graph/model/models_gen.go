@@ -391,19 +391,19 @@ type NodeCharacRef struct {
 }
 
 type NodeFilter struct {
-	ID         []string          `json:"id,omitempty"`
-	CreatedAt  *DateTimeFilter   `json:"createdAt,omitempty"`
-	Type       *NodeTypeHash     `json:"type_,omitempty"`
-	Name       *StringTermFilter `json:"name,omitempty"`
-	Nameid     *StringHashFilter `json:"nameid,omitempty"`
-	Rootnameid *StringHashFilter `json:"rootnameid,omitempty"`
-	IsRoot     *bool             `json:"isRoot"`
-	IsPrivate  *bool             `json:"isPrivate"`
-	Skills     *StringTermFilter `json:"skills,omitempty"`
-	RoleType   *RoleTypeHash     `json:"role_type,omitempty"`
-	And        *NodeFilter       `json:"and,omitempty"`
-	Or         *NodeFilter       `json:"or,omitempty"`
-	Not        *NodeFilter       `json:"not,omitempty"`
+	ID         []string                            `json:"id,omitempty"`
+	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
+	Type       *NodeTypeHash                       `json:"type_,omitempty"`
+	Name       *StringTermFilter                   `json:"name,omitempty"`
+	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
+	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
+	IsRoot     *bool                               `json:"isRoot"`
+	IsPrivate  *bool                               `json:"isPrivate"`
+	Skills     *StringTermFilter                   `json:"skills,omitempty"`
+	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
+	And        *NodeFilter                         `json:"and,omitempty"`
+	Or         *NodeFilter                         `json:"or,omitempty"`
+	Not        *NodeFilter                         `json:"not,omitempty"`
 }
 
 type NodeModeHash struct {
