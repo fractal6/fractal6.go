@@ -166,6 +166,7 @@ type ComplexityRoot struct {
 	}
 
 	Mandate struct {
+		About            func(childComplexity int) int
 		Domains          func(childComplexity int) int
 		ID               func(childComplexity int) int
 		Policies         func(childComplexity int) int
@@ -750,6 +751,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Label.Name(childComplexity), true
+
+	case "Mandate.about":
+		if e.complexity.Mandate.About == nil {
+			break
+		}
+
+		return e.complexity.Mandate.About(childComplexity), true
 
 	case "Mandate.domains":
 		if e.complexity.Mandate.Domains == nil {
@@ -2191,6 +2199,7 @@ type Comment {
 type Mandate {
   id: ID!
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]! @hasInverse(field: mandate)
+  about: String @search(by: [fulltext])
   purpose: String! @search(by: [fulltext])
   responsabilities: String
   domains: String
@@ -2278,9 +2287,13 @@ enum TensionAction {
 
 }
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @cascade on FIELD
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
@@ -2288,13 +2301,9 @@ directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
-
 directive @remote on OBJECT|INTERFACE
 
-directive @cascade on FIELD
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2320,6 +2329,7 @@ type AddLabelPayload {
 
 input AddMandateInput {
   tensions: [TensionRef!]!
+  about: String
   purpose: String!
   responsabilities: String
   domains: String
@@ -2612,6 +2622,7 @@ input LabelRef {
 
 input MandateFilter {
   id: [ID!]
+  about: StringFullTextFilter
   purpose: StringFullTextFilter
   and: MandateFilter
   or: MandateFilter
@@ -2625,6 +2636,7 @@ input MandateOrder {
 }
 
 enum MandateOrderable {
+  about
   purpose
   responsabilities
   domains
@@ -2633,6 +2645,7 @@ enum MandateOrderable {
 
 input MandatePatch {
   tensions: [TensionRef!]
+  about: String
   purpose: String @patch_RO
   responsabilities: String @patch_RO
   domains: String @patch_RO
@@ -2642,6 +2655,7 @@ input MandatePatch {
 input MandateRef {
   id: ID
   tensions: [TensionRef!]
+  about: String
   purpose: String
   responsabilities: String
   domains: String
@@ -6841,6 +6855,58 @@ func (ec *executionContext) _Mandate_tensions(ctx context.Context, field graphql
 	res := resTmp.([]*model.Tension)
 	fc.Result = res
 	return ec.marshalNTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mandate_about(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mandate",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.About, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_purpose(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -13110,6 +13176,12 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalNString2string(ctx, v)
@@ -14537,6 +14609,12 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
@@ -14606,6 +14684,12 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 		case "tensions":
 			var err error
 			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14714,6 +14798,12 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		case "tensions":
 			var err error
 			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18012,6 +18102,8 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "about":
+			out.Values[i] = ec._Mandate_about(ctx, field, obj)
 		case "purpose":
 			out.Values[i] = ec._Mandate_purpose(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

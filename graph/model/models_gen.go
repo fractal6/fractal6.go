@@ -32,6 +32,7 @@ type AddLabelPayload struct {
 
 type AddMandateInput struct {
 	Tensions         []*TensionRef `json:"tensions,omitempty"`
+	About            *string       `json:"about,omitempty"`
 	Purpose          string        `json:"purpose,omitempty"`
 	Responsabilities *string       `json:"responsabilities,omitempty"`
 	Domains          *string       `json:"domains,omitempty"`
@@ -301,6 +302,7 @@ type LabelRef struct {
 type Mandate struct {
 	ID               string     `json:"id,omitempty"`
 	Tensions         []*Tension `json:"tensions,omitempty"`
+	About            *string    `json:"about,omitempty"`
 	Purpose          string     `json:"purpose,omitempty"`
 	Responsabilities *string    `json:"responsabilities,omitempty"`
 	Domains          *string    `json:"domains,omitempty"`
@@ -309,6 +311,7 @@ type Mandate struct {
 
 type MandateFilter struct {
 	ID      []string              `json:"id,omitempty"`
+	About   *StringFullTextFilter `json:"about,omitempty"`
 	Purpose *StringFullTextFilter `json:"purpose,omitempty"`
 	And     *MandateFilter        `json:"and,omitempty"`
 	Or      *MandateFilter        `json:"or,omitempty"`
@@ -323,6 +326,7 @@ type MandateOrder struct {
 
 type MandatePatch struct {
 	Tensions         []*TensionRef `json:"tensions,omitempty"`
+	About            *string       `json:"about,omitempty"`
 	Purpose          *string       `json:"purpose,omitempty"`
 	Responsabilities *string       `json:"responsabilities,omitempty"`
 	Domains          *string       `json:"domains,omitempty"`
@@ -332,6 +336,7 @@ type MandatePatch struct {
 type MandateRef struct {
 	ID               *string       `json:"id,omitempty"`
 	Tensions         []*TensionRef `json:"tensions,omitempty"`
+	About            *string       `json:"about,omitempty"`
 	Purpose          *string       `json:"purpose,omitempty"`
 	Responsabilities *string       `json:"responsabilities,omitempty"`
 	Domains          *string       `json:"domains,omitempty"`
@@ -1001,6 +1006,7 @@ func (e LabelOrderable) MarshalGQL(w io.Writer) {
 type MandateOrderable string
 
 const (
+	MandateOrderableAbout            MandateOrderable = "about"
 	MandateOrderablePurpose          MandateOrderable = "purpose"
 	MandateOrderableResponsabilities MandateOrderable = "responsabilities"
 	MandateOrderableDomains          MandateOrderable = "domains"
@@ -1008,6 +1014,7 @@ const (
 )
 
 var AllMandateOrderable = []MandateOrderable{
+	MandateOrderableAbout,
 	MandateOrderablePurpose,
 	MandateOrderableResponsabilities,
 	MandateOrderableDomains,
@@ -1016,7 +1023,7 @@ var AllMandateOrderable = []MandateOrderable{
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies:
+	case MandateOrderableAbout, MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies:
 		return true
 	}
 	return false
