@@ -27,6 +27,10 @@ func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddNodeFragment(ctx context.Context, input []*model.AddNodeFragmentInput) (data *model.AddNodeFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (data *model.AddNodeCharacPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -130,6 +134,10 @@ func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string)
 func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) (data []*model.Node, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
+}
+
+func (r *queryResolver) QueryNodeFragment(ctx context.Context, order *model.NodeFragmentOrder, first *int, offset *int) (data []*model.NodeFragment, errors error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetNodeCharac(ctx context.Context, id string) (data *model.NodeCharac, errors error) {

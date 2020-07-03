@@ -31,12 +31,11 @@ type AddLabelPayload struct {
 }
 
 type AddMandateInput struct {
-	Tensions         []*TensionRef `json:"tensions,omitempty"`
-	About            *string       `json:"about,omitempty"`
-	Purpose          string        `json:"purpose,omitempty"`
-	Responsabilities *string       `json:"responsabilities,omitempty"`
-	Domains          *string       `json:"domains,omitempty"`
-	Policies         *string       `json:"policies,omitempty"`
+	About            *string `json:"about,omitempty"`
+	Purpose          string  `json:"purpose,omitempty"`
+	Responsabilities *string `json:"responsabilities,omitempty"`
+	Domains          *string `json:"domains,omitempty"`
+	Policies         *string `json:"policies,omitempty"`
 }
 
 type AddMandatePayload struct {
@@ -54,15 +53,34 @@ type AddNodeCharacPayload struct {
 	NumUids    *int          `json:"numUids,omitempty"`
 }
 
+type AddNodeFragmentInput struct {
+	Name       *string            `json:"name,omitempty"`
+	Nameid     *string            `json:"nameid,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
+	Type       *NodeType          `json:"type_,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	IsPrivate  *bool              `json:"isPrivate"`
+	Charac     *NodeCharacRef     `json:"charac,omitempty"`
+	FirstLink  *string            `json:"first_link,omitempty"`
+	SecondLink *string            `json:"second_link,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	RoleType   *RoleType          `json:"role_type,omitempty"`
+}
+
+type AddNodeFragmentPayload struct {
+	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
 type AddNodeInput struct {
 	CreatedAt    string         `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
-	Parent       *NodeRef       `json:"parent,omitempty"`
-	Children     []*NodeRef     `json:"children,omitempty"`
-	Type         NodeType       `json:"type_,omitempty"`
 	Name         string         `json:"name,omitempty"`
 	Nameid       string         `json:"nameid,omitempty"`
 	Rootnameid   string         `json:"rootnameid,omitempty"`
+	Parent       *NodeRef       `json:"parent,omitempty"`
+	Children     []*NodeRef     `json:"children,omitempty"`
+	Type         NodeType       `json:"type_,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
@@ -72,11 +90,11 @@ type AddNodeInput struct {
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       bool           `json:"isRoot"`
 	IsPrivate    bool           `json:"isPrivate"`
+	Charac       *NodeCharacRef `json:"charac,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
-	Charac       *NodeCharacRef `json:"charac,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -97,22 +115,22 @@ type AddNodeStatsPayload struct {
 }
 
 type AddTensionInput struct {
-	CreatedAt  string         `json:"createdAt,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
-	Message    *string        `json:"message,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      string         `json:"title,omitempty"`
-	Type       TensionType    `json:"type_,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
-	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
-	Comments   []*CommentRef  `json:"comments,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
-	Status     TensionStatus  `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Mandate    *MandateRef    `json:"mandate,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
+	CreatedAt  string           `json:"createdAt,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Nth        *string          `json:"nth,omitempty"`
+	Title      string           `json:"title,omitempty"`
+	Type       TensionType      `json:"type_,omitempty"`
+	Emitter    *NodeRef         `json:"emitter,omitempty"`
+	Emitterid  string           `json:"emitterid,omitempty"`
+	Receiver   *NodeRef         `json:"receiver,omitempty"`
+	Receiverid string           `json:"receiverid,omitempty"`
+	Comments   []*CommentRef    `json:"comments,omitempty"`
+	Labels     []*LabelRef      `json:"labels,omitempty"`
+	Status     TensionStatus    `json:"status,omitempty"`
+	Action     *TensionAction   `json:"action,omitempty"`
+	Data       *NodeFragmentRef `json:"data,omitempty"`
+	NComments  *int             `json:"n_comments,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -300,13 +318,12 @@ type LabelRef struct {
 }
 
 type Mandate struct {
-	ID               string     `json:"id,omitempty"`
-	Tensions         []*Tension `json:"tensions,omitempty"`
-	About            *string    `json:"about,omitempty"`
-	Purpose          string     `json:"purpose,omitempty"`
-	Responsabilities *string    `json:"responsabilities,omitempty"`
-	Domains          *string    `json:"domains,omitempty"`
-	Policies         *string    `json:"policies,omitempty"`
+	ID               string  `json:"id,omitempty"`
+	About            *string `json:"about,omitempty"`
+	Purpose          string  `json:"purpose,omitempty"`
+	Responsabilities *string `json:"responsabilities,omitempty"`
+	Domains          *string `json:"domains,omitempty"`
+	Policies         *string `json:"policies,omitempty"`
 }
 
 type MandateFilter struct {
@@ -325,34 +342,32 @@ type MandateOrder struct {
 }
 
 type MandatePatch struct {
-	Tensions         []*TensionRef `json:"tensions,omitempty"`
-	About            *string       `json:"about,omitempty"`
-	Purpose          *string       `json:"purpose,omitempty"`
-	Responsabilities *string       `json:"responsabilities,omitempty"`
-	Domains          *string       `json:"domains,omitempty"`
-	Policies         *string       `json:"policies,omitempty"`
+	About            *string `json:"about,omitempty"`
+	Purpose          *string `json:"purpose,omitempty"`
+	Responsabilities *string `json:"responsabilities,omitempty"`
+	Domains          *string `json:"domains,omitempty"`
+	Policies         *string `json:"policies,omitempty"`
 }
 
 type MandateRef struct {
-	ID               *string       `json:"id,omitempty"`
-	Tensions         []*TensionRef `json:"tensions,omitempty"`
-	About            *string       `json:"about,omitempty"`
-	Purpose          *string       `json:"purpose,omitempty"`
-	Responsabilities *string       `json:"responsabilities,omitempty"`
-	Domains          *string       `json:"domains,omitempty"`
-	Policies         *string       `json:"policies,omitempty"`
+	ID               *string `json:"id,omitempty"`
+	About            *string `json:"about,omitempty"`
+	Purpose          *string `json:"purpose,omitempty"`
+	Responsabilities *string `json:"responsabilities,omitempty"`
+	Domains          *string `json:"domains,omitempty"`
+	Policies         *string `json:"policies,omitempty"`
 }
 
 type Node struct {
 	ID           string      `json:"id,omitempty"`
 	CreatedAt    string      `json:"createdAt,omitempty"`
 	CreatedBy    *User       `json:"createdBy,omitempty"`
-	Parent       *Node       `json:"parent,omitempty"`
-	Children     []*Node     `json:"children,omitempty"`
-	Type         NodeType    `json:"type_,omitempty"`
 	Name         string      `json:"name,omitempty"`
 	Nameid       string      `json:"nameid,omitempty"`
 	Rootnameid   string      `json:"rootnameid,omitempty"`
+	Parent       *Node       `json:"parent,omitempty"`
+	Children     []*Node     `json:"children,omitempty"`
+	Type         NodeType    `json:"type_,omitempty"`
 	TensionsOut  []*Tension  `json:"tensions_out,omitempty"`
 	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
 	Mandate      *Mandate    `json:"mandate,omitempty"`
@@ -362,11 +377,11 @@ type Node struct {
 	Stats        *NodeStats  `json:"stats,omitempty"`
 	IsRoot       bool        `json:"isRoot"`
 	IsPrivate    bool        `json:"isPrivate"`
+	Charac       *NodeCharac `json:"charac,omitempty"`
 	FirstLink    *User       `json:"first_link,omitempty"`
 	SecondLink   *User       `json:"second_link,omitempty"`
 	Skills       []string    `json:"skills,omitempty"`
 	RoleType     *RoleType   `json:"role_type,omitempty"`
-	Charac       *NodeCharac `json:"charac,omitempty"`
 }
 
 type NodeCharac struct {
@@ -398,10 +413,10 @@ type NodeCharacRef struct {
 type NodeFilter struct {
 	ID         []string                            `json:"id,omitempty"`
 	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
-	Type       *NodeTypeHash                       `json:"type_,omitempty"`
 	Name       *StringTermFilter                   `json:"name,omitempty"`
 	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
 	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
+	Type       *NodeTypeHash                       `json:"type_,omitempty"`
 	IsRoot     *bool                               `json:"isRoot"`
 	IsPrivate  *bool                               `json:"isPrivate"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
@@ -409,6 +424,40 @@ type NodeFilter struct {
 	And        *NodeFilter                         `json:"and,omitempty"`
 	Or         *NodeFilter                         `json:"or,omitempty"`
 	Not        *NodeFilter                         `json:"not,omitempty"`
+}
+
+type NodeFragment struct {
+	Name       *string         `json:"name,omitempty"`
+	Nameid     *string         `json:"nameid,omitempty"`
+	Children   []*NodeFragment `json:"children,omitempty"`
+	Type       *NodeType       `json:"type_,omitempty"`
+	Mandate    *Mandate        `json:"mandate,omitempty"`
+	IsPrivate  *bool           `json:"isPrivate"`
+	Charac     *NodeCharac     `json:"charac,omitempty"`
+	FirstLink  *string         `json:"first_link,omitempty"`
+	SecondLink *string         `json:"second_link,omitempty"`
+	Skills     []string        `json:"skills,omitempty"`
+	RoleType   *RoleType       `json:"role_type,omitempty"`
+}
+
+type NodeFragmentOrder struct {
+	Asc  *NodeFragmentOrderable `json:"asc,omitempty"`
+	Desc *NodeFragmentOrderable `json:"desc,omitempty"`
+	Then *NodeFragmentOrder     `json:"then,omitempty"`
+}
+
+type NodeFragmentRef struct {
+	Name       *string            `json:"name,omitempty"`
+	Nameid     *string            `json:"nameid,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
+	Type       *NodeType          `json:"type_,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	IsPrivate  *bool              `json:"isPrivate"`
+	Charac     *NodeCharacRef     `json:"charac,omitempty"`
+	FirstLink  *string            `json:"first_link,omitempty"`
+	SecondLink *string            `json:"second_link,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	RoleType   *RoleType          `json:"role_type,omitempty"`
 }
 
 type NodeModeHash struct {
@@ -424,11 +473,11 @@ type NodeOrder struct {
 type NodePatch struct {
 	CreatedAt    *string        `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	Name         *string        `json:"name,omitempty"`
+	Rootnameid   *string        `json:"rootnameid,omitempty"`
 	Parent       *NodeRef       `json:"parent,omitempty"`
 	Children     []*NodeRef     `json:"children,omitempty"`
 	Type         *NodeType      `json:"type_,omitempty"`
-	Name         *string        `json:"name,omitempty"`
-	Rootnameid   *string        `json:"rootnameid,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
@@ -438,23 +487,23 @@ type NodePatch struct {
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
 	IsPrivate    *bool          `json:"isPrivate"`
+	Charac       *NodeCharacRef `json:"charac,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
-	Charac       *NodeCharacRef `json:"charac,omitempty"`
 }
 
 type NodeRef struct {
 	ID           *string        `json:"id,omitempty"`
 	CreatedAt    *string        `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
-	Parent       *NodeRef       `json:"parent,omitempty"`
-	Children     []*NodeRef     `json:"children,omitempty"`
-	Type         *NodeType      `json:"type_,omitempty"`
 	Name         *string        `json:"name,omitempty"`
 	Nameid       *string        `json:"nameid,omitempty"`
 	Rootnameid   *string        `json:"rootnameid,omitempty"`
+	Parent       *NodeRef       `json:"parent,omitempty"`
+	Children     []*NodeRef     `json:"children,omitempty"`
+	Type         *NodeType      `json:"type_,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
@@ -464,11 +513,11 @@ type NodeRef struct {
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
 	IsPrivate    *bool          `json:"isPrivate"`
+	Charac       *NodeCharacRef `json:"charac,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
-	Charac       *NodeCharacRef `json:"charac,omitempty"`
 }
 
 type NodeStats struct {
@@ -574,7 +623,7 @@ type Tension struct {
 	Labels     []*Label       `json:"labels,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
-	Mandate    *Mandate       `json:"mandate,omitempty"`
+	Data       *NodeFragment  `json:"data,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
@@ -604,42 +653,42 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
-	CreatedAt  *string        `json:"createdAt,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
-	Message    *string        `json:"message,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      *string        `json:"title,omitempty"`
-	Type       *TensionType   `json:"type_,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
-	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
-	Comments   []*CommentRef  `json:"comments,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
-	Status     *TensionStatus `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Mandate    *MandateRef    `json:"mandate,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
+	CreatedAt  *string          `json:"createdAt,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Nth        *string          `json:"nth,omitempty"`
+	Title      *string          `json:"title,omitempty"`
+	Type       *TensionType     `json:"type_,omitempty"`
+	Emitter    *NodeRef         `json:"emitter,omitempty"`
+	Emitterid  *string          `json:"emitterid,omitempty"`
+	Receiver   *NodeRef         `json:"receiver,omitempty"`
+	Receiverid *string          `json:"receiverid,omitempty"`
+	Comments   []*CommentRef    `json:"comments,omitempty"`
+	Labels     []*LabelRef      `json:"labels,omitempty"`
+	Status     *TensionStatus   `json:"status,omitempty"`
+	Action     *TensionAction   `json:"action,omitempty"`
+	Data       *NodeFragmentRef `json:"data,omitempty"`
+	NComments  *int             `json:"n_comments,omitempty"`
 }
 
 type TensionRef struct {
-	ID         *string        `json:"id,omitempty"`
-	CreatedAt  *string        `json:"createdAt,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
-	Message    *string        `json:"message,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      *string        `json:"title,omitempty"`
-	Type       *TensionType   `json:"type_,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
-	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
-	Comments   []*CommentRef  `json:"comments,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
-	Status     *TensionStatus `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Mandate    *MandateRef    `json:"mandate,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
+	ID         *string          `json:"id,omitempty"`
+	CreatedAt  *string          `json:"createdAt,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Nth        *string          `json:"nth,omitempty"`
+	Title      *string          `json:"title,omitempty"`
+	Type       *TensionType     `json:"type_,omitempty"`
+	Emitter    *NodeRef         `json:"emitter,omitempty"`
+	Emitterid  *string          `json:"emitterid,omitempty"`
+	Receiver   *NodeRef         `json:"receiver,omitempty"`
+	Receiverid *string          `json:"receiverid,omitempty"`
+	Comments   []*CommentRef    `json:"comments,omitempty"`
+	Labels     []*LabelRef      `json:"labels,omitempty"`
+	Status     *TensionStatus   `json:"status,omitempty"`
+	Action     *TensionAction   `json:"action,omitempty"`
+	Data       *NodeFragmentRef `json:"data,omitempty"`
+	NComments  *int             `json:"n_comments,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -1088,6 +1137,53 @@ func (e *Mode) UnmarshalGQL(v interface{}) error {
 }
 
 func (e Mode) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NodeFragmentOrderable string
+
+const (
+	NodeFragmentOrderableName       NodeFragmentOrderable = "name"
+	NodeFragmentOrderableNameid     NodeFragmentOrderable = "nameid"
+	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
+	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
+	NodeFragmentOrderableSkills     NodeFragmentOrderable = "skills"
+)
+
+var AllNodeFragmentOrderable = []NodeFragmentOrderable{
+	NodeFragmentOrderableName,
+	NodeFragmentOrderableNameid,
+	NodeFragmentOrderableFirstLink,
+	NodeFragmentOrderableSecondLink,
+	NodeFragmentOrderableSkills,
+}
+
+func (e NodeFragmentOrderable) IsValid() bool {
+	switch e {
+	case NodeFragmentOrderableName, NodeFragmentOrderableNameid, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableSkills:
+		return true
+	}
+	return false
+}
+
+func (e NodeFragmentOrderable) String() string {
+	return string(e)
+}
+
+func (e *NodeFragmentOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeFragmentOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeFragmentOrderable", str)
+	}
+	return nil
+}
+
+func (e NodeFragmentOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
