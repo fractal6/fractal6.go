@@ -187,7 +187,8 @@ func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateF
 }
 
 func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string) (data *model.User, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) (data []*model.User, errors error) {
