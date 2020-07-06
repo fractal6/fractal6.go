@@ -508,6 +508,9 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
             return false, err
         }
         nameid = nameid_.(string)
+        if isRole(nameid) {
+            nameid, _ = nid2pid(nameid)
+        }
     } else if (nameid_ != nil) {
         // Node Here
         typeName := "Node"
@@ -757,6 +760,8 @@ func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, firstLink mode
 //
 // User Codecs
 //
+
+// Get the parent nameid from the given nameid
 func nid2pid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")
@@ -772,6 +777,7 @@ func nid2pid(nid string) (string, error) {
     return pid, nil
 }
 
+// Get the rootnameid from the given nameid
 func nid2rootid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")
@@ -780,6 +786,15 @@ func nid2rootid(nid string) (string, error) {
     }
 
     return parts[0], nil
+}
+
+func isCircle(nid string) (bool) {
+    parts := strings.Split(nid, "#")
+    return len(parts) == 1 || len(parts) == 2
+}
+func isRole(nid string) (bool) {
+    parts := strings.Split(nid, "#")
+    return len(parts) == 3
 }
 
 
