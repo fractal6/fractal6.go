@@ -54,6 +54,7 @@ type DirectiveRoot struct {
 	Hidden             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	HidePrivate        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addNode       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateNode    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTension func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	IsAuth             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -171,7 +172,6 @@ type ComplexityRoot struct {
 	}
 
 	Mandate struct {
-		About            func(childComplexity int) int
 		Domains          func(childComplexity int) int
 		ID               func(childComplexity int) int
 		Policies         func(childComplexity int) int
@@ -209,6 +209,7 @@ type ComplexityRoot struct {
 	}
 
 	Node struct {
+		About        func(childComplexity int) int
 		Charac       func(childComplexity int, filter *model.NodeCharacFilter) int
 		Children     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		CreatedAt    func(childComplexity int) int
@@ -241,6 +242,7 @@ type ComplexityRoot struct {
 	}
 
 	NodeFragment struct {
+		About      func(childComplexity int) int
 		Charac     func(childComplexity int, filter *model.NodeCharacFilter) int
 		Children   func(childComplexity int, order *model.NodeFragmentOrder, first *int, offset *int) int
 		FirstLink  func(childComplexity int) int
@@ -793,13 +795,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Label.Name(childComplexity), true
 
-	case "Mandate.about":
-		if e.complexity.Mandate.About == nil {
-			break
-		}
-
-		return e.complexity.Mandate.About(childComplexity), true
-
 	case "Mandate.domains":
 		if e.complexity.Mandate.Domains == nil {
 			break
@@ -1147,6 +1142,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(model.UpdateUserInput)), true
 
+	case "Node.about":
+		if e.complexity.Node.About == nil {
+			break
+		}
+
+		return e.complexity.Node.About(childComplexity), true
+
 	case "Node.charac":
 		if e.complexity.Node.Charac == nil {
 			break
@@ -1373,6 +1375,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeCharac.UserCanJoin(childComplexity), true
+
+	case "NodeFragment.about":
+		if e.complexity.NodeFragment.About == nil {
+			break
+		}
+
+		return e.complexity.NodeFragment.About(childComplexity), true
 
 	case "NodeFragment.charac":
 		if e.complexity.NodeFragment.Charac == nil {
@@ -2241,6 +2250,7 @@ directive @meta_getNodeStats on FIELD_DEFINITION
 
 directive @hook_addNode on ARGUMENT_DEFINITION
 
+directive @hook_updateNode on ARGUMENT_DEFINITION
 directive @hook_updateTension on ARGUMENT_DEFINITION
 
 directive @alter_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
@@ -2275,6 +2285,7 @@ type Node @hidePrivate {
   type_: NodeType! @search
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: receiver)
+  about: String @search(by: [fulltext])
   mandate(filter: MandateFilter): Mandate
   n_tensions_out: Int @count(f: tensions_out)
   n_tensions_in: Int @count(f: tensions_in)
@@ -2294,6 +2305,7 @@ type NodeFragment {
   nameid: String
   children(order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment]
   type_: NodeType
+  about: String
   mandate(filter: MandateFilter): Mandate
   isPrivate: Boolean
   charac(filter: NodeCharacFilter): NodeCharac
@@ -2352,7 +2364,6 @@ type Comment {
 
 type Mandate {
   id: ID!
-  about: String @search(by: [fulltext])
   purpose: String! @search(by: [fulltext])
   responsabilities: String
   domains: String
@@ -2431,8 +2442,10 @@ enum TensionAction {
 
 
 
-
-
+  UpdateRoleAbout
+  UpdateCircleAbout
+  UpdateRoleMandate
+  UpdateCircleMandate
 
 
 
@@ -2440,23 +2453,23 @@ enum TensionAction {
 
 }
 
-directive @remote on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
-directive @cascade on FIELD
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @cascade on FIELD
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
 
 input AddCommentInput {
   createdAt: DateTime!
@@ -2481,7 +2494,6 @@ type AddLabelPayload {
 }
 
 input AddMandateInput {
-  about: String @alter_maxLength(f:"about", n:280)
   purpose: String!
   responsabilities: String
   domains: String
@@ -2508,6 +2520,7 @@ input AddNodeFragmentInput {
   nameid: String
   children: [NodeFragmentRef]
   type_: NodeType
+  about: String
   mandate: MandateRef
   isPrivate: Boolean
   charac: NodeCharacRef
@@ -2533,6 +2546,7 @@ input AddNodeInput {
   type_: NodeType!
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
+  about: String @alter_maxLength(f:"about", n:280)
   mandate: MandateRef
   n_tensions_out: Int
   n_tensions_in: Int
@@ -2793,7 +2807,6 @@ input LabelRef {
 
 input MandateFilter {
   id: [ID!]
-  about: StringFullTextFilter
   purpose: StringFullTextFilter
   and: MandateFilter
   or: MandateFilter
@@ -2807,7 +2820,6 @@ input MandateOrder {
 }
 
 enum MandateOrderable {
-  about
   purpose
   responsabilities
   domains
@@ -2815,7 +2827,6 @@ enum MandateOrderable {
 }
 
 input MandatePatch {
-  about: String @alter_maxLength(f:"about", n:280)
   purpose: String @patch_RO
   responsabilities: String @patch_RO
   domains: String @patch_RO
@@ -2824,7 +2835,6 @@ input MandatePatch {
 
 input MandateRef {
   id: ID
-  about: String
   purpose: String
   responsabilities: String
   domains: String
@@ -2838,7 +2848,7 @@ enum Mode {
 
 type Mutation {
   addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload
-  updateNode(input: UpdateNodeInput!): UpdateNodePayload
+  updateNode(input: UpdateNodeInput! @hook_updateNode): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
@@ -2892,6 +2902,7 @@ input NodeFilter {
   nameid: StringHashFilter_StringRegExpFilter
   rootnameid: StringHashFilter_StringRegExpFilter
   type_: NodeType_hash
+  about: StringFullTextFilter
   isRoot: Boolean
   isPrivate: Boolean
   skills: StringTermFilter
@@ -2910,6 +2921,7 @@ input NodeFragmentOrder {
 enum NodeFragmentOrderable {
   name
   nameid
+  about
   first_link
   second_link
   skills
@@ -2920,6 +2932,7 @@ input NodeFragmentRef {
   nameid: String
   children: [NodeFragmentRef]
   type_: NodeType
+  about: String
   mandate: MandateRef
   isPrivate: Boolean
   charac: NodeCharacRef
@@ -2944,6 +2957,7 @@ enum NodeOrderable {
   name
   nameid
   rootnameid
+  about
   n_tensions_out
   n_tensions_in
   n_children
@@ -2960,6 +2974,7 @@ input NodePatch {
   type_: NodeType @patch_RO
   tensions_out: [TensionRef!] @patch_RO
   tensions_in: [TensionRef!] @patch_RO
+  about: String @patch_hasRole(n:["parent"], r: Coordinator) @alter_maxLength(f:"about", n:280)
   mandate: MandateRef @patch_hasRole(n:["parent"], r: Coordinator)
   n_tensions_out: Int
   n_tensions_in: Int
@@ -2986,6 +3001,7 @@ input NodeRef {
   type_: NodeType
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
+  about: String
   mandate: MandateRef
   n_tensions_out: Int
   n_tensions_in: Int
@@ -4311,9 +4327,24 @@ func (ec *executionContext) field_Mutation_updateNode_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 model.UpdateNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateNode == nil {
+				return nil, errors.New("directive hook_updateNode is not implemented")
+			}
+			return ec.directives.Hook_updateNode(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
 			return nil, err
+		}
+		if data, ok := tmp.(model.UpdateNodeInput); ok {
+			arg0 = data
+		} else {
+			return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateNodeInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -7137,58 +7168,6 @@ func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.Colle
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mandate_about(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mandate",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.About, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, by)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mandate_purpose(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8818,6 +8797,58 @@ func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql
 	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_about(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.About, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"fulltext"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_mandate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9617,6 +9648,34 @@ func (ec *executionContext) _NodeFragment_type_(ctx context.Context, field graph
 	res := resTmp.(*model.NodeType)
 	fc.Result = res
 	return ec.marshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragment_about(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NodeFragment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.About, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeFragment_mandate(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
@@ -13842,35 +13901,6 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 
 	for k, v := range asMap {
 		switch k {
-		case "about":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "about")
-				if err != nil {
-					return nil, err
-				}
-				n, err := ec.unmarshalNInt2int(ctx, 280)
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_maxLength == nil {
-					return nil, errors.New("directive alter_maxLength is not implemented")
-				}
-				return ec.directives.Alter_maxLength(ctx, obj, directive0, f, n)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*string); ok {
-				it.About = data
-			} else if tmp == nil {
-				it.About = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalNString2string(ctx, v)
@@ -13952,6 +13982,12 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 		case "type_":
 			var err error
 			it.Type, err = ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14089,6 +14125,35 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
+			}
+		case "about":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "about")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalNInt2int(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_maxLength == nil {
+					return nil, errors.New("directive alter_maxLength is not implemented")
+				}
+				return ec.directives.Alter_maxLength(ctx, obj, directive0, f, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.About = data
+			} else if tmp == nil {
+				it.About = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "mandate":
 			var err error
@@ -15376,12 +15441,6 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "about":
-			var err error
-			it.About, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "purpose":
 			var err error
 			it.Purpose, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
@@ -15448,35 +15507,6 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
-		case "about":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "about")
-				if err != nil {
-					return nil, err
-				}
-				n, err := ec.unmarshalNInt2int(ctx, 280)
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_maxLength == nil {
-					return nil, errors.New("directive alter_maxLength is not implemented")
-				}
-				return ec.directives.Alter_maxLength(ctx, obj, directive0, f, n)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*string); ok {
-				it.About = data
-			} else if tmp == nil {
-				it.About = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
 		case "purpose":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -15576,12 +15606,6 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		case "id":
 			var err error
 			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "about":
-			var err error
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15759,6 +15783,12 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isRoot":
 			var err error
 			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -15864,6 +15894,12 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 		case "type_":
 			var err error
 			it.Type, err = ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16171,6 +16207,49 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.TensionsIn = data
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+			}
+		case "about":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
+				}
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
+				}
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "about")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalNInt2int(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_maxLength == nil {
+					return nil, errors.New("directive alter_maxLength is not implemented")
+				}
+				return ec.directives.Alter_maxLength(ctx, obj, directive1, f, n)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.About = data
+			} else if tmp == nil {
+				it.About = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "mandate":
 			var err error
@@ -16495,6 +16574,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		case "tensions_in":
 			var err error
 			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19009,8 +19094,6 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "about":
-			out.Values[i] = ec._Mandate_about(ctx, field, obj)
 		case "purpose":
 			out.Values[i] = ec._Mandate_purpose(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19165,6 +19248,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_tensions_out(ctx, field, obj)
 		case "tensions_in":
 			out.Values[i] = ec._Node_tensions_in(ctx, field, obj)
+		case "about":
+			out.Values[i] = ec._Node_about(ctx, field, obj)
 		case "mandate":
 			out.Values[i] = ec._Node_mandate(ctx, field, obj)
 		case "n_tensions_out":
@@ -19265,6 +19350,8 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._NodeFragment_children(ctx, field, obj)
 		case "type_":
 			out.Values[i] = ec._NodeFragment_type_(ctx, field, obj)
+		case "about":
+			out.Values[i] = ec._NodeFragment_about(ctx, field, obj)
 		case "mandate":
 			out.Values[i] = ec._NodeFragment_mandate(ctx, field, obj)
 		case "isPrivate":

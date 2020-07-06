@@ -31,7 +31,6 @@ type AddLabelPayload struct {
 }
 
 type AddMandateInput struct {
-	About            *string `json:"about,omitempty"`
 	Purpose          string  `json:"purpose,omitempty"`
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
@@ -58,6 +57,7 @@ type AddNodeFragmentInput struct {
 	Nameid     *string            `json:"nameid,omitempty"`
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
+	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	IsPrivate  *bool              `json:"isPrivate"`
 	Charac     *NodeCharacRef     `json:"charac,omitempty"`
@@ -83,6 +83,7 @@ type AddNodeInput struct {
 	Type         NodeType       `json:"type_,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
@@ -319,7 +320,6 @@ type LabelRef struct {
 
 type Mandate struct {
 	ID               string  `json:"id,omitempty"`
-	About            *string `json:"about,omitempty"`
 	Purpose          string  `json:"purpose,omitempty"`
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
@@ -328,7 +328,6 @@ type Mandate struct {
 
 type MandateFilter struct {
 	ID      []string              `json:"id,omitempty"`
-	About   *StringFullTextFilter `json:"about,omitempty"`
 	Purpose *StringFullTextFilter `json:"purpose,omitempty"`
 	And     *MandateFilter        `json:"and,omitempty"`
 	Or      *MandateFilter        `json:"or,omitempty"`
@@ -342,7 +341,6 @@ type MandateOrder struct {
 }
 
 type MandatePatch struct {
-	About            *string `json:"about,omitempty"`
 	Purpose          *string `json:"purpose,omitempty"`
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
@@ -351,7 +349,6 @@ type MandatePatch struct {
 
 type MandateRef struct {
 	ID               *string `json:"id,omitempty"`
-	About            *string `json:"about,omitempty"`
 	Purpose          *string `json:"purpose,omitempty"`
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
@@ -370,6 +367,7 @@ type Node struct {
 	Type         NodeType    `json:"type_,omitempty"`
 	TensionsOut  []*Tension  `json:"tensions_out,omitempty"`
 	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
+	About        *string     `json:"about,omitempty"`
 	Mandate      *Mandate    `json:"mandate,omitempty"`
 	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
@@ -417,6 +415,7 @@ type NodeFilter struct {
 	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
 	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
 	Type       *NodeTypeHash                       `json:"type_,omitempty"`
+	About      *StringFullTextFilter               `json:"about,omitempty"`
 	IsRoot     *bool                               `json:"isRoot"`
 	IsPrivate  *bool                               `json:"isPrivate"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
@@ -431,6 +430,7 @@ type NodeFragment struct {
 	Nameid     *string         `json:"nameid,omitempty"`
 	Children   []*NodeFragment `json:"children,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
+	About      *string         `json:"about,omitempty"`
 	Mandate    *Mandate        `json:"mandate,omitempty"`
 	IsPrivate  *bool           `json:"isPrivate"`
 	Charac     *NodeCharac     `json:"charac,omitempty"`
@@ -451,6 +451,7 @@ type NodeFragmentRef struct {
 	Nameid     *string            `json:"nameid,omitempty"`
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
+	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	IsPrivate  *bool              `json:"isPrivate"`
 	Charac     *NodeCharacRef     `json:"charac,omitempty"`
@@ -480,6 +481,7 @@ type NodePatch struct {
 	Type         *NodeType      `json:"type_,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
@@ -506,6 +508,7 @@ type NodeRef struct {
 	Type         *NodeType      `json:"type_,omitempty"`
 	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
+	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
@@ -1055,7 +1058,6 @@ func (e LabelOrderable) MarshalGQL(w io.Writer) {
 type MandateOrderable string
 
 const (
-	MandateOrderableAbout            MandateOrderable = "about"
 	MandateOrderablePurpose          MandateOrderable = "purpose"
 	MandateOrderableResponsabilities MandateOrderable = "responsabilities"
 	MandateOrderableDomains          MandateOrderable = "domains"
@@ -1063,7 +1065,6 @@ const (
 )
 
 var AllMandateOrderable = []MandateOrderable{
-	MandateOrderableAbout,
 	MandateOrderablePurpose,
 	MandateOrderableResponsabilities,
 	MandateOrderableDomains,
@@ -1072,7 +1073,7 @@ var AllMandateOrderable = []MandateOrderable{
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderableAbout, MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies:
+	case MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies:
 		return true
 	}
 	return false
@@ -1145,6 +1146,7 @@ type NodeFragmentOrderable string
 const (
 	NodeFragmentOrderableName       NodeFragmentOrderable = "name"
 	NodeFragmentOrderableNameid     NodeFragmentOrderable = "nameid"
+	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
 	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
 	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
 	NodeFragmentOrderableSkills     NodeFragmentOrderable = "skills"
@@ -1153,6 +1155,7 @@ const (
 var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 	NodeFragmentOrderableName,
 	NodeFragmentOrderableNameid,
+	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
 	NodeFragmentOrderableSecondLink,
 	NodeFragmentOrderableSkills,
@@ -1160,7 +1163,7 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableName, NodeFragmentOrderableNameid, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableSkills:
+	case NodeFragmentOrderableName, NodeFragmentOrderableNameid, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableSkills:
 		return true
 	}
 	return false
@@ -1235,6 +1238,7 @@ const (
 	NodeOrderableName         NodeOrderable = "name"
 	NodeOrderableNameid       NodeOrderable = "nameid"
 	NodeOrderableRootnameid   NodeOrderable = "rootnameid"
+	NodeOrderableAbout        NodeOrderable = "about"
 	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
 	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
 	NodeOrderableNChildren    NodeOrderable = "n_children"
@@ -1246,6 +1250,7 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableName,
 	NodeOrderableNameid,
 	NodeOrderableRootnameid,
+	NodeOrderableAbout,
 	NodeOrderableNTensionsOut,
 	NodeOrderableNTensionsIn,
 	NodeOrderableNChildren,
@@ -1254,7 +1259,7 @@ var AllNodeOrderable = []NodeOrderable{
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
+	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
 		return true
 	}
 	return false
@@ -1456,18 +1461,26 @@ func (e RoleType) MarshalGQL(w io.Writer) {
 type TensionAction string
 
 const (
-	TensionActionNewRole   TensionAction = "NewRole"
-	TensionActionNewCircle TensionAction = "NewCircle"
+	TensionActionNewRole             TensionAction = "NewRole"
+	TensionActionNewCircle           TensionAction = "NewCircle"
+	TensionActionUpdateRoleAbout     TensionAction = "UpdateRoleAbout"
+	TensionActionUpdateCircleAbout   TensionAction = "UpdateCircleAbout"
+	TensionActionUpdateRoleMandate   TensionAction = "UpdateRoleMandate"
+	TensionActionUpdateCircleMandate TensionAction = "UpdateCircleMandate"
 )
 
 var AllTensionAction = []TensionAction{
 	TensionActionNewRole,
 	TensionActionNewCircle,
+	TensionActionUpdateRoleAbout,
+	TensionActionUpdateCircleAbout,
+	TensionActionUpdateRoleMandate,
+	TensionActionUpdateCircleMandate,
 }
 
 func (e TensionAction) IsValid() bool {
 	switch e {
-	case TensionActionNewRole, TensionActionNewCircle:
+	case TensionActionNewRole, TensionActionNewCircle, TensionActionUpdateRoleAbout, TensionActionUpdateCircleAbout, TensionActionUpdateRoleMandate, TensionActionUpdateCircleMandate:
 		return true
 	}
 	return false

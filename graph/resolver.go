@@ -77,6 +77,7 @@ func Init() gen.Config {
     c.Directives.Alter_hasRoot = hasRoot
     // Mutation Hook directives
     c.Directives.Hook_addNode = addNodeHook
+    c.Directives.Hook_updateNode = updateNodeHook
     c.Directives.Hook_updateTension = updateTensionHook
 
     return c
@@ -328,22 +329,34 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     return nil, tools.LogErr("@addNodeHook", "Access denied", e)
 }
 
+// Update Node hook
+// * add the nameid field in the context for further inspection in new resolver
+func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
+    nameid_ := filter["nameid"].(model.JsonAtom)["eq"]
+    if nameid_ != nil {
+        //return nil, tools.LogErr("@updateNodeHook", "not implemented", fmt.Errorf("node identifier unknonw"))
+        ctx = context.WithValue(ctx, "nameid", nameid_.(string))
+        input_, err := next(ctx)
+        return input_, err
+    }
+
+    return next(ctx)
+}
+
 // Update Tension hook
 // * add the id field in the context for further inspection in new resolver
 func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
     ids := filter["id"].([]interface{})
     if len(ids) > 1 {
-        return nil, tools.LogErr("@addNodeHook/NodeCharac", "not implemented", fmt.Errorf("multiple tension not supported"))
+        return nil, tools.LogErr("@updateTensionHook", "not implemented", fmt.Errorf("multiple tension not supported"))
     }
 
     ctx = context.WithValue(ctx, "id", ids[0].(string))
-
     input_, err := next(ctx)
     return input_, err
 }
-
-
 
 // HasRole check the user has the authorisation to update a ressource by checking if it satisfies at least one of 
 // 1. user rights
@@ -483,22 +496,30 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
     // Check that nodes are present
     var nameid string
     node := nodeObj.(model.JsonAtom)[nodeField]
-    if node == nil || node.(model.JsonAtom)["nameid"] == nil {
-        // Database request
-        id := ctx.Value("id").(string)
-        if id == "" {
-            return false, fmt.Errorf("node target unknown(id), need a database request here...")
-        }
+    id_ := ctx.Value("id")
+    nameid_ := ctx.Value("nameid")
+    if  id_ != nil {
+        // Tension here
         // Request the database to get the field
-        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
+        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function here ?
         typeName := "Tension"
-        nameid_, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "Node", "nameid")
+        nameid_, err := db.GetDB().GetSubFieldById(id_.(string), typeName, nodeField, "Node", "nameid")
         if err != nil {
             return false, err
         }
         nameid = nameid_.(string)
-    } else {
+    } else if (nameid_ != nil) {
+        // Node Here
+        typeName := "Node"
+        nameid_, err := db.GetDB().GetSubFieldByEq("nameid", nameid_.(string), typeName, nodeField, "Node", "nameid")
+        if err != nil {
+            return false, err
+        }
+        nameid = nameid_.(string)
+    } else if (node != nil && node.(model.JsonAtom)["nameid"] != nil) {
         nameid = node.(model.JsonAtom)["nameid"].(string)
+    } else {
+        return false, fmt.Errorf("node target unknown, need a database request here...")
     }
 
     // Search for rights
@@ -663,7 +684,11 @@ func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
 // useHasRole return true if the user has the given role on the given node
 func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
     for _, ur := range uctx.Roles {
-        if ur.Nameid == nameid && ur.RoleType == role {
+        pid, err := nid2pid(ur.Nameid)
+        if err != nil {
+            panic(err.Error())
+        }
+        if pid == nameid && ur.RoleType == role {
             return true
         }
     }
