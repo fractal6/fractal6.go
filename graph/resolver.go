@@ -515,6 +515,10 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
         if err != nil {
             return false, err
         }
+        if nameid_ == nil {
+            // Assume root node
+            return false, fmt.Errorf("Root node updates are not implemented yet...")
+        }
         nameid = nameid_.(string)
     } else if (node != nil && node.(model.JsonAtom)["nameid"] != nil) {
         nameid = node.(model.JsonAtom)["nameid"].(string)
@@ -669,7 +673,6 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 //
 // User Rights Seeker
 //
-
 
 // useHasRoot return true if the user has at least one role in above given node
 func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
