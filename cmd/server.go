@@ -53,10 +53,16 @@ func RunServer() {
 
     r := chi.NewRouter()
 
+    var allowedOrigins []string
+    if buildMode == "PROD" {
+        allowedOrigins = append(allowedOrigins,  "*")
+    } else {
+        allowedOrigins = append(allowedOrigins,  "http://localhost:8000")
+    }
+
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
 	cors := cors.New(cors.Options{
-		//AllowedOrigins:   []string{"*"},
-        AllowedOrigins: []string{"http://localhost:8000"}, // DEV mode
+		AllowedOrigins:   allowedOrigins,
 		//AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		//AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		//AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -114,7 +120,7 @@ func RunServer() {
     }
 
     address := HOST + ":" + PORT
-    log.Printf("Running @ http://%s", address)
+    log.Printf("Running (%s) @ http://%s", buildMode, address)
     http.ListenAndServe(address, r)
 }
 
