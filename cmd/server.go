@@ -17,8 +17,8 @@ import (
     middle6 "zerogov/fractal6.go/web/middleware"
 )
 
-var buildMode string
 var tkMaster *auth.Jwt
+var buildMode string
 
 func init() {
     // Jwt init
@@ -27,13 +27,12 @@ func init() {
     // Cli init
     rootCmd.AddCommand(runCmd)
 
-    // Set dev mode
+    // Get env mode
     if buildMode == "" {
         buildMode = "DEV"
     } else {
         buildMode = "PROD"
     }
-        
 }
 
 var runCmd = &cobra.Command{
@@ -55,7 +54,7 @@ func RunServer() {
 
     var allowedOrigins []string
     if buildMode == "PROD" {
-        allowedOrigins = append(allowedOrigins,  "*")
+        allowedOrigins = append(allowedOrigins,  "https://fractale.co")
     } else {
         allowedOrigins = append(allowedOrigins,  "http://localhost:8000")
     }
@@ -91,9 +90,11 @@ func RunServer() {
     // Auth handlers 
     r.Group(func(r chi.Router) {
         //r.Use(middle6.EnsurePostMethod)
-        r.Post("/signup", handle6.Signup)
-        r.Post("/login", handle6.Login)
-        r.Post("/tokenack", handle6.TokenAck)
+        r.Route("/auth", func(r chi.Router) {
+            r.Post("/signup", handle6.Signup)
+            r.Post("/login", handle6.Login)
+            r.Post("/tokenack", handle6.TokenAck)
+        })
     })
 
     // Http API

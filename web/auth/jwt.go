@@ -17,9 +17,17 @@ import (
 )
 
 var tkMaster *Jwt
+var buildMode string
 
 func init () {
     tkMaster = Jwt{}.New()
+
+    // Get env mode
+    if buildMode == "" {
+        buildMode = "DEV"
+    } else {
+        buildMode = "PROD"
+    }
 }
 
 type Jwt struct {
@@ -83,16 +91,24 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
     if err != nil {
         return nil, err
     }
-
-    httpCookie := http.Cookie{
+    var httpCookie http.Cookie
+    if buildMode == "PROD" {
+        httpCookie = http.Cookie{
             Name: "jwt",
             Value: tokenString,
             Path: "/", 
-            //HttpOnly: true,
-            //Secure: true, 
+            HttpOnly: true,
+            Secure: true, 
             //Expires: expirationTime,
             //MaxAge: 90000,
         }
+    } else {
+        httpCookie = http.Cookie{
+            Name: "jwt",
+            Value: tokenString,
+            Path: "/", 
+        }
+    }
 
     return &httpCookie, nil
 }
