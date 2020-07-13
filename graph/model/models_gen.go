@@ -10,6 +10,7 @@ import (
 
 type AddCommentInput struct {
 	CreatedAt string   `json:"createdAt,omitempty"`
+	UpdatedAt *string  `json:"updatedAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
@@ -117,6 +118,7 @@ type AddNodeStatsPayload struct {
 
 type AddTensionInput struct {
 	CreatedAt  string           `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
 	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
 	Message    *string          `json:"message,omitempty"`
 	Nth        *string          `json:"nth,omitempty"`
@@ -177,10 +179,11 @@ type AuthRule struct {
 }
 
 type Comment struct {
-	Message   string `json:"message,omitempty"`
-	ID        string `json:"id,omitempty"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	CreatedBy *User  `json:"createdBy,omitempty"`
+	Message   string  `json:"message,omitempty"`
+	ID        string  `json:"id,omitempty"`
+	CreatedAt string  `json:"createdAt,omitempty"`
+	UpdatedAt *string `json:"updatedAt,omitempty"`
+	CreatedBy *User   `json:"createdBy,omitempty"`
 }
 
 type CommentFilter struct {
@@ -200,6 +203,7 @@ type CommentOrder struct {
 
 type CommentPatch struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
+	UpdatedAt *string  `json:"updatedAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
@@ -208,6 +212,7 @@ type CommentPatch struct {
 type CommentRef struct {
 	ID        *string  `json:"id,omitempty"`
 	CreatedAt *string  `json:"createdAt,omitempty"`
+	UpdatedAt *string  `json:"updatedAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
@@ -550,6 +555,7 @@ type NodeTypeHash struct {
 type Post struct {
 	ID        string  `json:"id,omitempty"`
 	CreatedAt string  `json:"createdAt,omitempty"`
+	UpdatedAt *string `json:"updatedAt,omitempty"`
 	CreatedBy *User   `json:"createdBy,omitempty"`
 	Message   *string `json:"message,omitempty"`
 }
@@ -571,6 +577,7 @@ type PostOrder struct {
 
 type PostPatch struct {
 	CreatedAt *string  `json:"createdAt,omitempty"`
+	UpdatedAt *string  `json:"updatedAt,omitempty"`
 	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 }
@@ -630,6 +637,7 @@ type Tension struct {
 	NComments  *int           `json:"n_comments,omitempty"`
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	CreatedBy  *User          `json:"createdBy,omitempty"`
 	Message    *string        `json:"message,omitempty"`
 }
@@ -657,6 +665,7 @@ type TensionOrder struct {
 
 type TensionPatch struct {
 	CreatedAt  *string          `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
 	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
 	Message    *string          `json:"message,omitempty"`
 	Nth        *string          `json:"nth,omitempty"`
@@ -677,6 +686,7 @@ type TensionPatch struct {
 type TensionRef struct {
 	ID         *string          `json:"id,omitempty"`
 	CreatedAt  *string          `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
 	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
 	Message    *string          `json:"message,omitempty"`
 	Nth        *string          `json:"nth,omitempty"`
@@ -865,19 +875,21 @@ type CommentOrderable string
 
 const (
 	CommentOrderableCreatedAt CommentOrderable = "createdAt"
+	CommentOrderableUpdatedAt CommentOrderable = "updatedAt"
 	CommentOrderableMessage   CommentOrderable = "message"
 	CommentOrderableVoid      CommentOrderable = "_VOID"
 )
 
 var AllCommentOrderable = []CommentOrderable{
 	CommentOrderableCreatedAt,
+	CommentOrderableUpdatedAt,
 	CommentOrderableMessage,
 	CommentOrderableVoid,
 }
 
 func (e CommentOrderable) IsValid() bool {
 	switch e {
-	case CommentOrderableCreatedAt, CommentOrderableMessage, CommentOrderableVoid:
+	case CommentOrderableCreatedAt, CommentOrderableUpdatedAt, CommentOrderableMessage, CommentOrderableVoid:
 		return true
 	}
 	return false
@@ -1376,17 +1388,19 @@ type PostOrderable string
 
 const (
 	PostOrderableCreatedAt PostOrderable = "createdAt"
+	PostOrderableUpdatedAt PostOrderable = "updatedAt"
 	PostOrderableMessage   PostOrderable = "message"
 )
 
 var AllPostOrderable = []PostOrderable{
 	PostOrderableCreatedAt,
+	PostOrderableUpdatedAt,
 	PostOrderableMessage,
 }
 
 func (e PostOrderable) IsValid() bool {
 	switch e {
-	case PostOrderableCreatedAt, PostOrderableMessage:
+	case PostOrderableCreatedAt, PostOrderableUpdatedAt, PostOrderableMessage:
 		return true
 	}
 	return false
@@ -1511,6 +1525,7 @@ type TensionOrderable string
 
 const (
 	TensionOrderableCreatedAt  TensionOrderable = "createdAt"
+	TensionOrderableUpdatedAt  TensionOrderable = "updatedAt"
 	TensionOrderableMessage    TensionOrderable = "message"
 	TensionOrderableNth        TensionOrderable = "nth"
 	TensionOrderableTitle      TensionOrderable = "title"
@@ -1521,6 +1536,7 @@ const (
 
 var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableCreatedAt,
+	TensionOrderableUpdatedAt,
 	TensionOrderableMessage,
 	TensionOrderableNth,
 	TensionOrderableTitle,
@@ -1531,7 +1547,7 @@ var AllTensionOrderable = []TensionOrderable{
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNComments:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNComments:
 		return true
 	}
 	return false

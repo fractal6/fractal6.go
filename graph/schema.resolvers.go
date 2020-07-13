@@ -62,8 +62,7 @@ func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTen
 }
 
 func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
@@ -76,7 +75,9 @@ func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCom
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.CommentFilter) (data *model.DeleteCommentPayload, errors error) {

@@ -54,6 +54,7 @@ type DirectiveRoot struct {
 	Hidden             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	HidePrivate        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addNode       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateComment func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateNode    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTension func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -123,6 +124,7 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
 		Message   func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	DeleteCommentPayload struct {
@@ -268,6 +270,7 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
 		Message   func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Query struct {
@@ -310,6 +313,7 @@ type ComplexityRoot struct {
 		Status     func(childComplexity int) int
 		Title      func(childComplexity int) int
 		Type       func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
 	}
 
 	UpdateCommentPayload struct {
@@ -661,6 +665,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.Message(childComplexity), true
+
+	case "Comment.updatedAt":
+		if e.complexity.Comment.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Comment.UpdatedAt(childComplexity), true
 
 	case "DeleteCommentPayload.msg":
 		if e.complexity.DeleteCommentPayload.Msg == nil {
@@ -1536,6 +1547,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Post.Message(childComplexity), true
 
+	case "Post.updatedAt":
+		if e.complexity.Post.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Post.UpdatedAt(childComplexity), true
+
 	case "Query.getComment":
 		if e.complexity.Query.GetComment == nil {
 			break
@@ -1908,6 +1926,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Type(childComplexity), true
 
+	case "Tension.updatedAt":
+		if e.complexity.Tension.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Tension.UpdatedAt(childComplexity), true
+
 	case "UpdateCommentPayload.comment":
 		if e.complexity.UpdateCommentPayload.Comment == nil {
 			break
@@ -2251,7 +2276,10 @@ directive @meta_getNodeStats on FIELD_DEFINITION
 directive @hook_addNode on ARGUMENT_DEFINITION
 
 directive @hook_updateNode on ARGUMENT_DEFINITION
+
 directive @hook_updateTension on ARGUMENT_DEFINITION
+
+directive @hook_updateComment on ARGUMENT_DEFINITION
 
 directive @alter_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
 
@@ -2331,6 +2359,7 @@ type NodeStats {
 type Post {
   id: ID!
   createdAt: DateTime! @search
+  updatedAt: DateTime
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
@@ -2351,6 +2380,7 @@ type Tension {
   n_comments: Int @count(f: comments)
   id: ID!
   createdAt: DateTime! @search
+  updatedAt: DateTime
   createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
@@ -2359,6 +2389,7 @@ type Comment {
   message: String! @search(by: [fulltext])
   id: ID!
   createdAt: DateTime! @search
+  updatedAt: DateTime
   createdBy(filter: UserFilter): User!
 }
 
@@ -2453,9 +2484,17 @@ enum TensionAction {
 
 }
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
@@ -2463,16 +2502,9 @@ directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRu
 
 directive @cascade on FIELD
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
-
 input AddCommentInput {
   createdAt: DateTime!
+  updatedAt: DateTime
   createdBy: UserRef!
   message: String
   _VOID: String
@@ -2580,6 +2612,7 @@ type AddNodeStatsPayload {
 
 input AddTensionInput {
   createdAt: DateTime!
+  updatedAt: DateTime
   createdBy: UserRef!
   message: String
   nth: String
@@ -2656,12 +2689,14 @@ input CommentOrder {
 
 enum CommentOrderable {
   createdAt
+  updatedAt
   message
   _VOID
 }
 
 input CommentPatch {
   createdAt: DateTime
+  updatedAt: DateTime
   createdBy: UserRef
   message: String @patch_isOwner(u:"createdBy")
   _VOID: String
@@ -2670,6 +2705,7 @@ input CommentPatch {
 input CommentRef {
   id: ID
   createdAt: DateTime
+  updatedAt: DateTime
   createdBy: UserRef
   message: String
   _VOID: String
@@ -2861,7 +2897,7 @@ type Mutation {
   updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload
   deleteTension(filter: TensionFilter!): DeleteTensionPayload
   addComment(input: [AddCommentInput!]!): AddCommentPayload
-  updateComment(input: UpdateCommentInput!): UpdateCommentPayload
+  updateComment(input: UpdateCommentInput! @hook_updateComment): UpdateCommentPayload
   deleteComment(filter: CommentFilter!): DeleteCommentPayload
   addMandate(input: [AddMandateInput!]!): AddMandatePayload
   updateMandate(input: UpdateMandateInput!): UpdateMandatePayload
@@ -3057,11 +3093,13 @@ input PostOrder {
 
 enum PostOrderable {
   createdAt
+  updatedAt
   message
 }
 
 input PostPatch {
   createdAt: DateTime @patch_RO
+  updatedAt: DateTime @patch_isOwner(u:"createdBy")
   createdBy: UserRef @patch_RO
   message: String @patch_isOwner(u:"createdBy")
 }
@@ -3150,6 +3188,7 @@ input TensionOrder {
 
 enum TensionOrderable {
   createdAt
+  updatedAt
   message
   nth
   title
@@ -3160,6 +3199,7 @@ enum TensionOrderable {
 
 input TensionPatch {
   createdAt: DateTime
+  updatedAt: DateTime
   createdBy: UserRef
   message: String
   nth: String
@@ -3180,6 +3220,7 @@ input TensionPatch {
 input TensionRef {
   id: ID
   createdAt: DateTime
+  updatedAt: DateTime
   createdBy: UserRef
   message: String
   nth: String
@@ -4271,9 +4312,24 @@ func (ec *executionContext) field_Mutation_updateComment_args(ctx context.Contex
 	args := map[string]interface{}{}
 	var arg0 model.UpdateCommentInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNUpdateCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentInput(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateComment == nil {
+				return nil, errors.New("directive hook_updateComment is not implemented")
+			}
+			return ec.directives.Hook_updateComment(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
 			return nil, err
+		}
+		if data, ok := tmp.(model.UpdateCommentInput); ok {
+			arg0 = data
+		} else {
+			return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateCommentInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -6539,6 +6595,34 @@ func (ec *executionContext) _Comment_createdAt(ctx context.Context, field graphq
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Comment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
@@ -10082,6 +10166,34 @@ func (ec *executionContext) _Post_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalNDateTime2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Post_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Post_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -11629,6 +11741,34 @@ func (ec *executionContext) _Tension_createdAt(ctx context.Context, field graphq
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -13847,6 +13987,12 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdBy":
 			var err error
 			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -14278,6 +14424,12 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15038,6 +15190,12 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdBy":
 			var err error
 			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -15096,6 +15254,12 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16850,6 +17014,31 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
+		case "updatedAt":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Patch_isOwner == nil {
+					return nil, errors.New("directive patch_isOwner is not implemented")
+				}
+				return ec.directives.Patch_isOwner(ctx, obj, directive0, u)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "createdBy":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -17213,6 +17402,12 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17644,6 +17839,12 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18820,6 +19021,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updatedAt":
+			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
 		case "createdBy":
 			out.Values[i] = ec._Comment_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19428,6 +19631,8 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updatedAt":
+			out.Values[i] = ec._Post_updatedAt(ctx, field, obj)
 		case "createdBy":
 			out.Values[i] = ec._Post_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19753,6 +19958,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updatedAt":
+			out.Values[i] = ec._Tension_updatedAt(ctx, field, obj)
 		case "createdBy":
 			out.Values[i] = ec._Tension_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

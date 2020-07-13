@@ -78,7 +78,8 @@ func Init() gen.Config {
     // Mutation Hook directives
     c.Directives.Hook_addNode = addNodeHook
     c.Directives.Hook_updateNode = updateNodeHook
-    c.Directives.Hook_updateTension = updateTensionHook
+    c.Directives.Hook_updateTension = updatePostHook
+    c.Directives.Hook_updateComment = updatePostHook
 
     return c
 }
@@ -344,13 +345,13 @@ func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     return next(ctx)
 }
 
-// Update Tension hook
+// Update Post hook (Tensiont, Comment, etc)
 // * add the id field in the context for further inspection in new resolver
-func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updatePostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
     ids := filter["id"].([]interface{})
     if len(ids) > 1 {
-        return nil, tools.LogErr("@updateTensionHook", "not implemented", fmt.Errorf("multiple tension not supported"))
+        return nil, tools.LogErr("@updatePostHook", "not implemented", fmt.Errorf("multiple post not supported"))
     }
 
     ctx = context.WithValue(ctx, "id", ids[0].(string))
