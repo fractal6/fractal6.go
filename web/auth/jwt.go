@@ -81,7 +81,13 @@ func GetTokenMaster() *Jwt {
 
 // NewUserToken create a new user token from master key
 func NewUserToken(userCtx model.UserCtx) (string, error) {
-    token, err := tkMaster.issue(userCtx, time.Hour*24)
+    var token string
+    var err error
+    if buildMode == "PROD" {
+        token, err = tkMaster.issue(userCtx, time.Hour*24*30)
+    } else {
+        token, err = tkMaster.issue(userCtx, time.Hour*24)
+    }
     return token, err
 }
 
