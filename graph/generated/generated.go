@@ -2372,10 +2372,10 @@ type Tension {
   emitterid: String! @search(by: [hash, regexp])
   receiver(filter: NodeFilter): Node!
   receiverid: String! @search(by: [hash, regexp])
-  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   status: TensionStatus! @search
   action: TensionAction
+  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   data: NodeFragment
   n_comments: Int @count(f: comments)
   id: ID!
@@ -3009,7 +3009,7 @@ input NodePatch {
   children: [NodeRef!] @patch_RO
   type_: NodeType @patch_RO
   tensions_out: [TensionRef!] @patch_RO
-  tensions_in: [TensionRef!] @patch_RO
+  tensions_in: [TensionRef!] @patch_hasRole(n:["parent"], r: Coordinator)
   about: String @patch_hasRole(n:["parent"], r: Coordinator) @alter_maxLength(f:"about", n:280)
   mandate: MandateRef @patch_hasRole(n:["parent"], r: Coordinator)
   n_tensions_out: Int
@@ -11432,41 +11432,6 @@ func (ec *executionContext) _Tension_receiverid(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Tension",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Tension_comments_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comments, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Comment)
-	fc.Result = res
-	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -11579,6 +11544,41 @@ func (ec *executionContext) _Tension_action(ctx context.Context, field graphql.C
 	res := resTmp.(*model.TensionAction)
 	fc.Result = res
 	return ec.marshalOTensionAction2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_comments_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comments, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_data(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -16357,10 +16357,18 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"parent"})
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
+				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Patch_hasRole == nil {
+					return nil, errors.New("directive patch_hasRole is not implemented")
+				}
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -19933,8 +19941,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "comments":
-			out.Values[i] = ec._Tension_comments(ctx, field, obj)
 		case "labels":
 			out.Values[i] = ec._Tension_labels(ctx, field, obj)
 		case "status":
@@ -19944,6 +19950,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "action":
 			out.Values[i] = ec._Tension_action(ctx, field, obj)
+		case "comments":
+			out.Values[i] = ec._Tension_comments(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._Tension_data(ctx, field, obj)
 		case "n_comments":

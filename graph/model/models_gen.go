@@ -629,10 +629,10 @@ type Tension struct {
 	Emitterid  string         `json:"emitterid,omitempty"`
 	Receiver   *Node          `json:"receiver,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
-	Comments   []*Comment     `json:"comments,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
+	Comments   []*Comment     `json:"comments,omitempty"`
 	Data       *NodeFragment  `json:"data,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	ID         string         `json:"id,omitempty"`
