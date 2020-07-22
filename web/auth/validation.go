@@ -7,15 +7,18 @@ import (
 
 var stripReg *re.Regexp
 var specialReg *re.Regexp
+var specialSoftReg *re.Regexp
 var reservedURIReg *re.Regexp
 
 func init() {
     //special := "@!#<>{}`'\"" + `%\\`
     //reservedURI := "&=+'/[]" + `\s`
     special := `\@\!\#\<\>\{\}\%\'\"\\` + "`"
+    specialSoft := `\!\#\<\>\{\}\%\'\"\\` + "`"
     reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
     stripReg = re.MustCompile(`^\s|\s$`)
     specialReg = re.MustCompile(`[`+special+`]`)
+    specialSoftReg = re.MustCompile(`[`+specialSoft+`]`)
     reservedURIReg = re.MustCompile(`[`+reservedURI+`]`)
 }
 
@@ -78,11 +81,14 @@ func ValidateNameid(nameid string, rootnameid string, name string) error {
                 // assume role under root node
                 continue
             }
-            //if i == len(ns)-1 && formatName(n) != n {
-            //    return ErrBadNameidFormat
-            //}
-            err := ValidateUsername(n)
-            if err != nil {
+
+            if hasStrip(n) {
+                return ErrBadNameidFormat
+            }
+            if hasSpecialSoft(n) {
+                return ErrBadNameidFormat
+            }
+            if hasReservedURI(n) {
                 return ErrBadNameidFormat
             }
         }
@@ -132,6 +138,10 @@ func hasStrip(s string) bool {
 
 func hasSpecial(s string) bool {
     return specialReg.MatchString(s)
+}
+
+func hasSpecialSoft(s string) bool {
+    return specialSoftReg.MatchString(s)
 }
 
 func hasReservedURI(s string) bool {
