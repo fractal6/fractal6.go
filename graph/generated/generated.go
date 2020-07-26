@@ -45,6 +45,7 @@ type DirectiveRoot struct {
 	Alter_hasRole      func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
 	Alter_hasRoot      func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
 	Alter_maxLength    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
+	Alter_toLower      func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
 	Auth               func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
 	Cascade            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Count              func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
@@ -2281,6 +2282,8 @@ directive @hook_updateTension on ARGUMENT_DEFINITION
 
 directive @hook_updateComment on ARGUMENT_DEFINITION
 
+directive @alter_toLower(f: String!) on INPUT_FIELD_DEFINITION
+
 directive @alter_maxLength(f: String!, n: Int!) on INPUT_FIELD_DEFINITION
 
 directive @alter_assertType(f: String!, t: NodeType!) on INPUT_FIELD_DEFINITION
@@ -2486,19 +2489,19 @@ enum TensionAction {
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
@@ -2571,8 +2574,8 @@ input AddNodeInput {
   createdAt: DateTime!
   createdBy: UserRef! @add_isOwner(u:"createdBy")
   name: String!
-  nameid: String!
-  rootnameid: String!
+  nameid: String! @alter_toLower(f:"nameid")
+  rootnameid: String! @alter_toLower(f:"rootnameid")
   parent: NodeRef
   children: [NodeRef!]
   type_: NodeType!
@@ -2622,10 +2625,10 @@ input AddTensionInput {
   emitterid: String! @alter_hasRoot(n:["emitter"])
   receiver: NodeRef! @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
   receiverid: String! @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
-  comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   status: TensionStatus! @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   data: NodeFragmentRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
@@ -2637,8 +2640,8 @@ type AddTensionPayload {
 
 input AddUserInput {
   createdAt: DateTime!
-  username: String! @alter_maxLength(f:"username", n:42)
-  name: String @alter_maxLength(f:"name", n:100)
+  username: String! @alter_maxLength(f:"username", n:42) @alter_toLower(f:"username")
+  name: String @alter_maxLength(f:"name", n:100) @alter_toLower(f:"name")
   password: String! @alter_maxLength(f:"password", n:100)
   email: String! @alter_maxLength(f:"email", n:100)
   emailHash: String
@@ -3004,7 +3007,7 @@ input NodePatch {
   createdAt: DateTime @patch_RO
   createdBy: UserRef @patch_RO
   name: String @patch_hasRole(n:["parent"], r: Coordinator)
-  rootnameid: String @patch_RO
+  rootnameid: String @patch_RO @alter_toLower(f:"rootnameid")
   parent: NodeRef @patch_RO
   children: [NodeRef!] @patch_RO
   type_: NodeType @patch_RO
@@ -3209,10 +3212,10 @@ input TensionPatch {
   emitterid: String @patch_RO @alter_hasRoot(n:["emitter"])
   receiver: NodeRef @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
   receiverid: String @alter_hasRoot(n:["receiver"]) @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
-  comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   status: TensionStatus @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   action: TensionAction @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   data: NodeFragmentRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
@@ -3230,10 +3233,10 @@ input TensionRef {
   emitterid: String
   receiver: NodeRef
   receiverid: String
-  comments: [CommentRef!]
   labels: [LabelRef!]
   status: TensionStatus
   action: TensionAction
+  comments: [CommentRef!]
   data: NodeFragmentRef
   n_comments: Int
 }
@@ -3362,7 +3365,7 @@ enum UserOrderable {
 
 input UserPatch {
   createdAt: DateTime @patch_RO
-  name: String @patch_isOwner @alter_maxLength(f:"name", n:100)
+  name: String @patch_isOwner @alter_maxLength(f:"name", n:100) @alter_toLower(f:"name")
   password: String @patch_isOwner @alter_maxLength(f:"password", n:100)
   email: String @patch_isOwner @alter_maxLength(f:"email", n:100)
   emailHash: String @patch_RO
@@ -3501,6 +3504,20 @@ func (ec *executionContext) dir_alter_maxLength_args(ctx context.Context, rawArg
 		}
 	}
 	args["n"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) dir_alter_toLower_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["f"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["f"] = arg0
 	return args, nil
 }
 
@@ -14232,15 +14249,49 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "nameid":
 			var err error
-			it.Nameid, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "nameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive0, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
+			if data, ok := tmp.(string); ok {
+				it.Nameid = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+			}
 		case "rootnameid":
 			var err error
-			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive0, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.(string); ok {
+				it.Rootnameid = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "parent":
 			var err error
@@ -14651,31 +14702,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
-		case "comments":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.([]*model.CommentRef); ok {
-				it.Comments = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
-			}
 		case "labels":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -14777,6 +14803,31 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.TensionAction`, tmp)
 			}
+		case "comments":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.([]*model.CommentRef); ok {
+				it.Comments = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
+			}
 		case "data":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -14853,8 +14904,18 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				}
 				return ec.directives.Alter_maxLength(ctx, obj, directive0, f, n)
 			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "username")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive1, f)
+			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -14880,8 +14941,18 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				}
 				return ec.directives.Alter_maxLength(ctx, obj, directive0, f, n)
 			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "name")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive1, f)
+			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -16251,8 +16322,18 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				}
 				return ec.directives.Patch_RO(ctx, obj, directive0)
 			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive1, f)
+			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -17657,31 +17738,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
-		case "comments":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.([]*model.CommentRef); ok {
-				it.Comments = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
-			}
 		case "labels":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -17784,6 +17840,31 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				it.Action = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.TensionAction`, tmp)
+			}
+		case "comments":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.([]*model.CommentRef); ok {
+				it.Comments = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
 			}
 		case "data":
 			var err error
@@ -17910,12 +17991,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "comments":
-			var err error
-			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "labels":
 			var err error
 			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
@@ -17931,6 +18006,12 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "action":
 			var err error
 			it.Action, err = ec.unmarshalOTensionAction2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "comments":
+			var err error
+			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18356,8 +18437,18 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				}
 				return ec.directives.Alter_maxLength(ctx, obj, directive1, f, n)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "name")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive2, f)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, err
 			}

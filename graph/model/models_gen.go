@@ -128,10 +128,10 @@ type AddTensionInput struct {
 	Emitterid  string           `json:"emitterid,omitempty"`
 	Receiver   *NodeRef         `json:"receiver,omitempty"`
 	Receiverid string           `json:"receiverid,omitempty"`
-	Comments   []*CommentRef    `json:"comments,omitempty"`
 	Labels     []*LabelRef      `json:"labels,omitempty"`
 	Status     TensionStatus    `json:"status,omitempty"`
 	Action     *TensionAction   `json:"action,omitempty"`
+	Comments   []*CommentRef    `json:"comments,omitempty"`
 	Data       *NodeFragmentRef `json:"data,omitempty"`
 	NComments  *int             `json:"n_comments,omitempty"`
 }
@@ -675,10 +675,10 @@ type TensionPatch struct {
 	Emitterid  *string          `json:"emitterid,omitempty"`
 	Receiver   *NodeRef         `json:"receiver,omitempty"`
 	Receiverid *string          `json:"receiverid,omitempty"`
-	Comments   []*CommentRef    `json:"comments,omitempty"`
 	Labels     []*LabelRef      `json:"labels,omitempty"`
 	Status     *TensionStatus   `json:"status,omitempty"`
 	Action     *TensionAction   `json:"action,omitempty"`
+	Comments   []*CommentRef    `json:"comments,omitempty"`
 	Data       *NodeFragmentRef `json:"data,omitempty"`
 	NComments  *int             `json:"n_comments,omitempty"`
 }
@@ -696,10 +696,10 @@ type TensionRef struct {
 	Emitterid  *string          `json:"emitterid,omitempty"`
 	Receiver   *NodeRef         `json:"receiver,omitempty"`
 	Receiverid *string          `json:"receiverid,omitempty"`
-	Comments   []*CommentRef    `json:"comments,omitempty"`
 	Labels     []*LabelRef      `json:"labels,omitempty"`
 	Status     *TensionStatus   `json:"status,omitempty"`
 	Action     *TensionAction   `json:"action,omitempty"`
+	Comments   []*CommentRef    `json:"comments,omitempty"`
 	Data       *NodeFragmentRef `json:"data,omitempty"`
 	NComments  *int             `json:"n_comments,omitempty"`
 }

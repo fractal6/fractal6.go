@@ -71,6 +71,7 @@ func Init() gen.Config {
     c.Directives.Patch_RO = readOnly
     c.Directives.Patch_hasRole = hasRole 
     // Add, Update and Remove inputs directives
+    c.Directives.Alter_toLower = toLower
     c.Directives.Alter_maxLength = inputMaxLength
     c.Directives.Alter_assertType = assertType
     c.Directives.Alter_hasRole = hasRole 
@@ -235,6 +236,11 @@ func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (
 //
 // Mutation
 //
+
+func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
+    input_, err := next(ctx)
+    return strings.ToLower(input_.(string)), err
+}
 
 func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
     v := obj.(model.JsonAtom)[field].(string)

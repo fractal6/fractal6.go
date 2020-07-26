@@ -15,13 +15,13 @@ import (
 var (
     ErrBadNameidFormat = errors.New(`{
         "errors":[{
-            "message":"Bad formating.",
+            "message":"Please enter a valid name.",
             "location": "nameid"
         }]
     }`)
     ErrBadUsernameFormat = errors.New(`{
         "errors":[{
-            "message":"Bad formating.",
+            "message":"Please enter a valid name.",
             "location": "username"
         }]
     }`)
@@ -33,7 +33,7 @@ var (
     }`)
     ErrBadNameFormat = errors.New(`{
         "errors":[{
-            "message":"Bad formating.",
+            "message":"Please enter a valid name.",
             "location": "name"
         }]
     }`)
@@ -45,13 +45,13 @@ var (
     }`)
     ErrBadEmailFormat = errors.New(`{
         "errors":[{
-            "message":"Bad formating.",
+            "message":"Please enter a valid email.",
             "location": "email"
         }]
     }`)
     ErrEmailTooLong = errors.New(`{
         "errors":[{
-            "message":"Name too long",
+            "message":"Email too long",
             "location": "name"
         }]
     }`)

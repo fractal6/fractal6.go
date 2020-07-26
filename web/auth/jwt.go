@@ -54,7 +54,7 @@ func (Jwt) New() *Jwt {
             {Rootnameid:"open-chaos", Nameid:"open-chaos", RoleType:model.RoleTypeGuest},
         },
     }
-    token, _ := tk.issue(uctx, time.Hour*24)
+    token, _ := tk.issue(uctx, time.Hour*72)
 	log.Println("DEBUG JWT:", tools.Unpack64(token))
 	return tk
 }

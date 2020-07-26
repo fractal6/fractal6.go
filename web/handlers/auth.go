@@ -2,6 +2,7 @@ package handlers
 
 import (
     //"fmt"
+    "strings"
     "net/http"
     "encoding/json"
 
@@ -23,6 +24,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 400)
 		return
 	}
+    // Ignore username/email case
+    creds.Username = strings.ToLower(creds.Username)
 
     // Validate user form and ensure user uniquenesss.
     err = auth.ValidateNewUser(creds)
@@ -74,17 +77,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
 		// Body structure error
-		//w.WriteHeader(http.StatusBadRequest)
         http.Error(w, err.Error(), 400)
 		return
 	}
+    // Ignore username/email case
+    creds.Username = strings.ToLower(creds.Username)
 
     // === This is protected ===
     // Returns the user ctx if authenticated.
     uctx, err = auth.GetAuthUserCtx(creds)
     if err != nil {
 		// Credentials validation error
-		//w.WriteHeader(http.StatusUnauthorized)
         http.Error(w, err.Error(), 401)
 		return
     }
@@ -98,7 +101,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
     httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		//w.WriteHeader(http.StatusInternalServerError)
         http.Error(w, err.Error(), 500)
 		return
 	}
@@ -115,11 +117,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
     w.Write(data)
 }
-
-// Logout deletes the user token.
-//func Logout(w http.ResponseWriter, r *http.Request) {
-//    // The client deletes the cookies or session.
-//}
 
 // TokenAck update the user token.
 func TokenAck(w http.ResponseWriter, r *http.Request) {
@@ -162,3 +159,9 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
     }
     w.Write(data)
 }
+
+// Logout deletes the user token.
+//func Logout(w http.ResponseWriter, r *http.Request) {
+//    // The client deletes the cookies or session.
+//}
+
