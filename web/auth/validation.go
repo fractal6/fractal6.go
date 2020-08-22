@@ -101,7 +101,7 @@ func ValidateEmail(e string) error {
     if len(ns) == 2 {
         for i, n := range ns {
             if i == len(ns)-1 && !strings.Contains(n, ".")  {
-                return ErrBadNameidFormat
+                return ErrBadEmailFormat 
             }
             err := ValidateUsername(n)
             if err != nil {

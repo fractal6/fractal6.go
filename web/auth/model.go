@@ -21,7 +21,7 @@ var (
     }`)
     ErrBadUsernameFormat = errors.New(`{
         "errors":[{
-            "message":"Please enter a valid name.",
+            "message":"Please enter a valid username.",
             "location": "username"
         }]
     }`)
