@@ -8,6 +8,22 @@ import (
 	"strconv"
 )
 
+type AddBlobInput struct {
+	CreatedAt string           `json:"createdAt,omitempty"`
+	UpdatedAt *string          `json:"updatedAt,omitempty"`
+	CreatedBy *UserRef         `json:"createdBy,omitempty"`
+	Message   *string          `json:"message,omitempty"`
+	Tension   *TensionRef      `json:"tension,omitempty"`
+	BlobType  BlobType         `json:"blob_type,omitempty"`
+	Node      *NodeFragmentRef `json:"node,omitempty"`
+	Md        *string          `json:"md,omitempty"`
+}
+
+type AddBlobPayload struct {
+	Blob    []*Blob `json:"blob,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
 type AddCommentInput struct {
 	CreatedAt string   `json:"createdAt,omitempty"`
 	UpdatedAt *string  `json:"updatedAt,omitempty"`
@@ -19,6 +35,21 @@ type AddCommentInput struct {
 type AddCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type AddEventInput struct {
+	CreatedAt string       `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	EventType TensionEvent `json:"event_type,omitempty"`
+	Old       string       `json:"old,omitempty"`
+	New       string       `json:"new,omitempty"`
+}
+
+type AddEventPayload struct {
+	Event   []*Event `json:"event,omitempty"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type AddLabelInput struct {
@@ -86,6 +117,8 @@ type AddNodeInput struct {
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
+	Docs         []*TensionRef  `json:"docs,omitempty"`
+	Source       *TensionRef    `json:"source,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -117,23 +150,25 @@ type AddNodeStatsPayload struct {
 }
 
 type AddTensionInput struct {
-	CreatedAt  string           `json:"createdAt,omitempty"`
-	UpdatedAt  *string          `json:"updatedAt,omitempty"`
-	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
-	Message    *string          `json:"message,omitempty"`
-	Nth        *string          `json:"nth,omitempty"`
-	Title      string           `json:"title,omitempty"`
-	Type       TensionType      `json:"type_,omitempty"`
-	Emitter    *NodeRef         `json:"emitter,omitempty"`
-	Emitterid  string           `json:"emitterid,omitempty"`
-	Receiver   *NodeRef         `json:"receiver,omitempty"`
-	Receiverid string           `json:"receiverid,omitempty"`
-	Labels     []*LabelRef      `json:"labels,omitempty"`
-	Status     TensionStatus    `json:"status,omitempty"`
-	Action     *TensionAction   `json:"action,omitempty"`
-	Comments   []*CommentRef    `json:"comments,omitempty"`
-	Data       *NodeFragmentRef `json:"data,omitempty"`
-	NComments  *int             `json:"n_comments,omitempty"`
+	CreatedAt  string         `json:"createdAt,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
+	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
+	Message    *string        `json:"message,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      string         `json:"title,omitempty"`
+	Type       TensionType    `json:"type_,omitempty"`
+	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Emitterid  string         `json:"emitterid,omitempty"`
+	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Receiverid string         `json:"receiverid,omitempty"`
+	Status     TensionStatus  `json:"status,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
+	Labels     []*LabelRef    `json:"labels,omitempty"`
+	Comments   []*CommentRef  `json:"comments,omitempty"`
+	Blobs      []*BlobRef     `json:"blobs,omitempty"`
+	History    []*EventRef    `json:"history,omitempty"`
+	Head       *BlobRef       `json:"head,omitempty"`
+	NComments  *int           `json:"n_comments,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -176,6 +211,61 @@ type AuthRule struct {
 	Or   []*AuthRule `json:"or,omitempty"`
 	Not  *AuthRule   `json:"not,omitempty"`
 	Rule *string     `json:"rule,omitempty"`
+}
+
+type Blob struct {
+	Tension   *Tension      `json:"tension,omitempty"`
+	BlobType  BlobType      `json:"blob_type,omitempty"`
+	Node      *NodeFragment `json:"node,omitempty"`
+	Md        *string       `json:"md,omitempty"`
+	ID        string        `json:"id,omitempty"`
+	CreatedAt string        `json:"createdAt,omitempty"`
+	UpdatedAt *string       `json:"updatedAt,omitempty"`
+	CreatedBy *User         `json:"createdBy,omitempty"`
+	Message   *string       `json:"message,omitempty"`
+}
+
+type BlobFilter struct {
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	BlobType  *BlobTypeHash         `json:"blob_type,omitempty"`
+	And       *BlobFilter           `json:"and,omitempty"`
+	Or        *BlobFilter           `json:"or,omitempty"`
+	Not       *BlobFilter           `json:"not,omitempty"`
+}
+
+type BlobOrder struct {
+	Asc  *BlobOrderable `json:"asc,omitempty"`
+	Desc *BlobOrderable `json:"desc,omitempty"`
+	Then *BlobOrder     `json:"then,omitempty"`
+}
+
+type BlobPatch struct {
+	CreatedAt *string          `json:"createdAt,omitempty"`
+	UpdatedAt *string          `json:"updatedAt,omitempty"`
+	CreatedBy *UserRef         `json:"createdBy,omitempty"`
+	Message   *string          `json:"message,omitempty"`
+	Tension   *TensionRef      `json:"tension,omitempty"`
+	BlobType  *BlobType        `json:"blob_type,omitempty"`
+	Node      *NodeFragmentRef `json:"node,omitempty"`
+	Md        *string          `json:"md,omitempty"`
+}
+
+type BlobRef struct {
+	ID        *string          `json:"id,omitempty"`
+	CreatedAt *string          `json:"createdAt,omitempty"`
+	UpdatedAt *string          `json:"updatedAt,omitempty"`
+	CreatedBy *UserRef         `json:"createdBy,omitempty"`
+	Message   *string          `json:"message,omitempty"`
+	Tension   *TensionRef      `json:"tension,omitempty"`
+	BlobType  *BlobType        `json:"blob_type,omitempty"`
+	Node      *NodeFragmentRef `json:"node,omitempty"`
+	Md        *string          `json:"md,omitempty"`
+}
+
+type BlobTypeHash struct {
+	Eq BlobType `json:"eq,omitempty"`
 }
 
 type Comment struct {
@@ -237,7 +327,17 @@ type DateTimeFilter struct {
 	Gt *string `json:"gt,omitempty"`
 }
 
+type DeleteBlobPayload struct {
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
 type DeleteCommentPayload struct {
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteEventPayload struct {
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
@@ -253,6 +353,11 @@ type DeleteMandatePayload struct {
 }
 
 type DeleteNodeCharacPayload struct {
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteNodeFragmentPayload struct {
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
@@ -275,6 +380,54 @@ type DeleteTensionPayload struct {
 type DeleteUserPayload struct {
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type Event struct {
+	EventType TensionEvent `json:"event_type,omitempty"`
+	Old       string       `json:"old,omitempty"`
+	New       string       `json:"new,omitempty"`
+	ID        string       `json:"id,omitempty"`
+	CreatedAt string       `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	CreatedBy *User        `json:"createdBy,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+}
+
+type EventFilter struct {
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	EventType *TensionEventHash     `json:"event_type,omitempty"`
+	And       *EventFilter          `json:"and,omitempty"`
+	Or        *EventFilter          `json:"or,omitempty"`
+	Not       *EventFilter          `json:"not,omitempty"`
+}
+
+type EventOrder struct {
+	Asc  *EventOrderable `json:"asc,omitempty"`
+	Desc *EventOrderable `json:"desc,omitempty"`
+	Then *EventOrder     `json:"then,omitempty"`
+}
+
+type EventPatch struct {
+	CreatedAt *string       `json:"createdAt,omitempty"`
+	UpdatedAt *string       `json:"updatedAt,omitempty"`
+	CreatedBy *UserRef      `json:"createdBy,omitempty"`
+	Message   *string       `json:"message,omitempty"`
+	EventType *TensionEvent `json:"event_type,omitempty"`
+	Old       *string       `json:"old,omitempty"`
+	New       *string       `json:"new,omitempty"`
+}
+
+type EventRef struct {
+	ID        *string       `json:"id,omitempty"`
+	CreatedAt *string       `json:"createdAt,omitempty"`
+	UpdatedAt *string       `json:"updatedAt,omitempty"`
+	CreatedBy *UserRef      `json:"createdBy,omitempty"`
+	Message   *string       `json:"message,omitempty"`
+	EventType *TensionEvent `json:"event_type,omitempty"`
+	Old       *string       `json:"old,omitempty"`
+	New       *string       `json:"new,omitempty"`
 }
 
 type FloatFilter struct {
@@ -374,6 +527,8 @@ type Node struct {
 	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
 	About        *string     `json:"about,omitempty"`
 	Mandate      *Mandate    `json:"mandate,omitempty"`
+	Docs         []*Tension  `json:"docs,omitempty"`
+	Source       *Tension    `json:"source,omitempty"`
 	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
 	NChildren    *int        `json:"n_children,omitempty"`
@@ -431,6 +586,7 @@ type NodeFilter struct {
 }
 
 type NodeFragment struct {
+	ID         string          `json:"id,omitempty"`
 	Name       *string         `json:"name,omitempty"`
 	Nameid     *string         `json:"nameid,omitempty"`
 	Children   []*NodeFragment `json:"children,omitempty"`
@@ -445,13 +601,34 @@ type NodeFragment struct {
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 }
 
+type NodeFragmentFilter struct {
+	ID  []string            `json:"id,omitempty"`
+	Not *NodeFragmentFilter `json:"not,omitempty"`
+}
+
 type NodeFragmentOrder struct {
 	Asc  *NodeFragmentOrderable `json:"asc,omitempty"`
 	Desc *NodeFragmentOrderable `json:"desc,omitempty"`
 	Then *NodeFragmentOrder     `json:"then,omitempty"`
 }
 
+type NodeFragmentPatch struct {
+	Name       *string            `json:"name,omitempty"`
+	Nameid     *string            `json:"nameid,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
+	Type       *NodeType          `json:"type_,omitempty"`
+	About      *string            `json:"about,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	IsPrivate  *bool              `json:"isPrivate"`
+	Charac     *NodeCharacRef     `json:"charac,omitempty"`
+	FirstLink  *string            `json:"first_link,omitempty"`
+	SecondLink *string            `json:"second_link,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	RoleType   *RoleType          `json:"role_type,omitempty"`
+}
+
 type NodeFragmentRef struct {
+	ID         *string            `json:"id,omitempty"`
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
@@ -488,6 +665,8 @@ type NodePatch struct {
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
+	Docs         []*TensionRef  `json:"docs,omitempty"`
+	Source       *TensionRef    `json:"source,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -515,6 +694,8 @@ type NodeRef struct {
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
+	Docs         []*TensionRef  `json:"docs,omitempty"`
+	Source       *TensionRef    `json:"source,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -629,17 +810,23 @@ type Tension struct {
 	Emitterid  string         `json:"emitterid,omitempty"`
 	Receiver   *Node          `json:"receiver,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
-	Labels     []*Label       `json:"labels,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
+	Labels     []*Label       `json:"labels,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
-	Data       *NodeFragment  `json:"data,omitempty"`
+	Blobs      []*Blob        `json:"blobs,omitempty"`
+	History    []*Event       `json:"history,omitempty"`
+	Head       *Blob          `json:"head,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	CreatedBy  *User          `json:"createdBy,omitempty"`
 	Message    *string        `json:"message,omitempty"`
+}
+
+type TensionEventHash struct {
+	Eq TensionEvent `json:"eq,omitempty"`
 }
 
 type TensionFilter struct {
@@ -664,44 +851,48 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
-	CreatedAt  *string          `json:"createdAt,omitempty"`
-	UpdatedAt  *string          `json:"updatedAt,omitempty"`
-	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
-	Message    *string          `json:"message,omitempty"`
-	Nth        *string          `json:"nth,omitempty"`
-	Title      *string          `json:"title,omitempty"`
-	Type       *TensionType     `json:"type_,omitempty"`
-	Emitter    *NodeRef         `json:"emitter,omitempty"`
-	Emitterid  *string          `json:"emitterid,omitempty"`
-	Receiver   *NodeRef         `json:"receiver,omitempty"`
-	Receiverid *string          `json:"receiverid,omitempty"`
-	Labels     []*LabelRef      `json:"labels,omitempty"`
-	Status     *TensionStatus   `json:"status,omitempty"`
-	Action     *TensionAction   `json:"action,omitempty"`
-	Comments   []*CommentRef    `json:"comments,omitempty"`
-	Data       *NodeFragmentRef `json:"data,omitempty"`
-	NComments  *int             `json:"n_comments,omitempty"`
+	CreatedAt  *string        `json:"createdAt,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
+	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
+	Message    *string        `json:"message,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      *string        `json:"title,omitempty"`
+	Type       *TensionType   `json:"type_,omitempty"`
+	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Emitterid  *string        `json:"emitterid,omitempty"`
+	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Receiverid *string        `json:"receiverid,omitempty"`
+	Status     *TensionStatus `json:"status,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
+	Labels     []*LabelRef    `json:"labels,omitempty"`
+	Comments   []*CommentRef  `json:"comments,omitempty"`
+	Blobs      []*BlobRef     `json:"blobs,omitempty"`
+	History    []*EventRef    `json:"history,omitempty"`
+	Head       *BlobRef       `json:"head,omitempty"`
+	NComments  *int           `json:"n_comments,omitempty"`
 }
 
 type TensionRef struct {
-	ID         *string          `json:"id,omitempty"`
-	CreatedAt  *string          `json:"createdAt,omitempty"`
-	UpdatedAt  *string          `json:"updatedAt,omitempty"`
-	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
-	Message    *string          `json:"message,omitempty"`
-	Nth        *string          `json:"nth,omitempty"`
-	Title      *string          `json:"title,omitempty"`
-	Type       *TensionType     `json:"type_,omitempty"`
-	Emitter    *NodeRef         `json:"emitter,omitempty"`
-	Emitterid  *string          `json:"emitterid,omitempty"`
-	Receiver   *NodeRef         `json:"receiver,omitempty"`
-	Receiverid *string          `json:"receiverid,omitempty"`
-	Labels     []*LabelRef      `json:"labels,omitempty"`
-	Status     *TensionStatus   `json:"status,omitempty"`
-	Action     *TensionAction   `json:"action,omitempty"`
-	Comments   []*CommentRef    `json:"comments,omitempty"`
-	Data       *NodeFragmentRef `json:"data,omitempty"`
-	NComments  *int             `json:"n_comments,omitempty"`
+	ID         *string        `json:"id,omitempty"`
+	CreatedAt  *string        `json:"createdAt,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
+	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
+	Message    *string        `json:"message,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      *string        `json:"title,omitempty"`
+	Type       *TensionType   `json:"type_,omitempty"`
+	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Emitterid  *string        `json:"emitterid,omitempty"`
+	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Receiverid *string        `json:"receiverid,omitempty"`
+	Status     *TensionStatus `json:"status,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
+	Labels     []*LabelRef    `json:"labels,omitempty"`
+	Comments   []*CommentRef  `json:"comments,omitempty"`
+	Blobs      []*BlobRef     `json:"blobs,omitempty"`
+	History    []*EventRef    `json:"history,omitempty"`
+	Head       *BlobRef       `json:"head,omitempty"`
+	NComments  *int           `json:"n_comments,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -710,6 +901,17 @@ type TensionStatusHash struct {
 
 type TensionTypeHash struct {
 	Eq TensionType `json:"eq,omitempty"`
+}
+
+type UpdateBlobInput struct {
+	Filter *BlobFilter `json:"filter,omitempty"`
+	Set    *BlobPatch  `json:"set,omitempty"`
+	Remove *BlobPatch  `json:"remove,omitempty"`
+}
+
+type UpdateBlobPayload struct {
+	Blob    []*Blob `json:"blob,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdateCommentInput struct {
@@ -721,6 +923,17 @@ type UpdateCommentInput struct {
 type UpdateCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type UpdateEventInput struct {
+	Filter *EventFilter `json:"filter,omitempty"`
+	Set    *EventPatch  `json:"set,omitempty"`
+	Remove *EventPatch  `json:"remove,omitempty"`
+}
+
+type UpdateEventPayload struct {
+	Event   []*Event `json:"event,omitempty"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type UpdateLabelInput struct {
@@ -754,6 +967,17 @@ type UpdateNodeCharacInput struct {
 type UpdateNodeCharacPayload struct {
 	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
 	NumUids    *int          `json:"numUids,omitempty"`
+}
+
+type UpdateNodeFragmentInput struct {
+	Filter *NodeFragmentFilter `json:"filter,omitempty"`
+	Set    *NodeFragmentPatch  `json:"set,omitempty"`
+	Remove *NodeFragmentPatch  `json:"remove,omitempty"`
+}
+
+type UpdateNodeFragmentPayload struct {
+	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type UpdateNodeInput struct {
@@ -871,6 +1095,98 @@ type UserRightsRef struct {
 	CanCreateRoot *bool `json:"canCreateRoot"`
 }
 
+type BlobOrderable string
+
+const (
+	BlobOrderableCreatedAt BlobOrderable = "createdAt"
+	BlobOrderableUpdatedAt BlobOrderable = "updatedAt"
+	BlobOrderableMessage   BlobOrderable = "message"
+	BlobOrderableMd        BlobOrderable = "md"
+)
+
+var AllBlobOrderable = []BlobOrderable{
+	BlobOrderableCreatedAt,
+	BlobOrderableUpdatedAt,
+	BlobOrderableMessage,
+	BlobOrderableMd,
+}
+
+func (e BlobOrderable) IsValid() bool {
+	switch e {
+	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderableMd:
+		return true
+	}
+	return false
+}
+
+func (e BlobOrderable) String() string {
+	return string(e)
+}
+
+func (e *BlobOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BlobOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BlobOrderable", str)
+	}
+	return nil
+}
+
+func (e BlobOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type BlobType string
+
+const (
+	BlobTypeInitBlob    BlobType = "InitBlob"
+	BlobTypeOnAbout     BlobType = "OnAbout"
+	BlobTypeOnMandate   BlobType = "OnMandate"
+	BlobTypeOnFirstLink BlobType = "OnFirstLink"
+	BlobTypeOnDoc       BlobType = "OnDoc"
+)
+
+var AllBlobType = []BlobType{
+	BlobTypeInitBlob,
+	BlobTypeOnAbout,
+	BlobTypeOnMandate,
+	BlobTypeOnFirstLink,
+	BlobTypeOnDoc,
+}
+
+func (e BlobType) IsValid() bool {
+	switch e {
+	case BlobTypeInitBlob, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnFirstLink, BlobTypeOnDoc:
+		return true
+	}
+	return false
+}
+
+func (e BlobType) String() string {
+	return string(e)
+}
+
+func (e *BlobType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BlobType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BlobType", str)
+	}
+	return nil
+}
+
+func (e BlobType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type CommentOrderable string
 
 const (
@@ -976,6 +1292,53 @@ func (e *DgraphIndex) UnmarshalGQL(v interface{}) error {
 }
 
 func (e DgraphIndex) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventOrderable string
+
+const (
+	EventOrderableCreatedAt EventOrderable = "createdAt"
+	EventOrderableUpdatedAt EventOrderable = "updatedAt"
+	EventOrderableMessage   EventOrderable = "message"
+	EventOrderableOld       EventOrderable = "old"
+	EventOrderableNew       EventOrderable = "new"
+)
+
+var AllEventOrderable = []EventOrderable{
+	EventOrderableCreatedAt,
+	EventOrderableUpdatedAt,
+	EventOrderableMessage,
+	EventOrderableOld,
+	EventOrderableNew,
+}
+
+func (e EventOrderable) IsValid() bool {
+	switch e {
+	case EventOrderableCreatedAt, EventOrderableUpdatedAt, EventOrderableMessage, EventOrderableOld, EventOrderableNew:
+		return true
+	}
+	return false
+}
+
+func (e EventOrderable) String() string {
+	return string(e)
+}
+
+func (e *EventOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventOrderable", str)
+	}
+	return nil
+}
+
+func (e EventOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -1475,26 +1838,22 @@ func (e RoleType) MarshalGQL(w io.Writer) {
 type TensionAction string
 
 const (
-	TensionActionNewRole             TensionAction = "NewRole"
-	TensionActionNewCircle           TensionAction = "NewCircle"
-	TensionActionUpdateRoleAbout     TensionAction = "UpdateRoleAbout"
-	TensionActionUpdateCircleAbout   TensionAction = "UpdateCircleAbout"
-	TensionActionUpdateRoleMandate   TensionAction = "UpdateRoleMandate"
-	TensionActionUpdateCircleMandate TensionAction = "UpdateCircleMandate"
+	TensionActionNewRole    TensionAction = "NewRole"
+	TensionActionNewCircle  TensionAction = "NewCircle"
+	TensionActionEditRole   TensionAction = "EditRole"
+	TensionActionEditCircle TensionAction = "EditCircle"
 )
 
 var AllTensionAction = []TensionAction{
 	TensionActionNewRole,
 	TensionActionNewCircle,
-	TensionActionUpdateRoleAbout,
-	TensionActionUpdateCircleAbout,
-	TensionActionUpdateRoleMandate,
-	TensionActionUpdateCircleMandate,
+	TensionActionEditRole,
+	TensionActionEditCircle,
 }
 
 func (e TensionAction) IsValid() bool {
 	switch e {
-	case TensionActionNewRole, TensionActionNewCircle, TensionActionUpdateRoleAbout, TensionActionUpdateCircleAbout, TensionActionUpdateRoleMandate, TensionActionUpdateCircleMandate:
+	case TensionActionNewRole, TensionActionNewCircle, TensionActionEditRole, TensionActionEditCircle:
 		return true
 	}
 	return false
@@ -1518,6 +1877,59 @@ func (e *TensionAction) UnmarshalGQL(v interface{}) error {
 }
 
 func (e TensionAction) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TensionEvent string
+
+const (
+	TensionEventCreated       TensionEvent = "Created"
+	TensionEventReopened      TensionEvent = "Reopened"
+	TensionEventClosed        TensionEvent = "Closed"
+	TensionEventTitleUpdated  TensionEvent = "TitleUpdated"
+	TensionEventCommentPushed TensionEvent = "CommentPushed"
+	TensionEventBlobCreated   TensionEvent = "BlobCreated"
+	TensionEventBlobCommitted TensionEvent = "BlobCommitted"
+	TensionEventBlobPushed    TensionEvent = "BlobPushed"
+)
+
+var AllTensionEvent = []TensionEvent{
+	TensionEventCreated,
+	TensionEventReopened,
+	TensionEventClosed,
+	TensionEventTitleUpdated,
+	TensionEventCommentPushed,
+	TensionEventBlobCreated,
+	TensionEventBlobCommitted,
+	TensionEventBlobPushed,
+}
+
+func (e TensionEvent) IsValid() bool {
+	switch e {
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed:
+		return true
+	}
+	return false
+}
+
+func (e TensionEvent) String() string {
+	return string(e)
+}
+
+func (e *TensionEvent) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TensionEvent(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TensionEvent", str)
+	}
+	return nil
+}
+
+func (e TensionEvent) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

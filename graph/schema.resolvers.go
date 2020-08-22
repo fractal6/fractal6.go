@@ -31,6 +31,14 @@ func (r *mutationResolver) AddNodeFragment(ctx context.Context, input []*model.A
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) UpdateNodeFragment(ctx context.Context, input model.UpdateNodeFragmentInput) (data *model.UpdateNodeFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteNodeFragment(ctx context.Context, filter model.NodeFragmentFilter) (data *model.DeleteNodeFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (data *model.AddNodeCharacPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -62,11 +70,27 @@ func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTen
 }
 
 func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
+	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
 	return data, errors
 }
 
 func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.TensionFilter) (data *model.DeleteTensionPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	//errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	//return data, errors
+}
+
+func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -81,6 +105,30 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, input model.Update
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.CommentFilter) (data *model.DeleteCommentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddBlob(ctx context.Context, input []*model.AddBlobInput) (data *model.AddBlobPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateBlob(ctx context.Context, input model.UpdateBlobInput) (data *model.UpdateBlobPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteBlob(ctx context.Context, filter model.BlobFilter) (data *model.DeleteBlobPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddEvent(ctx context.Context, input []*model.AddEventInput) (data *model.AddEventPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateEvent(ctx context.Context, input model.UpdateEventInput) (data *model.UpdateEventPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteEvent(ctx context.Context, filter model.EventFilter) (data *model.DeleteEventPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -112,21 +160,6 @@ func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.Add
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	//errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
-	//return data, errors
-}
-
-func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data *model.Node, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
@@ -137,7 +170,11 @@ func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter,
 	return data, errors
 }
 
-func (r *queryResolver) QueryNodeFragment(ctx context.Context, order *model.NodeFragmentOrder, first *int, offset *int) (data []*model.NodeFragment, errors error) {
+func (r *queryResolver) GetNodeFragment(ctx context.Context, id string) (data *model.NodeFragment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryNodeFragment(ctx context.Context, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) (data []*model.NodeFragment, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -171,11 +208,36 @@ func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionF
 	return data, errors
 }
 
+func (r *queryResolver) GetLabel(ctx context.Context, id *string, name *string) (data *model.Label, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) (data []*model.Label, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
+}
+
 func (r *queryResolver) GetComment(ctx context.Context, id string) (data *model.Comment, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) (data []*model.Comment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetBlob(ctx context.Context, id string) (data *model.Blob, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryBlob(ctx context.Context, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) (data []*model.Blob, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetEvent(ctx context.Context, id string) (data *model.Event, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryEvent(ctx context.Context, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) (data []*model.Event, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -199,15 +261,6 @@ func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter,
 
 func (r *queryResolver) QueryUserRights(ctx context.Context, first *int, offset *int) (data []*model.UserRights, errors error) {
 	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) GetLabel(ctx context.Context, id *string, name *string) (data *model.Label, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) (data []*model.Label, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
 }
 
 // Mutation returns generated.MutationResolver implementation.

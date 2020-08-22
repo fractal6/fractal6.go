@@ -53,29 +53,37 @@ func Init() gen.Config {
     c.Directives.HasInverse = nothing2
     c.Directives.Search = nothing3
 
-    /* Query */
-    // Objects directives
-    c.Directives.HidePrivate = hidePrivate
+    //
+    // Query 
+    //
 
     // Fields directives
     c.Directives.Hidden = hidden
     c.Directives.Count = count
     c.Directives.Meta_getNodeStats = getNodeStats
 
-    /* Mutation */
+    // Objects directives
+    c.Directives.HidePrivate = hidePrivate
+
+    //
+    // Mutation 
+    //
 
     // Add inputs directives
     c.Directives.Add_isOwner = isOwner
+
     // Update or Remove inputs directives
     c.Directives.Patch_isOwner = isOwner
     c.Directives.Patch_RO = readOnly
     c.Directives.Patch_hasRole = hasRole 
+
     // Add, Update and Remove inputs directives
     c.Directives.Alter_toLower = toLower
     c.Directives.Alter_maxLength = inputMaxLength
     c.Directives.Alter_assertType = assertType
     c.Directives.Alter_hasRole = hasRole 
     c.Directives.Alter_hasRoot = hasRoot
+
     // Mutation Hook directives
     c.Directives.Hook_addNode = addNodeHook
     c.Directives.Hook_updateNode = updateNodeHook
@@ -109,28 +117,11 @@ func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx [
 //
 
 func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    //if obj != nil {
-    //    switch v := obj.(type) {
-    //    case *model.Node:
-    //        nameid := v.Nameid
-    //        if nameid == "" {
-    //            return nil, tools.LogErr("@hidePrivate/node", "Access denied", fmt.Errorf("nameid not provided"))
-    //        } else {
-    //            fmt.Println("Get da node a private")
-    //        }
-    //    case *model.Tension:
-    //            // pass for now
-    //            // isPrivate should be inherited by the tension, and user right check if orivate
-    //    default:
-    //        fmt.Printf("%T\n", v)
-    //        panic("type unknonw for @hidePrivate directive.")
-    //    }
-    //    return next(ctx)
-    //} 
     node_, err := next(ctx)
     if obj == nil {
         switch v := node_.(type) {
         case *model.Node:
+            // Get Node
             if v == nil {
                 break
             }
@@ -138,6 +129,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             if err != nil { return nil, err }
             if yes { return nil, tools.LogErr("@hidePrivate/getNode", "Access denied", fmt.Errorf("private node")) }
         case []*model.Node:
+            // Query Nodes
             for _, node := range(v) {
                 yes, err := isHidePrivate(ctx, node.Nameid)
                 if err != nil { return nil, err }
@@ -153,6 +145,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
 func isHidePrivate(ctx context.Context, nameid string) (bool, error) {
     var yes bool = true
     var err error
+
     if nameid == "" {
         err = tools.LogErr("@hidePrivate", "Access denied", fmt.Errorf("nameid not provided"))
     } else {
@@ -342,10 +335,7 @@ func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
     nameid_ := filter["nameid"].(model.JsonAtom)["eq"]
     if nameid_ != nil {
-        //return nil, tools.LogErr("@updateNodeHook", "not implemented", fmt.Errorf("node identifier unknonw"))
         ctx = context.WithValue(ctx, "nameid", nameid_.(string))
-        input_, err := next(ctx)
-        return input_, err
     }
 
     return next(ctx)
@@ -361,8 +351,7 @@ func updatePostHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     }
 
     ctx = context.WithValue(ctx, "id", ids[0].(string))
-    input_, err := next(ctx)
-    return input_, err
+    return next(ctx)
 }
 
 // HasRole check the user has the authorisation to update a ressource by checking if it satisfies at least one of 
