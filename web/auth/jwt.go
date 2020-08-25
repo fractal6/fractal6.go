@@ -147,8 +147,6 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
             panic(err)
         }
         json.Unmarshal(uRaw, &userCtx)
-        // @DEBUG: mapstructure seems to not decode enum (RoleType) !
-        //mapstructure.Decode(claims[tkMaster.tokenClaim], &userCtx)
         ctx = context.WithValue(ctx, tkMaster.tokenClaim, userCtx)
     } else {
         ctx = context.WithValue(ctx, tkMaster.tokenClaimErr, err)

@@ -40,33 +40,35 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Add_isOwner        func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
-	Alter_assertType   func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
-	Alter_hasRole      func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
-	Alter_hasRoot      func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
-	Alter_maxLength    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
-	Alter_toLower      func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
-	Auth               func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
-	Cascade            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Count              func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
-	Custom             func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP) (res interface{}, err error)
-	Dgraph             func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
-	HasInverse         func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
-	Hidden             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	HidePrivate        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addNode       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateComment func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateNode    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTension func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	IsAuth             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Meta_getNodeStats  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_RO           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_hasRole      func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
-	Patch_isOwner      func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
-	Remote             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Search             func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
-	Secret             func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
+	Add_isOwner         func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
+	Alter_assertType    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
+	Alter_hasRole       func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Alter_hasRoot       func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
+	Alter_maxLength     func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
+	Alter_toLower       func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
+	Auth                func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
+	Cascade             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Count               func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
+	Custom              func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP) (res interface{}, err error)
+	Dgraph              func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
+	HasInverse          func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
+	Hidden              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	HidePrivate         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addNode        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTension     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_postAddTension func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateComment  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateNode     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTension  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	IsAuth              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Meta_getNodeStats   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_RO            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_hasRole       func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Patch_isOwner       func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
+	Remote              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Search              func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
+	Secret              func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -2864,6 +2866,10 @@ directive @hook_addNode on ARGUMENT_DEFINITION
 
 directive @hook_updateNode on ARGUMENT_DEFINITION
 
+directive @hook_addTension on ARGUMENT_DEFINITION
+
+directive @hook_postAddTension on FIELD_DEFINITION
+
 directive @hook_updateTension on ARGUMENT_DEFINITION
 
 directive @hook_updateComment on ARGUMENT_DEFINITION
@@ -2923,12 +2929,12 @@ type NodeFragment {
   id: ID!
   name: String
   nameid: String
-  children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
   type_: NodeType
-  about: String
-  mandate(filter: MandateFilter): Mandate
   isPrivate: Boolean
   charac(filter: NodeCharacFilter): NodeCharac
+  about: String
+  mandate(filter: MandateFilter): Mandate
+  children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
   first_link: String
   second_link: String
   skills: [String!]
@@ -3007,8 +3013,8 @@ type Blob {
 
 type Event {
   event_type: TensionEvent! @search
-  old: String!
-  new: String!
+  old: String
+  new: String
   id: ID!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -3121,23 +3127,23 @@ enum BlobType {
   OnDoc
 }
 
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @remote on OBJECT|INTERFACE
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3174,8 +3180,8 @@ input AddEventInput {
   createdBy: UserRef!
   message: String
   event_type: TensionEvent!
-  old: String!
-  new: String!
+  old: String
+  new: String
 }
 
 type AddEventPayload {
@@ -3217,13 +3223,13 @@ type AddNodeCharacPayload {
 
 input AddNodeFragmentInput {
   name: String
-  nameid: String
-  children: [NodeFragmentRef!]
+  nameid: String @alter_toLower(f:"nameid")
   type_: NodeType
-  about: String @alter_maxLength(f:"about", n:280)
-  mandate: MandateRef
   isPrivate: Boolean
   charac: NodeCharacRef
+  about: String @alter_maxLength(f:"about", n:280)
+  mandate: MandateRef
+  children: [NodeFragmentRef!]
   first_link: String
   second_link: String
   skills: [String!]
@@ -3239,8 +3245,8 @@ input AddNodeInput {
   createdAt: DateTime!
   createdBy: UserRef! @add_isOwner(u:"createdBy")
   name: String!
-  nameid: String! @alter_toLower(f:"nameid")
-  rootnameid: String! @alter_toLower(f:"rootnameid")
+  nameid: String!
+  rootnameid: String!
   parent: NodeRef
   children: [NodeRef!]
   type_: NodeType!
@@ -3677,7 +3683,7 @@ type Mutation {
   addNodeStats(input: [AddNodeStatsInput!]!): AddNodeStatsPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
-  addTension(input: [AddTensionInput!]!): AddTensionPayload
+  addTension(input: [AddTensionInput!]! @hook_addTension): AddTensionPayload @hook_postAddTension
   updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload
   deleteTension(filter: TensionFilter!): DeleteTensionPayload
   addLabel(input: [AddLabelInput!]!): AddLabelPayload
@@ -3760,13 +3766,13 @@ enum NodeFragmentOrderable {
 
 input NodeFragmentPatch {
   name: String
-  nameid: String
-  children: [NodeFragmentRef!]
+  nameid: String @alter_toLower(f:"nameid")
   type_: NodeType
-  about: String @alter_maxLength(f:"about", n:280)
-  mandate: MandateRef
   isPrivate: Boolean
   charac: NodeCharacRef
+  about: String @alter_maxLength(f:"about", n:280)
+  mandate: MandateRef
+  children: [NodeFragmentRef!]
   first_link: String
   second_link: String
   skills: [String!]
@@ -3777,12 +3783,12 @@ input NodeFragmentRef {
   id: ID
   name: String
   nameid: String
-  children: [NodeFragmentRef!]
   type_: NodeType
-  about: String
-  mandate: MandateRef
   isPrivate: Boolean
   charac: NodeCharacRef
+  about: String
+  mandate: MandateRef
+  children: [NodeFragmentRef!]
   first_link: String
   second_link: String
   skills: [String!]
@@ -3815,7 +3821,7 @@ input NodePatch {
   createdAt: DateTime @patch_RO
   createdBy: UserRef @patch_RO
   name: String @patch_hasRole(n:["parent"], r: Coordinator)
-  rootnameid: String @patch_RO @alter_toLower(f:"rootnameid")
+  rootnameid: String @patch_RO
   parent: NodeRef @patch_RO
   children: [NodeRef!] @patch_RO
   type_: NodeType @patch_RO
@@ -5201,9 +5207,24 @@ func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 []*model.AddTensionInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addTension == nil {
+				return nil, errors.New("directive hook_addTension is not implemented")
+			}
+			return ec.directives.Hook_addTension(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
 			return nil, err
+		}
+		if data, ok := tmp.([]*model.AddTensionInput); ok {
+			arg0 = data
+		} else {
+			return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddTensionInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -9346,14 +9367,11 @@ func (ec *executionContext) _Event_old(ctx context.Context, field graphql.Collec
 	})
 
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_new(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -9377,14 +9395,11 @@ func (ec *executionContext) _Event_new(ctx context.Context, field graphql.Collec
 	})
 
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_id(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -10310,8 +10325,28 @@ func (ec *executionContext) _Mutation_addTension(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddTension(rctx, args["input"].([]*model.AddTensionInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddTension(rctx, args["input"].([]*model.AddTensionInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_postAddTension == nil {
+				return nil, errors.New("directive hook_postAddTension is not implemented")
+			}
+			return ec.directives.Hook_postAddTension(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddTensionPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddTensionPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -12528,41 +12563,6 @@ func (ec *executionContext) _NodeFragment_nameid(ctx context.Context, field grap
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeFragment_children(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NodeFragment",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_NodeFragment_children_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Children, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NodeFragment)
-	fc.Result = res
-	return ec.marshalONodeFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentᚄ(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _NodeFragment_type_(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12589,6 +12589,69 @@ func (ec *executionContext) _NodeFragment_type_(ctx context.Context, field graph
 	res := resTmp.(*model.NodeType)
 	fc.Result = res
 	return ec.marshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragment_isPrivate(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NodeFragment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsPrivate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragment_charac(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NodeFragment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_NodeFragment_charac_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Charac, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeCharac)
+	fc.Result = res
+	return ec.marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeFragment_about(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
@@ -12654,35 +12717,7 @@ func (ec *executionContext) _NodeFragment_mandate(ctx context.Context, field gra
 	return ec.marshalOMandate2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeFragment_isPrivate(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NodeFragment",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsPrivate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeFragment_charac(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+func (ec *executionContext) _NodeFragment_children(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -12698,7 +12733,7 @@ func (ec *executionContext) _NodeFragment_charac(ctx context.Context, field grap
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_NodeFragment_charac_args(ctx, rawArgs)
+	args, err := ec.field_NodeFragment_children_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -12706,15 +12741,15 @@ func (ec *executionContext) _NodeFragment_charac(ctx context.Context, field grap
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Charac, nil
+		return obj.Children, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.NodeCharac)
+	res := resTmp.([]*model.NodeFragment)
 	fc.Result = res
-	return ec.marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
+	return ec.marshalONodeFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeFragment_first_link(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
@@ -17440,13 +17475,13 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 			}
 		case "old":
 			var err error
-			it.Old, err = ec.unmarshalNString2string(ctx, v)
+			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "new":
 			var err error
-			it.New, err = ec.unmarshalNString2string(ctx, v)
+			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17554,19 +17589,44 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			}
 		case "nameid":
 			var err error
-			it.Nameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "nameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive0, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
-		case "children":
-			var err error
-			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			if data, ok := tmp.(*string); ok {
+				it.Nameid = data
+			} else if tmp == nil {
+				it.Nameid = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "type_":
 			var err error
 			it.Type, err = ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPrivate":
+			var err error
+			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "charac":
+			var err error
+			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17605,15 +17665,9 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
+		case "children":
 			var err error
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
+			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17694,49 +17748,15 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			}
 		case "nameid":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "nameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_toLower == nil {
-					return nil, errors.New("directive alter_toLower is not implemented")
-				}
-				return ec.directives.Alter_toLower(ctx, obj, directive0, f)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Nameid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(string); ok {
-				it.Nameid = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "rootnameid":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "rootnameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_toLower == nil {
-					return nil, errors.New("directive alter_toLower is not implemented")
-				}
-				return ec.directives.Alter_toLower(ctx, obj, directive0, f)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.(string); ok {
-				it.Rootnameid = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 			}
 		case "parent":
 			var err error
@@ -20006,19 +20026,44 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 			}
 		case "nameid":
 			var err error
-			it.Nameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "nameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive0, f)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
-		case "children":
-			var err error
-			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			if data, ok := tmp.(*string); ok {
+				it.Nameid = data
+			} else if tmp == nil {
+				it.Nameid = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "type_":
 			var err error
 			it.Type, err = ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPrivate":
+			var err error
+			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "charac":
+			var err error
+			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20057,15 +20102,9 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
+		case "children":
 			var err error
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
+			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20123,15 +20162,21 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "children":
-			var err error
-			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "type_":
 			var err error
 			it.Type, err = ec.unmarshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPrivate":
+			var err error
+			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "charac":
+			var err error
+			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20147,15 +20192,9 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
+		case "children":
 			var err error
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
+			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20325,18 +20364,8 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				}
 				return ec.directives.Patch_RO(ctx, obj, directive0)
 			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				f, err := ec.unmarshalNString2string(ctx, "rootnameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_toLower == nil {
-					return nil, errors.New("directive alter_toLower is not implemented")
-				}
-				return ec.directives.Alter_toLower(ctx, obj, directive1, f)
-			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -23687,14 +23716,8 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "old":
 			out.Values[i] = ec._Event_old(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "new":
 			out.Values[i] = ec._Event_new(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "id":
 			out.Values[i] = ec._Event_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24052,18 +24075,18 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._NodeFragment_name(ctx, field, obj)
 		case "nameid":
 			out.Values[i] = ec._NodeFragment_nameid(ctx, field, obj)
-		case "children":
-			out.Values[i] = ec._NodeFragment_children(ctx, field, obj)
 		case "type_":
 			out.Values[i] = ec._NodeFragment_type_(ctx, field, obj)
-		case "about":
-			out.Values[i] = ec._NodeFragment_about(ctx, field, obj)
-		case "mandate":
-			out.Values[i] = ec._NodeFragment_mandate(ctx, field, obj)
 		case "isPrivate":
 			out.Values[i] = ec._NodeFragment_isPrivate(ctx, field, obj)
 		case "charac":
 			out.Values[i] = ec._NodeFragment_charac(ctx, field, obj)
+		case "about":
+			out.Values[i] = ec._NodeFragment_about(ctx, field, obj)
+		case "mandate":
+			out.Values[i] = ec._NodeFragment_mandate(ctx, field, obj)
+		case "children":
+			out.Values[i] = ec._NodeFragment_children(ctx, field, obj)
 		case "first_link":
 			out.Values[i] = ec._NodeFragment_first_link(ctx, field, obj)
 		case "second_link":

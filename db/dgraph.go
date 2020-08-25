@@ -181,8 +181,12 @@ func initDB() *Dgraph {
             all(func: eq(User.{{.fieldid}}, "{{.userid}}"))
                 {{.payload}}
         }`,
-        "getNodeCharac": `{
+        "getNode": `{
             all(func: eq(Node.{{.fieldid}}, "{{.objid}}"))
+                {{.payload}}
+        }`,
+        "getTension": `{
+            all(func: uid("{{.id}}"))
                 {{.payload}}
         }`,
 		// Get multiple objects
@@ -364,9 +368,9 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     return res, nil
 }
 
-//MutateGpm runs an upsert block mutation by first querying query 
+//MutateWithQueryGpm runs an upsert block mutation by first querying query 
 //and then mutate based on the result.
-func (dg Dgraph) MutateGpm(query string, mu *api.Mutation) (error) {
+func (dg Dgraph) MutateWithQueryGpm(query string, mu *api.Mutation) (error) {
     // init client
 	dgc, cancel := dg.getDgraphClient()
     defer cancel()
@@ -377,13 +381,87 @@ func (dg Dgraph) MutateGpm(query string, mu *api.Mutation) (error) {
 	req := &api.Request{
 		Query: query,
 		Mutations: []*api.Mutation{mu},
-		CommitNow:true,
+		CommitNow: true,
 	}
 
 	if _, err := txn.Do(ctx, req); err != nil {
 		return err
 	}
 	return nil
+}
+
+//MutateGpm push a new object in the database with upsert operation
+func (dg Dgraph) MutateUpsertGpm(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
+    // init client
+	dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+	// make the template here.
+    template := template.Must(template.New("graphql").Parse(`{
+			all(func: eq({{.dtype}}.{{.upsertField}}, "{{.upserVal}}")) {
+				v as uid
+			}
+		}`))
+    buf := bytes.Buffer{}
+    template.Execute(&buf, map[string]string{"dtype":dtype, "upsertField":upsertField, "upsertVal":upsertVal})
+    query := buf.String()
+
+    object["dgraph.type"] = []string{dtype}
+	object["uid"] = "uid(v)"
+	obj, err := json.Marshal(object)
+	if err != nil {
+        return err
+    }
+    mu := &api.Mutation{SetJson: obj}
+
+	req := &api.Request{
+        Query: query,
+		Mutations: []*api.Mutation{mu},
+		CommitNow: true,
+	}
+	// User do instead of Mutate here ?
+    _, err = txn.Do(ctx, req)
+    if err != nil {
+        return err
+	}
+    return nil
+}
+
+//MutateGpm push a new object in the database.
+func (dg Dgraph) MutateGpm(object map[string]interface{}, dtype string) (string, error) {
+    // init client
+	dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+    object["dgraph.type"] = []string{dtype}
+    uid, ok := object["uid"]
+    if !ok {
+        uid = "_:new_obj"
+        object["uid"] = uid
+    }
+	obj, err := json.Marshal(object)
+    fmt.Println(obj)
+	if err != nil {
+        return "", err
+    }
+
+	mu := &api.Mutation{
+		CommitNow: true,
+		SetJson:   obj,
+	}
+    r, err := txn.Mutate(ctx, mu)
+    if err != nil {
+        return "", err
+	}
+
+	uid = r.Uids[uid.(string)]
+    return uid.(string), nil
 }
 
 //
@@ -559,7 +637,7 @@ func (dg Dgraph) GetFieldByEq(typeName string, fieldid string, objid string, fie
 	}
 
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in gpm query")
+        return nil, fmt.Errorf("Got multiple in gpm query: %s %s", fieldName, objid)
     } else if len(r.All) == 1 {
         f1 := typeName +"."+ fieldName
         x := r.All[0][f1]
@@ -698,7 +776,7 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
         "payload": model.NodeCharacPayloadDg,
     }
     // Send request
-    res, err := dg.QueryGpm("getNodeCharac", maps)
+    res, err := dg.QueryGpm("getNode", maps)
     if err != nil {
         return  nil, err
     }
@@ -730,6 +808,101 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
             return nil, err
         }
         err = decoder.Decode(r.All[0][model.NodeCharacNF])
+        if err != nil {
+            return nil, err
+        }
+    }
+    return &obj, nil
+}
+
+//// Returns the node hook content
+//func (dg Dgraph) GetNodeHook(fieldid string, objid string) (*model.Node, error) {
+//    // Format Query
+//    maps := map[string]string{
+//        "fieldid":fieldid,
+//        "objid":objid,
+//        "payload": model.NodeHookPayload,
+//    }
+//    // Send request
+//    res, err := dg.QueryGpm("getNode", maps)
+//    if err != nil {
+//        return  nil, err
+//    }
+//
+//    // Decode response
+//    var r GpmResp
+//	err = json.Unmarshal(res.Json, &r)
+//	if err != nil {
+//        return nil, err
+//	}
+//
+//    var obj model.Node
+//    if len(r.All) > 1 {
+//        return nil, fmt.Errorf("Got multiple node charac for @id: %s, %s", fieldid, objid)
+//    } else if len(r.All) == 1 {
+//        config := &mapstructure.DecoderConfig{
+//            Result: &obj,
+//            TagName: "json",
+//            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+//                if to == reflect.Struct {
+//                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+//                    return nv, nil
+//                }
+//                return v, nil
+//            },
+//        }
+//        decoder, err := mapstructure.NewDecoder(config)
+//        if err != nil {
+//            return nil, err
+//        }
+//        err = decoder.Decode(r.All[0])
+//        if err != nil {
+//            return nil, err
+//        }
+//    }
+//    return &obj, nil
+//}
+
+// Returns the tension hook content
+func (dg Dgraph) GetTensionHook(uid string) (*model.Tension, error) {
+    // Format Query
+    maps := map[string]string{
+        "id":uid,
+        "payload": model.TensionHookPayload,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getTension", maps)
+    if err != nil {
+        return  nil, err
+    }
+
+    // Decode response
+    var r GpmResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+        return nil, err
+	}
+
+    var obj model.Tension
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple tension for @uid: %s", uid)
+    } else if len(r.All) == 1 {
+        config := &mapstructure.DecoderConfig{
+            Result: &obj,
+            TagName: "json",
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
+        }
+        decoder, err := mapstructure.NewDecoder(config)
+        if err != nil {
+            return nil, err
+        }
+        err = decoder.Decode(r.All[0])
         if err != nil {
             return nil, err
         }
@@ -829,7 +1002,7 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 
 // Mutation
 
-// UpdateRoleType update the rolet of a node given the nameid uqing upsert block.
+// UpdateRoleType update the role of a node given the nameid using upsert block.
 func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
 
 	query := fmt.Sprintf(`query {
@@ -845,7 +1018,7 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
 		SetNquads: []byte(mu),
 	}
 	
-    err := dg.MutateGpm(query, mutation)
+    err := dg.MutateWithQueryGpm(query, mutation)
     if err != nil {
         return err
     }
@@ -875,15 +1048,15 @@ func (dg Dgraph) AddUser(input model.AddUserInput) error {
     }
 
     // Send request
-    userDGql := model.AddUserPayload{}
-    err := dg.QueryGql("add", reqInput, &userDGql)
+    payload := model.AddUserPayload{}
+    err := dg.QueryGql("add", reqInput, &payload)
     if err != nil {
         return err
     }
 
     // Decode response
     //var user model.UserCtx
-    //rRaw, err := json.Marshal(userDGql.User[0])
+    //rRaw, err := json.Marshal(payload.User[0])
     //if err != nil {
     //    return nil, err
     //}
@@ -914,8 +1087,8 @@ func (dg Dgraph) AddNode(input model.AddNodeInput) error {
     }
 
     // Send request
-    nodeDGql := model.AddNodePayload{}
-    err := dg.QueryGql("add", reqInput, &nodeDGql)
+    payload := model.AddNodePayload{}
+    err := dg.QueryGql("add", reqInput, &payload)
     if err != nil {
         return err
     }
@@ -923,3 +1096,30 @@ func (dg Dgraph) AddNode(input model.AddNodeInput) error {
     return nil
 }
 
+// AddTension add a new tension
+func (dg Dgraph) AddTension(input model.AddTensionInput) (string, error) {
+    queryName := "addTension"
+    inputType := "AddTensionInput"
+    queryGraph := `tension { id }`
+
+    // Just One Tension
+    inputs, _ := json.Marshal([]model.AddTensionInput{input})
+
+    // Build the string request
+    reqInput := map[string]string{
+        "QueryName": queryName, // function name (e.g addUser)
+        "InputType": inputType, // input type name (e.g AddUserInput)
+        "QueryGraph": tools.CleanString(queryGraph, true), // output data
+        "InputPayload": string(inputs), // inputs data
+    }
+
+    // Send request
+    payload := model.AddTensionPayload{}
+    err := dg.QueryGql("add", reqInput, &payload)
+    if err != nil {
+        return "", err
+    }
+
+    r := payload.Tension[0].ID
+    return r, nil
+}

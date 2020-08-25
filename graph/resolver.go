@@ -7,7 +7,6 @@ package graph
 
 import (
     "fmt"
-    //"time"
     "context"
     "reflect"
     "strings"
@@ -87,8 +86,10 @@ func Init() gen.Config {
     // Mutation Hook directives
     c.Directives.Hook_addNode = addNodeHook
     c.Directives.Hook_updateNode = updateNodeHook
-    c.Directives.Hook_updateTension = updatePostHook
-    c.Directives.Hook_updateComment = updatePostHook
+    c.Directives.Hook_addTension = addTensionHook
+    c.Directives.Hook_postAddTension = addTensionPostHook
+    c.Directives.Hook_updateTension = updateTensionHook
+    c.Directives.Hook_updateComment = updateCommentHook
 
     return c
 }
@@ -250,8 +251,8 @@ func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, fie
 
 // Add Node Hook:
 // * addNode: New Orga (Root creation) -> check UserRight.CanCreateRoot
-// * addNode/updateNode?: Join orga (push Node) -> check if NodeCharac.UserCanJoin is True and if user is not already a member
-// * addNode/updateNode: Add role and subcircle
+// * addNode: Join orga (push Node) -> check if NodeCharac.UserCanJoin is True and if user is not already a member
+// * addNode: (push Node) Add role and subcircle
 // Check user right for special query
 func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
@@ -260,69 +261,38 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
         return nil, tools.LogErr("@addNodeHook/userCtx", "Access denied", err)  // Login or signup
     }
 
+    // Get Input
     input_, err := next(ctx)
     if err != nil {
         return nil, tools.LogErr("@addNodeHook", "internal error", err)
     }
     input := input_.([]*model.AddNodeInput)
+
+    // Validate Input
     if len(input) != 1 {
         return nil, tools.LogErr("@addNodeHook", "Add node error", fmt.Errorf("Only one node supported in input"))
     }
     node := *input[0]
 
-    rc := graphql.GetResolverContext(ctx)
-    queryName := rc.Field.Name
-    if queryName == "addNode" {  // @obsolete with ARGUMENT_DEFINITION directive ?
+    // Get the Node Characteristics of the **Parent Node**
+    if node.Parent == nil && (*node.Parent).Nameid == nil {
+        return nil, tools.LogErr("@addNodeHook", "Access denied", fmt.Errorf("Parent node not found"))
+    }
+    parentid := *(node.Parent).Nameid
+    charac_, err := db.GetDB().GetNodeCharac("nameid", parentid)
+    //nodeCHarac := getLut(nameid, "getNodeCharac")
+    if err != nil {
+        return nil, tools.LogErr("@addNodeHook/NodeCharac", "Access denied", err)
+    } else if charac_ == nil {
+        return nil, tools.LogErr("@addNodeHook/NodeCharac", "Access denied", fmt.Errorf("Node characteristic not found"))
+    }
 
-        // Get the Node Characteristics of the **Parent Node**
-        if node.Parent == nil && (*node.Parent).Nameid == nil {
-            return nil, tools.LogErr("@addNodeHook", "Access denied", fmt.Errorf("Parent node not found"))
-        }
-        parentid := *(node.Parent).Nameid
-        charac_, err := db.GetDB().GetNodeCharac("nameid", parentid)
-        //nodeCHarac := getLut(nameid, "getNodeCharac")
-        if err != nil {
-            return nil, tools.LogErr("@addNodeHook/NodeCharac", "Access denied", err)
-        } else if charac_ == nil {
-            return nil, tools.LogErr("@addNodeHook/NodeCharac", "Access denied", fmt.Errorf("Node characteristic not found"))
-        }
-        charac := *charac_
-
-        ok, err := doAddNodeHook(uctx, node, parentid, charac)
-        if err != nil {
-            return nil, tools.LogErr("@addNodeHook/doAddNodeHook", "Access denied", err)
-        }
-        if ok {
-            //// Add the default node
-            //userCanJoin := false
-            //typeCo := model.NodeTypeRole
-            //roleTypeCo := model.RoleTypeCoordinator
-            //nameCo := "Coordinator"
-            //nameidCo := node.Nameid + "#" + "coordo1"
-            //nowCo := time.Now().Format(time.RFC3339)
-            //isRootCo := false
-
-            //co := model.NodeRef{
-            //    CreatedAt:  & nowCo,
-            //    CreatedBy:  & model.UserRef{Username: & uctx.Username},
-            //    IsRoot:     & isRootCo,
-            //    Type:       & typeCo,
-            //    RoleType:   & roleTypeCo,
-            //    Name:       & nameCo,
-            //    Nameid:     & nameidCo,
-            //    Rootnameid: & node.Rootnameid,
-            //    Charac: &model.NodeCharacRef{
-            //        UserCanJoin: &userCanJoin,
-            //        Mode: &charac.Mode, // Inherit mode
-            //    },
-            //    //Mandate: ... // @Debug: todo default mandate for basic Role
-            //    FirstLink:  & model.UserRef{Username: & uctx.Username},
-            //}
-            //node.Children = []*model.NodeRef{&co}
-            //newInput := []*model.AddNodeInput{&node}
-            //return newInput, nil
-            return input_, nil
-        }
+    ok, err := doAddNodeHook(uctx, node, parentid, *charac_)
+    if err != nil {
+        return nil, tools.LogErr("@addNodeHook/doAddNodeHook", "Access denied", err)
+    }
+    if ok {
+        return input_, nil
     }
 
     e := fmt.Errorf("contact a coordinator to access this ressource.")
@@ -341,13 +311,73 @@ func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     return next(ctx)
 }
 
-// Update Post hook (Tensiont, Comment, etc)
+// Add Tension Hook:
+func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Get Input
+    input_, err := next(ctx)
+    if err != nil {
+        return nil, tools.LogErr("@addTensionHook", "internal error", err)
+    }
+    input := input_.([]*model.AddTensionInput)
+
+    // Validate Input
+    if len(input) != 1 {
+        return nil, tools.LogErr("@addTensionHook", "Add tension error", fmt.Errorf("Only one tension supported in input"))
+    }
+
+    return input_, nil
+}
+
+// Update Tension hook
 // * add the id field in the context for further inspection in new resolver
-func updatePostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
     ids := filter["id"].([]interface{})
     if len(ids) > 1 {
-        return nil, tools.LogErr("@updatePostHook", "not implemented", fmt.Errorf("multiple post not supported"))
+        return nil, tools.LogErr("@updateTensionHook", "not implemented", fmt.Errorf("multiple post not supported"))
+    }
+
+    ctx = context.WithValue(ctx, "id", ids[0].(string))
+    return next(ctx)
+}
+
+// Add Tension Post Hook:
+func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Retrieve userCtx from token
+    uctx, err := auth.UserCtxFromContext(ctx)
+    if err != nil {
+        return nil, tools.LogErr("@addTensionPostHook/userCtx", "Access denied", err)  // Login or signup
+    }
+
+    if !PayloadContains(ctx, "id") {
+        return nil, tools.LogErr("@postAddTensionHook", "field missing", fmt.Errorf("id field is required in tension payload"))
+    }
+    data, err := next(ctx)
+    if err != nil {
+        return nil, tools.LogErr("@addTensionPostHook", "internal error", err)
+    }
+
+    // Validate and process Request
+    id := data.(*model.AddTensionPayload).Tension[0].ID
+    rc := graphql.GetResolverContext(ctx)
+    input := rc.Args["input"].([]*model.AddTensionInput)[0]
+    if ok, err := tensionHook(uctx, id, input.History, "add"); err != nil  {
+        return nil, tools.LogErr("@addTensionPostHook", "Internal Error", err)
+    } else if ok {
+        return data, err
+    }
+
+    e := fmt.Errorf("contact a coordinator to access this ressource.")
+    return nil, tools.LogErr("@addNodeHook", "Access denied", e)
+}
+
+// Update Comment hook
+// * add the id field in the context for further inspection in new resolver
+func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
+    ids := filter["id"].([]interface{})
+    if len(ids) > 1 {
+        return nil, tools.LogErr("@updateCommentHook", "not implemented", fmt.Errorf("multiple post not supported"))
     }
 
     ctx = context.WithValue(ctx, "id", ids[0].(string))
@@ -623,50 +653,55 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
         return ok, err
     }
 
-    //
-    // New Role hook
-    // 
-    if nodeType == model.NodeTypeRole {
-        if roleType == nil {
-            err = fmt.Errorf("role should have a RoleType")
-        }
-
-        // Add node Policies
-        if charac.Mode == model.NodeModeChaos {
-            ok = userIsMember(uctx, parentid)
-        } else if charac.Mode == model.NodeModeCoordinated {
-            ok = userIsCoordo(uctx, parentid)
-        }
-
-        // Change Guest to member if user got its first role
-        if ok && node.FirstLink != nil {
-            err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
-        }
-
-        return ok, err
-    }
-
-    //
-    // New sub-circle hook
-    // 
-    if nodeType == model.NodeTypeCircle {
-        // Add node Policies
-        if charac.Mode == model.NodeModeChaos {
-            ok = userIsMember(uctx, parentid)
-        } else if charac.Mode == model.NodeModeCoordinated {
-            ok = userIsCoordo(uctx, parentid)
-        }
-
-        for _, child := range node.Children {
-            if ok && child.FirstLink != nil {
-                err = maybeUpdateGuest2Peer(uctx, rootnameid, *child.FirstLink)
-            }
-        }
-
-        return ok, err
-    }
-
     return false, fmt.Errorf("not implemented addNode request")
+}
+
+// Take action base on the Event value:
+// * get node target NodeCharac
+// * Copy value in target Node.source if event == BlobPushed
+// | if User is authorized: make a gpm(or gql?) request that push the change into the node
+// Note: @Debug: Only one BlobPushed will be processed
+// Note: @Debug: remove added tension on error.
+func tensionHook(uctx model.UserCtx, tid string, events []*model.EventRef, qtype string) (bool, error) {
+    for _, event := range(events) {
+        if (*event.EventType == model.TensionEventBlobPushed) {
+            // Get Hook receiverid,  last blob and Receiver Charac
+            tension, err := db.GetDB().GetTensionHook(tid)
+            if err != nil {
+                return false, tools.LogErr("@tensionhook/tension", "Access denied", err)
+            } else if tension == nil {
+                return false, tools.LogErr("@tensionhook/tension", "Access denied", fmt.Errorf("tension not found"))
+            }
+            blob := tension.Blobs[0]
+            emitterid := tension.Emitter.Nameid
+            parentid := tension.Receiver.Nameid
+            charac := tension.Receiver.Charac
+            isPrivate := tension.Receiver.IsPrivate
+            if blob.BlobType != model.BlobTypeOnDoc {
+                // OnNode
+                node := blob.Node
+                if qtype == "add" {
+                    ok, err := canAddOrgaNode(uctx, node, parentid, charac)
+                    if err != nil {
+                        return false, tools.LogErr("@tensionhook/tension", "Access denied", err)
+                    } else if ok {
+                        err = pushOrgaNode(uctx, tid, node, emitterid, parentid, charac, isPrivate)
+                        return true, err
+                    } else {
+                        return false, nil
+                    }
+                } else if qtype == "update" {
+                    //Todo
+                } else {
+                    return false, fmt.Errorf("hook tension qtype unknonwn")
+                }
+            } else {
+                // OnDoc
+            }
+            break
+        }
+    }
+    return true, nil
 }
 
 //
@@ -736,63 +771,6 @@ func userIsGuest(uctx model.UserCtx, rootnameid string) int {
 
     return -1
 }
-
-// maybeUpdateGuest2Peer check if Guest should be upgrade to Member role type
-func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, firstLink model.UserRef) error {
-    if uctx.Username == *(firstLink).Username {
-        i := userIsGuest(uctx, rootnameid)
-        if i >= 0 {
-            // Update RoleType to Member
-            err := db.GetDB().UpgradeGuest(uctx.Roles[i].Nameid, model.RoleTypeMember)
-            if err != nil {
-                return err
-            }
-        }
-    }
-
-    return nil
-}
-
-//
-// User Codecs
-//
-
-// Get the parent nameid from the given nameid
-func nid2pid(nid string) (string, error) {
-    var pid string
-    parts := strings.Split(nid, "#")
-    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
-    }
-
-    if len(parts) == 1 || parts[1] == "" {
-        pid = parts[0]
-    } else {
-        pid = strings.Join(parts[:len(parts)-1],  "#")
-    }
-    return pid, nil
-}
-
-// Get the rootnameid from the given nameid
-func nid2rootid(nid string) (string, error) {
-    var pid string
-    parts := strings.Split(nid, "#")
-    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
-    }
-
-    return parts[0], nil
-}
-
-func isCircle(nid string) (bool) {
-    parts := strings.Split(nid, "#")
-    return len(parts) == 1 || len(parts) == 2
-}
-func isRole(nid string) (bool) {
-    parts := strings.Split(nid, "#")
-    return len(parts) == 3
-}
-
 
 //
 // Go Utils

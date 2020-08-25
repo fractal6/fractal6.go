@@ -43,8 +43,8 @@ type AddEventInput struct {
 	CreatedBy *UserRef     `json:"createdBy,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 	EventType TensionEvent `json:"event_type,omitempty"`
-	Old       string       `json:"old,omitempty"`
-	New       string       `json:"new,omitempty"`
+	Old       *string      `json:"old,omitempty"`
+	New       *string      `json:"new,omitempty"`
 }
 
 type AddEventPayload struct {
@@ -87,12 +87,12 @@ type AddNodeCharacPayload struct {
 type AddNodeFragmentInput struct {
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
-	About      *string            `json:"about,omitempty"`
-	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	IsPrivate  *bool              `json:"isPrivate"`
 	Charac     *NodeCharacRef     `json:"charac,omitempty"`
+	About      *string            `json:"about,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
 	Skills     []string           `json:"skills,omitempty"`
@@ -384,8 +384,8 @@ type DeleteUserPayload struct {
 
 type Event struct {
 	EventType TensionEvent `json:"event_type,omitempty"`
-	Old       string       `json:"old,omitempty"`
-	New       string       `json:"new,omitempty"`
+	Old       *string      `json:"old,omitempty"`
+	New       *string      `json:"new,omitempty"`
 	ID        string       `json:"id,omitempty"`
 	CreatedAt string       `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
@@ -589,12 +589,12 @@ type NodeFragment struct {
 	ID         string          `json:"id,omitempty"`
 	Name       *string         `json:"name,omitempty"`
 	Nameid     *string         `json:"nameid,omitempty"`
-	Children   []*NodeFragment `json:"children,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
-	About      *string         `json:"about,omitempty"`
-	Mandate    *Mandate        `json:"mandate,omitempty"`
 	IsPrivate  *bool           `json:"isPrivate"`
 	Charac     *NodeCharac     `json:"charac,omitempty"`
+	About      *string         `json:"about,omitempty"`
+	Mandate    *Mandate        `json:"mandate,omitempty"`
+	Children   []*NodeFragment `json:"children,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
 	SecondLink *string         `json:"second_link,omitempty"`
 	Skills     []string        `json:"skills,omitempty"`
@@ -615,12 +615,12 @@ type NodeFragmentOrder struct {
 type NodeFragmentPatch struct {
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
-	About      *string            `json:"about,omitempty"`
-	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	IsPrivate  *bool              `json:"isPrivate"`
 	Charac     *NodeCharacRef     `json:"charac,omitempty"`
+	About      *string            `json:"about,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
 	Skills     []string           `json:"skills,omitempty"`
@@ -631,12 +631,12 @@ type NodeFragmentRef struct {
 	ID         *string            `json:"id,omitempty"`
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
-	About      *string            `json:"about,omitempty"`
-	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	IsPrivate  *bool              `json:"isPrivate"`
 	Charac     *NodeCharacRef     `json:"charac,omitempty"`
+	About      *string            `json:"about,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
 	Skills     []string           `json:"skills,omitempty"`

@@ -4,6 +4,7 @@ import (
     "reflect"
     "regexp"
     "strings"
+    "encoding/json"
     "github.com/spf13/viper"
 )
 
@@ -24,10 +25,8 @@ func InitViper() {
 
 
 // This function will help you to convert your object from struct to map[string]interface{} based on your JSON tag in your structs.
-// Example how to use posted in sample_test.go file.
 // Use mapstructure instead ?
 func StructToMap(item interface{}) map[string]interface{} {
-
     res := map[string]interface{}{}
     if item == nil {
         return res
@@ -53,11 +52,27 @@ func StructToMap(item interface{}) map[string]interface{} {
     return res
 }
 
+// Use Marshaling and Unmarshaling to convert an object to a map of string.
+// @DEBUG: mapstructure seems to not decode enum (RoleType) !
+// @see also: https://stackoverflow.com/questions/23589564/function-for-converting-a-struct-to-map-in-golang#25117810
+func Struct2Map(item interface{}) map[string]interface{} {
+    var amap map[string]interface{}
+    itemRaw, _ := json.Marshal(item)
+    json.Unmarshal(itemRaw, &amap)
+    return amap
+}
+
+// StructMap convert/copy a interface to another
+func StructMap(in interface{}, out interface{}) {
+    raw, _ := json.Marshal(in)
+    json.Unmarshal(raw, &out)
+}
+
+
 // CleanAliasedMap copy the input map by renaming all the keys
 // recursively by removing trailing integers.
 // @DEBUG: how to better handle aliasing (check gqlgen)
 func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
-    
     out := make(map[string]interface{}, len(m))
     for k, v := range m {
         var nk string
@@ -83,8 +98,7 @@ func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
 }
 
 // Keep the last key string when separated by dot (eg [a.key.name: 10] -> [name: 10])
-func CleanCompositeName(m map[string]interface{})  map[string]interface{} {
-    
+func CleanCompositeName(m map[string]interface{}) map[string]interface{} {
     out := make(map[string]interface{}, len(m))
     for k, v := range m {
         ks := strings.Split(k, ".")
