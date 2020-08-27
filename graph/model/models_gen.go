@@ -9,14 +9,15 @@ import (
 )
 
 type AddBlobInput struct {
-	CreatedAt string           `json:"createdAt,omitempty"`
-	UpdatedAt *string          `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef         `json:"createdBy,omitempty"`
-	Message   *string          `json:"message,omitempty"`
-	Tension   *TensionRef      `json:"tension,omitempty"`
-	BlobType  BlobType         `json:"blob_type,omitempty"`
-	Node      *NodeFragmentRef `json:"node,omitempty"`
-	Md        *string          `json:"md,omitempty"`
+	CreatedAt  string           `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Tension    *TensionRef      `json:"tension,omitempty"`
+	BlobType   BlobType         `json:"blob_type,omitempty"`
+	Node       *NodeFragmentRef `json:"node,omitempty"`
+	Md         *string          `json:"md,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
 }
 
 type AddBlobPayload struct {
@@ -214,15 +215,16 @@ type AuthRule struct {
 }
 
 type Blob struct {
-	Tension   *Tension      `json:"tension,omitempty"`
-	BlobType  BlobType      `json:"blob_type,omitempty"`
-	Node      *NodeFragment `json:"node,omitempty"`
-	Md        *string       `json:"md,omitempty"`
-	ID        string        `json:"id,omitempty"`
-	CreatedAt string        `json:"createdAt,omitempty"`
-	UpdatedAt *string       `json:"updatedAt,omitempty"`
-	CreatedBy *User         `json:"createdBy,omitempty"`
-	Message   *string       `json:"message,omitempty"`
+	Tension    *Tension      `json:"tension,omitempty"`
+	BlobType   BlobType      `json:"blob_type,omitempty"`
+	Node       *NodeFragment `json:"node,omitempty"`
+	Md         *string       `json:"md,omitempty"`
+	PushedFlag *string       `json:"pushedFlag,omitempty"`
+	ID         string        `json:"id,omitempty"`
+	CreatedAt  string        `json:"createdAt,omitempty"`
+	UpdatedAt  *string       `json:"updatedAt,omitempty"`
+	CreatedBy  *User         `json:"createdBy,omitempty"`
+	Message    *string       `json:"message,omitempty"`
 }
 
 type BlobFilter struct {
@@ -242,26 +244,28 @@ type BlobOrder struct {
 }
 
 type BlobPatch struct {
-	CreatedAt *string          `json:"createdAt,omitempty"`
-	UpdatedAt *string          `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef         `json:"createdBy,omitempty"`
-	Message   *string          `json:"message,omitempty"`
-	Tension   *TensionRef      `json:"tension,omitempty"`
-	BlobType  *BlobType        `json:"blob_type,omitempty"`
-	Node      *NodeFragmentRef `json:"node,omitempty"`
-	Md        *string          `json:"md,omitempty"`
+	CreatedAt  *string          `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Tension    *TensionRef      `json:"tension,omitempty"`
+	BlobType   *BlobType        `json:"blob_type,omitempty"`
+	Node       *NodeFragmentRef `json:"node,omitempty"`
+	Md         *string          `json:"md,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
 }
 
 type BlobRef struct {
-	ID        *string          `json:"id,omitempty"`
-	CreatedAt *string          `json:"createdAt,omitempty"`
-	UpdatedAt *string          `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef         `json:"createdBy,omitempty"`
-	Message   *string          `json:"message,omitempty"`
-	Tension   *TensionRef      `json:"tension,omitempty"`
-	BlobType  *BlobType        `json:"blob_type,omitempty"`
-	Node      *NodeFragmentRef `json:"node,omitempty"`
-	Md        *string          `json:"md,omitempty"`
+	ID         *string          `json:"id,omitempty"`
+	CreatedAt  *string          `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Tension    *TensionRef      `json:"tension,omitempty"`
+	BlobType   *BlobType        `json:"blob_type,omitempty"`
+	Node       *NodeFragmentRef `json:"node,omitempty"`
+	Md         *string          `json:"md,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
 }
 
 type BlobTypeHash struct {
@@ -1098,10 +1102,11 @@ type UserRightsRef struct {
 type BlobOrderable string
 
 const (
-	BlobOrderableCreatedAt BlobOrderable = "createdAt"
-	BlobOrderableUpdatedAt BlobOrderable = "updatedAt"
-	BlobOrderableMessage   BlobOrderable = "message"
-	BlobOrderableMd        BlobOrderable = "md"
+	BlobOrderableCreatedAt  BlobOrderable = "createdAt"
+	BlobOrderableUpdatedAt  BlobOrderable = "updatedAt"
+	BlobOrderableMessage    BlobOrderable = "message"
+	BlobOrderableMd         BlobOrderable = "md"
+	BlobOrderablePushedFlag BlobOrderable = "pushedFlag"
 )
 
 var AllBlobOrderable = []BlobOrderable{
@@ -1109,11 +1114,12 @@ var AllBlobOrderable = []BlobOrderable{
 	BlobOrderableUpdatedAt,
 	BlobOrderableMessage,
 	BlobOrderableMd,
+	BlobOrderablePushedFlag,
 }
 
 func (e BlobOrderable) IsValid() bool {
 	switch e {
-	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderableMd:
+	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderableMd, BlobOrderablePushedFlag:
 		return true
 	}
 	return false

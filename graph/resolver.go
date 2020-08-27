@@ -663,6 +663,8 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 // Note: @Debug: Only one BlobPushed will be processed
 // Note: @Debug: remove added tension on error.
 func tensionHook(uctx model.UserCtx, tid string, events []*model.EventRef, qtype string) (bool, error) {
+    var ok bool = true
+    var err error
     for _, event := range(events) {
         if (*event.EventType == model.TensionEventBlobPushed) {
             // Get Hook receiverid,  last blob and Receiver Charac
@@ -686,9 +688,9 @@ func tensionHook(uctx model.UserCtx, tid string, events []*model.EventRef, qtype
                         return false, tools.LogErr("@tensionhook/tension", "Access denied", err)
                     } else if ok {
                         err = pushOrgaNode(uctx, tid, node, emitterid, parentid, charac, isPrivate)
-                        return true, err
-                    } else {
-                        return false, nil
+                        if err != nil {
+                            return ok, err
+                        }
                     }
                 } else if qtype == "update" {
                     //Todo
@@ -698,10 +700,15 @@ func tensionHook(uctx model.UserCtx, tid string, events []*model.EventRef, qtype
             } else {
                 // OnDoc
             }
+            // Update blob pushed flag
+            err = db.GetDB().SetPushedBlob(blob.ID, "")
+            if err != nil {
+                return ok, err
+            }
             break
         }
     }
-    return true, nil
+    return ok, err
 }
 
 //

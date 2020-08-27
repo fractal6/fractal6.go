@@ -133,15 +133,16 @@ type ComplexityRoot struct {
 	}
 
 	Blob struct {
-		BlobType  func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int, filter *model.UserFilter) int
-		ID        func(childComplexity int) int
-		Md        func(childComplexity int) int
-		Message   func(childComplexity int) int
-		Node      func(childComplexity int, filter *model.NodeFragmentFilter) int
-		Tension   func(childComplexity int, filter *model.TensionFilter) int
-		UpdatedAt func(childComplexity int) int
+		BlobType   func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		CreatedBy  func(childComplexity int, filter *model.UserFilter) int
+		ID         func(childComplexity int) int
+		Md         func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Node       func(childComplexity int, filter *model.NodeFragmentFilter) int
+		PushedFlag func(childComplexity int) int
+		Tension    func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt  func(childComplexity int) int
 	}
 
 	Comment struct {
@@ -826,6 +827,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Blob.Node(childComplexity, args["filter"].(*model.NodeFragmentFilter)), true
+
+	case "Blob.pushedFlag":
+		if e.complexity.Blob.PushedFlag == nil {
+			break
+		}
+
+		return e.complexity.Blob.PushedFlag(childComplexity), true
 
 	case "Blob.tension":
 		if e.complexity.Blob.Tension == nil {
@@ -3004,6 +3012,7 @@ type Blob {
   blob_type: BlobType! @search
   node(filter: NodeFragmentFilter): NodeFragment
   md: String
+  pushedFlag: String
   id: ID!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -3127,23 +3136,23 @@ enum BlobType {
   OnDoc
 }
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3154,6 +3163,7 @@ input AddBlobInput {
   blob_type: BlobType!
   node: NodeFragmentRef
   md: String
+  pushedFlag: String
 }
 
 type AddBlobPayload {
@@ -3371,6 +3381,7 @@ enum BlobOrderable {
   updatedAt
   message
   md
+  pushedFlag
 }
 
 input BlobPatch {
@@ -3382,6 +3393,7 @@ input BlobPatch {
   blob_type: BlobType @patch_RO
   node: NodeFragmentRef @patch_RO
   md: String @patch_RO
+  pushedFlag: String @patch_RO
 }
 
 input BlobRef {
@@ -3394,6 +3406,7 @@ input BlobRef {
   blob_type: BlobType
   node: NodeFragmentRef
   md: String
+  pushedFlag: String
 }
 
 input BlobType_hash {
@@ -8266,6 +8279,34 @@ func (ec *executionContext) _Blob_md(ctx context.Context, field graphql.Collecte
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Md, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Blob",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PushedFlag, nil
 	})
 
 	if resTmp == nil {
@@ -17389,6 +17430,12 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "pushedFlag":
+			var err error
+			it.PushedFlag, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -18769,6 +18816,27 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
+		case "pushedFlag":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.PushedFlag = data
+			} else if tmp == nil {
+				it.PushedFlag = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		}
 	}
 
@@ -18832,6 +18900,12 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		case "md":
 			var err error
 			it.Md, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pushedFlag":
+			var err error
+			it.PushedFlag, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23338,6 +23412,8 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Blob_node(ctx, field, obj)
 		case "md":
 			out.Values[i] = ec._Blob_md(ctx, field, obj)
+		case "pushedFlag":
+			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Blob_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

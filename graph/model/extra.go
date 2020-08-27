@@ -38,6 +38,7 @@ var TensionHookPayload string = `{
     }
   }
   Tension.blobs (orderdesc: Post.createdAt, first: 1) {
+    uid
     Blob.blob_type
     Blob.md
     Blob.node {

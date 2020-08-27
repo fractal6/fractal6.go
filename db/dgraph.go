@@ -815,54 +815,6 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
     return &obj, nil
 }
 
-//// Returns the node hook content
-//func (dg Dgraph) GetNodeHook(fieldid string, objid string) (*model.Node, error) {
-//    // Format Query
-//    maps := map[string]string{
-//        "fieldid":fieldid,
-//        "objid":objid,
-//        "payload": model.NodeHookPayload,
-//    }
-//    // Send request
-//    res, err := dg.QueryGpm("getNode", maps)
-//    if err != nil {
-//        return  nil, err
-//    }
-//
-//    // Decode response
-//    var r GpmResp
-//	err = json.Unmarshal(res.Json, &r)
-//	if err != nil {
-//        return nil, err
-//	}
-//
-//    var obj model.Node
-//    if len(r.All) > 1 {
-//        return nil, fmt.Errorf("Got multiple node charac for @id: %s, %s", fieldid, objid)
-//    } else if len(r.All) == 1 {
-//        config := &mapstructure.DecoderConfig{
-//            Result: &obj,
-//            TagName: "json",
-//            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-//                if to == reflect.Struct {
-//                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
-//                    return nv, nil
-//                }
-//                return v, nil
-//            },
-//        }
-//        decoder, err := mapstructure.NewDecoder(config)
-//        if err != nil {
-//            return nil, err
-//        }
-//        err = decoder.Decode(r.All[0])
-//        if err != nil {
-//            return nil, err
-//        }
-//    }
-//    return &obj, nil
-//}
-
 // Returns the tension hook content
 func (dg Dgraph) GetTensionHook(uid string) (*model.Tension, error) {
     // Format Query
@@ -1004,7 +956,6 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 
 // UpdateRoleType update the role of a node given the nameid using upsert block.
 func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
-
 	query := fmt.Sprintf(`query {
 		node as var(func: eq(Node.nameid, "%s"))
 	}`, nameid)
@@ -1022,9 +973,30 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
     if err != nil {
         return err
     }
-
     return nil
 }
+
+// UpdateRoleType update the role of a node given the nameid using upsert block.
+func (dg Dgraph) SetPushedBlob(uid string, flag string) error {
+	query := fmt.Sprintf(`query {
+		obj as var(func: uid(%s))
+	}`, uid)
+
+    mu := fmt.Sprintf(`
+        uid(obj) <Blob.pushedFlag> "%s" .
+    `, flag)
+
+	mutation := &api.Mutation{
+		SetNquads: []byte(mu),
+	}
+	
+    err := dg.MutateWithQueryGpm(query, mutation)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
 
 //
 // Graphql requests
