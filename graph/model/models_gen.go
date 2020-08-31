@@ -168,7 +168,6 @@ type AddTensionInput struct {
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
-	Head       *BlobRef       `json:"head,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 }
 
@@ -820,7 +819,6 @@ type Tension struct {
 	Comments   []*Comment     `json:"comments,omitempty"`
 	Blobs      []*Blob        `json:"blobs,omitempty"`
 	History    []*Event       `json:"history,omitempty"`
-	Head       *Blob          `json:"head,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
@@ -872,7 +870,6 @@ type TensionPatch struct {
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
-	Head       *BlobRef       `json:"head,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 }
 
@@ -895,7 +892,6 @@ type TensionRef struct {
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
-	Head       *BlobRef       `json:"head,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 }
 

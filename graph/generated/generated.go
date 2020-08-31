@@ -371,7 +371,6 @@ type ComplexityRoot struct {
 		CreatedBy  func(childComplexity int, filter *model.UserFilter) int
 		Emitter    func(childComplexity int, filter *model.NodeFilter) int
 		Emitterid  func(childComplexity int) int
-		Head       func(childComplexity int, filter *model.BlobFilter) int
 		History    func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		ID         func(childComplexity int) int
 		Labels     func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
@@ -2362,18 +2361,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Emitterid(childComplexity), true
 
-	case "Tension.head":
-		if e.complexity.Tension.Head == nil {
-			break
-		}
-
-		args, err := ec.field_Tension_head_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Tension.Head(childComplexity, args["filter"].(*model.BlobFilter)), true
-
 	case "Tension.history":
 		if e.complexity.Tension.History == nil {
 			break
@@ -2984,7 +2971,6 @@ type Tension {
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
-  head(filter: BlobFilter): Blob
   n_comments: Int @count(f: comments)
   id: ID!
   createdAt: DateTime! @search
@@ -3136,23 +3122,23 @@ enum BlobType {
   OnDoc
 }
 
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
 directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3314,7 +3300,6 @@ input AddTensionInput {
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   history: [EventRef!]!
-  head: BlobRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
 
@@ -4058,7 +4043,6 @@ input TensionPatch {
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   history: [EventRef!]
-  head: BlobRef @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   n_comments: Int
 }
 
@@ -4081,7 +4065,6 @@ input TensionRef {
   comments: [CommentRef!]
   blobs: [BlobRef!]
   history: [EventRef!]
-  head: BlobRef
   n_comments: Int
 }
 
@@ -6705,20 +6688,6 @@ func (ec *executionContext) field_Tension_emitter_args(ctx context.Context, rawA
 	var arg0 *model.NodeFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Tension_head_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.BlobFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		arg0, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -14786,41 +14755,6 @@ func (ec *executionContext) _Tension_history(ctx context.Context, field graphql.
 	return ec.marshalNEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_head(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Tension",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Tension_head_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Head, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Blob)
-	fc.Result = res
-	return ec.marshalOBlob2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18355,41 +18289,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			it.History, err = ec.unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
-			}
-		case "head":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOBlobRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*model.BlobRef); ok {
-				it.Head = data
-			} else if tmp == nil {
-				it.Head = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.BlobRef`, tmp)
 			}
 		case "n_comments":
 			var err error
@@ -22047,41 +21946,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "head":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOBlobRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
-				if err != nil {
-					return nil, err
-				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
-				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*model.BlobRef); ok {
-				it.Head = data
-			} else if tmp == nil {
-				it.Head = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.BlobRef`, tmp)
-			}
 		case "n_comments":
 			var err error
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
@@ -22205,12 +22069,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "history":
 			var err error
 			it.History, err = ec.unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "head":
-			var err error
-			it.Head, err = ec.unmarshalOBlobRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24608,8 +24466,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "head":
-			out.Values[i] = ec._Tension_head(ctx, field, obj)
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
 		case "id":
@@ -26872,10 +26728,6 @@ func (ec *executionContext) unmarshalOBlobPatch2ᚖzerogovᚋfractal6ᚗgoᚋgra
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalOBlobRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx context.Context, v interface{}) (model.BlobRef, error) {
-	return ec.unmarshalInputBlobRef(ctx, v)
-}
-
 func (ec *executionContext) unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx context.Context, v interface{}) ([]*model.BlobRef, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -26894,14 +26746,6 @@ func (ec *executionContext) unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalOBlobRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx context.Context, v interface{}) (*model.BlobRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOBlobRef2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalOBlobType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, v interface{}) (model.BlobType, error) {
