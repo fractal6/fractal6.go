@@ -12,14 +12,14 @@ import (
 )
 
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput) (data *model.AddNodePayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	//errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
@@ -64,14 +64,12 @@ func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilt
 }
 
 func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (data *model.AddTensionPayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
 func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
@@ -81,9 +79,6 @@ func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.Tensi
 
 func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
-	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	//errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
-	//return data, errors
 }
 
 func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
@@ -99,8 +94,7 @@ func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCom
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
-	ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: UpdateMut, argName: "input"})
-	errors = r.Gqlgen2DgraphMutationResolver(ctx, &data, input)
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
 
