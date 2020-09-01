@@ -119,7 +119,7 @@ func pushOrgaNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emit
         case model.NodeTypeCircle:
           for _, child := range(children) {
             // Add the child tension
-            tensionInput := makeNewCoordoTension(uctx, emitterid, parentid, child)
+            tensionInput := makeNewCoordoTension(uctx, emitterid, nameid, child)
             tid_c, err := db.GetDB().AddTension(tensionInput)
             if err != nil {
               return err
