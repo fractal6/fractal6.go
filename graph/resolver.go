@@ -189,7 +189,7 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
     // Reflect to get obj data info
     // DEBUG: use type switch instead ? (less modular but faster?)
     id := reflect.ValueOf(obj).Elem().FieldByName("ID").String()
-	if id == "" {
+    if id == "" {
         err := fmt.Errorf("`id' field is needed to query `%s'", fieldName)
         return nil, err
     }
@@ -208,7 +208,7 @@ func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (
     // Reflect to get obj data info
     // DEBUG: use type switch instead ? (less modular but faster?)
     nameid := reflect.ValueOf(obj).Elem().FieldByName("Nameid").String()
-	if nameid == "" {
+    if nameid == "" {
         err := fmt.Errorf("`nameid' field is needed to query `%s'", fieldName)
         return nil, err
     }
@@ -407,7 +407,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
             return next(ctx) 
         }
     }
-    
+
     // Check that user has the given role on the asked node
     for _, nodeField := range nodeFields {
         ok, err = checkUserRole(ctx, uctx, nodeField, obj, role)
@@ -421,7 +421,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
 
     // Format output to get to be able to format a links in a frontend.
     // @DEBUG: get rootnameid from nameid
-    e := fmt.Errorf("join this organisation or contact a coordinator to access this ressource")
+    e := fmt.Errorf("contact a coordinator to access this ressource")
     return nil, tools.LogErr("@hasRole", "Access denied", e)
 }
 
@@ -446,7 +446,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     }
 
     // Format output to get to be able to format a links in a frontend.
-    e := fmt.Errorf("join this organisation or contact a coordinator to access this ressource")
+    e := fmt.Errorf("contact a coordinator to access this ressource")
     return nil, tools.LogErr("@hasRoot", "Access denied", e)
 }
 

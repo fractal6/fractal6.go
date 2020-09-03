@@ -73,7 +73,7 @@ func pushOrgaNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emit
     now := time.Now().Format(time.RFC3339)
     rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil {
-      return err
+        return err
     }
 
     var nodeInput model.AddNodeInput
@@ -95,39 +95,39 @@ func pushOrgaNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emit
 
     var children []model.NodeFragment
     switch *node.Type {
-        case model.NodeTypeRole:
-            nodeInput.FirstLink = &model.UserRef{Username: &uctx.Username}
-        case model.NodeTypeCircle:
-          for i, c := range(node.Children) {
+    case model.NodeTypeRole:
+        nodeInput.FirstLink = &model.UserRef{Username: &uctx.Username}
+    case model.NodeTypeCircle:
+        for i, c := range(node.Children) {
             child := makeNewCoordo(i, *c.FirstLink, charac)
             children = append(children, child)
-          }
+        }
     }
 
 
     // Push the nodes to the Database
     err = db.GetDB().AddNode(nodeInput)
     if err != nil {
-      return err
+        return err
     }
 
     // Change Guest to member if user got its first role.
     // add tension and child for existing children.
     switch *node.Type {
-        case model.NodeTypeRole:
-            err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
-        case model.NodeTypeCircle:
-          for _, child := range(children) {
+    case model.NodeTypeRole:
+        err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
+    case model.NodeTypeCircle:
+        for _, child := range(children) {
             // Add the child tension
             tensionInput := makeNewCoordoTension(uctx, emitterid, nameid, child)
             tid_c, err := db.GetDB().AddTension(tensionInput)
             if err != nil {
-              return err
+                return err
             }
             // Push child
             err = pushOrgaNode(uctx, tid_c, &child, emitterid, nameid, charac, isPrivate)
-          }
-      }
+        }
+    }
 
     return err
 }
@@ -140,13 +140,13 @@ func makeNewCoordo(i int, username string, charac *model.NodeCharac) model.NodeF
     fs := username 
     mandate := model.Mandate{Purpose: en.CoordoPurpose}
     child := model.NodeFragment{
-      Name: &name,
-      Nameid: &nameid,
-      Type: &type_,
-      RoleType: &roleType,
-      FirstLink: &fs,
-      Mandate: &mandate,
-      Charac: charac,
+        Name: &name,
+        Nameid: &nameid,
+        Type: &type_,
+        RoleType: &roleType,
+        FirstLink: &fs,
+        Mandate: &mandate,
+        Charac: charac,
     }
     return child
 }
@@ -171,26 +171,26 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
         PushedFlag: nil,
     }
     tension := model.AddTensionInput{
-      CreatedAt: now,
-      CreatedBy : &createdBy,
-      Title: "[New Role] Coordinator",
-      Type: model.TensionTypeGovernance,
-      Status: model.TensionStatusClosed,
-      Emitter: &emitter,
-      Receiver: &receiver,
-      Emitterid: emitterid,
-      Receiverid: receiverid,
-      Action: &action,
-      History : []*model.EventRef{
-        &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
-        &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
-        &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
-      },
-      Blobs: []*model.BlobRef{&blob},
-      Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil }},
+        CreatedAt: now,
+        CreatedBy : &createdBy,
+        Title: "[Role] Coordinator",
+        Type: model.TensionTypeGovernance,
+        Status: model.TensionStatusClosed,
+        Emitter: &emitter,
+        Receiver: &receiver,
+        Emitterid: emitterid,
+        Receiverid: receiverid,
+        Action: &action,
+        History : []*model.EventRef{
+            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
+            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
+            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
+        },
+        Blobs: []*model.BlobRef{&blob},
+        Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil }},
     }
     return tension
-  }
+}
 
 // maybeUpdateGuest2Peer check if Guest should be upgrade to Member role type
 func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, username string) error {
@@ -234,34 +234,34 @@ func encodeNodeMap(m map[string]interface{}, prefix string) map[string]interface
         case map[string]interface{}:
             var p string
             if k == "parent" || k == "receiver" || k == "emitter" {
-              p = "Node"
+                p = "Node"
             } else if k == "charac" {
-              p = "NodeCharac"
+                p = "NodeCharac"
             } else if k == "mandate" {
-              p = "Mandate"
+                p = "Mandate"
             } else if k == "createdBy" || k == "first_link" || k == "second_link" {
-              p = "User"
+                p = "User"
             }
             nv = encodeNodeMap(t, p)
         case []map[string]interface{}:
-          var nv_ []map[string]interface{}
-          var p string
-          for _, s := range(v.([]map[string]interface{})) {
-            if k == "docs" {
-              p = "Tension"
-            } else if k == "labels" {
-              p = "Label"
-            } else if k == "comments" {
-              p = "Comment"
-            } else if k == "blobs" {
-              p = "Blob"
-            } else if k == "history" {
-              p = "Event"
+            var nv_ []map[string]interface{}
+            var p string
+            for _, s := range(v.([]map[string]interface{})) {
+                if k == "docs" {
+                    p = "Tension"
+                } else if k == "labels" {
+                    p = "Label"
+                } else if k == "comments" {
+                    p = "Comment"
+                } else if k == "blobs" {
+                    p = "Blob"
+                } else if k == "history" {
+                    p = "Event"
+                }
+                ns := encodeNodeMap(s, p)
+                nv_ = append(nv_, ns)
             }
-            ns := encodeNodeMap(s, p)
-            nv_ = append(nv_, ns)
-          }
-          nv = nv_
+            nv = nv_
         default:
             nv = t
         }
@@ -280,11 +280,11 @@ func nodeIdCodec(parentid string, targetid string,  nodeType model.NodeType) (st
     var nameid string
     rootnameid, err := nid2rootid(parentid)
     if nodeType == model.NodeTypeRole {
-      if rootnameid == parentid {
-          nameid = strings.Join([]string{rootnameid, "", targetid}, "#")
-      } else {
-          nameid = strings.Join([]string{parentid, targetid}, "#")
-      }
+        if rootnameid == parentid {
+            nameid = strings.Join([]string{rootnameid, "", targetid}, "#")
+        } else {
+            nameid = strings.Join([]string{parentid, targetid}, "#")
+        }
     } else if nodeType == model.NodeTypeCircle {
         nameid = strings.Join([]string{rootnameid, targetid}, "#")
     }
