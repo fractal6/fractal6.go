@@ -168,7 +168,7 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
         CreatedBy : &createdBy,
         BlobType: &blob_type,
         Node: &childref,
-        PushedFlag: nil,
+        PushedFlag: &now,
     }
     tension := model.AddTensionInput{
         CreatedAt: now,

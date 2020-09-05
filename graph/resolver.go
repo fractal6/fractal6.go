@@ -11,6 +11,7 @@ import (
     "reflect"
     "strings"
     "github.com/99designs/gqlgen/graphql"
+    "time"
 
     gen "zerogov/fractal6.go/graph/generated"
     "zerogov/fractal6.go/graph/model"
@@ -264,7 +265,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     // Get Input
     input_, err := next(ctx)
     if err != nil {
-        return nil, tools.LogErr("@addNodeHook", "internal error", err)
+        return nil, err
     }
     input := input_.([]*model.AddNodeInput)
 
@@ -316,7 +317,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     // Get Input
     input_, err := next(ctx)
     if err != nil {
-        return nil, tools.LogErr("@addTensionHook", "internal error", err)
+        return nil, err
     }
     input := input_.([]*model.AddTensionInput)
 
@@ -661,7 +662,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 // * Copy value in target Node.source if event == BlobPushed
 // | if User is authorized: make a gpm(or gql?) request that push the change into the node
 // Note: @Debug: Only one BlobPushed will be processed
-// Note: @Debug: remove added tension on error.
+// Note: @Debug: remove added tension on error ?
 func tensionHook(uctx model.UserCtx, tid string, events []*model.EventRef, qtype string) (bool, error) {
     var ok bool = true
     var err error
@@ -701,7 +702,7 @@ func tensionHook(uctx model.UserCtx, tid string, events []*model.EventRef, qtype
                 // OnDoc
             }
             // Update blob pushed flag
-            err = db.GetDB().SetPushedBlob(blob.ID, "")
+            err = db.GetDB().SetPushedFlagBlob(blob.ID, time.Now().Format(time.RFC3339))
             if err != nil {
                 return ok, err
             }

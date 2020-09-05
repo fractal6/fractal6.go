@@ -977,7 +977,7 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
 }
 
 // UpdateRoleType update the role of a node given the nameid using upsert block.
-func (dg Dgraph) SetPushedBlob(uid string, flag string) error {
+func (dg Dgraph) SetPushedFlagBlob(uid string, flag string) error {
 	query := fmt.Sprintf(`query {
 		obj as var(func: uid(%s))
 	}`, uid)

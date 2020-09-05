@@ -2998,7 +2998,7 @@ type Blob {
   blob_type: BlobType! @search
   node(filter: NodeFragmentFilter): NodeFragment
   md: String
-  pushedFlag: String
+  pushedFlag: DateTime
   id: ID!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -3126,19 +3126,19 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @remote on OBJECT|INTERFACE
+
+directive @cascade on FIELD
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
-
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
-
-directive @cascade on FIELD
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3149,7 +3149,7 @@ input AddBlobInput {
   blob_type: BlobType!
   node: NodeFragmentRef
   md: String
-  pushedFlag: String
+  pushedFlag: DateTime
 }
 
 type AddBlobPayload {
@@ -3378,7 +3378,7 @@ input BlobPatch {
   blob_type: BlobType @patch_RO
   node: NodeFragmentRef @patch_RO
   md: String @patch_RO
-  pushedFlag: String @patch_RO
+  pushedFlag: DateTime @patch_RO
 }
 
 input BlobRef {
@@ -3391,7 +3391,7 @@ input BlobRef {
   blob_type: BlobType
   node: NodeFragmentRef
   md: String
-  pushedFlag: String
+  pushedFlag: DateTime
 }
 
 input BlobType_hash {
@@ -8283,7 +8283,7 @@ func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Blob_id(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
@@ -17366,7 +17366,7 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 			}
 		case "pushedFlag":
 			var err error
-			it.PushedFlag, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18717,7 +18717,7 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 			}
 		case "pushedFlag":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.Patch_RO == nil {
 					return nil, errors.New("directive patch_RO is not implemented")
@@ -18804,7 +18804,7 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 			}
 		case "pushedFlag":
 			var err error
-			it.PushedFlag, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
