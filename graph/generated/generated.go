@@ -40,35 +40,40 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Add_isOwner         func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
-	Alter_assertType    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
-	Alter_hasRole       func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
-	Alter_hasRoot       func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
-	Alter_maxLength     func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
-	Alter_toLower       func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
-	Auth                func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
-	Cascade             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Count               func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
-	Custom              func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP) (res interface{}, err error)
-	Dgraph              func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
-	HasInverse          func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
-	Hidden              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	HidePrivate         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addNode        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTension     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_postAddTension func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateComment  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateNode     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTension  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	IsAuth              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Meta_getNodeStats   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_RO            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_hasRole       func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
-	Patch_isOwner       func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
-	Remote              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Search              func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
-	Secret              func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
+	Add_isOwner            func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
+	Alter_RO               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Alter_assertType       func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
+	Alter_hasRole          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Alter_hasRoot          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
+	Alter_maxLength        func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
+	Alter_toLower          func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
+	Auth                   func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
+	Cascade                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Count                  func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
+	Custom                 func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP) (res interface{}, err error)
+	Dgraph                 func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
+	HasInverse             func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
+	Hidden                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	HidePrivate            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addNode           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addNodePost       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTension        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTensionPost    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateComment     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateCommentPost func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateNode        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateNodePost    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTension     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTensionPost func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id                     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	IsAuth                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Meta_getNodeStats      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_RO               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_hasRole          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Patch_isOwner          func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
+	Remote                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Search                 func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
+	Secret                 func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -375,6 +380,7 @@ type ComplexityRoot struct {
 		ID         func(childComplexity int) int
 		Labels     func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		Message    func(childComplexity int) int
+		NBlobs     func(childComplexity int) int
 		NComments  func(childComplexity int) int
 		Nth        func(childComplexity int) int
 		Receiver   func(childComplexity int, filter *model.NodeFilter) int
@@ -2399,6 +2405,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Message(childComplexity), true
 
+	case "Tension.n_blobs":
+		if e.complexity.Tension.NBlobs == nil {
+			break
+		}
+
+		return e.complexity.Tension.NBlobs(childComplexity), true
+
 	case "Tension.n_comments":
 		if e.complexity.Tension.NComments == nil {
 			break
@@ -2859,15 +2872,23 @@ directive @meta_getNodeStats on FIELD_DEFINITION
 
 directive @hook_addNode on ARGUMENT_DEFINITION
 
+directive @hook_addNodePost on FIELD_DEFINITION
+
 directive @hook_updateNode on ARGUMENT_DEFINITION
+
+directive @hook_updateNodePost on FIELD_DEFINITION
 
 directive @hook_addTension on ARGUMENT_DEFINITION
 
-directive @hook_postAddTension on FIELD_DEFINITION
+directive @hook_addTensionPost on FIELD_DEFINITION
 
 directive @hook_updateTension on ARGUMENT_DEFINITION
 
+directive @hook_updateTensionPost on FIELD_DEFINITION
+
 directive @hook_updateComment on ARGUMENT_DEFINITION
+
+directive @hook_updateCommentPost on FIELD_DEFINITION
 
 directive @alter_toLower(f: String!) on INPUT_FIELD_DEFINITION
 
@@ -2879,17 +2900,19 @@ directive @hidePrivate on OBJECT|FIELD_DEFINITION
 
 directive @isAuth on OBJECT|FIELD_DEFINITION
 
-directive @alter_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
-
 directive @patch_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
+
+directive @alter_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
 
 directive @alter_hasRoot(n: [String!]!) on INPUT_FIELD_DEFINITION
 
-directive @patch_isOwner(u: String) on INPUT_FIELD_DEFINITION
-
 directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
 
+directive @patch_isOwner(u: String) on INPUT_FIELD_DEFINITION
+
 directive @patch_RO on INPUT_FIELD_DEFINITION
+
+directive @alter_RO on INPUT_FIELD_DEFINITION
 
 type Node @hidePrivate {
   id: ID!
@@ -2972,6 +2995,7 @@ type Tension {
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
   n_comments: Int @count(f: comments)
+  n_blobs: Int @count(f: blobs)
   id: ID!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -2996,9 +3020,9 @@ type Comment {
 type Blob {
   tension(filter: TensionFilter): Tension!
   blob_type: BlobType! @search
+  pushedFlag: DateTime @search
   node(filter: NodeFragmentFilter): NodeFragment
   md: String
-  pushedFlag: DateTime
   id: ID!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -3086,11 +3110,11 @@ enum TensionAction {
 
   NewRole
   NewCircle
-
+  NewMd
 
   EditRole
   EditCircle
-
+  EditMd
 
 
 
@@ -3115,16 +3139,22 @@ enum TensionEvent {
 }
 
 enum BlobType {
-  InitBlob
+  OnNode
   OnAbout
   OnMandate
   OnFirstLink
   OnDoc
 }
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
@@ -3132,13 +3162,7 @@ directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3147,9 +3171,9 @@ input AddBlobInput {
   message: String
   tension: TensionRef!
   blob_type: BlobType!
+  pushedFlag: DateTime @alter_RO
   node: NodeFragmentRef
   md: String
-  pushedFlag: DateTime
 }
 
 type AddBlobPayload {
@@ -3301,6 +3325,7 @@ input AddTensionInput {
   blobs: [BlobRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   history: [EventRef!]!
   n_comments: Int
+  n_blobs: Int
 }
 
 type AddTensionPayload {
@@ -3350,6 +3375,7 @@ input BlobFilter {
   createdAt: DateTimeFilter
   message: StringFullTextFilter
   blob_type: BlobType_hash
+  pushedFlag: DateTimeFilter
   and: BlobFilter
   or: BlobFilter
   not: BlobFilter
@@ -3365,8 +3391,8 @@ enum BlobOrderable {
   createdAt
   updatedAt
   message
-  md
   pushedFlag
+  md
 }
 
 input BlobPatch {
@@ -3376,9 +3402,9 @@ input BlobPatch {
   message: String
   tension: TensionRef
   blob_type: BlobType @patch_RO
+  pushedFlag: DateTime @alter_RO
   node: NodeFragmentRef @patch_RO
   md: String @patch_RO
-  pushedFlag: DateTime @patch_RO
 }
 
 input BlobRef {
@@ -3389,9 +3415,9 @@ input BlobRef {
   message: String
   tension: TensionRef
   blob_type: BlobType
+  pushedFlag: DateTime
   node: NodeFragmentRef
   md: String
-  pushedFlag: DateTime
 }
 
 input BlobType_hash {
@@ -3669,8 +3695,8 @@ enum Mode {
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload
-  updateNode(input: UpdateNodeInput! @hook_updateNode): UpdateNodePayload
+  addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload @hook_addNodePost
+  updateNode(input: UpdateNodeInput! @hook_updateNode): UpdateNodePayload @hook_updateNodePost
   deleteNode(filter: NodeFilter!): DeleteNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   updateNodeFragment(input: UpdateNodeFragmentInput!): UpdateNodeFragmentPayload
@@ -3681,14 +3707,14 @@ type Mutation {
   addNodeStats(input: [AddNodeStatsInput!]!): AddNodeStatsPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
-  addTension(input: [AddTensionInput!]! @hook_addTension): AddTensionPayload @hook_postAddTension
-  updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload
+  addTension(input: [AddTensionInput!]! @hook_addTension): AddTensionPayload @hook_addTensionPost
+  updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload @hook_updateTensionPost
   deleteTension(filter: TensionFilter!): DeleteTensionPayload
   addLabel(input: [AddLabelInput!]!): AddLabelPayload
   updateLabel(input: UpdateLabelInput!): UpdateLabelPayload
   deleteLabel(filter: LabelFilter!): DeleteLabelPayload
   addComment(input: [AddCommentInput!]!): AddCommentPayload
-  updateComment(input: UpdateCommentInput! @hook_updateComment): UpdateCommentPayload
+  updateComment(input: UpdateCommentInput! @hook_updateComment): UpdateCommentPayload @hook_updateCommentPost
   deleteComment(filter: CommentFilter!): DeleteCommentPayload
   addBlob(input: [AddBlobInput!]!): AddBlobPayload
   updateBlob(input: UpdateBlobInput!): UpdateBlobPayload
@@ -4023,6 +4049,7 @@ enum TensionOrderable {
   emitterid
   receiverid
   n_comments
+  n_blobs
 }
 
 input TensionPatch {
@@ -4044,6 +4071,7 @@ input TensionPatch {
   blobs: [BlobRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   history: [EventRef!]
   n_comments: Int
+  n_blobs: Int
 }
 
 input TensionRef {
@@ -4066,6 +4094,7 @@ input TensionRef {
   blobs: [BlobRef!]
   history: [EventRef!]
   n_comments: Int
+  n_blobs: Int
 }
 
 input TensionStatus_hash {
@@ -8195,6 +8224,54 @@ func (ec *executionContext) _Blob_blob_type(ctx context.Context, field graphql.C
 	return ec.marshalNBlobType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Blob",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.PushedFlag, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Blob_node(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8256,34 +8333,6 @@ func (ec *executionContext) _Blob_md(ctx context.Context, field graphql.Collecte
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Blob",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PushedFlag, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Blob_id(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
@@ -9915,8 +9964,28 @@ func (ec *executionContext) _Mutation_addNode(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddNode(rctx, args["input"].([]*model.AddNodeInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddNode(rctx, args["input"].([]*model.AddNodeInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addNodePost == nil {
+				return nil, errors.New("directive hook_addNodePost is not implemented")
+			}
+			return ec.directives.Hook_addNodePost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddNodePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddNodePayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -9950,8 +10019,28 @@ func (ec *executionContext) _Mutation_updateNode(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateNode(rctx, args["input"].(model.UpdateNodeInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateNode(rctx, args["input"].(model.UpdateNodeInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateNodePost == nil {
+				return nil, errors.New("directive hook_updateNodePost is not implemented")
+			}
+			return ec.directives.Hook_updateNodePost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateNodePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateNodePayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -10340,10 +10429,10 @@ func (ec *executionContext) _Mutation_addTension(ctx context.Context, field grap
 			return ec.resolvers.Mutation().AddTension(rctx, args["input"].([]*model.AddTensionInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_postAddTension == nil {
-				return nil, errors.New("directive hook_postAddTension is not implemented")
+			if ec.directives.Hook_addTensionPost == nil {
+				return nil, errors.New("directive hook_addTensionPost is not implemented")
 			}
-			return ec.directives.Hook_postAddTension(ctx, nil, directive0)
+			return ec.directives.Hook_addTensionPost(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -10390,8 +10479,28 @@ func (ec *executionContext) _Mutation_updateTension(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateTension(rctx, args["input"].(model.UpdateTensionInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateTension(rctx, args["input"].(model.UpdateTensionInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateTensionPost == nil {
+				return nil, errors.New("directive hook_updateTensionPost is not implemented")
+			}
+			return ec.directives.Hook_updateTensionPost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateTensionPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateTensionPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -10600,8 +10709,28 @@ func (ec *executionContext) _Mutation_updateComment(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateComment(rctx, args["input"].(model.UpdateCommentInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateComment(rctx, args["input"].(model.UpdateCommentInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateCommentPost == nil {
+				return nil, errors.New("directive hook_updateCommentPost is not implemented")
+			}
+			return ec.directives.Hook_updateCommentPost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateCommentPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateCommentPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -14807,6 +14936,58 @@ func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graph
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Tension_n_blobs(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.NBlobs, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "blobs")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Count == nil {
+				return nil, errors.New("directive count is not implemented")
+			}
+			return ec.directives.Count(ctx, obj, directive0, f)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*int); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Tension_id(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -17352,6 +17533,27 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "pushedFlag":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.PushedFlag = data
+			} else if tmp == nil {
+				it.PushedFlag = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "node":
 			var err error
 			it.Node, err = ec.unmarshalONodeFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
@@ -17361,12 +17563,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 		case "md":
 			var err error
 			it.Md, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pushedFlag":
-			var err error
-			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18296,6 +18492,12 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "n_blobs":
+			var err error
+			it.NBlobs, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -18558,6 +18760,12 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "pushedFlag":
+			var err error
+			it.PushedFlag, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "and":
 			var err error
 			it.And, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
@@ -18671,6 +18879,27 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.BlobType`, tmp)
 			}
+		case "pushedFlag":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.PushedFlag = data
+			} else if tmp == nil {
+				it.PushedFlag = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "node":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -18712,27 +18941,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				it.Md = data
 			} else if tmp == nil {
 				it.Md = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
-		case "pushedFlag":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*string); ok {
-				it.PushedFlag = data
-			} else if tmp == nil {
-				it.PushedFlag = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
@@ -18790,6 +18998,12 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "pushedFlag":
+			var err error
+			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "node":
 			var err error
 			it.Node, err = ec.unmarshalONodeFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
@@ -18799,12 +19013,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		case "md":
 			var err error
 			it.Md, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pushedFlag":
-			var err error
-			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21952,6 +22160,12 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "n_blobs":
+			var err error
+			it.NBlobs, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -22075,6 +22289,12 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "n_comments":
 			var err error
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_blobs":
+			var err error
+			it.NBlobs, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23266,12 +23486,12 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "pushedFlag":
+			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
 		case "node":
 			out.Values[i] = ec._Blob_node(ctx, field, obj)
 		case "md":
 			out.Values[i] = ec._Blob_md(ctx, field, obj)
-		case "pushedFlag":
-			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Blob_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24468,6 +24688,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
+		case "n_blobs":
+			out.Values[i] = ec._Tension_n_blobs(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Tension_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

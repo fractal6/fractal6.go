@@ -3,7 +3,6 @@ package graph
 import (
     "fmt"
     "time"
-    "strings"
     "strconv"
     //"github.com/mitchellh/mapstructure"
 
@@ -11,10 +10,54 @@ import (
     "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/text/en"
-    "zerogov/fractal6.go/tools"
+    . "zerogov/fractal6.go/tools"
 )
 
-func canAddOrgaNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, charac *model.NodeCharac) (bool, error) {
+// tryAddNode add a new node is user has the correct right
+// * it inherits node charac
+func tryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+    tid := tension.ID
+    emitterid := tension.Emitter.Nameid
+    parentid := tension.Receiver.Nameid
+
+    charac := tension.Receiver.Charac
+    isPrivate := tension.Receiver.IsPrivate
+
+    // Inherits node properties
+    if node.Charac == nil {
+        node.Charac = charac
+    }
+    if node.IsPrivate == nil {
+        node.IsPrivate = &isPrivate
+    }
+
+    ok, err := canAddNode(uctx, node, parentid, charac)
+    if err != nil || !ok {
+        return ok, err
+    }
+
+    err = pushNode(uctx, tid, node, emitterid, parentid)
+    return ok, err
+}
+
+func tryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+    tid := tension.ID
+    emitterid := tension.Emitter.Nameid
+    parentid := tension.Receiver.Nameid
+
+    charac := tension.Receiver.Charac
+
+    ok, err := canAddNode(uctx, node, parentid, charac)
+    if err != nil || !ok {
+        return ok, err
+    }
+
+    err = updateNode(uctx, tid, node, emitterid, parentid)
+    return ok, err
+}
+
+// canAddNode check that a user can add a given role or circle in an organisation.
+func canAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, charac *model.NodeCharac) (bool, error) {
     var ok bool = false
     var err error
 
@@ -30,9 +73,8 @@ func canAddOrgaNode(uctx model.UserCtx, node *model.NodeFragment, parentid strin
     }
 
     //
-    //
     // New Role hook
-    // 
+    //
     if nodeType == model.NodeTypeRole {
         if roleType == nil {
             err = fmt.Errorf("role should have a RoleType")
@@ -44,13 +86,12 @@ func canAddOrgaNode(uctx model.UserCtx, node *model.NodeFragment, parentid strin
         } else if charac.Mode == model.NodeModeCoordinated {
             ok = userIsCoordo(uctx, parentid)
         }
-
         return ok, err
     }
 
     //
     // New sub-circle hook
-    // 
+    //
     if nodeType == model.NodeTypeCircle {
         // Add node Policies
         if charac.Mode == model.NodeModeChaos {
@@ -58,58 +99,49 @@ func canAddOrgaNode(uctx model.UserCtx, node *model.NodeFragment, parentid strin
         } else if charac.Mode == model.NodeModeCoordinated {
             ok = userIsCoordo(uctx, parentid)
         }
-
         return ok, err
     }
 
     return false, fmt.Errorf("unknown node type")
 }
 
-// pushOrgaNode add a new role or circle in an graph.
+// pushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
-func pushOrgaNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string, charac *model.NodeCharac, isPrivate bool) (error) {
+func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
     // Get References
-    now := time.Now().Format(time.RFC3339)
     rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil {
         return err
     }
 
+    // Map NodeFragment to Node Input
     var nodeInput model.AddNodeInput
-    tools.StructMap(node, &nodeInput)
-    var characRef model.NodeCharacRef
-    tools.StructMap(charac, &characRef)
+    StructMap(node, &nodeInput)
 
-    // Set Automatic fields
+    // Fix Automatic fields
     nodeInput.IsRoot = false
-    nodeInput.IsPrivate = isPrivate
-    nodeInput.Charac = &characRef
     nodeInput.Nameid = nameid
     nodeInput.Rootnameid = rootnameid
-    nodeInput.CreatedAt = now
+    nodeInput.CreatedAt = time.Now().Format(time.RFC3339)
     nodeInput.CreatedBy = &model.UserRef{Username: &uctx.Username}
     nodeInput.Parent = &model.NodeRef{Nameid: &parentid}
     nodeInput.Source = &model.TensionRef{ID: &tid}
-    nodeInput.Children = nil
-
     var children []model.NodeFragment
     switch *node.Type {
     case model.NodeTypeRole:
         nodeInput.FirstLink = &model.UserRef{Username: &uctx.Username}
     case model.NodeTypeCircle:
+        nodeInput.Children = nil
         for i, c := range(node.Children) {
-            child := makeNewCoordo(i, *c.FirstLink, charac)
+            child := makeNewCoordo(i, *c.FirstLink, node.Charac, node.IsPrivate)
             children = append(children, child)
         }
     }
 
-
-    // Push the nodes to the Database
+    // Push the nodes into the database
     err = db.GetDB().AddNode(nodeInput)
-    if err != nil {
-        return err
-    }
+    if err != nil { return err }
 
     // Change Guest to member if user got its first role.
     // add tension and child for existing children.
@@ -121,23 +153,52 @@ func pushOrgaNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emit
             // Add the child tension
             tensionInput := makeNewCoordoTension(uctx, emitterid, nameid, child)
             tid_c, err := db.GetDB().AddTension(tensionInput)
-            if err != nil {
-                return err
-            }
+            if err != nil { return err }
             // Push child
-            err = pushOrgaNode(uctx, tid_c, &child, emitterid, nameid, charac, isPrivate)
+            err = pushNode(uctx, tid_c, &child, emitterid, nameid)
         }
     }
 
     return err
 }
 
-func makeNewCoordo(i int, username string, charac *model.NodeCharac) model.NodeFragment {
+
+// updateNode update a node from the given fragment
+// @DEBUG: only set the field that have been modified in NodePatch
+func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return err }
+
+    // Map NodeFragment to Node Patch Input
+    var nodePatch model.NodePatch
+    StructMap(node, &nodePatch)
+
+    // Fix automatic fields
+    switch *node.Type {
+    case model.NodeTypeRole:
+        nodePatch.FirstLink = &model.UserRef{Username: &uctx.Username}
+    case model.NodeTypeCircle:
+        nodePatch.Children = nil
+    }
+
+    // Build input
+    nodeInput := model.UpdateNodeInput{
+        Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
+        Set: &nodePatch,
+    }
+
+    // Update the node in database
+    err = db.GetDB().UpdateNode(nodeInput)
+    return err
+}
+
+func makeNewCoordo(i int, username string, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
     name := "Coordinator"
     nameid := "coordo" + strconv.Itoa(i)
     type_ := model.NodeTypeRole
     roleType := model.RoleTypeCoordinator
-    fs := username 
+    fs := username
     mandate := model.Mandate{Purpose: en.CoordoPurpose}
     child := model.NodeFragment{
         Name: &name,
@@ -147,6 +208,7 @@ func makeNewCoordo(i int, username string, charac *model.NodeCharac) model.NodeF
         FirstLink: &fs,
         Mandate: &mandate,
         Charac: charac,
+        IsPrivate: isPrivate,
     }
     return child
 }
@@ -160,9 +222,9 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
     evt1 := model.TensionEventCreated
     evt2 := model.TensionEventBlobCreated
     evt3 := model.TensionEventBlobPushed
-    blob_type := model.BlobTypeInitBlob
+    blob_type := model.BlobTypeOnNode
     var childref model.NodeFragmentRef
-    tools.StructMap(child, &childref)
+    StructMap(child, &childref)
     blob := model.BlobRef{
         CreatedAt: &now,
         CreatedBy : &createdBy,
@@ -199,9 +261,7 @@ func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, username strin
     DB := db.GetDB()
     if username != uctx.Username {
         uctxFs, err = DB.GetUser("username", username)
-        if err != nil {
-            return err
-        }
+        if err != nil { return err }
     } else {
         uctxFs = &uctx
     }
@@ -210,9 +270,7 @@ func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, username strin
     if i >= 0 {
         // Update RoleType to Member
         err := DB.UpgradeGuest(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
-        if err != nil {
-            return err
-        }
+        if err != nil { return err }
     }
 
     return nil
@@ -269,60 +327,4 @@ func encodeNodeMap(m map[string]interface{}, prefix string) map[string]interface
     }
 
     return out
-
-}
-
-//
-// User Codecs
-//
-
-func nodeIdCodec(parentid string, targetid string,  nodeType model.NodeType) (string, string, error) {
-    var nameid string
-    rootnameid, err := nid2rootid(parentid)
-    if nodeType == model.NodeTypeRole {
-        if rootnameid == parentid {
-            nameid = strings.Join([]string{rootnameid, "", targetid}, "#")
-        } else {
-            nameid = strings.Join([]string{parentid, targetid}, "#")
-        }
-    } else if nodeType == model.NodeTypeCircle {
-        nameid = strings.Join([]string{rootnameid, targetid}, "#")
-    }
-    return rootnameid, nameid, err
-}
-
-// Get the parent nameid from the given nameid
-func nid2pid(nid string) (string, error) {
-    var pid string
-    parts := strings.Split(nid, "#")
-    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
-    }
-
-    if len(parts) == 1 || parts[1] == "" {
-        pid = parts[0]
-    } else {
-        pid = strings.Join(parts[:len(parts)-1],  "#")
-    }
-    return pid, nil
-}
-
-// Get the rootnameid from the given nameid
-func nid2rootid(nid string) (string, error) {
-    var pid string
-    parts := strings.Split(nid, "#")
-    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
-    }
-
-    return parts[0], nil
-}
-
-func isCircle(nid string) (bool) {
-    parts := strings.Split(nid, "#")
-    return len(parts) == 1 || len(parts) == 2
-}
-func isRole(nid string) (bool) {
-    parts := strings.Split(nid, "#")
-    return len(parts) == 3
 }

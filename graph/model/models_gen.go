@@ -15,9 +15,9 @@ type AddBlobInput struct {
 	Message    *string          `json:"message,omitempty"`
 	Tension    *TensionRef      `json:"tension,omitempty"`
 	BlobType   BlobType         `json:"blob_type,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
 	Node       *NodeFragmentRef `json:"node,omitempty"`
 	Md         *string          `json:"md,omitempty"`
-	PushedFlag *string          `json:"pushedFlag,omitempty"`
 }
 
 type AddBlobPayload struct {
@@ -169,6 +169,7 @@ type AddTensionInput struct {
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
+	NBlobs     *int           `json:"n_blobs,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -216,9 +217,9 @@ type AuthRule struct {
 type Blob struct {
 	Tension    *Tension      `json:"tension,omitempty"`
 	BlobType   BlobType      `json:"blob_type,omitempty"`
+	PushedFlag *string       `json:"pushedFlag,omitempty"`
 	Node       *NodeFragment `json:"node,omitempty"`
 	Md         *string       `json:"md,omitempty"`
-	PushedFlag *string       `json:"pushedFlag,omitempty"`
 	ID         string        `json:"id,omitempty"`
 	CreatedAt  string        `json:"createdAt,omitempty"`
 	UpdatedAt  *string       `json:"updatedAt,omitempty"`
@@ -227,13 +228,14 @@ type Blob struct {
 }
 
 type BlobFilter struct {
-	ID        []string              `json:"id,omitempty"`
-	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
-	Message   *StringFullTextFilter `json:"message,omitempty"`
-	BlobType  *BlobTypeHash         `json:"blob_type,omitempty"`
-	And       *BlobFilter           `json:"and,omitempty"`
-	Or        *BlobFilter           `json:"or,omitempty"`
-	Not       *BlobFilter           `json:"not,omitempty"`
+	ID         []string              `json:"id,omitempty"`
+	CreatedAt  *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message    *StringFullTextFilter `json:"message,omitempty"`
+	BlobType   *BlobTypeHash         `json:"blob_type,omitempty"`
+	PushedFlag *DateTimeFilter       `json:"pushedFlag,omitempty"`
+	And        *BlobFilter           `json:"and,omitempty"`
+	Or         *BlobFilter           `json:"or,omitempty"`
+	Not        *BlobFilter           `json:"not,omitempty"`
 }
 
 type BlobOrder struct {
@@ -249,9 +251,9 @@ type BlobPatch struct {
 	Message    *string          `json:"message,omitempty"`
 	Tension    *TensionRef      `json:"tension,omitempty"`
 	BlobType   *BlobType        `json:"blob_type,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
 	Node       *NodeFragmentRef `json:"node,omitempty"`
 	Md         *string          `json:"md,omitempty"`
-	PushedFlag *string          `json:"pushedFlag,omitempty"`
 }
 
 type BlobRef struct {
@@ -262,9 +264,9 @@ type BlobRef struct {
 	Message    *string          `json:"message,omitempty"`
 	Tension    *TensionRef      `json:"tension,omitempty"`
 	BlobType   *BlobType        `json:"blob_type,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
 	Node       *NodeFragmentRef `json:"node,omitempty"`
 	Md         *string          `json:"md,omitempty"`
-	PushedFlag *string          `json:"pushedFlag,omitempty"`
 }
 
 type BlobTypeHash struct {
@@ -820,6 +822,7 @@ type Tension struct {
 	Blobs      []*Blob        `json:"blobs,omitempty"`
 	History    []*Event       `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
+	NBlobs     *int           `json:"n_blobs,omitempty"`
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
@@ -871,6 +874,7 @@ type TensionPatch struct {
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
+	NBlobs     *int           `json:"n_blobs,omitempty"`
 }
 
 type TensionRef struct {
@@ -893,6 +897,7 @@ type TensionRef struct {
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
+	NBlobs     *int           `json:"n_blobs,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -1101,21 +1106,21 @@ const (
 	BlobOrderableCreatedAt  BlobOrderable = "createdAt"
 	BlobOrderableUpdatedAt  BlobOrderable = "updatedAt"
 	BlobOrderableMessage    BlobOrderable = "message"
-	BlobOrderableMd         BlobOrderable = "md"
 	BlobOrderablePushedFlag BlobOrderable = "pushedFlag"
+	BlobOrderableMd         BlobOrderable = "md"
 )
 
 var AllBlobOrderable = []BlobOrderable{
 	BlobOrderableCreatedAt,
 	BlobOrderableUpdatedAt,
 	BlobOrderableMessage,
-	BlobOrderableMd,
 	BlobOrderablePushedFlag,
+	BlobOrderableMd,
 }
 
 func (e BlobOrderable) IsValid() bool {
 	switch e {
-	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderableMd, BlobOrderablePushedFlag:
+	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderablePushedFlag, BlobOrderableMd:
 		return true
 	}
 	return false
@@ -1145,7 +1150,7 @@ func (e BlobOrderable) MarshalGQL(w io.Writer) {
 type BlobType string
 
 const (
-	BlobTypeInitBlob    BlobType = "InitBlob"
+	BlobTypeOnNode      BlobType = "OnNode"
 	BlobTypeOnAbout     BlobType = "OnAbout"
 	BlobTypeOnMandate   BlobType = "OnMandate"
 	BlobTypeOnFirstLink BlobType = "OnFirstLink"
@@ -1153,7 +1158,7 @@ const (
 )
 
 var AllBlobType = []BlobType{
-	BlobTypeInitBlob,
+	BlobTypeOnNode,
 	BlobTypeOnAbout,
 	BlobTypeOnMandate,
 	BlobTypeOnFirstLink,
@@ -1162,7 +1167,7 @@ var AllBlobType = []BlobType{
 
 func (e BlobType) IsValid() bool {
 	switch e {
-	case BlobTypeInitBlob, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnFirstLink, BlobTypeOnDoc:
+	case BlobTypeOnNode, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnFirstLink, BlobTypeOnDoc:
 		return true
 	}
 	return false
@@ -1842,20 +1847,24 @@ type TensionAction string
 const (
 	TensionActionNewRole    TensionAction = "NewRole"
 	TensionActionNewCircle  TensionAction = "NewCircle"
+	TensionActionNewMd      TensionAction = "NewMd"
 	TensionActionEditRole   TensionAction = "EditRole"
 	TensionActionEditCircle TensionAction = "EditCircle"
+	TensionActionEditMd     TensionAction = "EditMd"
 )
 
 var AllTensionAction = []TensionAction{
 	TensionActionNewRole,
 	TensionActionNewCircle,
+	TensionActionNewMd,
 	TensionActionEditRole,
 	TensionActionEditCircle,
+	TensionActionEditMd,
 }
 
 func (e TensionAction) IsValid() bool {
 	switch e {
-	case TensionActionNewRole, TensionActionNewCircle, TensionActionEditRole, TensionActionEditCircle:
+	case TensionActionNewRole, TensionActionNewCircle, TensionActionNewMd, TensionActionEditRole, TensionActionEditCircle, TensionActionEditMd:
 		return true
 	}
 	return false
@@ -1946,6 +1955,7 @@ const (
 	TensionOrderableEmitterid  TensionOrderable = "emitterid"
 	TensionOrderableReceiverid TensionOrderable = "receiverid"
 	TensionOrderableNComments  TensionOrderable = "n_comments"
+	TensionOrderableNBlobs     TensionOrderable = "n_blobs"
 )
 
 var AllTensionOrderable = []TensionOrderable{
@@ -1957,11 +1967,12 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableEmitterid,
 	TensionOrderableReceiverid,
 	TensionOrderableNComments,
+	TensionOrderableNBlobs,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNComments:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNComments, TensionOrderableNBlobs:
 		return true
 	}
 	return false

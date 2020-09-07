@@ -1,6 +1,6 @@
 package model
 
-// JsonAtom is a general interface 
+// JsonAtom is a general interface
 // for decoding unknonw structure
 type JsonAtom = map[string]interface{}
 
@@ -26,6 +26,8 @@ type User_ struct {
 
 
 var TensionHookPayload string = `{
+  uid
+  Tension.action
   Tension.emitter {
     Node.nameid
   }
@@ -37,7 +39,7 @@ var TensionHookPayload string = `{
         NodeCharac.mode
     }
   }
-  Tension.blobs (orderdesc: Post.createdAt, first: 1) {
+  Tension.blobs %s {
     uid
     Blob.blob_type
     Blob.md

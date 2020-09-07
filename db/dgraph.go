@@ -5,19 +5,19 @@ import (
     "log"
     "bytes"
     "context"
-	"reflect"
+    "reflect"
     "net/http"
     "encoding/json"
     "text/template"
     "github.com/spf13/viper"
     "github.com/mitchellh/mapstructure"
-	//"github.com/vektah/gqlparser/v2/gqlerror"
+    //"github.com/vektah/gqlparser/v2/gqlerror"
     "github.com/dgraph-io/dgo/v200"
-	"github.com/dgraph-io/dgo/v200/protos/api"
-	"google.golang.org/grpc"
+    "github.com/dgraph-io/dgo/v200/protos/api"
+    "google.golang.org/grpc"
 
-	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/tools"
+    "zerogov/fractal6.go/graph/model"
+    "zerogov/fractal6.go/tools"
 )
 
 // Draph database clients
@@ -36,11 +36,11 @@ type Dgraph struct {
 //
 
 type GpmResp struct {
-	All []map[string]interface{} `json:"all"`
+    All []map[string]interface{} `json:"all"`
 }
 
 type GpmRespCount struct {
-	All []map[string]int `json:"all"`
+    All []map[string]int `json:"all"`
 }
 
 //
@@ -48,8 +48,8 @@ type GpmRespCount struct {
 //
 
 type GqlRes struct {
-	Data   model.JsonAtom `json:"data"`
-	Errors []model.JsonAtom `json:"errors"` // message, locations, path, extensions
+    Data   model.JsonAtom `json:"data"`
+    Errors []model.JsonAtom `json:"errors"` // message, locations, path, extensions
 }
 
 type GraphQLError struct {
@@ -122,36 +122,36 @@ func initDB() *Dgraph {
                 count({{.typeName}}.{{.fieldName}})
             }
         }`,
-		"getNodeStats": `{
-			var(func: eq(Node.nameid, "{{.nameid}}"))  {
-				Node.children @filter(eq(Node.role_type, "Guest")) {
-					guest as count(uid)
-				}
-			}
-			var(func: eq(Node.nameid, "{{.nameid}}"))  {
-				Node.children @filter(eq(Node.role_type, "Member")) {
-					member as count(uid)
-				}
-			}
+        "getNodeStats": `{
+            var(func: eq(Node.nameid, "{{.nameid}}"))  {
+                Node.children @filter(eq(Node.role_type, "Guest")) {
+                    guest as count(uid)
+                }
+            }
+            var(func: eq(Node.nameid, "{{.nameid}}"))  {
+                Node.children @filter(eq(Node.role_type, "Member")) {
+                    member as count(uid)
+                }
+            }
 
-			var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
-				c as Node.children
-			}
-			var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
-				circle as count(uid)
-			}
-			var(func: uid(c)) @filter(eq(Node.type_, "Role")) {
-				role as count(uid)
-			}
+            var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+                c as Node.children
+            }
+            var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
+                circle as count(uid)
+            }
+            var(func: uid(c)) @filter(eq(Node.type_, "Role")) {
+                role as count(uid)
+            }
 
-			all() {
-				n_member: sum(val(member))
-				n_guest: sum(val(guest))
-				n_role: sum(val(role))
-				n_circle: sum(val(circle))
-			}
-		}`,
-		// Query existance
+            all() {
+                n_member: sum(val(member))
+                n_guest: sum(val(guest))
+                n_role: sum(val(role))
+                n_circle: sum(val(circle))
+            }
+        }`,
+        // Query existance
         "exists": `{
             all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {
                 uid
@@ -179,26 +179,26 @@ func initDB() *Dgraph {
         }`,
         "getUser": `{
             all(func: eq(User.{{.fieldid}}, "{{.userid}}"))
-                {{.payload}}
+            {{.payload}}
         }`,
         "getNode": `{
             all(func: eq(Node.{{.fieldid}}, "{{.objid}}"))
-                {{.payload}}
+            {{.payload}}
         }`,
         "getTension": `{
             all(func: uid("{{.id}}"))
-                {{.payload}}
+            {{.payload}}
         }`,
-		// Get multiple objects
-		"getAllChildren": `{
-			var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-				o as Node.children
-			}
+        // Get multiple objects
+        "getAllChildren": `{
+            var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+                o as Node.children
+            }
 
-			all(func: uid(o)) {
-				Node.{{.fieldid}}
-			}
-		}`,
+            all(func: uid(o)) {
+                Node.{{.fieldid}}
+            }
+        }`,
         "getAllMembers": `{
             var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
                 o as Node.children
@@ -226,10 +226,10 @@ func initDB() *Dgraph {
     gqlQueries := map[string]string{
         // QUERIES
         "query": `{
-            "query": "query {{.Args}} {{.QueryName}} { 
+            "query": "query {{.Args}} {{.QueryName}} {
                 {{.QueryName}} {
                     {{.QueryGraph}}
-                } 
+                }
             }"
         }`,
         "rawQuery": `{
@@ -238,37 +238,37 @@ func initDB() *Dgraph {
 
         // MUTATIONS
         "add": `{
-            "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) { 
+            "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) {
                 {{.QueryName}}(input: $input) {
                     {{.QueryGraph}}
-                } 
+                }
             }",
             "variables": {
                 "input": {{.InputPayload}}
             }
         }`,
         "update": `{
-            "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
+            "query": "mutation {{.QueryName}}($input:{{.InputType}}!) {
                 {{.QueryName}}(input: $input) {
                     {{.QueryGraph}}
-                } 
+                }
             }",
             "variables": {
                 "input": {{.InputPayload}}
             }
         }`,
         "delete": `{
-            "query": "mutation {{.QueryName}}($input:{{.InputType}}!) { 
+            "query": "mutation {{.QueryName}}($input:{{.InputType}}!) {
                 {{.QueryName}}(filter: $input) {
                     {{.QueryGraph}}
-                } 
+                }
             }",
             "variables": {
                 "input": {{.InputPayload}}
             }
         }`,
     }
-    
+
     gpmT := map[string]*QueryString{}
     gqlT := map[string]*QueryString{}
 
@@ -280,7 +280,7 @@ func initDB() *Dgraph {
         gqlT[op] = &QueryString{Q:q}
         gqlT[op].Init()
     }
-    
+
     return &Dgraph{
         gqlUrl: dgraphApiUrl,
         grpcUrl: grpcUrl,
@@ -295,33 +295,33 @@ func initDB() *Dgraph {
 
 // Get the grpc Dgraph client.
 func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
-	conn, err := grpc.Dial(dg.grpcUrl, grpc.WithInsecure())
-	if err != nil {
-		log.Fatal("While trying to dial gRPC")
-	}
+    conn, err := grpc.Dial(dg.grpcUrl, grpc.WithInsecure())
+    if err != nil {
+        log.Fatal("While trying to dial gRPC")
+    }
 
-	dgClient = dgo.NewDgraphClient(api.NewDgraphClient(conn))
-	//ctx := context.Background()
+    dgClient = dgo.NewDgraphClient(api.NewDgraphClient(conn))
+    //ctx := context.Background()
 
-	//// Perform login call. If the Dgraph cluster does not have ACL and
-	//// enterprise features enabled, this call should be skipped.
-	//for {
-	//	// Keep retrying until we succeed or receive a non-retriable error.
-	//	err = dgClient.Login(ctx, "groot", "password")
-	//	if err == nil || !strings.Contains(err.Error(), "Please retry") {
-	//		break
-	//	}
-	//	time.Sleep(time.Second)
-	//}
-	//if err != nil {
-	//	log.Fatalf("While trying to login %v", err.Error())
-	//}
+    //// Perform login call. If the Dgraph cluster does not have ACL and
+    //// enterprise features enabled, this call should be skipped.
+    //for {
+    //	// Keep retrying until we succeed or receive a non-retriable error.
+    //	err = dgClient.Login(ctx, "groot", "password")
+    //	if err == nil || !strings.Contains(err.Error(), "Please retry") {
+    //		break
+    //	}
+    //	time.Sleep(time.Second)
+    //}
+    //if err != nil {
+    //	log.Fatalf("While trying to login %v", err.Error())
+    //}
 
-	cancelFunc =  func() {
-		if err := conn.Close(); err != nil {
-			log.Printf("Error while closing connection:%v", err)
-		}
-	}
+    cancelFunc =  func() {
+        if err := conn.Close(); err != nil {
+            log.Printf("Error while closing connection:%v", err)
+        }
+    }
     return
 }
 
@@ -350,7 +350,7 @@ func (dg Dgraph) post(data []byte, res interface{}) error {
 // Returns: data res
 func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, error) {
     // init client
-	dgc, cancel := dg.getDgraphClient()
+    dgc, cancel := dg.getDgraphClient()
     defer cancel()
     ctx := context.Background()
     txn := dgc.NewTxn()
@@ -360,80 +360,80 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     q := dg.gpmTemplates[op].Format(maps)
     // Send Request
     //fmt.Println(string(q))
-	res, err := txn.Query(ctx, q)
+    res, err := txn.Query(ctx, q)
     //fmt.Println(res)
-	if err != nil {
+    if err != nil {
         return nil, err
-	}
+    }
     return res, nil
 }
 
-//MutateWithQueryGpm runs an upsert block mutation by first querying query 
+//MutateWithQueryGpm runs an upsert block mutation by first querying query
 //and then mutate based on the result.
 func (dg Dgraph) MutateWithQueryGpm(query string, mu *api.Mutation) (error) {
     // init client
-	dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-	txn := dgc.NewTxn()
-	defer txn.Discard(ctx)
-
-	req := &api.Request{
-		Query: query,
-		Mutations: []*api.Mutation{mu},
-		CommitNow: true,
-	}
-
-	if _, err := txn.Do(ctx, req); err != nil {
-		return err
-	}
-	return nil
-}
-
-//MutateGpm push a new object in the database with upsert operation
-func (dg Dgraph) MutateUpsertGpm(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
-    // init client
-	dgc, cancel := dg.getDgraphClient()
+    dgc, cancel := dg.getDgraphClient()
     defer cancel()
     ctx := context.Background()
     txn := dgc.NewTxn()
     defer txn.Discard(ctx)
 
-	// make the template here.
+    req := &api.Request{
+        Query: query,
+        Mutations: []*api.Mutation{mu},
+        CommitNow: true,
+    }
+
+    if _, err := txn.Do(ctx, req); err != nil {
+        return err
+    }
+    return nil
+}
+
+//MutateGpm push a new object in the database with upsert operation
+func (dg Dgraph) MutateUpsertGpm(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
+    // init client
+    dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+    // make the template here.
     template := template.Must(template.New("graphql").Parse(`{
-			all(func: eq({{.dtype}}.{{.upsertField}}, "{{.upserVal}}")) {
-				v as uid
-			}
-		}`))
+        all(func: eq({{.dtype}}.{{.upsertField}}, "{{.upserVal}}")) {
+            v as uid
+        }
+    }`))
     buf := bytes.Buffer{}
     template.Execute(&buf, map[string]string{"dtype":dtype, "upsertField":upsertField, "upsertVal":upsertVal})
     query := buf.String()
 
     object["dgraph.type"] = []string{dtype}
-	object["uid"] = "uid(v)"
-	obj, err := json.Marshal(object)
-	if err != nil {
+    object["uid"] = "uid(v)"
+    obj, err := json.Marshal(object)
+    if err != nil {
         return err
     }
     mu := &api.Mutation{SetJson: obj}
 
-	req := &api.Request{
+    req := &api.Request{
         Query: query,
-		Mutations: []*api.Mutation{mu},
-		CommitNow: true,
-	}
-	// User do instead of Mutate here ?
+        Mutations: []*api.Mutation{mu},
+        CommitNow: true,
+    }
+    // User do instead of Mutate here ?
     _, err = txn.Do(ctx, req)
     if err != nil {
         return err
-	}
+    }
     return nil
 }
 
 //MutateGpm push a new object in the database.
 func (dg Dgraph) MutateGpm(object map[string]interface{}, dtype string) (string, error) {
     // init client
-	dgc, cancel := dg.getDgraphClient()
+    dgc, cancel := dg.getDgraphClient()
     defer cancel()
     ctx := context.Background()
     txn := dgc.NewTxn()
@@ -445,22 +445,21 @@ func (dg Dgraph) MutateGpm(object map[string]interface{}, dtype string) (string,
         uid = "_:new_obj"
         object["uid"] = uid
     }
-	obj, err := json.Marshal(object)
-    fmt.Println(obj)
-	if err != nil {
+    obj, err := json.Marshal(object)
+    if err != nil {
         return "", err
     }
 
-	mu := &api.Mutation{
-		CommitNow: true,
-		SetJson:   obj,
-	}
+    mu := &api.Mutation{
+        CommitNow: true,
+        SetJson:   obj,
+    }
     r, err := txn.Mutate(ctx, mu)
     if err != nil {
         return "", err
-	}
+    }
 
-	uid = r.Uids[uid.(string)]
+    uid = r.Uids[uid.(string)]
     return uid.(string), nil
 }
 
@@ -511,7 +510,7 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
     } else {
         config = &mapstructure.DecoderConfig{TagName: "json", Result: data}
     }
-    
+
     decoder, err := mapstructure.NewDecoder(config)
     if err != nil {
         return err
@@ -533,30 +532,30 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
 func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
     // Format Query
     maps := map[string]string{
-       "id":id, "typeName": typeName, "fieldName":fieldName, 
+        "id":id, "typeName": typeName, "fieldName":fieldName,
     }
     // Send request
     res, err := dg.QueryGpm("count", maps)
-	if err != nil {
+    if err != nil {
         panic(err)
-	}
+    }
 
     // Decode response
-	var r GpmRespCount
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		panic(err)
-	}
+    var r GpmRespCount
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
+        panic(err)
+    }
 
     // Extract result
     if len(r.All) == 0 {
         return -1
     }
 
-	values := make([]int, 0, len(r.All[0]))
-	for _, v := range r.All[0] {
-		values = append(values, v)
-	}
+    values := make([]int, 0, len(r.All[0]))
+    for _, v := range r.All[0] {
+        values = append(values, v)
+    }
 
     return values[0]
 }
@@ -564,26 +563,26 @@ func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
 func (dg Dgraph) GetNodeStats(nameid string) map[string]int {
     // Format Query
     maps := map[string]string{
-        "nameid": nameid, 
+        "nameid": nameid,
     }
     // Send request
     res, err := dg.QueryGpm("getNodeStats", maps)
-	if err != nil {
+    if err != nil {
         panic(err)
-	}
+    }
 
     // Decode response
-	var r GpmRespCount
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		panic(err)
-	}
+    var r GpmRespCount
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
+        panic(err)
+    }
 
     // Extract result
     if len(r.All) == 0 {
         panic("no stats for: "+ nameid)
     }
-	stats := make(map[string]int, len(r.All))
+    stats := make(map[string]int, len(r.All))
     for _, s := range r.All {
         for k, v := range s {
             stats[k] = v
@@ -607,10 +606,10 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return false, err
-	}
+    }
     return len(r.All) > 0, nil
 }
 
@@ -631,10 +630,10 @@ func (dg Dgraph) GetFieldByEq(typeName string, fieldid string, objid string, fie
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query: %s %s", fieldName, objid)
@@ -664,10 +663,10 @@ func (dg Dgraph) GetSubFieldById(id string, typeNameSource string, fieldNameSour
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query")
@@ -682,7 +681,7 @@ func (dg Dgraph) GetSubFieldById(id string, typeNameSource string, fieldNameSour
     return nil, err
 }
 
-// Returns a subfield from Eq 
+// Returns a subfield from Eq
 func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, typeNameSource string, fieldNameSource string, typeNameTarget string, fieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
@@ -701,10 +700,10 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, typeNameSource st
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query")
@@ -735,10 +734,10 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     var user model.UserCtx
     if len(r.All) > 1 {
@@ -783,10 +782,10 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     var obj model.NodeCharac
     if len(r.All) > 1 {
@@ -816,11 +815,17 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
 }
 
 // Returns the tension hook content
-func (dg Dgraph) GetTensionHook(uid string) (*model.Tension, error) {
+func (dg Dgraph) GetTensionHook(tid string, blobid *string) (*model.Tension, error) {
     // Format Query
+    var blobFilter string
+    if blobid == nil {
+        blobFilter = "(orderdesc: Post.createdAt, first: 1)"
+    } else {
+        blobFilter = fmt.Sprintf(`@filter(uid(%s))`, *blobid)
+    }
     maps := map[string]string{
-        "id":uid,
-        "payload": model.TensionHookPayload,
+        "id": tid,
+        "payload": fmt.Sprintf(model.TensionHookPayload, blobFilter),
     }
     // Send request
     res, err := dg.QueryGpm("getTension", maps)
@@ -830,14 +835,14 @@ func (dg Dgraph) GetTensionHook(uid string) (*model.Tension, error) {
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     var obj model.Tension
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple tension for @uid: %s", uid)
+        return nil, fmt.Errorf("Got multiple tension for @uid: %s", tid)
     } else if len(r.All) == 1 {
         config := &mapstructure.DecoderConfig{
             Result: &obj,
@@ -877,32 +882,32 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     var data []model.NodeId
     //if len(r.All) > 1 {
-        config := &mapstructure.DecoderConfig{
-            Result: &data,
-            TagName: "json",
-            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-                if to == reflect.Struct {
-                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
-                    return nv, nil
-                }
-                return v, nil
-            },
-        }
-        decoder, err := mapstructure.NewDecoder(config)
-        if err != nil {
-            return nil, err
-        }
-        err = decoder.Decode(r.All)
-        if err != nil {
-            return nil, err
-        }
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil {
+        return nil, err
+    }
+    err = decoder.Decode(r.All)
+    if err != nil {
+        return nil, err
+    }
     //}
     return data, nil
 }
@@ -922,33 +927,31 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 
     // Decode response
     var r GpmResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
         return nil, err
-	}
+    }
 
     var data []model.MemberNode
-    //if len(r.All) > 1 {
-        config := &mapstructure.DecoderConfig{
-            Result: &data,
-            TagName: "json",
-            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-                if to == reflect.Struct {
-                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
-                    return nv, nil
-                }
-                return v, nil
-            },
-        }
-        decoder, err := mapstructure.NewDecoder(config)
-        if err != nil {
-            return nil, err
-        }
-        err = decoder.Decode(r.All)
-        if err != nil {
-            return nil, err
-        }
-    //}
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil {
+        return nil, err
+    }
+    err = decoder.Decode(r.All)
+    if err != nil {
+        return nil, err
+    }
     return data, nil
 }
 
@@ -956,19 +959,19 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 
 // UpdateRoleType update the role of a node given the nameid using upsert block.
 func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
-	query := fmt.Sprintf(`query {
-		node as var(func: eq(Node.nameid, "%s"))
-	}`, nameid)
+    query := fmt.Sprintf(`query {
+        node as var(func: eq(Node.nameid, "%s"))
+    }`, nameid)
 
     mu := fmt.Sprintf(`
-        uid(node) <Node.role_type> "%s" .
-        uid(node) <Node.name> "Member" .
+    uid(node) <Node.role_type> "%s" .
+    uid(node) <Node.name> "Member" .
     `, roleType)
 
-	mutation := &api.Mutation{
-		SetNquads: []byte(mu),
-	}
-	
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
     err := dg.MutateWithQueryGpm(query, mutation)
     if err != nil {
         return err
@@ -976,27 +979,27 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
     return nil
 }
 
-// UpdateRoleType update the role of a node given the nameid using upsert block.
-func (dg Dgraph) SetPushedFlagBlob(uid string, flag string) error {
-	query := fmt.Sprintf(`query {
-		obj as var(func: uid(%s))
-	}`, uid)
+// Set the blob pushedFlag and the tension action
+func (dg Dgraph) SetPushedFlagBlob(blobid string, flag string, tid string, action model.TensionAction) error {
+    query := fmt.Sprintf(`query {
+        obj as var(func: uid(%s))
+    }`, blobid)
 
     mu := fmt.Sprintf(`
-        uid(obj) <Blob.pushedFlag> "%s" .
-    `, flag)
+    uid(obj) <Blob.pushedFlag> "%s" .
+    <%s> <Tension.action> "%s" .
+    `, flag, tid, action)
 
-	mutation := &api.Mutation{
-		SetNquads: []byte(mu),
-	}
-	
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
     err := dg.MutateWithQueryGpm(query, mutation)
     if err != nil {
         return err
     }
     return nil
 }
-
 
 //
 // Graphql requests
@@ -1040,7 +1043,6 @@ func (dg Dgraph) AddUser(input model.AddUserInput) error {
     return nil
 }
 
-
 // AddNode add a new node
 func (dg Dgraph) AddNode(input model.AddNodeInput) error {
     queryName := "addNode"
@@ -1061,6 +1063,33 @@ func (dg Dgraph) AddNode(input model.AddNodeInput) error {
     // Send request
     payload := model.AddNodePayload{}
     err := dg.QueryGql("add", reqInput, &payload)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+// UpdateNode update a node node
+func (dg Dgraph) UpdateNode(input model.UpdateNodeInput) error {
+    queryName := "updateNode"
+    inputType := "UpdateNodeInput"
+    queryGraph := `node { id }`
+
+    // Just One Node
+    inputs, _ := json.Marshal(input)
+
+    // Build the string request
+    reqInput := map[string]string{
+        "QueryName": queryName, // function name (e.g addUser)
+        "InputType": inputType, // input type name (e.g AddUserInput)
+        "QueryGraph": tools.CleanString(queryGraph, true), // output data
+        "InputPayload": string(inputs), // inputs data
+    }
+
+    // Send request
+    payload := model.UpdateNodePayload{}
+    err := dg.QueryGql("update", reqInput, &payload)
     if err != nil {
         return err
     }
