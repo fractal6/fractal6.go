@@ -76,6 +76,7 @@ func canAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, c
     // New Role hook
     //
     if nodeType == model.NodeTypeRole {
+        // Validate input
         if roleType == nil {
             err = fmt.Errorf("role should have a RoleType")
         }

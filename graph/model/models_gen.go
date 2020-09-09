@@ -816,8 +816,8 @@ type Tension struct {
 	Receiver   *Node          `json:"receiver,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
 	Blobs      []*Blob        `json:"blobs,omitempty"`
 	History    []*Event       `json:"history,omitempty"`
@@ -1041,6 +1041,7 @@ type User struct {
 	Rights         *UserRights `json:"rights,omitempty"`
 	Roles          []*Node     `json:"roles,omitempty"`
 	BackedRoles    []*Node     `json:"backed_roles,omitempty"`
+	Tensions       []*Tension  `json:"tensions,omitempty"`
 	Bio            *string     `json:"bio,omitempty"`
 	Utc            *string     `json:"utc,omitempty"`
 }

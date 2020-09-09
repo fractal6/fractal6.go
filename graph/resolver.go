@@ -352,6 +352,12 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
 
     // Validate and process Blob Event
     ok, err := tensionBlobHook(uctx, tid, input.History, nil)
+    if err != nil  || !ok {
+        // Delete the tension just added
+        err = db.GetDB().DeleteGpm(tid)
+        if err != nil { panic(err) }
+    }
+
     if err != nil  { return nil, err }
     if ok { return data, err }
 
@@ -378,10 +384,14 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
 
     // Validate Blob Event
     if input.Set != nil && len(input.Set.Blobs) > 0 {
-        blobid := input.Set.Blobs[0].ID
-        ok, err := tensionBlobHook(uctx, tids[0], input.Set.History, blobid)
+        bid := input.Set.Blobs[0].ID
+        ok, err := tensionBlobHook(uctx, tids[0], input.Set.History, bid)
         if err != nil  { return nil, err }
-        if ok { return data, err }
+        if ok {
+            return data, err
+        } else {
+            return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource."))
+        }
     }
 
     return data, err
@@ -639,7 +649,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 
 // Take action base on the Event value:
 // * get tension node target NodeCharac and either
-//      * last blob is blobid is null
+//      * last blob if bid is null
 //      * given blob otherwiser
 // * if event == blobPushed
 //      * check user hasa the right authorization based on NodeCharac
@@ -647,13 +657,13 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 //      * copy the Blob data in the target Node.source (Uses GQL requests)
 // Note: @Debug: Only one BlobPushed will be processed
 // Note: @Debug: remove added tension on error ?
-func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, blobid *string) (bool, error) {
+func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, error) {
     var ok bool = true
     var err error
     for _, event := range(events) {
         if (*event.EventType == model.TensionEventBlobPushed) {
-            // Get Tension, target Node and blob charac (last if blobid undefined)
-            tension, err := db.GetDB().GetTensionHook(tid, blobid)
+            // Get Tension, target Node and blob charac (last if bid undefined)
+            tension, err := db.GetDB().GetTensionHook(tid, bid)
             if err != nil { return false, LogErr("Access denied", err) }
             if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found")) }
 
@@ -668,7 +678,6 @@ func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, b
             // switch on TensionCharac.DocType (not blob type !!!)
             // -> rule differ from doc type!
             // then swith on TensionCharac.ActionType to add update etc...
-            var ok bool
             var node *model.NodeFragment
             switch tensionCharac.ActionType {
             case NewAction:
@@ -701,6 +710,7 @@ func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, b
             break
         }
     }
+
     return ok, err
 }
 

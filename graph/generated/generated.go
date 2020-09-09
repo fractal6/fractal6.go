@@ -458,6 +458,7 @@ type ComplexityRoot struct {
 		Password       func(childComplexity int) int
 		Rights         func(childComplexity int) int
 		Roles          func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		Tensions       func(childComplexity int) int
 		Username       func(childComplexity int) int
 		Utc            func(childComplexity int) int
 	}
@@ -2769,6 +2770,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Roles(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "User.tensions":
+		if e.complexity.User.Tensions == nil {
+			break
+		}
+
+		return e.complexity.User.Tensions(childComplexity), true
+
 	case "User.username":
 		if e.complexity.User.Username == nil {
 			break
@@ -2989,8 +2997,8 @@ type Tension {
   receiver(filter: NodeFilter): Node!
   receiverid: String! @search(by: [hash, regexp])
   status: TensionStatus! @search
-  action: TensionAction
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  action: TensionAction
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
@@ -3061,6 +3069,7 @@ type User {
   rights: UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second_link)
+  tensions: [Tension] @hasInverse(field: createdBy)
   bio: String
   utc: String
 }
@@ -3121,6 +3130,8 @@ enum TensionAction {
 
 
 
+
+
 }
 
 enum TensionEvent {
@@ -3144,6 +3155,7 @@ enum BlobType {
   OnMandate
   OnFirstLink
   OnDoc
+
 }
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
@@ -3154,6 +3166,8 @@ directive @id on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
@@ -3161,8 +3175,6 @@ directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRu
 directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3322,7 +3334,7 @@ input AddTensionInput {
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
-  blobs: [BlobRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
   history: [EventRef!]!
   n_comments: Int
   n_blobs: Int
@@ -4068,7 +4080,7 @@ input TensionPatch {
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
-  blobs: [BlobRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
   history: [EventRef!]
   n_comments: Int
   n_blobs: Int
@@ -14689,34 +14701,6 @@ func (ec *executionContext) _Tension_status(ctx context.Context, field graphql.C
 	return ec.marshalNTensionStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_action(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Tension",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Action, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.TensionAction)
-	fc.Result = res
-	return ec.marshalOTensionAction2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -14750,6 +14734,34 @@ func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.C
 	res := resTmp.([]*model.Label)
 	fc.Result = res
 	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_action(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Tension",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Action, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAction)
+	fc.Result = res
+	return ec.marshalOTensionAction2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -16412,6 +16424,58 @@ func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphq
 	res := resTmp.([]*model.Node)
 	fc.Result = res
 	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_tensions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Tensions, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "createdBy")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_bio(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -18457,18 +18521,10 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
 				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22125,18 +22181,10 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				r, err := ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, "Coordinator")
-				if err != nil {
-					return nil, err
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
 				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRole == nil {
-					return nil, errors.New("directive alter_hasRole is not implemented")
-				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
 			}
 
 			tmp, err := directive1(ctx)
@@ -24673,10 +24721,10 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "action":
-			out.Values[i] = ec._Tension_action(ctx, field, obj)
 		case "labels":
 			out.Values[i] = ec._Tension_labels(ctx, field, obj)
+		case "action":
+			out.Values[i] = ec._Tension_action(ctx, field, obj)
 		case "comments":
 			out.Values[i] = ec._Tension_comments(ctx, field, obj)
 		case "blobs":
@@ -25060,6 +25108,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_roles(ctx, field, obj)
 		case "backed_roles":
 			out.Values[i] = ec._User_backed_roles(ctx, field, obj)
+		case "tensions":
+			out.Values[i] = ec._User_tensions(ctx, field, obj)
 		case "bio":
 			out.Values[i] = ec._User_bio(ctx, field, obj)
 		case "utc":
