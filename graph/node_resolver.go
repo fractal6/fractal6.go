@@ -219,7 +219,7 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
     createdBy := model.UserRef{Username: &uctx.Username}
     emitter := model.NodeRef{Nameid: &emitterid}
     receiver := model.NodeRef{Nameid: &receiverid}
-    action := model.TensionActionNewRole
+    action := model.TensionActionEditRole
     evt1 := model.TensionEventCreated
     evt2 := model.TensionEventBlobCreated
     evt3 := model.TensionEventBlobPushed
