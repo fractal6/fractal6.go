@@ -167,7 +167,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
             if err != nil {
                 return yes, LogErr("Access denied", err)
             }
-            rootnameid, err := nid2pid(nameid)
+            rootnameid, err := nid2rootid(nameid)
             for _, ur := range uctx.Roles {
                 if ur.Rootnameid == rootnameid  {
                     return false, err

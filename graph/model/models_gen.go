@@ -158,13 +158,14 @@ type AddTensionInput struct {
 	Nth        *string        `json:"nth,omitempty"`
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
 	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
+	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
+	Assignees  []*UserRef     `json:"assignees,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
@@ -178,18 +179,20 @@ type AddTensionPayload struct {
 }
 
 type AddUserInput struct {
-	CreatedAt      string         `json:"createdAt,omitempty"`
-	Username       string         `json:"username,omitempty"`
-	Name           *string        `json:"name,omitempty"`
-	Password       string         `json:"password,omitempty"`
-	Email          string         `json:"email,omitempty"`
-	EmailHash      *string        `json:"emailHash,omitempty"`
-	EmailValidated bool           `json:"emailValidated"`
-	Rights         *UserRightsRef `json:"rights,omitempty"`
-	Roles          []*NodeRef     `json:"roles,omitempty"`
-	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
-	Bio            *string        `json:"bio,omitempty"`
-	Utc            *string        `json:"utc,omitempty"`
+	CreatedAt        string         `json:"createdAt,omitempty"`
+	Username         string         `json:"username,omitempty"`
+	Name             *string        `json:"name,omitempty"`
+	Password         string         `json:"password,omitempty"`
+	Email            string         `json:"email,omitempty"`
+	EmailHash        *string        `json:"emailHash,omitempty"`
+	EmailValidated   bool           `json:"emailValidated"`
+	Rights           *UserRightsRef `json:"rights,omitempty"`
+	Roles            []*NodeRef     `json:"roles,omitempty"`
+	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
+	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
+	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
+	Bio              *string        `json:"bio,omitempty"`
+	Utc              *string        `json:"utc,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -808,15 +811,17 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
+	CreatedBy  *User          `json:"createdBy,omitempty"`
 	Nth        *string        `json:"nth,omitempty"`
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
-	Emitter    *Node          `json:"emitter,omitempty"`
 	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiver   *Node          `json:"receiver,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
+	Emitter    *Node          `json:"emitter,omitempty"`
+	Receiver   *Node          `json:"receiver,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
+	Assignees  []*User        `json:"assignees,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
 	Blobs      []*Blob        `json:"blobs,omitempty"`
@@ -826,7 +831,6 @@ type Tension struct {
 	ID         string         `json:"id,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	CreatedBy  *User          `json:"createdBy,omitempty"`
 	Message    *string        `json:"message,omitempty"`
 }
 
@@ -863,13 +867,14 @@ type TensionPatch struct {
 	Nth        *string        `json:"nth,omitempty"`
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
 	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Receiverid *string        `json:"receiverid,omitempty"`
+	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
+	Assignees  []*UserRef     `json:"assignees,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
@@ -886,13 +891,14 @@ type TensionRef struct {
 	Nth        *string        `json:"nth,omitempty"`
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
 	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Receiverid *string        `json:"receiverid,omitempty"`
+	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
+	Assignees  []*UserRef     `json:"assignees,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
@@ -1030,20 +1036,21 @@ type UpdateUserPayload struct {
 }
 
 type User struct {
-	ID             string      `json:"id,omitempty"`
-	CreatedAt      string      `json:"createdAt,omitempty"`
-	Username       string      `json:"username,omitempty"`
-	Name           *string     `json:"name,omitempty"`
-	Password       string      `json:"password,omitempty"`
-	Email          string      `json:"email,omitempty"`
-	EmailHash      *string     `json:"emailHash,omitempty"`
-	EmailValidated bool        `json:"emailValidated"`
-	Rights         *UserRights `json:"rights,omitempty"`
-	Roles          []*Node     `json:"roles,omitempty"`
-	BackedRoles    []*Node     `json:"backed_roles,omitempty"`
-	Tensions       []*Tension  `json:"tensions,omitempty"`
-	Bio            *string     `json:"bio,omitempty"`
-	Utc            *string     `json:"utc,omitempty"`
+	ID               string      `json:"id,omitempty"`
+	CreatedAt        string      `json:"createdAt,omitempty"`
+	Username         string      `json:"username,omitempty"`
+	Name             *string     `json:"name,omitempty"`
+	Password         string      `json:"password,omitempty"`
+	Email            string      `json:"email,omitempty"`
+	EmailHash        *string     `json:"emailHash,omitempty"`
+	EmailValidated   bool        `json:"emailValidated"`
+	Rights           *UserRights `json:"rights,omitempty"`
+	Roles            []*Node     `json:"roles,omitempty"`
+	BackedRoles      []*Node     `json:"backed_roles,omitempty"`
+	TensionsCreated  []*Tension  `json:"tensions_created,omitempty"`
+	TensionsAssigned []*Tension  `json:"tensions_assigned,omitempty"`
+	Bio              *string     `json:"bio,omitempty"`
+	Utc              *string     `json:"utc,omitempty"`
 }
 
 type UserFilter struct {
@@ -1062,33 +1069,37 @@ type UserOrder struct {
 }
 
 type UserPatch struct {
-	CreatedAt      *string        `json:"createdAt,omitempty"`
-	Name           *string        `json:"name,omitempty"`
-	Password       *string        `json:"password,omitempty"`
-	Email          *string        `json:"email,omitempty"`
-	EmailHash      *string        `json:"emailHash,omitempty"`
-	EmailValidated *bool          `json:"emailValidated"`
-	Rights         *UserRightsRef `json:"rights,omitempty"`
-	Roles          []*NodeRef     `json:"roles,omitempty"`
-	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
-	Bio            *string        `json:"bio,omitempty"`
-	Utc            *string        `json:"utc,omitempty"`
+	CreatedAt        *string        `json:"createdAt,omitempty"`
+	Name             *string        `json:"name,omitempty"`
+	Password         *string        `json:"password,omitempty"`
+	Email            *string        `json:"email,omitempty"`
+	EmailHash        *string        `json:"emailHash,omitempty"`
+	EmailValidated   *bool          `json:"emailValidated"`
+	Rights           *UserRightsRef `json:"rights,omitempty"`
+	Roles            []*NodeRef     `json:"roles,omitempty"`
+	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
+	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
+	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
+	Bio              *string        `json:"bio,omitempty"`
+	Utc              *string        `json:"utc,omitempty"`
 }
 
 type UserRef struct {
-	ID             *string        `json:"id,omitempty"`
-	CreatedAt      *string        `json:"createdAt,omitempty"`
-	Username       *string        `json:"username,omitempty"`
-	Name           *string        `json:"name,omitempty"`
-	Password       *string        `json:"password,omitempty"`
-	Email          *string        `json:"email,omitempty"`
-	EmailHash      *string        `json:"emailHash,omitempty"`
-	EmailValidated *bool          `json:"emailValidated"`
-	Rights         *UserRightsRef `json:"rights,omitempty"`
-	Roles          []*NodeRef     `json:"roles,omitempty"`
-	BackedRoles    []*NodeRef     `json:"backed_roles,omitempty"`
-	Bio            *string        `json:"bio,omitempty"`
-	Utc            *string        `json:"utc,omitempty"`
+	ID               *string        `json:"id,omitempty"`
+	CreatedAt        *string        `json:"createdAt,omitempty"`
+	Username         *string        `json:"username,omitempty"`
+	Name             *string        `json:"name,omitempty"`
+	Password         *string        `json:"password,omitempty"`
+	Email            *string        `json:"email,omitempty"`
+	EmailHash        *string        `json:"emailHash,omitempty"`
+	EmailValidated   *bool          `json:"emailValidated"`
+	Rights           *UserRightsRef `json:"rights,omitempty"`
+	Roles            []*NodeRef     `json:"roles,omitempty"`
+	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
+	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
+	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
+	Bio              *string        `json:"bio,omitempty"`
+	Utc              *string        `json:"utc,omitempty"`
 }
 
 type UserRights struct {

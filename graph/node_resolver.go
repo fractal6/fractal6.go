@@ -131,7 +131,10 @@ func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     var children []model.NodeFragment
     switch *node.Type {
     case model.NodeTypeRole:
-        nodeInput.FirstLink = &model.UserRef{Username: &uctx.Username}
+        fmt.Println(*node.FirstLink)
+        if node.FirstLink != nil {
+            nodeInput.FirstLink = &model.UserRef{Username: node.FirstLink}
+        }
     case model.NodeTypeCircle:
         nodeInput.Children = nil
         for i, c := range(node.Children) {
@@ -148,7 +151,9 @@ func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     // add tension and child for existing children.
     switch *node.Type {
     case model.NodeTypeRole:
-        err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
+        if node.FirstLink != nil {
+            err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
+        }
     case model.NodeTypeCircle:
         for _, child := range(children) {
             // Add the child tension
