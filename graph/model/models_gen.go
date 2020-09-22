@@ -159,8 +159,8 @@ type AddTensionInput struct {
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
 	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Receiverid string         `json:"receiverid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
@@ -816,8 +816,8 @@ type Tension struct {
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
 	Emitterid  string         `json:"emitterid,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
 	Emitter    *Node          `json:"emitter,omitempty"`
+	Receiverid string         `json:"receiverid,omitempty"`
 	Receiver   *Node          `json:"receiver,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
@@ -868,8 +868,8 @@ type TensionPatch struct {
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
 	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Receiverid *string        `json:"receiverid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
@@ -892,8 +892,8 @@ type TensionRef struct {
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
 	Emitterid  *string        `json:"emitterid,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
+	Receiverid *string        `json:"receiverid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
@@ -1906,14 +1906,16 @@ func (e TensionAction) MarshalGQL(w io.Writer) {
 type TensionEvent string
 
 const (
-	TensionEventCreated       TensionEvent = "Created"
-	TensionEventReopened      TensionEvent = "Reopened"
-	TensionEventClosed        TensionEvent = "Closed"
-	TensionEventTitleUpdated  TensionEvent = "TitleUpdated"
-	TensionEventCommentPushed TensionEvent = "CommentPushed"
-	TensionEventBlobCreated   TensionEvent = "BlobCreated"
-	TensionEventBlobCommitted TensionEvent = "BlobCommitted"
-	TensionEventBlobPushed    TensionEvent = "BlobPushed"
+	TensionEventCreated         TensionEvent = "Created"
+	TensionEventReopened        TensionEvent = "Reopened"
+	TensionEventClosed          TensionEvent = "Closed"
+	TensionEventTitleUpdated    TensionEvent = "TitleUpdated"
+	TensionEventCommentPushed   TensionEvent = "CommentPushed"
+	TensionEventAssigneeAdded   TensionEvent = "AssigneeAdded"
+	TensionEventAssigneeRemoved TensionEvent = "AssigneeRemoved"
+	TensionEventBlobCreated     TensionEvent = "BlobCreated"
+	TensionEventBlobCommitted   TensionEvent = "BlobCommitted"
+	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 )
 
 var AllTensionEvent = []TensionEvent{
@@ -1922,6 +1924,8 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventClosed,
 	TensionEventTitleUpdated,
 	TensionEventCommentPushed,
+	TensionEventAssigneeAdded,
+	TensionEventAssigneeRemoved,
 	TensionEventBlobCreated,
 	TensionEventBlobCommitted,
 	TensionEventBlobPushed,
@@ -1929,7 +1933,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed:
 		return true
 	}
 	return false

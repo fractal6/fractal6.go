@@ -15,37 +15,49 @@ import (
 var (
     ErrBadNameidFormat = errors.New(`{
         "errors":[{
-            "message":"Please enter a valid name.",
+            "message":"Please enter a valid name",
             "location": "nameid"
         }]
     }`)
     ErrBadUsernameFormat = errors.New(`{
         "errors":[{
-            "message":"Please enter a valid username.",
+            "message":"Please enter a valid username",
             "location": "username"
         }]
     }`)
     ErrUsernameTooLong = errors.New(`{
         "errors":[{
-            "message":"Username too long.",
+            "message":"Username too long",
+            "location": "username"
+        }]
+    }`)
+    ErrUsernameTooShort = errors.New(`{
+        "errors":[{
+            "message":"Username too short",
             "location": "username"
         }]
     }`)
     ErrBadNameFormat = errors.New(`{
         "errors":[{
-            "message":"Please enter a valid name.",
+            "message":"Please enter a valid name",
             "location": "name"
         }]
     }`)
     ErrNameTooLong = errors.New(`{
         "errors":[{
-            "message":"Name too long.",
+            "message":"Name too long",
+            "location": "name"
+        }]
+    }`)
+    ErrNameTooShort = errors.New(`{
+        "errors":[{
+            "message":"Name too short",
             "location": "name"
         }]
     }`)
     ErrBadEmailFormat = errors.New(`{
         "errors":[{
-            "message":"Please enter a valid email.",
+            "message":"Please enter a valid email",
             "location": "email"
         }]
     }`)
@@ -57,39 +69,39 @@ var (
     }`)
     ErrBadPassword = errors.New(`{
         "errors":[{
-            "message":"Bad Password.",
+            "message":"Bad Password",
             "location": "password"
         }]
     }`)
     ErrPasswordTooShort = errors.New(`{
         "errors":[{
-            "message":"Password too short.",
+            "message":"Password too short",
             "location": "password"
         }]
     }`)
     ErrPasswordTooLong = errors.New(`{
         "errors":[{
-            "message":"Password too long.",
+            "message":"Password too long",
             "location": "password"
         }]
     }`)
     // Upsert error
     ErrUsernameExist = errors.New(`{
         "errors":[{
-            "message":"Username already exists.",
+            "message":"Username already exists",
             "location": "username"
         }]
     }`)
     ErrEmailExist = errors.New(`{
         "errors":[{
-            "message":"Email already exists.",
+            "message":"Email already exists",
             "location": "email"
         }]
     }`)
     // User Rights
     ErrCantLogin = errors.New(`{
         "errors":[{
-            "message": "You are not authorized to login.",
+            "message": "You are not authorized to login",
             "location": ""
         }]
     }`)
@@ -102,7 +114,7 @@ var (
 // GetUser returns the user ctx from a db.grpc request,
 // **if they are authencitated** against their hashed password.
 func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
-    // 1. get username/email or throw error 
+    // 1. get username/email or throw error
     // 3. if pass compare pasword or throw error
     // 4. if pass, returns UsertCtx from db request or throw error
     var fieldId string
@@ -130,7 +142,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     DB := db.GetDB()
     userCtx, err := DB.GetUser(fieldId, userId)
     if err != nil {
-        return nil, err 
+        return nil, err
     }
 
     // Compare hashed password.
@@ -154,23 +166,23 @@ func ValidateNewUser(creds model.UserCreds) error {
 
     // Username validation
     err := ValidateUsername(username)
-    if err != nil { 
+    if err != nil {
         return err
     }
     // Email validation
     err = ValidateEmail(email)
-    if err != nil { 
+    if err != nil {
         return err
     }
     // Password validation
     err = ValidatePassword(password)
-    if err != nil { 
+    if err != nil {
         return err
     }
     // Name validation
     if name != nil {
         err = ValidateName(*name)
-        if err != nil { 
+        if err != nil {
             return err
         }
     }
@@ -199,14 +211,14 @@ func ValidateNewUser(creds model.UserCreds) error {
     return nil
 }
 
-// CreateNewUser Upsert an user, 
+// CreateNewUser Upsert an user,
 // using db.graphql request.
 func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     // Rights
     canLogin := true
     canCreateRoot := false
 
-    userInput := model.AddUserInput{                                 
+    userInput := model.AddUserInput{
         CreatedAt:      time.Now().Format(time.RFC3339),
         Username:       creds.Username,
         Email:          creds.Email,
@@ -218,20 +230,20 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,
         },
-        //Utc            *string    
+        //Utc            *string
     }
 
     // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
     DB := db.GetDB()
     err := DB.AddUser(userInput)
     if err != nil {
-        return nil, err 
+        return nil, err
     }
 
     // Try getting usetCtx
     userCtx, err := DB.GetUser("username", creds.Username)
     if err != nil {
-        return nil, err 
+        return nil, err
     }
 
     // Hide the password !
@@ -239,7 +251,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     return userCtx, nil
 }
 
-// GetAuthUserFromCtx returns the user ctx from a db.grpc request, 
+// GetAuthUserFromCtx returns the user ctx from a db.grpc request,
 // from the given user context.
 func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     fieldId := "username"
@@ -249,7 +261,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     DB := db.GetDB()
     userCtx, err := DB.GetUser(fieldId, userId)
     if err != nil {
-        return nil, err 
+        return nil, err
     }
 
     // Hide the password !

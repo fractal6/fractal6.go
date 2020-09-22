@@ -67,10 +67,10 @@ func canAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, c
     roleType := node.RoleType
 
     rootnameid, _ := nid2rootid(nameid)
-    err = auth.ValidateNameid(nameid, rootnameid, name)
-    if err != nil {
-        return false, err
-    }
+    err = auth.ValidateNameid(nameid, rootnameid)
+    if err != nil { return ok, err }
+    err = auth.ValidateName(name)
+    if err != nil { return ok, err }
 
     //
     // New Role hook
@@ -131,14 +131,13 @@ func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     var children []model.NodeFragment
     switch *node.Type {
     case model.NodeTypeRole:
-        fmt.Println(*node.FirstLink)
         if node.FirstLink != nil {
             nodeInput.FirstLink = &model.UserRef{Username: node.FirstLink}
         }
     case model.NodeTypeCircle:
         nodeInput.Children = nil
         for i, c := range(node.Children) {
-            child := makeNewCoordo(i, *c.FirstLink, node.Charac, node.IsPrivate)
+            child := makeNewChild(i, *c.FirstLink, *c.RoleType, node.Charac, node.IsPrivate)
             children = append(children, child)
         }
     }
@@ -183,7 +182,9 @@ func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitte
     // Fix automatic fields
     switch *node.Type {
     case model.NodeTypeRole:
-        nodePatch.FirstLink = &model.UserRef{Username: &uctx.Username}
+        if node.FirstLink != nil {
+            nodePatch.FirstLink = &model.UserRef{Username: node.FirstLink}
+        }
     case model.NodeTypeCircle:
         nodePatch.Children = nil
     }
@@ -199,9 +200,11 @@ func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitte
     return err
 }
 
-func makeNewCoordo(i int, username string, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
-    name := "Coordinator"
-    nameid := "coordo" + strconv.Itoa(i)
+func makeNewChild(i int, username string, role_type model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
+    //name := "Coordinator"
+    //nameid := "coordo" + strconv.Itoa(i)
+    name := string(role_type)
+    nameid := name + strconv.Itoa(i)
     type_ := model.NodeTypeRole
     roleType := model.RoleTypeCoordinator
     fs := username

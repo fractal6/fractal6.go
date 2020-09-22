@@ -26,7 +26,7 @@ func nodeIdCodec(parentid string, targetid string,  nodeType model.NodeType) (st
     return rootnameid, nameid, err
 }
 
-// Get the parent nameid from the given nameid
+// Get the parent nameid from the given nameid (ROLE)
 func nid2pid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")

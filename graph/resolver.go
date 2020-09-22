@@ -352,10 +352,10 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
 
     // Validate and process Blob Event
     ok, err := tensionBlobHook(uctx, tid, input.History, nil)
-    if err != nil  || !ok {
+    if err != nil || !ok {
         // Delete the tension just added
-        err = db.GetDB().DeleteGpm(tid)
-        if err != nil { panic(err) }
+        e := db.GetDB().DeleteGpm(tid)
+        if e != nil { panic(e) }
     }
 
     if err != nil  { return nil, err }
@@ -602,8 +602,10 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     name := node.Name
     parent_ := node.Parent
 
-    err = auth.ValidateNameid(nameid, rootnameid, name)
-    if err != nil { return false, err }
+    err = auth.ValidateNameid(nameid, rootnameid)
+    if err != nil { return ok, err }
+    err = auth.ValidateName(name)
+    if err != nil { return ok, err }
 
     //
     // Create new organisation Hook

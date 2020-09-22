@@ -1,4 +1,4 @@
-package auth 
+package auth
 
 import (
     "strings"
@@ -28,7 +28,7 @@ func ValidateName(n string) error {
         return ErrNameTooLong
     }
     if len(n) < 3 {
-        return ErrNameTooLong // too short
+        return ErrNameTooShort
     }
 
     // Format/Security Check
@@ -49,7 +49,7 @@ func ValidateUsername(u string) error {
         return ErrUsernameTooLong
     }
     if len(u) < 2 {
-        return ErrUsernameTooLong // too short
+        return ErrUsernameTooShort
     }
 
     // Format/Security Check
@@ -68,7 +68,7 @@ func ValidateUsername(u string) error {
     return nil
 }
 
-func ValidateNameid(nameid string, rootnameid string, name string) error {
+func ValidateNameid(nameid string, rootnameid string) error {
     ns := strings.Split(nameid, "#")
     if len(ns) == 0 {
         return ErrBadNameidFormat
@@ -77,9 +77,15 @@ func ValidateNameid(nameid string, rootnameid string, name string) error {
             if i == 0 && n != rootnameid {
                 return ErrBadNameidFormat
             }
-            if n == "" {
+            if i==1 && len(ns) == 3 &&  n == "" {
                 // assume role under root node
                 continue
+            }
+            if len(n) > 42 {
+                return ErrNameTooLong
+            }
+            if len(n) < 2 {
+                return ErrNameTooShort
             }
 
             if hasStrip(n) {
@@ -101,11 +107,11 @@ func ValidateEmail(e string) error {
     if len(ns) == 2 {
         for i, n := range ns {
             if i == len(ns)-1 && !strings.Contains(n, ".")  {
-                return ErrBadEmailFormat 
+                return ErrBadEmailFormat
             }
             err := ValidateUsername(n)
             if err != nil {
-                return ErrBadEmailFormat 
+                return ErrBadEmailFormat
             }
         }
     } else {

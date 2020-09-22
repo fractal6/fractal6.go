@@ -59,6 +59,7 @@ var TensionHookPayload string = `{
 
       NodeFragment.children {
         NodeFragment.first_link
+        NodeFragment.role_type
       }
     }
   }
