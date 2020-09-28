@@ -177,6 +177,7 @@ func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitte
 
     // Map NodeFragment to Node Patch Input
     var nodePatch model.NodePatch
+    delMap := make(map[string]interface{}, 2)
     StructMap(node, &nodePatch)
 
     // Fix automatic fields
@@ -184,6 +185,8 @@ func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitte
     case model.NodeTypeRole:
         if node.FirstLink != nil {
             nodePatch.FirstLink = &model.UserRef{Username: node.FirstLink}
+        } else {
+            delMap["Node.first_link"] = nil
         }
     case model.NodeTypeCircle:
         nodePatch.Children = nil
@@ -193,10 +196,16 @@ func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitte
     nodeInput := model.UpdateNodeInput{
         Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
         Set: &nodePatch,
+        //Remove: &delNodePatch, // @debug: omitempty issues
     }
-
     // Update the node in database
     err = db.GetDB().UpdateNode(nodeInput)
+    if err != nil { return err }
+
+    if len(delMap) > 0 {
+        err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap)
+    }
+
     return err
 }
 

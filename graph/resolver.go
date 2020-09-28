@@ -354,7 +354,7 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
     ok, err := tensionBlobHook(uctx, tid, input.History, nil)
     if err != nil || !ok {
         // Delete the tension just added
-        e := db.GetDB().DeleteGpm(tid)
+        e := db.GetDB().DeleteNodes(tid)
         if e != nil { panic(e) }
     }
 

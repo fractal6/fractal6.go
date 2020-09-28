@@ -58,7 +58,7 @@ _named_returns_resolver:
 	sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go
 
 _add_omitempty:
-	# Don't add omitempty for boolean field hsa it get remove if set to false!
+	# Don't add omitempty for boolean field has it get remove if set to false!
 	sed -i  '/bool /I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
 
 

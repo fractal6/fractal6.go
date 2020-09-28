@@ -364,47 +364,6 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     return res, err
 }
 
-//MutateGpm runs a mutation on dgraph
-func (dg Dgraph) MutateGpm(mu *api.Mutation) (error) {
-    // init client
-    dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-    txn := dgc.NewTxn()
-    defer txn.Discard(ctx)
-
-    req := &api.Request{
-        Mutations: []*api.Mutation{mu},
-        CommitNow: true,
-    }
-
-    _, err := txn.Do(ctx, req)
-    return err
-}
-
-//DeleteGpm Delete nodes from theirs uid and their edges in dgraph
-func (dg Dgraph) DeleteGpm(uids ...string) (error) {
-    // init client
-    dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-    txn := dgc.NewTxn()
-    defer txn.Discard(ctx)
-
-    d :=  map[string]string{}
-    for _, uid := range uids { d["uid"] = uid }
-    js, err := json.Marshal(d)
-    if err != nil { return err }
-
-    mu := &api.Mutation{
-        CommitNow: true,
-        DeleteJson: js,
-    }
-
-    _, err = txn.Mutate(ctx, mu)
-    return err
-}
-
 //MutateWithQueryGpm runs an upsert block mutation by first querying query
 //and then mutate based on the result.
 func (dg Dgraph) MutateWithQueryGpm(query string, mu *api.Mutation) (error) {
@@ -425,7 +384,7 @@ func (dg Dgraph) MutateWithQueryGpm(query string, mu *api.Mutation) (error) {
     return err
 }
 
-//MutateGpm adds a new object in the database with upsert operation
+//MutateUpsertGpm adds a new object in the database if it doesn't exist
 func (dg Dgraph) MutateUpsertGpm(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
     // init client
     dgc, cancel := dg.getDgraphClient()
@@ -487,6 +446,55 @@ func (dg Dgraph) Push(object map[string]interface{}, dtype string) (string, erro
 
     uid = r.Uids[uid.(string)]
     return uid.(string), nil
+}
+
+//DeleteNodes Delete nodes from theirs uid and their edges in dgraph
+func (dg Dgraph) DeleteNodes(uids ...string) (error) {
+    // init client
+    dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+    d :=  map[string]string{}
+    for _, uid := range uids { d["uid"] = uid }
+    js, err := json.Marshal(d)
+    if err != nil { return err }
+
+    mu := &api.Mutation{
+        CommitNow: true,
+        DeleteJson: js,
+    }
+
+    _, err = txn.Mutate(ctx, mu)
+    return err
+}
+
+//DeleteEdges Delete edges from their uid
+func (dg Dgraph) DeleteEdges(key string, value string, delMap map[string]interface{}) (error) {
+    // init client
+    dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+    query := fmt.Sprintf(`query {
+        o as var(func: eq(%s, "%s"))
+    }`, key, value)
+
+    var mu string
+    for k, _ := range delMap {
+        mu = mu + fmt.Sprintf(`uid(o) <%s> * .`, k) + "\n"
+    }
+
+    mutation := &api.Mutation{
+        DelNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryGpm(query, mutation)
+    return err
 }
 
 //
