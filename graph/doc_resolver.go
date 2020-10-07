@@ -4,10 +4,18 @@ import (
     "zerogov/fractal6.go/graph/model"
 )
 
-func tryAddDoc(uctx model.UserCtx, tension *model.Tension, md *string) (bool, error) {
+func TryAddDoc(uctx model.UserCtx, tension *model.Tension, md *string) (bool, error) {
     return false, nil
 }
 
-func tryUpdateDoc(uctx model.UserCtx, tension *model.Tension, md *string) (bool, error) {
+func TryUpdateDoc(uctx model.UserCtx, tension *model.Tension, md *string) (bool, error) {
+    return false, nil
+}
+
+func TryArchiveDoc(uctx model.UserCtx, tension *model.Tension, md *string) (bool, error) {
+    return false, nil
+}
+
+func TryUnarchiveDoc(uctx model.UserCtx, tension *model.Tension, md *string) (bool, error) {
     return false, nil
 }

@@ -138,16 +138,17 @@ type ComplexityRoot struct {
 	}
 
 	Blob struct {
-		BlobType   func(childComplexity int) int
-		CreatedAt  func(childComplexity int) int
-		CreatedBy  func(childComplexity int, filter *model.UserFilter) int
-		ID         func(childComplexity int) int
-		Md         func(childComplexity int) int
-		Message    func(childComplexity int) int
-		Node       func(childComplexity int, filter *model.NodeFragmentFilter) int
-		PushedFlag func(childComplexity int) int
-		Tension    func(childComplexity int, filter *model.TensionFilter) int
-		UpdatedAt  func(childComplexity int) int
+		ArchivedFlag func(childComplexity int) int
+		BlobType     func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
+		ID           func(childComplexity int) int
+		Md           func(childComplexity int) int
+		Message      func(childComplexity int) int
+		Node         func(childComplexity int, filter *model.NodeFragmentFilter) int
+		PushedFlag   func(childComplexity int) int
+		Tension      func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt    func(childComplexity int) int
 	}
 
 	Comment struct {
@@ -284,6 +285,7 @@ type ComplexityRoot struct {
 		Docs         func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		FirstLink    func(childComplexity int, filter *model.UserFilter) int
 		ID           func(childComplexity int) int
+		IsArchived   func(childComplexity int) int
 		IsPrivate    func(childComplexity int) int
 		IsRoot       func(childComplexity int) int
 		Mandate      func(childComplexity int, filter *model.MandateFilter) int
@@ -776,6 +778,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddUserRightsPayload.UserRights(childComplexity, args["first"].(*int), args["offset"].(*int)), true
+
+	case "Blob.archivedFlag":
+		if e.complexity.Blob.ArchivedFlag == nil {
+			break
+		}
+
+		return e.complexity.Blob.ArchivedFlag(childComplexity), true
 
 	case "Blob.blob_type":
 		if e.complexity.Blob.BlobType == nil {
@@ -1661,6 +1670,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.ID(childComplexity), true
+
+	case "Node.isArchived":
+		if e.complexity.Node.IsArchived == nil {
+			break
+		}
+
+		return e.complexity.Node.IsArchived(childComplexity), true
 
 	case "Node.isPrivate":
 		if e.complexity.Node.IsPrivate == nil {
@@ -2975,6 +2991,7 @@ type Node @hidePrivate {
   stats: NodeStats @meta_getNodeStats
   isRoot: Boolean! @search
   isPrivate: Boolean! @search
+  isArchived: Boolean! @search
   charac(filter: NodeCharacFilter): NodeCharac!
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
@@ -3000,8 +3017,8 @@ type NodeFragment {
 
 type NodeCharac {
   id: ID!
-  userCanJoin: Boolean! @search
   mode: NodeMode! @search
+  userCanJoin: Boolean! @search
 }
 
 type NodeStats {
@@ -3061,6 +3078,7 @@ type Blob {
   tension(filter: TensionFilter): Tension!
   blob_type: BlobType! @search
   pushedFlag: DateTime @search
+  archivedFlag: DateTime @search
   node(filter: NodeFragmentFilter): NodeFragment
   md: String
   id: ID!
@@ -3158,9 +3176,9 @@ enum TensionAction {
   EditCircle
   EditMd
 
-
-
-
+  ArchivedRole
+  ArchivedCircle
+  ArchivedMd
 
 
 
@@ -3184,6 +3202,8 @@ enum TensionEvent {
   BlobCreated
   BlobCommitted
   BlobPushed
+  BlobArchived
+  BlobUnarchived
 }
 
 enum BlobType {
@@ -3197,23 +3217,23 @@ enum BlobType {
 
 }
 
+directive @remote on OBJECT|INTERFACE
+
+directive @cascade on FIELD
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
-
-directive @cascade on FIELD
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3223,6 +3243,7 @@ input AddBlobInput {
   tension: TensionRef!
   blob_type: BlobType!
   pushedFlag: DateTime @alter_RO
+  archivedFlag: DateTime @alter_RO
   node: NodeFragmentRef
   md: String
 }
@@ -3283,8 +3304,8 @@ type AddMandatePayload {
 }
 
 input AddNodeCharacInput {
-  userCanJoin: Boolean!
   mode: NodeMode!
+  userCanJoin: Boolean!
 }
 
 type AddNodeCharacPayload {
@@ -3333,6 +3354,7 @@ input AddNodeInput {
   stats: NodeStatsRef
   isRoot: Boolean!
   isPrivate: Boolean!
+  isArchived: Boolean!
   charac: NodeCharacRef!
   first_link: UserRef
   second_link: UserRef
@@ -3430,6 +3452,7 @@ input BlobFilter {
   message: StringFullTextFilter
   blob_type: BlobType_hash
   pushedFlag: DateTimeFilter
+  archivedFlag: DateTimeFilter
   and: BlobFilter
   or: BlobFilter
   not: BlobFilter
@@ -3446,6 +3469,7 @@ enum BlobOrderable {
   updatedAt
   message
   pushedFlag
+  archivedFlag
   md
 }
 
@@ -3457,6 +3481,7 @@ input BlobPatch {
   tension: TensionRef
   blob_type: BlobType @patch_RO
   pushedFlag: DateTime @alter_RO
+  archivedFlag: DateTime @alter_RO
   node: NodeFragmentRef @patch_RO
   md: String @patch_RO
 }
@@ -3470,6 +3495,7 @@ input BlobRef {
   tension: TensionRef
   blob_type: BlobType
   pushedFlag: DateTime
+  archivedFlag: DateTime
   node: NodeFragmentRef
   md: String
 }
@@ -3787,22 +3813,22 @@ type Mutation {
 
 input NodeCharacFilter {
   id: [ID!]
-  userCanJoin: Boolean
   mode: NodeMode_hash
+  userCanJoin: Boolean
   and: NodeCharacFilter
   or: NodeCharacFilter
   not: NodeCharacFilter
 }
 
 input NodeCharacPatch {
-  userCanJoin: Boolean
   mode: NodeMode
+  userCanJoin: Boolean
 }
 
 input NodeCharacRef {
   id: ID
-  userCanJoin: Boolean
   mode: NodeMode
+  userCanJoin: Boolean
 }
 
 input NodeFilter {
@@ -3815,6 +3841,7 @@ input NodeFilter {
   about: StringFullTextFilter
   isRoot: Boolean
   isPrivate: Boolean
+  isArchived: Boolean
   skills: StringTermFilter
   role_type: RoleType_hash
   and: NodeFilter
@@ -3915,6 +3942,7 @@ input NodePatch {
   stats: NodeStatsRef
   isRoot: Boolean @patch_RO
   isPrivate: Boolean @patch_RO
+  isArchived: Boolean @patch_RO
   charac: NodeCharacRef @patch_hasRole(n:["parent"], r: Coordinator)
   first_link: UserRef @patch_hasRole(n:["parent"], r: Coordinator)
   second_link: UserRef @patch_hasRole(n:["parent"], r: Coordinator)
@@ -3944,6 +3972,7 @@ input NodeRef {
   stats: NodeStatsRef
   isRoot: Boolean
   isPrivate: Boolean
+  isArchived: Boolean
   charac: NodeCharacRef
   first_link: UserRef
   second_link: UserRef
@@ -8446,6 +8475,54 @@ func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Blob_archivedFlag(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Blob",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ArchivedFlag, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Blob_node(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12448,6 +12525,57 @@ func (ec *executionContext) _Node_isPrivate(ctx context.Context, field graphql.C
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_isArchived(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.IsArchived, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_charac(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12687,57 +12815,6 @@ func (ec *executionContext) _NodeCharac_id(ctx context.Context, field graphql.Co
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeCharac_userCanJoin(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NodeCharac",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.UserCanJoin, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _NodeCharac_mode(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12787,6 +12864,57 @@ func (ec *executionContext) _NodeCharac_mode(ctx context.Context, field graphql.
 	res := resTmp.(model.NodeMode)
 	fc.Result = res
 	return ec.marshalNNodeMode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeCharac_userCanJoin(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NodeCharac",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.UserCanJoin, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeFragment_id(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
@@ -17881,6 +18009,27 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
+		case "archivedFlag":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ArchivedFlag = data
+			} else if tmp == nil {
+				it.ArchivedFlag = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "node":
 			var err error
 			it.Node, err = ec.unmarshalONodeFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
@@ -18061,15 +18210,15 @@ func (ec *executionContext) unmarshalInputAddNodeCharacInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
-		case "userCanJoin":
-			var err error
-			it.UserCanJoin, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "mode":
 			var err error
 			it.Mode, err = ec.unmarshalNNodeMode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userCanJoin":
+			var err error
+			it.UserCanJoin, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18349,6 +18498,12 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		case "isPrivate":
 			var err error
 			it.IsPrivate, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isArchived":
+			var err error
+			it.IsArchived, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19170,6 +19325,12 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "archivedFlag":
+			var err error
+			it.ArchivedFlag, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "and":
 			var err error
 			it.And, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
@@ -19304,6 +19465,27 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
+		case "archivedFlag":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ArchivedFlag = data
+			} else if tmp == nil {
+				it.ArchivedFlag = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "node":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -19405,6 +19587,12 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		case "pushedFlag":
 			var err error
 			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "archivedFlag":
+			var err error
+			it.ArchivedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20357,15 +20545,15 @@ func (ec *executionContext) unmarshalInputNodeCharacFilter(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "userCanJoin":
-			var err error
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "mode":
 			var err error
 			it.Mode, err = ec.unmarshalONodeMode_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeModeHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userCanJoin":
+			var err error
+			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20399,15 +20587,15 @@ func (ec *executionContext) unmarshalInputNodeCharacPatch(ctx context.Context, o
 
 	for k, v := range asMap {
 		switch k {
-		case "userCanJoin":
-			var err error
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "mode":
 			var err error
 			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userCanJoin":
+			var err error
+			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20429,15 +20617,15 @@ func (ec *executionContext) unmarshalInputNodeCharacRef(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "userCanJoin":
-			var err error
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "mode":
 			var err error
 			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userCanJoin":
+			var err error
+			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20504,6 +20692,12 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 		case "isPrivate":
 			var err error
 			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isArchived":
+			var err error
+			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21248,6 +21442,27 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 			}
+		case "isArchived":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsArchived = data
+			} else if tmp == nil {
+				it.IsArchived = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+			}
 		case "charac":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -21534,6 +21749,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		case "isPrivate":
 			var err error
 			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isArchived":
+			var err error
+			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23983,6 +24204,8 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "pushedFlag":
 			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
+		case "archivedFlag":
+			out.Values[i] = ec._Blob_archivedFlag(ctx, field, obj)
 		case "node":
 			out.Values[i] = ec._Blob_node(ctx, field, obj)
 		case "md":
@@ -24643,6 +24866,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "isArchived":
+			out.Values[i] = ec._Node_isArchived(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "charac":
 			out.Values[i] = ec._Node_charac(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24683,13 +24911,13 @@ func (ec *executionContext) _NodeCharac(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userCanJoin":
-			out.Values[i] = ec._NodeCharac_userCanJoin(ctx, field, obj)
+		case "mode":
+			out.Values[i] = ec._NodeCharac_mode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "mode":
-			out.Values[i] = ec._NodeCharac_mode(ctx, field, obj)
+		case "userCanJoin":
+			out.Values[i] = ec._NodeCharac_userCanJoin(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

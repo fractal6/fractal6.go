@@ -45,6 +45,12 @@ func (TensionCharac) New(action model.TensionAction) (*TensionCharac, error) {
         l = append(l, "edit", "node")
     case model.TensionActionEditMd:
         l = append(l, "edit", "md")
+    case model.TensionActionArchivedRole:
+        l = append(l, "archive", "node")
+    case model.TensionActionArchivedCircle:
+        l = append(l, "archive", "node")
+    case model.TensionActionArchivedMd:
+        l = append(l, "archive", "md")
     default:
         err = fmt.Errorf("Tension Action type unknown: " + string(action))
     }
@@ -67,6 +73,22 @@ func (tc TensionCharac) EditAction(t *model.NodeType) (model.TensionAction) {
             a = model.TensionActionEditRole
         case model.NodeTypeCircle:
             a = model.TensionActionEditCircle
+        }
+    }
+    return a
+}
+
+func (tc TensionCharac) ArchiveAction(t *model.NodeType) (model.TensionAction) {
+    var a model.TensionAction
+    switch tc.DocType {
+    case MdDoc:
+        a = model.TensionActionArchivedMd
+    case NodeDoc:
+        switch *t {
+        case model.NodeTypeRole:
+            a = model.TensionActionArchivedRole
+        case model.NodeTypeCircle:
+            a = model.TensionActionArchivedCircle
         }
     }
     return a

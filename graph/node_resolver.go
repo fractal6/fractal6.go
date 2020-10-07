@@ -15,11 +15,10 @@ import (
 
 // tryAddNode add a new node is user has the correct right
 // * it inherits node charac
-func tryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     tid := tension.ID
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
-
     charac := tension.Receiver.Charac
     isPrivate := tension.Receiver.IsPrivate
 
@@ -31,33 +30,71 @@ func tryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
         node.IsPrivate = &isPrivate
     }
 
-    ok, err := canAddNode(uctx, node, parentid, charac)
+    ok, err := CanAddNode(uctx, node, parentid, charac)
     if err != nil || !ok {
         return ok, err
     }
 
-    err = pushNode(uctx, tid, node, emitterid, parentid)
+    err = PushNode(uctx, tid, node, emitterid, parentid)
     return ok, err
 }
 
-func tryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
-    tid := tension.ID
+func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
-
     charac := tension.Receiver.Charac
 
-    ok, err := canAddNode(uctx, node, parentid, charac)
+    ok, err := CanAddNode(uctx, node, parentid, charac)
     if err != nil || !ok {
         return ok, err
     }
 
-    err = updateNode(uctx, tid, node, emitterid, parentid)
+    err = UpdateNode(uctx, node, emitterid, parentid)
+    return ok, err
+}
+
+func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+    parentid := tension.Receiver.Nameid
+    charac := tension.Receiver.Charac
+
+    ok, err := CanAddNode(uctx, node, parentid, charac)
+    if err != nil || !ok {
+        return ok, err
+    }
+
+    // Archive Node
+    // --
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return ok, err }
+
+    // Update the node in database
+    err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
+
+    return ok, err
+}
+func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+    parentid := tension.Receiver.Nameid
+    charac := tension.Receiver.Charac
+
+    ok, err := CanAddNode(uctx, node, parentid, charac)
+    if err != nil || !ok {
+        return ok, err
+    }
+
+    // Unarchive Node
+    // --
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return ok, err }
+
+    // Update the node in database
+    err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(false))
     return ok, err
 }
 
 // canAddNode check that a user can add a given role or circle in an organisation.
-func canAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, charac *model.NodeCharac) (bool, error) {
+func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, charac *model.NodeCharac) (bool, error) {
     var ok bool = false
     var err error
 
@@ -109,7 +146,7 @@ func canAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, c
 // pushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
-func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
+func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
     // Get References
     rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil {
@@ -122,6 +159,7 @@ func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
 
     // Fix Automatic fields
     nodeInput.IsRoot = false
+    nodeInput.IsArchived = false
     nodeInput.Nameid = nameid
     nodeInput.Rootnameid = rootnameid
     nodeInput.CreatedAt = time.Now().Format(time.RFC3339)
@@ -160,7 +198,7 @@ func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
             tid_c, err := db.GetDB().AddTension(tensionInput)
             if err != nil { return err }
             // Push child
-            err = pushNode(uctx, tid_c, &child, emitterid, nameid)
+            err = PushNode(uctx, tid_c, &child, emitterid, nameid)
         }
     }
 
@@ -170,7 +208,7 @@ func pushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
 
 // updateNode update a node from the given fragment
 // @DEBUG: only set the field that have been modified in NodePatch
-func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
+func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid string, parentid string) (error) {
     // Get References
     _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return err }
@@ -208,6 +246,8 @@ func updateNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitte
 
     return err
 }
+
+// internals
 
 func makeNewChild(i int, username string, role_type model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
     //name := "Coordinator"

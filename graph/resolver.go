@@ -663,53 +663,100 @@ func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, b
     var ok bool = true
     var err error
     for _, event := range(events) {
-        if (*event.EventType == model.TensionEventBlobPushed) {
-            // Get Tension, target Node and blob charac (last if bid undefined)
-            tension, err := db.GetDB().GetTensionHook(tid, bid)
-            if err != nil { return false, LogErr("Access denied", err) }
-            if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found")) }
+        if *event.EventType == model.TensionEventBlobPushed ||
+           *event.EventType == model.TensionEventBlobArchived ||
+           *event.EventType == model.TensionEventBlobUnarchived {
+               // Process the special event
+               ok, err = processTensionEventHook(uctx, event, tid, bid)
+               // Break after the first hooked event
+               break
+           }
+    }
 
-            // Check that Blob exists
-            blob := tension.Blobs[0]
-            if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found")) }
+    return ok, err
+}
 
-            // Extract Tension characteristic
-            tensionCharac, err:= TensionCharac{}.New(*tension.Action)
-            if err != nil { return false, LogErr("internal error", err) }
+// Add, Update or Archived a Node
+func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error) {
+    // Get Tension, target Node and blob charac (last if bid undefined)
+    tension, err := db.GetDB().GetTensionHook(tid, bid)
+    if err != nil { return false, LogErr("Access denied", err) }
+    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found")) }
 
-            // switch on TensionCharac.DocType (not blob type !!!)
-            // -> rule differ from doc type!
-            // then swith on TensionCharac.ActionType to add update etc...
-            var node *model.NodeFragment
-            switch tensionCharac.ActionType {
-            case NewAction:
-                // First time a blob is pushed.
-                switch tensionCharac.DocType {
-                case NodeDoc:
-                    node = blob.Node
-                    ok, err = tryAddNode(uctx, tension, node)
-                case MdDoc:
-                    md := blob.Md
-                    ok, err = tryAddDoc(uctx, tension, md)
-                }
-            case EditAction:
-                switch tensionCharac.DocType {
-                case NodeDoc:
-                    node = blob.Node
-                    ok, err = tryUpdateNode(uctx, tension, node)
-                case MdDoc:
-                    md := blob.Md
-                    ok, err = tryUpdateDoc(uctx, tension, md)
-                }
+    // Check that Blob exists
+    blob := tension.Blobs[0]
+    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found")) }
+
+    // Extract Tension characteristic
+    tensionCharac, err:= TensionCharac{}.New(*tension.Action)
+    if err != nil { return false, LogErr("internal error", err) }
+
+    var ok bool
+    var node *model.NodeFragment
+    if *event.EventType == model.TensionEventBlobPushed {
+        // Add or Update Node
+        // --
+        // 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
+        // 2. swith on TensionCharac.ActionType to add update etc...
+        switch tensionCharac.ActionType {
+        case NewAction:
+            // First time a blob is pushed.
+            switch tensionCharac.DocType {
+            case NodeDoc:
+                node = blob.Node
+                ok, err = TryAddNode(uctx, tension, node)
+            case MdDoc:
+                md := blob.Md
+                ok, err = TryAddDoc(uctx, tension, md)
             }
-
-            if err != nil { return ok, err }
-            if ok { // Update blob pushed flag
-                err = db.GetDB().SetPushedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.EditAction(node.Type))
+        case EditAction:
+            switch tensionCharac.DocType {
+            case NodeDoc:
+                node = blob.Node
+                ok, err = TryUpdateNode(uctx, tension, node)
+            case MdDoc:
+                md := blob.Md
+                ok, err = TryUpdateDoc(uctx, tension, md)
             }
+        case ArchiveAction:
+            err = fmt.Errorf("Cannot push archived document")
+        }
 
-            // Break after the first BlobPushed event
-            break
+        if err != nil { return ok, err }
+        if ok { // Update blob pushed flag
+            err = db.GetDB().SetPushedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.EditAction(node.Type))
+        }
+    } else if *event.EventType == model.TensionEventBlobArchived {
+        // Archived Node
+        // --
+        switch tensionCharac.DocType {
+        case NodeDoc:
+            node = blob.Node
+            ok, err = TryArchiveNode(uctx, tension, node)
+        case MdDoc:
+            md := blob.Md
+            ok, err = TryArchiveDoc(uctx, tension, md)
+        }
+
+        if err != nil { return ok, err }
+        if ok { // Update blob archived flag
+            err = db.GetDB().SetArchivedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.ArchiveAction(node.Type))
+        }
+    } else if *event.EventType == model.TensionEventBlobUnarchived {
+        // Unarchived Node
+        // --
+        switch tensionCharac.DocType {
+        case NodeDoc:
+            node = blob.Node
+            ok, err = TryUnarchiveNode(uctx, tension, node)
+        case MdDoc:
+            md := blob.Md
+            ok, err = TryUnarchiveDoc(uctx, tension, md)
+        }
+
+        if err != nil { return ok, err }
+        if ok { // Update blob pushed flag
+            err = db.GetDB().SetPushedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.EditAction(node.Type))
         }
     }
 

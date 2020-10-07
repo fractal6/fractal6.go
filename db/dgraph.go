@@ -923,6 +923,23 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 
 // DQL Mutations
 
+// SetNodeLiteral set a predicate for the given node in the DB
+func (dg Dgraph) SetNodeLiteral(nameid string, predicate string, val string) error {
+    query := fmt.Sprintf(`query {
+        node as var(func: eq(Node.nameid, "%s"))
+    }`, nameid)
+
+    mu := fmt.Sprintf(`
+    uid(node) <Node.%s> "%s" .
+    `, predicate, val)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryGpm(query, mutation)
+    return err
+}
 // UpdateRoleType update the role of a node given the nameid using upsert block.
 func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
     query := fmt.Sprintf(`query {
@@ -942,6 +959,7 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
     return err
 }
 
+
 // Set the blob pushedFlag and the tension action
 func (dg Dgraph) SetPushedFlagBlob(bid string, flag string, tid string, action model.TensionAction) error {
     query := fmt.Sprintf(`query {
@@ -949,8 +967,29 @@ func (dg Dgraph) SetPushedFlagBlob(bid string, flag string, tid string, action m
     }`, bid)
 
     mu := fmt.Sprintf(`
-    uid(obj) <Blob.pushedFlag> "%s" .
-    <%s> <Tension.action> "%s" .
+        uid(obj) <Blob.pushedFlag> "%s" .
+        <%s> <Tension.action> "%s" .
+    `, flag, tid, action)
+    muDel := `uid(obj) <Blob.archivedFlag> * . `
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+        DelNquads: []byte(muDel),
+    }
+
+    err := dg.MutateWithQueryGpm(query, mutation)
+    return err
+}
+
+// Set the blob pushedFlag and the tension action
+func (dg Dgraph) SetArchivedFlagBlob(bid string, flag string, tid string, action model.TensionAction) error {
+    query := fmt.Sprintf(`query {
+        obj as var(func: uid(%s))
+    }`, bid)
+
+    mu := fmt.Sprintf(`
+        uid(obj) <Blob.archivedFlag> "%s" .
+        <%s> <Tension.action> "%s" .
     `, flag, tid, action)
 
     mutation := &api.Mutation{
