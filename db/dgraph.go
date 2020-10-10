@@ -158,22 +158,36 @@ func initDB() *Dgraph {
             }
         }`,
         // Get single object
+        "getFieldById": `{
+            all(func: uid("{{.id}}")) {
+                {{.fieldName}}
+            }
+        }`,
         "getFieldByEq": `{
-            all(func: eq({{.typeName}}.{{.fieldid}}, "{{.objid}}")) {
-                {{.typeName}}.{{.fieldName}}
+            all(func: eq({{.fieldid}}, "{{.objid}}")) {
+                {{.fieldName}}
             }
         }`,
         "getSubFieldById": `{
             all(func: uid("{{.id}}")) {
-                {{.typeNameSource}}.{{.fieldNameSource}} {
-                    {{.typeNameTarget}}.{{.fieldNameTarget}}
+                {{.fieldNameSource}} {
+                    {{.fieldNameTarget}}
                 }
             }
         }`,
         "getSubFieldByEq": `{
-            all(func: eq({{.typeNameSource}}.{{.fieldid}}, "{{.value}}")) {
-                {{.typeNameSource}}.{{.fieldNameSource}} {
-                    {{.typeNameTarget}}.{{.fieldNameTarget}}
+            all(func: eq({{.fieldid}}, "{{.value}}")) {
+                {{.fieldNameSource}} {
+                    {{.fieldNameTarget}}
+                }
+            }
+        }`,
+        "getSubSubFieldByEq": `{
+            all(func: eq({{.fieldid}}, "{{.value}}")) {
+                {{.fieldNameSource}} {
+                    {{.fieldNameTarget}} {
+                        {{.subFieldNameTarget}}
+                    }
                 }
             }
         }`,
@@ -632,18 +646,42 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, 
     return len(r.All) > 0, nil
 }
 
-// Returns a field from objid
-func (dg Dgraph) GetFieldByEq(typeName string, fieldid string, objid string, fieldName string) (interface{}, error) {
+// Returns a field from id
+func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
-        "typeName":typeName,
+        "id": id,
+        "fieldName":fieldName,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getFieldById", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple in gpm query: %s %s", fieldName, id)
+    } else if len(r.All) == 1 {
+        x := r.All[0][fieldName]
+        return x, nil
+    }
+    return nil, err
+}
+
+// Returns a field from objid
+func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (interface{}, error) {
+    // Format Query
+    maps := map[string]string{
         "fieldid": fieldid,
         "objid":objid,
         "fieldName":fieldName,
     }
     // Send request
     res, err := dg.QueryGpm("getFieldByEq", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -653,26 +691,23 @@ func (dg Dgraph) GetFieldByEq(typeName string, fieldid string, objid string, fie
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query: %s %s", fieldName, objid)
     } else if len(r.All) == 1 {
-        f1 := typeName +"."+ fieldName
-        x := r.All[0][f1]
+        x := r.All[0][fieldName]
         return x, nil
     }
     return nil, err
 }
 
 // Returns a subfield from uid
-func (dg Dgraph) GetSubFieldById(id string, typeNameSource string, fieldNameSource string, typeNameTarget string, fieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
         "id":id,
-        "typeNameSource":typeNameSource,
         "fieldNameSource":fieldNameSource,
-        "typeNameTarget":typeNameTarget,
         "fieldNameTarget":fieldNameTarget,
     }
     // Send request
     res, err := dg.QueryGpm("getSubFieldById", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -682,30 +717,38 @@ func (dg Dgraph) GetSubFieldById(id string, typeNameSource string, fieldNameSour
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query")
     } else if len(r.All) == 1 {
-        f1 := typeNameSource +"."+ fieldNameSource
-        f2 := typeNameTarget +"."+ fieldNameTarget
-        x := r.All[0][f1].(model.JsonAtom)
-        if x != nil {
-            return x[f2], nil
+        switch x := r.All[0][fieldNameSource].(type) {
+        case model.JsonAtom:
+            if x != nil {
+                return x[fieldNameTarget], nil
+            }
+        case []interface{}:
+            if x != nil {
+                var y []interface{}
+                for _, v := range(x) {
+                    y = append(y, v.(model.JsonAtom)[fieldNameTarget])
+                }
+                return y, nil
+            }
+        default:
+            return nil, fmt.Errorf("Decode type unknonwn: %T", x)
         }
     }
     return nil, err
 }
 
 // Returns a subfield from Eq
-func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, typeNameSource string, fieldNameSource string, typeNameTarget string, fieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
         "fieldid":fieldid,
         "value":value,
-        "typeNameSource":typeNameSource,
         "fieldNameSource":fieldNameSource,
-        "typeNameTarget":typeNameTarget,
         "fieldNameTarget":fieldNameTarget,
     }
     // Send request
     res, err := dg.QueryGpm("getSubFieldByEq", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -715,11 +758,42 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, typeNameSource st
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query")
     } else if len(r.All) == 1 {
-        f1 := typeNameSource +"."+ fieldNameSource
-        f2 := typeNameTarget +"."+ fieldNameTarget
-        x := r.All[0][f1].(model.JsonAtom)
+        x := r.All[0][fieldNameSource].(model.JsonAtom)
         if x != nil {
-            return x[f2], nil
+            return x[fieldNameTarget], nil
+        }
+    }
+    return nil, err
+}
+
+// Returns a subfield from Eq
+func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (interface{}, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid":fieldid,
+        "value":value,
+        "fieldNameSource":fieldNameSource,
+        "fieldNameTarget":fieldNameTarget,
+        "subFieldNameTarget":subFieldNameTarget,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getSubSubFieldByEq", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple in gpm query")
+    } else if len(r.All) == 1 {
+        x := r.All[0][fieldNameSource].(model.JsonAtom)
+        if x != nil {
+            y := x[fieldNameTarget].(model.JsonAtom)
+            if y != nil {
+                return y[subFieldNameTarget], nil
+            }
         }
     }
     return nil, err
@@ -735,7 +809,7 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
     }
     // Send request
     res, err := dg.QueryGpm("getUser", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -775,7 +849,7 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
     }
     // Send request
     res, err := dg.QueryGpm("getNode", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -820,7 +894,7 @@ func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error)
     }
     // Send request
     res, err := dg.QueryGpm("getTension", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -859,7 +933,7 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
     }
     // Send request
     res, err := dg.QueryGpm("getAllChildren", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp
@@ -896,7 +970,7 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
     }
     // Send request
     res, err := dg.QueryGpm("getAllMembers", maps)
-    if err != nil { return  nil, err }
+    if err != nil { return nil, err }
 
     // Decode response
     var r GpmResp

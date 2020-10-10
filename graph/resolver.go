@@ -157,7 +157,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
         err = LogErr("Access denied", fmt.Errorf("nameid field required in node payload"))
     } else {
         // Get the public status of the node
-        //isPrivate, err :=  db.GetDB().GetFieldByEq("Node", "nameid", nameid, "isPrivate")
+        //isPrivate, err :=  db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isPrivate")
         //if err != nil {
         //    return yes, LogErr("Access denied", err)
         //}
@@ -414,13 +414,12 @@ func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolv
 // 1. user rights
 // 2. user ownership (u field)
 // 3. check user role, (n r field)
-func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nFields []string, r model.RoleType, uField *string) (interface{}, error) {
+func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nFields []string, r model.RoleType, uField *string, assignee *int) (interface{}, error) {
     // Retrieve userCtx from token
     uctx, err := auth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
-    // If uField is given check if the current user
-    // is the owner of the ressource
+    // If uField is given check if the current user is the creator ressource
     var ok bool
     if uField != nil {
         ok, err = checkUserOwnership(ctx, uctx, *uField, obj)
@@ -431,6 +430,13 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
     // Check that user has the given role on the asked node
     for _, nField := range nFields {
         ok, err = checkUserRole(ctx, uctx, nField, obj, r)
+        if err != nil { return nil, LogErr("Access denied", err) }
+        if ok { return next(ctx) }
+    }
+
+    // Check is the user is an assigne of the curent tension
+    if assignee != nil {
+        ok, err = checkAssignees(ctx, uctx, obj)
         if err != nil { return nil, LogErr("Access denied", err) }
         if ok { return next(ctx) }
     }
@@ -502,9 +508,7 @@ func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField strin
             return false, fmt.Errorf("node target unknown(id), need a database request here...")
         }
         // Request the database to get the field
-        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
-        typeName := "Post" // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface ....
-        username_, err := db.GetDB().GetSubFieldById(id, typeName, userField, "User", "username")
+        username_, err := db.GetDB().GetSubFieldById(id, "Post."+userField, "User.username") // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
         if err != nil { return false, err }
         username = username_.(string)
     } else {
@@ -523,12 +527,10 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
     node := nodeObj.(model.JsonAtom)[nodeField]
     id_ := ctx.Value("id")
     nameid_ := ctx.Value("nameid")
-    if  id_ != nil {
+    if id_ != nil {
         // Tension here
         // Request the database to get the field
-        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function here ?
-        typeName := "Tension"
-        nameid_, err = db.GetDB().GetSubFieldById(id_.(string), typeName, nodeField, "Node", "nameid")
+        nameid_, err = db.GetDB().GetSubFieldById(id_.(string), "Tension."+nodeField, "Node.nameid")
         if err != nil { return false, err }
         nameid = nameid_.(string)
         if isRole(nameid) {
@@ -536,8 +538,7 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
         }
     } else if (nameid_ != nil) {
         // Node Here
-        typeName := "Node"
-        nameid_, err := db.GetDB().GetSubFieldByEq("nameid", nameid_.(string), typeName, nodeField, "Node", "nameid")
+        nameid_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid_.(string), "Node."+nodeField, "Node.nameid")
         if err != nil { return false, err }
         if nameid_ == nil {
             // Assume root node
@@ -567,10 +568,7 @@ func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, no
         if id == "" {
             return false, fmt.Errorf("node target unknown(id), need a database request here...")
         }
-        // @DEBUG (#xxx): how to get the type of the object to update for a more generic function hre ?
-        //typeName := ToTypeName(reflect.TypeOf(nodeObj).String())
-        typeName := "Tension"
-        rootnameid_, err := db.GetDB().GetSubFieldById(id, typeName, nodeField, "Node", "rootnameid")
+        rootnameid_, err := db.GetDB().GetSubFieldById(id, "Tension."+nodeField, "Node.rootnameid")
         if err != nil { return false, err }
         if rootnameid_ != nil {
             rootnameid = rootnameid_.(string)
@@ -590,6 +588,36 @@ func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, no
     // Search for rights
     ok := userHasRoot(uctx, rootnameid)
     return ok, err
+}
+
+// check if the an user has the given role of the given (nested) node
+func checkAssignees(ctx context.Context, uctx model.UserCtx, nodeObj interface{}) (bool, error) {
+    // Check that nodes are present
+    var assignees []interface{}
+    var err error
+    id_ := ctx.Value("id")
+    nameid_ := ctx.Value("nameid")
+    if id_ != nil {
+        // Tension here
+        res, err := db.GetDB().GetSubFieldById(id_.(string), "Tension.assignees", "User.username")
+        if err != nil { return false, err }
+        if res != nil { assignees = res.([]interface{}) }
+    } else if (nameid_ != nil) {
+        // Node Here
+        res, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", nameid_.(string), "Node.source", "Tension.assignees", "User.username")
+        if err != nil { return false, err }
+        if res != nil { assignees = res.([]interface{}) }
+    } else {
+        return false, fmt.Errorf("node target unknown, need a database request here...")
+    }
+
+    // Search for assignees
+    for _, a := range(assignees) {
+        if a.(string) == uctx.Username {
+            return true, err
+        }
+    }
+    return false, err
 }
 
 func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string, charac model.NodeCharac) (bool, error) {

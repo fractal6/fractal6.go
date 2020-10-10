@@ -43,7 +43,7 @@ type DirectiveRoot struct {
 	Add_isOwner            func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Alter_RO               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Alter_assertType       func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, t model.NodeType) (res interface{}, err error)
-	Alter_hasRole          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Alter_hasRole          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string, a *int) (res interface{}, err error)
 	Alter_hasRoot          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
 	Alter_maxLength        func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, n int) (res interface{}, err error)
 	Alter_toLower          func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
@@ -69,7 +69,7 @@ type DirectiveRoot struct {
 	IsAuth                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Meta_getNodeStats      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Patch_RO               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_hasRole          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string) (res interface{}, err error)
+	Patch_hasRole          func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, r model.RoleType, u *string, a *int) (res interface{}, err error)
 	Patch_isOwner          func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Remote                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Search                 func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
@@ -2955,9 +2955,9 @@ directive @hidePrivate on OBJECT|FIELD_DEFINITION
 
 directive @isAuth on OBJECT|FIELD_DEFINITION
 
-directive @patch_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
+directive @patch_hasRole(n: [String!]!, r: RoleType!, u: String, a: Int) on INPUT_FIELD_DEFINITION
 
-directive @alter_hasRole(n: [String!]!, r: RoleType!, u: String) on INPUT_FIELD_DEFINITION
+directive @alter_hasRole(n: [String!]!, r: RoleType!, u: String, a: Int) on INPUT_FIELD_DEFINITION
 
 directive @alter_hasRoot(n: [String!]!) on INPUT_FIELD_DEFINITION
 
@@ -3217,23 +3217,23 @@ enum BlobType {
 
 }
 
-directive @remote on OBJECT|INTERFACE
-
-directive @cascade on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 directive @id on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @cascade on FIELD
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdAt: DateTime!
@@ -3385,15 +3385,15 @@ input AddTensionInput {
   createdBy: UserRef! @add_isOwner(u:"createdBy")
   message: String
   nth: String
-  title: String! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  type_: TensionType! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  emitterid: String! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  emitter: NodeRef! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  receiverid: String! @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
-  receiver: NodeRef! @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
-  status: TensionStatus! @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
-  labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
-  assignees: [UserRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  title: String! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  type_: TensionType! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  emitterid: String! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  emitter: NodeRef! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  receiverid: String! @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy", a:1)
+  receiver: NodeRef! @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy", a:1)
+  status: TensionStatus! @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy", a:1)
+  labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, a:1)
+  assignees: [UserRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, a:1)
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
@@ -4141,15 +4141,15 @@ input TensionPatch {
   createdBy: UserRef @patch_RO
   message: String
   nth: String
-  title: String @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  type_: TensionType @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  emitterid: String @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  emitter: NodeRef @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy")
-  receiverid: String @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
-  receiver: NodeRef @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy")
-  status: TensionStatus @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
-  labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
-  assignees: [UserRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy")
+  title: String @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  type_: TensionType @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  emitterid: String @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  emitter: NodeRef @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
+  receiverid: String @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy", a:1)
+  receiver: NodeRef @alter_hasRole(n:["receiver"], r: Coordinator, u:"createdBy", a:1)
+  status: TensionStatus @alter_hasRole(n:["emitter","receiver"], r: Coordinator, u:"createdBy", a:1)
+  labels: [LabelRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, a:1)
+  assignees: [UserRef!] @alter_hasRole(n:["emitter","receiver"], r: Coordinator, a:1)
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
@@ -4446,6 +4446,14 @@ func (ec *executionContext) dir_alter_hasRole_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["u"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["a"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["a"] = arg3
 	return args, nil
 }
 
@@ -4628,6 +4636,14 @@ func (ec *executionContext) dir_patch_hasRole_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["u"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["a"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["a"] = arg3
 	return args, nil
 }
 
@@ -18652,10 +18668,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18685,10 +18705,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18716,10 +18740,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18749,10 +18777,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18782,10 +18814,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18815,10 +18851,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18850,10 +18890,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18879,14 +18923,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
 				if err != nil {
 					return nil, err
 				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -18912,14 +18956,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
 				if err != nil {
 					return nil, err
 				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21120,7 +21164,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21260,7 +21304,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21287,7 +21331,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21318,7 +21362,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21480,7 +21524,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21511,7 +21555,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21542,7 +21586,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21571,7 +21615,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -21600,7 +21644,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				if ec.directives.Patch_hasRole == nil {
 					return nil, errors.New("directive patch_hasRole is not implemented")
 				}
-				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil)
+				return ec.directives.Patch_hasRole(ctx, obj, directive0, n, r, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22449,10 +22493,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22484,10 +22532,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22517,10 +22569,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22552,10 +22608,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22585,10 +22645,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22620,10 +22684,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22655,10 +22723,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22686,14 +22758,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
 				if err != nil {
 					return nil, err
 				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -22719,14 +22791,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
 				if err != nil {
 					return nil, err
 				}
 				if ec.directives.Alter_hasRole == nil {
 					return nil, errors.New("directive alter_hasRole is not implemented")
 				}
-				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, u)
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, r, nil, a)
 			}
 
 			tmp, err := directive1(ctx)
