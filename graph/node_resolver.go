@@ -54,6 +54,7 @@ func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeF
 }
 
 func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+    nameid := *node.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
@@ -63,17 +64,12 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     }
 
     // Archive Node
-    // --
-    // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
-    if err != nil { return ok, err }
-
-    // Update the node in database
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
 
     return ok, err
 }
 func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+    nameid := *node.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
@@ -83,12 +79,6 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     }
 
     // Unarchive Node
-    // --
-    // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
-    if err != nil { return ok, err }
-
-    // Update the node in database
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(false))
     return ok, err
 }
@@ -109,49 +99,48 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, c
     err = auth.ValidateName(name)
     if err != nil { return ok, err }
 
-    //
     // New Role hook
-    //
     if nodeType == model.NodeTypeRole {
         // Validate input
         if roleType == nil {
             err = fmt.Errorf("role should have a RoleType")
         }
-
-        // Add node Policies
-        if charac.Mode == model.NodeModeChaos {
-            ok = userIsMember(uctx, parentid)
-        } else if charac.Mode == model.NodeModeCoordinated {
-            ok = userIsCoordo(uctx, parentid)
-        }
-        return ok, err
     }
 
-    //
     // New sub-circle hook
-    //
     if nodeType == model.NodeTypeCircle {
-        // Add node Policies
-        if charac.Mode == model.NodeModeChaos {
-            ok = userIsMember(uctx, parentid)
-        } else if charac.Mode == model.NodeModeCoordinated {
-            ok = userIsCoordo(uctx, parentid)
-        }
-        return ok, err
+        //pass
     }
 
-    return false, fmt.Errorf("unknown node type")
+    // Add node Policies
+    if charac.Mode == model.NodeModeChaos {
+        ok = userIsMember(uctx, parentid)
+    } else if charac.Mode == model.NodeModeCoordinated {
+        ok = userIsCoordo(uctx, parentid)
+    }
+
+    // Check if user is Coordinator of any parents
+    if !ok {
+        // @debug: move to checkCoordoPath
+        parents, err := db.GetDB().GetParents(nameid)
+        if err != nil { return false, LogErr("Internal Error", err) }
+        for _, p := range(parents) {
+            if userIsCoordo(uctx, p) {
+                ok = true
+                break
+            }
+        }
+    }
+
+    return ok, err
 }
 
 // pushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
 func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
-    // Get References
-    rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
-    if err != nil {
-        return err
-    }
+    nameid := *node.Nameid
+    rootnameid, _ := nid2rootid(nameid)
 
     // Map NodeFragment to Node Input
     var nodeInput model.AddNodeInput
@@ -181,7 +170,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     }
 
     // Push the nodes into the database
-    err = db.GetDB().AddNode(nodeInput)
+    err := db.GetDB().AddNode(nodeInput)
     if err != nil { return err }
 
     // Change Guest to member if user got its first role.
@@ -209,9 +198,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
 // updateNode update a node from the given fragment
 // @DEBUG: only set the field that have been modified in NodePatch
 func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid string, parentid string) (error) {
-    // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
-    if err != nil { return err }
+    nameid := *node.Nameid
 
     // Map NodeFragment to Node Patch Input
     var nodePatch model.NodePatch
@@ -237,7 +224,7 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid string, 
         //Remove: &delNodePatch, // @debug: omitempty issues
     }
     // Update the node in database
-    err = db.GetDB().UpdateNode(nodeInput)
+    err := db.GetDB().UpdateNode(nodeInput)
     if err != nil { return err }
 
     if len(delMap) > 0 {

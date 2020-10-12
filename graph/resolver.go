@@ -438,6 +438,19 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
         if ok { return next(ctx) }
     }
 
+    // Check if user is Coordinator of any parents
+    if !ok && ctx.Value("nameid") != nil { // is a Node
+        // @debug: move to checkCoordoPath
+        parents, err := db.GetDB().GetParents(ctx.Value("nameid").(string))
+        if err != nil { return nil, LogErr("Internal Error", err) }
+        for _, p := range(parents) {
+            if userIsCoordo(uctx, p) {
+                ok = true
+                break
+            }
+        }
+    }
+
     return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource"))
 }
 
@@ -726,7 +739,14 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     if err != nil { return false, LogErr("internal error", err), nameid }
 
     var ok bool
-    var node *model.NodeFragment
+    var node *model.NodeFragment = blob.Node
+
+    // Nameid Codec
+    if node != nil && node.Nameid != nil {
+        _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
+        node.Nameid = &nameid
+    }
+
     if *event.EventType == model.TensionEventBlobPushed {
         // Add or Update Node
         // --
@@ -737,7 +757,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
             // First time a blob is pushed.
             switch tensionCharac.DocType {
             case NodeDoc:
-                node = blob.Node
                 ok, err = TryAddNode(uctx, tension, node)
             case MdDoc:
                 md := blob.Md
@@ -746,7 +765,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         case EditAction:
             switch tensionCharac.DocType {
             case NodeDoc:
-                node = blob.Node
                 ok, err = TryUpdateNode(uctx, tension, node)
             case MdDoc:
                 md := blob.Md
@@ -765,7 +783,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // --
         switch tensionCharac.DocType {
         case NodeDoc:
-            node = blob.Node
             ok, err = TryArchiveNode(uctx, tension, node)
         case MdDoc:
             md := blob.Md
@@ -781,7 +798,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // --
         switch tensionCharac.DocType {
         case NodeDoc:
-            node = blob.Node
             ok, err = TryUnarchiveNode(uctx, tension, node)
         case MdDoc:
             md := blob.Md
@@ -792,10 +808,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         if ok { // Update blob pushed flag
             err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tid, tensionCharac.EditAction(node.Type))
         }
-    }
-
-    if ok && err == nil {
-        _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
     }
 
     return ok, err, nameid

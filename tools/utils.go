@@ -101,7 +101,7 @@ func CleanAliasedMap(m map[string]interface{})  map[string]interface{} {
         default:
             nv = t
         }
-        out[nk] =  nv
+        out[nk] = nv
     }
 
     return out
@@ -127,7 +127,7 @@ func CleanCompositeName(m map[string]interface{}) map[string]interface{} {
         default:
             nv = t
         }
-        out[nk] =  nv
+        out[nk] = nv
     }
 
     return out

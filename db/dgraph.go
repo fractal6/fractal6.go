@@ -233,6 +233,12 @@ func initDB() *Dgraph {
                 }
             }
         }`,
+        "getParents": `{
+            all(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+                Node.parent @normalize
+                Node.nameid
+            }
+        }`,
         // Mutations
     }
 
@@ -651,7 +657,7 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) 
     // Format Query
     maps := map[string]string{
         "id": id,
-        "fieldName":fieldName,
+        "fieldName": fieldName,
     }
     // Send request
     res, err := dg.QueryGpm("getFieldById", maps)
@@ -676,8 +682,8 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
-        "objid":objid,
-        "fieldName":fieldName,
+        "objid": objid,
+        "fieldName": fieldName,
     }
     // Send request
     res, err := dg.QueryGpm("getFieldByEq", maps)
@@ -701,9 +707,9 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
 func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
-        "id":id,
-        "fieldNameSource":fieldNameSource,
-        "fieldNameTarget":fieldNameTarget,
+        "id": id,
+        "fieldNameSource": fieldNameSource,
+        "fieldNameTarget": fieldNameTarget,
     }
     // Send request
     res, err := dg.QueryGpm("getSubFieldById", maps)
@@ -770,11 +776,11 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
 func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
-        "fieldid":fieldid,
-        "value":value,
-        "fieldNameSource":fieldNameSource,
-        "fieldNameTarget":fieldNameTarget,
-        "subFieldNameTarget":subFieldNameTarget,
+        "fieldid": fieldid,
+        "value": value,
+        "fieldNameSource": fieldNameSource,
+        "fieldNameTarget": fieldNameTarget,
+        "subFieldNameTarget": subFieldNameTarget,
     }
     // Send request
     res, err := dg.QueryGpm("getSubSubFieldByEq", maps)
@@ -803,8 +809,8 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
 func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) {
     // Format Query
     maps := map[string]string{
-        "fieldid":fieldid,
-        "userid":userid,
+        "fieldid": fieldid,
+        "userid": userid,
         "payload": model.UserCtxPayloadDg,
     }
     // Send request
@@ -843,8 +849,8 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
 func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac, error) {
     // Format Query
     maps := map[string]string{
-        "fieldid":fieldid,
-        "objid":objid,
+        "fieldid": fieldid,
+        "objid": objid,
         "payload": model.NodeCharacPayloadDg,
     }
     // Send request
@@ -928,8 +934,8 @@ func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error)
 func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, error) {
     // Format Query
     maps := map[string]string{
-        "fieldid":fieldid,
-        "objid":objid,
+        "fieldid": fieldid,
+        "objid": objid,
     }
     // Send request
     res, err := dg.QueryGpm("getAllChildren", maps)
@@ -965,8 +971,8 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
 func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode, error) {
     // Format Query
     maps := map[string]string{
-        "fieldid":fieldid,
-        "objid":objid,
+        "fieldid": fieldid,
+        "objid": objid,
     }
     // Send request
     res, err := dg.QueryGpm("getAllMembers", maps)
@@ -992,6 +998,29 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
     decoder, err := mapstructure.NewDecoder(config)
     if err != nil { return nil, err }
     err = decoder.Decode(r.All)
+    return data, err
+}
+
+// Get path to root
+func (dg Dgraph) GetParents(nameid string) ([]string, error) {
+    // Format Query
+    maps := map[string]string{
+        "nameid" :nameid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getParents", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []string
+    // f%$*µ%ing decoding
+    for _, x := range(r.All[0]["Node.parent"].([]interface{})[0].(model.JsonAtom)["Node.nameid"].([]interface{})) {
+        data = append(data, x.(string))
+    }
     return data, err
 }
 

@@ -24,7 +24,6 @@ type User_ struct {
     Name *string    `json:"name,omitempty"`
 }
 
-
 var TensionHookPayload string = `{
   uid
   Tension.action
