@@ -11,9 +11,10 @@ import (
     //"github.com/mitchellh/mapstructure"
     jwt "github.com/dgrijalva/jwt-go"
 
+    . "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/web/middleware/jwtauth"
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/tools"
+    "zerogov/fractal6.go/db"
 )
 
 var tkMaster *Jwt
@@ -34,8 +35,8 @@ type Jwt struct {
     // @FIX: How to initialize mapClaims with another map
     // in order to node decode evething at each request
 	tokenAuth  *jwtauth.JWTAuth
-    tokenClaim string 
-    tokenClaimErr string 
+    tokenClaim string
+    tokenClaimErr string
 }
 
 // New create a token auth master
@@ -55,7 +56,7 @@ func (Jwt) New() *Jwt {
         },
     }
     token, _ := tk.issue(uctx, time.Hour*72)
-	log.Println("DEBUG JWT:", tools.Unpack64(token))
+	log.Println("DEBUG JWT:", Unpack64(token))
 	return tk
 }
 
@@ -66,9 +67,10 @@ func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
 // Issue generate and encode a new token
 func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
     claims := jwt.MapClaims{ tk.tokenClaim: d }
+    jwtauth.SetIssuedNow(claims)
     jwtauth.SetExpiry(claims, time.Now().Add(t))
 	_, tokenString, err := tk.tokenAuth.Encode(claims)
-	return tools.Pack64(tokenString), err
+	return Pack64(tokenString), err
 }
 
 //
@@ -76,7 +78,7 @@ func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
 //
 
 func GetTokenMaster() *Jwt {
-    return tkMaster 
+    return tkMaster
 }
 
 // NewUserToken create a new user token from master key
@@ -103,9 +105,9 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
         httpCookie = http.Cookie{
             Name: "jwt",
             Value: tokenString,
-            Path: "/", 
+            Path: "/",
             HttpOnly: true,
-            Secure: true, 
+            Secure: true,
             //Expires: expirationTime,
             //MaxAge: 90000,
         }
@@ -113,7 +115,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
         httpCookie = http.Cookie{
             Name: "jwt",
             Value: tokenString,
-            Path: "/", 
+            Path: "/",
         }
     }
 
@@ -152,6 +154,11 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
     } else {
         ctx = context.WithValue(ctx, tkMaster.tokenClaimErr, err)
     }
+
+    if claims["iat"] != nil {
+        var iat int64 = int64(claims["iat"].(float64))
+        return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339))
+    }
     return ctx
 }
 
@@ -159,7 +166,31 @@ func UserCtxFromContext(ctx context.Context) (model.UserCtx, error) {
     userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
     if userCtxErr != nil {
         return model.UserCtx{}, userCtxErr.(error)
-    } 
-    return ctx.Value(tkMaster.tokenClaim).(model.UserCtx), nil
+    }
+    uctx := ctx.Value(tkMaster.tokenClaim).(model.UserCtx)
+    uctx.Iat = ctx.Value("iat").(string)
+    return uctx, nil
 
+}
+
+// CheckUserCtxIat update the user token if the given
+// node has been updated after that the token's iat.
+func CheckUserCtxIat(uctx model.UserCtx, nid string) (model.UserCtx, error) {
+    var u *model.UserCtx
+    var e error
+    var updatedAt string
+    DB := db.GetDB()
+    updatedAt_, e := DB.GetFieldByEq("Node.nameid", nid, "Node.updatedAt")
+    if e != nil { return uctx, e }
+    if updatedAt_ == nil {
+        updatedAt = uctx.Iat
+    } else {
+        updatedAt = updatedAt_.(string)
+    }
+    if IsOlder(uctx.Iat, updatedAt) {
+        u, e = DB.GetUser("username", uctx.Username)
+        if e != nil { return uctx, e }
+        return *u, e
+    }
+    return uctx, e
 }

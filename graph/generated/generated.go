@@ -304,6 +304,7 @@ type ComplexityRoot struct {
 		TensionsIn   func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		TensionsOut  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		Type         func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
 	}
 
 	NodeCharac struct {
@@ -1834,6 +1835,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Type(childComplexity), true
 
+	case "Node.updatedAt":
+		if e.complexity.Node.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Node.UpdatedAt(childComplexity), true
+
 	case "NodeCharac.id":
 		if e.complexity.NodeCharac.ID == nil {
 			break
@@ -2971,8 +2979,9 @@ directive @alter_RO on INPUT_FIELD_DEFINITION
 
 type Node @hidePrivate {
   id: ID!
-  createdAt: DateTime! @search
   createdBy(filter: UserFilter): User!
+  createdAt: DateTime! @search
+  updatedAt: DateTime
   name: String! @search(by: [term])
   nameid: String! @id @search(by: [hash, regexp])
   rootnameid: String! @search(by: [hash, regexp])
@@ -3030,9 +3039,9 @@ type NodeStats {
 
 type Post {
   id: ID!
+  createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
-  createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
@@ -3069,9 +3078,9 @@ type Label {
 type Comment {
   message: String! @search(by: [fulltext])
   id: ID!
+  createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
-  createdBy(filter: UserFilter): User!
 }
 
 type Blob {
@@ -3082,9 +3091,9 @@ type Blob {
   node(filter: NodeFragmentFilter): NodeFragment
   md: String
   id: ID!
+  createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
-  createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
@@ -3093,9 +3102,9 @@ type Event {
   old: String
   new: String
   id: ID!
+  createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
-  createdBy(filter: UserFilter): User!
   message: String @search(by: [fulltext])
 }
 
@@ -3217,28 +3226,28 @@ enum BlobType {
 
 }
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @id on FIELD_DEFINITION
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
-
 directive @cascade on FIELD
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
+  createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime
-  createdBy: UserRef!
   message: String
   tension: TensionRef!
   blob_type: BlobType!
@@ -3254,9 +3263,9 @@ type AddBlobPayload {
 }
 
 input AddCommentInput {
+  createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime
-  createdBy: UserRef!
   message: String
   _VOID: String
 }
@@ -3267,9 +3276,9 @@ type AddCommentPayload {
 }
 
 input AddEventInput {
+  createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime
-  createdBy: UserRef!
   message: String
   event_type: TensionEvent!
   old: String
@@ -3334,8 +3343,9 @@ type AddNodeFragmentPayload {
 }
 
 input AddNodeInput {
-  createdAt: DateTime!
   createdBy: UserRef! @add_isOwner(u:"createdBy")
+  createdAt: DateTime!
+  updatedAt: DateTime @alter_RO
   name: String!
   nameid: String!
   rootnameid: String!
@@ -3380,9 +3390,9 @@ type AddNodeStatsPayload {
 }
 
 input AddTensionInput {
+  createdBy: UserRef! @add_isOwner(u:"createdBy")
   createdAt: DateTime!
   updatedAt: DateTime
-  createdBy: UserRef! @add_isOwner(u:"createdBy")
   message: String
   nth: String
   title: String! @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
@@ -3474,9 +3484,9 @@ enum BlobOrderable {
 }
 
 input BlobPatch {
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String
   tension: TensionRef
   blob_type: BlobType @patch_RO
@@ -3488,9 +3498,9 @@ input BlobPatch {
 
 input BlobRef {
   id: ID
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String
   tension: TensionRef
   blob_type: BlobType
@@ -3527,18 +3537,18 @@ enum CommentOrderable {
 }
 
 input CommentPatch {
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String @patch_isOwner(u:"createdBy")
   _VOID: String
 }
 
 input CommentRef {
   id: ID
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String
   _VOID: String
 }
@@ -3660,9 +3670,9 @@ enum EventOrderable {
 }
 
 input EventPatch {
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String
   event_type: TensionEvent
   old: String
@@ -3671,9 +3681,9 @@ input EventPatch {
 
 input EventRef {
   id: ID
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String
   event_type: TensionEvent
   old: String
@@ -3912,6 +3922,7 @@ input NodeOrder {
 
 enum NodeOrderable {
   createdAt
+  updatedAt
   name
   nameid
   rootnameid
@@ -3923,8 +3934,9 @@ enum NodeOrderable {
 }
 
 input NodePatch {
-  createdAt: DateTime @patch_RO
   createdBy: UserRef @patch_RO
+  createdAt: DateTime @patch_RO
+  updatedAt: DateTime @alter_RO
   name: String @patch_hasRole(n:["parent"], r: Coordinator)
   rootnameid: String @patch_RO
   parent: NodeRef @patch_RO
@@ -3952,8 +3964,9 @@ input NodePatch {
 
 input NodeRef {
   id: ID
-  createdAt: DateTime
   createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime
   name: String
   nameid: String
   rootnameid: String
@@ -4026,9 +4039,9 @@ enum PostOrderable {
 }
 
 input PostPatch {
+  createdBy: UserRef @patch_RO
   createdAt: DateTime @patch_RO
   updatedAt: DateTime @patch_isOwner(u:"createdBy")
-  createdBy: UserRef @patch_RO
   message: String @patch_isOwner(u:"createdBy")
 }
 
@@ -4136,9 +4149,9 @@ enum TensionOrderable {
 }
 
 input TensionPatch {
+  createdBy: UserRef @patch_RO
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef @patch_RO
   message: String
   nth: String
   title: String @alter_hasRole(n:["emitter"], r: Coordinator, u:"createdBy", a:1)
@@ -4160,9 +4173,9 @@ input TensionPatch {
 
 input TensionRef {
   id: ID
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  createdBy: UserRef
   message: String
   nth: String
   title: String
@@ -8633,6 +8646,44 @@ func (ec *executionContext) _Blob_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Blob_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Blob",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Blob_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Blob_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8710,44 +8761,6 @@ func (ec *executionContext) _Blob_updatedAt(ctx context.Context, field graphql.C
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Blob_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Blob",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Blob_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Blob_message(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
@@ -8888,6 +8901,44 @@ func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.Colle
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Comment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Comment_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Comment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8965,44 +9016,6 @@ func (ec *executionContext) _Comment_updatedAt(ctx context.Context, field graphq
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Comment",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Comment_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteBlobPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteBlobPayload) (ret graphql.Marshaler) {
@@ -9759,6 +9772,44 @@ func (ec *executionContext) _Event_id(ctx context.Context, field graphql.Collect
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Event_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Event",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Event_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Event_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9836,44 +9887,6 @@ func (ec *executionContext) _Event_updatedAt(ctx context.Context, field graphql.
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Event_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Event",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Event_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_message(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -11529,6 +11542,44 @@ func (ec *executionContext) _Node_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -11580,7 +11631,7 @@ func (ec *executionContext) _Node_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalNDateTime2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+func (ec *executionContext) _Node_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11595,27 +11646,17 @@ func (ec *executionContext) _Node_createdBy(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
+		return obj.UpdatedAt, nil
 	})
 
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Node_name(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
@@ -13464,6 +13505,44 @@ func (ec *executionContext) _Post_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Post_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Post",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Post_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Post_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13541,44 +13620,6 @@ func (ec *executionContext) _Post_updatedAt(ctx context.Context, field graphql.C
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Post_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Post",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Post_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Post_message(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
@@ -17968,6 +18009,12 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
@@ -17977,12 +18024,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18070,6 +18111,12 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
@@ -18079,12 +18126,6 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18112,6 +18153,12 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
@@ -18121,12 +18168,6 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18376,12 +18417,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
-		case "createdAt":
-			var err error
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "createdBy":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -18408,6 +18443,33 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				it.CreatedBy = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
+			}
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "name":
 			var err error
@@ -18601,18 +18663,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 
 	for k, v := range asMap {
 		switch k {
-		case "createdAt":
-			var err error
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "updatedAt":
-			var err error
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "createdBy":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -18639,6 +18689,18 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				it.CreatedBy = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
+			}
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		case "message":
 			var err error
@@ -19435,6 +19497,12 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -19444,12 +19512,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19592,6 +19654,12 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -19601,12 +19669,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19760,6 +19822,12 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -19769,12 +19837,6 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19827,6 +19889,12 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -19836,12 +19904,6 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20055,6 +20117,12 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -20064,12 +20132,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20115,6 +20177,12 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -20124,12 +20192,6 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21105,27 +21167,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 
 	for k, v := range asMap {
 		switch k {
-		case "createdAt":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*string); ok {
-				it.CreatedAt = data
-			} else if tmp == nil {
-				it.CreatedAt = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
 		case "createdBy":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -21148,6 +21189,48 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.CreatedBy = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
+			}
+		case "createdAt":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
+		case "updatedAt":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
 		case "name":
 			var err error
@@ -21676,15 +21759,21 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "createdBy":
+		case "updatedAt":
 			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22006,6 +22095,29 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 
 	for k, v := range asMap {
 		switch k {
+		case "createdBy":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.CreatedBy = data
+			} else if tmp == nil {
+				it.CreatedBy = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
+			}
 		case "createdAt":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
@@ -22051,29 +22163,6 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 				it.UpdatedAt = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-			}
-		case "createdBy":
-			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, err
-			}
-			if data, ok := tmp.(*model.UserRef); ok {
-				it.CreatedBy = data
-			} else if tmp == nil {
-				it.CreatedBy = nil
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
 			}
 		case "message":
 			var err error
@@ -22430,18 +22519,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
-		case "createdAt":
-			var err error
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "updatedAt":
-			var err error
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "createdBy":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -22464,6 +22541,18 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				it.CreatedBy = nil
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
+			}
+		case "createdAt":
+			var err error
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		case "message":
 			var err error
@@ -22942,6 +23031,12 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "createdBy":
+			var err error
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -22951,12 +23046,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		case "updatedAt":
 			var err error
 			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "createdBy":
-			var err error
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24287,6 +24376,11 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdBy":
+			out.Values[i] = ec._Blob_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Blob_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24294,11 +24388,6 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Blob_updatedAt(ctx, field, obj)
-		case "createdBy":
-			out.Values[i] = ec._Blob_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "message":
 			out.Values[i] = ec._Blob_message(ctx, field, obj)
 		default:
@@ -24333,6 +24422,11 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdBy":
+			out.Values[i] = ec._Comment_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Comment_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24340,11 +24434,6 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
-		case "createdBy":
-			out.Values[i] = ec._Comment_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -24667,6 +24756,11 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdBy":
+			out.Values[i] = ec._Event_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Event_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24674,11 +24768,6 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Event_updatedAt(ctx, field, obj)
-		case "createdBy":
-			out.Values[i] = ec._Event_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "message":
 			out.Values[i] = ec._Event_message(ctx, field, obj)
 		default:
@@ -24874,16 +24963,18 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "createdAt":
-			out.Values[i] = ec._Node_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "createdBy":
 			out.Values[i] = ec._Node_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdAt":
+			out.Values[i] = ec._Node_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Node_updatedAt(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Node_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -25101,6 +25192,11 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdBy":
+			out.Values[i] = ec._Post_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Post_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -25108,11 +25204,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Post_updatedAt(ctx, field, obj)
-		case "createdBy":
-			out.Values[i] = ec._Post_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "message":
 			out.Values[i] = ec._Post_message(ctx, field, obj)
 		default:

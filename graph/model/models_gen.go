@@ -9,9 +9,9 @@ import (
 )
 
 type AddBlobInput struct {
+	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	CreatedAt    string           `json:"createdAt,omitempty"`
 	UpdatedAt    *string          `json:"updatedAt,omitempty"`
-	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	Message      *string          `json:"message,omitempty"`
 	Tension      *TensionRef      `json:"tension,omitempty"`
 	BlobType     BlobType         `json:"blob_type,omitempty"`
@@ -27,9 +27,9 @@ type AddBlobPayload struct {
 }
 
 type AddCommentInput struct {
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	CreatedAt string   `json:"createdAt,omitempty"`
 	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
@@ -40,9 +40,9 @@ type AddCommentPayload struct {
 }
 
 type AddEventInput struct {
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
 	CreatedAt string       `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef     `json:"createdBy,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 	EventType TensionEvent `json:"event_type,omitempty"`
 	Old       *string      `json:"old,omitempty"`
@@ -107,8 +107,9 @@ type AddNodeFragmentPayload struct {
 }
 
 type AddNodeInput struct {
-	CreatedAt    string         `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt    string         `json:"createdAt,omitempty"`
+	UpdatedAt    *string        `json:"updatedAt,omitempty"`
 	Name         string         `json:"name,omitempty"`
 	Nameid       string         `json:"nameid,omitempty"`
 	Rootnameid   string         `json:"rootnameid,omitempty"`
@@ -153,9 +154,9 @@ type AddNodeStatsPayload struct {
 }
 
 type AddTensionInput struct {
+	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
 	Message    *string        `json:"message,omitempty"`
 	Nth        *string        `json:"nth,omitempty"`
 	Title      string         `json:"title,omitempty"`
@@ -227,9 +228,9 @@ type Blob struct {
 	Node         *NodeFragment `json:"node,omitempty"`
 	Md           *string       `json:"md,omitempty"`
 	ID           string        `json:"id,omitempty"`
+	CreatedBy    *User         `json:"createdBy,omitempty"`
 	CreatedAt    string        `json:"createdAt,omitempty"`
 	UpdatedAt    *string       `json:"updatedAt,omitempty"`
-	CreatedBy    *User         `json:"createdBy,omitempty"`
 	Message      *string       `json:"message,omitempty"`
 }
 
@@ -252,9 +253,9 @@ type BlobOrder struct {
 }
 
 type BlobPatch struct {
+	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	CreatedAt    *string          `json:"createdAt,omitempty"`
 	UpdatedAt    *string          `json:"updatedAt,omitempty"`
-	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	Message      *string          `json:"message,omitempty"`
 	Tension      *TensionRef      `json:"tension,omitempty"`
 	BlobType     *BlobType        `json:"blob_type,omitempty"`
@@ -266,9 +267,9 @@ type BlobPatch struct {
 
 type BlobRef struct {
 	ID           *string          `json:"id,omitempty"`
+	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	CreatedAt    *string          `json:"createdAt,omitempty"`
 	UpdatedAt    *string          `json:"updatedAt,omitempty"`
-	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	Message      *string          `json:"message,omitempty"`
 	Tension      *TensionRef      `json:"tension,omitempty"`
 	BlobType     *BlobType        `json:"blob_type,omitempty"`
@@ -285,9 +286,9 @@ type BlobTypeHash struct {
 type Comment struct {
 	Message   string  `json:"message,omitempty"`
 	ID        string  `json:"id,omitempty"`
+	CreatedBy *User   `json:"createdBy,omitempty"`
 	CreatedAt string  `json:"createdAt,omitempty"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
-	CreatedBy *User   `json:"createdBy,omitempty"`
 }
 
 type CommentFilter struct {
@@ -306,18 +307,18 @@ type CommentOrder struct {
 }
 
 type CommentPatch struct {
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
 type CommentRef struct {
 	ID        *string  `json:"id,omitempty"`
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 	Void      *string  `json:"_VOID,omitempty"`
 }
@@ -401,9 +402,9 @@ type Event struct {
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
 	ID        string       `json:"id,omitempty"`
+	CreatedBy *User        `json:"createdBy,omitempty"`
 	CreatedAt string       `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
-	CreatedBy *User        `json:"createdBy,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 }
 
@@ -424,9 +425,9 @@ type EventOrder struct {
 }
 
 type EventPatch struct {
+	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	UpdatedAt *string       `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
 	EventType *TensionEvent `json:"event_type,omitempty"`
 	Old       *string       `json:"old,omitempty"`
@@ -435,9 +436,9 @@ type EventPatch struct {
 
 type EventRef struct {
 	ID        *string       `json:"id,omitempty"`
+	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	UpdatedAt *string       `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef      `json:"createdBy,omitempty"`
 	Message   *string       `json:"message,omitempty"`
 	EventType *TensionEvent `json:"event_type,omitempty"`
 	Old       *string       `json:"old,omitempty"`
@@ -529,8 +530,9 @@ type MandateRef struct {
 
 type Node struct {
 	ID           string      `json:"id,omitempty"`
-	CreatedAt    string      `json:"createdAt,omitempty"`
 	CreatedBy    *User       `json:"createdBy,omitempty"`
+	CreatedAt    string      `json:"createdAt,omitempty"`
+	UpdatedAt    *string     `json:"updatedAt,omitempty"`
 	Name         string      `json:"name,omitempty"`
 	Nameid       string      `json:"nameid,omitempty"`
 	Rootnameid   string      `json:"rootnameid,omitempty"`
@@ -670,8 +672,9 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedAt    *string        `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt    *string        `json:"createdAt,omitempty"`
+	UpdatedAt    *string        `json:"updatedAt,omitempty"`
 	Name         *string        `json:"name,omitempty"`
 	Rootnameid   *string        `json:"rootnameid,omitempty"`
 	Parent       *NodeRef       `json:"parent,omitempty"`
@@ -699,8 +702,9 @@ type NodePatch struct {
 
 type NodeRef struct {
 	ID           *string        `json:"id,omitempty"`
-	CreatedAt    *string        `json:"createdAt,omitempty"`
 	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt    *string        `json:"createdAt,omitempty"`
+	UpdatedAt    *string        `json:"updatedAt,omitempty"`
 	Name         *string        `json:"name,omitempty"`
 	Nameid       *string        `json:"nameid,omitempty"`
 	Rootnameid   *string        `json:"rootnameid,omitempty"`
@@ -753,9 +757,9 @@ type NodeTypeHash struct {
 
 type Post struct {
 	ID        string  `json:"id,omitempty"`
+	CreatedBy *User   `json:"createdBy,omitempty"`
 	CreatedAt string  `json:"createdAt,omitempty"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
-	CreatedBy *User   `json:"createdBy,omitempty"`
 	Message   *string `json:"message,omitempty"`
 }
 
@@ -775,9 +779,9 @@ type PostOrder struct {
 }
 
 type PostPatch struct {
+	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	CreatedAt *string  `json:"createdAt,omitempty"`
 	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
 	Message   *string  `json:"message,omitempty"`
 }
 
@@ -870,9 +874,9 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
+	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
 	CreatedAt  *string        `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
 	Message    *string        `json:"message,omitempty"`
 	Nth        *string        `json:"nth,omitempty"`
 	Title      *string        `json:"title,omitempty"`
@@ -894,9 +898,9 @@ type TensionPatch struct {
 
 type TensionRef struct {
 	ID         *string        `json:"id,omitempty"`
+	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
 	CreatedAt  *string        `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
 	Message    *string        `json:"message,omitempty"`
 	Nth        *string        `json:"nth,omitempty"`
 	Title      *string        `json:"title,omitempty"`
@@ -1641,6 +1645,7 @@ type NodeOrderable string
 
 const (
 	NodeOrderableCreatedAt    NodeOrderable = "createdAt"
+	NodeOrderableUpdatedAt    NodeOrderable = "updatedAt"
 	NodeOrderableName         NodeOrderable = "name"
 	NodeOrderableNameid       NodeOrderable = "nameid"
 	NodeOrderableRootnameid   NodeOrderable = "rootnameid"
@@ -1653,6 +1658,7 @@ const (
 
 var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableCreatedAt,
+	NodeOrderableUpdatedAt,
 	NodeOrderableName,
 	NodeOrderableNameid,
 	NodeOrderableRootnameid,
@@ -1665,7 +1671,7 @@ var AllNodeOrderable = []NodeOrderable{
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
 		return true
 	}
 	return false

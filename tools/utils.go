@@ -1,12 +1,23 @@
 package tools
 
 import (
+    "time"
     "reflect"
     "regexp"
     "strings"
     "encoding/json"
     "github.com/spf13/viper"
 )
+
+func Now() string {
+    return time.Now().Format(time.RFC3339)
+}
+
+func IsOlder(d1, d2 string) bool {
+    date1, _ := time.Parse(time.RFC3339, d1)
+    date2, _ := time.Parse(time.RFC3339, d2)
+    return  date1.Before(date2)
+}
 
 //
 // Read Config file

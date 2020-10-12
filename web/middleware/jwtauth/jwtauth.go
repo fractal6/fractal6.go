@@ -263,7 +263,7 @@ func SetExpiryIn(claims jwt.MapClaims, tm time.Duration) {
 	claims["exp"] = ExpireIn(tm)
 }
 
-// TokenFromCookie tries to retreive the token string from a cookie named
+// TokenFromCookie tries to retrieve the token string from a cookie named
 // "jwt".
 func TokenFromCookie(r *http.Request) string {
 	cookie, err := r.Cookie("jwt")

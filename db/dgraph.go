@@ -998,13 +998,14 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 // DQL Mutations
 
 // SetNodeLiteral set a predicate for the given node in the DB
+// @debug rename to SetFieldByEq
 func (dg Dgraph) SetNodeLiteral(nameid string, predicate string, val string) error {
     query := fmt.Sprintf(`query {
         node as var(func: eq(Node.nameid, "%s"))
     }`, nameid)
 
     mu := fmt.Sprintf(`
-    uid(node) <Node.%s> "%s" .
+        uid(node) <Node.%s> "%s" .
     `, predicate, val)
 
     mutation := &api.Mutation{

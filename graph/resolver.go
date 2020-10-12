@@ -11,7 +11,6 @@ import (
     "reflect"
     "strings"
     "github.com/99designs/gqlgen/graphql"
-    "time"
 
     . "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/db"
@@ -168,10 +167,8 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
                 return yes, LogErr("Access denied", err)
             }
             rootnameid, err := nid2rootid(nameid)
-            for _, ur := range uctx.Roles {
-                if ur.Rootnameid == rootnameid  {
-                    return false, err
-                }
+            if userHasRoot(uctx, rootnameid) == false {
+                return false, err
             }
         } else {
             yes = false
@@ -690,12 +687,20 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, error) {
     var ok bool = true
     var err error
+    var nameid string
     for _, event := range(events) {
         if *event.EventType == model.TensionEventBlobPushed ||
            *event.EventType == model.TensionEventBlobArchived ||
            *event.EventType == model.TensionEventBlobUnarchived {
                // Process the special event
-               ok, err = processTensionEventHook(uctx, event, tid, bid)
+               ok, err, nameid = processTensionEventHook(uctx, event, tid, bid)
+               if ok && err == nil {
+                   err = db.GetDB().SetNodeLiteral(nameid, "updatedAt", Now())
+                   pid, _ := nid2pid(nameid)
+                   if pid != nameid && err == nil {
+                       err = db.GetDB().SetNodeLiteral(pid, "updatedAt", Now())
+                   }
+               }
                // Break after the first hooked event
                break
            }
@@ -705,19 +710,20 @@ func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, b
 }
 
 // Add, Update or Archived a Node
-func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error) {
+func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error, string) {
+    var nameid string
     // Get Tension, target Node and blob charac (last if bid undefined)
     tension, err := db.GetDB().GetTensionHook(tid, bid)
-    if err != nil { return false, LogErr("Access denied", err) }
-    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found")) }
+    if err != nil { return false, LogErr("Access denied", err), nameid}
+    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found")), nameid }
 
     // Check that Blob exists
     blob := tension.Blobs[0]
-    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found")) }
+    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found")), nameid }
 
     // Extract Tension characteristic
     tensionCharac, err:= TensionCharac{}.New(*tension.Action)
-    if err != nil { return false, LogErr("internal error", err) }
+    if err != nil { return false, LogErr("internal error", err), nameid }
 
     var ok bool
     var node *model.NodeFragment
@@ -747,12 +753,12 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
                 ok, err = TryUpdateDoc(uctx, tension, md)
             }
         case ArchiveAction:
-            err = fmt.Errorf("Cannot push archived document")
+            err = LogErr("Access denied", fmt.Errorf("Cannot publish archived document"))
         }
 
-        if err != nil { return ok, err }
+        if err != nil { return ok, err, nameid }
         if ok { // Update blob pushed flag
-            err = db.GetDB().SetPushedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.EditAction(node.Type))
+            err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tid, tensionCharac.EditAction(node.Type))
         }
     } else if *event.EventType == model.TensionEventBlobArchived {
         // Archived Node
@@ -766,9 +772,9 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
             ok, err = TryArchiveDoc(uctx, tension, md)
         }
 
-        if err != nil { return ok, err }
+        if err != nil { return ok, err, nameid }
         if ok { // Update blob archived flag
-            err = db.GetDB().SetArchivedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.ArchiveAction(node.Type))
+            err = db.GetDB().SetArchivedFlagBlob(blob.ID, Now(), tid, tensionCharac.ArchiveAction(node.Type))
         }
     } else if *event.EventType == model.TensionEventBlobUnarchived {
         // Unarchived Node
@@ -782,13 +788,17 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
             ok, err = TryUnarchiveDoc(uctx, tension, md)
         }
 
-        if err != nil { return ok, err }
+        if err != nil { return ok, err, nameid }
         if ok { // Update blob pushed flag
-            err = db.GetDB().SetPushedFlagBlob(blob.ID, time.Now().Format(time.RFC3339), tid, tensionCharac.EditAction(node.Type))
+            err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tid, tensionCharac.EditAction(node.Type))
         }
     }
 
-    return ok, err
+    if ok && err == nil {
+        _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
+    }
+
+    return ok, err, nameid
 }
 
 //
@@ -797,6 +807,11 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
 
 // useHasRoot return true if the user has at least one role in above given node
 func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
+    if e != nil {
+        panic(e)
+    }
+
     for _, ur := range uctx.Roles {
         if ur.Rootnameid == rootnameid  {
             return true
@@ -807,6 +822,11 @@ func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
 
 // useHasRole return true if the user has the given role on the given node
 func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
+    if e != nil {
+        panic(e)
+    }
+
     for _, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
@@ -821,6 +841,11 @@ func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
 
 // useIsCoordo return true if the user has at least one role in the given node
 func userIsMember(uctx model.UserCtx, nameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
+    if e != nil {
+        panic(e)
+    }
+
     for _, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
@@ -835,6 +860,11 @@ func userIsMember(uctx model.UserCtx, nameid string) bool {
 
 // useIsCoordo return true if the user has at least one role of Coordinator in the given node
 func userIsCoordo(uctx model.UserCtx, nameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
+    if e != nil {
+        panic(e)
+    }
+
     for _, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
@@ -850,6 +880,11 @@ func userIsCoordo(uctx model.UserCtx, nameid string) bool {
 
 // userIsGuest return true if the user is a guest (has only one role) in the given organisation
 func userIsGuest(uctx model.UserCtx, rootnameid string) int {
+    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
+    if e != nil {
+        panic(e)
+    }
+
     for i, r := range uctx.Roles {
         if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
             return i

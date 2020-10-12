@@ -21,12 +21,13 @@ type UserCtx struct {
     Passwd   string     `json:"password"` // hash
     Rights   UserRights `json:"rights"`
 	Roles    []Role     `json:"roles"`
+    Iat      string     // fot token iat (empty when uctx is got from DB)
 }
 type Role struct {
-    Rootnameid string  `json:"rootnameid"` 
-    Nameid string      `json:"nameid"` 
-    Name string        `json:"name"` 
-    RoleType RoleType  `json:"role_type"` 
+    Rootnameid string  `json:"rootnameid"`
+    Nameid string      `json:"nameid"`
+    Name string        `json:"name"`
+    RoleType RoleType  `json:"role_type"`
 }
 
 //
