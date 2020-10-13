@@ -11,7 +11,7 @@ import (
 // Codecs
 //
 
-func nodeIdCodec(parentid string, targetid string,  nodeType model.NodeType) (string, string, error) {
+func nodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, string, error) {
     var nameid string
     rootnameid, err := nid2rootid(parentid)
     if nodeType == model.NodeTypeRole {
@@ -27,17 +27,19 @@ func nodeIdCodec(parentid string, targetid string,  nodeType model.NodeType) (st
 }
 
 // Get the parent nameid from the given nameid (ROLE)
+// @debug nearestCircleId
 func nid2pid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")
-    if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
-    }
 
     if len(parts) == 1 || parts[1] == "" {
         pid = parts[0]
-    } else {
+    } else if len(parts) == 2 {
+        pid = nid
+    } else if len(parts) == 3 {
         pid = strings.Join(parts[:len(parts)-1],  "#")
+    } else {
+        return pid, fmt.Errorf("bad nameid format for nid2pid: " + nid)
     }
     return pid, nil
 }

@@ -153,9 +153,7 @@ func initDB() *Dgraph {
         }`,
         // Query existance
         "exists": `{
-            all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {
-                uid
-            }
+            all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) { uid }
         }`,
         // Get single object
         "getFieldById": `{
@@ -231,6 +229,11 @@ func initDB() *Dgraph {
                 Node.parent {
                     Node.nameid
                 }
+            }
+        }`,
+        "getCoordos": `{
+            all(func: eq(Node.nameid, "{{.nameid}}")) {
+                Node.children @fiter(eq(Node.role_type, Coordinator)) { uid }
             }
         }`,
         "getParents": `{
@@ -947,9 +950,6 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
     if err != nil { return nil, err }
 
     var data []model.NodeId
-    //if len(r.All) <= 1 {
-    //    return nil, new erro ?
-    //}
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1001,6 +1001,32 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
     return data, err
 }
 
+// Get all coordo roles
+func (dg Dgraph) HasCoordos(nameid string) (bool) {
+    // Format Query
+    maps := map[string]string{
+        "nameid": nameid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getCoordos", maps)
+    if err != nil { return false }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return false }
+
+    //var data []model.NodeId
+    var ok bool = false
+    if len(r.All) > 1 {
+        return ok
+    } else if len(r.All) == 1 {
+        fmt.Println("hasCoorods ?!!!")
+        fmt.Println(r.All[0])
+    }
+    return ok
+}
+
 // Get path to root
 func (dg Dgraph) GetParents(nameid string) ([]string, error) {
     // Format Query
@@ -1017,9 +1043,20 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
     if err != nil { return nil, err }
 
     var data []string
-    // f%$*µ%ing decoding
-    for _, x := range(r.All[0]["Node.parent"].([]interface{})[0].(model.JsonAtom)["Node.nameid"].([]interface{})) {
-        data = append(data, x.(string))
+    fmt.Println(nameid)
+    fmt.Println(r.All)
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple tension for @uid: %s", nameid)
+    } else if len(r.All) == 1 {
+        // f%$*µ%ing decoding
+        switch p := r.All[0]["Node.parent"].([]interface{})[0].(model.JsonAtom)["Node.nameid"].(type) {
+        case []interface{}:
+            for _, x := range(p) {
+                data = append(data, x.(string))
+            }
+        case string:
+            data = append(data, p)
+        }
     }
     return data, err
 }

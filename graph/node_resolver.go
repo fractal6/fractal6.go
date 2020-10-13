@@ -4,6 +4,7 @@ import (
     "fmt"
     "time"
     "strconv"
+    "strings"
     //"github.com/mitchellh/mapstructure"
 
     "zerogov/fractal6.go/graph/model"
@@ -30,12 +31,16 @@ func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
         node.IsPrivate = &isPrivate
     }
 
-    ok, err := CanAddNode(uctx, node, parentid, charac)
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return false, err }
+
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
     if err != nil || !ok {
         return ok, err
     }
 
-    err = PushNode(uctx, tid, node, emitterid, parentid)
+    err = PushNode(uctx, tid, node, emitterid, nameid, parentid)
     return ok, err
 }
 
@@ -44,24 +49,32 @@ func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeF
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
-    ok, err := CanAddNode(uctx, node, parentid, charac)
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return false, err }
+
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
     if err != nil || !ok {
         return ok, err
     }
 
-    err = UpdateNode(uctx, node, emitterid, parentid)
+    err = UpdateNode(uctx, node, emitterid, nameid, parentid)
     return ok, err
 }
 
 func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
-    nameid := *node.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
-    ok, err := CanAddNode(uctx, node, parentid, charac)
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return false, err }
+
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
     if err != nil || !ok {
         return ok, err
     }
+
 
     // Archive Node
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
@@ -69,14 +82,18 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     return ok, err
 }
 func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
-    nameid := *node.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
-    ok, err := CanAddNode(uctx, node, parentid, charac)
+    // Get References
+    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return false, err }
+
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
     if err != nil || !ok {
         return ok, err
     }
+
 
     // Unarchive Node
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(false))
@@ -84,11 +101,10 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
 }
 
 // canAddNode check that a user can add a given role or circle in an organisation.
-func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, charac *model.NodeCharac) (bool, error) {
+func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac) (bool, error) {
     var ok bool = false
     var err error
 
-    nameid := *node.Nameid // @TODO (nameid @codec): verify that nameid match parentid
     name := *node.Name
     nodeType := *node.Type
     roleType := node.RoleType
@@ -119,15 +135,18 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, c
         ok = userIsCoordo(uctx, parentid)
     }
 
-    // Check if user is Coordinator of any parents
+    // Check if user is Coordinator of any parents if the PID has no coordinator
     if !ok {
-        // @debug: move to checkCoordoPath
-        parents, err := db.GetDB().GetParents(nameid)
-        if err != nil { return false, LogErr("Internal Error", err) }
-        for _, p := range(parents) {
-            if userIsCoordo(uctx, p) {
-                ok = true
-                break
+        parents, err := db.GetDB().GetParents(parentid)
+        // Check of pid has coordos
+        if len(parents) > 0 && !db.GetDB().HasCoordos(parents[0]) {
+            // @debug: move to checkCoordoPath
+            if err != nil { return ok, LogErr("Internal Error", err) }
+            for _, p := range(parents) {
+                if userIsCoordo(uctx, p) {
+                    ok = true
+                    break
+                }
             }
         }
     }
@@ -138,8 +157,7 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, parentid string, c
 // pushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
-func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid string, parentid string) (error) {
-    nameid := *node.Nameid
+func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
     rootnameid, _ := nid2rootid(nameid)
 
     // Map NodeFragment to Node Input
@@ -164,7 +182,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     case model.NodeTypeCircle:
         nodeInput.Children = nil
         for i, c := range(node.Children) {
-            child := makeNewChild(i, *c.FirstLink, *c.RoleType, node.Charac, node.IsPrivate)
+            child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node.Charac, node.IsPrivate)
             children = append(children, child)
         }
     }
@@ -187,7 +205,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
             tid_c, err := db.GetDB().AddTension(tensionInput)
             if err != nil { return err }
             // Push child
-            err = PushNode(uctx, tid_c, &child, emitterid, nameid)
+            err = PushNode(uctx, tid_c, &child, emitterid, *child.Nameid, nameid)
         }
     }
 
@@ -197,9 +215,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
 
 // updateNode update a node from the given fragment
 // @DEBUG: only set the field that have been modified in NodePatch
-func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid string, parentid string) (error) {
-    nameid := *node.Nameid
-
+func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
     // Map NodeFragment to Node Patch Input
     var nodePatch model.NodePatch
     delMap := make(map[string]interface{}, 2)
@@ -236,11 +252,11 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid string, 
 
 // internals
 
-func makeNewChild(i int, username string, role_type model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
+func makeNewChild(i int, username string, parentid string, role_type model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
     //name := "Coordinator"
     //nameid := "coordo" + strconv.Itoa(i)
     name := string(role_type)
-    nameid := name + strconv.Itoa(i)
+    nameid := parentid +"#"+ name + strconv.Itoa(i)
     type_ := model.NodeTypeRole
     roleType := model.RoleTypeCoordinator
     fs := username
@@ -270,6 +286,8 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
     blob_type := model.BlobTypeOnNode
     var childref model.NodeFragmentRef
     StructMap(child, &childref)
+    parts := strings.Split(*child.Nameid, "#")
+    childref.Nameid = &parts[len(parts)-1]
     blob := model.BlobRef{
         CreatedAt: &now,
         CreatedBy : &createdBy,
