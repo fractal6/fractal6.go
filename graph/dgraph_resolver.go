@@ -8,7 +8,21 @@ import (
     "github.com/99designs/gqlgen/graphql"
 
 	"zerogov/fractal6.go/tools"
+    "zerogov/fractal6.go/db"
 )
+
+
+func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
+    return DgraphRawQueryResolver(ctx, data, r.db)
+}
+
+func (r *mutationResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
+    return DgraphRawQueryResolver(ctx, data, r.db)
+}
+
+//func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, ipts interface{}, data interface{}) error {
+//    return DgraphQueryResolver(ctx, ipts, data, r.db)
+//}
 
 /*
 *
@@ -16,10 +30,10 @@ import (
 *
 */
 
-func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
+func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph) error {
     // How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
     // for k, a := range rc.Args {
-    
+
     /* Rebuild the Graphql inputs request from this context */
     rc := graphql.GetResolverContext(ctx)
     // rc.Field.Name
@@ -32,42 +46,15 @@ func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data int
     }
 
     // Send request
-    op := "rawQuery"
-    err := r.db.QueryGql(op, reqInput, data)
+    err := db.QueryGql("rawQuery", reqInput, data)
     if err != nil {
-        //panic(err)
-        return err
-    }
-    return nil
-}
-
-func (r *mutationResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
-    // How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
-    // for k, a := range rc.Args {
-    
-    /* Rebuild the Graphql inputs request from this context */
-    rc := graphql.GetResolverContext(ctx)
-    // rc.Field.Name
-    queryName := rc.Path().String()
-
-    // Build the graphql raw request
-    reqInput := map[string]string{
-        "QueryName": queryName,
-        "RawQuery": tools.CleanString(graphql.GetRequestContext(ctx).RawQuery, true),
-    }
-
-    // Send request
-    op := "rawQuery"
-    err := r.db.QueryGql(op, reqInput, data)
-    if err != nil {
-        //panic(err)
         return err
     }
     return nil
 }
 
 // @Debug: GetPreloads loose subfilter in payload(in QueryGraph)
-func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, data interface{}, ipts interface{}) error {
+func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}, db *db.Dgraph) error {
     mutCtx := ctx.Value("mutation_context").(MutationContext)
 
     /* Rebuild the Graphql inputs request from this context */
@@ -76,7 +63,7 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
 
     // Format inputs
     inputs, _ := json.Marshal(ipts)
-    // If inputs needs to get modified, see tools.StructToMap() usage 
+    // If inputs needs to get modified, see tools.StructToMap() usage
     // in order to to get the struct in the scema.resolver caller.
 
     // Format collected fields
@@ -93,11 +80,9 @@ func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, da
 
     // Send request
     op := string(mutCtx.type_)
-    err := r.db.QueryGql(op, reqInput, data)
+    err := db.QueryGql(op, reqInput, data)
     if err != nil {
-        //panic(err)
         return err
     }
     return nil
 }
-

@@ -442,8 +442,8 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
     if !ok && ctx.Value("nameid") != nil { // is a Node
         parents, err := db.GetDB().GetParents(ctx.Value("nameid").(string))
         // Check of pid has coordos
-        if len(parents) > 0 && !db.GetDB().HasCoordos(parents[0]) {
-            // @debug: move to checkCoordoPath
+        if len(parents) > 0 && !db.GetDB().HasCoordos(ctx.Value("nameid").(string)) {
+            // @debug: move to CheckCoordoPath function
             if err != nil { return nil, LogErr("Internal Error", err) }
             for _, p := range(parents) {
                 if userIsCoordo(uctx, p) {

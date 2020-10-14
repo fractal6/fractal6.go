@@ -76,8 +76,20 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     }
 
     // Archive Node
+    // --
+    if node.FirstLink != nil {
+        // Remove user role
+        userInput := model.UpdateUserInput{
+            Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: node.FirstLink } },
+            Remove: &model.UserPatch{
+                Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
+            },
+        }
+        err := db.GetDB().Update("user", userInput)
+        if err != nil { return false, err }
+    }
+    // Toggle the node flag
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
-    // remove user role
     return ok, err
 }
 func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
@@ -94,8 +106,20 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     }
 
     // Unarchive Node
+    // --
+    if node.FirstLink != nil {
+        // Add user role
+        userInput := model.UpdateUserInput{
+            Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: node.FirstLink } },
+            Set: &model.UserPatch{
+                Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
+            },
+        }
+        err := db.GetDB().Update("user", userInput)
+        if err != nil { return false, err }
+    }
+    // Toggle the node flag
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(false))
-    // add user role
     return ok, err
 }
 
@@ -135,8 +159,8 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
     if !ok {
         parents, err := db.GetDB().GetParents(parentid)
         // Check of pid has coordos
-        if len(parents) > 0 && !db.GetDB().HasCoordos(parents[0]) {
-            // @debug: move to checkCoordoPath
+        if len(parents) > 0 && !db.GetDB().HasCoordos(parentid) {
+            // @debug: move to CheckCoordoPath function
             if err != nil { return ok, LogErr("Internal Error", err) }
             for _, p := range(parents) {
                 if userIsCoordo(uctx, p) {
@@ -184,7 +208,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     }
 
     // Push the nodes into the database
-    err := db.GetDB().AddNode(nodeInput)
+    _, err := db.GetDB().Add("node", nodeInput)
     if err != nil { return err }
 
     // Change Guest to member if user got its first role.
@@ -198,7 +222,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
         for _, child := range(children) {
             // Add the child tension
             tensionInput := makeNewCoordoTension(uctx, emitterid, nameid, child)
-            tid_c, err := db.GetDB().AddTension(tensionInput)
+            tid_c, err := db.GetDB().Add("tension", tensionInput)
             if err != nil { return err }
             // Push child
             err = PushNode(uctx, tid_c, &child, emitterid, *child.Nameid, nameid)
@@ -221,8 +245,9 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
     switch *node.Type {
     case model.NodeTypeRole:
         if node.FirstLink != nil {
-            nodePatch.FirstLink = &model.UserRef{Username: node.FirstLink}
+            nodePatch.FirstLink = &model.UserRef{ Username: node.FirstLink }
         } else {
+            // if first_link is empty, remove it.
             delMap["Node.first_link"] = nil
         }
     case model.NodeTypeCircle:
@@ -236,7 +261,7 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
         //Remove: &delNodePatch, // @debug: omitempty issues
     }
     // Update the node in database
-    err := db.GetDB().UpdateNode(nodeInput)
+    err := db.GetDB().Update("node", nodeInput)
     if err != nil { return err }
 
     if len(delMap) > 0 {
@@ -250,7 +275,6 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
 
 func makeNewChild(i int, username string, parentid string, role_type model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
     //name := "Coordinator"
-    //nameid := "coordo" + strconv.Itoa(i)
     name := string(role_type)
     nameid := parentid +"#"+ name + strconv.Itoa(i)
     type_ := model.NodeTypeRole

@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "bytes"
+    "strings"
     "context"
     "reflect"
     "net/http"
@@ -207,7 +208,7 @@ func initDB() *Dgraph {
                 o as Node.children
             }
 
-            all(func: uid(o)) @filter( NOT eq("Node.isArchived", true)) {
+            all(func: uid(o)) @filter( NOT eq(Node.isArchived, true)) {
                 Node.{{.fieldid}}
             }
         }`,
@@ -216,7 +217,7 @@ func initDB() *Dgraph {
                 o as Node.children
             }
 
-            all(func: uid(o)) @filter(has(Node.role_type) AND NOT eq("Node.isArchived", true) ) {
+            all(func: uid(o)) @filter(has(Node.role_type) AND NOT eq(Node.isArchived, true) ) {
                 Node.createdAt
                 Node.name
                 Node.nameid
@@ -232,8 +233,8 @@ func initDB() *Dgraph {
             }
         }`,
         "getCoordos": `{
-            all(func: eq(Node.nameid, "{{.nameid}}")) @filter( NOT eq("Node.isArchived", true)) {
-                Node.children @fiter(eq(Node.role_type, Coordinator)) { uid }
+            all(func: eq(Node.nameid, "{{.nameid}}")) {
+                Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
             }
         }`,
         "getParents": `{
@@ -549,28 +550,37 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
         return &GraphQLError{string(err)}
     }
 
-    var config *mapstructure.DecoderConfig
-    if op == "query" || op == "rawQuery" {
-        // Decoder config to handle aliased request
-        // @DEBUG: see bug #3c3f1f7
-        config = &mapstructure.DecoderConfig{
-            Result: data,
-            TagName: "json",
-            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-                if to == reflect.Struct {
-                    nv := tools.CleanAliasedMap(v.(map[string]interface{}))
-                    return nv, nil
-                }
-                return v, nil
-            },
+
+    switch v := data.(type) {
+    case model.JsonAtom:
+        for k, val := range res.Data {
+            v[k] = val
         }
-    } else {
-        config = &mapstructure.DecoderConfig{TagName: "json", Result: data}
+    default: // Payload data type
+        var config *mapstructure.DecoderConfig
+        if op == "query" || op == "rawQuery" {
+            // Decoder config to handle aliased request
+            // @DEBUG: see bug #3c3f1f7
+            config = &mapstructure.DecoderConfig{
+                Result: data,
+                TagName: "json",
+                DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                    if to == reflect.Struct {
+                        nv := tools.CleanAliasedMap(v.(map[string]interface{}))
+                        return nv, nil
+                    }
+                    return v, nil
+                },
+            }
+        } else {
+            config = &mapstructure.DecoderConfig{TagName: "json", Result: data}
+        }
+
+        decoder, err := mapstructure.NewDecoder(config)
+        if err != nil { return err }
+        err = decoder.Decode(res.Data[queryName])
     }
 
-    decoder, err := mapstructure.NewDecoder(config)
-    if err != nil { return err }
-    err = decoder.Decode(res.Data[queryName])
     return err
 }
 
@@ -1021,8 +1031,10 @@ func (dg Dgraph) HasCoordos(nameid string) (bool) {
     if len(r.All) > 1 {
         return ok
     } else if len(r.All) == 1 {
-        fmt.Println("hasCoorods ?!!!")
-        fmt.Println(r.All[0])
+        c := r.All[0]["Node.children"]
+        if c != nil && len(c.([]interface{})) > 0 {
+            ok = true
+        }
     }
     return ok
 }
@@ -1043,8 +1055,6 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
     if err != nil { return nil, err }
 
     var data []string
-    fmt.Println(nameid)
-    fmt.Println(r.All)
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple tension for @uid: %s", nameid)
     } else if len(r.All) == 1 {
@@ -1145,38 +1155,17 @@ func (dg Dgraph) SetArchivedFlagBlob(bid string, flag string, tid string, action
 // Graphql requests
 //
 
-// AddUser add a new user
-func (dg Dgraph) AddUser(input model.AddUserInput) error {
-    queryName := "addUser"
-    inputType := "AddUserInput"
-    queryGraph := `user { id } `
-
-    // Just One User
-    inputs, _ := json.Marshal([]model.AddUserInput{input})
-
-    // Build the string request
-    reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
-        "InputType": inputType, // input type name (e.g AddUserInput)
-        "QueryGraph": tools.CleanString(queryGraph, true), // output data
-        "InputPayload": string(inputs), // inputs data
-    }
-
-    // Send request
-    payload := model.AddUserPayload{}
-    err := dg.QueryGql("add", reqInput, &payload)
-
-    return err
-}
-
-// AddNode add a new node
-func (dg Dgraph) AddNode(input model.AddNodeInput) error {
-    queryName := "addNode"
-    inputType := "AddNodeInput"
-    queryGraph := `node { id }`
+// Add a new vertex
+func (dg Dgraph) Add(vertex string, input interface{}) (string, error) {
+    Vertex := strings.Title(vertex)
+    queryName := "add" + Vertex
+    inputType := "Add" + Vertex + "Input"
+    queryGraph := vertex + ` { id }`
 
     // Just One Node
-    inputs, _ := json.Marshal([]model.AddNodeInput{input})
+    var ifaces []interface{} = make([]interface{}, 1)
+    ifaces[0] = input
+    inputs, _ := json.Marshal(ifaces)
 
     // Build the string request
     reqInput := map[string]string{
@@ -1187,17 +1176,20 @@ func (dg Dgraph) AddNode(input model.AddNodeInput) error {
     }
 
     // Send request
-    payload := model.AddNodePayload{}
-    err := dg.QueryGql("add", reqInput, &payload)
-
-    return err
+    payload := make(model.JsonAtom, 1)
+    err := dg.QueryGql("add", reqInput, payload)
+    if err != nil { return "", err }
+    // Extract id result
+    res := payload[queryName].(model.JsonAtom)[vertex].([]interface{})[0].(model.JsonAtom)["id"]
+    return res.(string), err
 }
 
-// UpdateNode update a node node
-func (dg Dgraph) UpdateNode(input model.UpdateNodeInput) error {
-    queryName := "updateNode"
-    inputType := "UpdateNodeInput"
-    queryGraph := `node { id }`
+// Update a vertex
+func (dg Dgraph) Update(vertex string, input interface{}) error {
+    Vertex := strings.Title(vertex)
+    queryName := "update" + Vertex
+    inputType := "Update" + Vertex + "Input"
+    queryGraph := vertex + ` { id }`
 
     // Just One Node
     inputs, _ := json.Marshal(input)
@@ -1211,20 +1203,20 @@ func (dg Dgraph) UpdateNode(input model.UpdateNodeInput) error {
     }
 
     // Send request
-    payload := model.UpdateNodePayload{}
-    err := dg.QueryGql("update", reqInput, &payload)
-
+    payload := make(model.JsonAtom, 1)
+    err := dg.QueryGql("update", reqInput, payload)
     return err
 }
 
-// AddTension add a new tension
-func (dg Dgraph) AddTension(input model.AddTensionInput) (string, error) {
-    queryName := "addTension"
-    inputType := "AddTensionInput"
-    queryGraph := `tension { id }`
+// Delete a vertex
+func (dg Dgraph) Delete(vertex string, input interface{}) error {
+    Vertex := strings.Title(vertex)
+    queryName := "delete" + Vertex
+    inputType := "Delete" + Vertex + "Input"
+    queryGraph := vertex + ` { id }`
 
-    // Just One Tension
-    inputs, _ := json.Marshal([]model.AddTensionInput{input})
+    // Just One Node
+    inputs, _ := json.Marshal(input)
 
     // Build the string request
     reqInput := map[string]string{
@@ -1235,12 +1227,8 @@ func (dg Dgraph) AddTension(input model.AddTensionInput) (string, error) {
     }
 
     // Send request
-    payload := model.AddTensionPayload{}
-    err := dg.QueryGql("add", reqInput, &payload)
-    if err != nil {
-        return "", err
-    }
-
-    r := payload.Tension[0].ID
-    return r, err
+    payload := make(model.JsonAtom, 1)
+    err := dg.QueryGql("delete", reqInput, payload)
+    return err
 }
+

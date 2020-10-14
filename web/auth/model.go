@@ -233,9 +233,9 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         //Utc            *string
     }
 
-    // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
     DB := db.GetDB()
-    err := DB.AddUser(userInput)
+    // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
+    _, err := DB.Add("user", userInput)
     if err != nil {
         return nil, err
     }
