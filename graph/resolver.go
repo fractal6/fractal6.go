@@ -744,6 +744,10 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     var ok bool
     var node *model.NodeFragment = blob.Node
 
+    // Nameid Codec
+    if node != nil && node.Nameid != nil {
+        _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
+    }
 
     if *event.EventType == model.TensionEventBlobPushed {
         // Add or Update Node
@@ -752,10 +756,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // 2. swith on TensionCharac.ActionType to add update etc...
         switch tensionCharac.ActionType {
         case NewAction:
-            // Nameid Codec
-            if node != nil && node.Nameid != nil {
-                _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
-            }
             // First time a blob is pushed.
             switch tensionCharac.DocType {
             case NodeDoc:
@@ -765,8 +765,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
                 ok, err = TryAddDoc(uctx, tension, md)
             }
         case EditAction:
-            // Nameid Codec
-            nameid = *node.Nameid
             switch tensionCharac.DocType {
             case NodeDoc:
                 ok, err = TryUpdateNode(uctx, tension, node)

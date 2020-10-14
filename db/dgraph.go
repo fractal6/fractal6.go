@@ -207,7 +207,7 @@ func initDB() *Dgraph {
                 o as Node.children
             }
 
-            all(func: uid(o)) {
+            all(func: uid(o)) @filter( NOT eq("Node.isArchived", true)) {
                 Node.{{.fieldid}}
             }
         }`,
@@ -216,7 +216,7 @@ func initDB() *Dgraph {
                 o as Node.children
             }
 
-            all(func: uid(o)) @filter(has(Node.role_type)) {
+            all(func: uid(o)) @filter(has(Node.role_type) AND NOT eq("Node.isArchived", true) ) {
                 Node.createdAt
                 Node.name
                 Node.nameid
@@ -232,7 +232,7 @@ func initDB() *Dgraph {
             }
         }`,
         "getCoordos": `{
-            all(func: eq(Node.nameid, "{{.nameid}}")) {
+            all(func: eq(Node.nameid, "{{.nameid}}")) @filter( NOT eq("Node.isArchived", true)) {
                 Node.children @fiter(eq(Node.role_type, Coordinator)) { uid }
             }
         }`,

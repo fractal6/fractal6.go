@@ -35,7 +35,7 @@ func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
     _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, true)
     if err != nil || !ok {
         return ok, err
     }
@@ -53,7 +53,7 @@ func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeF
     _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok {
         return ok, err
     }
@@ -70,15 +70,14 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok {
         return ok, err
     }
 
-
     // Archive Node
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
-
+    // remove user role
     return ok, err
 }
 func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
@@ -89,19 +88,19 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac)
+    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok {
         return ok, err
     }
 
-
     // Unarchive Node
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(false))
+    // add user role
     return ok, err
 }
 
 // canAddNode check that a user can add a given role or circle in an organisation.
-func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac) (bool, error) {
+func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, isNew bool) (bool, error) {
     var ok bool = false
     var err error
 
@@ -115,16 +114,13 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
     err = auth.ValidateName(name)
     if err != nil { return ok, err }
 
-    // New Role hook
+    // RoleType Hook
     if nodeType == model.NodeTypeRole {
         // Validate input
         if roleType == nil {
             err = fmt.Errorf("role should have a RoleType")
         }
-    }
-
-    // New sub-circle hook
-    if nodeType == model.NodeTypeCircle {
+    } else if nodeType == model.NodeTypeCircle {
         //pass
     }
 

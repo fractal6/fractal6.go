@@ -23,6 +23,7 @@ func nodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, st
     } else if nodeType == model.NodeTypeCircle {
         nameid = strings.Join([]string{rootnameid, targetid}, "#")
     }
+    nameid = strings.TrimSuffix(nameid, "#")
     return rootnameid, nameid, err
 }
 
