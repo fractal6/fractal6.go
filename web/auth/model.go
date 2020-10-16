@@ -268,3 +268,31 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     userCtx.Passwd = ""
     return userCtx, nil
 }
+
+//
+// Public user methods
+//
+
+// AddUserRole add a role to the user roles list
+func AddUserRole(username, nameid string) error {
+    userInput := model.UpdateUserInput{
+        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
+        Set: &model.UserPatch{
+            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
+        },
+    }
+    err := db.GetDB().Update("user", userInput)
+    return err
+}
+
+// RemoveUserRole remove a  role to the user roles list
+func RemoveUserRole(username, nameid string) error {
+    userInput := model.UpdateUserInput{
+        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
+        Remove: &model.UserPatch{
+            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
+        },
+    }
+    err := db.GetDB().Update("user", userInput)
+    return err
+}

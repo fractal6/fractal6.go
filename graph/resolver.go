@@ -834,7 +834,7 @@ func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
     return false
 }
 
-// useHasRole return true if the user has the given role on the given node
+// userHasRole return true if the user has the given role on the given node
 func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
     uctx, e := auth.CheckUserCtxIat(uctx, nameid)
     if e != nil {
@@ -847,6 +847,21 @@ func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
             panic(err.Error())
         }
         if pid == nameid && ur.RoleType == role {
+            return true
+        }
+    }
+    return false
+}
+
+// usePlayRole return true if the user play the given role (Nameid)
+func userPlayRole(uctx model.UserCtx, nameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
+    if e != nil {
+        panic(e)
+    }
+
+    for _, ur := range uctx.Roles {
+        if ur.Nameid == nameid  {
             return true
         }
     }

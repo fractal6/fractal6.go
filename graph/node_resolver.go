@@ -75,17 +75,12 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
         return ok, err
     }
 
+    // Check that circle has no children
+
     // Archive Node
     // --
     if node.FirstLink != nil {
-        // Remove user role
-        userInput := model.UpdateUserInput{
-            Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: node.FirstLink } },
-            Remove: &model.UserPatch{
-                Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-            },
-        }
-        err := db.GetDB().Update("user", userInput)
+        err = auth.RemoveUserRole(*node.FirstLink, nameid)
         if err != nil { return false, err }
     }
     // Toggle the node flag
@@ -108,14 +103,7 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     // Unarchive Node
     // --
     if node.FirstLink != nil {
-        // Add user role
-        userInput := model.UpdateUserInput{
-            Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: node.FirstLink } },
-            Set: &model.UserPatch{
-                Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-            },
-        }
-        err := db.GetDB().Update("user", userInput)
+        err = auth.AddUserRole(*node.FirstLink, nameid)
         if err != nil { return false, err }
     }
     // Toggle the node flag
@@ -266,8 +254,16 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
     err := db.GetDB().Update("node", nodeInput)
     if err != nil { return err }
 
-    if len(delMap) > 0 {
-        err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap)
+    if len(delMap) > 0 { // delete the node reference
+        //err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap) // do not delete the reverse edge (User.roles)
+        firstLink_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
+        fmt.Println(firstLink_, err)
+        if err != nil { return err }
+        err = auth.RemoveUserRole(firstLink_.(string), nameid)
+    } else if node.FirstLink != nil  {
+        // @debug: is the firstlink user has already this role,
+        //         the update is useless
+        err = auth.AddUserRole(*node.FirstLink, nameid)
     }
 
     return err
