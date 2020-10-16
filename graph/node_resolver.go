@@ -202,8 +202,10 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     case model.NodeTypeCircle:
         nodeInput.Children = nil
         for i, c := range(node.Children) {
-            child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node.Charac, node.IsPrivate)
-            children = append(children, child)
+            if c.FirstLink != nil {
+                child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node.Charac, node.IsPrivate)
+                children = append(children, child)
+            }
         }
     }
 
