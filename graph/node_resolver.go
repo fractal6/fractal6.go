@@ -76,6 +76,13 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     }
 
     // Check that circle has no children
+    if *node.Type == model.NodeTypeCircle {
+        children, err := db.GetDB().GetChildren(nameid)
+        if err != nil { return ok, err }
+        if len(children) > 0 {
+            return ok, fmt.Errorf("Cannot archive circle with active children. Please archive children first.")
+        }
+    }
 
     // Archive Node
     // --
@@ -98,6 +105,13 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok {
         return ok, err
+    }
+
+    // Check that node has no parent archived
+    parentIsArchived, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
+    if err != nil { return ok, err }
+    if parentIsArchived != nil && parentIsArchived.(bool) == true{
+        return ok, fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
     }
 
     // Unarchive Node
@@ -151,9 +165,16 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
             // @debug: move to CheckCoordoPath function
             if err != nil { return ok, LogErr("Internal Error", err) }
             for _, p := range(parents) {
-                if userIsCoordo(uctx, p) {
-                    ok = true
-                    break
+                if charac.Mode == model.NodeModeChaos {
+                    if userIsMember(uctx, p) {
+                        ok = true
+                        break
+                    }
+                } else if charac.Mode == model.NodeModeCoordinated {
+                    if userIsCoordo(uctx, p) {
+                        ok = true
+                        break
+                    }
                 }
             }
         }
@@ -255,11 +276,12 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
     if err != nil { return err }
 
     if len(delMap) > 0 { // delete the node reference
-        //err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap) // do not delete the reverse edge (User.roles)
+        //err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap) // that do not delete the reverse edge (User.roles)
         firstLink_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
-        fmt.Println(firstLink_, err)
         if err != nil { return err }
-        err = auth.RemoveUserRole(firstLink_.(string), nameid)
+        if firstLink_ != nil {
+            err = auth.RemoveUserRole(firstLink_.(string), nameid)
+        }
     } else if node.FirstLink != nil  {
         // @debug: is the firstlink user has already this role,
         //         the update is useless

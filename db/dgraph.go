@@ -136,7 +136,7 @@ func initDB() *Dgraph {
             }
 
             var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
-                c as Node.children
+                c as Node.children @filter(NOT eq(Node.isArchived, true))
             }
             var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
                 circle as count(uid)
@@ -203,12 +203,25 @@ func initDB() *Dgraph {
             {{.payload}}
         }`,
         // Get multiple objects
+        "getChildren": `{
+            all(func: eq(Node.nameid, "{{.nameid}}"))  {
+                Node.children @filter(NOT eq(Node.isArchived, true)) {
+                    Node.nameid
+                }
+            }
+        }`,
+        "getParents": `{
+            all(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+                Node.parent @normalize
+                Node.nameid
+            }
+        }`,
         "getAllChildren": `{
             var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
                 o as Node.children
             }
 
-            all(func: uid(o)) @filter( NOT eq(Node.isArchived, true)) {
+            all(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
                 Node.{{.fieldid}}
             }
         }`,
@@ -235,12 +248,6 @@ func initDB() *Dgraph {
         "getCoordos": `{
             all(func: eq(Node.nameid, "{{.nameid}}")) {
                 Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
-            }
-        }`,
-        "getParents": `{
-            all(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
-                Node.parent @normalize
-                Node.nameid
             }
         }`,
         // Mutations
@@ -777,9 +784,21 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in gpm query")
     } else if len(r.All) == 1 {
-        x := r.All[0][fieldNameSource].(model.JsonAtom)
-        if x != nil {
-            return x[fieldNameTarget], nil
+        switch x := r.All[0][fieldNameSource].(type) {
+        case model.JsonAtom:
+            if x != nil {
+                return x[fieldNameTarget], nil
+            }
+        case []interface{}:
+            if x != nil {
+                var y []interface{}
+                for _, v := range(x) {
+                    y = append(y, v.(model.JsonAtom)[fieldNameTarget])
+                }
+                return y, nil
+            }
+        default:
+            return nil, fmt.Errorf("Decode type unknonwn: %T", x)
         }
     }
     return nil, err
@@ -1039,6 +1058,33 @@ func (dg Dgraph) HasCoordos(nameid string) (bool) {
     return ok
 }
 
+// Get children
+func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
+    // Format Query
+    maps := map[string]string{
+        "nameid" :nameid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getChildren", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []string
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple object for term: %s", nameid)
+    } else if len(r.All) == 1 {
+        c := r.All[0]["Node.children"].([]interface{})
+        for _, x := range(c) {
+            data = append(data, x.(model.JsonAtom)["Node.nameid"].(string))
+        }
+    }
+    return data, err
+}
+
 // Get path to root
 func (dg Dgraph) GetParents(nameid string) ([]string, error) {
     // Format Query
@@ -1056,7 +1102,7 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 
     var data []string
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple tension for @uid: %s", nameid)
+        return nil, fmt.Errorf("Got multiple object for term: %s", nameid)
     } else if len(r.All) == 1 {
         // f%$*µ%ing decoding
         switch p := r.All[0]["Node.parent"].([]interface{})[0].(model.JsonAtom)["Node.nameid"].(type) {
