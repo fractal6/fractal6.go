@@ -13,6 +13,12 @@ import (
 
 // Library errors
 var (
+    ErrUserUnknown = errors.New(`{
+        "errors":[{
+            "message":"User unknown",
+            "location": "nameid"
+        }]
+    }`)
     ErrBadNameidFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid name",
@@ -143,6 +149,10 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     userCtx, err := DB.GetUser(fieldId, userId)
     if err != nil {
         return nil, err
+    }
+
+    if userCtx.Username == "" {
+        return nil, ErrUserUnknown
     }
 
     // Compare hashed password.
