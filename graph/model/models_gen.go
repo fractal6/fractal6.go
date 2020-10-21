@@ -1834,6 +1834,7 @@ const (
 	RoleTypePeer        RoleType = "Peer"
 	RoleTypeMember      RoleType = "Member"
 	RoleTypeGuest       RoleType = "Guest"
+	RoleTypeOwner       RoleType = "Owner"
 )
 
 var AllRoleType = []RoleType{
@@ -1841,11 +1842,12 @@ var AllRoleType = []RoleType{
 	RoleTypePeer,
 	RoleTypeMember,
 	RoleTypeGuest,
+	RoleTypeOwner,
 }
 
 func (e RoleType) IsValid() bool {
 	switch e {
-	case RoleTypeCoordinator, RoleTypePeer, RoleTypeMember, RoleTypeGuest:
+	case RoleTypeCoordinator, RoleTypePeer, RoleTypeMember, RoleTypeGuest, RoleTypeOwner:
 		return true
 	}
 	return false

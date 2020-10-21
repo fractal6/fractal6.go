@@ -3153,6 +3153,8 @@ enum RoleType {
 
   Guest
 
+  Owner
+
 
 }
 
@@ -3228,21 +3230,21 @@ enum BlobType {
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
 directive @id on FIELD_DEFINITION
 
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 input AddBlobInput {
   createdBy: UserRef!

@@ -67,7 +67,7 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     charac := tension.Receiver.Charac
 
     // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
@@ -89,6 +89,9 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     if node.FirstLink != nil {
         err = auth.RemoveUserRole(*node.FirstLink, nameid)
         if err != nil { return false, err }
+
+        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeGuest)
+        if err != nil { return false, err }
     }
     // Toggle the node flag
     err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
@@ -99,7 +102,7 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     charac := tension.Receiver.Charac
 
     // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
@@ -118,6 +121,9 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     // --
     if node.FirstLink != nil {
         err = auth.AddUserRole(*node.FirstLink, nameid)
+        if err != nil { return false, err }
+
+        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
         if err != nil { return false, err }
     }
     // Toggle the node flag
@@ -150,11 +156,16 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
         //pass
     }
 
+    // Check if user is an owner
+    if userIsOwner(uctx, rootnameid) >= 0 {
+        return true, err
+    }
+
     // Add node Policies
     if charac.Mode == model.NodeModeChaos {
-        ok = userIsMember(uctx, parentid)
+        ok = userIsMember(uctx, parentid) >= 0
     } else if charac.Mode == model.NodeModeCoordinated {
-        ok = userIsCoordo(uctx, parentid)
+        ok = userIsCoordo(uctx, parentid) >= 0
     }
 
     // Check if user is Coordinator of any parents if the PID has no coordinator
@@ -166,12 +177,12 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
             if err != nil { return ok, LogErr("Internal Error", err) }
             for _, p := range(parents) {
                 if charac.Mode == model.NodeModeChaos {
-                    if userIsMember(uctx, p) {
+                    if userIsMember(uctx, p) >= 0 {
                         ok = true
                         break
                     }
                 } else if charac.Mode == model.NodeModeCoordinated {
-                    if userIsCoordo(uctx, p) {
+                    if userIsCoordo(uctx, p) >= 0 {
                         ok = true
                         break
                     }
@@ -227,7 +238,7 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     switch *node.Type {
     case model.NodeTypeRole:
         if node.FirstLink != nil {
-            err = maybeUpdateGuest2Peer(uctx, rootnameid, *node.FirstLink)
+            err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
         }
     case model.NodeTypeCircle:
         for _, child := range(children) {
@@ -265,6 +276,10 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
         nodePatch.Children = nil
     }
 
+    // Get the first link prior updating the node
+    firstLink_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
+    if err != nil { return err }
+
     // Build input
     nodeInput := model.UpdateNodeInput{
         Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
@@ -272,21 +287,30 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
         //Remove: &delNodePatch, // @debug: omitempty issues
     }
     // Update the node in database
-    err := db.GetDB().Update("node", nodeInput)
+    err = db.GetDB().Update("node", nodeInput)
     if err != nil { return err }
 
+    rootnameid, _ := nid2rootid(nameid)
     if len(delMap) > 0 { // delete the node reference
         //err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap) // that do not delete the reverse edge (User.roles)
-        firstLink_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
-        if err != nil { return err }
         if firstLink_ != nil {
             err = auth.RemoveUserRole(firstLink_.(string), nameid)
+            if err != nil { return err }
+            err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
         }
+
     } else if node.FirstLink != nil  {
-        // @debug: is the firstlink user has already this role,
+        // @debug: if the firstlink user has already this role,
         //         the update is useless
         err = auth.AddUserRole(*node.FirstLink, nameid)
+        if err != nil { return err }
+        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
+        if err != nil { return err }
+        if firstLink_ != nil && firstLink_.(string) != *node.FirstLink {
+            err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
+        }
     }
+
 
     return err
 }
@@ -357,23 +381,34 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
     return tension
 }
 
-// maybeUpdateGuest2Peer check if Guest should be upgrade to Member role type
-func maybeUpdateGuest2Peer(uctx model.UserCtx, rootnameid string, username string) error {
+
+// maybeUpdateMembership check try to toggle uer membership to Guest or Member
+func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
     var uctxFs *model.UserCtx
     var err error
     DB := db.GetDB()
-    if username != uctx.Username {
-        uctxFs, err = DB.GetUser("username", username)
-        if err != nil { return err }
-    } else {
-        uctxFs = &uctx
+    uctxFs, err = DB.GetUser("username", username)
+    if err != nil { return err }
+
+    // Don't touch owner state
+    if userIsOwner(*uctxFs, rootnameid) >= 0 {
+        return nil
     }
 
+    // Update RoleType to Guest
+    if rt == model.RoleTypeGuest && len(uctxFs.Roles) == 1  {
+        err := DB.UpgradeGuest(uctxFs.Roles[0].Nameid, model.RoleTypeGuest)
+        if err != nil { return err }
+        return nil
+    }
+
+    // Update RoleType to Member
     i := userIsGuest(*uctxFs, rootnameid)
-    if i >= 0 {
+    if rt == model.RoleTypeMember && i >= 0 {
         // Update RoleType to Member
         err := DB.UpgradeGuest(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
         if err != nil { return err }
+        return nil
     }
 
     return nil

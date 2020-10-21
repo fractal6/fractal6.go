@@ -1145,8 +1145,8 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
 
     mu := fmt.Sprintf(`
     uid(node) <Node.role_type> "%s" .
-    uid(node) <Node.name> "Member" .
-    `, roleType)
+    uid(node) <Node.name> "%s" .
+    `, roleType, roleType)
 
     mutation := &api.Mutation{
         SetNquads: []byte(mu),

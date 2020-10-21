@@ -446,7 +446,8 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
             // @debug: move to CheckCoordoPath function
             if err != nil { return nil, LogErr("Internal Error", err) }
             for _, p := range(parents) {
-                if userIsCoordo(uctx, p) {
+                // @debug: chec charac mode !
+                if userIsCoordo(uctx, p) >= 0 {
                     ok = true
                     break
                 }
@@ -562,6 +563,12 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
         nameid = node.(model.JsonAtom)["nameid"].(string)
     } else {
         return false, fmt.Errorf("node target unknown, need a database request here...")
+    }
+
+    // Check if user is an owner
+    rootnameid, _ := nid2rootid(nameid)
+    if userIsOwner(uctx, rootnameid) >= 0 {
+        return true, err
     }
 
     // Search for rights
@@ -869,42 +876,42 @@ func userPlayRole(uctx model.UserCtx, nameid string) bool {
 }
 
 // useIsCoordo return true if the user has at least one role in the given node
-func userIsMember(uctx model.UserCtx, nameid string) bool {
+func userIsMember(uctx model.UserCtx, nameid string) int {
     uctx, e := auth.CheckUserCtxIat(uctx, nameid)
     if e != nil {
         panic(e)
     }
 
-    for _, ur := range uctx.Roles {
+    for i, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
             panic(err.Error())
         }
         if pid == nameid {
-            return true
+            return i
         }
     }
-    return false
+    return -1
 }
 
 // useIsCoordo return true if the user has at least one role of Coordinator in the given node
-func userIsCoordo(uctx model.UserCtx, nameid string) bool {
+func userIsCoordo(uctx model.UserCtx, nameid string) int {
     uctx, e := auth.CheckUserCtxIat(uctx, nameid)
     if e != nil {
         panic(e)
     }
 
-    for _, ur := range uctx.Roles {
+    for i, ur := range uctx.Roles {
         pid, err := nid2pid(ur.Nameid)
         if err != nil {
             panic("bad nameid format for coordo test: "+ ur.Nameid)
         }
         if pid == nameid && ur.RoleType == model.RoleTypeCoordinator {
-            return true
+            return i
         }
     }
 
-    return false
+    return -1
 }
 
 // userIsGuest return true if the user is a guest (has only one role) in the given organisation
@@ -916,6 +923,21 @@ func userIsGuest(uctx model.UserCtx, rootnameid string) int {
 
     for i, r := range uctx.Roles {
         if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
+            return i
+        }
+    }
+
+    return -1
+}
+
+func userIsOwner(uctx model.UserCtx, rootnameid string) int {
+    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
+    if e != nil {
+        panic(e)
+    }
+
+    for i, r := range uctx.Roles {
+        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeOwner {
             return i
         }
     }
