@@ -12,10 +12,11 @@ import (
 )
 
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput) (data *model.AddNodePayload, errors error) {
-	//ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	//errors = r.Gqlgen2DgraphMutationResolver(ctx, input, &data)
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
+	////ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
+	////errors = r.Gqlgen2DgraphMutationResolver(ctx, input, &data)
+	//errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	//return data, errors
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
