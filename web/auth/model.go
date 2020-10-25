@@ -1,7 +1,7 @@
 package auth
 
 import (
-    //"fmt"
+    "fmt"
     "time"
     "errors"
     "strings"
@@ -240,11 +240,9 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,
         },
-        //Utc            *string
     }
 
     DB := db.GetDB()
-    // @DEBUG: ensure that dgraph graphql add requests are atomic (i.e honor @id field)
     _, err := DB.Add("user", userInput)
     if err != nil {
         return nil, err
@@ -277,6 +275,27 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     // Hide the password !
     userCtx.Passwd = ""
     return userCtx, nil
+}
+
+//
+// Verify New orga right
+//
+
+func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
+    var ok bool
+    var err error
+
+    regex := fmt.Sprintf("@%s$", uctx.Username)
+    nodes, err := db.GetDB().GetNodes(regex, true)
+    if err != nil {return ok, err}
+
+    SELFORGA_LIMIT := 10
+    if len(nodes) > SELFORGA_LIMIT {
+        return ok, fmt.Errorf("number of personnal organisation are limited to %d for now", SELFORGA_LIMIT)
+    }
+
+    ok = true
+    return ok, err
 }
 
 //

@@ -64,7 +64,7 @@ func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}
     // Format inputs
     inputs, _ := json.Marshal(ipts)
     // If inputs needs to get modified, see tools.StructToMap() usage
-    // in order to to get the struct in the scema.resolver caller.
+    // in order to to get the struct in the schema.resolver caller.
 
     // Format collected fields
     inputType := strings.Split(fmt.Sprintf("%T", rc.Args[mutCtx.argName]), ".")[1]

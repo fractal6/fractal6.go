@@ -2,7 +2,7 @@ package model
 
 
 //
-// User Auth Data structure
+// Data Form
 //
 
 
@@ -13,6 +13,19 @@ type UserCreds struct {
     Name     *string `json:"name"`
     Password string  `json:"password"`
 }
+
+
+// OrgaForm are data sink/form for creating new organisation
+type OrgaForm struct {
+    Name    string   `json:"name"`
+    Nameid  string   `json:"nameid"`
+    About   *string  `json:"about"`
+    Purpose *string  `json:"purpose"`
+}
+
+//
+// User Auth Data structure
+//
 
 // UserCtx are data encoded in the token (e.g Jwt claims)
 type UserCtx struct {

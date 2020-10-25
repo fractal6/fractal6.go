@@ -63,3 +63,7 @@ var TensionHookPayload string = `{
     }
   }
 }`
+
+var NodeIdPayloadDg string = `{
+    Node.nameid
+}`

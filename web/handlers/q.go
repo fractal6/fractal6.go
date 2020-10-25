@@ -8,8 +8,11 @@ import (
     "zerogov/fractal6.go/db"
 )
 
+//
+// Query data
+// @Todo: token and check private status
+//
 
-// Signup register a new user and gives it a token.
 func SubChildren(w http.ResponseWriter, r *http.Request) {
 	var q string
 
@@ -29,7 +32,6 @@ func SubChildren(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-
     // Return the user context
     jsonData, err := json.Marshal(data)
     if err != nil {
@@ -39,7 +41,6 @@ func SubChildren(w http.ResponseWriter, r *http.Request) {
     w.Write(jsonData)
 }
 
-// Signup register a new user and gives it a token.
 func SubMembers(w http.ResponseWriter, r *http.Request) {
 	var q string
 
@@ -58,7 +59,6 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 500)
 		return
     }
-
 
     // Return the user context
     jsonData, err := json.Marshal(data)

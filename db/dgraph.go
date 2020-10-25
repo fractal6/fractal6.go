@@ -198,6 +198,14 @@ func initDB() *Dgraph {
             all(func: eq(Node.{{.fieldid}}, "{{.objid}}"))
             {{.payload}}
         }`,
+        "getNodes": `{
+            all(func: regexp(Node.nameid, /{{.regex}}/))
+            {{.payload}}
+        }`,
+        "getNodesRoot": `{
+            all(func: regexp(Node.nameid, /{{.regex}}/)) @filter(eq(Node.isRoot, true))
+            {{.payload}}
+        }`,
         "getTension": `{
             all(func: uid("{{.id}}"))
             {{.payload}}
@@ -230,7 +238,7 @@ func initDB() *Dgraph {
                 o as Node.children
             }
 
-            all(func: uid(o)) @filter(has(Node.role_type) AND NOT eq(Node.isArchived, true) ) {
+            all(func: uid(o)) @filter(has(Node.role_type) AND NOT eq(Node.isArchived, true)) {
                 Node.createdAt
                 Node.name
                 Node.nameid
@@ -917,6 +925,47 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
     return &obj, err
 }
 
+// Returns the matching nodes
+func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.NodeId, error) {
+    // Format Query
+    maps := map[string]string{
+        "regex": regex,
+        "payload": model.NodeIdPayloadDg,
+    }
+
+    // Send request
+    var res *api.Response
+    var err error
+    if isRoot {
+        res, err = dg.QueryGpm("getNodesRoot", maps)
+    } else {
+        res, err = dg.QueryGpm("getNodes", maps)
+    }
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []model.NodeId
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    return data, err
+}
+
 // Returns the tension hook content
 func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error) {
     // Format Query
@@ -1188,6 +1237,23 @@ func (dg Dgraph) SetArchivedFlagBlob(bid string, flag string, tid string, action
         uid(obj) <Blob.archivedFlag> "%s" .
         <%s> <Tension.action> "%s" .
     `, flag, tid, action)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryGpm(query, mutation)
+    return err
+}
+
+func (dg Dgraph) SetTensionSource(nameid string, tid string) error {
+    query := fmt.Sprintf(`query {
+        node as var(func: eq(Node.nameid, "%s"))
+    }`, nameid)
+
+    mu := fmt.Sprintf(`
+        uid(node) <Node.source> <%s> .
+    `, tid)
 
     mutation := &api.Mutation{
         SetNquads: []byte(mu),

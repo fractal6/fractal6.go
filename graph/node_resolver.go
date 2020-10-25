@@ -5,7 +5,6 @@ import (
     "time"
     "strconv"
     "strings"
-    //"github.com/mitchellh/mapstructure"
 
     "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/web/auth"
@@ -36,9 +35,7 @@ func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, true)
-    if err != nil || !ok {
-        return ok, err
-    }
+    if err != nil || !ok { return ok, err }
 
     err = PushNode(uctx, tid, node, emitterid, nameid, parentid)
     return ok, err
@@ -54,9 +51,7 @@ func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeF
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
-    if err != nil || !ok {
-        return ok, err
-    }
+    if err != nil || !ok { return ok, err }
 
     err = UpdateNode(uctx, node, emitterid, nameid, parentid)
     return ok, err
@@ -71,9 +66,7 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
-    if err != nil || !ok {
-        return ok, err
-    }
+    if err != nil || !ok { return ok, err }
 
     // Check that circle has no children
     if *node.Type == model.NodeTypeCircle {
@@ -106,9 +99,7 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
-    if err != nil || !ok {
-        return ok, err
-    }
+    if err != nil || !ok { return ok, err }
 
     // Check that node has no parent archived
     parentIsArchived, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
@@ -157,9 +148,7 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
     }
 
     // Check if user is an owner
-    if userIsOwner(uctx, rootnameid) >= 0 {
-        return true, err
-    }
+    if userIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
     // Add node Policies
     if charac.Mode == model.NodeModeChaos {
@@ -311,29 +300,31 @@ func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid,
         }
     }
 
-
     return err
 }
 
-// internals
+//
+// Internals
+//
 
-func makeNewChild(i int, username string, parentid string, role_type model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
+func makeNewChild(i int, username string, parentid string, roleType model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
     //name := "Coordinator"
-    name := string(role_type)
+    name := string(roleType)
     nameid := parentid +"#"+ name + strconv.Itoa(i)
     type_ := model.NodeTypeRole
-    roleType := model.RoleTypeCoordinator
     fs := username
-    mandate := model.Mandate{Purpose: en.CoordoPurpose}
     child := model.NodeFragment{
         Name: &name,
         Nameid: &nameid,
         Type: &type_,
         RoleType: &roleType,
         FirstLink: &fs,
-        Mandate: &mandate,
         Charac: charac,
         IsPrivate: isPrivate,
+    }
+    if roleType == model.RoleTypeCoordinator {
+        mandate := model.Mandate{Purpose: en.CoordoPurpose}
+        child.Mandate = &mandate
     }
     return child
 }
@@ -381,6 +372,49 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
     return tension
 }
 
+func MakeNewRootTension(uctx model.UserCtx, rootnameid string, node model.AddNodeInput) model.AddTensionInput {
+    now := time.Now().Format(time.RFC3339)
+    createdBy := *node.CreatedBy
+    emitter := model.NodeRef{Nameid: &rootnameid}
+    receiver := model.NodeRef{Nameid: &rootnameid}
+    action := model.TensionActionEditRole
+    evt1 := model.TensionEventCreated
+    evt2 := model.TensionEventBlobCreated
+    evt3 := model.TensionEventBlobPushed
+    blob_type := model.BlobTypeOnNode
+    var noderef model.NodeFragmentRef
+    StructMap(node, &noderef)
+    emptyString := ""
+    noderef.Nameid = &emptyString
+    blob := model.BlobRef{
+        CreatedAt: &now,
+        CreatedBy : &createdBy,
+        BlobType: &blob_type,
+        Node: &noderef,
+        PushedFlag: &now,
+    }
+    tension := model.AddTensionInput{
+        CreatedAt: now,
+        CreatedBy : &createdBy,
+        Title: "[Circle] Anchor node",
+        Type: model.TensionTypeGovernance,
+        Status: model.TensionStatusClosed,
+        Emitter: &emitter,
+        Receiver: &receiver,
+        Emitterid: rootnameid,
+        Receiverid: rootnameid,
+        Action: &action,
+        History : []*model.EventRef{
+            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
+            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
+            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
+        },
+        Blobs: []*model.BlobRef{&blob},
+        Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil }},
+    }
+    return tension
+}
+
 
 // maybeUpdateMembership check try to toggle uer membership to Guest or Member
 func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
@@ -391,9 +425,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     if err != nil { return err }
 
     // Don't touch owner state
-    if userIsOwner(*uctxFs, rootnameid) >= 0 {
-        return nil
-    }
+    if userIsOwner(*uctxFs, rootnameid) >= 0 { return nil }
 
     // Update RoleType to Guest
     if rt == model.RoleTypeGuest && len(uctxFs.Roles) == 1  {

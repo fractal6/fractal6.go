@@ -127,6 +127,7 @@ type AddNodeInput struct {
 	NChildren    *int           `json:"n_children,omitempty"`
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       bool           `json:"isRoot"`
+	IsPersonal   *bool          `json:"isPersonal"`
 	IsPrivate    bool           `json:"isPrivate"`
 	IsArchived   bool           `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
@@ -550,6 +551,7 @@ type Node struct {
 	NChildren    *int        `json:"n_children,omitempty"`
 	Stats        *NodeStats  `json:"stats,omitempty"`
 	IsRoot       bool        `json:"isRoot"`
+	IsPersonal   *bool       `json:"isPersonal"`
 	IsPrivate    bool        `json:"isPrivate"`
 	IsArchived   bool        `json:"isArchived"`
 	Charac       *NodeCharac `json:"charac,omitempty"`
@@ -594,6 +596,7 @@ type NodeFilter struct {
 	Type       *NodeTypeHash                       `json:"type_,omitempty"`
 	About      *StringFullTextFilter               `json:"about,omitempty"`
 	IsRoot     *bool                               `json:"isRoot"`
+	IsPersonal *bool                               `json:"isPersonal"`
 	IsPrivate  *bool                               `json:"isPrivate"`
 	IsArchived *bool                               `json:"isArchived"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
@@ -691,6 +694,7 @@ type NodePatch struct {
 	NChildren    *int           `json:"n_children,omitempty"`
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
+	IsPersonal   *bool          `json:"isPersonal"`
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
@@ -722,6 +726,7 @@ type NodeRef struct {
 	NChildren    *int           `json:"n_children,omitempty"`
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
+	IsPersonal   *bool          `json:"isPersonal"`
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`

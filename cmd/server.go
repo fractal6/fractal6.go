@@ -87,19 +87,24 @@ func RunServer() {
     // processing should be stopped.
     r.Use(middleware.Timeout(60 * time.Second))
 
-    // Auth handlers 
+    // Auth handlers
     r.Group(func(r chi.Router) {
         //r.Use(middle6.EnsurePostMethod)
         r.Route("/auth", func(r chi.Router) {
+            // User
             r.Post("/signup", handle6.Signup)
             r.Post("/login", handle6.Login)
             r.Post("/tokenack", handle6.TokenAck)
+
+            // Organisation
+            r.Post("/createorga", handle6.CreateOrga)
         })
     })
 
-    // Http API
+    // Http/Rest API
     r.Group(func(r chi.Router) {
         r.Route("/q", func(r chi.Router) {
+            // query
             r.Post("/sub_children", handle6.SubChildren)
             r.Post("/sub_members", handle6.SubMembers)
         })

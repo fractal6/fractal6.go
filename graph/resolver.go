@@ -142,7 +142,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 if yes { return nil,  LogErr("Access denied", fmt.Errorf("private node")) }
             }
         default:
-            panic("@isPrivate: node type unknonwn.")
+            panic("@isPrivate: node type unknonwn: " + fmt.Sprintf("%T", v))
         }
     }
     return data, err
@@ -167,7 +167,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
                 return yes, LogErr("Access denied", err)
             }
             rootnameid, err := nid2rootid(nameid)
-            if userHasRoot(uctx, rootnameid) == false {
+            if userHasRoot(uctx, rootnameid) {
                 return false, err
             }
         } else {
@@ -505,9 +505,13 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
     return nil, LogErr("Forbiden", fmt.Errorf("Read only field on `%s'", fieldName))
 }
 
+
+
 //
 // Private auth methods
 //
+
+
 
 // Check if the an user owns the given object
 func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
@@ -567,9 +571,7 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
 
     // Check if user is an owner
     rootnameid, _ := nid2rootid(nameid)
-    if userIsOwner(uctx, rootnameid) >= 0 {
-        return true, err
-    }
+    if userIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
     // Search for rights
     ok := userHasRole(uctx, role, nameid)
@@ -648,7 +650,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     nameid := node.Nameid // @TODO (nameid @codec): verify that nameid match parentid
     rootnameid := node.Rootnameid
     name := node.Name
-    parent_ := node.Parent
+    //parent_ := node.Parent
 
     err = auth.ValidateNameid(nameid, rootnameid)
     if err != nil { return ok, err }
@@ -659,18 +661,19 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     // Create new organisation Hook
     //
     if isRoot{
-        if uctx.Rights.CanCreateRoot {
-            if parent_ != nil {
-                err = fmt.Errorf("root node can't have a parent")
-            } else if nameid != rootnameid {
-                err = fmt.Errorf("root node nameid and rootnameid are different")
-            } else {
-                ok = true
-            }
-        } else {
-            err = fmt.Errorf("you are not authorized to create new organisation")
-        }
+        //if uctx.Rights.CanCreateRoot {
+        //    if parent_ != nil {
+        //        err = fmt.Errorf("root node can't have a parent")
+        //    } else if nameid != rootnameid {
+        //        err = fmt.Errorf("root node nameid and rootnameid are different")
+        //    } else {
+        //        ok = true
+        //    }
+        //} else {
+        //    err = fmt.Errorf("you are not authorized to create new organisation")
+        //}
 
+        err = fmt.Errorf("you are not authorized to create new organisation")
         return ok, err
     }
 

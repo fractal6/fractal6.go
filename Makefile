@@ -4,8 +4,6 @@ GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
 MOD := "zerogov/fractal6.go"
-DGRAPH := ../database/bin/dgraph
-DATAPATH := ../database/export/dgraph.r330019.u0628.1616
 
 # TODO: versioning
 # LDFLAGS see versioning, hash etc...
@@ -60,20 +58,4 @@ _named_returns_resolver:
 _add_omitempty:
 	# Don't add omitempty for boolean field has it get remove if set to false!
 	sed -i  '/bool /I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
-
-
-#
-# Database
-#
-backup_rdf:
-	curl 'localhost:8080/admin/export'
-
-backup_json:
-	curl 'localhost:8080/admin/export?format=json'
-
-backdown_bulk:
-	$(DGRAPH) bulk -f $(DATAPATH)/*.rdf.* -s $(DATAPATH)/*.schema.* --http localhost:8282 --zero=localhost:5080
-
-backdown_live:
-	$(DGRAPH) live -C -f $(DATAPATH)/*.rdf.* -s $(DATAPATH)/*.schema.*
 

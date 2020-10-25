@@ -286,6 +286,7 @@ type ComplexityRoot struct {
 		FirstLink    func(childComplexity int, filter *model.UserFilter) int
 		ID           func(childComplexity int) int
 		IsArchived   func(childComplexity int) int
+		IsPersonal   func(childComplexity int) int
 		IsPrivate    func(childComplexity int) int
 		IsRoot       func(childComplexity int) int
 		Mandate      func(childComplexity int, filter *model.MandateFilter) int
@@ -1679,6 +1680,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.IsArchived(childComplexity), true
 
+	case "Node.isPersonal":
+		if e.complexity.Node.IsPersonal == nil {
+			break
+		}
+
+		return e.complexity.Node.IsPersonal(childComplexity), true
+
 	case "Node.isPrivate":
 		if e.complexity.Node.IsPrivate == nil {
 			break
@@ -2999,6 +3007,7 @@ type Node @hidePrivate {
   n_children: Int @count(f: children)
   stats: NodeStats @meta_getNodeStats
   isRoot: Boolean! @search
+  isPersonal: Boolean @search
   isPrivate: Boolean! @search
   isArchived: Boolean! @search
   charac(filter: NodeCharacFilter): NodeCharac!
@@ -3228,23 +3237,23 @@ enum BlobType {
 
 }
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
 directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3365,6 +3374,7 @@ input AddNodeInput {
   n_children: Int
   stats: NodeStatsRef
   isRoot: Boolean!
+  isPersonal: Boolean
   isPrivate: Boolean!
   isArchived: Boolean!
   charac: NodeCharacRef!
@@ -3852,6 +3862,7 @@ input NodeFilter {
   type_: NodeType_hash
   about: StringFullTextFilter
   isRoot: Boolean
+  isPersonal: Boolean
   isPrivate: Boolean
   isArchived: Boolean
   skills: StringTermFilter
@@ -3955,6 +3966,7 @@ input NodePatch {
   n_children: Int
   stats: NodeStatsRef
   isRoot: Boolean @patch_RO
+  isPersonal: Boolean @patch_RO
   isPrivate: Boolean @patch_RO
   isArchived: Boolean @patch_RO
   charac: NodeCharacRef @patch_hasRole(n:["parent"], r: Coordinator)
@@ -3986,6 +3998,7 @@ input NodeRef {
   n_children: Int
   stats: NodeStatsRef
   isRoot: Boolean
+  isPersonal: Boolean
   isPrivate: Boolean
   isArchived: Boolean
   charac: NodeCharacRef
@@ -12533,6 +12546,54 @@ func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.Coll
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_isPersonal(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Node",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.IsPersonal, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_isPrivate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18575,6 +18636,12 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "isPersonal":
+			var err error
+			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isPrivate":
 			var err error
 			it.IsPrivate, err = ec.unmarshalNBoolean2bool(ctx, v)
@@ -20797,6 +20864,12 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "isPersonal":
+			var err error
+			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isPrivate":
 			var err error
 			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -21550,6 +21623,27 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 			}
+		case "isPersonal":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsPersonal = data
+			} else if tmp == nil {
+				it.IsPersonal = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+			}
 		case "isPrivate":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
@@ -21878,6 +21972,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		case "isRoot":
 			var err error
 			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPersonal":
+			var err error
+			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25026,6 +25126,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "isPersonal":
+			out.Values[i] = ec._Node_isPersonal(ctx, field, obj)
 		case "isPrivate":
 			out.Values[i] = ec._Node_isPrivate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
