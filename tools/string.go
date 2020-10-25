@@ -30,6 +30,15 @@ func CleanString(data string, quote bool) string {
     return d
 }
 
+func QuoteString(data string) string {
+    var d string = data
+    // @DEBUG: better way to encode a json string ?
+    d = strconv.Quote(d)
+    // remove surrounding quote !
+    d = d[1:len(d)-1]
+    return d
+}
+
 func ToGoNameFormat(name string) string {
     var l []string
     for _, s := range strings.Split(name, "_") {
@@ -42,7 +51,7 @@ func ToGoNameFormat(name string) string {
 func ToTypeName(name string) string {
     l := strings.Split(name, ".")
     typeName := l[len(l)-1]
-    return typeName 
+    return typeName
 }
 
 //
