@@ -27,7 +27,7 @@ func ValidateName(n string) error {
     if len(n) > 100 {
         return ErrNameTooLong
     }
-    if len(n) < 3 {
+    if len(n) < 2 {
         return ErrNameTooShort
     }
 
@@ -48,7 +48,7 @@ func ValidateUsername(u string) error {
     if len(u) > 42 {
         return ErrUsernameTooLong
     }
-    if len(u) < 2 {
+    if len(u) < 3 {
         return ErrUsernameTooShort
     }
 
