@@ -231,6 +231,7 @@ func initDB() *Dgraph {
 
             all(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
                 Node.{{.fieldid}}
+                Node.isPrivate
             }
         }`,
         "getAllMembers": `{
@@ -250,7 +251,9 @@ func initDB() *Dgraph {
                 }
                 Node.parent {
                     Node.nameid
+                    Node.isPrivate
                 }
+                Node.isPrivate
             }
         }`,
         "getCoordos": `{
@@ -1154,7 +1157,9 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
         return nil, fmt.Errorf("Got multiple object for term: %s", nameid)
     } else if len(r.All) == 1 {
         // f%$*µ%ing decoding
-        switch p := r.All[0]["Node.parent"].([]interface{})[0].(model.JsonAtom)["Node.nameid"].(type) {
+        parents := r.All[0]["Node.parent"]
+        if parents == nil {return data, err}
+        switch p := parents.([]interface{})[0].(model.JsonAtom)["Node.nameid"].(type) {
         case []interface{}:
             for _, x := range(p) {
                 data = append(data, x.(string))

@@ -1,11 +1,29 @@
 package model
 
+//
+// Errors
+//
+
+type GqlErrors struct {
+    Errors []GqlError `json:"errors"`
+}
+
+type GqlError struct {
+    Location string  `json:"location"`
+    Message string  `json:"message"`
+}
+
 // JsonAtom is a general interface
 // for decoding unknonw structure
 type JsonAtom = map[string]interface{}
 
+//
+// Utils
+//
+
 type NodeId struct {
     Nameid string `json:"nameid"`
+    IsPrivate bool `json:"isPrivate"`
 }
 
 type MemberNode struct {
@@ -16,6 +34,7 @@ type MemberNode struct {
 	RoleType *RoleType  `json:"role_type,omitempty"`
 	FirstLink *User_    `json:"first_link,omitempty"`
 	Parent *NodeId      `json:"parent,omitempty"`
+    IsPrivate bool      `json:"isPrivate"`
 
 }
 
@@ -66,4 +85,5 @@ var TensionHookPayload string = `{
 
 var NodeIdPayloadDg string = `{
     Node.nameid
+    Node.isPrivate
 }`

@@ -123,6 +123,16 @@ func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx [
 //
 
 func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Check that isPrivate is present in payload
+    fok := false
+    for _, f := range GetPreloads(ctx) {
+        if f == "isPrivate" {  fok = true; break }
+    }
+    if !fok {
+        //rc := graphql.GetResolverContext(ctx)
+        return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request"))
+    }
+
     data, err := next(ctx)
     if obj == nil {
         switch v := data.(type) {
@@ -153,7 +163,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
     var err error
 
     if nameid == "" {
-        err = LogErr("Access denied", fmt.Errorf("nameid field required in node payload"))
+        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required for this request"))
     } else {
         // Get the public status of the node
         //isPrivate, err :=  db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isPrivate")
@@ -163,9 +173,14 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
         if isPrivate {
             // check user role.
             uctx, err := auth.UserCtxFromContext(ctx)
-            if err != nil {
-                return yes, LogErr("Access denied", err)
-            }
+            //if err == jwtauth.ErrExpired {
+            //    // Uctx claims is not parsed for unverified token
+            //    u, err := db.GetDB().GetUser("username", uctx.Username)
+            //    if err != nil { return yes, LogErr("internal error", err) }
+            //    err = nil
+            //    uctx = *u
+            if err != nil { return yes, LogErr("Access denied", err) }
+
             rootnameid, err := nid2rootid(nameid)
             if userHasRoot(uctx, rootnameid) {
                 return false, err

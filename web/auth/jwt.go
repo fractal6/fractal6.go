@@ -89,7 +89,7 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
         token, err = tkMaster.issue(userCtx, time.Hour*24*30)
     } else {
         token, err = tkMaster.issue(userCtx, time.Hour*24)
-        //token, err = tkMaster.issue(userCtx, time.Minute)
+        //token, err = tkMaster.issue(userCtx, time.Second*30)
     }
     return token, err
 }
@@ -124,7 +124,6 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
 
 func ContextWithUserCtx(ctx context.Context) context.Context {
     token, claims, err := jwtauth.FromContext(ctx)
-
     if err != nil {
         //errMsg := fmt.Errorf("%v", err)
         switch err {
@@ -143,18 +142,18 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
         err = errors.New("auth: user claim is invalid")
     }
 
-    if err == nil {
-        userCtx := model.UserCtx{}
-        uRaw, err := json.Marshal(claims[tkMaster.tokenClaim])
-        if err != nil {
-            panic(err)
-        }
-        json.Unmarshal(uRaw, &userCtx)
-        ctx = context.WithValue(ctx, tkMaster.tokenClaim, userCtx)
-    } else {
+    if err != nil { // Set the user error token
         ctx = context.WithValue(ctx, tkMaster.tokenClaimErr, err)
     }
 
+    // Set the user token
+    userCtx := model.UserCtx{}
+    uRaw, err := json.Marshal(claims[tkMaster.tokenClaim])
+    if err != nil { panic(err) }
+    json.Unmarshal(uRaw, &userCtx)
+    ctx = context.WithValue(ctx, tkMaster.tokenClaim, userCtx)
+
+    // Set the Iat
     if claims["iat"] != nil {
         var iat int64 = int64(claims["iat"].(float64))
         return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339))
@@ -163,14 +162,12 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
 }
 
 func UserCtxFromContext(ctx context.Context) (model.UserCtx, error) {
-    userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
-    if userCtxErr != nil {
-        return model.UserCtx{}, userCtxErr.(error)
-    }
     uctx := ctx.Value(tkMaster.tokenClaim).(model.UserCtx)
+    userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
+    if userCtxErr != nil { return uctx, userCtxErr.(error) }
+
     uctx.Iat = ctx.Value("iat").(string)
     return uctx, nil
-
 }
 
 // CheckUserCtxIat update the user token if the given
