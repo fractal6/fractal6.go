@@ -41,7 +41,7 @@ schema:
 
 schema_all:
 	cd ../schema
-	make all # Do alter Dgraph
+	make schema_all # Do alter Dgraph
 	cd -
 
 gen: _gen _named_returns_resolver _add_omitempty
