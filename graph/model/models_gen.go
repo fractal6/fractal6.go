@@ -325,14 +325,15 @@ type CommentRef struct {
 }
 
 type CustomHTTP struct {
-	URL               string     `json:"url,omitempty"`
-	Method            HTTPMethod `json:"method,omitempty"`
-	Body              *string    `json:"body,omitempty"`
-	Graphql           *string    `json:"graphql,omitempty"`
-	Mode              *Mode      `json:"mode,omitempty"`
-	ForwardHeaders    []string   `json:"forwardHeaders,omitempty"`
-	SecretHeaders     []string   `json:"secretHeaders,omitempty"`
-	SkipIntrospection *bool      `json:"skipIntrospection"`
+	URL                  string     `json:"url,omitempty"`
+	Method               HTTPMethod `json:"method,omitempty"`
+	Body                 *string    `json:"body,omitempty"`
+	Graphql              *string    `json:"graphql,omitempty"`
+	Mode                 *Mode      `json:"mode,omitempty"`
+	ForwardHeaders       []string   `json:"forwardHeaders,omitempty"`
+	SecretHeaders        []string   `json:"secretHeaders,omitempty"`
+	IntrospectionHeaders []string   `json:"introspectionHeaders,omitempty"`
+	SkipIntrospection    *bool      `json:"skipIntrospection"`
 }
 
 type DateTimeFilter struct {
@@ -344,56 +345,67 @@ type DateTimeFilter struct {
 }
 
 type DeleteBlobPayload struct {
+	Blob    []*Blob `json:"blob,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteCommentPayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	Comment []*Comment `json:"comment,omitempty"`
+	Msg     *string    `json:"msg,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteEventPayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	Event   []*Event `json:"event,omitempty"`
+	Msg     *string  `json:"msg,omitempty"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type DeleteLabelPayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	Label   []*Label `json:"label,omitempty"`
+	Msg     *string  `json:"msg,omitempty"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type DeleteMandatePayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	Mandate []*Mandate `json:"mandate,omitempty"`
+	Msg     *string    `json:"msg,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteNodeCharacPayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
+	Msg        *string       `json:"msg,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type DeleteNodeFragmentPayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
+	Msg          *string         `json:"msg,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type DeleteNodePayload struct {
+	Node    []*Node `json:"node,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeletePostPayload struct {
+	Post    []*Post `json:"post,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteTensionPayload struct {
-	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	Tension []*Tension `json:"tension,omitempty"`
+	Msg     *string    `json:"msg,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteUserPayload struct {
+	User    []*User `json:"user,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
@@ -1564,7 +1576,6 @@ const (
 	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
 	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
 	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
-	NodeFragmentOrderableSkills     NodeFragmentOrderable = "skills"
 )
 
 var AllNodeFragmentOrderable = []NodeFragmentOrderable{
@@ -1573,12 +1584,11 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
 	NodeFragmentOrderableSecondLink,
-	NodeFragmentOrderableSkills,
 }
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableName, NodeFragmentOrderableNameid, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableSkills:
+	case NodeFragmentOrderableName, NodeFragmentOrderableNameid, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink:
 		return true
 	}
 	return false
@@ -1658,7 +1668,6 @@ const (
 	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
 	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
 	NodeOrderableNChildren    NodeOrderable = "n_children"
-	NodeOrderableSkills       NodeOrderable = "skills"
 )
 
 var AllNodeOrderable = []NodeOrderable{
@@ -1671,12 +1680,11 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableNTensionsOut,
 	NodeOrderableNTensionsIn,
 	NodeOrderableNChildren,
-	NodeOrderableSkills,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableSkills:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren:
 		return true
 	}
 	return false

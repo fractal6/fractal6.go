@@ -74,6 +74,7 @@ type DirectiveRoot struct {
 	Remote                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Search                 func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
 	Secret                 func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
+	WithSubscription       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -160,58 +161,69 @@ type ComplexityRoot struct {
 	}
 
 	DeleteBlobPayload struct {
+		Blob    func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
 
 	DeleteCommentPayload struct {
+		Comment func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
 
 	DeleteEventPayload struct {
+		Event   func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
 
 	DeleteLabelPayload struct {
+		Label   func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
 
 	DeleteMandatePayload struct {
+		Mandate func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
 
 	DeleteNodeCharacPayload struct {
-		Msg     func(childComplexity int) int
-		NumUids func(childComplexity int) int
+		Msg        func(childComplexity int) int
+		NodeCharac func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
+		NumUids    func(childComplexity int) int
 	}
 
 	DeleteNodeFragmentPayload struct {
-		Msg     func(childComplexity int) int
-		NumUids func(childComplexity int) int
+		Msg          func(childComplexity int) int
+		NodeFragment func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
+		NumUids      func(childComplexity int) int
 	}
 
 	DeleteNodePayload struct {
 		Msg     func(childComplexity int) int
+		Node    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
 	}
 
 	DeletePostPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
+		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
 	}
 
 	DeleteTensionPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
+		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
 	DeleteUserPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
+		User    func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 	}
 
 	Event struct {
@@ -913,6 +925,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.UpdatedAt(childComplexity), true
 
+	case "DeleteBlobPayload.blob":
+		if e.complexity.DeleteBlobPayload.Blob == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteBlobPayload_blob_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteBlobPayload.Blob(childComplexity, args["filter"].(*model.BlobFilter), args["order"].(*model.BlobOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteBlobPayload.msg":
 		if e.complexity.DeleteBlobPayload.Msg == nil {
 			break
@@ -926,6 +950,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteBlobPayload.NumUids(childComplexity), true
+
+	case "DeleteCommentPayload.comment":
+		if e.complexity.DeleteCommentPayload.Comment == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteCommentPayload_comment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteCommentPayload.Comment(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeleteCommentPayload.msg":
 		if e.complexity.DeleteCommentPayload.Msg == nil {
@@ -941,6 +977,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteCommentPayload.NumUids(childComplexity), true
 
+	case "DeleteEventPayload.event":
+		if e.complexity.DeleteEventPayload.Event == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteEventPayload_event_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteEventPayload.Event(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteEventPayload.msg":
 		if e.complexity.DeleteEventPayload.Msg == nil {
 			break
@@ -955,6 +1003,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteEventPayload.NumUids(childComplexity), true
 
+	case "DeleteLabelPayload.label":
+		if e.complexity.DeleteLabelPayload.Label == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteLabelPayload_label_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteLabelPayload.Label(childComplexity, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteLabelPayload.msg":
 		if e.complexity.DeleteLabelPayload.Msg == nil {
 			break
@@ -968,6 +1028,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteLabelPayload.NumUids(childComplexity), true
+
+	case "DeleteMandatePayload.mandate":
+		if e.complexity.DeleteMandatePayload.Mandate == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteMandatePayload_mandate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteMandatePayload.Mandate(childComplexity, args["filter"].(*model.MandateFilter), args["order"].(*model.MandateOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeleteMandatePayload.msg":
 		if e.complexity.DeleteMandatePayload.Msg == nil {
@@ -990,6 +1062,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteNodeCharacPayload.Msg(childComplexity), true
 
+	case "DeleteNodeCharacPayload.nodeCharac":
+		if e.complexity.DeleteNodeCharacPayload.NodeCharac == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteNodeCharacPayload_nodeCharac_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteNodeCharacPayload.NodeCharac(childComplexity, args["filter"].(*model.NodeCharacFilter), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteNodeCharacPayload.numUids":
 		if e.complexity.DeleteNodeCharacPayload.NumUids == nil {
 			break
@@ -1004,6 +1088,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteNodeFragmentPayload.Msg(childComplexity), true
 
+	case "DeleteNodeFragmentPayload.nodeFragment":
+		if e.complexity.DeleteNodeFragmentPayload.NodeFragment == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteNodeFragmentPayload_nodeFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteNodeFragmentPayload.NodeFragment(childComplexity, args["filter"].(*model.NodeFragmentFilter), args["order"].(*model.NodeFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteNodeFragmentPayload.numUids":
 		if e.complexity.DeleteNodeFragmentPayload.NumUids == nil {
 			break
@@ -1017,6 +1113,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteNodePayload.Msg(childComplexity), true
+
+	case "DeleteNodePayload.node":
+		if e.complexity.DeleteNodePayload.Node == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteNodePayload_node_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteNodePayload.Node(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeleteNodePayload.numUids":
 		if e.complexity.DeleteNodePayload.NumUids == nil {
@@ -1039,6 +1147,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeletePostPayload.NumUids(childComplexity), true
 
+	case "DeletePostPayload.post":
+		if e.complexity.DeletePostPayload.Post == nil {
+			break
+		}
+
+		args, err := ec.field_DeletePostPayload_post_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeletePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteTensionPayload.msg":
 		if e.complexity.DeleteTensionPayload.Msg == nil {
 			break
@@ -1053,6 +1173,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteTensionPayload.NumUids(childComplexity), true
 
+	case "DeleteTensionPayload.tension":
+		if e.complexity.DeleteTensionPayload.Tension == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteTensionPayload_tension_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteUserPayload.msg":
 		if e.complexity.DeleteUserPayload.Msg == nil {
 			break
@@ -1066,6 +1198,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteUserPayload.NumUids(childComplexity), true
+
+	case "DeleteUserPayload.user":
+		if e.complexity.DeleteUserPayload.User == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteUserPayload_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteUserPayload.User(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Event.createdAt":
 		if e.complexity.Event.CreatedAt == nil {
@@ -2932,7 +3076,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema/gen2/schema.graphql", Input: `
+	{Name: "../schema/gen/schema.graphql", Input: `
 
 
 directive @hidden on FIELD_DEFINITION
@@ -3237,23 +3381,25 @@ enum BlobType {
 
 }
 
-directive @id on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @cascade on FIELD
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE
-
-directive @cascade on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3573,6 +3719,7 @@ input CustomHTTP {
   mode: Mode
   forwardHeaders: [String!]
   secretHeaders: [String!]
+  introspectionHeaders: [String!]
   skipIntrospection: Boolean
 }
 
@@ -3587,56 +3734,67 @@ input DateTimeFilter {
 }
 
 type DeleteBlobPayload {
+  blob(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   msg: String
   numUids: Int
 }
 
 type DeleteCommentPayload {
+  comment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment]
   msg: String
   numUids: Int
 }
 
 type DeleteEventPayload {
+  event(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
   msg: String
   numUids: Int
 }
 
 type DeleteLabelPayload {
+  label(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label]
   msg: String
   numUids: Int
 }
 
 type DeleteMandatePayload {
+  mandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
   msg: String
   numUids: Int
 }
 
 type DeleteNodeCharacPayload {
+  nodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
   msg: String
   numUids: Int
 }
 
 type DeleteNodeFragmentPayload {
+  nodeFragment(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment]
   msg: String
   numUids: Int
 }
 
 type DeleteNodePayload {
+  node(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
   msg: String
   numUids: Int
 }
 
 type DeletePostPayload {
+  post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   msg: String
   numUids: Int
 }
 
 type DeleteTensionPayload {
+  tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
   msg: String
   numUids: Int
 }
 
 type DeleteUserPayload {
+  user(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   msg: String
   numUids: Int
 }
@@ -3889,7 +4047,6 @@ enum NodeFragmentOrderable {
   about
   first_link
   second_link
-  skills
 }
 
 input NodeFragmentPatch {
@@ -3943,7 +4100,6 @@ enum NodeOrderable {
   n_tensions_out
   n_tensions_in
   n_children
-  skills
 }
 
 input NodePatch {
@@ -5202,6 +5358,416 @@ func (ec *executionContext) field_Comment_createdBy_args(ctx context.Context, ra
 		}
 	}
 	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteBlobPayload_blob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BlobFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.BlobOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOBlobOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteCommentPayload_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.CommentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOCommentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteEventPayload_event_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteLabelPayload_label_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.LabelFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOLabelFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.LabelOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOLabelOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteMandatePayload_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MandateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.MandateOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOMandateOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteNodeCharacPayload_nodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeCharacFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteNodeFragmentPayload_nodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalONodeFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteNodePayload_node_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeletePostPayload_post_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PostFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PostOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteTensionPayload_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteUserPayload_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		arg1, err = ec.unmarshalOUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -9033,6 +9599,41 @@ func (ec *executionContext) _Comment_updatedAt(ctx context.Context, field graphq
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeleteBlobPayload_blob(ctx context.Context, field graphql.CollectedField, obj *model.DeleteBlobPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteBlobPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteBlobPayload_blob_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Blob, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Blob)
+	fc.Result = res
+	return ec.marshalOBlob2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteBlobPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteBlobPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9087,6 +9688,41 @@ func (ec *executionContext) _DeleteBlobPayload_numUids(ctx context.Context, fiel
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteCommentPayload_comment(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCommentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteCommentPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteCommentPayload_comment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteCommentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCommentPayload) (ret graphql.Marshaler) {
@@ -9145,6 +9781,41 @@ func (ec *executionContext) _DeleteCommentPayload_numUids(ctx context.Context, f
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeleteEventPayload_event(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteEventPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteEventPayload_event_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Event, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Event)
+	fc.Result = res
+	return ec.marshalOEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteEventPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9199,6 +9870,41 @@ func (ec *executionContext) _DeleteEventPayload_numUids(ctx context.Context, fie
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteLabelPayload_label(ctx context.Context, field graphql.CollectedField, obj *model.DeleteLabelPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteLabelPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteLabelPayload_label_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Label, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Label)
+	fc.Result = res
+	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteLabelPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteLabelPayload) (ret graphql.Marshaler) {
@@ -9257,6 +9963,41 @@ func (ec *executionContext) _DeleteLabelPayload_numUids(ctx context.Context, fie
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeleteMandatePayload_mandate(ctx context.Context, field graphql.CollectedField, obj *model.DeleteMandatePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteMandatePayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteMandatePayload_mandate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mandate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Mandate)
+	fc.Result = res
+	return ec.marshalOMandate2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteMandatePayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteMandatePayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9311,6 +10052,41 @@ func (ec *executionContext) _DeleteMandatePayload_numUids(ctx context.Context, f
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteNodeCharacPayload_nodeCharac(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeCharacPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteNodeCharacPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteNodeCharacPayload_nodeCharac_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NodeCharac, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.NodeCharac)
+	fc.Result = res
+	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteNodeCharacPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeCharacPayload) (ret graphql.Marshaler) {
@@ -9369,6 +10145,41 @@ func (ec *executionContext) _DeleteNodeCharacPayload_numUids(ctx context.Context
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeleteNodeFragmentPayload_nodeFragment(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteNodeFragmentPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteNodeFragmentPayload_nodeFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NodeFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.NodeFragment)
+	fc.Result = res
+	return ec.marshalONodeFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragment(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteNodeFragmentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeFragmentPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9423,6 +10234,61 @@ func (ec *executionContext) _DeleteNodeFragmentPayload_numUids(ctx context.Conte
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteNodePayload_node(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteNodePayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteNodePayload_node_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Node, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Node); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Node`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteNodePayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodePayload) (ret graphql.Marshaler) {
@@ -9481,6 +10347,41 @@ func (ec *executionContext) _DeleteNodePayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeletePostPayload_post(ctx context.Context, field graphql.CollectedField, obj *model.DeletePostPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeletePostPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeletePostPayload_post_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Post, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Post)
+	fc.Result = res
+	return ec.marshalOPost2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeletePostPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeletePostPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9537,6 +10438,41 @@ func (ec *executionContext) _DeletePostPayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeleteTensionPayload_tension(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTensionPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteTensionPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteTensionPayload_tension_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tension, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteTensionPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTensionPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9591,6 +10527,41 @@ func (ec *executionContext) _DeleteTensionPayload_numUids(ctx context.Context, f
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserPayload_user(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeleteUserPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteUserPayload_user_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteUserPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserPayload) (ret graphql.Marshaler) {
@@ -20042,6 +21013,12 @@ func (ec *executionContext) unmarshalInputCustomHTTP(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "introspectionHeaders":
+			var err error
+			it.IntrospectionHeaders, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "skipIntrospection":
 			var err error
 			it.SkipIntrospection, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -24558,6 +25535,8 @@ func (ec *executionContext) _DeleteBlobPayload(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteBlobPayload")
+		case "blob":
+			out.Values[i] = ec._DeleteBlobPayload_blob(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteBlobPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24584,6 +25563,8 @@ func (ec *executionContext) _DeleteCommentPayload(ctx context.Context, sel ast.S
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteCommentPayload")
+		case "comment":
+			out.Values[i] = ec._DeleteCommentPayload_comment(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteCommentPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24610,6 +25591,8 @@ func (ec *executionContext) _DeleteEventPayload(ctx context.Context, sel ast.Sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteEventPayload")
+		case "event":
+			out.Values[i] = ec._DeleteEventPayload_event(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteEventPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24636,6 +25619,8 @@ func (ec *executionContext) _DeleteLabelPayload(ctx context.Context, sel ast.Sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteLabelPayload")
+		case "label":
+			out.Values[i] = ec._DeleteLabelPayload_label(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteLabelPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24662,6 +25647,8 @@ func (ec *executionContext) _DeleteMandatePayload(ctx context.Context, sel ast.S
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteMandatePayload")
+		case "mandate":
+			out.Values[i] = ec._DeleteMandatePayload_mandate(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteMandatePayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24688,6 +25675,8 @@ func (ec *executionContext) _DeleteNodeCharacPayload(ctx context.Context, sel as
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodeCharacPayload")
+		case "nodeCharac":
+			out.Values[i] = ec._DeleteNodeCharacPayload_nodeCharac(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteNodeCharacPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24714,6 +25703,8 @@ func (ec *executionContext) _DeleteNodeFragmentPayload(ctx context.Context, sel 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodeFragmentPayload")
+		case "nodeFragment":
+			out.Values[i] = ec._DeleteNodeFragmentPayload_nodeFragment(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteNodeFragmentPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24740,6 +25731,8 @@ func (ec *executionContext) _DeleteNodePayload(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodePayload")
+		case "node":
+			out.Values[i] = ec._DeleteNodePayload_node(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteNodePayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24766,6 +25759,8 @@ func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeletePostPayload")
+		case "post":
+			out.Values[i] = ec._DeletePostPayload_post(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeletePostPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24792,6 +25787,8 @@ func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.S
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteTensionPayload")
+		case "tension":
+			out.Values[i] = ec._DeleteTensionPayload_tension(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteTensionPayload_msg(ctx, field, obj)
 		case "numUids":
@@ -24818,6 +25815,8 @@ func (ec *executionContext) _DeleteUserPayload(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserPayload")
+		case "user":
+			out.Values[i] = ec._DeleteUserPayload_user(ctx, field, obj)
 		case "msg":
 			out.Values[i] = ec._DeleteUserPayload_msg(ctx, field, obj)
 		case "numUids":
