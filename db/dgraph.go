@@ -1173,15 +1173,14 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 
 // DQL Mutations
 
-// SetNodeLiteral set a predicate for the given node in the DB
-// @debug rename to SetFieldByEq
-func (dg Dgraph) SetNodeLiteral(nameid string, predicate string, val string) error {
+// SetFieldByEq set a predicate for the given node in the DB
+func (dg Dgraph) SetFieldByEq(fieldid string, objid string, predicate string, val string) error {
     query := fmt.Sprintf(`query {
-        node as var(func: eq(Node.nameid, "%s"))
-    }`, nameid)
+        node as var(func: eq(%s, "%s"))
+    }`,fieldid, objid)
 
     mu := fmt.Sprintf(`
-        uid(node) <Node.%s> "%s" .
+        uid(node) <%s> "%s" .
     `, predicate, val)
 
     mutation := &api.Mutation{
@@ -1191,6 +1190,7 @@ func (dg Dgraph) SetNodeLiteral(nameid string, predicate string, val string) err
     err := dg.MutateWithQueryGpm(query, mutation)
     return err
 }
+
 // UpdateRoleType update the role of a node given the nameid using upsert block.
 func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
     query := fmt.Sprintf(`query {

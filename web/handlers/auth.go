@@ -9,6 +9,7 @@ import (
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/graph/model"
+    . "zerogov/fractal6.go/tools"
 )
 
 
@@ -115,6 +116,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 500)
 		return
     }
+
+    // @debug: use a thread to set the last ack Literal, no need to wait here.
+    err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "lastAck", Now())
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
     w.Write(data)
 }
 
@@ -157,6 +166,15 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 500)
 		return
     }
+
+    // @debug: use a thread to set the last ack Literal, no need to wait here.
+    err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "lastAck", Now())
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+
     w.Write(data)
 }
 

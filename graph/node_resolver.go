@@ -80,14 +80,11 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     // Archive Node
     // --
     if node.FirstLink != nil {
-        err = auth.RemoveUserRole(*node.FirstLink, nameid)
-        if err != nil { return false, err }
-
-        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeGuest)
+        err := UnlinkUser(rootnameid, nameid, *node.FirstLink)
         if err != nil { return false, err }
     }
     // Toggle the node flag
-    err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(true))
+    err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isArchived", strconv.FormatBool(true))
     return ok, err
 }
 func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
@@ -111,14 +108,11 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
     // Unarchive Node
     // --
     if node.FirstLink != nil {
-        err = auth.AddUserRole(*node.FirstLink, nameid)
-        if err != nil { return false, err }
-
-        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
+        err := LinkUser(rootnameid, nameid, *node.FirstLink)
         if err != nil { return false, err }
     }
     // Toggle the node flag
-    err = db.GetDB().SetNodeLiteral(nameid, "isArchived", strconv.FormatBool(false))
+    err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isArchived", strconv.FormatBool(false))
     return ok, err
 }
 

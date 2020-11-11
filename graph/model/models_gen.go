@@ -184,6 +184,7 @@ type AddTensionPayload struct {
 
 type AddUserInput struct {
 	CreatedAt        string         `json:"createdAt,omitempty"`
+	LastAck          string         `json:"lastAck,omitempty"`
 	Username         string         `json:"username,omitempty"`
 	Name             *string        `json:"name,omitempty"`
 	Password         string         `json:"password,omitempty"`
@@ -1069,6 +1070,7 @@ type UpdateUserPayload struct {
 type User struct {
 	ID               string      `json:"id,omitempty"`
 	CreatedAt        string      `json:"createdAt,omitempty"`
+	LastAck          string      `json:"lastAck,omitempty"`
 	Username         string      `json:"username,omitempty"`
 	Name             *string     `json:"name,omitempty"`
 	Password         string      `json:"password,omitempty"`
@@ -1101,6 +1103,7 @@ type UserOrder struct {
 
 type UserPatch struct {
 	CreatedAt        *string        `json:"createdAt,omitempty"`
+	LastAck          *string        `json:"lastAck,omitempty"`
 	Name             *string        `json:"name,omitempty"`
 	Password         *string        `json:"password,omitempty"`
 	Email            *string        `json:"email,omitempty"`
@@ -1118,6 +1121,7 @@ type UserPatch struct {
 type UserRef struct {
 	ID               *string        `json:"id,omitempty"`
 	CreatedAt        *string        `json:"createdAt,omitempty"`
+	LastAck          *string        `json:"lastAck,omitempty"`
 	Username         *string        `json:"username,omitempty"`
 	Name             *string        `json:"name,omitempty"`
 	Password         *string        `json:"password,omitempty"`
@@ -1957,6 +1961,7 @@ const (
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
+	TensionEventUserLeft        TensionEvent = "UserLeft"
 )
 
 var AllTensionEvent = []TensionEvent{
@@ -1972,11 +1977,12 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
+	TensionEventUserLeft,
 }
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserLeft:
 		return true
 	}
 	return false
@@ -2148,6 +2154,7 @@ type UserOrderable string
 
 const (
 	UserOrderableCreatedAt UserOrderable = "createdAt"
+	UserOrderableLastAck   UserOrderable = "lastAck"
 	UserOrderableUsername  UserOrderable = "username"
 	UserOrderableName      UserOrderable = "name"
 	UserOrderablePassword  UserOrderable = "password"
@@ -2159,6 +2166,7 @@ const (
 
 var AllUserOrderable = []UserOrderable{
 	UserOrderableCreatedAt,
+	UserOrderableLastAck,
 	UserOrderableUsername,
 	UserOrderableName,
 	UserOrderablePassword,
@@ -2170,7 +2178,7 @@ var AllUserOrderable = []UserOrderable{
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableEmailHash, UserOrderableBio, UserOrderableUtc:
+	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableEmailHash, UserOrderableBio, UserOrderableUtc:
 		return true
 	}
 	return false

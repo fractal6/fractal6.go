@@ -471,6 +471,7 @@ type ComplexityRoot struct {
 		EmailHash        func(childComplexity int) int
 		EmailValidated   func(childComplexity int) int
 		ID               func(childComplexity int) int
+		LastAck          func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Password         func(childComplexity int) int
 		Rights           func(childComplexity int) int
@@ -2927,6 +2928,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
+	case "User.lastAck":
+		if e.complexity.User.LastAck == nil {
+			break
+		}
+
+		return e.complexity.User.LastAck(childComplexity), true
+
 	case "User.name":
 		if e.complexity.User.Name == nil {
 			break
@@ -3272,6 +3280,7 @@ type Mandate {
 type User {
   id: ID!
   createdAt: DateTime!
+  lastAck: DateTime!
   username: String! @id
   name: String
   password: String! @hidden
@@ -3365,9 +3374,11 @@ enum TensionEvent {
 
   BlobCreated
   BlobCommitted
+
   BlobPushed
   BlobArchived
   BlobUnarchived
+  UserLeft
 }
 
 enum BlobType {
@@ -3381,25 +3392,25 @@ enum BlobType {
 
 }
 
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @cascade on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
-
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @cascade on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3577,6 +3588,7 @@ type AddTensionPayload {
 
 input AddUserInput {
   createdAt: DateTime!
+  lastAck: DateTime!
   username: String! @alter_toLower(f:"username")
   name: String @alter_toLower(f:"name")
   password: String!
@@ -4512,6 +4524,7 @@ input UserOrder {
 
 enum UserOrderable {
   createdAt
+  lastAck
   username
   name
   password
@@ -4523,6 +4536,7 @@ enum UserOrderable {
 
 input UserPatch {
   createdAt: DateTime @patch_RO
+  lastAck: DateTime @patch_RO
   name: String @patch_isOwner @alter_toLower(f:"name")
   password: String @patch_isOwner
   email: String @patch_isOwner
@@ -4540,6 +4554,7 @@ input UserPatch {
 input UserRef {
   id: ID
   createdAt: DateTime
+  lastAck: DateTime
   username: String
   name: String
   password: String
@@ -17391,6 +17406,37 @@ func (ec *executionContext) _User_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalNDateTime2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_lastAck(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastAck, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_username(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -20206,6 +20252,12 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastAck":
+			var err error
+			it.LastAck, err = ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24707,6 +24759,27 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			} else {
 				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 			}
+		case "lastAck":
+			var err error
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, err
+			}
+			if data, ok := tmp.(*string); ok {
+				it.LastAck = data
+			} else if tmp == nil {
+				it.LastAck = nil
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+			}
 		case "name":
 			var err error
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -24990,6 +25063,12 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		case "createdAt":
 			var err error
 			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastAck":
+			var err error
+			it.LastAck, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -27015,6 +27094,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "createdAt":
 			out.Values[i] = ec._User_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastAck":
+			out.Values[i] = ec._User_lastAck(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

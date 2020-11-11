@@ -296,6 +296,7 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     charac_, err := db.GetDB().GetNodeCharac("nameid", parentid)
     if err != nil { return nil, LogErr("Access denied", err) }
     if charac_ == nil { return nil, LogErr("Access denied", fmt.Errorf("Node characteristic not found")) }
+    fmt.Println(parentid, *charac_)
 
     ok, err := doAddNodeHook(uctx, node, parentid, *charac_)
     if err != nil { return nil, LogErr("Access denied", err) }
@@ -698,6 +699,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     nodeType := node.Type
     roleType := node.RoleType
     if roleType != nil && *roleType == model.RoleTypeGuest {
+        fmt.Println(node, charac)
         if !charac.UserCanJoin {
             err = fmt.Errorf("this organisation does not accept new members")
         } else if rootnameid != parentid {
@@ -723,6 +725,12 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
 //      * check user hasa the right authorization based on NodeCharac
 //      * update the tension action value AND the blob pushedFlag
 //      * copy the Blob data in the target Node.source (Uses GQL requests)
+// * elif event == TensionEventBlobArchived/Unarchived
+//     * link or unlink role
+//     * set archive evnet and flag
+// * elif event == TensionEventUserLeft
+//    * remove User role
+//    * remove Orga role (Guest/Member) if role_type is Guest|Member
 // Note: @Debug: Only one BlobPushed will be processed
 // Note: @Debug: remove added tension on error ?
 func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, error) {
@@ -732,14 +740,16 @@ func tensionBlobHook(uctx model.UserCtx, tid string, events []*model.EventRef, b
     for _, event := range(events) {
         if *event.EventType == model.TensionEventBlobPushed ||
            *event.EventType == model.TensionEventBlobArchived ||
-           *event.EventType == model.TensionEventBlobUnarchived {
+           *event.EventType == model.TensionEventBlobUnarchived ||
+           *event.EventType == model.TensionEventUserLeft {
                // Process the special event
                ok, err, nameid = processTensionEventHook(uctx, event, tid, bid)
                if ok && err == nil {
-                   err = db.GetDB().SetNodeLiteral(nameid, "updatedAt", Now())
+                   // Set the Update time into the target node
+                   err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
                    pid, _ := nid2pid(nameid) // @debug: real parent needed here (ie event for circle)
                    if pid != nameid && err == nil {
-                       err = db.GetDB().SetNodeLiteral(pid, "updatedAt", Now())
+                       err = db.GetDB().SetFieldByEq("Node.nameid", pid, "Node.updatedAt", Now())
                    }
                }
                // Break after the first hooked event
@@ -835,6 +845,10 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         if ok { // Update blob pushed flag
             err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tid, tensionCharac.EditAction(node.Type))
         }
+    } else if *event.EventType == model.TensionEventUserLeft {
+        // Remove user reference
+        // --
+        ok, err = LeaveRole(uctx, tension, node)
     }
 
     return ok, err, nameid

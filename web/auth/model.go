@@ -230,6 +230,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
 
     userInput := model.AddUserInput{
         CreatedAt:      time.Now().Format(time.RFC3339),
+        LastAck:        time.Now().Format(time.RFC3339),
         Username:       creds.Username,
         Email:          creds.Email,
         //EmailHash:      *string,
@@ -289,9 +290,9 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
     nodes, err := db.GetDB().GetNodes(regex, true)
     if err != nil {return ok, err}
 
-    SELFORGA_LIMIT := 10
-    if len(nodes) > SELFORGA_LIMIT {
-        return ok, fmt.Errorf("number of personnal organisation are limited to %d for now", SELFORGA_LIMIT)
+    SELFORGA_LIMIT := 5
+    if len(nodes) >= SELFORGA_LIMIT {
+        return ok, fmt.Errorf("number of personnal organisation are limited to %d, please contact us to create more", SELFORGA_LIMIT)
     }
 
     ok = true
