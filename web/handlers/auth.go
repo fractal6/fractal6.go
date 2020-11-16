@@ -118,7 +118,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
 
     // @debug: use a thread to set the last ack Literal, no need to wait here.
-    err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "lastAck", Now())
+    err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "User.lastAck", Now())
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -168,12 +168,11 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
     }
 
     // @debug: use a thread to set the last ack Literal, no need to wait here.
-    err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "lastAck", Now())
+    err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "User.lastAck", Now())
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
     }
-
 
     w.Write(data)
 }
