@@ -68,7 +68,7 @@ func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
 func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
     claims := jwt.MapClaims{ tk.tokenClaim: d }
     jwtauth.SetIssuedNow(claims)
-    jwtauth.SetExpiry(claims, time.Now().Add(t))
+    jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 	_, tokenString, err := tk.tokenAuth.Encode(claims)
 	return Pack64(tokenString), err
 }

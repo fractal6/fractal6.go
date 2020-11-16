@@ -2,7 +2,6 @@ package graph
 
 import (
     "fmt"
-    "time"
     "strconv"
     "strings"
 
@@ -15,8 +14,8 @@ import (
 
 // tryAddNode add a new node is user has the correct right
 // * it inherits node charac
-func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
-    tid := tension.ID
+func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
+    //tid := tension.ID
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
@@ -37,11 +36,11 @@ func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, true)
     if err != nil || !ok { return ok, err }
 
-    err = PushNode(uctx, tid, node, emitterid, nameid, parentid)
+    err = PushNode(uctx, bid, node, emitterid, nameid, parentid)
     return ok, err
 }
 
-func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
@@ -53,7 +52,7 @@ func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeF
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok { return ok, err }
 
-    err = UpdateNode(uctx, node, emitterid, nameid, parentid)
+    err = UpdateNode(uctx, bid, node, emitterid, nameid, parentid)
     return ok, err
 }
 
@@ -135,7 +134,7 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
     if nodeType == model.NodeTypeRole {
         // Validate input
         if roleType == nil {
-            err = fmt.Errorf("role should have a RoleType")
+            err = fmt.Errorf("role should have a RoleType.")
         }
     } else if nodeType == model.NodeTypeCircle {
         //pass
@@ -180,7 +179,7 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
 // pushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
-func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
+func PushNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
     rootnameid, _ := nid2rootid(nameid)
 
     // Map NodeFragment to Node Input
@@ -192,10 +191,12 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     nodeInput.IsArchived = false
     nodeInput.Nameid = nameid
     nodeInput.Rootnameid = rootnameid
-    nodeInput.CreatedAt = time.Now().Format(time.RFC3339)
+    nodeInput.CreatedAt = Now()
     nodeInput.CreatedBy = &model.UserRef{Username: &uctx.Username}
     nodeInput.Parent = &model.NodeRef{Nameid: &parentid}
-    nodeInput.Source = &model.TensionRef{ID: &tid}
+    if bid != nil {
+        nodeInput.Source = &model.BlobRef{ ID: bid }
+    }
     var children []model.NodeFragment
     switch *node.Type {
     case model.NodeTypeRole:
@@ -226,11 +227,12 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
     case model.NodeTypeCircle:
         for _, child := range(children) {
             // Add the child tension
-            tensionInput := makeNewCoordoTension(uctx, emitterid, nameid, child)
+            tensionInput := makeNewChildTension(uctx, emitterid, nameid, child)
             tid_c, err := db.GetDB().Add("tension", tensionInput)
             if err != nil { return err }
             // Push child
-            err = PushNode(uctx, tid_c, &child, emitterid, *child.Nameid, nameid)
+            bid_c := db.GetDB().GetLastBlobId(tid_c)
+            err = PushNode(uctx, bid_c, &child, emitterid, *child.Nameid, nameid)
         }
     }
 
@@ -240,11 +242,16 @@ func PushNode(uctx model.UserCtx, tid string, node *model.NodeFragment, emitteri
 
 // updateNode update a node from the given fragment
 // @DEBUG: only set the field that have been modified in NodePatch
-func UpdateNode(uctx model.UserCtx, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
+func UpdateNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
     // Map NodeFragment to Node Patch Input
     var nodePatch model.NodePatch
     delMap := make(map[string]interface{}, 2)
     StructMap(node, &nodePatch)
+
+    // Blob reference update
+    if bid != nil {
+        nodePatch.Source = &model.BlobRef{ ID: bid }
+    }
 
     // Fix automatic fields
     switch *node.Type {
@@ -323,8 +330,8 @@ func makeNewChild(i int, username string, parentid string, roleType model.RoleTy
     return child
 }
 
-func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid string, child model.NodeFragment) model.AddTensionInput {
-    now := time.Now().Format(time.RFC3339)
+func makeNewChildTension(uctx model.UserCtx, emitterid string, receiverid string, child model.NodeFragment) model.AddTensionInput {
+    now := Now()
     createdBy := model.UserRef{Username: &uctx.Username}
     emitter := model.NodeRef{Nameid: &emitterid}
     receiver := model.NodeRef{Nameid: &receiverid}
@@ -347,7 +354,7 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
     tension := model.AddTensionInput{
         CreatedAt: now,
         CreatedBy : &createdBy,
-        Title: "[Role] Coordinator",
+        Title: "[Role] "+ *child.Name,
         Type: model.TensionTypeGovernance,
         Status: model.TensionStatusClosed,
         Emitter: &emitter,
@@ -367,7 +374,7 @@ func makeNewCoordoTension(uctx model.UserCtx, emitterid string, receiverid strin
 }
 
 func MakeNewRootTension(uctx model.UserCtx, rootnameid string, node model.AddNodeInput) model.AddTensionInput {
-    now := time.Now().Format(time.RFC3339)
+    now := Now()
     createdBy := *node.CreatedBy
     emitter := model.NodeRef{Nameid: &rootnameid}
     receiver := model.NodeRef{Nameid: &rootnameid}

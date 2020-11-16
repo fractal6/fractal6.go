@@ -254,7 +254,7 @@ func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter,
 	return data, errors
 }
 
-func (r *queryResolver) QueryUserRights(ctx context.Context, first *int, offset *int) (data []*model.UserRights, errors error) {
+func (r *queryResolver) QueryUserRights(ctx context.Context, order *model.UserRightsOrder, first *int, offset *int) (data []*model.UserRights, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

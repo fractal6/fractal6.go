@@ -10,7 +10,7 @@ import (
 )
 
 func Now() string {
-    return time.Now().Format(time.RFC3339)
+    return time.Now().UTC().Format(time.RFC3339)
 }
 
 func IsOlder(d1, d2 string) bool {

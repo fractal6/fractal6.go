@@ -130,7 +130,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     }
     if !fok {
         //rc := graphql.GetResolverContext(ctx)
-        return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request"))
+        return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
     }
 
     data, err := next(ctx)
@@ -163,7 +163,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
     var err error
 
     if nameid == "" {
-        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required for this request"))
+        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required for this request."))
     } else {
         // Get the public status of the node
         //isPrivate, err :=  db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isPrivate")
@@ -284,25 +284,25 @@ func addNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     // Validate input
     input := data.([]*model.AddNodeInput)
     if len(input) != 1 {
-        return nil, LogErr("Add node error", fmt.Errorf("Only one node supported in input"))
+        return nil, LogErr("Add node error", fmt.Errorf("Only one node supported in input."))
     }
     node := *input[0]
 
     // Get the Node Characteristics of the **Parent Node**
     if node.Parent == nil && (*node.Parent).Nameid == nil {
-        return nil, LogErr("Access denied", fmt.Errorf("Parent node not found"))
+        return nil, LogErr("Access denied", fmt.Errorf("Parent node not found."))
     }
     parentid := *(node.Parent).Nameid
     charac_, err := db.GetDB().GetNodeCharac("nameid", parentid)
     if err != nil { return nil, LogErr("Access denied", err) }
-    if charac_ == nil { return nil, LogErr("Access denied", fmt.Errorf("Node characteristic not found")) }
+    if charac_ == nil { return nil, LogErr("Access denied", fmt.Errorf("Node characteristic not found.")) }
     fmt.Println(parentid, *charac_)
 
     ok, err := doAddNodeHook(uctx, node, parentid, *charac_)
     if err != nil { return nil, LogErr("Access denied", err) }
     if ok { return data, nil }
 
-    return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource."))
+    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
 // Update Node hook:
@@ -326,7 +326,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     // Validate input
     input := data.([]*model.AddTensionInput)
     if len(input) != 1 {
-        return nil, LogErr("Add tension error", fmt.Errorf("Only one tension supported in input"))
+        return nil, LogErr("Add tension error", fmt.Errorf("Only one tension supported in input."))
     }
 
     return data, err
@@ -374,7 +374,7 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
     if err != nil  { return nil, err }
     if ok { return data, err }
 
-    return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource."))
+    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
 // Update Tension Post Hook
@@ -392,7 +392,7 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
     input := rc.Args["input"].(model.UpdateTensionInput)
     tids := input.Filter.ID
     if len(tids) == 0 {
-        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension filter"))
+        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension filter."))
     }
 
     // Validate Blob Event
@@ -403,7 +403,7 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
         if ok {
             return data, err
         } else {
-            return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource."))
+            return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }
     }
 
@@ -471,7 +471,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
         }
     }
 
-    return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource"))
+    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
 // HasRoot check the list of node to check if the user has root node in common.
@@ -488,7 +488,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
         if ok { return next(ctx) }
     }
 
-    return nil, LogErr("Access denied", fmt.Errorf("contact a coordinator to access this ressource"))
+    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
 // Only the onwer of the object can edit it.
@@ -512,7 +512,7 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, userFi
     if err != nil { return nil, LogErr("Access denied", err) }
     if ok { return next(ctx) }
 
-    return nil, LogErr("Access Denied", fmt.Errorf("bad ownership"))
+    return nil, LogErr("Access Denied", fmt.Errorf("bad ownership."))
 }
 
 func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
@@ -615,7 +615,7 @@ func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, no
         // Extract node identifiers
         nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
         if nameid_ == nil {
-            return false, fmt.Errorf("node target unknown (nameid), need a database request here ...")
+            return false, fmt.Errorf("node target unknown (nameid), need a database request here...")
         }
         rootnameid, err = nid2rootid(nameid_.(string))
         if err != nil {
@@ -689,7 +689,7 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
         //    err = fmt.Errorf("you are not authorized to create new organisation")
         //}
 
-        err = fmt.Errorf("you are not authorized to create new organisation")
+        err = fmt.Errorf("You are not authorized to create new organisation.")
         return ok, err
     }
 
@@ -701,12 +701,12 @@ func doAddNodeHook(uctx model.UserCtx, node model.AddNodeInput, parentid string,
     if roleType != nil && *roleType == model.RoleTypeGuest {
         fmt.Println(node, charac)
         if !charac.UserCanJoin {
-            err = fmt.Errorf("this organisation does not accept new members")
+            err = fmt.Errorf("this organisation does not accept new members.")
         } else if rootnameid != parentid {
-            err = fmt.Errorf("guest user can only join the root circle")
+            err = fmt.Errorf("guest user can only join the root circle.")
         } else if nodeType != model.NodeTypeRole {
             // @DEBUG; this will be obsolete with union schema
-            err = fmt.Errorf("circle with role_type defined should be of type RoleType")
+            err = fmt.Errorf("circle with role_type defined should be of type RoleType.")
         } else {
             ok = true
         }
@@ -766,11 +766,12 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     // Get Tension, target Node and blob charac (last if bid undefined)
     tension, err := db.GetDB().GetTensionHook(tid, bid)
     if err != nil { return false, LogErr("Access denied", err), nameid}
-    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found")), nameid }
+    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found.")), nameid }
 
     // Check that Blob exists
     blob := tension.Blobs[0]
-    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found")), nameid }
+    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
+    bid = &blob.ID
 
     // Extract Tension characteristic
     tensionCharac, err:= TensionCharac{}.New(*tension.Action)
@@ -794,7 +795,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
             // First time a blob is pushed.
             switch tensionCharac.DocType {
             case NodeDoc:
-                ok, err = TryAddNode(uctx, tension, node)
+                ok, err = TryAddNode(uctx, tension, node, bid)
             case MdDoc:
                 md := blob.Md
                 ok, err = TryAddDoc(uctx, tension, md)
@@ -802,13 +803,13 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         case EditAction:
             switch tensionCharac.DocType {
             case NodeDoc:
-                ok, err = TryUpdateNode(uctx, tension, node)
+                ok, err = TryUpdateNode(uctx, tension, node, bid)
             case MdDoc:
                 md := blob.Md
                 ok, err = TryUpdateDoc(uctx, tension, md)
             }
         case ArchiveAction:
-            err = LogErr("Access denied", fmt.Errorf("Cannot publish archived document"))
+            err = LogErr("Access denied", fmt.Errorf("Cannot publish archived document."))
         }
 
         if err != nil { return ok, err, nameid }

@@ -52,7 +52,7 @@ func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragm
         if err != nil {return false, err}
     case model.RoleTypeMember:
     case model.RoleTypeOwner:
-        return false, fmt.Errorf("Doh, owner escape is not implemented right now, WIP.")
+        return false, fmt.Errorf("Doh, organisation destruction is not yet implemented, WIP.")
     default: // Peer, Coordinator
         err = UnlinkUser(rootnameid, nameid, *node.FirstLink)
     }

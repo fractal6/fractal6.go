@@ -120,8 +120,8 @@ type AddNodeInput struct {
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
-	Docs         []*TensionRef  `json:"docs,omitempty"`
-	Source       *TensionRef    `json:"source,omitempty"`
+	Docs         []*BlobRef     `json:"docs,omitempty"`
+	Source       *BlobRef       `json:"source,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -208,6 +208,7 @@ type AddUserPayload struct {
 type AddUserRightsInput struct {
 	CanLogin      bool `json:"canLogin"`
 	CanCreateRoot bool `json:"canCreateRoot"`
+	MaxPublicOrga int  `json:"maxPublicOrga,omitempty"`
 }
 
 type AddUserRightsPayload struct {
@@ -557,8 +558,8 @@ type Node struct {
 	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
 	About        *string     `json:"about,omitempty"`
 	Mandate      *Mandate    `json:"mandate,omitempty"`
-	Docs         []*Tension  `json:"docs,omitempty"`
-	Source       *Tension    `json:"source,omitempty"`
+	Docs         []*Blob     `json:"docs,omitempty"`
+	Source       *Blob       `json:"source,omitempty"`
 	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
 	NChildren    *int        `json:"n_children,omitempty"`
@@ -700,8 +701,8 @@ type NodePatch struct {
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
-	Docs         []*TensionRef  `json:"docs,omitempty"`
-	Source       *TensionRef    `json:"source,omitempty"`
+	Docs         []*BlobRef     `json:"docs,omitempty"`
+	Source       *BlobRef       `json:"source,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -732,8 +733,8 @@ type NodeRef struct {
 	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
 	About        *string        `json:"about,omitempty"`
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
-	Docs         []*TensionRef  `json:"docs,omitempty"`
-	Source       *TensionRef    `json:"source,omitempty"`
+	Docs         []*BlobRef     `json:"docs,omitempty"`
+	Source       *BlobRef       `json:"source,omitempty"`
 	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
 	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
 	NChildren    *int           `json:"n_children,omitempty"`
@@ -1140,11 +1141,19 @@ type UserRef struct {
 type UserRights struct {
 	CanLogin      bool `json:"canLogin"`
 	CanCreateRoot bool `json:"canCreateRoot"`
+	MaxPublicOrga int  `json:"maxPublicOrga,omitempty"`
+}
+
+type UserRightsOrder struct {
+	Asc  *UserRightsOrderable `json:"asc,omitempty"`
+	Desc *UserRightsOrderable `json:"desc,omitempty"`
+	Then *UserRightsOrder     `json:"then,omitempty"`
 }
 
 type UserRightsRef struct {
 	CanLogin      *bool `json:"canLogin"`
 	CanCreateRoot *bool `json:"canCreateRoot"`
+	MaxPublicOrga *int  `json:"maxPublicOrga,omitempty"`
 }
 
 type BlobOrderable string
@@ -2202,5 +2211,44 @@ func (e *UserOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e UserOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserRightsOrderable string
+
+const (
+	UserRightsOrderableMaxPublicOrga UserRightsOrderable = "maxPublicOrga"
+)
+
+var AllUserRightsOrderable = []UserRightsOrderable{
+	UserRightsOrderableMaxPublicOrga,
+}
+
+func (e UserRightsOrderable) IsValid() bool {
+	switch e {
+	case UserRightsOrderableMaxPublicOrga:
+		return true
+	}
+	return false
+}
+
+func (e UserRightsOrderable) String() string {
+	return string(e)
+}
+
+func (e *UserRightsOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserRightsOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserRightsOrderable", str)
+	}
+	return nil
+}
+
+func (e UserRightsOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

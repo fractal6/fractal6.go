@@ -1014,6 +1014,7 @@ func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error)
     return &obj, err
 }
 
+
 // Get all sub children
 func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, error) {
     // Format Query
@@ -1048,6 +1049,38 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
     return data, err
 }
 
+func (dg Dgraph) GetLastBlobId(tid string) (*string) {
+    // init client
+    dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+    q := fmt.Sprintf(`{all(func: uid(%s))  {
+        Tension.blobs (orderdesc: Post.createdAt, first: 1) { uid }
+    }}`, tid)
+    // Send request
+    res, err := txn.Query(ctx, q)
+    if err != nil { return nil}
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil}
+
+    var bid string
+    if len(r.All) > 1 {
+        return nil
+    } else if len(r.All) == 1 {
+        blobs := r.All[0]["Tension.blobs"].([]interface{})
+        if len(blobs) > 0 {
+            bid = blobs[0].(model.JsonAtom)["uid"].(string)
+        }
+    }
+
+    return &bid
+}
 // Get all sub children
 func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode, error) {
     // Format Query
@@ -1177,7 +1210,7 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 func (dg Dgraph) SetFieldByEq(fieldid string, objid string, predicate string, val string) error {
     query := fmt.Sprintf(`query {
         node as var(func: eq(%s, "%s"))
-    }`,fieldid, objid)
+    }`, fieldid, objid)
 
     mu := fmt.Sprintf(`
         uid(node) <%s> "%s" .
@@ -1251,14 +1284,14 @@ func (dg Dgraph) SetArchivedFlagBlob(bid string, flag string, tid string, action
     return err
 }
 
-func (dg Dgraph) SetTensionSource(nameid string, tid string) error {
+func (dg Dgraph) SetNodeSource(nameid string, bid string) error {
     query := fmt.Sprintf(`query {
         node as var(func: eq(Node.nameid, "%s"))
     }`, nameid)
 
     mu := fmt.Sprintf(`
         uid(node) <Node.source> <%s> .
-    `, tid)
+    `, bid)
 
     mutation := &api.Mutation{
         SetNquads: []byte(mu),

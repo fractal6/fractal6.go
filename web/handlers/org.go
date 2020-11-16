@@ -3,7 +3,6 @@ package handlers
 
 import (
     //"fmt"
-    "time"
     "net/http"
     "encoding/json"
 
@@ -59,7 +58,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
         IsArchived: false,
         Charac: &model.NodeCharacRef{ UserCanJoin: &userCanJoin, Mode: &mode },
         // Common
-        CreatedAt: time.Now().Format(time.RFC3339),
+        CreatedAt: Now(),
         CreatedBy: &model.UserRef{ID: &uid},
         //CreatedBy: &model.UserRef{Username: &uctx.Username},
     }
@@ -87,7 +86,8 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Links the source tension
-    err = db.GetDB().SetTensionSource(nameid, tid)
+    bid := db.GetDB().GetLastBlobId(tid)
+    err = db.GetDB().SetNodeSource(nameid, *bid)
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Add the Owner role to the user
