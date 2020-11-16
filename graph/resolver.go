@@ -814,7 +814,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
 
         if err != nil { return ok, err, nameid }
         if ok { // Update blob pushed flag
-            err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tid, tensionCharac.EditAction(node.Type))
+            err = db.GetDB().SetPushedFlagBlob(*bid, Now(), tid, tensionCharac.EditAction(node.Type))
         }
     } else if *event.EventType == model.TensionEventBlobArchived {
         // Archived Node
@@ -829,7 +829,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
 
         if err != nil { return ok, err, nameid }
         if ok { // Update blob archived flag
-            err = db.GetDB().SetArchivedFlagBlob(blob.ID, Now(), tid, tensionCharac.ArchiveAction(node.Type))
+            err = db.GetDB().SetArchivedFlagBlob(*bid, Now(), tid, tensionCharac.ArchiveAction(node.Type))
         }
     } else if *event.EventType == model.TensionEventBlobUnarchived {
         // Unarchived Node
@@ -844,12 +844,12 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
 
         if err != nil { return ok, err, nameid }
         if ok { // Update blob pushed flag
-            err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tid, tensionCharac.EditAction(node.Type))
+            err = db.GetDB().SetPushedFlagBlob(*bid, Now(), tid, tensionCharac.EditAction(node.Type))
         }
     } else if *event.EventType == model.TensionEventUserLeft {
         // Remove user reference
         // --
-        ok, err = LeaveRole(uctx, tension, node)
+        ok, err = LeaveRole(uctx, tension, node, bid)
     }
 
     return ok, err, nameid

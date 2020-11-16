@@ -1243,6 +1243,25 @@ func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
     return err
 }
 
+// Remove the user link in the last blob if user match
+func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
+    query := fmt.Sprintf(`query {
+		var(func: uid(%s)) {
+          Tension.blobs (orderdesc: Post.createdAt, first: 1) {
+            n as Blob.node @filter(eq(NodeFragment.first_link, "%s"))
+          }
+        }
+    }`, tid, username)
+
+    muDel := `uid(n) <NodeFragment.first_link> * .`
+
+    mutation := &api.Mutation{
+        DelNquads: []byte(muDel),
+    }
+
+    err := dg.MutateWithQueryGpm(query, mutation)
+    return err
+}
 
 // Set the blob pushedFlag and the tension action
 func (dg Dgraph) SetPushedFlagBlob(bid string, flag string, tid string, action model.TensionAction) error {
