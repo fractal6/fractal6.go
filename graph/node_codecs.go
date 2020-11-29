@@ -14,6 +14,9 @@ import (
 func nodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, string, error) {
     var nameid string
     rootnameid, err := nid2rootid(parentid)
+    if len(strings.Split(targetid, "#")) > 1 {
+        return rootnameid, targetid, err
+    }
     if nodeType == model.NodeTypeRole {
         if rootnameid == parentid {
             nameid = strings.Join([]string{rootnameid, "", targetid}, "#")

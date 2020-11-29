@@ -30,14 +30,14 @@ func UnlinkUser(rootnameid, nameid, firstLink string) error {
     return err
 }
 
-func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
+func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     tid := tension.ID
     parentid := tension.Receiver.Nameid
 
     // CanLeaveRole
     // --
-    if node.RoleType == nil  { return false, fmt.Errorf("Node need a role type for this action.") }
-    if node.FirstLink == nil  { return false, fmt.Errorf("Node need a linked user for this action.") }
+    if node.RoleType == nil { return false, fmt.Errorf("Node need a role type for this action.") }
+    if node.FirstLink == nil { return false, fmt.Errorf("Node need a linked user for this action.") }
 
     // Check the identity of the user asking
     if *node.FirstLink != uctx.Username {

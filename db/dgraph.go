@@ -388,7 +388,7 @@ func (dg Dgraph) post(data []byte, res interface{}) error {
 //
 
 
-// QueryGpm runs a query on dgraph
+// QueryGpm runs a query on dgraph (...QueryDql)
 func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, error) {
     // init client
     dgc, cancel := dg.getDgraphClient()
@@ -1381,7 +1381,7 @@ func (dg Dgraph) Update(vertex string, input interface{}) error {
 func (dg Dgraph) Delete(vertex string, input interface{}) error {
     Vertex := strings.Title(vertex)
     queryName := "delete" + Vertex
-    inputType := "Delete" + Vertex + "Input"
+    inputType :=  Vertex + "Filter"
     queryGraph := vertex + ` { id }`
 
     // Just One Node

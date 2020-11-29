@@ -849,7 +849,20 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     } else if *event.EventType == model.TensionEventUserLeft {
         // Remove user reference
         // --
-        ok, err = LeaveRole(uctx, tension, node, bid)
+        if model.RoleType(*event.Old) == model.RoleTypeGuest {
+            rootid, err := nid2rootid(*event.New)
+            if err != nil { return ok, err, nameid }
+            i := userIsGuest(uctx, rootid)
+            if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")), nameid}
+            var nf model.NodeFragment
+            var t model.NodeType = model.NodeTypeRole
+            StructMap(uctx.Roles[i], &nf)
+            nf.FirstLink = &uctx.Username
+            nf.Type = &t
+            node = &nf
+        }
+
+        ok, err = LeaveRole(uctx, tension, node)
     }
 
     return ok, err, nameid
