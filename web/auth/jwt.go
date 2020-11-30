@@ -108,6 +108,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
             Path: "/",
             HttpOnly: true,
             Secure: true,
+            SameSite: 2, // https://golang.org/src/net/http/cookie.go
             //Expires: expirationTime,
             //MaxAge: 90000,
         }
@@ -116,6 +117,8 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
             Name: "jwt",
             Value: tokenString,
             Path: "/",
+            Secure: true,
+            SameSite: 2,
         }
     }
 
