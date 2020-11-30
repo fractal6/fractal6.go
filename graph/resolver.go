@@ -124,30 +124,86 @@ func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx [
 
 func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Check that isPrivate is present in payload
-    fok := false
-    for _, f := range GetPreloads(ctx) {
-        if f == "isPrivate" {  fok = true; break }
-    }
-    if !fok {
-        //rc := graphql.GetResolverContext(ctx)
-        return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
-    }
+    var fok, yes bool
+    var err error
+    var nameid string
 
     data, err := next(ctx)
     if obj == nil {
         switch v := data.(type) {
+        // Get Node
         case *model.Node:
-            // Get Node
             if v == nil {
                 break
             }
-            yes, err := isHidePrivate(ctx, v.Nameid, v.IsPrivate)
+            // Check fields
+            for _, f := range GetPreloads(ctx) { if f == "isPrivate" {fok = true; break } }
+            if !fok {
+                // @debug: Query the database if field is not present and print a warning.
+                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
+            }
+            // Validate
+            yes, err = isHidePrivate(ctx, v.Nameid, v.IsPrivate)
             if err != nil { return nil, err }
             if yes { return nil, LogErr("Access denied", fmt.Errorf("private node")) }
+        // Query Nodes
         case []*model.Node:
-            // Query Nodes
+            // Check fields
+            for _, f := range GetPreloads(ctx) { if f == "isPrivate" {fok = true; break } }
+            if !fok {
+                // @debug: Query the database if field is not present and print a warning.
+                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
+            }
+            // Validate
             for _, node := range(v) {
-                yes, err := isHidePrivate(ctx, node.Nameid, node.IsPrivate)
+                yes, err = isHidePrivate(ctx, node.Nameid, node.IsPrivate)
+                if err != nil { return nil, err }
+                if yes { return nil,  LogErr("Access denied", fmt.Errorf("private node")) }
+            }
+         // Get Tension
+        case *model.Tension:
+            if v == nil {
+                break
+            }
+            // Check fields
+            for _, f := range GetPreloads(ctx) { if f == "id" {fok = true; break } }
+            if !fok {
+                // @debug: Query the database if field is not present and print a warning.
+                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required for this request."))
+            }
+            if v.Receiver == nil {
+                nameid_, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.nameid")
+                if err != nil { return nil, err }
+                nameid = nameid_.(string)
+            } else {
+                nameid = v.Receiver.Nameid
+            }
+            // validate
+            isPrivate, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.isPrivate")
+            if err != nil { return nil, err }
+            yes, err = isHidePrivate(ctx, nameid, isPrivate.(bool))
+            if err != nil { return nil, err }
+            if yes { return nil, LogErr("Access denied", fmt.Errorf("private node")) }
+        // Query Tensions
+        case []*model.Tension:
+            // Check fields
+            for _, f := range GetPreloads(ctx) { if f == "id" {fok = true; break } }
+            if !fok {
+                // @debug: Query the database if field is not present and print a warning.
+                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required for this request."))
+            }
+            for _, tension := range(v) {
+                if tension.Receiver == nil {
+                    nameid_, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.receiver", "Node.nameid")
+                    if err != nil { return nil, err }
+                    nameid = nameid_.(string)
+                } else {
+                    nameid = tension.Receiver.Nameid
+                }
+                // validate
+                isPrivate, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.receiver", "Node.isPrivate")
+                if err != nil { return nil, err }
+                yes, err = isHidePrivate(ctx, nameid, isPrivate.(bool))
                 if err != nil { return nil, err }
                 if yes { return nil,  LogErr("Access denied", fmt.Errorf("private node")) }
             }
@@ -189,7 +245,6 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
             yes = false
         }
     }
-
     return yes, err
 }
 

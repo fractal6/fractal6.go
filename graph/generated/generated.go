@@ -3214,7 +3214,7 @@ type Post {
   message: String @search(by: [fulltext])
 }
 
-type Tension {
+type Tension @hidePrivate {
   createdBy(filter: UserFilter): User!
   nth: String @search
   title: String! @search(by: [fulltext])
@@ -3401,25 +3401,25 @@ enum BlobType {
 
 }
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
-
-directive @cascade on FIELD
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE
+
+directive @cascade on FIELD
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8834,8 +8834,28 @@ func (ec *executionContext) _AddTensionPayload_tension(ctx context.Context, fiel
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tension, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Tension, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -9023,8 +9043,28 @@ func (ec *executionContext) _Blob_tension(ctx context.Context, field graphql.Col
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tension, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Tension, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -10513,8 +10553,28 @@ func (ec *executionContext) _DeleteTensionPayload_tension(ctx context.Context, f
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tension, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Tension, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -13067,6 +13127,12 @@ func (ec *executionContext) _Node_tensions_out(ctx context.Context, field graphq
 			return obj.TensionsOut, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			field, err := ec.unmarshalNString2string(ctx, "emitter")
 			if err != nil {
 				return nil, err
@@ -13074,10 +13140,10 @@ func (ec *executionContext) _Node_tensions_out(ctx context.Context, field graphq
 			if ec.directives.HasInverse == nil {
 				return nil, errors.New("directive hasInverse is not implemented")
 			}
-			return ec.directives.HasInverse(ctx, obj, directive0, field)
+			return ec.directives.HasInverse(ctx, obj, directive1, field)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -13126,6 +13192,12 @@ func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql
 			return obj.TensionsIn, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			field, err := ec.unmarshalNString2string(ctx, "receiver")
 			if err != nil {
 				return nil, err
@@ -13133,10 +13205,10 @@ func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql
 			if ec.directives.HasInverse == nil {
 				return nil, errors.New("directive hasInverse is not implemented")
 			}
-			return ec.directives.HasInverse(ctx, obj, directive0, field)
+			return ec.directives.HasInverse(ctx, obj, directive1, field)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -15138,8 +15210,28 @@ func (ec *executionContext) _Query_getTension(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetTension(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetTension(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -15173,8 +15265,28 @@ func (ec *executionContext) _Query_queryTension(ctx context.Context, field graph
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryTension(rctx, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().QueryTension(rctx, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -17278,8 +17390,28 @@ func (ec *executionContext) _UpdateTensionPayload_tension(ctx context.Context, f
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tension, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Tension, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -17953,6 +18085,12 @@ func (ec *executionContext) _User_tensions_created(ctx context.Context, field gr
 			return obj.TensionsCreated, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			field, err := ec.unmarshalNString2string(ctx, "createdBy")
 			if err != nil {
 				return nil, err
@@ -17960,10 +18098,10 @@ func (ec *executionContext) _User_tensions_created(ctx context.Context, field gr
 			if ec.directives.HasInverse == nil {
 				return nil, errors.New("directive hasInverse is not implemented")
 			}
-			return ec.directives.HasInverse(ctx, obj, directive0, field)
+			return ec.directives.HasInverse(ctx, obj, directive1, field)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, err
 		}
@@ -18012,6 +18150,12 @@ func (ec *executionContext) _User_tensions_assigned(ctx context.Context, field g
 			return obj.TensionsAssigned, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.HidePrivate == nil {
+				return nil, errors.New("directive hidePrivate is not implemented")
+			}
+			return ec.directives.HidePrivate(ctx, obj, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			field, err := ec.unmarshalNString2string(ctx, "assignees")
 			if err != nil {
 				return nil, err
@@ -18019,10 +18163,10 @@ func (ec *executionContext) _User_tensions_assigned(ctx context.Context, field g
 			if ec.directives.HasInverse == nil {
 				return nil, errors.New("directive hasInverse is not implemented")
 			}
-			return ec.directives.HasInverse(ctx, obj, directive0, field)
+			return ec.directives.HasInverse(ctx, obj, directive1, field)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, err
 		}
