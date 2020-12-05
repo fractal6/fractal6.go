@@ -125,8 +125,9 @@ func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx [
 func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Check that isPrivate is present in payload
     var fok, yes bool
-    var err error
     var nameid string
+    var isPrivate bool = true
+    var err error
 
     data, err := next(ctx)
     if obj == nil {
@@ -143,9 +144,10 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
             }
             // Validate
-            yes, err = isHidePrivate(ctx, v.Nameid, v.IsPrivate)
+            nameid = v.Nameid
+            isPrivate = v.IsPrivate
+            yes, err = isHidePrivate(ctx, nameid, isPrivate)
             if err != nil { return nil, err }
-            if yes { return nil, LogErr("Access denied", fmt.Errorf("private node")) }
         // Query Nodes
         case []*model.Node:
             // Check fields
@@ -156,9 +158,11 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             }
             // Validate
             for _, node := range(v) {
-                yes, err = isHidePrivate(ctx, node.Nameid, node.IsPrivate)
+                nameid = node.Nameid
+                isPrivate = node.IsPrivate
+                yes, err = isHidePrivate(ctx, nameid, isPrivate)
                 if err != nil { return nil, err }
-                if yes { return nil,  LogErr("Access denied", fmt.Errorf("private node")) }
+                if yes { break }
             }
          // Get Tension
         case *model.Tension:
@@ -179,11 +183,11 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 nameid = v.Receiver.Nameid
             }
             // validate
-            isPrivate, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.isPrivate")
+            isPrivate_, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.isPrivate")
             if err != nil { return nil, err }
-            yes, err = isHidePrivate(ctx, nameid, isPrivate.(bool))
+            isPrivate = isPrivate_.(bool)
+            yes, err = isHidePrivate(ctx, nameid, isPrivate)
             if err != nil { return nil, err }
-            if yes { return nil, LogErr("Access denied", fmt.Errorf("private node")) }
         // Query Tensions
         case []*model.Tension:
             // Check fields
@@ -201,16 +205,23 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                     nameid = tension.Receiver.Nameid
                 }
                 // validate
-                isPrivate, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.receiver", "Node.isPrivate")
+                isPrivate_, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.receiver", "Node.isPrivate")
                 if err != nil { return nil, err }
-                yes, err = isHidePrivate(ctx, nameid, isPrivate.(bool))
+                isPrivate = isPrivate_.(bool)
+                yes, err = isHidePrivate(ctx, nameid, isPrivate)
                 if err != nil { return nil, err }
-                if yes { return nil,  LogErr("Access denied", fmt.Errorf("private node")) }
+                if yes { break }
             }
         default:
             panic("@isPrivate: node type unknonwn: " + fmt.Sprintf("%T", v))
         }
     }
+
+    if yes {
+        // retry with refresh token
+        return nil, LogErr("Access denied", fmt.Errorf("private node"))
+    }
+
     return data, err
 }
 
