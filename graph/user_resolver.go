@@ -54,11 +54,9 @@ func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragm
     case model.RoleTypeMember:
         return false, fmt.Errorf("Doh, you avec active role in this organisation.")
     case model.RoleTypeGuest:
-        err = UnlinkUser(rootnameid, nameid, *node.FirstLink)
+        err := db.GetDB().UpgradeMember(nameid, model.RoleTypeRetired)
         if err != nil {return false, err}
-        err = db.GetDB().Delete("node", model.NodeFilter{ Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}})
-        if err != nil {return false, err}
-    default: // Peer, Coordinator
+    default: // Peer, Coordinator + user defined roles
         err = UnlinkUser(rootnameid, nameid, *node.FirstLink)
         if err != nil {return false, err}
         // @Debug: Remove user from last blob if present
