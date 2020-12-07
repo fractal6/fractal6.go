@@ -430,7 +430,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 
     // Update RoleType to Guest
     if rt == model.RoleTypeGuest && len(uctxFs.Roles) == 1  {
-        err := DB.UpgradeGuest(uctxFs.Roles[0].Nameid, model.RoleTypeGuest)
+        err := DB.UpgradeMember(uctxFs.Roles[0].Nameid, model.RoleTypeGuest)
         if err != nil { return err }
         return nil
     }
@@ -439,7 +439,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     i := userIsGuest(*uctxFs, rootnameid)
     if rt == model.RoleTypeMember && i >= 0 {
         // Update RoleType to Member
-        err := DB.UpgradeGuest(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
+        err := DB.UpgradeMember(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
         if err != nil { return err }
         return nil
     }

@@ -80,6 +80,7 @@ var TensionHookPayload string = `{
         NodeFragment.role_type
       }
     }
+
   }
 }`
 

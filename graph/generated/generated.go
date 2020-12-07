@@ -3317,15 +3317,19 @@ enum NodeType {
 
 enum RoleType {
 
-  Coordinator
-  Peer
+
+  Owner
 
   Member
 
   Guest
 
-  Owner
+  Retired
 
+
+  Coordinator
+
+  Peer
 
 }
 
@@ -3340,10 +3344,10 @@ enum TensionStatus {
 }
 
 enum TensionType {
-  Governance
   Operational
-  Personal
+  Governance
   Help
+  Personal
 
 
 }
@@ -3387,6 +3391,7 @@ enum TensionEvent {
   BlobPushed
   BlobArchived
   BlobUnarchived
+  UserJoin
   UserLeft
 }
 
@@ -3401,25 +3406,25 @@ enum BlobType {
 
 }
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE
 
-directive @cascade on FIELD
-
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @cascade on FIELD
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3585,7 +3590,7 @@ input AddTensionInput {
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
-  history: [EventRef!]! @alter_hasRoot(n:["emitter","receiver"])
+  history: [EventRef!]!
   n_comments: Int
   n_blobs: Int
 }
@@ -3977,8 +3982,8 @@ enum Mode {
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload @hook_addNodePost
-  updateNode(input: UpdateNodeInput! @hook_updateNode): UpdateNodePayload @hook_updateNodePost
+  addNode(input: [AddNodeInput!]!): AddNodePayload
+  updateNode(input: UpdateNodeInput!): UpdateNodePayload
   deleteNode(filter: NodeFilter!): DeleteNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   updateNodeFragment(input: UpdateNodeFragmentInput!): UpdateNodeFragmentPayload
@@ -4359,7 +4364,7 @@ input TensionPatch {
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
-  history: [EventRef!] @alter_hasRoot(n:["emitter","receiver"])
+  history: [EventRef!]
   n_comments: Int
   n_blobs: Int
 }
@@ -5946,24 +5951,9 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	args := map[string]interface{}{}
 	var arg0 []*model.AddNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
-		directive0 := func(ctx context.Context) (interface{}, error) {
-			return ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addNode == nil {
-				return nil, errors.New("directive hook_addNode is not implemented")
-			}
-			return ec.directives.Hook_addNode(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
-		}
-		if data, ok := tmp.([]*model.AddNodeInput); ok {
-			arg0 = data
-		} else {
-			return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddNodeInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -6299,24 +6289,9 @@ func (ec *executionContext) field_Mutation_updateNode_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 model.UpdateNodeInput
 	if tmp, ok := rawArgs["input"]; ok {
-		directive0 := func(ctx context.Context) (interface{}, error) {
-			return ec.unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx, tmp)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateNode == nil {
-				return nil, errors.New("directive hook_updateNode is not implemented")
-			}
-			return ec.directives.Hook_updateNode(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx, tmp)
 		if err != nil {
 			return nil, err
-		}
-		if data, ok := tmp.(model.UpdateNodeInput); ok {
-			arg0 = data
-		} else {
-			return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateNodeInput`, tmp)
 		}
 	}
 	args["input"] = arg0
@@ -11342,28 +11317,8 @@ func (ec *executionContext) _Mutation_addNode(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().AddNode(rctx, args["input"].([]*model.AddNodeInput))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addNodePost == nil {
-				return nil, errors.New("directive hook_addNodePost is not implemented")
-			}
-			return ec.directives.Hook_addNodePost(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.AddNodePayload); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddNodePayload`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddNode(rctx, args["input"].([]*model.AddNodeInput))
 	})
 
 	if resTmp == nil {
@@ -11397,28 +11352,8 @@ func (ec *executionContext) _Mutation_updateNode(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateNode(rctx, args["input"].(model.UpdateNodeInput))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateNodePost == nil {
-				return nil, errors.New("directive hook_updateNodePost is not implemented")
-			}
-			return ec.directives.Hook_updateNodePost(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.UpdateNodePayload); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateNodePayload`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateNode(rctx, args["input"].(model.UpdateNodeInput))
 	})
 
 	if resTmp == nil {
@@ -20414,28 +20349,9 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			}
 		case "history":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-
-			tmp, err := directive1(ctx)
+			it.History, err = ec.unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.([]*model.EventRef); ok {
-				it.History = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.EventRef`, tmp)
 			}
 		case "n_comments":
 			var err error
@@ -24410,28 +24326,9 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			}
 		case "history":
 			var err error
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Alter_hasRoot == nil {
-					return nil, errors.New("directive alter_hasRoot is not implemented")
-				}
-				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
-			}
-
-			tmp, err := directive1(ctx)
+			it.History, err = ec.unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
-			}
-			if data, ok := tmp.([]*model.EventRef); ok {
-				it.History = data
-			} else {
-				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.EventRef`, tmp)
 			}
 		case "n_comments":
 			var err error

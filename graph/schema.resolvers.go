@@ -14,14 +14,13 @@ import (
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput) (data *model.AddNodePayload, errors error) {
 	////ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
 	////errors = r.Gqlgen2DgraphMutationResolver(ctx, input, &data)
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
-	//return nil, tools.LogErr("not implemented", fmt.Errorf("FORBIDDEN QUERY"))
+	//errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	//return data, errors
+	return nil, fmt.Errorf("not implemented: add node")
 }
 
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
+	return nil, fmt.Errorf("not implemented: update node")
 }
 
 func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilter) (data *model.DeleteNodePayload, errors error) {

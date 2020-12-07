@@ -30,6 +30,11 @@ func nodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, st
     return rootnameid, nameid, err
 }
 
+func guestIdCodec(rootnameid, username string) (string) {
+    nameid := strings.Join([]string{rootnameid, "","@"+ username}, "#")
+    return nameid
+}
+
 // Get the parent nameid from the given nameid (ROLE)
 // @debug nearestCircleId
 func nid2pid(nid string) (string, error) {

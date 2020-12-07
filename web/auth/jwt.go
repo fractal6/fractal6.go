@@ -88,8 +88,7 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
     if buildMode == "PROD" {
         token, err = tkMaster.issue(userCtx, time.Hour*24*30)
     } else {
-        token, err = tkMaster.issue(userCtx, time.Hour*24)
-        //token, err = tkMaster.issue(userCtx, time.Second*30)
+        token, err = tkMaster.issue(userCtx, time.Hour*12)
     }
     return token, err
 }

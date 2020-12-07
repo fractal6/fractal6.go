@@ -885,6 +885,13 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
         err = decoder.Decode(r.All[0])
         if err != nil { return nil, err }
     }
+    // Filter special roles
+    for i := 0; i < len(user.Roles); i++ {
+        if user.Roles[i].RoleType == model.RoleTypeRetired {
+            user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
+            i--
+        }
+    }
     return &user, err
 }
 
@@ -1225,7 +1232,7 @@ func (dg Dgraph) SetFieldByEq(fieldid string, objid string, predicate string, va
 }
 
 // UpdateRoleType update the role of a node given the nameid using upsert block.
-func (dg Dgraph) UpgradeGuest(nameid string, roleType model.RoleType) error {
+func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
     query := fmt.Sprintf(`query {
         node as var(func: eq(Node.nameid, "%s"))
     }`, nameid)

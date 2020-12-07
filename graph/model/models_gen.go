@@ -1856,24 +1856,26 @@ func (e PostOrderable) MarshalGQL(w io.Writer) {
 type RoleType string
 
 const (
-	RoleTypeCoordinator RoleType = "Coordinator"
-	RoleTypePeer        RoleType = "Peer"
+	RoleTypeOwner       RoleType = "Owner"
 	RoleTypeMember      RoleType = "Member"
 	RoleTypeGuest       RoleType = "Guest"
-	RoleTypeOwner       RoleType = "Owner"
+	RoleTypeRetired     RoleType = "Retired"
+	RoleTypeCoordinator RoleType = "Coordinator"
+	RoleTypePeer        RoleType = "Peer"
 )
 
 var AllRoleType = []RoleType{
-	RoleTypeCoordinator,
-	RoleTypePeer,
+	RoleTypeOwner,
 	RoleTypeMember,
 	RoleTypeGuest,
-	RoleTypeOwner,
+	RoleTypeRetired,
+	RoleTypeCoordinator,
+	RoleTypePeer,
 }
 
 func (e RoleType) IsValid() bool {
 	switch e {
-	case RoleTypeCoordinator, RoleTypePeer, RoleTypeMember, RoleTypeGuest, RoleTypeOwner:
+	case RoleTypeOwner, RoleTypeMember, RoleTypeGuest, RoleTypeRetired, RoleTypeCoordinator, RoleTypePeer:
 		return true
 	}
 	return false
@@ -1970,6 +1972,7 @@ const (
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
+	TensionEventUserJoin        TensionEvent = "UserJoin"
 	TensionEventUserLeft        TensionEvent = "UserLeft"
 )
 
@@ -1986,12 +1989,13 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
+	TensionEventUserJoin,
 	TensionEventUserLeft,
 }
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserLeft:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoin, TensionEventUserLeft:
 		return true
 	}
 	return false
@@ -2117,22 +2121,22 @@ func (e TensionStatus) MarshalGQL(w io.Writer) {
 type TensionType string
 
 const (
-	TensionTypeGovernance  TensionType = "Governance"
 	TensionTypeOperational TensionType = "Operational"
-	TensionTypePersonal    TensionType = "Personal"
+	TensionTypeGovernance  TensionType = "Governance"
 	TensionTypeHelp        TensionType = "Help"
+	TensionTypePersonal    TensionType = "Personal"
 )
 
 var AllTensionType = []TensionType{
-	TensionTypeGovernance,
 	TensionTypeOperational,
-	TensionTypePersonal,
+	TensionTypeGovernance,
 	TensionTypeHelp,
+	TensionTypePersonal,
 }
 
 func (e TensionType) IsValid() bool {
 	switch e {
-	case TensionTypeGovernance, TensionTypeOperational, TensionTypePersonal, TensionTypeHelp:
+	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypePersonal:
 		return true
 	}
 	return false
