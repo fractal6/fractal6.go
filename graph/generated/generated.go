@@ -3347,7 +3347,6 @@ enum TensionType {
   Operational
   Governance
   Help
-  Personal
 
 
 }
@@ -3406,15 +3405,9 @@ enum BlobType {
 
 }
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
@@ -3422,9 +3415,15 @@ directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!

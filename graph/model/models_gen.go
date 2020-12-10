@@ -2124,19 +2124,17 @@ const (
 	TensionTypeOperational TensionType = "Operational"
 	TensionTypeGovernance  TensionType = "Governance"
 	TensionTypeHelp        TensionType = "Help"
-	TensionTypePersonal    TensionType = "Personal"
 )
 
 var AllTensionType = []TensionType{
 	TensionTypeOperational,
 	TensionTypeGovernance,
 	TensionTypeHelp,
-	TensionTypePersonal,
 }
 
 func (e TensionType) IsValid() bool {
 	switch e {
-	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypePersonal:
+	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp:
 		return true
 	}
 	return false
