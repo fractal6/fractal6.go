@@ -10,7 +10,7 @@ import (
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    //"zerogov/fractal6.go/web"
+    "zerogov/fractal6.go/web"
     "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/web/middleware/jwtauth"
     handle6 "zerogov/fractal6.go/web/handlers"
@@ -124,6 +124,9 @@ func RunServer() {
         // Overwrite gql config
         gqlConfig["introspection"] = true
     }
+
+    // Serve static files
+    web.FileServer(r, "/data/", "./data")
 
     address := HOST + ":" + PORT
     log.Printf("Running (%s) @ http://%s", buildMode, address)

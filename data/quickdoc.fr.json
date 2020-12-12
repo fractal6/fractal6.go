@@ -1,0 +1,19 @@
+[
+  {
+    "name": "organisation",
+    "tasks": [
+      {
+        "header": "définitions",
+        "content": "**organisation** (fractale) : groupe d'humains partageant une raison d'être commune (cercle racine) composé de roles et de cercles.\n\n**Role** : une fonction réalisé par une personne.  \n\n**Circle** : ensemble de role et de sous-cercles (équipe, groupe etc).  \n\n**Mandat** : document qui définit la fonction d'un role ou d'un cercle en explicitant :\n* sa raison d'être : pourquoi il existe\n* ses responsabilités (optionel) : quelle sont les attentes de ce role/cercle.\n* ses domaines (optionel) : quelle propriétés/ressources il contrôle.\n* ses politiques (optionel) : les regles d'acces à ses ressources.\n\n**Tension** : distance entre la ou est là l'on veut aller. Une tension peut être utilisée par exemple pour partager et gérer des tâches, des questions ou des idées. Une tension, comme un courrier électronique, a un émetteur et un destinataire (un rôle ou un cercle).\nIl y a trois grandes catégories de tension :\n* Interne (ou de gouvernance) : concernant la structure de l'organisation, ses mandats etc.\n* externe (ou opérationnelle) : concerne les actions mené par l'organisation.\n* Entraide (ou Help) : pour les demandes d'aide, questions ou clarifications.\n"
+      },
+      {
+        "header": "créer une organisation",
+        "content": "Cliquez sur le bouton + dans le coin supérieur droit de la page. Cliquez ensuite sur le bouton 'Créer une nouvelle organisation'."
+      },
+      {
+        "header": "mode de l'organisation",
+        "content": "Le mode de l'organisation permet de définir la portée des droits associés au roles dans l'organisation. Il existe deux modes :\n\n###### mode coordonné\n\nDans le mode coordoné, les rôles de coordinateur ont les droits suivant au sein de leurs cercles :\n* création de rôles et de sous-cercles\n* modification des rôles et des sous-cercles\n* création de tensions et commentaires\n* modification des tensions (titre, labels, assignés)\n* déplacement des tensions\n\nLes rôles normaux ont les droits suivante au sein de leurs cercles :\n* création de tension et commentaires \n* fermer ses propres tensions \n\n###### mode agile\n\nDans le mode agile les rôles ont les droits suivant au sein de leurs cercles :\n* création de rôles et de sous-cercles\n* modification des rôles et des sous-cercles\n* création de tension et commentaires\n* modification de tension (titre, labels, assignés)\n* déplacement des tensions\n\nNote: les droits d'un rôle associé à un cercle sont hérité dans les sous-cercles qui ne possède pas rôles\n"
+      }
+    ]
+  }
+]

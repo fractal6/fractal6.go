@@ -4,6 +4,7 @@ GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
 MOD := "zerogov/fractal6.go"
+LANGS := en fr
 
 # TODO: versioning
 # LDFLAGS see versioning, hash etc...
@@ -59,3 +60,14 @@ _add_omitempty:
 	# Don't add omitempty for boolean field has it get remove if set to false!
 	sed -i  '/bool /I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
 
+
+#
+# Generate Data
+#
+
+build_doc: $(LANGS)
+
+$(LANGS):
+	wildq -M -i toml -o json '.[] | {name:.name, tasks:.tasks[]|flatten }' ../doc/doc.$@.toml > data/quickdoc.$@.json_
+	jq -s "." data/quickdoc.$@.json_ > data/quickdoc.$@.json
+	rm -f data/quickdoc.$@.json_
