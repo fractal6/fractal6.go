@@ -354,11 +354,13 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     // Check that user as the given emitter role
     emitterid := input[0].Emitterid
     if !userPlayRole(uctx, emitterid) {
-        // if not check that emitter is a orga bot
+        // if not check for bot access
         r_, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.role_type")
         if err != nil { return nil, LogErr("Internal error", err) }
+        isArchived, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.isArchived")
+        if err != nil { return nil, LogErr("Internal error", err) }
         if r_ == nil { return data, err }
-        if model.RoleType(r_.(string)) != model.RoleTypeBot {
+        if model.RoleType(r_.(string)) != model.RoleTypeBot || isArchived.(bool) {
             return nil, LogErr("Access denied", fmt.Errorf("you do not own this node"))
         }
     }
@@ -541,8 +543,10 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     if rid == rootnameid {
         r_, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.role_type")
         if err != nil { return nil, LogErr("Internal error", err) }
+        isArchived, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isArchived")
+        if err != nil { return nil, LogErr("Internal error", err) }
         if r_ == nil { return nil, e }
-        if model.RoleType(r_.(string)) == model.RoleTypeBot {
+        if model.RoleType(r_.(string)) == model.RoleTypeBot && !isArchived.(bool) {
             return next(ctx)
         }
     }
