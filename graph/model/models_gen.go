@@ -77,8 +77,8 @@ type AddMandatePayload struct {
 }
 
 type AddNodeCharacInput struct {
-	Mode        NodeMode `json:"mode,omitempty"`
 	UserCanJoin bool     `json:"userCanJoin"`
+	Mode        NodeMode `json:"mode,omitempty"`
 }
 
 type AddNodeCharacPayload struct {
@@ -169,8 +169,8 @@ type AddTensionInput struct {
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
@@ -577,28 +577,28 @@ type Node struct {
 
 type NodeCharac struct {
 	ID          string   `json:"id,omitempty"`
-	Mode        NodeMode `json:"mode,omitempty"`
 	UserCanJoin bool     `json:"userCanJoin"`
+	Mode        NodeMode `json:"mode,omitempty"`
 }
 
 type NodeCharacFilter struct {
 	ID          []string          `json:"id,omitempty"`
-	Mode        *NodeModeHash     `json:"mode,omitempty"`
 	UserCanJoin *bool             `json:"userCanJoin"`
+	Mode        *NodeModeHash     `json:"mode,omitempty"`
 	And         *NodeCharacFilter `json:"and,omitempty"`
 	Or          *NodeCharacFilter `json:"or,omitempty"`
 	Not         *NodeCharacFilter `json:"not,omitempty"`
 }
 
 type NodeCharacPatch struct {
-	Mode        *NodeMode `json:"mode,omitempty"`
 	UserCanJoin *bool     `json:"userCanJoin"`
+	Mode        *NodeMode `json:"mode,omitempty"`
 }
 
 type NodeCharacRef struct {
 	ID          *string   `json:"id,omitempty"`
-	Mode        *NodeMode `json:"mode,omitempty"`
 	UserCanJoin *bool     `json:"userCanJoin"`
+	Mode        *NodeMode `json:"mode,omitempty"`
 }
 
 type NodeFilter struct {
@@ -855,8 +855,8 @@ type Tension struct {
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
 	Assignees  []*User        `json:"assignees,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*Blob        `json:"blobs,omitempty"`
 	History    []*Event       `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
@@ -907,8 +907,8 @@ type TensionPatch struct {
 	Status     *TensionStatus `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
@@ -931,8 +931,8 @@ type TensionRef struct {
 	Status     *TensionStatus `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
+	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
@@ -1631,18 +1631,18 @@ func (e NodeFragmentOrderable) MarshalGQL(w io.Writer) {
 type NodeMode string
 
 const (
-	NodeModeChaos       NodeMode = "Chaos"
 	NodeModeCoordinated NodeMode = "Coordinated"
+	NodeModeAgile       NodeMode = "Agile"
 )
 
 var AllNodeMode = []NodeMode{
-	NodeModeChaos,
 	NodeModeCoordinated,
+	NodeModeAgile,
 }
 
 func (e NodeMode) IsValid() bool {
 	switch e {
-	case NodeModeChaos, NodeModeCoordinated:
+	case NodeModeCoordinated, NodeModeAgile:
 		return true
 	}
 	return false
@@ -1862,6 +1862,7 @@ const (
 	RoleTypeRetired     RoleType = "Retired"
 	RoleTypeCoordinator RoleType = "Coordinator"
 	RoleTypePeer        RoleType = "Peer"
+	RoleTypeBot         RoleType = "Bot"
 )
 
 var AllRoleType = []RoleType{
@@ -1871,11 +1872,12 @@ var AllRoleType = []RoleType{
 	RoleTypeRetired,
 	RoleTypeCoordinator,
 	RoleTypePeer,
+	RoleTypeBot,
 }
 
 func (e RoleType) IsValid() bool {
 	switch e {
-	case RoleTypeOwner, RoleTypeMember, RoleTypeGuest, RoleTypeRetired, RoleTypeCoordinator, RoleTypePeer:
+	case RoleTypeOwner, RoleTypeMember, RoleTypeGuest, RoleTypeRetired, RoleTypeCoordinator, RoleTypePeer, RoleTypeBot:
 		return true
 	}
 	return false

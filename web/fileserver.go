@@ -1,6 +1,7 @@
 package web
 
 import (
+    //"fmt"
     "os"
 	"path"
     "path/filepath"
@@ -32,6 +33,11 @@ func FileServer(r chi.Router, public string, static string) {
 
 	r.Get(public+"*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		file := strings.Replace(r.RequestURI, public, "/", 1)
+
+        // Manage i18n
+        //lang := r.Header.Get("Accept-Language")
+        //fmt.Println(lang)
+
 		if _, err := os.Stat(root + file); os.IsNotExist(err) {
 			http.ServeFile(w, r, path.Join(root, "index.html"))
 			return

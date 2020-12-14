@@ -339,6 +339,8 @@ func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 
 // Add Tension Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    uctx, err := auth.UserCtxFromContext(ctx)
+    if err != nil { return nil, LogErr("Access denied", err) }
     // Get input
     data, err := next(ctx)
     if err != nil { return nil, err }
@@ -347,6 +349,18 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     input := data.([]*model.AddTensionInput)
     if len(input) != 1 {
         return nil, LogErr("Add tension error", fmt.Errorf("Only one tension supported in input."))
+    }
+
+    // Check that user as the given emitter role
+    emitterid := input[0].Emitterid
+    if !userPlayRole(uctx, emitterid) {
+        // if not check that emitter is a orga bot
+        r_, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.role_type")
+        if err != nil { return nil, LogErr("Internal error", err) }
+        if r_ == nil { return data, err }
+        if model.RoleType(r_.(string)) != model.RoleTypeBot {
+            return nil, LogErr("Access denied", fmt.Errorf("you do not own this node"))
+        }
     }
 
     return data, err
@@ -459,10 +473,17 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
         if ok { return next(ctx) }
     }
 
-    // Check that user has the given role on the asked node
+    // Check that user has the given (nested) role on the asked node
     for _, nField := range nFields {
-        ok, err = checkUserRole(ctx, uctx, nField, obj, r)
-        if err != nil { return nil, LogErr("Access denied", err) }
+        nameid, err := extractNameid(ctx, nField, obj)
+        if err != nil { return nil, LogErr("Internal error", err) }
+
+        // Check if user is an owner
+        rootnameid, _ := nid2rootid(nameid)
+        if userIsOwner(uctx, rootnameid) >= 0 { next(ctx) }
+
+        // Search for rights
+        ok := userHasRole(uctx, r, nameid)
         if ok { return next(ctx) }
     }
 
@@ -501,13 +522,32 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
 
     // Check that user has the given role on the asked node
     var ok bool
+    var rootnameid string
     for _, nodeField := range nodeFields {
-        ok, err = checkUserRoot(ctx, uctx, nodeField, obj)
-        if err != nil { return nil, LogErr("Access denied", err) }
+        rootnameid, err = extractRootnameid(ctx, nodeField, obj)
+        if err != nil { return nil, LogErr("Internal error", err) }
+        ok = userHasRoot(uctx, rootnameid)
         if ok { return next(ctx) }
     }
 
-    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+    e := LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+
+    // Check for bot access
+    nameid_ := obj.(model.JsonAtom)["emitterid"]
+    if nameid_ == nil { return nil, e }
+    nameid := nameid_.(string)
+    rid, err := nid2rootid(nameid)
+    if err != nil { return nil, LogErr("Internal error", err) }
+    if rid == rootnameid {
+        r_, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.role_type")
+        if err != nil { return nil, LogErr("Internal error", err) }
+        if r_ == nil { return nil, e }
+        if model.RoleType(r_.(string)) == model.RoleTypeBot {
+            return next(ctx)
+        }
+    }
+
+    return nil, e
 }
 
 // Only the onwer of the object can edit it.
@@ -545,33 +585,38 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
 // Private auth methods
 //
 
-
-// Check if the an user owns the given object
-func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
-    // Get user ID
-    var username string
+func extractRootnameid(ctx context.Context, nodeField string, nodeObj interface{}) (string, error) {
+    // Check that nodes are present
+    var rootnameid string
     var err error
-    user := userObj.(model.JsonAtom)[userField]
-    if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        // Database request
+    nodeTarget_ := getNestedObj(nodeObj, nodeField)
+    if nodeTarget_ == nil {
+        // Tension here
         id := ctx.Value("id").(string)
         if id == "" {
-            return false, fmt.Errorf("node target unknown(id), need a database request here...")
+            return rootnameid, fmt.Errorf("node target unknown(id), need a database request here...")
         }
-        // Request the database to get the field
-        username_, err := db.GetDB().GetSubFieldById(id, "Post."+userField, "User.username") // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
-        if err != nil { return false, err }
-        username = username_.(string)
+        rootnameid_, err := db.GetDB().GetSubFieldById(id, "Tension."+nodeField, "Node.rootnameid")
+        if err != nil { return rootnameid, err }
+        if rootnameid_ != nil {
+            rootnameid = rootnameid_.(string)
+        }
     } else {
-        username = user.(model.JsonAtom)["username"].(string)
+        // Node here
+        nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
+        if nameid_ == nil {
+            return rootnameid, fmt.Errorf("node target unknown (nameid), need a database request here...")
+        }
+        rootnameid, err = nid2rootid(nameid_.(string))
+        if err != nil {
+            panic(err.Error())
+        }
     }
 
-    // Check user ID match
-    return uctx.Username == username, err
+    return rootnameid, err
 }
 
-// check if the an user has the given role of the given (nested) node
-func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, nodeObj interface{}, role model.RoleType) (bool, error) {
+func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (string, error) {
     // Check that nodes are present
     var nameid string
     var err error
@@ -582,7 +627,7 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
         // Tension here
         // Request the database to get the field
         nameid_, err = db.GetDB().GetSubFieldById(id_.(string), "Tension."+nodeField, "Node.nameid")
-        if err != nil { return false, err }
+        if err != nil { return nameid, err }
         nameid = nameid_.(string)
         if isRole(nameid) {
             nameid, _ = nid2pid(nameid)
@@ -590,59 +635,46 @@ func checkUserRole(ctx context.Context, uctx model.UserCtx, nodeField string, no
     } else if (nameid_ != nil) {
         // Node Here
         nameid_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid_.(string), "Node."+nodeField, "Node.nameid")
-        if err != nil { return false, err }
+        if err != nil { return nameid, err }
         if nameid_ == nil {
             // Assume root node
-            return false, fmt.Errorf("Root node updates are not implemented yet...")
+            return nameid, fmt.Errorf("Root node updates are not implemented yet...")
         }
         nameid = nameid_.(string)
     } else if (node != nil && node.(model.JsonAtom)["nameid"] != nil) {
         nameid = node.(model.JsonAtom)["nameid"].(string)
     } else {
-        return false, fmt.Errorf("node target unknown, need a database request here...")
+        return nameid, fmt.Errorf("node target unknown, need a database request here...")
     }
 
-    // Check if user is an owner
-    rootnameid, _ := nid2rootid(nameid)
-    if userIsOwner(uctx, rootnameid) >= 0 { return true, err }
-
-    // Search for rights
-    ok := userHasRole(uctx, role, nameid)
-    return ok, err
+    return nameid, err
 }
 
-// check if an user as at least one of his role whithin the given root.
-func checkUserRoot(ctx context.Context, uctx model.UserCtx, nodeField string, nodeObj interface{}) (bool, error) {
-    // Check that nodes are present
-    var rootnameid string
+
+
+// Check if the an user owns the given object
+func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
+    // Get user ID
+    var username string
     var err error
-    nodeTarget_ := getNestedObj(nodeObj, nodeField)
-    if nodeTarget_ == nil {
-        // Database request
+    user := userObj.(model.JsonAtom)[userField]
+    if user == nil || user.(model.JsonAtom)["username"] == nil  {
+        // Tension here
         id := ctx.Value("id").(string)
         if id == "" {
             return false, fmt.Errorf("node target unknown(id), need a database request here...")
         }
-        rootnameid_, err := db.GetDB().GetSubFieldById(id, "Tension."+nodeField, "Node.rootnameid")
+        // Request the database to get the field
+        username_, err := db.GetDB().GetSubFieldById(id, "Post."+userField, "User.username") // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
         if err != nil { return false, err }
-        if rootnameid_ != nil {
-            rootnameid = rootnameid_.(string)
-        }
+        username = username_.(string)
     } else {
-        // Extract node identifiers
-        nameid_ := nodeTarget_.(model.JsonAtom)["nameid"]
-        if nameid_ == nil {
-            return false, fmt.Errorf("node target unknown (nameid), need a database request here...")
-        }
-        rootnameid, err = nid2rootid(nameid_.(string))
-        if err != nil {
-            panic(err.Error())
-        }
+        // User here
+        username = user.(model.JsonAtom)["username"].(string)
     }
 
-    // Search for rights
-    ok := userHasRoot(uctx, rootnameid)
-    return ok, err
+    // Check user ID match
+    return uctx.Username == username, err
 }
 
 // check if the an user has the given role of the given (nested) node

@@ -144,7 +144,7 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
     if userIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
     // Add node Policies
-    if charac.Mode == model.NodeModeChaos {
+    if charac.Mode == model.NodeModeAgile {
         ok = userIsMember(uctx, parentid) >= 0
     } else if charac.Mode == model.NodeModeCoordinated {
         ok = userIsCoordo(uctx, parentid) >= 0
@@ -158,7 +158,7 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
             // @debug: move to CheckCoordoPath function
             if err != nil { return ok, LogErr("Internal Error", err) }
             for _, p := range(parents) {
-                if charac.Mode == model.NodeModeChaos {
+                if charac.Mode == model.NodeModeAgile {
                     if userIsMember(uctx, p) >= 0 {
                         ok = true
                         break
