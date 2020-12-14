@@ -15,8 +15,8 @@
         "content": "The organisation mode allows you to define the scope of rights associated with roles in the organisation. There are two modes:\n\n###### coordinated mode\n\nIn the coordinated mode, the coordinator roles have the following rights within their circles:\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNormal roles have the following rights within their circles : \n* creation of tensions and comments \n* close your own tensions\n\n###### agile mode\n\nIn the agile mode, all roles have the following rights within their circles:\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNote: the rights of a role associated with a circle are inherited in sub-circles that do not have roles.\n"
       },
       {
-        "header": "Circle/Role focus",
-        "content": "The role or circle focused is the node where looking at. If the focus thz .\nYou can change the current role or node who has \n"
+        "header": "organisation navigation",
+        "content": "On the organisation overview or map, you can navigate in your organisation by clicking a role or circle. The **focus** will change as well as:\n* the organisation path in the header of the page indicationg your localisation\n* the mandate in the organisation overview panel\n* the recent activities in the organisation overvie panel\n"
       }
     ]
   },
