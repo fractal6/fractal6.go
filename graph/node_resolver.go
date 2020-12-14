@@ -221,7 +221,7 @@ func PushNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitter
     // add tension and child for existing children.
     switch *node.Type {
     case model.NodeTypeRole:
-        if node.FirstLink != nil {
+        if node.FirstLink != nil && *node.RoleType != model.RoleTypeGuest {
             err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
         }
     case model.NodeTypeCircle:
@@ -417,10 +417,11 @@ func MakeNewRootTension(uctx model.UserCtx, rootnameid string, node model.AddNod
 }
 
 
-// maybeUpdateMembership check try to toggle uer membership to Guest or Member
+// maybeUpdateMembership check try to toggle user membership to Guest or Member
 func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
     var uctxFs *model.UserCtx
     var err error
+    var i int
     DB := db.GetDB()
     uctxFs, err = DB.GetUser("username", username)
     if err != nil { return err }
@@ -429,14 +430,15 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     if userIsOwner(*uctxFs, rootnameid) >= 0 { return nil }
 
     // Update RoleType to Guest
-    if rt == model.RoleTypeGuest && len(uctxFs.Roles) == 1  {
-        err := DB.UpgradeMember(uctxFs.Roles[0].Nameid, model.RoleTypeGuest)
+    roles := getRoles(*uctxFs, rootnameid)
+    if rt == model.RoleTypeGuest && len(roles) == 1  {
+        err := DB.UpgradeMember(roles[0].Nameid, model.RoleTypeGuest)
         if err != nil { return err }
         return nil
     }
 
     // Update RoleType to Member
-    i := userIsGuest(*uctxFs, rootnameid)
+    i = userIsGuest(*uctxFs, rootnameid)
     if rt == model.RoleTypeMember && i >= 0 {
         // Update RoleType to Member
         err := DB.UpgradeMember(uctxFs.Roles[i].Nameid, model.RoleTypeMember)

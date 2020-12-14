@@ -846,8 +846,8 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // Remove user reference
         // --
         if model.RoleType(*event.Old) == model.RoleTypeGuest {
-            rootid, err := nid2rootid(*event.New)
-            if err != nil { return ok, err, nameid }
+            rootid, e := nid2rootid(*event.New)
+            if e != nil { return ok, e, nameid }
             i := userIsGuest(uctx, rootid)
             if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")), nameid}
             var nf model.NodeFragment
@@ -861,8 +861,8 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         ok, err = LeaveRole(uctx, tension, node)
     } else if *event.EventType == model.TensionEventUserJoin {
         // Only root node can be join
-        rootid, err := nid2rootid(*event.New)
-        if err != nil { return ok, err, nameid }
+        rootid, e := nid2rootid(*event.New)
+        if e != nil { return ok, e, nameid }
         if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")), nameid}
         i := userIsMember(uctx, rootid)
         if i>=0 {return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation.")), nameid}
@@ -874,21 +874,23 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // * else check if User Can Join Organisation
         if tension.Receiver.Charac.UserCanJoin {
             guestid := guestIdCodec(rootid, uctx.Username)
-            ex, err :=  db.GetDB().Exists("Node", "nameid", guestid)
-            if err != nil { return ok, err, nameid }
+            ex, e :=  db.GetDB().Exists("Node", "nameid", guestid)
+            if e != nil { return ok, e, nameid }
             if ex {
                 err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)
             } else {
                 rt := model.RoleTypeGuest
                 t := model.NodeTypeRole
+                name := "Guest"
                 n := &model.NodeFragment{
+                    Name: &name,
                     RoleType: &rt,
                     Type: &t,
-                    FirstLink : &uctx.Username,
-                    IsPrivate: node.IsPrivate,
-                    Charac: node.Charac,
+                    FirstLink: &uctx.Username,
+                    IsPrivate: &tension.Receiver.IsPrivate,
+                    Charac: tension.Receiver.Charac,
                 }
-                err = PushNode(uctx, nil, n, "", "@"+uctx.Username, rootid)
+                err = PushNode(uctx, nil, n, "", guestid, rootid)
             }
             ok = true
         }
@@ -901,15 +903,15 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
 // User Rights Seeker
 //
 
-// useHasRoot return true if the user has at least one role in above given node
-func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
-    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
+// usePlayRole return true if the user play the given role (Nameid)
+func userPlayRole(uctx model.UserCtx, nameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
     if e != nil {
         panic(e)
     }
 
     for _, ur := range uctx.Roles {
-        if ur.Rootnameid == rootnameid  {
+        if ur.Nameid == nameid  {
             return true
         }
     }
@@ -935,19 +937,52 @@ func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
     return false
 }
 
-// usePlayRole return true if the user play the given role (Nameid)
-func userPlayRole(uctx model.UserCtx, nameid string) bool {
-    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
+// useHasRoot return true if the user belongs to the given root
+func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
+    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
     if e != nil {
         panic(e)
     }
 
     for _, ur := range uctx.Roles {
-        if ur.Nameid == nameid  {
+        if ur.Rootnameid == rootnameid {
             return true
         }
     }
     return false
+}
+
+func getRoles(uctx model.UserCtx, rootnameid string) []model.Role {
+    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
+    if e != nil {
+        panic(e)
+    }
+
+    var roles []model.Role
+    for _, r := range uctx.Roles {
+        if r.Rootnameid == rootnameid  {
+            roles = append(roles, r)
+        }
+    }
+
+    return roles
+}
+
+
+// userIsGuest return true if the user is a guest (has only one role) in the given organisation
+func userIsGuest(uctx model.UserCtx, rootnameid string) int {
+    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
+    if e != nil {
+        panic(e)
+    }
+
+    for i, r := range uctx.Roles {
+        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
+            return i
+        }
+    }
+
+    return -1
 }
 
 // useIsMember return true if the user has at least one role in the given node
@@ -982,22 +1017,6 @@ func userIsCoordo(uctx model.UserCtx, nameid string) int {
             panic("bad nameid format for coordo test: "+ ur.Nameid)
         }
         if pid == nameid && ur.RoleType == model.RoleTypeCoordinator {
-            return i
-        }
-    }
-
-    return -1
-}
-
-// userIsGuest return true if the user is a guest (has only one role) in the given organisation
-func userIsGuest(uctx model.UserCtx, rootnameid string) int {
-    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
             return i
         }
     }
