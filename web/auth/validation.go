@@ -227,6 +227,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     // Rights
     canLogin := true
     canCreateRoot := false
+    maxPublicOrga := 5
 
     userInput := model.AddUserInput{
         CreatedAt:      now,
@@ -240,6 +241,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         Rights: &model.UserRightsRef{
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,
+            MaxPublicOrga: &maxPublicOrga,
         },
     }
 
