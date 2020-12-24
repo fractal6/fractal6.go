@@ -20,10 +20,15 @@ func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeIn
 }
 
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
-	return nil, fmt.Errorf("not implemented: update node")
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilter) (data *model.DeleteNodePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddSharedNode(ctx context.Context, input []*model.AddSharedNodeInput) (data *model.AddSharedNodePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -164,6 +169,10 @@ func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter,
 	return data, errors
 }
 
+func (r *queryResolver) QuerySharedNode(ctx context.Context, order *model.SharedNodeOrder, first *int, offset *int) (data []*model.SharedNode, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetNodeFragment(ctx context.Context, id string) (data *model.NodeFragment, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -202,7 +211,7 @@ func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionF
 	return data, errors
 }
 
-func (r *queryResolver) GetLabel(ctx context.Context, id *string, name *string) (data *model.Label, errors error) {
+func (r *queryResolver) GetLabel(ctx context.Context, id *string, nameid *string) (data *model.Label, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

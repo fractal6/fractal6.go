@@ -78,6 +78,7 @@ func Init() gen.Config {
 
     // Add, Update and Remove inputs directives
     c.Directives.Alter_toLower = toLower
+    c.Directives.Alter_minLength = inputMinLength
     c.Directives.Alter_maxLength = inputMaxLength
     c.Directives.Alter_assertType = assertType
     c.Directives.Alter_hasRole = hasRole
@@ -87,10 +88,12 @@ func Init() gen.Config {
     c.Directives.Hook_addTension = addTensionHook
     c.Directives.Hook_updateTension = updateTensionHook
     c.Directives.Hook_updateComment = updateCommentHook
+    c.Directives.Hook_updateNode = updateNodeHook
 
     c.Directives.Hook_addTensionPost = addTensionPostHook
     c.Directives.Hook_updateTensionPost = updateTensionPostHook
     c.Directives.Hook_updateCommentPost = nothing
+    c.Directives.Hook_updateNodePost = nothing
 
     return c
 }
@@ -137,8 +140,14 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 // @debug: Query the database if field is not present and print a warning.
                 return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
             }
+            var nameid string
+            rc := graphql.GetResolverContext(ctx)
+            if rc.Args["nameid"] != nil {
+                nameid = *(rc.Args["nameid"].(*string))
+            } else {
+                nameid = v.Nameid
+            }
             // Validate
-            nameid = v.Nameid
             isPrivate = v.IsPrivate
             yes, err = isHidePrivate(ctx, nameid, isPrivate)
             if err != nil { return nil, err }
@@ -307,24 +316,6 @@ func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (
 // Mutation
 //
 
-func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
-    data, err := next(ctx)
-    return strings.ToLower(data.(string)), err
-}
-
-func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
-    v := obj.(model.JsonAtom)[field].(string)
-    if len(v) > max {
-        return nil, fmt.Errorf("`%s' to long. Maximum length is %d", field, max)
-    }
-    return next(ctx)
-}
-
-func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
-    v := obj.(model.JsonAtom)[field].(model.JsonAtom)
-    return nil, fmt.Errorf("only Node type is supported, this is not: %T", v )
-}
-
 // Update Node hook:
 // * add the nameid field in the context for further inspection in new resolver
 func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
@@ -458,57 +449,88 @@ func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolv
     return next(ctx)
 }
 
+//
+// Field utils
+//
+
+func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
+    data, err := next(ctx)
+    return strings.ToLower(data.(string)), err
+}
+
+func inputMinLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, min int) (interface{}, error) {
+    v := obj.(model.JsonAtom)[field].(string)
+    if len(v) < min {
+        return nil, fmt.Errorf("`%s' to short. Maximum length is %d", field, min)
+    }
+    return next(ctx)
+}
+
+func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
+    v := obj.(model.JsonAtom)[field].(string)
+    if len(v) > max {
+        return nil, fmt.Errorf("`%s' to long. Maximum length is %d", field, max)
+    }
+    return next(ctx)
+}
+
+func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
+    v := obj.(model.JsonAtom)[field].(model.JsonAtom)
+    return nil, fmt.Errorf("only Node type is supported, this is not: %T", v )
+}
+
+//
+// Auth directives
+//
+
 // HasRole check the user has the authorisation to update a ressource by checking if it satisfies at least one of
-// 1. user rights
-// 2. user ownership (u field)
-// 3. check user role, (n r field)
-func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nFields []string, r model.RoleType, uField *string, assignee *int) (interface{}, error) {
+// 1. user owner
+// 1. user rights (n field)
+// 3. check assignees
+// 4. check residual
+func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nFields []string, uField *string, assignee *int) (interface{}, error) {
+    var ok bool
     // Retrieve userCtx from token
     uctx, err := auth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
-    // If uField is given check if the current user is the creator ressource
-    var ok bool
-    if uField != nil {
+    if uField != nil { // Check that the current user is the creator of the ressource
         ok, err = checkUserOwnership(ctx, uctx, *uField, obj)
         if err != nil { return nil, LogErr("Access denied", err) }
         if ok { return next(ctx) }
     }
 
-    // Check that user has the given (nested) role on the asked node
-    for _, nField := range nFields {
+    for _, nField := range nFields { // Check tha the user has the given (nested) role on the asked node
         nameid, err := extractNameid(ctx, nField, obj)
         if err != nil { return nil, LogErr("Internal error", err) }
 
-        // Check if user is an owner
+        // Escape if an user is an owner
         rootnameid, _ := nid2rootid(nameid)
-        if userIsOwner(uctx, rootnameid) >= 0 { next(ctx) }
+        if userIsOwner(uctx, rootnameid) >= 0 { return next(ctx) }
 
-        // Search for rights
-        ok := userHasRole(uctx, r, nameid)
+        // Check user rights
+        ok, err := checkUserRights(uctx, nameid, nil)
+        if err != nil { return nil, LogErr("Internal error", err) }
         if ok { return next(ctx) }
     }
 
-    // Check is the user is an assigne of the curent tension
-    if assignee != nil {
+    if assignee != nil { // Check if the user is an assigne of the curent tension
         ok, err = checkAssignees(ctx, uctx, obj)
         if err != nil { return nil, LogErr("Access denied", err) }
         if ok { return next(ctx) }
     }
 
-    // Check if user is Coordinator of any parents if the PID has no coordinator
     if !ok && ctx.Value("nameid") != nil { // is a Node
+        // Check if user has rights of any parents if the node has no Coordo role.
         parents, err := db.GetDB().GetParents(ctx.Value("nameid").(string))
         // Check of pid has coordos
         if len(parents) > 0 && !db.GetDB().HasCoordos(ctx.Value("nameid").(string)) {
             // @debug: move to CheckCoordoPath function
             if err != nil { return nil, LogErr("Internal Error", err) }
             for _, p := range(parents) {
-                // @debug: check charac mode !
-                if userIsCoordo(uctx, p) >= 0 {
-                    ok = true
-                    break
-                }
+                ok, err = checkUserRights(uctx, p, nil)
+                if err != nil { return nil, LogErr("Internal error", err) }
+                if ok { break }
             }
         }
     }
@@ -638,6 +660,7 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
         }
     } else if (nameid_ != nil) {
         // Node Here
+        if nodeField == "__self__" { return nameid_.(string), err }
         nameid_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid_.(string), "Node."+nodeField, "Node.nameid")
         if err != nil { return nameid, err }
         if nameid_ == nil {
@@ -652,63 +675,6 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
     }
 
     return nameid, err
-}
-
-
-
-// Check if the an user owns the given object
-func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
-    // Get user ID
-    var username string
-    var err error
-    user := userObj.(model.JsonAtom)[userField]
-    if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        // Tension here
-        id := ctx.Value("id").(string)
-        if id == "" {
-            return false, fmt.Errorf("node target unknown(id), need a database request here...")
-        }
-        // Request the database to get the field
-        username_, err := db.GetDB().GetSubFieldById(id, "Post."+userField, "User.username") // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
-        if err != nil { return false, err }
-        username = username_.(string)
-    } else {
-        // User here
-        username = user.(model.JsonAtom)["username"].(string)
-    }
-
-    // Check user ID match
-    return uctx.Username == username, err
-}
-
-// check if the an user has the given role of the given (nested) node
-func checkAssignees(ctx context.Context, uctx model.UserCtx, nodeObj interface{}) (bool, error) {
-    // Check that nodes are present
-    var assignees []interface{}
-    var err error
-    id_ := ctx.Value("id")
-    nameid_ := ctx.Value("nameid")
-    if id_ != nil {
-        // Tension here
-        res, err := db.GetDB().GetSubFieldById(id_.(string), "Tension.assignees", "User.username")
-        if err != nil { return false, err }
-        if res != nil { assignees = res.([]interface{}) }
-    } else if (nameid_ != nil) {
-        // Node Here
-        res, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", nameid_.(string), "Node.source", "Tension.assignees", "User.username")
-        if err != nil { return false, err }
-        if res != nil { assignees = res.([]interface{}) }
-    } else {
-        return false, fmt.Errorf("node target unknown, need a database request here...")
-    }
-
-    // Search for assignees
-    for _, a := range(assignees) {
-        if a.(string) == uctx.Username {
-            return true, err
-        }
-    }
-    return false, err
 }
 
 // Take action based on the given Event
@@ -899,145 +865,6 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     return ok, err, nameid
 }
 
-//
-// User Rights Seeker
-//
-
-// usePlayRole return true if the user play the given role (Nameid)
-func userPlayRole(uctx model.UserCtx, nameid string) bool {
-    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for _, ur := range uctx.Roles {
-        if ur.Nameid == nameid  {
-            return true
-        }
-    }
-    return false
-}
-
-// userHasRole return true if the user has the given role on the given node
-func userHasRole(uctx model.UserCtx, role model.RoleType, nameid string) bool {
-    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for _, ur := range uctx.Roles {
-        pid, err := nid2pid(ur.Nameid)
-        if err != nil {
-            panic(err.Error())
-        }
-        if pid == nameid && ur.RoleType == role {
-            return true
-        }
-    }
-    return false
-}
-
-// useHasRoot return true if the user belongs to the given root
-func userHasRoot(uctx model.UserCtx, rootnameid string) bool {
-    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for _, ur := range uctx.Roles {
-        if ur.Rootnameid == rootnameid {
-            return true
-        }
-    }
-    return false
-}
-
-func getRoles(uctx model.UserCtx, rootnameid string) []model.Role {
-    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
-    if e != nil {
-        panic(e)
-    }
-
-    var roles []model.Role
-    for _, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid  {
-            roles = append(roles, r)
-        }
-    }
-
-    return roles
-}
-
-
-// userIsGuest return true if the user is a guest (has only one role) in the given organisation
-func userIsGuest(uctx model.UserCtx, rootnameid string) int {
-    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
-            return i
-        }
-    }
-
-    return -1
-}
-
-// useIsMember return true if the user has at least one role in the given node
-func userIsMember(uctx model.UserCtx, nameid string) int {
-    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for i, ur := range uctx.Roles {
-        pid, err := nid2pid(ur.Nameid)
-        if err != nil {
-            panic(err.Error())
-        }
-        if pid == nameid {
-            return i
-        }
-    }
-    return -1
-}
-
-// useIsCoordo return true if the user has at least one role of Coordinator in the given node
-func userIsCoordo(uctx model.UserCtx, nameid string) int {
-    uctx, e := auth.CheckUserCtxIat(uctx, nameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for i, ur := range uctx.Roles {
-        pid, err := nid2pid(ur.Nameid)
-        if err != nil {
-            panic("bad nameid format for coordo test: "+ ur.Nameid)
-        }
-        if pid == nameid && ur.RoleType == model.RoleTypeCoordinator {
-            return i
-        }
-    }
-
-    return -1
-}
-
-func userIsOwner(uctx model.UserCtx, rootnameid string) int {
-    uctx, e := auth.CheckUserCtxIat(uctx, rootnameid)
-    if e != nil {
-        panic(e)
-    }
-
-    for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeOwner {
-            return i
-        }
-    }
-
-    return -1
-}
 
 //
 // Go Utils

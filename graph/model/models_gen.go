@@ -55,8 +55,10 @@ type AddEventPayload struct {
 }
 
 type AddLabelInput struct {
-	Name  string  `json:"name,omitempty"`
-	Color *string `json:"color,omitempty"`
+	Nameid      string  `json:"nameid,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Color       *string `json:"color,omitempty"`
 }
 
 type AddLabelPayload struct {
@@ -131,10 +133,12 @@ type AddNodeInput struct {
 	IsPrivate    bool           `json:"isPrivate"`
 	IsArchived   bool           `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Shared       *SharedNodeRef `json:"shared,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -152,6 +156,17 @@ type AddNodeStatsInput struct {
 type AddNodeStatsPayload struct {
 	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
 	NumUids   *int         `json:"numUids,omitempty"`
+}
+
+type AddSharedNodeInput struct {
+	NLabels         *int `json:"n_labels,omitempty"`
+	NTensions       *int `json:"n_tensions,omitempty"`
+	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+}
+
+type AddSharedNodePayload struct {
+	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type AddTensionInput struct {
@@ -477,17 +492,20 @@ type IntFilter struct {
 }
 
 type Label struct {
-	ID    string  `json:"id,omitempty"`
-	Name  string  `json:"name,omitempty"`
-	Color *string `json:"color,omitempty"`
+	ID          string  `json:"id,omitempty"`
+	Nameid      string  `json:"nameid,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Color       *string `json:"color,omitempty"`
 }
 
 type LabelFilter struct {
-	ID   []string          `json:"id,omitempty"`
-	Name *StringHashFilter `json:"name,omitempty"`
-	And  *LabelFilter      `json:"and,omitempty"`
-	Or   *LabelFilter      `json:"or,omitempty"`
-	Not  *LabelFilter      `json:"not,omitempty"`
+	ID     []string                            `json:"id,omitempty"`
+	Nameid *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
+	Name   *StringHashFilterStringTermFilter   `json:"name,omitempty"`
+	And    *LabelFilter                        `json:"and,omitempty"`
+	Or     *LabelFilter                        `json:"or,omitempty"`
+	Not    *LabelFilter                        `json:"not,omitempty"`
 }
 
 type LabelOrder struct {
@@ -497,13 +515,17 @@ type LabelOrder struct {
 }
 
 type LabelPatch struct {
-	Color *string `json:"color,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Color       *string `json:"color,omitempty"`
 }
 
 type LabelRef struct {
-	ID    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
-	Color *string `json:"color,omitempty"`
+	ID          *string `json:"id,omitempty"`
+	Nameid      *string `json:"nameid,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Color       *string `json:"color,omitempty"`
 }
 
 type Mandate struct {
@@ -569,10 +591,12 @@ type Node struct {
 	IsPrivate    bool        `json:"isPrivate"`
 	IsArchived   bool        `json:"isArchived"`
 	Charac       *NodeCharac `json:"charac,omitempty"`
+	Labels       []*Label    `json:"labels,omitempty"`
 	FirstLink    *User       `json:"first_link,omitempty"`
 	SecondLink   *User       `json:"second_link,omitempty"`
 	Skills       []string    `json:"skills,omitempty"`
 	RoleType     *RoleType   `json:"role_type,omitempty"`
+	Shared       *SharedNode `json:"shared,omitempty"`
 }
 
 type NodeCharac struct {
@@ -712,10 +736,12 @@ type NodePatch struct {
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Shared       *SharedNodeRef `json:"shared,omitempty"`
 }
 
 type NodeRef struct {
@@ -744,10 +770,12 @@ type NodeRef struct {
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Shared       *SharedNodeRef `json:"shared,omitempty"`
 }
 
 type NodeStats struct {
@@ -812,6 +840,24 @@ type RoleTypeHash struct {
 	Eq *RoleType `json:"eq,omitempty"`
 }
 
+type SharedNode struct {
+	NLabels         *int `json:"n_labels,omitempty"`
+	NTensions       *int `json:"n_tensions,omitempty"`
+	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+}
+
+type SharedNodeOrder struct {
+	Asc  *SharedNodeOrderable `json:"asc,omitempty"`
+	Desc *SharedNodeOrderable `json:"desc,omitempty"`
+	Then *SharedNodeOrder     `json:"then,omitempty"`
+}
+
+type SharedNodeRef struct {
+	NLabels         *int `json:"n_labels,omitempty"`
+	NTensions       *int `json:"n_tensions,omitempty"`
+	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+}
+
 type StringExactFilter struct {
 	Eq *string `json:"eq,omitempty"`
 	Le *string `json:"le,omitempty"`
@@ -832,6 +878,12 @@ type StringHashFilter struct {
 type StringHashFilterStringRegExpFilter struct {
 	Eq     *string `json:"eq,omitempty"`
 	Regexp *string `json:"regexp,omitempty"`
+}
+
+type StringHashFilterStringTermFilter struct {
+	Eq         *string `json:"eq,omitempty"`
+	Allofterms *string `json:"allofterms,omitempty"`
+	Anyofterms *string `json:"anyofterms,omitempty"`
 }
 
 type StringRegExpFilter struct {
@@ -1457,18 +1509,22 @@ func (e HTTPMethod) MarshalGQL(w io.Writer) {
 type LabelOrderable string
 
 const (
-	LabelOrderableName  LabelOrderable = "name"
-	LabelOrderableColor LabelOrderable = "color"
+	LabelOrderableNameid      LabelOrderable = "nameid"
+	LabelOrderableName        LabelOrderable = "name"
+	LabelOrderableDescription LabelOrderable = "description"
+	LabelOrderableColor       LabelOrderable = "color"
 )
 
 var AllLabelOrderable = []LabelOrderable{
+	LabelOrderableNameid,
 	LabelOrderableName,
+	LabelOrderableDescription,
 	LabelOrderableColor,
 }
 
 func (e LabelOrderable) IsValid() bool {
 	switch e {
-	case LabelOrderableName, LabelOrderableColor:
+	case LabelOrderableNameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor:
 		return true
 	}
 	return false
@@ -1901,6 +1957,49 @@ func (e *RoleType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e RoleType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SharedNodeOrderable string
+
+const (
+	SharedNodeOrderableNLabels         SharedNodeOrderable = "n_labels"
+	SharedNodeOrderableNTensions       SharedNodeOrderable = "n_tensions"
+	SharedNodeOrderableNClosedTensions SharedNodeOrderable = "n_closed_tensions"
+)
+
+var AllSharedNodeOrderable = []SharedNodeOrderable{
+	SharedNodeOrderableNLabels,
+	SharedNodeOrderableNTensions,
+	SharedNodeOrderableNClosedTensions,
+}
+
+func (e SharedNodeOrderable) IsValid() bool {
+	switch e {
+	case SharedNodeOrderableNLabels, SharedNodeOrderableNTensions, SharedNodeOrderableNClosedTensions:
+		return true
+	}
+	return false
+}
+
+func (e SharedNodeOrderable) String() string {
+	return string(e)
+}
+
+func (e *SharedNodeOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SharedNodeOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SharedNodeOrderable", str)
+	}
+	return nil
+}
+
+func (e SharedNodeOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

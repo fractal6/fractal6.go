@@ -140,17 +140,14 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
         //pass
     }
 
-    // Check if user is an owner
+    // Escape if an user is an owner
     if userIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
-    // Add node Policies
-    if charac.Mode == model.NodeModeAgile {
-        ok = userIsMember(uctx, parentid) >= 0
-    } else if charac.Mode == model.NodeModeCoordinated {
-        ok = userIsCoordo(uctx, parentid) >= 0
-    }
+    // Check user rights
+    ok, err = checkUserRights(uctx, parentid, charac)
+    if err != nil { return ok, LogErr("Internal error", err) }
 
-    // Check if user is Coordinator of any parents if the PID has no coordinator
+    // Check if user has rights of any parents if the node has no Coordo role.
     if !ok {
         parents, err := db.GetDB().GetParents(parentid)
         // Check of pid has coordos
@@ -158,17 +155,9 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
             // @debug: move to CheckCoordoPath function
             if err != nil { return ok, LogErr("Internal Error", err) }
             for _, p := range(parents) {
-                if charac.Mode == model.NodeModeAgile {
-                    if userIsMember(uctx, p) >= 0 {
-                        ok = true
-                        break
-                    }
-                } else if charac.Mode == model.NodeModeCoordinated {
-                    if userIsCoordo(uctx, p) >= 0 {
-                        ok = true
-                        break
-                    }
-                }
+                ok, err = checkUserRights(uctx, p, charac)
+                if err != nil { return ok, LogErr("Internal error", err) }
+                if ok { break }
             }
         }
     }

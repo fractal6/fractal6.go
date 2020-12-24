@@ -51,8 +51,7 @@ func (Jwt) New() *Jwt {
         Username: "yoda",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true},
         Roles: []model.Role{
-            {Rootnameid:"SKU", Nameid:"SKU", RoleType:model.RoleTypeCoordinator},
-            {Rootnameid:"open-chaos", Nameid:"open-chaos", RoleType:model.RoleTypeCoordinator},
+            {Rootnameid:"sku", Nameid:"sku", RoleType:model.RoleTypeCoordinator},
         },
     }
     token, _ := tk.issue(uctx, time.Hour*72)

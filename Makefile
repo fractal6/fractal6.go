@@ -45,10 +45,10 @@ schema_all:
 	make schema_all # Do alter Dgraph
 	cd -
 
-gen: _gen _named_returns_resolver _add_omitempty
-
-_gen:
-	go run ./scripts/gqlgen.go
+gen: #_named_returns_resolver _add_omitempty
+	go run ./scripts/gqlgen.go && \
+		sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go && \
+		sed -i  '/bool /I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
 	# Or @DEBUG: why it doesnt work anymore ?
 	#go generate ./...
 	# go run github.com/99designs/gqlgen generate
