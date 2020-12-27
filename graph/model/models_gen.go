@@ -55,10 +55,12 @@ type AddEventPayload struct {
 }
 
 type AddLabelInput struct {
-	Nameid      string  `json:"nameid,omitempty"`
-	Name        string  `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Color       *string `json:"color,omitempty"`
+	Rootnameid  string        `json:"rootnameid,omitempty"`
+	Name        string        `json:"name,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	Color       *string       `json:"color,omitempty"`
+	Tensions    []*TensionRef `json:"tensions,omitempty"`
+	Nodes       []*NodeRef    `json:"nodes,omitempty"`
 }
 
 type AddLabelPayload struct {
@@ -492,20 +494,22 @@ type IntFilter struct {
 }
 
 type Label struct {
-	ID          string  `json:"id,omitempty"`
-	Nameid      string  `json:"nameid,omitempty"`
-	Name        string  `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Color       *string `json:"color,omitempty"`
+	ID          string     `json:"id,omitempty"`
+	Rootnameid  string     `json:"rootnameid,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Color       *string    `json:"color,omitempty"`
+	Tensions    []*Tension `json:"tensions,omitempty"`
+	Nodes       []*Node    `json:"nodes,omitempty"`
 }
 
 type LabelFilter struct {
-	ID     []string                            `json:"id,omitempty"`
-	Nameid *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
-	Name   *StringHashFilterStringTermFilter   `json:"name,omitempty"`
-	And    *LabelFilter                        `json:"and,omitempty"`
-	Or     *LabelFilter                        `json:"or,omitempty"`
-	Not    *LabelFilter                        `json:"not,omitempty"`
+	ID         []string                          `json:"id,omitempty"`
+	Rootnameid *StringTermFilter                 `json:"rootnameid,omitempty"`
+	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
+	And        *LabelFilter                      `json:"and,omitempty"`
+	Or         *LabelFilter                      `json:"or,omitempty"`
+	Not        *LabelFilter                      `json:"not,omitempty"`
 }
 
 type LabelOrder struct {
@@ -515,17 +519,22 @@ type LabelOrder struct {
 }
 
 type LabelPatch struct {
-	Name        *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Color       *string `json:"color,omitempty"`
+	Rootnameid  *string       `json:"rootnameid,omitempty"`
+	Name        *string       `json:"name,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	Color       *string       `json:"color,omitempty"`
+	Tensions    []*TensionRef `json:"tensions,omitempty"`
+	Nodes       []*NodeRef    `json:"nodes,omitempty"`
 }
 
 type LabelRef struct {
-	ID          *string `json:"id,omitempty"`
-	Nameid      *string `json:"nameid,omitempty"`
-	Name        *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Color       *string `json:"color,omitempty"`
+	ID          *string       `json:"id,omitempty"`
+	Rootnameid  *string       `json:"rootnameid,omitempty"`
+	Name        *string       `json:"name,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	Color       *string       `json:"color,omitempty"`
+	Tensions    []*TensionRef `json:"tensions,omitempty"`
+	Nodes       []*NodeRef    `json:"nodes,omitempty"`
 }
 
 type Mandate struct {
@@ -1509,14 +1518,14 @@ func (e HTTPMethod) MarshalGQL(w io.Writer) {
 type LabelOrderable string
 
 const (
-	LabelOrderableNameid      LabelOrderable = "nameid"
+	LabelOrderableRootnameid  LabelOrderable = "rootnameid"
 	LabelOrderableName        LabelOrderable = "name"
 	LabelOrderableDescription LabelOrderable = "description"
 	LabelOrderableColor       LabelOrderable = "color"
 )
 
 var AllLabelOrderable = []LabelOrderable{
-	LabelOrderableNameid,
+	LabelOrderableRootnameid,
 	LabelOrderableName,
 	LabelOrderableDescription,
 	LabelOrderableColor,
@@ -1524,7 +1533,7 @@ var AllLabelOrderable = []LabelOrderable{
 
 func (e LabelOrderable) IsValid() bool {
 	switch e {
-	case LabelOrderableNameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor:
+	case LabelOrderableRootnameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor:
 		return true
 	}
 	return false

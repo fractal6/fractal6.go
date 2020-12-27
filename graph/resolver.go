@@ -77,10 +77,10 @@ func Init() gen.Config {
     c.Directives.Patch_hasRole = hasRole
 
     // Add, Update and Remove inputs directives
+    c.Directives.Alter_unique = unique
     c.Directives.Alter_toLower = toLower
     c.Directives.Alter_minLength = inputMinLength
     c.Directives.Alter_maxLength = inputMaxLength
-    c.Directives.Alter_assertType = assertType
     c.Directives.Alter_hasRole = hasRole
     c.Directives.Alter_hasRoot = hasRoot
 
@@ -89,11 +89,15 @@ func Init() gen.Config {
     c.Directives.Hook_updateTension = updateTensionHook
     c.Directives.Hook_updateComment = updateCommentHook
     c.Directives.Hook_updateNode = updateNodeHook
+    c.Directives.Hook_addLabel = addLabelHook
+    c.Directives.Hook_updateLabel = updateLabelHook
 
     c.Directives.Hook_addTensionPost = addTensionPostHook
     c.Directives.Hook_updateTensionPost = updateTensionPostHook
     c.Directives.Hook_updateCommentPost = nothing
     c.Directives.Hook_updateNodePost = nothing
+    c.Directives.Hook_addLabelPost = nothing
+    c.Directives.Hook_updateLabelPost = nothing
 
     return c
 }
@@ -313,149 +317,40 @@ func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (
 }
 
 //
-// Mutation
-//
-
-// Update Node hook:
-// * add the nameid field in the context for further inspection in new resolver
-func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    nameid_ := filter["nameid"].(model.JsonAtom)["eq"]
-    if nameid_ != nil {
-        ctx = context.WithValue(ctx, "nameid", nameid_.(string))
-    }
-
-    return next(ctx)
-}
-
-// Add Tension Hook
-func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    uctx, err := auth.UserCtxFromContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
-    // Get input
-    data, err := next(ctx)
-    if err != nil { return nil, err }
-
-    // Validate input
-    input := data.([]*model.AddTensionInput)
-    if len(input) != 1 {
-        return nil, LogErr("Add tension error", fmt.Errorf("Only one tension supported in input."))
-    }
-
-    // Check that user as the given emitter role
-    emitterid := input[0].Emitterid
-    if !userPlayRole(uctx, emitterid) {
-        // if not check for bot access
-        r_, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.role_type")
-        if err != nil { return nil, LogErr("Internal error", err) }
-        isArchived, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.isArchived")
-        if err != nil { return nil, LogErr("Internal error", err) }
-        if r_ == nil { return data, err }
-        if model.RoleType(r_.(string)) != model.RoleTypeBot || isArchived.(bool) {
-            return nil, LogErr("Access denied", fmt.Errorf("you do not own this node"))
-        }
-    }
-
-    return data, err
-}
-
-// Update Tension hook:
-// * add the id field in the context for further inspection in new resolver
-func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    ids := filter["id"].([]interface{})
-    if len(ids) > 1 {
-        return nil, LogErr("not implemented", fmt.Errorf("multiple post not supported"))
-    }
-
-    ctx = context.WithValue(ctx, "id", ids[0].(string))
-    return next(ctx)
-}
-
-// Add Tension Post Hook
-func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
-
-    // Get Input
-    data, err := next(ctx)
-    if err != nil { return nil, err }
-
-    // Validate input
-    rc := graphql.GetResolverContext(ctx)
-    input := rc.Args["input"].([]*model.AddTensionInput)[0]
-    tid := data.(*model.AddTensionPayload).Tension[0].ID
-    if tid == "" {
-        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension payload"))
-    }
-
-    // Validate and process Blob Event
-    ok, err := tensionEventHook(uctx, tid, input.History, nil)
-    if err != nil || !ok {
-        // Delete the tension just added
-        e := db.GetDB().DeleteNodes(tid)
-        if e != nil { panic(e) }
-    }
-
-    if err != nil  { return nil, err }
-    if ok { return data, err }
-
-    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
-}
-
-// Update Tension Post Hook
-func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
-
-    // Validate input
-    rc := graphql.GetResolverContext(ctx)
-    input := rc.Args["input"].(model.UpdateTensionInput)
-    tids := input.Filter.ID
-    if len(tids) == 0 {
-        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension filter."))
-    }
-
-    // Validate Blob Event
-    var bid *string
-    if input.Set != nil  {
-        if len(input.Set.Blobs) > 0 {
-            bid = input.Set.Blobs[0].ID
-        }
-        ok, err := tensionEventHook(uctx, tids[0], input.Set.History, bid)
-        if err != nil  { return nil, err }
-        if ok {
-            return next(ctx)
-        } else {
-            return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
-        }
-    }
-
-    return next(ctx)
-}
-
-// Update Comment hook
-// * add the id field in the context for further inspection in new resolver
-func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    ids := filter["id"].([]interface{})
-    if len(ids) > 1 {
-        return nil, LogErr("not implemented", fmt.Errorf("multiple post not supported"))
-    }
-
-    ctx = context.WithValue(ctx, "id", ids[0].(string))
-    return next(ctx)
-}
-
-//
 // Field utils
 //
 
+// Check uniqueness (@DEBUG follow @unique dgraph field iplementation)
+// @Debug: only supert Label right now (ch
+func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field string, subfield *string) (interface{}, error) {
+    v := obj.(model.JsonAtom)[field].(string)
+    id := ctx.Value("id")
+    if id == nil {
+        return nil, fmt.Errorf("id field is required for @unique directive.")
+    }
+    t := "Label"
+    if subfield != nil {
+        filterName := t + "." + *subfield
+        s, err := db.GetDB().GetFieldById(id.(string), filterName)
+        if err != nil || s == nil { return nil, LogErr("Internal error", err) }
+        filterValue := s.(string)
+        ex, err :=  db.GetDB().Exists(t, field, v, &filterName, &filterValue)
+        if err != nil { return nil, LogErr("Internal error", err) }
+        if !ex {
+            return next(ctx)
+        }
+    } else {
+        return nil, fmt.Errorf("@unique alone not implemented.")
+    }
+
+    return nil, LogErr("Duplicate error", fmt.Errorf("duplicate label found"))
+
+}
+
 func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
     data, err := next(ctx)
-    return strings.ToLower(data.(string)), err
+    v := strings.ToLower(*(data.(*string)))
+    return &v, err
 }
 
 func inputMinLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, min int) (interface{}, error) {
@@ -474,11 +369,6 @@ func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver,
     return next(ctx)
 }
 
-func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, field string, type_ model.NodeType) (interface{}, error) {
-    v := obj.(model.JsonAtom)[field].(model.JsonAtom)
-    return nil, fmt.Errorf("only Node type is supported, this is not: %T", v )
-}
-
 //
 // Auth directives
 //
@@ -489,34 +379,30 @@ func assertType(ctx context.Context, obj interface{}, next graphql.Resolver, fie
 // 3. check assignees
 // 4. check residual
 func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nFields []string, uField *string, assignee *int) (interface{}, error) {
-    var ok bool
     // Retrieve userCtx from token
     uctx, err := auth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
-    if uField != nil { // Check that the current user is the creator of the ressource
-        ok, err = checkUserOwnership(ctx, uctx, *uField, obj)
+    var ok bool
+    if uField != nil { // Check if the user is the creator of the ressource
+        ok, err = CheckUserOwnership(ctx, uctx, *uField, obj)
         if err != nil { return nil, LogErr("Access denied", err) }
         if ok { return next(ctx) }
     }
 
-    for _, nField := range nFields { // Check tha the user has the given (nested) role on the asked node
+    if assignee != nil { // Check if the user is an assignee of the curent tension
+        ok, err = CheckAssignees(ctx, uctx, obj)
+        if err != nil { return nil, LogErr("Access denied", err) }
+        if ok { return next(ctx) }
+    }
+
+    for _, nField := range nFields { // Check if the user has the given (nested) role on the asked node
         nameid, err := extractNameid(ctx, nField, obj)
         if err != nil { return nil, LogErr("Internal error", err) }
 
-        // Escape if an user is an owner
-        rootnameid, _ := nid2rootid(nameid)
-        if userIsOwner(uctx, rootnameid) >= 0 { return next(ctx) }
-
         // Check user rights
-        ok, err := checkUserRights(uctx, nameid, nil)
+        ok, err := CheckUserRights(uctx, nameid, nil)
         if err != nil { return nil, LogErr("Internal error", err) }
-        if ok { return next(ctx) }
-    }
-
-    if assignee != nil { // Check if the user is an assigne of the curent tension
-        ok, err = checkAssignees(ctx, uctx, obj)
-        if err != nil { return nil, LogErr("Access denied", err) }
         if ok { return next(ctx) }
     }
 
@@ -528,7 +414,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
             // @debug: move to CheckCoordoPath function
             if err != nil { return nil, LogErr("Internal Error", err) }
             for _, p := range(parents) {
-                ok, err = checkUserRights(uctx, p, nil)
+                ok, err = CheckUserRights(uctx, p, nil)
                 if err != nil { return nil, LogErr("Internal error", err) }
                 if ok { break }
             }
@@ -593,7 +479,7 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, userFi
         userObj = obj.(model.JsonAtom)
     }
 
-    ok, err := checkUserOwnership(ctx, uctx, f, userObj)
+    ok, err := CheckUserOwnership(ctx, uctx, f, userObj)
     if err != nil { return nil, LogErr("Access denied", err) }
     if ok { return next(ctx) }
 
@@ -676,195 +562,6 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
 
     return nameid, err
 }
-
-// Take action based on the given Event
-// * get tension node target NodeCharac and either
-//      * last blob if bid is null
-//      * given blob otherwiser
-// * if event == blobPushed
-//      * check user hasa the right authorization based on NodeCharac
-//      * update the tension action value AND the blob pushedFlag
-//      * copy the Blob data in the target Node.source (Uses GQL requests)
-// * elif event == TensionEventBlobArchived/Unarchived
-//     * link or unlink role
-//     * set archive evnet and flag
-// * elif event == TensionEventUserLeft
-//    * remove User role
-//    * unlink Orga role (Guest/Member) if role_type is Guest|Member
-//    * upgrade user membership
-// Note: @Debug: Only one BlobPushed will be processed
-// Note: @Debug: remove added tension on error ?
-func tensionEventHook(uctx model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, error) {
-    var ok bool = true
-    var err error
-    var nameid string
-    for _, event := range(events) {
-        if *event.EventType == model.TensionEventBlobPushed ||
-           *event.EventType == model.TensionEventBlobArchived ||
-           *event.EventType == model.TensionEventBlobUnarchived ||
-           *event.EventType == model.TensionEventUserLeft ||
-           *event.EventType == model.TensionEventUserJoin {
-               // Process the special event
-               ok, err, nameid = processTensionEventHook(uctx, event, tid, bid)
-               if ok && err == nil {
-                   // Set the Update time into the target node
-                   err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
-                   pid, _ := nid2pid(nameid) // @debug: real parent needed here (ie event for circle)
-                   if pid != nameid && err == nil {
-                       err = db.GetDB().SetFieldByEq("Node.nameid", pid, "Node.updatedAt", Now())
-                   }
-               }
-               // Break after the first hooked event
-               break
-           }
-    }
-
-    return ok, err
-}
-
-// Add, Update or Archived a Node
-func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error, string) {
-    var nameid string
-    // Get Tension, target Node and blob charac (last if bid undefined)
-    tension, err := db.GetDB().GetTensionHook(tid, bid)
-    if err != nil { return false, LogErr("Access denied", err), nameid}
-    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found.")), nameid }
-
-    // Check that Blob exists
-    blob := tension.Blobs[0]
-    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
-    bid = &blob.ID
-
-    // Extract Tension characteristic
-    tensionCharac, err:= TensionCharac{}.New(*tension.Action)
-    if err != nil { return false, LogErr("internal error", err), nameid }
-
-    var ok bool
-    var node *model.NodeFragment = blob.Node
-
-    // Nameid Codec
-    if node != nil && node.Nameid != nil {
-        _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
-    }
-
-    if *event.EventType == model.TensionEventBlobPushed {
-        // Add or Update Node
-        // --
-        // 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
-        // 2. swith on TensionCharac.ActionType to add update etc...
-        switch tensionCharac.ActionType {
-        case NewAction:
-            // First time a blob is pushed.
-            switch tensionCharac.DocType {
-            case NodeDoc:
-                ok, err = TryAddNode(uctx, tension, node, bid)
-            case MdDoc:
-                md := blob.Md
-                ok, err = TryAddDoc(uctx, tension, md)
-            }
-        case EditAction:
-            switch tensionCharac.DocType {
-            case NodeDoc:
-                ok, err = TryUpdateNode(uctx, tension, node, bid)
-            case MdDoc:
-                md := blob.Md
-                ok, err = TryUpdateDoc(uctx, tension, md)
-            }
-        case ArchiveAction:
-            err = LogErr("Access denied", fmt.Errorf("Cannot publish archived document."))
-        }
-
-        if err != nil { return ok, err, nameid }
-        if ok { // Update blob pushed flag
-            err = db.GetDB().SetPushedFlagBlob(*bid, Now(), tid, tensionCharac.EditAction(node.Type))
-        }
-    } else if *event.EventType == model.TensionEventBlobArchived {
-        // Archived Node
-        // --
-        switch tensionCharac.DocType {
-        case NodeDoc:
-            ok, err = TryArchiveNode(uctx, tension, node)
-        case MdDoc:
-            md := blob.Md
-            ok, err = TryArchiveDoc(uctx, tension, md)
-        }
-
-        if err != nil { return ok, err, nameid }
-        if ok { // Update blob archived flag
-            err = db.GetDB().SetArchivedFlagBlob(*bid, Now(), tid, tensionCharac.ArchiveAction(node.Type))
-        }
-    } else if *event.EventType == model.TensionEventBlobUnarchived {
-        // Unarchived Node
-        // --
-        switch tensionCharac.DocType {
-        case NodeDoc:
-            ok, err = TryUnarchiveNode(uctx, tension, node)
-        case MdDoc:
-            md := blob.Md
-            ok, err = TryUnarchiveDoc(uctx, tension, md)
-        }
-
-        if err != nil { return ok, err, nameid }
-        if ok { // Update blob pushed flag
-            err = db.GetDB().SetPushedFlagBlob(*bid, Now(), tid, tensionCharac.EditAction(node.Type))
-        }
-    } else if *event.EventType == model.TensionEventUserLeft {
-        // Remove user reference
-        // --
-        if model.RoleType(*event.Old) == model.RoleTypeGuest {
-            rootid, e := nid2rootid(*event.New)
-            if e != nil { return ok, e, nameid }
-            i := userIsGuest(uctx, rootid)
-            if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")), nameid}
-            var nf model.NodeFragment
-            var t model.NodeType = model.NodeTypeRole
-            StructMap(uctx.Roles[i], &nf)
-            nf.FirstLink = &uctx.Username
-            nf.Type = &t
-            node = &nf
-        }
-
-        ok, err = LeaveRole(uctx, tension, node)
-    } else if *event.EventType == model.TensionEventUserJoin {
-        // Only root node can be join
-        rootid, e := nid2rootid(*event.New)
-        if e != nil { return ok, e, nameid }
-        if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")), nameid}
-        i := userIsMember(uctx, rootid)
-        if i>=0 {return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation.")), nameid}
-
-        // Validate
-        // --
-        // check the invitation if a hash is given
-        // * orga invtation ? <> user invitation hash ?
-        // * else check if User Can Join Organisation
-        if tension.Receiver.Charac.UserCanJoin {
-            guestid := guestIdCodec(rootid, uctx.Username)
-            ex, e :=  db.GetDB().Exists("Node", "nameid", guestid)
-            if e != nil { return ok, e, nameid }
-            if ex {
-                err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)
-            } else {
-                rt := model.RoleTypeGuest
-                t := model.NodeTypeRole
-                name := "Guest"
-                n := &model.NodeFragment{
-                    Name: &name,
-                    RoleType: &rt,
-                    Type: &t,
-                    FirstLink: &uctx.Username,
-                    IsPrivate: &tension.Receiver.IsPrivate,
-                    Charac: tension.Receiver.Charac,
-                }
-                err = PushNode(uctx, nil, n, "", guestid, rootid)
-            }
-            ok = true
-        }
-    }
-
-    return ok, err, nameid
-}
-
 
 //
 // Go Utils

@@ -17,6 +17,10 @@
       {
         "header": "organisation navigation",
         "content": "On the organisation overview or map, you can navigate in your organisation by clicking a role or circle. The **focus** will change as well as:\n* the organisation path in the header of the page indicationg your localisation\n* the mandate in the organisation overview panel\n* the recent activities in the organisation overvie panel\n"
+      },
+      {
+        "header": "invite member",
+        "content": "Work in progress..."
       }
     ]
   },
@@ -29,11 +33,11 @@
       },
       {
         "header": "close/reopen tension",
-        "content": "Tension can closed or reopen at any time by user with **sufficient rights**, when this tension is considered solved. Closed tension won't appear in the Overview activities panel but can still be access in the Tension panel.\n"
+        "content": "Tensions can be closed or reopen at any time by user with **sufficient rights**, when they are considered solved. Closed tension won't appear in the Overview activities panel but can still be access in the Tension panel thanks to the searching filters.\n"
       },
       {
         "header": "Add a comment",
-        "content": "In a tension page, you can add a comment to a tensions in the sub-panel _Conversation_."
+        "content": "In a tension page, you can add a comment to a tension in the sub-panel _Conversation_."
       },
       {
         "header": "Add/remove assignees",

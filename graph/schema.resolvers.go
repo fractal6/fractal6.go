@@ -87,7 +87,8 @@ func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabel
 }
 
 func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
@@ -211,7 +212,7 @@ func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionF
 	return data, errors
 }
 
-func (r *queryResolver) GetLabel(ctx context.Context, id *string, nameid *string) (data *model.Label, errors error) {
+func (r *queryResolver) GetLabel(ctx context.Context, id string) (data *model.Label, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

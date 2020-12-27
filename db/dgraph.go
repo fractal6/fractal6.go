@@ -154,7 +154,7 @@ func initDB() *Dgraph {
         }`,
         // Query existance
         "exists": `{
-            all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) { uid }
+            all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
         }`,
         // Get single object
         "getFieldById": `{
@@ -663,10 +663,13 @@ func (dg Dgraph) GetNodeStats(nameid string) map[string]int {
 }
 
 // Probe if an object exists.
-func (dg Dgraph) Exists(typeName string, fieldName string, value string) (bool, error) {
+func (dg Dgraph) Exists(typeName string, fieldName string, value string, filterName, filterValue *string) (bool, error) {
     // Format Query
     maps := map[string]string{
         "typeName": typeName, "fieldName":fieldName, "value": value,
+    }
+    if filterName != nil {
+        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
     }
     // Send request
     res, err := dg.QueryGpm("exists", maps)

@@ -9,12 +9,20 @@ import (
     . "zerogov/fractal6.go/tools"
 )
 
-// chechUserRight return true if the user has the given correct on the given node
-func checkUserRights(uctx model.UserCtx, nameid string, charac *model.NodeCharac) (bool, error) {
+func GetNodeCharacStrict() model.NodeCharac {
+    return model.NodeCharac{UserCanJoin: false, Mode: model.NodeModeCoordinated}
+}
+
+// chechUserRight return true if the user has access right (e.g. Coordo) on the given node
+func CheckUserRights(uctx model.UserCtx, nameid string, charac *model.NodeCharac) (bool, error) {
     var ok bool = false
     var err error
     uctx, e := auth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }
+
+    // Escape if the user is an owner
+    rootnameid, _ := nid2rootid(nameid)
+    if userIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
     if charac == nil {
         charac, err = db.GetDB().GetNodeCharac("nameid", nameid)
@@ -31,7 +39,7 @@ func checkUserRights(uctx model.UserCtx, nameid string, charac *model.NodeCharac
 }
 
 // Check if the an user owns the given object
-func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
+func CheckUserOwnership(ctx context.Context, uctx model.UserCtx, userField string, userObj interface{}) (bool, error) {
     // Get user ID
     var username string
     var err error
@@ -57,7 +65,7 @@ func checkUserOwnership(ctx context.Context, uctx model.UserCtx, userField strin
 }
 
 // check if the an user has the given role of the given (nested) node
-func checkAssignees(ctx context.Context, uctx model.UserCtx, nodeObj interface{}) (bool, error) {
+func CheckAssignees(ctx context.Context, uctx model.UserCtx, nodeObj interface{}) (bool, error) {
     // Check that nodes are present
     var assignees []interface{}
     var err error
