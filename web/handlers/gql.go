@@ -14,8 +14,8 @@ import (
 // Defining the Graphql handler
 func GraphqlHandler(c map[string]interface{}) http.HandlerFunc {
     introspection := c["introspection"].(bool)
-    //complextityLimit := int(c["complexity_limit"])
     complextityLimit := int(c["complexity_limit"].(int64))
+
 	// NewExecutableSchema and Config are in the generated.go file
 	// Resolver is in the resolver.go file
 	h := handler.GraphQL(

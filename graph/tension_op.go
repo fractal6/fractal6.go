@@ -171,7 +171,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // * else check if User Can Join Organisation
         if tension.Receiver.Charac.UserCanJoin {
             guestid := guestIdCodec(rootid, uctx.Username)
-            ex, e :=  db.GetDB().Exists("Node", "nameid", guestid, nil, nil)
+            ex, e :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
             if e != nil { return ok, e, nameid }
             if ex {
                 err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)

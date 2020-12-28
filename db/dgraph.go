@@ -120,7 +120,7 @@ func initDB() *Dgraph {
         // Count objects
         "count": `{
             all(func: uid("{{.id}}")) {
-                count({{.typeName}}.{{.fieldName}})
+                count({{.fieldName}})
             }
         }`,
         "getNodeStats": `{
@@ -154,7 +154,10 @@ func initDB() *Dgraph {
         }`,
         // Query existance
         "exists": `{
-            all(func: eq({{.typeName}}.{{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
+            all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
+        }`,
+        "getID": `{
+            all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
         }`,
         // Get single object
         "getFieldById": `{
@@ -609,10 +612,10 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
 
 // Count count the number of object in fieldName attribute for given type and id
 // Returns: int or -1 if nothing is found.
-func (dg Dgraph) Count(id string, typeName string, fieldName string) int {
+func (dg Dgraph) Count(id string, fieldName string) int {
     // Format Query
     maps := map[string]string{
-        "id":id, "typeName": typeName, "fieldName":fieldName,
+        "id":id, "fieldName":fieldName,
     }
     // Send request
     res, err := dg.QueryGpm("count", maps)
@@ -663,10 +666,10 @@ func (dg Dgraph) GetNodeStats(nameid string) map[string]int {
 }
 
 // Probe if an object exists.
-func (dg Dgraph) Exists(typeName string, fieldName string, value string, filterName, filterValue *string) (bool, error) {
+func (dg Dgraph) Exists(fieldName string, value string, filterName, filterValue *string) (bool, error) {
     // Format Query
     maps := map[string]string{
-        "typeName": typeName, "fieldName":fieldName, "value": value,
+        "fieldName":fieldName, "value": value,
     }
     if filterName != nil {
         maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
@@ -684,6 +687,34 @@ func (dg Dgraph) Exists(typeName string, fieldName string, value string, filterN
         return false, err
     }
     return len(r.All) > 0, nil
+}
+
+// Returns the uids of the objects if found.
+func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue *string) ([]string, error) {
+    result := []string{}
+    // Format Query
+    maps := map[string]string{
+        "fieldName":fieldName, "value": value,
+    }
+    if filterName != nil {
+        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
+    }
+    // Send request
+    res, err := dg.QueryGpm("getID", maps)
+    if err != nil {
+        return result, err
+    }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil {
+        return result, err
+    }
+    for _, x := range r.All {
+        result = append(result, x["uid"].(string))
+    }
+    return result, nil
 }
 
 // Returns a field from id

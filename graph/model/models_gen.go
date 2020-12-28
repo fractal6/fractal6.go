@@ -61,6 +61,8 @@ type AddLabelInput struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
+	NNodes      *int          `json:"n_nodes,omitempty"`
+	NTensions   *int          `json:"n_tensions,omitempty"`
 }
 
 type AddLabelPayload struct {
@@ -501,11 +503,13 @@ type Label struct {
 	Color       *string    `json:"color,omitempty"`
 	Tensions    []*Tension `json:"tensions,omitempty"`
 	Nodes       []*Node    `json:"nodes,omitempty"`
+	NNodes      *int       `json:"n_nodes,omitempty"`
+	NTensions   *int       `json:"n_tensions,omitempty"`
 }
 
 type LabelFilter struct {
 	ID         []string                          `json:"id,omitempty"`
-	Rootnameid *StringTermFilter                 `json:"rootnameid,omitempty"`
+	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
 	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
 	And        *LabelFilter                      `json:"and,omitempty"`
 	Or         *LabelFilter                      `json:"or,omitempty"`
@@ -525,6 +529,8 @@ type LabelPatch struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
+	NNodes      *int          `json:"n_nodes,omitempty"`
+	NTensions   *int          `json:"n_tensions,omitempty"`
 }
 
 type LabelRef struct {
@@ -535,6 +541,8 @@ type LabelRef struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
+	NNodes      *int          `json:"n_nodes,omitempty"`
+	NTensions   *int          `json:"n_tensions,omitempty"`
 }
 
 type Mandate struct {
@@ -1522,6 +1530,8 @@ const (
 	LabelOrderableName        LabelOrderable = "name"
 	LabelOrderableDescription LabelOrderable = "description"
 	LabelOrderableColor       LabelOrderable = "color"
+	LabelOrderableNNodes      LabelOrderable = "n_nodes"
+	LabelOrderableNTensions   LabelOrderable = "n_tensions"
 )
 
 var AllLabelOrderable = []LabelOrderable{
@@ -1529,11 +1539,13 @@ var AllLabelOrderable = []LabelOrderable{
 	LabelOrderableName,
 	LabelOrderableDescription,
 	LabelOrderableColor,
+	LabelOrderableNNodes,
+	LabelOrderableNTensions,
 }
 
 func (e LabelOrderable) IsValid() bool {
 	switch e {
-	case LabelOrderableRootnameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor:
+	case LabelOrderableRootnameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor, LabelOrderableNNodes, LabelOrderableNTensions:
 		return true
 	}
 	return false

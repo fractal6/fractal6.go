@@ -56,7 +56,7 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
     ok, err := CheckUserRights(uctx, *nid, &charac)
     if err != nil { return nil, LogErr("Internal error", err) }
     if ok {
-        return next(ctx)
+        return data, err
     }
 
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -70,23 +70,64 @@ func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
+    var lid string
+    var isNew bool
     filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    ids := filter["id"].([]interface{})
-    if len(ids) != 1 {
-        return nil, LogErr("Update label error", fmt.Errorf("Only one label supported in input."))
+    if filter["id"] != nil {
+        ids := filter["id"].([]interface{})
+        if len(ids) != 1 {
+            return nil, LogErr("Update label error", fmt.Errorf("Only one label supported in input."))
+        }
+        lid = ids[0].(string)
+    } else { // assumes rootnameid and name are given
+        rootnameid := getNestedObj(filter, "rootnameid.eq").(string)
+        name := getNestedObj(filter, "name.eq").(string)
+        filterName := "Label.rootnameid"
+        ids, err := db.GetDB().GetIDs("Label.name", name, &filterName, &rootnameid)
+        if err != nil { return nil, LogErr("Internal error", err) }
+        lid = ids[0]
+        isNew = true
     }
-    lid := ids[0].(string)
+
     ctx = context.WithValue(ctx, "id", lid)
 
+    // Get input
+    data, err := next(ctx)
+    if err != nil { return nil, err }
+    input := data.(model.UpdateLabelInput)
+
+    // Check rights
+    charac := GetNodeCharacStrict()
     nodes, err := db.GetDB().GetSubFieldById(lid, "Label.nodes", "Node.nameid")
     if err != nil { return nil, LogErr("Internal error", err) }
-    if nodes == nil { return nil, LogErr("Access denied", fmt.Errorf("You do not own this ressource.")) }
-    fmt.Println(nodes)
-    charac := GetNodeCharacStrict()
+
+    // Add label a in a  Circle
+    if isNew {
+        // Similar than AddLabel
+        if len(input.Set.Nodes) != 1 { return nil, LogErr("Input error", fmt.Errorf("One circle required.")) }
+        nid := input.Set.Nodes[0].Nameid
+        ok, err := CheckUserRights(uctx, *nid, &charac)
+        if err != nil { return nil, LogErr("Internal error", err) }
+        if ok {
+            return data, err
+        }
+
+    } else if nodes == nil {
+        return nil, LogErr("Access denied", fmt.Errorf("You do not own this ressource."))
+    }
+
+    // Update label
     for _, nid := range nodes.([]interface{}) {
         ok, err := CheckUserRights(uctx, nid.(string), &charac)
         if err != nil { return nil, LogErr("Internal error", err) }
-        if ok { return next(ctx) }
+        if ok {
+            if obj.(model.JsonAtom)["input"].(model.JsonAtom)["remove"] != nil {
+                // user is removing node
+                fmt.Println("remove label here !!! check if removed from tension")
+            }
+            //return data, err
+            return next(ctx)
+        }
     }
 
     return nil, LogErr("Access denied", fmt.Errorf("You do not own this ressource."))

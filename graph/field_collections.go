@@ -1,8 +1,9 @@
 package graph
 
 import (
-  "context"
-  "github.com/99designs/gqlgen/graphql"
+    //"fmt"
+    "context"
+    "github.com/99designs/gqlgen/graphql"
 )
 
 func GetPreloads(ctx context.Context) []string {
@@ -18,7 +19,7 @@ func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedFi
     //fmt.Println(ctx.OperationName) // user define name of operation
     //fmt.Println(ctx.Operation.Operation) // query|mutation|etc
     // @DEBUG: empty see: https://github.com/99designs/gqlgen/issues/1144
-    //fmt.Println("variables ->", ctx.Variables, len(ctx.Variables)==0)
+    //fmt.Println("variables -> ", ctx.Variables, len(ctx.Variables)==0)
   }
   for _, column := range fields {
     //prefixColumn := GetPreloadString(prefix, column.Name)

@@ -142,7 +142,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             for _, f := range GetPreloads(ctx) { if f == "isPrivate" {fok = true; break } }
             if !fok {
                 // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
+                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required."))
             }
             var nameid string
             rc := graphql.GetResolverContext(ctx)
@@ -161,7 +161,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             for _, f := range GetPreloads(ctx) { if f == "isPrivate" {fok = true; break } }
             if !fok {
                 // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required for this request."))
+                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required."))
             }
             // Validate
             for _, node := range(v) {
@@ -178,7 +178,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             for _, f := range GetPreloads(ctx) { if f == "id" {fok = true; break } }
             if !fok {
                 // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required for this request."))
+                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required."))
             }
             if v.Receiver == nil {
                 nameid_, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.nameid")
@@ -199,7 +199,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             for _, f := range GetPreloads(ctx) { if f == "id" {fok = true; break } }
             if !fok {
                 // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required for this request."))
+                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required."))
             }
             for _, tension := range(v) {
                 if tension.Receiver == nil {
@@ -235,7 +235,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
     var err error
 
     if nameid == "" {
-        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required for this request."))
+        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required."))
     } else {
         // Get the public status of the node
         //isPrivate, err :=  db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isPrivate")
@@ -283,7 +283,7 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
         return nil, err
     }
     typeName := ToTypeName(reflect.TypeOf(obj).String())
-    v := db.GetDB().Count(id, typeName, field)
+    v := db.GetDB().Count(id, typeName+"."+field)
     if v >= 0 {
         reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
     }
@@ -321,36 +321,55 @@ func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (
 //
 
 // Check uniqueness (@DEBUG follow @unique dgraph field iplementation)
-// @Debug: only supert Label right now (ch
 func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field string, subfield *string) (interface{}, error) {
-    v := obj.(model.JsonAtom)[field].(string)
-    id := ctx.Value("id")
-    if id == nil {
-        return nil, fmt.Errorf("id field is required for @unique directive.")
+    data, err := next(ctx)
+    var v string
+    switch d := data.(type) {
+    case *string:
+        v = *d
+    case string:
+        v = d
     }
+    // @Debug: only supert Label right now (ch
+    // get the type asked automatically...
     t := "Label"
+    fieldName := t + "." + field
+    id := ctx.Value("id")
     if subfield != nil {
         filterName := t + "." + *subfield
-        s, err := db.GetDB().GetFieldById(id.(string), filterName)
-        if err != nil || s == nil { return nil, LogErr("Internal error", err) }
+        s := obj.(model.JsonAtom)[*subfield]
+        if s != nil {
+            //pass
+        } else if id != nil {
+            s, err = db.GetDB().GetFieldById(id.(string), filterName)
+            if err != nil || s == nil { return nil, LogErr("Internal error", err) }
+        } else {
+            return nil, LogErr("Value Error", fmt.Errorf("%s or id is required.", *subfield))
+        }
         filterValue := s.(string)
-        ex, err :=  db.GetDB().Exists(t, field, v, &filterName, &filterValue)
+        ex, err :=  db.GetDB().Exists(fieldName, v, &filterName, &filterValue)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ex {
-            return next(ctx)
+            return data, err
         }
     } else {
         return nil, fmt.Errorf("@unique alone not implemented.")
     }
 
-    return nil, LogErr("Duplicate error", fmt.Errorf("duplicate label found"))
-
+    return data, LogErr("Duplicate error", fmt.Errorf("%s is already taken", field))
 }
 
 func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
     data, err := next(ctx)
-    v := strings.ToLower(*(data.(*string)))
-    return &v, err
+    switch d := data.(type) {
+    case *string:
+        v := strings.ToLower(*d)
+        return &v, err
+    case string:
+        v := strings.ToLower(d)
+        return v, err
+    }
+    return nil, fmt.Errorf("Type unknwown")
 }
 
 func inputMinLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, min int) (interface{}, error) {
@@ -573,10 +592,12 @@ func getNestedObj(obj interface {}, field string) interface{} {
     source =  obj.(model.JsonAtom)
     fields := strings.Split(field, ".")
 
-    for _, f := range fields {
+    for i, f := range fields {
         target = source[f]
         if target == nil { return nil }
-        source = target.(model.JsonAtom)
+        if i < len(fields) -1 {
+            source = target.(model.JsonAtom)
+        }
     }
 
     return target

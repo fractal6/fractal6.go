@@ -20,8 +20,7 @@ func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeIn
 }
 
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilter) (data *model.DeleteNodePayload, errors error) {
@@ -83,7 +82,8 @@ func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.Tensi
 }
 
 func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {

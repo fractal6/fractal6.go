@@ -251,6 +251,8 @@ type ComplexityRoot struct {
 		Color       func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
+		NNodes      func(childComplexity int) int
+		NTensions   func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Nodes       func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		Rootnameid  func(childComplexity int) int
@@ -1339,6 +1341,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Label.ID(childComplexity), true
+
+	case "Label.n_nodes":
+		if e.complexity.Label.NNodes == nil {
+			break
+		}
+
+		return e.complexity.Label.NNodes(childComplexity), true
+
+	case "Label.n_tensions":
+		if e.complexity.Label.NTensions == nil {
+			break
+		}
+
+		return e.complexity.Label.NTensions(childComplexity), true
 
 	case "Label.name":
 		if e.complexity.Label.Name == nil {
@@ -3405,12 +3421,14 @@ type Tension @hidePrivate {
 
 type Label {
   id: ID!
-  rootnameid: String! @search
+  rootnameid: String! @search(by: [hash])
   name: String! @search(by: [hash, term])
   description: String
   color: String
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
+  n_nodes: Int @count(f: nodes)
+  n_tensions: Int @count(f: tensions)
 }
 
 type Comment {
@@ -3580,23 +3598,23 @@ enum BlobType {
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
-
 directive @withSubscription on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
+directive @id on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3646,11 +3664,13 @@ type AddEventPayload {
 
 input AddLabelInput {
   rootnameid: String!
-  name: String! @alter_toLower(f:"name") @alter_unique(f:"name", s:"rootnameid")
+  name: String! @alter_toLower(f:"name") @alter_unique(f:"name", s:"rootnameid") @alter_minLength(f:"name", n:1)
   description: String @alter_maxLength(f:"description", n:280)
   color: String
-  tensions: [TensionRef!]
+  tensions: [TensionRef!] @alter_RO
   nodes: [NodeRef!]
+  n_nodes: Int
+  n_tensions: Int
 }
 
 type AddLabelPayload {
@@ -4102,7 +4122,7 @@ input IntFilter {
 
 input LabelFilter {
   id: [ID!]
-  rootnameid: StringTermFilter
+  rootnameid: StringHashFilter
   name: StringHashFilter_StringTermFilter
   and: LabelFilter
   or: LabelFilter
@@ -4120,15 +4140,19 @@ enum LabelOrderable {
   name
   description
   color
+  n_nodes
+  n_tensions
 }
 
 input LabelPatch {
   rootnameid: String @patch_RO
-  name: String @alter_toLower(f:"name") @alter_unique(f:"name", s:"rootnameid")
+  name: String @alter_toLower(f:"name") @alter_unique(f:"name", s:"rootnameid") @alter_minLength(f:"name", n:1)
   description: String @alter_maxLength(f:"description", n:280)
   color: String
-  tensions: [TensionRef!]
+  tensions: [TensionRef!] @alter_RO
   nodes: [NodeRef!]
+  n_nodes: Int
+  n_tensions: Int
 }
 
 input LabelRef {
@@ -4139,6 +4163,8 @@ input LabelRef {
   color: String
   tensions: [TensionRef!]
   nodes: [NodeRef!]
+  n_nodes: Int
+  n_tensions: Int
 }
 
 input MandateFilter {
@@ -11591,10 +11617,14 @@ func (ec *executionContext) _Label_rootnameid(ctx context.Context, field graphql
 			return obj.Rootnameid, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
+			if err != nil {
+				return nil, err
+			}
 			if ec.directives.Search == nil {
 				return nil, errors.New("directive search is not implemented")
 			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
+			return ec.directives.Search(ctx, obj, directive0, by)
 		}
 
 		tmp, err := directive1(rctx)
@@ -11860,6 +11890,110 @@ func (ec *executionContext) _Label_nodes(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*model.Node)
 	fc.Result = res
 	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Label_n_nodes(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Label",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.NNodes, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "nodes")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Count == nil {
+				return nil, errors.New("directive count is not implemented")
+			}
+			return ec.directives.Count(ctx, obj, directive0, f)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*int); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Label_n_tensions(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Label",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.NTensions, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "tensions")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Count == nil {
+				return nil, errors.New("directive count is not implemented")
+			}
+			return ec.directives.Count(ctx, obj, directive0, f)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*int); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mandate_id(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
@@ -20482,8 +20616,22 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 				}
 				return ec.directives.Alter_unique(ctx, obj, directive1, f, s)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "name")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalNInt2int(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_minLength == nil {
+					return nil, errors.New("directive alter_minLength is not implemented")
+				}
+				return ec.directives.Alter_minLength(ctx, obj, directive2, f, n)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -20529,13 +20677,40 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 			}
 		case "tensions":
 			var err error
-			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.Tensions = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
 			}
 		case "nodes":
 			var err error
 			it.Nodes, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_nodes":
+			var err error
+			it.NNodes, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_tensions":
+			var err error
+			it.NTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22700,7 +22875,7 @@ func (ec *executionContext) unmarshalInputLabelFilter(ctx context.Context, obj i
 			}
 		case "rootnameid":
 			var err error
-			it.Rootnameid, err = ec.unmarshalOStringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22818,8 +22993,22 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				}
 				return ec.directives.Alter_unique(ctx, obj, directive1, f, s)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "name")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalNInt2int(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_minLength == nil {
+					return nil, errors.New("directive alter_minLength is not implemented")
+				}
+				return ec.directives.Alter_minLength(ctx, obj, directive2, f, n)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, err
 			}
@@ -22867,13 +23056,40 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 			}
 		case "tensions":
 			var err error
-			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, err
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.Tensions = data
+			} else {
+				return it, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
 			}
 		case "nodes":
 			var err error
 			it.Nodes, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_nodes":
+			var err error
+			it.NNodes, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_tensions":
+			var err error
+			it.NTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22928,6 +23144,18 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 		case "nodes":
 			var err error
 			it.Nodes, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_nodes":
+			var err error
+			it.NNodes, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_tensions":
+			var err error
+			it.NTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -27485,6 +27713,10 @@ func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Label_tensions(ctx, field, obj)
 		case "nodes":
 			out.Values[i] = ec._Label_nodes(ctx, field, obj)
+		case "n_nodes":
+			out.Values[i] = ec._Label_n_nodes(ctx, field, obj)
+		case "n_tensions":
+			out.Values[i] = ec._Label_n_tensions(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
