@@ -135,6 +135,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     data, err := next(ctx)
     if obj == nil {
         switch v := data.(type) {
+
         // Get Node
         case *model.Node:
             if v == nil { break }
@@ -155,6 +156,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             isPrivate = v.IsPrivate
             yes, err = isHidePrivate(ctx, nameid, isPrivate)
             if err != nil { return nil, err }
+
         // Query Nodes
         case []*model.Node:
             // Check fields
@@ -171,6 +173,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 if err != nil { return nil, err }
                 if yes { break }
             }
+
          // Get Tension
         case *model.Tension:
             if v == nil { break }
@@ -193,6 +196,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             isPrivate = isPrivate_.(bool)
             yes, err = isHidePrivate(ctx, nameid, isPrivate)
             if err != nil { return nil, err }
+
         // Query Tensions
         case []*model.Tension:
             // Check fields
@@ -217,6 +221,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 if err != nil { return nil, err }
                 if yes { break }
             }
+
         default:
             panic("@isPrivate: node type unknonwn: " + fmt.Sprintf("%T", v))
         }

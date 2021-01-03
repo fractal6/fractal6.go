@@ -3570,8 +3570,8 @@ enum TensionEvent {
   CommentPushed
   AssigneeAdded
   AssigneeRemoved
-
-
+  LabelAdded
+  LabelRemoved
 
 
 
@@ -3596,19 +3596,19 @@ enum BlobType {
 
 }
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
+directive @withSubscription on OBJECT|INTERFACE
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 

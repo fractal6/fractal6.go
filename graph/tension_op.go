@@ -158,6 +158,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         ok, err = LeaveRole(uctx, tension, node)
     } else if *event.EventType == model.TensionEventUserJoin {
         // Only root node can be join
+        // --
         rootid, e := nid2rootid(*event.New)
         if e != nil { return ok, e, nameid }
         if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")), nameid}
