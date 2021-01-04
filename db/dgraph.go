@@ -694,7 +694,7 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
     result := []string{}
     // Format Query
     maps := map[string]string{
-        "fieldName":fieldName, "value": value,
+        "fieldName":fieldName, "value": value, "filter": "",
     }
     if filterName != nil {
         maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
