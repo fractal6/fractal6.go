@@ -88,6 +88,7 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
         token, err = tkMaster.issue(userCtx, time.Hour*24*30)
     } else {
         token, err = tkMaster.issue(userCtx, time.Hour*12)
+        //token, err = tkMaster.issue(userCtx, time.Second*30)
     }
     return token, err
 }

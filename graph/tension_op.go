@@ -48,6 +48,7 @@ func tensionEventHook(uctx model.UserCtx, tid string, events []*model.EventRef, 
                // Break after the first hooked event
                break
            }
+        // else ... notify center
     }
 
     return ok, err

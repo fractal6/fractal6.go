@@ -65,7 +65,7 @@ _add_omitempty:
 # Generate Data
 #
 
-build_doc: $(LANGS)
+docs: $(LANGS)
 
 $(LANGS):
 	wildq -M -i toml -o json '.[] | {name:.name, tasks:.tasks[]|flatten }' ../doc/doc.$@.toml > data/quickdoc.$@.json_

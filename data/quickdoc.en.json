@@ -42,6 +42,10 @@
       {
         "header": "Add/remove assignees",
         "content": "In a tension page, you can add/remove assigness by clicking on the assignees button on the right panel."
+      },
+      {
+        "header": "Add/remove assignees",
+        "content": "In a tension page, you can add/remove labels by clicking on the labels button on the right panel.\n\nYou can also add labels when creating a tension with the labels button at the bottom of the page.\n"
       }
     ]
   },
