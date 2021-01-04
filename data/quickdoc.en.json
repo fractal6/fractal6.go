@@ -4,7 +4,7 @@
     "tasks": [
       {
         "header": "definitions",
-        "content": "**Organisation** (fractal): group of humans sharing a common purpose (the root circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member user.  \n\n**Circle**: a set of roles and sub-circles (team, group etc).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/ressources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: distance between where you are and where you want to be. A tension can be used for example to share and manage tasks, issues or ideas. A tension, like an email, has an emitter and a receiver (a role or a circle).\nThere is three main categories of tension:\n* Internal (or governance): concerning the structure of the organisation its mandates etc.\n* external (or operational): concerns actions carried out by the organisation\n* Mutual aid (or Help): for help requests, questions or clarifications.\n"
+        "content": "**Organisation** (fractal): group of humans sharing a common purpose (the root circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member user.  \n\n**Circle**: a set of roles and sub-circles (team, group etc).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: distance between where you are and where you want to be. A tension can be used for example to share and manage tasks, issues or ideas. A tension, like an email, has an emitter and a receiver (a role or a circle).\nThere is three main categories of tension:\n* Internal (or governance): concerning the structure of the organisation its mandates etc.\n* external (or operational): concerns actions carried out by the organisation\n* Mutual aid (or Help): for help requests, questions or clarifications.\n"
       },
       {
         "header": "create organisation",
@@ -16,7 +16,11 @@
       },
       {
         "header": "organisation navigation",
-        "content": "On the organisation overview or map, you can navigate in your organisation by clicking a role or circle. The **focus** will change as well as:\n* the organisation path in the header of the page indicationg your localisation\n* the mandate in the organisation overview panel\n* the recent activities in the organisation overvie panel\n"
+        "content": "On the organisation overview or map, you can navigate in your organisation by clicking a role or circle. The **focus** will change as well as:\n* the organisation path in the header of the page indicating your localisation\n* the mandate in the organisation overview panel\n* the recent activities in the organisation overview panel\n"
+      },
+      {
+        "header": "Create and edit labels",
+        "content": "In the settings panel, the labels menu allow you to create, edit and remove labels.\n\nNote that labels are defined at the circle level. The labels that can be attach to a tension are the ones that belongs of its receiver, plus all the labels defined at an upper level. In other words, child circle inherit the labels of their parents.\n"
       },
       {
         "header": "invite member",
@@ -41,10 +45,10 @@
       },
       {
         "header": "Add/remove assignees",
-        "content": "In a tension page, you can add/remove assigness by clicking on the assignees button on the right panel."
+        "content": "In a tension page, you can add/remove assignees by clicking on the assignees button on the right panel."
       },
       {
-        "header": "Add/remove assignees",
+        "header": "Add/remove labels",
         "content": "In a tension page, you can add/remove labels by clicking on the labels button on the right panel.\n\nYou can also add labels when creating a tension with the labels button at the bottom of the page.\n"
       }
     ]
