@@ -110,6 +110,9 @@ func RunServer() {
         })
     })
 
+    // Notifications endpoint
+    r.Post("/notifications", handle6.Notifications)
+
     // Graphql API
     r.Post("/api", handle6.GraphqlHandler(gqlConfig))
 
