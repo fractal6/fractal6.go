@@ -52,9 +52,37 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    // Get sub children
+    // Get sub members
     DB := db.GetDB()
     data, err := DB.GetAllMembers("nameid", q)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}
+
+func SubLabels(w http.ResponseWriter, r *http.Request) {
+	var q string
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get sub labels
+    DB := db.GetDB()
+    data, err := DB.GetAllLabels("nameid", q)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return

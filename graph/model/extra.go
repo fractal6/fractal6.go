@@ -43,6 +43,14 @@ type User_ struct {
     Name *string    `json:"name,omitempty"`
 }
 
+type LabelFull struct {
+    ID string `json:"id"`
+    Name string    `json:"name,omitempty"`
+    Color *string    `json:"color,omitempty"`
+    Description *string    `json:"description,omitempty"`
+    NNodes *int    `json:"n_nodes,omitempty"`
+}
+
 var TensionHookPayload string = `{
   uid
   Tension.action

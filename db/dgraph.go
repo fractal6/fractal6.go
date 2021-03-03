@@ -259,6 +259,23 @@ func initDB() *Dgraph {
                 Node.isPrivate
             }
         }`,
+        "getAllLabels": `{
+            var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+                o as Node.children
+            }
+
+            labels(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
+                l as Node.labels
+            }
+
+            all(func: uid(l)){
+                uid
+                Label.name
+                Label.color
+                Label.description
+                n_nodes: count(Label.nodes)
+            }
+        }`,
         "getCoordos": `{
             all(func: eq(Node.nameid, "{{.nameid}}")) {
                 Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
@@ -1055,7 +1072,6 @@ func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error)
     return &obj, err
 }
 
-
 // Get all sub children
 func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, error) {
     // Format Query
@@ -1073,6 +1089,74 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
     if err != nil { return nil, err }
 
     var data []model.NodeId
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    return data, err
+}
+
+// Get all sub members
+func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid": fieldid,
+        "objid": objid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getAllMembers", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []model.MemberNode
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    return data, err
+}
+
+// Get all sub labels
+func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.LabelFull, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid": fieldid,
+        "objid": objid,
+    }
+    // Send request
+    res, err := dg.QueryGpm("getAllLabels", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []model.LabelFull
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1121,39 +1205,6 @@ func (dg Dgraph) GetLastBlobId(tid string) (*string) {
     }
 
     return &bid
-}
-// Get all sub children
-func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode, error) {
-    // Format Query
-    maps := map[string]string{
-        "fieldid": fieldid,
-        "objid": objid,
-    }
-    // Send request
-    res, err := dg.QueryGpm("getAllMembers", maps)
-    if err != nil { return nil, err }
-
-    // Decode response
-    var r GpmResp
-    err = json.Unmarshal(res.Json, &r)
-    if err != nil { return nil, err }
-
-    var data []model.MemberNode
-    config := &mapstructure.DecoderConfig{
-        Result: &data,
-        TagName: "json",
-        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-            if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
-                return nv, nil
-            }
-            return v, nil
-        },
-    }
-    decoder, err := mapstructure.NewDecoder(config)
-    if err != nil { return nil, err }
-    err = decoder.Decode(r.All)
-    return data, err
 }
 
 // Get all coordo roles

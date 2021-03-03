@@ -107,6 +107,7 @@ func RunServer() {
             // query
             r.Post("/sub_children", handle6.SubChildren)
             r.Post("/sub_members", handle6.SubMembers)
+            r.Post("/sub_labels", handle6.SubLabels)
         })
     })
 
