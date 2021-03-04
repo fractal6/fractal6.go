@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	"zerogov/fractal6.go/graph/generated"
 	"zerogov/fractal6.go/graph/model"
 )

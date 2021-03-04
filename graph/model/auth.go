@@ -1,10 +1,8 @@
 package model
 
-
 //
 // Data Form
 //
-
 
 // UserCreds are data sink/form for login request
 type UserCreds struct {

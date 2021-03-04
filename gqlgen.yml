@@ -22,6 +22,7 @@ resolver:
   layout: follow-schema
   dir: graph
   package: graph
+  filename_template: "{name}.resolvers.go"
 
 # Optional: turn on to use []Thing instead of []*Thing
 #omit_slice_element_pointers: true

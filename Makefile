@@ -45,21 +45,14 @@ schema_all:
 	make schema_all # Do alter Dgraph
 	cd -
 
-gen: #_named_returns_resolver _add_omitempty
+gen:
 	go run ./scripts/gqlgen.go && \
 		sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go && \
+		# Don't add omitempty for boolean field has it get remove if set to false!
 		sed -i  '/bool /I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
 	# Or @DEBUG: why it doesnt work anymore ?
 	#go generate ./...
 	# go run github.com/99designs/gqlgen generate
-
-_named_returns_resolver:
-	sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go
-
-_add_omitempty:
-	# Don't add omitempty for boolean field has it get remove if set to false!
-	sed -i  '/bool /I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
-
 
 #
 # Generate Data
