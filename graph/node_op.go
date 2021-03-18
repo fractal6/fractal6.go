@@ -6,7 +6,8 @@ import (
     "strings"
 
     "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/web/auth"
+    "zerogov/fractal6.go/graph/codec"
+    webauth "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/text/en"
     . "zerogov/fractal6.go/tools"
@@ -14,7 +15,7 @@ import (
 
 // tryAddNode add a new node is user has the correct right
 // * it inherits node charac
-func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
+func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
     //tid := tension.ID
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
@@ -30,7 +31,7 @@ func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
     }
 
     // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, true)
@@ -40,13 +41,13 @@ func TryAddNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFrag
     return ok, err
 }
 
-func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
+func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
     // Get References
-    _, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
@@ -56,12 +57,12 @@ func TryUpdateNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeF
     return ok, err
 }
 
-func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
     // Get References
-    rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
@@ -86,12 +87,12 @@ func TryArchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.Node
     err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isArchived", strconv.FormatBool(true))
     return ok, err
 }
-func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
     // Get References
-    rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
@@ -116,7 +117,7 @@ func TryUnarchiveNode(uctx model.UserCtx, tension *model.Tension, node *model.No
 }
 
 // canAddNode check that a user can add a given role or circle in an organisation.
-func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, isNew bool) (bool, error) {
+func CanAddNode(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, isNew bool) (bool, error) {
     var ok bool = false
     var err error
 
@@ -124,10 +125,10 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
     nodeType := *node.Type
     roleType := node.RoleType
 
-    rootnameid, _ := nid2rootid(nameid)
-    err = auth.ValidateNameid(nameid, rootnameid)
+    rootnameid, _ := codec.Nid2rootid(nameid)
+    err = webauth.ValidateNameid(nameid, rootnameid)
     if err != nil { return ok, err }
-    err = auth.ValidateName(name)
+    err = webauth.ValidateName(name)
     if err != nil { return ok, err }
 
     // RoleType Hook
@@ -165,8 +166,8 @@ func CanAddNode(uctx model.UserCtx, node *model.NodeFragment, nameid, parentid s
 // pushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
-func PushNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
-    rootnameid, _ := nid2rootid(nameid)
+func PushNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
+    rootnameid, _ := codec.Nid2rootid(nameid)
 
     // Map NodeFragment to Node Input
     var nodeInput model.AddNodeInput
@@ -228,7 +229,7 @@ func PushNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitter
 
 // updateNode update a node from the given fragment
 // @DEBUG: only set the field that have been modified in NodePatch
-func UpdateNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
+func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
     // Map NodeFragment to Node Patch Input
     var nodePatch model.NodePatch
     delMap := make(map[string]interface{}, 2)
@@ -266,11 +267,11 @@ func UpdateNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitt
     err = db.GetDB().Update("node", nodeInput)
     if err != nil { return err }
 
-    rootnameid, _ := nid2rootid(nameid)
+    rootnameid, _ := codec.Nid2rootid(nameid)
     if len(delMap) > 0 { // delete the node reference
         //err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap) // that do not delete the reverse edge (User.roles)
         if firstLink_ != nil {
-            err = auth.RemoveUserRole(firstLink_.(string), nameid)
+            err = webauth.RemoveUserRole(firstLink_.(string), nameid)
             if err != nil { return err }
             err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
         }
@@ -278,7 +279,7 @@ func UpdateNode(uctx model.UserCtx, bid *string, node *model.NodeFragment, emitt
     } else if node.FirstLink != nil  {
         // @debug: if the firstlink user has already this role,
         //         the update is useless
-        err = auth.AddUserRole(*node.FirstLink, nameid)
+        err = webauth.AddUserRole(*node.FirstLink, nameid)
         if err != nil { return err }
         err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
         if err != nil { return err }
@@ -316,7 +317,7 @@ func makeNewChild(i int, username string, parentid string, roleType model.RoleTy
     return child
 }
 
-func makeNewChildTension(uctx model.UserCtx, emitterid string, receiverid string, child model.NodeFragment) model.AddTensionInput {
+func makeNewChildTension(uctx *model.UserCtx, emitterid string, receiverid string, child model.NodeFragment) model.AddTensionInput {
     now := Now()
     createdBy := model.UserRef{Username: &uctx.Username}
     emitter := model.NodeRef{Nameid: &emitterid}
@@ -359,7 +360,7 @@ func makeNewChildTension(uctx model.UserCtx, emitterid string, receiverid string
     return tension
 }
 
-func MakeNewRootTension(uctx model.UserCtx, rootnameid string, node model.AddNodeInput) model.AddTensionInput {
+func MakeNewRootTension(uctx *model.UserCtx, rootnameid string, node model.AddNodeInput) model.AddTensionInput {
     now := Now()
     createdBy := *node.CreatedBy
     emitter := model.NodeRef{Nameid: &rootnameid}
@@ -400,39 +401,6 @@ func MakeNewRootTension(uctx model.UserCtx, rootnameid string, node model.AddNod
         Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil }},
     }
     return tension
-}
-
-
-// maybeUpdateMembership check try to toggle user membership to Guest or Member
-func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
-    var uctxFs *model.UserCtx
-    var err error
-    var i int
-    DB := db.GetDB()
-    uctxFs, err = DB.GetUser("username", username)
-    if err != nil { return err }
-
-    // Don't touch owner state
-    if userIsOwner(*uctxFs, rootnameid) >= 0 { return nil }
-
-    // Update RoleType to Guest
-    roles := getRoles(*uctxFs, rootnameid)
-    if rt == model.RoleTypeGuest && len(roles) == 1  {
-        err := DB.UpgradeMember(roles[0].Nameid, model.RoleTypeGuest)
-        if err != nil { return err }
-        return nil
-    }
-
-    // Update RoleType to Member
-    i = userIsGuest(*uctxFs, rootnameid)
-    if rt == model.RoleTypeMember && i >= 0 {
-        // Update RoleType to Member
-        err := DB.UpgradeMember(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
-        if err != nil { return err }
-        return nil
-    }
-
-    return nil
 }
 
 //

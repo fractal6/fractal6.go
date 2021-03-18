@@ -4,6 +4,8 @@ import (
     "fmt"
 
     "zerogov/fractal6.go/graph/model"
+    "zerogov/fractal6.go/graph/codec"
+    "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
     . "zerogov/fractal6.go/tools"
 )
@@ -25,7 +27,7 @@ import (
 //    * upgrade user membership
 // Note: @Debug: Only one BlobPushed will be processed
 // Note: @Debug: remove added tension on error ?
-func tensionEventHook(uctx model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, error) {
+func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, error) {
     var ok bool = true
     var err error
     var nameid string
@@ -40,7 +42,7 @@ func tensionEventHook(uctx model.UserCtx, tid string, events []*model.EventRef, 
                if ok && err == nil {
                    // Set the Update time into the target node
                    err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
-                   pid, _ := nid2pid(nameid) // @debug: real parent needed here (ie event for circle)
+                   pid, _ := codec.Nid2pid(nameid) // @debug: real parent needed here (ie event for circle)
                    if pid != nameid && err == nil {
                        err = db.GetDB().SetFieldByEq("Node.nameid", pid, "Node.updatedAt", Now())
                    }
@@ -55,7 +57,7 @@ func tensionEventHook(uctx model.UserCtx, tid string, events []*model.EventRef, 
 }
 
 // Add, Update or Archived a Node
-func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error, string) {
+func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error, string) {
     var nameid string
     // Get Tension, target Node and blob charac (last if bid undefined)
     tension, err := db.GetDB().GetTensionHook(tid, bid)
@@ -68,7 +70,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     bid = &blob.ID
 
     // Extract Tension characteristic
-    tensionCharac, err:= TensionCharac{}.New(*tension.Action)
+    tensionCharac, err:= codec.TensionCharac{}.New(*tension.Action)
     if err != nil { return false, LogErr("internal error", err), nameid }
 
     var ok bool
@@ -76,7 +78,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
 
     // Nameid Codec
     if node != nil && node.Nameid != nil {
-        _, nameid, err = nodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
+        _, nameid, err = codec.NodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
     }
 
     if *event.EventType == model.TensionEventBlobPushed {
@@ -85,24 +87,24 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
         // 2. swith on TensionCharac.ActionType to add update etc...
         switch tensionCharac.ActionType {
-        case NewAction:
+        case codec.NewAction:
             // First time a blob is pushed.
             switch tensionCharac.DocType {
-            case NodeDoc:
+            case codec.NodeDoc:
                 ok, err = TryAddNode(uctx, tension, node, bid)
-            case MdDoc:
+            case codec.MdDoc:
                 md := blob.Md
                 ok, err = TryAddDoc(uctx, tension, md)
             }
-        case EditAction:
+        case codec.EditAction:
             switch tensionCharac.DocType {
-            case NodeDoc:
+            case codec.NodeDoc:
                 ok, err = TryUpdateNode(uctx, tension, node, bid)
-            case MdDoc:
+            case codec.MdDoc:
                 md := blob.Md
                 ok, err = TryUpdateDoc(uctx, tension, md)
             }
-        case ArchiveAction:
+        case codec.ArchiveAction:
             err = LogErr("Access denied", fmt.Errorf("Cannot publish archived document."))
         }
 
@@ -114,9 +116,9 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // Archived Node
         // --
         switch tensionCharac.DocType {
-        case NodeDoc:
+        case codec.NodeDoc:
             ok, err = TryArchiveNode(uctx, tension, node)
-        case MdDoc:
+        case codec.MdDoc:
             md := blob.Md
             ok, err = TryArchiveDoc(uctx, tension, md)
         }
@@ -129,9 +131,9 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // Unarchived Node
         // --
         switch tensionCharac.DocType {
-        case NodeDoc:
+        case codec.NodeDoc:
             ok, err = TryUnarchiveNode(uctx, tension, node)
-        case MdDoc:
+        case codec.MdDoc:
             md := blob.Md
             ok, err = TryUnarchiveDoc(uctx, tension, md)
         }
@@ -144,9 +146,9 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // Remove user reference
         // --
         if model.RoleType(*event.Old) == model.RoleTypeGuest {
-            rootid, e := nid2rootid(*event.New)
+            rootid, e := codec.Nid2rootid(*event.New)
             if e != nil { return ok, e, nameid }
-            i := userIsGuest(uctx, rootid)
+            i := auth.UserIsGuest(uctx, rootid)
             if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")), nameid}
             var nf model.NodeFragment
             var t model.NodeType = model.NodeTypeRole
@@ -160,10 +162,10 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
     } else if *event.EventType == model.TensionEventUserJoin {
         // Only root node can be join
         // --
-        rootid, e := nid2rootid(*event.New)
+        rootid, e := codec.Nid2rootid(*event.New)
         if e != nil { return ok, e, nameid }
         if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")), nameid}
-        i := userIsMember(uctx, rootid)
+        i := auth.UserIsMember(uctx, rootid)
         if i>=0 {return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation.")), nameid}
 
         // Validate
@@ -172,7 +174,7 @@ func processTensionEventHook(uctx model.UserCtx, event *model.EventRef, tid stri
         // * orga invtation ? <> user invitation hash ?
         // * else check if User Can Join Organisation
         if tension.Receiver.Charac.UserCanJoin {
-            guestid := guestIdCodec(rootid, uctx.Username)
+            guestid := codec.GuestIdCodec(rootid, uctx.Username)
             ex, e :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
             if e != nil { return ok, e, nameid }
             if ex {

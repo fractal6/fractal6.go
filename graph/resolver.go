@@ -12,10 +12,12 @@ import (
     "strings"
     "github.com/99designs/gqlgen/graphql"
 
-    . "zerogov/fractal6.go/tools"
-    "zerogov/fractal6.go/db"
-    "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/graph/model"
+    "zerogov/fractal6.go/graph/codec"
+    "zerogov/fractal6.go/graph/auth"
+    "zerogov/fractal6.go/db"
+    . "zerogov/fractal6.go/tools"
+    webauth "zerogov/fractal6.go/web/auth"
     gen "zerogov/fractal6.go/graph/generated"
 )
 
@@ -174,49 +176,47 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 if yes { break }
             }
 
-         // Get Tension
+        // Get Tension
         case *model.Tension:
+            var startField bool
+            var inField bool
             if v == nil { break }
             // Check fields
-            for _, f := range GetPreloads(ctx) { if f == "id" {fok = true; break } }
+            for _, f := range GetPreloads(ctx) {
+                if f == "receiver" { startField = true }
+                if startField && string(f[0]) == "{" { inField = true } // ignore filter etc...
+                if inField && f == "isPrivate" { fok = true; break}
+                if inField && string(f[0]) == "}"  { inField = false }
+            }
             if !fok {
                 // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required."))
-            }
-            if v.Receiver == nil {
-                nameid_, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.nameid")
-                if err != nil { return nil, err }
-                nameid = nameid_.(string)
-            } else {
-                nameid = v.Receiver.Nameid
+                return nil, LogErr("Access denied", fmt.Errorf("`receiver.isPrivate' field is required."))
             }
             // validate
-            isPrivate_, err := db.GetDB().GetSubFieldById(v.ID, "Tension.receiver", "Node.isPrivate")
-            if err != nil { return nil, err }
-            isPrivate = isPrivate_.(bool)
+            nameid = v.Receiver.Nameid
+            isPrivate = v.Receiver.IsPrivate
             yes, err = isHidePrivate(ctx, nameid, isPrivate)
             if err != nil { return nil, err }
 
         // Query Tensions
         case []*model.Tension:
+            var startField bool
+            var inField bool
             // Check fields
-            for _, f := range GetPreloads(ctx) { if f == "id" {fok = true; break } }
+            for _, f := range GetPreloads(ctx) {
+                if f == "receiver" { startField = true }
+                if startField && string(f[0]) == "{" { inField = true } // ignore filter etc...
+                if inField && f == "isPrivate" { fok = true; break}
+                if inField && string(f[0]) == "}"  { inField = false }
+            }
             if !fok {
                 // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`id' field is required."))
+                return nil, LogErr("Access denied", fmt.Errorf("`receiver.isPrivate' field is required."))
             }
-            for _, tension := range(v) {
-                if tension.Receiver == nil {
-                    nameid_, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.receiver", "Node.nameid")
-                    if err != nil { return nil, err }
-                    nameid = nameid_.(string)
-                } else {
-                    nameid = tension.Receiver.Nameid
-                }
+            for _, t := range(v) {
                 // validate
-                isPrivate_, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.receiver", "Node.isPrivate")
-                if err != nil { return nil, err }
-                isPrivate = isPrivate_.(bool)
+                nameid = t.Receiver.Nameid
+                isPrivate = t.Receiver.IsPrivate
                 yes, err = isHidePrivate(ctx, nameid, isPrivate)
                 if err != nil { return nil, err }
                 if yes { break }
@@ -249,8 +249,8 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
         //}
         if isPrivate {
             // check user role.
-            uctx, err := auth.UserCtxFromContext(ctx)
-            //if err == jwtauth.ErrExpired {
+            uctx, err := webauth.UserCtxFromContext(ctx)
+            //if err == jwtwebauth.ErrExpired {
             //    // Uctx claims is not parsed for unverified token
             //    u, err := db.GetDB().GetUser("username", uctx.Username)
             //    if err != nil { return yes, LogErr("internal error", err) }
@@ -258,8 +258,8 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
             //    uctx = *u
             if err != nil { return yes, LogErr("Access denied", err) }
 
-            rootnameid, err := nid2rootid(nameid)
-            if userHasRoot(uctx, rootnameid) {
+            rootnameid, err := codec.Nid2rootid(nameid)
+            if auth.UserHasRoot(uctx, rootnameid) {
                 return false, err
             }
         } else {
@@ -404,7 +404,7 @@ func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver,
 // 4. check residual
 func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nFields []string, uField *string, assignee *int) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     var ok bool
@@ -451,7 +451,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
 // HasRoot check the list of node to check if the user has root node in common.
 func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFields []string) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Check that user has the given role on the asked node
@@ -460,7 +460,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     for _, nodeField := range nodeFields {
         rootnameid, err = extractRootnameid(ctx, nodeField, obj)
         if err != nil { return nil, LogErr("Internal error", err) }
-        ok = userHasRoot(uctx, rootnameid)
+        ok = auth.UserHasRoot(uctx, rootnameid)
         if ok { return next(ctx) }
     }
 
@@ -470,7 +470,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     nameid_ := obj.(model.JsonAtom)["emitterid"]
     if nameid_ == nil { return nil, e }
     nameid := nameid_.(string)
-    rid, err := nid2rootid(nameid)
+    rid, err := codec.Nid2rootid(nameid)
     if err != nil { return nil, LogErr("Internal error", err) }
     if rid == rootnameid {
         r_, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.role_type")
@@ -489,7 +489,7 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
 // Only the onwer of the object can edit it.
 func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, userField *string) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get attributes and check everything is ok
@@ -543,7 +543,7 @@ func extractRootnameid(ctx context.Context, nodeField string, nodeObj interface{
         if nameid_ == nil {
             return rootnameid, fmt.Errorf("node target unknown (nameid), need a database request here...")
         }
-        rootnameid, err = nid2rootid(nameid_.(string))
+        rootnameid, err = codec.Nid2rootid(nameid_.(string))
         if err != nil {
             panic(err.Error())
         }
@@ -565,8 +565,8 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
         nameid_, err = db.GetDB().GetSubFieldById(id_.(string), "Tension."+nodeField, "Node.nameid")
         if err != nil { return nameid, err }
         nameid = nameid_.(string)
-        if isRole(nameid) {
-            nameid, _ = nid2pid(nameid)
+        if codec.IsRole(nameid) {
+            nameid, _ = codec.Nid2pid(nameid)
         }
     } else if (nameid_ != nil) {
         // Node Here

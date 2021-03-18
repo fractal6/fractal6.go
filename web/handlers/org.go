@@ -31,7 +31,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     nidOwner := nameid + "##" + "@" + uctx.Username
 
     // Check plan
-    ok, err := auth.CanNewOrga(uctx, form)
+    ok, err := auth.CanNewOrga(*uctx, form)
     if err != nil || !ok { http.Error(w, err.Error(), 400); return }
 
     // @debug; temporary hack, see issue here: https://discuss.dgraph.io/t/create-child-nodes-with-addparent/11311/13

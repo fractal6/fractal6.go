@@ -4,14 +4,16 @@ import (
     "fmt"
 
     "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/web/auth"
+    "zerogov/fractal6.go/graph/codec"
+    "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
+    webauth "zerogov/fractal6.go/web/auth"
     //"zerogov/fractal6.go/text/en"
     //. "zerogov/fractal6.go/tools"
 )
 
 func LinkUser(rootnameid, nameid, firstLink string) error {
-    err := auth.AddUserRole(firstLink, nameid)
+    err := webauth.AddUserRole(firstLink, nameid)
     if err != nil { return err }
 
     err = maybeUpdateMembership(rootnameid, firstLink, model.RoleTypeMember)
@@ -21,7 +23,7 @@ func LinkUser(rootnameid, nameid, firstLink string) error {
 }
 
 func UnlinkUser(rootnameid, nameid, firstLink string) error {
-    err := auth.RemoveUserRole(firstLink, nameid)
+    err := webauth.RemoveUserRole(firstLink, nameid)
     if err != nil { return err }
 
     err = maybeUpdateMembership(rootnameid, firstLink, model.RoleTypeGuest)
@@ -30,7 +32,7 @@ func UnlinkUser(rootnameid, nameid, firstLink string) error {
     return err
 }
 
-func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     tid := tension.ID
     parentid := tension.Receiver.Nameid
 
@@ -46,7 +48,7 @@ func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragm
     // --
 
     // Get References
-    rootnameid, nameid, err := nodeIdCodec(parentid, *node.Nameid, *node.Type)
+    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
 
     switch *node.RoleType {
     case model.RoleTypeOwner:
@@ -65,3 +67,36 @@ func LeaveRole(uctx model.UserCtx, tension *model.Tension, node *model.NodeFragm
 
     return true, err
 }
+
+// maybeUpdateMembership check try to toggle user membership to Guest or Member
+func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
+    var uctxFs *model.UserCtx
+    var err error
+    var i int
+    DB := db.GetDB()
+    uctxFs, err = DB.GetUser("username", username)
+    if err != nil { return err }
+
+    // Don't touch owner state
+    if auth.UserIsOwner(uctxFs, rootnameid) >= 0 { return nil }
+
+    // Update RoleType to Guest
+    roles := auth.GetRoles(uctxFs, rootnameid)
+    if rt == model.RoleTypeGuest && len(roles) == 1  {
+        err := DB.UpgradeMember(roles[0].Nameid, model.RoleTypeGuest)
+        if err != nil { return err }
+        return nil
+    }
+
+    // Update RoleType to Member
+    i = auth.UserIsGuest(uctxFs, rootnameid)
+    if rt == model.RoleTypeMember && i >= 0 {
+        // Update RoleType to Member
+        err := DB.UpgradeMember(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
+        if err != nil { return err }
+        return nil
+    }
+
+    return nil
+}
+

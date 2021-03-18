@@ -6,8 +6,8 @@ import (
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/db"
+    webauth "zerogov/fractal6.go/web/auth"
     . "zerogov/fractal6.go/tools"
 )
 
@@ -35,7 +35,7 @@ func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 // + chech that user rights
 func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get input
@@ -66,7 +66,7 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
 // + check the user rights
 func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input

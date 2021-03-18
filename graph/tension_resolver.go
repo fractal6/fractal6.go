@@ -6,15 +6,16 @@ import (
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/web/auth"
+    "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
+    webauth"zerogov/fractal6.go/web/auth"
     . "zerogov/fractal6.go/tools"
 )
 
 // Add Tension Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get input
@@ -29,7 +30,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 
     // Check that user as the given emitter role
     emitterid := input[0].Emitterid
-    if !userPlayRole(uctx, emitterid) {
+    if !auth.UserPlayRole(uctx, emitterid) {
         // if not check for bot access
         r_, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.role_type")
         if err != nil { return nil, LogErr("Internal error", err) }
@@ -60,7 +61,7 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
 // Add Tension Post Hook
 func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get Input
@@ -92,7 +93,7 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
 // Update Tension Post Hook
 func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := auth.UserCtxFromContext(ctx)
+    uctx, err := webauth.UserCtxFromContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input

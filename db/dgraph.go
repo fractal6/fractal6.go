@@ -276,6 +276,28 @@ func initDB() *Dgraph {
                 n_nodes: count(Label.nodes)
             }
         }`,
+        "getTensionIntExt": `{
+			var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
+				tensions as Node.{{.inout}} {{.tensionFilter}} {
+                    {{.authorsFilter}}
+                    {{.labelsFilter}}
+				}
+			}
+
+			all(func: uid(tensions), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+                uid
+                Tension.createdAt
+				Post.createdBy { User.username }
+				Tension.receiver { Node.nameid Node.name Node.role_type Node.isPrivate }
+				Tension.emitter { Node.nameid Node.name Node.role_type Node.isPrivate }
+				Tension.title
+				Tension.status
+				Tension.type_
+				Tension.action
+				Tension.labels { Label.id Label.name }
+				n_comments: count(Tension.comments)
+			}
+        }`,
         "getCoordos": `{
             all(func: eq(Node.nameid, "{{.nameid}}")) {
                 Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
@@ -420,7 +442,7 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.gpmTemplates[op].Format(maps)
     // Send Request
-    //fmt.Println(string(q))
+    //fmt.Println(op, string(q))
     res, err := txn.Query(ctx, q)
     //fmt.Println(res)
     return res, err
@@ -991,7 +1013,10 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.NodeId, error) {
     // Format Query
     maps := map[string]string{
         "regex": regex,
-        "payload": model.NodeIdPayloadDg,
+        "payload": `{
+            Node.nameid
+            Node.isPrivate
+        }`,
     }
 
     // Send request
@@ -1174,6 +1199,37 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.LabelFull, 
     return data, err
 }
 
+func (dg Dgraph) GetTensionIntExt(q TensionQuery, intext string) ([]TensionPayload, error) {
+    // Format Query
+    maps, err := FormatTensionIntMap(q, intext)
+    if err != nil { return nil, err }
+    // Send request
+    res, err := dg.QueryGpm("getTensionIntExt", *maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r GpmResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []TensionPayload
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    return data, err
+}
+
 func (dg Dgraph) GetLastBlobId(tid string) (*string) {
     // init client
     dgc, cancel := dg.getDgraphClient()
@@ -1323,8 +1379,8 @@ func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
     }`, nameid)
 
     mu := fmt.Sprintf(`
-    uid(node) <Node.role_type> "%s" .
-    uid(node) <Node.name> "%s" .
+        uid(node) <Node.role_type> "%s" .
+        uid(node) <Node.name> "%s" .
     `, roleType, roleType)
 
     mutation := &api.Mutation{

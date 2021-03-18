@@ -32,7 +32,9 @@ type UserCtx struct {
     Passwd   string     `json:"password"` // hash
     Rights   UserRights `json:"rights"`
 	Roles    []Role     `json:"roles"`
-    Iat      string     // fot token iat (empty when uctx is got from DB)
+    Iat      string          // fot token iat (empty when uctx is got from DB)
+    CheckedNameid  []string  // limit the DB hit by keeping nodes checked for iat
+    Hit      int             // number of time the userctx iat is checked
 }
 type Role struct {
     Rootnameid string  `json:"rootnameid"`

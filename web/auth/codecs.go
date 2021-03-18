@@ -23,6 +23,10 @@ func init() {
     reservedURIReg = re.MustCompile(`[`+reservedURI+`]`)
 }
 
+//
+// Format Validation
+//
+
 func ValidateName(n string) error {
     // Size control
     if len(n) > 100 {

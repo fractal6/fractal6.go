@@ -139,7 +139,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
     }
 
     // Refresh the user context
-    uctx, err := auth.GetAuthUserFromCtx(oldUctx)
+    uctx, err := auth.GetAuthUserFromCtx(*oldUctx)
     if err != nil {
 		// Credentials validation error
 		//w.WriteHeader(http.StatusUnauthorized)

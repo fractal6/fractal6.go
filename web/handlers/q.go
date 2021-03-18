@@ -5,6 +5,7 @@ import (
     "net/http"
     "encoding/json"
 
+    //"zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/db"
 )
 
@@ -83,6 +84,67 @@ func SubLabels(w http.ResponseWriter, r *http.Request) {
     // Get sub labels
     DB := db.GetDB()
     data, err := DB.GetAllLabels("nameid", q)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}
+
+//
+// Query Tensions
+//
+
+
+func TensionsInt(w http.ResponseWriter, r *http.Request) {
+	var q db.TensionQuery
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get sub labels
+    DB := db.GetDB()
+    data, err := DB.GetTensionIntExt(q, "tensions_in")
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}
+
+func TensionsExt(w http.ResponseWriter, r *http.Request) {
+	var q db.TensionQuery
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get sub labels
+    DB := db.GetDB()
+    data, err := DB.GetTensionIntExt(q, "tensions_out")
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return

@@ -1,7 +1,7 @@
 package auth
 
 import (
-    //"fmt"
+    "fmt"
     "log"
     "time"
     "errors"
@@ -14,7 +14,7 @@ import (
     . "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/web/middleware/jwtauth"
 	"zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/db"
+	"zerogov/fractal6.go/db"
 )
 
 var tkMaster *Jwt
@@ -116,7 +116,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
             Name: "jwt",
             Value: tokenString,
             Path: "/",
-            Secure: true,
+            Secure: false,
             SameSite: 2,
         }
     }
@@ -153,18 +153,19 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
     uRaw, err := json.Marshal(claims[tkMaster.tokenClaim])
     if err != nil { panic(err) }
     json.Unmarshal(uRaw, &userCtx)
-    ctx = context.WithValue(ctx, tkMaster.tokenClaim, userCtx)
+    ctx = context.WithValue(ctx, tkMaster.tokenClaim, &userCtx)
 
     // Set the Iat
     if claims["iat"] != nil {
         var iat int64 = int64(claims["iat"].(float64))
         return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339))
     }
+    LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
     return ctx
 }
 
-func UserCtxFromContext(ctx context.Context) (model.UserCtx, error) {
-    uctx := ctx.Value(tkMaster.tokenClaim).(model.UserCtx)
+func UserCtxFromContext(ctx context.Context) (*model.UserCtx, error) {
+    uctx := ctx.Value(tkMaster.tokenClaim).(*model.UserCtx)
     userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
     if userCtxErr != nil { return uctx, userCtxErr.(error) }
 
@@ -174,10 +175,19 @@ func UserCtxFromContext(ctx context.Context) (model.UserCtx, error) {
 
 // CheckUserCtxIat update the user token if the given
 // node has been updated after that the token's iat.
-func CheckUserCtxIat(uctx model.UserCtx, nid string) (model.UserCtx, error) {
+func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
     var u *model.UserCtx
     var e error
     var updatedAt string
+
+    // Check if User context need to be updated
+    for _, v := range uctx.CheckedNameid {
+        if v == nid {
+            return uctx, e
+        }
+    }
+
+    // Check last node update date
     DB := db.GetDB()
     updatedAt_, e := DB.GetFieldByEq("Node.nameid", nid, "Node.updatedAt")
     if e != nil { return uctx, e }
@@ -186,10 +196,20 @@ func CheckUserCtxIat(uctx model.UserCtx, nid string) (model.UserCtx, error) {
     } else {
         updatedAt = updatedAt_.(string)
     }
+
+    // Update User context if node is newer
     if IsOlder(uctx.Iat, updatedAt) {
         u, e = DB.GetUser("username", uctx.Username)
+        // @DEBUG: UserCtx is update from their fields for propagation
+        uctx.Username = u.Username
+        uctx.Name     = u.Name
+        uctx.Passwd   = u.Passwd
+        uctx.Rights   = u.Rights
+        uctx.Roles    = u.Roles
+        uctx.CheckedNameid = u.CheckedNameid
         if e != nil { return uctx, e }
-        return *u, e
     }
+    uctx.Hit++
+    uctx.CheckedNameid = append(uctx.CheckedNameid, nid)
     return uctx, e
 }
