@@ -276,17 +276,46 @@ func initDB() *Dgraph {
                 n_nodes: count(Label.nodes)
             }
         }`,
-        "getTensionIntExt": `{
+        "getTensionInt": `{
 			var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
-				tensions as Node.{{.inout}} {{.tensionFilter}} {
+				tensions as Node.tensions_in {{.tensionFilter}} @cascade {
+                    Tension.emitter @filter({{.nameids}})
                     {{.authorsFilter}}
                     {{.labelsFilter}}
-				}
-			}
+                }
+            }
 
 			all(func: uid(tensions), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
                 uid
-                Tension.createdAt
+                Post.createdAt
+				Post.createdBy { User.username }
+				Tension.receiver { Node.nameid Node.name Node.role_type Node.isPrivate }
+				Tension.emitter { Node.nameid Node.name Node.role_type Node.isPrivate }
+				Tension.title
+				Tension.status
+				Tension.type_
+				Tension.action
+				Tension.labels { Label.id Label.name }
+				n_comments: count(Tension.comments)
+			}
+        }`,
+        "getTensionExt": `{
+			var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
+				tensions_in as Node.tensions_in {{.tensionFilter}} @cascade {
+                    Tension.emitter @filter(NOT ({{.nameids}}))
+                    {{.authorsFilter}}
+                    {{.labelsFilter}}
+                }
+				tensions_out as Node.tensions_out {{.tensionFilter}} @cascade {
+                    Tension.receiver @filter(NOT ({{.nameids}}))
+                    {{.authorsFilter}}
+                    {{.labelsFilter}}
+                }
+            }
+
+			all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+                uid
+                Post.createdAt
 				Post.createdBy { User.username }
 				Tension.receiver { Node.nameid Node.name Node.role_type Node.isPrivate }
 				Tension.emitter { Node.nameid Node.name Node.role_type Node.isPrivate }
@@ -442,6 +471,7 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.gpmTemplates[op].Format(maps)
     // Send Request
+    fmt.Println(op)
     //fmt.Println(op, string(q))
     res, err := txn.Query(ctx, q)
     //fmt.Println(res)
@@ -1199,12 +1229,18 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.LabelFull, 
     return data, err
 }
 
-func (dg Dgraph) GetTensionIntExt(q TensionQuery, intext string) ([]TensionPayload, error) {
+func (dg Dgraph) GetTensionIntExt(q TensionQuery, isInt bool) ([]TensionPayload, error) {
     // Format Query
-    maps, err := FormatTensionIntMap(q, intext)
+    maps, err := FormatTensionIntExtMap(q)
     if err != nil { return nil, err }
     // Send request
-    res, err := dg.QueryGpm("getTensionIntExt", *maps)
+    var op string
+    if isInt {
+        op = "getTensionInt"
+    } else {
+        op = "getTensionExt"
+    }
+    res, err := dg.QueryGpm(op, *maps)
     if err != nil { return nil, err }
 
     // Decode response

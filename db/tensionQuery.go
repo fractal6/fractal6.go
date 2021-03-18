@@ -35,7 +35,7 @@ type TensionQuery struct {
     Labels []string             `json:"labels"`
 }
 
-func FormatTensionIntMap(q TensionQuery, inout string) (*map[string]string, error) {
+func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
     /* list format */
 
     // Nameids
@@ -89,7 +89,6 @@ func FormatTensionIntMap(q TensionQuery, inout string) (*map[string]string, erro
     }
 
     /* Sub Tension filter */
-    var hasSub bool // sub filters
     var authorsFilter string
     var labelsFilter string
     if len(q.Authors) > 0 {
@@ -98,7 +97,6 @@ func FormatTensionIntMap(q TensionQuery, inout string) (*map[string]string, erro
             "Post.createdBy @filter(%s)",
             authorsFilter,
         )
-        hasSub = true
 
     }
     if len(q.Labels) > 0 {
@@ -107,15 +105,9 @@ func FormatTensionIntMap(q TensionQuery, inout string) (*map[string]string, erro
             "Tension.labels @filter(%s)",
             labelsFilter,
         )
-        hasSub = true
-    }
-
-    if hasSub {
-        tensionFilter = tensionFilter + " @cascade"
     }
 
     maps := &map[string]string{
-        "inout": inout,
         "first": strconv.Itoa(q.First),
         "offset": strconv.Itoa(q.Offset),
         "rootnameid": rootnameid,

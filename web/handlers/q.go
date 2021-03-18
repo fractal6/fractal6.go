@@ -116,7 +116,7 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
 
     // Get sub labels
     DB := db.GetDB()
-    data, err := DB.GetTensionIntExt(q, "tensions_in")
+    data, err := DB.GetTensionIntExt(q, true)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -144,7 +144,7 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 
     // Get sub labels
     DB := db.GetDB()
-    data, err := DB.GetTensionIntExt(q, "tensions_out")
+    data, err := DB.GetTensionIntExt(q, false)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
