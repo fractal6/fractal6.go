@@ -53,7 +53,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
     // labels
     var labels []string
     for _, v := range(q.Labels) {
-        labels = append(labels, fmt.Sprintf("eq(label.name, \"%s\")", v))
+        labels = append(labels, fmt.Sprintf("eq(Label.name, \"%s\")", v))
     }
 
     // Rootnameid
@@ -78,7 +78,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
         tf = append(tf, `has(Post.createdBy)`)
     }
     if len(q.Labels) > 0 {
-        tf = append(tf, `has(Post.labels)`)
+        tf = append(tf, `has(Tension.labels)`)
     }
 
     if len(tf) > 0 {

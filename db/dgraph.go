@@ -295,7 +295,7 @@ func initDB() *Dgraph {
 				Tension.status
 				Tension.type_
 				Tension.action
-				Tension.labels { Label.id Label.name }
+				Tension.labels { uid Label.name Label.color }
 				n_comments: count(Tension.comments)
 			}
         }`,
@@ -323,7 +323,7 @@ func initDB() *Dgraph {
 				Tension.status
 				Tension.type_
 				Tension.action
-				Tension.labels { Label.id Label.name }
+				Tension.labels { uid Label.name Label.color }
 				n_comments: count(Tension.comments)
 			}
         }`,
@@ -472,7 +472,7 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     q := dg.gpmTemplates[op].Format(maps)
     // Send Request
     fmt.Println(op)
-    //fmt.Println(op, string(q))
+    //fmt.Println(string(q))
     res, err := txn.Query(ctx, q)
     //fmt.Println(res)
     return res, err
