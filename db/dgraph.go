@@ -289,8 +289,8 @@ func initDB() *Dgraph {
                 uid
                 Post.createdAt
 				Post.createdBy { User.username }
-				Tension.receiver { Node.nameid Node.name Node.role_type Node.isPrivate }
-				Tension.emitter { Node.nameid Node.name Node.role_type Node.isPrivate }
+				Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+				Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
 				Tension.title
 				Tension.status
 				Tension.type_
@@ -317,8 +317,8 @@ func initDB() *Dgraph {
                 uid
                 Post.createdAt
 				Post.createdBy { User.username }
-				Tension.receiver { Node.nameid Node.name Node.role_type Node.isPrivate }
-				Tension.emitter { Node.nameid Node.name Node.role_type Node.isPrivate }
+				Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+				Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
 				Tension.title
 				Tension.status
 				Tension.type_
@@ -1039,7 +1039,7 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
 }
 
 // Returns the matching nodes
-func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.NodeId, error) {
+func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
     // Format Query
     maps := map[string]string{
         "regex": regex,
@@ -1064,7 +1064,7 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.NodeId, error) {
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    var data []model.NodeId
+    var data []model.Node
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1128,7 +1128,7 @@ func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error)
 }
 
 // Get all sub children
-func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, error) {
+func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.Node, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
@@ -1143,7 +1143,7 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    var data []model.NodeId
+    var data []model.Node
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1162,7 +1162,7 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.NodeId, e
 }
 
 // Get all sub members
-func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode, error) {
+func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.Node, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
@@ -1177,7 +1177,7 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    var data []model.MemberNode
+    var data []model.Node
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1196,7 +1196,7 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.MemberNode
 }
 
 // Get all sub labels
-func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.LabelFull, error) {
+func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.Label, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
@@ -1211,7 +1211,7 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.LabelFull, 
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    var data []model.LabelFull
+    var data []model.Label
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1229,7 +1229,7 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.LabelFull, 
     return data, err
 }
 
-func (dg Dgraph) GetTensionIntExt(q TensionQuery, isInt bool) ([]TensionPayload, error) {
+func (dg Dgraph) GetTensionIntExt(q TensionQuery, isInt bool) ([]model.Tension, error) {
     // Format Query
     maps, err := FormatTensionIntExtMap(q)
     if err != nil { return nil, err }
@@ -1248,7 +1248,7 @@ func (dg Dgraph) GetTensionIntExt(q TensionQuery, isInt bool) ([]TensionPayload,
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    var data []TensionPayload
+    var data []model.Tension
     config := &mapstructure.DecoderConfig{
         Result: &data,
         TagName: "json",
@@ -1314,7 +1314,6 @@ func (dg Dgraph) HasCoordos(nameid string) (bool) {
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return false }
 
-    //var data []model.NodeId
     var ok bool = false
     if len(r.All) > 1 {
         return ok

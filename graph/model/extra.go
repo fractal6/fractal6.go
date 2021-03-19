@@ -21,53 +21,6 @@ type JsonAtom = map[string]interface{}
 // Utils
 //
 
-type NodeId struct {
-    Nameid string `json:"nameid"`
-    IsPrivate bool `json:"isPrivate"`
-}
-
-type MemberNode struct {
-    CreatedAt string    `json:"createdAt"`
-    Name string         `json:"name"`
-    Nameid string       `json:"nameid"`
-    Rootnameid string   `json:"rootnameid"`
-	RoleType *RoleType  `json:"role_type,omitempty"`
-	FirstLink *User_    `json:"first_link,omitempty"`
-	Parent *NodeId      `json:"parent,omitempty"`
-    IsPrivate bool      `json:"isPrivate"`
-
-}
-
-type User_ struct {
-    Username string `json:"username"`
-    Name *string    `json:"name,omitempty"`
-}
-
-type Username_ struct {
-    Username string `json:"username"`
-}
-
-type EmitterOrReceiver struct {
-    Name string        `json:"name"`
-    Nameid string      `json:"nameid"`
-    RoleType RoleType  `json:"role_type"`
-    IsPrivate bool     `json:"isPrivate"`
-}
-
-type LabelFull struct {
-    ID string               `json:"id"`
-    Name string             `json:"name"`
-    Color *string           `json:"color,omitempty"`
-    Description *string     `json:"description,omitempty"`
-    NNodes *int             `json:"n_nodes,omitempty"`
-}
-
-type LabelShort struct {
-    ID string               `json:"id"`
-    Name string             `json:"name"`
-    Color *string           `json:"color,omitempty"`
-}
-
 var TensionHookPayload string = `{
   uid
   Tension.action

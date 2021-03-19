@@ -10,20 +10,6 @@ import (
 
 )
 
-type TensionPayload struct {
-	ID string                           `json:"id"`
-    CreatedAt string                    `json:"createdAt"`
-    CreatedBy model.Username_           `json:"createdBy"`
-    Title string                        `json:"title"`
-    Type model.TensionType              `json:"type_"`
-    Labels []*model.Label               `json:"labels"`
-    Emitter model.EmitterOrReceiver     `json:"emitter"`
-    Receiver model.EmitterOrReceiver    `json:"receiver"`
-    Action *model.TensionAction         `json:"action"`
-    Status model.TensionStatus          `json:"status"`
-    NComments *int                      `json:"n_comments"`
-}
-
 type TensionQuery struct {
     Nameids []string 	        `json:"nameids"`
     First int                   `json:"first"`

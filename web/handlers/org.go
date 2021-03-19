@@ -94,7 +94,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // return result on success
-    data, _ := json.Marshal(model.NodeId{Nameid: nameid})
+    data, _ := json.Marshal(model.Node{Nameid: nameid})
     w.Write(data)
 }
 
