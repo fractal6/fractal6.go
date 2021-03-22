@@ -26,21 +26,19 @@ type OrgaForm struct {
 //
 
 // UserCtx are data encoded in the token (e.g Jwt claims)
+// @DEBUG: see emcapsulation issue: https://github.com/golang/go/issues/9859
 type UserCtx struct {
-    Username string     `json:"username"`
-    Name     *string    `json:"name"`
-    Passwd   string     `json:"password"` // hash
-    Rights   UserRights `json:"rights"`
-	Roles    []Role     `json:"roles"`
-    Iat      string          // fot token iat (empty when uctx is got from DB)
-    CheckedNameid  []string  // limit the DB hit by keeping nodes checked for iat
-    Hit      int             // number of time the userctx iat is checked
-}
-type Role struct {
-    Rootnameid string  `json:"rootnameid"`
-    Nameid string      `json:"nameid"`
-    Name string        `json:"name"`
-    RoleType RoleType  `json:"role_type"`
+    Username       string     `json:"username"`
+    Name           *string    `json:"name"`
+    Password       string    `json:"password"` // hash
+    Rights         UserRights `json:"rights"`
+	Roles          []*Node    `json:"roles"`
+    // fot token iat (empty when uctx is got from DB)
+    // limit the DB hit by keeping nodes checked for iat
+    // number of time the userctx iat is checked
+    Iat            string
+    CheckedNameid  []string
+    Hit            int
 }
 
 //

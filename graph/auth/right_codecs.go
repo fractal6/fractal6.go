@@ -8,11 +8,11 @@ import (
 )
 
 // GetRoles returns the list of the users roles below the given node
-func GetRoles(uctx *model.UserCtx, rootnameid string) []model.Role {
+func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
     uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
     if e != nil { panic(e) }
 
-    var roles []model.Role
+    var roles []*model.Node
     for _, r := range uctx.Roles {
         if r.Rootnameid == rootnameid  {
             roles = append(roles, r)
@@ -54,7 +54,7 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeGuest {
+        if r.Rootnameid == rootnameid && *r.RoleType == model.RoleTypeGuest {
             return i
         }
     }
@@ -89,7 +89,7 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
         if err != nil {
             panic("bad nameid format for coordo test: "+ ur.Nameid)
         }
-        if pid == nameid && ur.RoleType == model.RoleTypeCoordinator {
+        if pid == nameid && *ur.RoleType == model.RoleTypeCoordinator {
             return i
         }
     }
@@ -102,7 +102,7 @@ func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && r.RoleType == model.RoleTypeOwner {
+        if r.Rootnameid == rootnameid && *r.RoleType == model.RoleTypeOwner {
             return i
         }
     }

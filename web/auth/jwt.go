@@ -47,11 +47,12 @@ func (Jwt) New() *Jwt {
         tokenClaimErr: "user_ctx_err",
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
 	}
+    roleType := model.RoleTypeCoordinator
     uctx := model.UserCtx{
         Username: "yoda",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true},
-        Roles: []model.Role{
-            {Rootnameid:"sku", Nameid:"sku", RoleType:model.RoleTypeCoordinator},
+        Roles: []*model.Node{
+            {Rootnameid:"sku", Nameid:"sku", RoleType:&roleType},
         },
     }
     token, _ := tk.issue(uctx, time.Hour*72)
@@ -203,7 +204,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
         // @DEBUG: UserCtx is update from their fields for propagation
         uctx.Username = u.Username
         uctx.Name     = u.Name
-        uctx.Passwd   = u.Passwd
+        uctx.Password = u.Password
         uctx.Rights   = u.Rights
         uctx.Roles    = u.Roles
         uctx.CheckedNameid = u.CheckedNameid

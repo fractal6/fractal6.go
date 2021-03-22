@@ -155,12 +155,12 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     }
 
     // Compare hashed password.
-    ok := tools.VerifyPassword(userCtx.Passwd, password)
+    ok := tools.VerifyPassword(userCtx.Password, password)
     if !ok {
         return nil, ErrBadPassword
     }
     // Hide the password !
-    userCtx.Passwd = ""
+    userCtx.Password = ""
     return userCtx, nil
 }
 
@@ -257,7 +257,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     }
 
     // Hide the password !
-    userCtx.Passwd = ""
+    userCtx.Password = ""
     return userCtx, nil
 }
 
@@ -274,7 +274,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     }
 
     // Hide the password !
-    userCtx.Passwd = ""
+    userCtx.Password = ""
     return userCtx, nil
 }
 
