@@ -116,7 +116,7 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
 
     // Get sub labels
     DB := db.GetDB()
-    data, err := DB.GetTensionIntExt(q, true)
+    data, err := DB.GetTensions(q, "int")
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -144,7 +144,35 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 
     // Get sub labels
     DB := db.GetDB()
-    data, err := DB.GetTensionIntExt(q, false)
+    data, err := DB.GetTensions(q, "ext")
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}
+
+func TensionsAll(w http.ResponseWriter, r *http.Request) {
+	var q db.TensionQuery
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get sub labels
+    DB := db.GetDB()
+    data, err := DB.GetTensions(q, "all")
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return

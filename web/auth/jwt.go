@@ -1,7 +1,7 @@
 package auth
 
 import (
-    "fmt"
+    //"fmt"
     "log"
     "time"
     "errors"
@@ -161,7 +161,7 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
         var iat int64 = int64(claims["iat"].(float64))
         return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339))
     }
-    LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
+    //LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
     return ctx
 }
 

@@ -327,6 +327,34 @@ func initDB() *Dgraph {
 				n_comments: count(Tension.comments)
 			}
         }`,
+        "getTensionAll": `{
+		    var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
+				tensions_in as Node.tensions_in {{.tensionFilter}} @cascade {
+                    uid
+                    {{.authorsFilter}}
+                    {{.labelsFilter}}
+                }
+				tensions_out as Node.tensions_out {{.tensionFilter}} @cascade {
+                    uid
+                    {{.authorsFilter}}
+                    {{.labelsFilter}}
+                }
+            }
+
+			all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+                uid
+                Post.createdAt
+				Post.createdBy { User.username }
+				Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+				Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+				Tension.title
+				Tension.status
+				Tension.type_
+				Tension.action
+				Tension.labels { uid Label.name Label.color }
+				n_comments: count(Tension.comments)
+			}
+        }`,
         "getCoordos": `{
             all(func: eq(Node.nameid, "{{.nameid}}")) {
                 Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
@@ -1229,16 +1257,20 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.Label, erro
     return data, err
 }
 
-func (dg Dgraph) GetTensionIntExt(q TensionQuery, isInt bool) ([]model.Tension, error) {
+func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, error) {
     // Format Query
     maps, err := FormatTensionIntExtMap(q)
     if err != nil { return nil, err }
     // Send request
     var op string
-    if isInt {
+    if type_ == "int" {
         op = "getTensionInt"
-    } else {
+    } else if type_ == "ext" {
         op = "getTensionExt"
+    } else if type_ == "all" {
+        op = "getTensionAll"
+    } else {
+        panic("Unknow type (tension query)")
     }
     res, err := dg.QueryGpm(op, *maps)
     if err != nil { return nil, err }

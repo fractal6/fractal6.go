@@ -110,6 +110,7 @@ func RunServer() {
             r.Post("/sub_labels", handle6.SubLabels)
             r.Post("/tensions_int", handle6.TensionsInt)
             r.Post("/tensions_ext", handle6.TensionsExt)
+            r.Post("/tensions_all", handle6.TensionsAll)
         })
     })
 
