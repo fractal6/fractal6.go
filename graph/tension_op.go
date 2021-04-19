@@ -36,7 +36,8 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
            *event.EventType == model.TensionEventBlobArchived ||
            *event.EventType == model.TensionEventBlobUnarchived ||
            *event.EventType == model.TensionEventUserLeft ||
-           *event.EventType == model.TensionEventUserJoin {
+           *event.EventType == model.TensionEventUserJoin ||
+           *event.EventType == model.TensionEventMoved {
                // Process the special event
                ok, err, nameid = processTensionEventHook(uctx, event, tid, bid)
                if ok && err == nil {
@@ -195,6 +196,8 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
             }
             ok = true
         }
+    } else if *event.EventType == model.TensionEventMoved {
+        // Only root node can be join
     }
 
     return ok, err, nameid

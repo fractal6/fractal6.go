@@ -3396,7 +3396,6 @@ type Post {
 }
 
 type Tension @hidePrivate {
-  createdBy(filter: UserFilter): User!
   nth: String @search
   title: String! @search(by: [fulltext])
   type_: TensionType! @search
@@ -3414,6 +3413,7 @@ type Tension @hidePrivate {
   n_comments: Int @count(f: comments)
   n_blobs: Int @count(f: blobs)
   id: ID!
+  createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
   message: String @search(by: [fulltext])
@@ -3578,6 +3578,7 @@ enum TensionEvent {
   BlobCreated
   BlobCommitted
 
+  Moved
   BlobPushed
   BlobArchived
   BlobUnarchived
@@ -3596,25 +3597,25 @@ enum BlobType {
 
 }
 
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
-directive @cascade on FIELD
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+
+directive @cascade on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3782,7 +3783,7 @@ type AddSharedNodePayload {
 }
 
 input AddTensionInput {
-  createdBy: UserRef! @add_isOwner(u:"createdBy")
+  createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
@@ -4604,7 +4605,7 @@ enum TensionOrderable {
 }
 
 input TensionPatch {
-  createdBy: UserRef @patch_RO
+  createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
   message: String
@@ -17472,45 +17473,6 @@ func (ec *executionContext) _SharedNode_n_closed_tensions(ctx context.Context, f
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Tension",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Tension_createdBy_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Tension_nth(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18322,6 +18284,45 @@ func (ec *executionContext) _Tension_id(ctx context.Context, field graphql.Colle
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -22078,31 +22079,9 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Add_isOwner == nil {
-					return nil, errors.New("directive add_isOwner is not implemented")
-				}
-				return ec.directives.Add_isOwner(ctx, obj, directive0, u)
-			}
-
-			tmp, err := directive1(ctx)
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.UserRef); ok {
-				it.CreatedBy = data
-			} else if tmp == nil {
-				it.CreatedBy = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "createdAt":
 			var err error
@@ -27068,27 +27047,9 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.UserRef); ok {
-				it.CreatedBy = data
-			} else if tmp == nil {
-				it.CreatedBy = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "createdAt":
 			var err error
@@ -30444,11 +30405,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Tension")
-		case "createdBy":
-			out.Values[i] = ec._Tension_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "nth":
 			out.Values[i] = ec._Tension_nth(ctx, field, obj)
 		case "title":
@@ -30507,6 +30463,11 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_n_blobs(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Tension_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdBy":
+			out.Values[i] = ec._Tension_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

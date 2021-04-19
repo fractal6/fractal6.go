@@ -913,7 +913,6 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	CreatedBy  *User          `json:"createdBy,omitempty"`
 	Nth        *string        `json:"nth,omitempty"`
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
@@ -931,6 +930,7 @@ type Tension struct {
 	NComments  *int           `json:"n_comments,omitempty"`
 	NBlobs     *int           `json:"n_blobs,omitempty"`
 	ID         string         `json:"id,omitempty"`
+	CreatedBy  *User          `json:"createdBy,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	Message    *string        `json:"message,omitempty"`
@@ -2093,6 +2093,7 @@ const (
 	TensionEventLabelRemoved    TensionEvent = "LabelRemoved"
 	TensionEventBlobCreated     TensionEvent = "BlobCreated"
 	TensionEventBlobCommitted   TensionEvent = "BlobCommitted"
+	TensionEventMoved           TensionEvent = "Moved"
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
@@ -2112,6 +2113,7 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventLabelRemoved,
 	TensionEventBlobCreated,
 	TensionEventBlobCommitted,
+	TensionEventMoved,
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
@@ -2121,7 +2123,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoin, TensionEventUserLeft:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMoved, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoin, TensionEventUserLeft:
 		return true
 	}
 	return false
