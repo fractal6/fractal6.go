@@ -23,6 +23,7 @@ type JsonAtom = map[string]interface{}
 
 var TensionHookPayload string = `{
   uid
+  Post.createdBy { User.username }
   Tension.action
   Tension.emitter {
     Node.nameid

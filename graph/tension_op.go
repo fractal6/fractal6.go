@@ -59,27 +59,31 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 
 // Add, Update or Archived a Node
 func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid string, bid *string) (bool, error, string) {
-    var nameid string
+    var ok bool
+
     // Get Tension, target Node and blob charac (last if bid undefined)
     tension, err := db.GetDB().GetTensionHook(tid, bid)
-    if err != nil { return false, LogErr("Access denied", err), nameid}
-    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found.")), nameid }
+    if err != nil { return false, LogErr("Access denied", err), tid}
+    if tension == nil { return false, LogErr("Access denied", fmt.Errorf("tension not found.")), tid }
+
 
     // Check that Blob exists
-    blob := tension.Blobs[0]
-    if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
-    bid = &blob.ID
+    var blob *model.Blob
+    var nameid string
+    var node *model.NodeFragment
+    var tensionCharac *codec.TensionCharac
+    if tension.Blobs != nil {
+        blob = tension.Blobs[0]
+        bid = &blob.ID
+        // Get Node and Nameid (from Codec)
+        node = blob.Node
+        if node != nil && node.Nameid != nil {
+            _, nameid, err = codec.NodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
+        }
 
-    // Extract Tension characteristic
-    tensionCharac, err:= codec.TensionCharac{}.New(*tension.Action)
-    if err != nil { return false, LogErr("internal error", err), nameid }
-
-    var ok bool
-    var node *model.NodeFragment = blob.Node
-
-    // Nameid Codec
-    if node != nil && node.Nameid != nil {
-        _, nameid, err = codec.NodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
+        // Extract tension blob characteristic
+        tensionCharac, err = codec.TensionCharac{}.New(*tension.Action)
+        if err != nil { return false, LogErr("internal error", err), nameid }
     }
 
     if *event.EventType == model.TensionEventBlobPushed {
@@ -87,6 +91,7 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
         // --
         // 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
         // 2. swith on TensionCharac.ActionType to add update etc...
+        if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
         switch tensionCharac.ActionType {
         case codec.NewAction:
             // First time a blob is pushed.
@@ -116,6 +121,7 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
     } else if *event.EventType == model.TensionEventBlobArchived {
         // Archived Node
         // --
+        if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
         switch tensionCharac.DocType {
         case codec.NodeDoc:
             ok, err = TryArchiveNode(uctx, tension, node)
@@ -131,6 +137,7 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
     } else if *event.EventType == model.TensionEventBlobUnarchived {
         // Unarchived Node
         // --
+        if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
         switch tensionCharac.DocType {
         case codec.NodeDoc:
             ok, err = TryUnarchiveNode(uctx, tension, node)
@@ -146,6 +153,7 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
     } else if *event.EventType == model.TensionEventUserLeft {
         // Remove user reference
         // --
+        if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
         if model.RoleType(*event.Old) == model.RoleTypeGuest {
             rootid, e := codec.Nid2rootid(*event.New)
             if e != nil { return ok, e, nameid }
@@ -163,6 +171,7 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
     } else if *event.EventType == model.TensionEventUserJoin {
         // Only root node can be join
         // --
+        if blob == nil { return false, LogErr("internal error", fmt.Errorf("blob not found.")), nameid }
         rootid, e := codec.Nid2rootid(*event.New)
         if e != nil { return ok, e, nameid }
         if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")), nameid}
@@ -197,8 +206,93 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
             ok = true
         }
     } else if *event.EventType == model.TensionEventMoved {
-        // Only root node can be join
+        ok, err = TryMoveTension(uctx, tension, *event)
     }
 
     return ok, err, nameid
+}
+
+func TryMoveTension(uctx *model.UserCtx, t *model.Tension, event model.EventRef) (bool, error) {
+    //receiverid_old := *event.Old
+    receiverid_new := *event.New
+
+    ok, err := CanChangeTension(uctx, t)
+    if err != nil || !ok { return ok, err }
+
+    // change tension.receiver = {nameid: receiverid_new}
+    // change tension.receiverid = receiverid_new
+    // if node != nil
+    //      update node.parent
+    //      update node.nameid r/p/n
+    //      update tension.tensions_in  receiverid -> nameid_new
+    //      update tension.tensions_out emmiterid -> nameid_new
+
+    // Update node and blob
+    if t.Blobs != nil && t.Blobs[0].Node != nil {
+        node := t.Blobs[0].Node
+        _, nameid_new, err := codec.NodeIdCodec(receiverid_new, *node.Nameid, *node.Type)
+        if err != nil { return false, err }
+
+        // node input
+        nodeInput := model.UpdateNodeInput{
+            Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: node.Nameid}},
+            Set: &model.NodePatch{
+                Parent: &model.NodeRef{Nameid: &receiverid_new},
+                Nameid: &nameid_new,
+            },
+        }
+
+        // update node
+        err = db.GetDB().Update("node", nodeInput)
+        if err != nil { return err }
+
+    }
+
+    // tension input
+    tensionInput := model.UpdateTensionInput{
+        Filter: &model.TensionFilter{ID: []string{t.ID}},
+        Set: &model.TensionPatch{
+            Receiver: &model.NodeRef{Nameid: &receiverid_new},
+            Receiverid: &receiverid_new,
+        },
+    }
+
+    // update tension
+    err = db.GetDB().Update("tension", tensionInput)
+    return ok, err
+}
+
+func CanChangeTension(uctx *model.UserCtx, t *model.Tension) (bool, error) {
+    var ok bool
+    var err error
+
+    // Check if the user is the creator of the ressource
+    if uctx.Username == t.CreatedBy.Username {
+        return true, err
+    }
+
+    // Check if the user is an assignee of the curent tension
+    // @debug: use checkAssigne, but how to create a context ?
+    var assignees []interface{}
+    res, err := db.GetDB().GetSubFieldById(t.ID, "Tension.assignees", "User.username")
+    if err != nil { return false, err }
+    if res != nil { assignees = res.([]interface{}) }
+    for _, a := range(assignees) {
+        if a.(string) == uctx.Username {
+            return true, err
+        }
+    }
+
+    // Check if the user has the given (nested) role on the target node
+    ok, err = CheckUserRights(uctx, t.Emitter.Nameid, nil)
+    if ok || err != nil { return ok, err}
+    ok, err = CheckUserRights(uctx, t.Receiver.Nameid, t.Receiver.Charac)
+    if ok || err != nil { return ok, err}
+
+    // Check if user has rights of any parents if the node has no Coordo role.
+    if !ok && !db.GetDB().HasCoordos(t.Receiver.Nameid) {
+        ok, err = CheckUpperRights(uctx, t.Receiver.Nameid, t.Receiver.Charac)
+    }
+
+    return ok, err
 }

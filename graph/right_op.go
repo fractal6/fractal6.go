@@ -20,10 +20,16 @@ func CheckUserRights(uctx *model.UserCtx, nameid string, charac *model.NodeChara
     var ok bool = false
     var err error
 
+    // Get the nearest circle
+    if codec.IsRole(nameid) {
+        nameid, _ = codec.Nid2pid(nameid)
+    }
+
     // Escape if the user is an owner
     rootnameid, _ := codec.Nid2rootid(nameid)
     if auth.UserIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
+    // Get the mode of the nearest circle
     if charac == nil {
         charac, err = db.GetDB().GetNodeCharac("nameid", nameid)
         if err != nil { return ok, LogErr("Internal error", err) }
@@ -33,6 +39,22 @@ func CheckUserRights(uctx *model.UserCtx, nameid string, charac *model.NodeChara
         ok = auth.UserIsMember(uctx, nameid) >= 0
     } else if charac.Mode == model.NodeModeCoordinated {
         ok = auth.UserIsCoordo(uctx, nameid) >= 0
+    }
+
+    return ok, err
+}
+
+// chechUpperRight return true if the user has access right (e.g. Coordo) on any on its parents.
+func CheckUpperRights(uctx *model.UserCtx, nameid string, charac *model.NodeCharac) (bool, error) {
+    var ok bool
+    parents, err := db.GetDB().GetParents(nameid)
+    if err != nil { return ok, LogErr("Internal Error", err) }
+    if len(parents) == 0 { return ok, err }
+
+    for _, p := range(parents) {
+        ok, err = CheckUserRights(uctx, p, charac)
+        if err != nil { return ok, LogErr("Internal error", err) }
+        if ok { break }
     }
 
     return ok, err

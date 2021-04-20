@@ -146,18 +146,8 @@ func CanAddNode(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid 
     if err != nil { return ok, LogErr("Internal error", err) }
 
     // Check if user has rights of any parents if the node has no Coordo role.
-    if !ok {
-        parents, err := db.GetDB().GetParents(parentid)
-        // Check of pid has coordos
-        if len(parents) > 0 && !db.GetDB().HasCoordos(parentid) {
-            // @debug: move to CheckCoordoPath function
-            if err != nil { return ok, LogErr("Internal Error", err) }
-            for _, p := range(parents) {
-                ok, err = CheckUserRights(uctx, p, charac)
-                if err != nil { return ok, LogErr("Internal error", err) }
-                if ok { break }
-            }
-        }
+    if !ok && !db.GetDB().HasCoordos(parentid) {
+        return CheckUpperRights(uctx, parentid, charac)
     }
 
     return ok, err

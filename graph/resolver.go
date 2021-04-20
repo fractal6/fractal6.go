@@ -335,9 +335,18 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field s
     case string:
         v = d
     }
-    // @Debug: only supert Label right now (ch
-    // get the type asked automatically...
+    // @Debug: Suport only Label right now .
+    // (@debug: get the type asked automatically...)
     t := "Label"
+
+    a := graphql.GetRequestContext(ctx)
+    b := graphql.CollectFieldsCtx(ctx, nil)
+
+    fmt.Println(a.OperationName)
+    fmt.Println(b[0].Field)
+    fmt.Println(b[0].Name)
+
+
     fieldName := t + "." + field
     id := ctx.Value("id")
     if subfield != nil {
@@ -430,19 +439,11 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
         if ok { return next(ctx) }
     }
 
-    if !ok && ctx.Value("nameid") != nil { // is a Node
-        // Check if user has rights of any parents if the node has no Coordo role.
-        parents, err := db.GetDB().GetParents(ctx.Value("nameid").(string))
-        // Check of pid has coordos
-        if len(parents) > 0 && !db.GetDB().HasCoordos(ctx.Value("nameid").(string)) {
-            // @debug: move to CheckCoordoPath function
-            if err != nil { return nil, LogErr("Internal Error", err) }
-            for _, p := range(parents) {
-                ok, err = CheckUserRights(uctx, p, nil)
-                if err != nil { return nil, LogErr("Internal error", err) }
-                if ok { break }
-            }
-        }
+    // Check if user has rights of any parents if the node has no Coordo role.
+    if !ok && ctx.Value("nameid") != nil && !db.GetDB().HasCoordos(ctx.Value("nameid").(string)) { // is a Node
+        ok, err = CheckUpperRights(uctx, ctx.Value("nameid").(string), nil)
+        if err != nil { return nil, LogErr("Internal error", err) }
+        if ok { return next(ctx) }
     }
 
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -565,9 +566,6 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
         nameid_, err = db.GetDB().GetSubFieldById(id_.(string), "Tension."+nodeField, "Node.nameid")
         if err != nil { return nameid, err }
         nameid = nameid_.(string)
-        if codec.IsRole(nameid) {
-            nameid, _ = codec.Nid2pid(nameid)
-        }
     } else if (nameid_ != nil) {
         // Node Here
         if nodeField == "__self__" { return nameid_.(string), err }
