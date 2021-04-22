@@ -3597,9 +3597,13 @@ enum BlobType {
 
 }
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @cascade on FIELD
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
@@ -3607,15 +3611,11 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE
-
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @cascade on FIELD
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -3788,15 +3788,15 @@ input AddTensionInput {
   updatedAt: DateTime
   message: String
   nth: String
-  title: String! @alter_hasRole(n:["emitter"], u:"createdBy", a:1) @alter_minLength(f:"title", n:1)
-  type_: TensionType! @alter_hasRole(n:["emitter"], u:"createdBy", a:1)
+  title: String! @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1) @alter_minLength(f:"title", n:1)
+  type_: TensionType! @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
   emitterid: String! @alter_hasRole(n:["emitter"], u:"createdBy", a:1)
   emitter: NodeRef! @alter_hasRole(n:["emitter"], u:"createdBy", a:1)
-  receiverid: String! @alter_hasRole(n:["receiver"], u:"createdBy", a:1)
-  receiver: NodeRef! @alter_hasRole(n:["receiver"], u:"createdBy", a:1)
+  receiverid: String! @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
+  receiver: NodeRef! @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
   status: TensionStatus! @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
   labels: [LabelRef!]
-  assignees: [UserRef!] @alter_hasRole(n:["emitter","receiver"], a:1)
+  assignees: [UserRef!] @alter_hasRole(n:["receiver"], a:1)
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
@@ -4610,15 +4610,15 @@ input TensionPatch {
   updatedAt: DateTime
   message: String
   nth: String
-  title: String @alter_hasRole(n:["emitter"], u:"createdBy", a:1) @alter_minLength(f:"title", n:1)
-  type_: TensionType @alter_hasRole(n:["emitter"], u:"createdBy", a:1)
+  title: String @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1) @alter_minLength(f:"title", n:1)
+  type_: TensionType @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
   emitterid: String @alter_hasRole(n:["emitter"], u:"createdBy", a:1)
   emitter: NodeRef @alter_hasRole(n:["emitter"], u:"createdBy", a:1)
-  receiverid: String @alter_hasRole(n:["receiver"], u:"createdBy", a:1)
-  receiver: NodeRef @alter_hasRole(n:["receiver"], u:"createdBy", a:1)
+  receiverid: String @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
+  receiver: NodeRef @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
   status: TensionStatus @alter_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
   labels: [LabelRef!] @patch_hasRole(n:["emitter","receiver"], u:"createdBy", a:1)
-  assignees: [UserRef!] @alter_hasRole(n:["emitter","receiver"], a:1)
+  assignees: [UserRef!] @alter_hasRole(n:["receiver"], a:1)
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
@@ -22121,7 +22121,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -22171,7 +22171,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalNTensionType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -22277,7 +22277,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -22313,7 +22313,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -22395,7 +22395,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -27089,7 +27089,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -27141,7 +27141,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOTensionType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -27251,7 +27251,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -27289,7 +27289,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
 				if err != nil {
 					return nil, err
 				}
@@ -27403,7 +27403,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
 				if err != nil {
 					return nil, err
 				}

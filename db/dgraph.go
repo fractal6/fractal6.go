@@ -1535,6 +1535,28 @@ func (dg Dgraph) SetNodeSource(nameid string, bid string) error {
     return err
 }
 
+func (dg Dgraph) PatchNameid(nameid_old string, nameid_new string) error {
+    query := fmt.Sprintf(`query {
+        node as var(func: eq(Node.nameid, "%s")) {
+            tin as Node.tensions_in
+            tout as Node.tensions_out
+        }
+    }`, nameid_old)
+
+    mu := fmt.Sprintf(`
+        uid(node) <Node.nameid> "%s" .
+        uid(tin) <Tension.receiverid> "%s" .
+        uid(tout) <Tension.emitterid> "%s" .
+    `, nameid_new, nameid_new, nameid_new)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryGpm(query, mutation)
+    return err
+}
+
 //
 // Graphql requests
 //

@@ -338,14 +338,8 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field s
     // @Debug: Suport only Label right now .
     // (@debug: get the type asked automatically...)
     t := "Label"
-
-    a := graphql.GetRequestContext(ctx)
-    b := graphql.CollectFieldsCtx(ctx, nil)
-
-    fmt.Println(a.OperationName)
-    fmt.Println(b[0].Field)
-    fmt.Println(b[0].Name)
-
+    //a := graphql.GetRequestContext(ctx)
+    //b := graphql.CollectFieldsCtx(ctx, nil)
 
     fieldName := t + "." + field
     id := ctx.Value("id")

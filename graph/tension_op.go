@@ -213,38 +213,40 @@ func processTensionEventHook(uctx *model.UserCtx, event *model.EventRef, tid str
 }
 
 func TryMoveTension(uctx *model.UserCtx, t *model.Tension, event model.EventRef) (bool, error) {
-    //receiverid_old := *event.Old
+    receiverid_old := *event.Old // == t.Receiverid
     receiverid_new := *event.New
 
     ok, err := CanChangeTension(uctx, t)
     if err != nil || !ok { return ok, err }
 
-    // change tension.receiver = {nameid: receiverid_new}
-    // change tension.receiverid = receiverid_new
-    // if node != nil
-    //      update node.parent
-    //      update node.nameid r/p/n
-    //      update tension.tensions_in  receiverid -> nameid_new
-    //      update tension.tensions_out emmiterid -> nameid_new
-
     // Update node and blob
     if t.Blobs != nil && t.Blobs[0].Node != nil {
         node := t.Blobs[0].Node
+        _, nameid_old, err := codec.NodeIdCodec(receiverid_old, *node.Nameid, *node.Type)
+        if err != nil { return false, err }
         _, nameid_new, err := codec.NodeIdCodec(receiverid_new, *node.Nameid, *node.Type)
         if err != nil { return false, err }
 
         // node input
+        if receiverid_new == nameid_new {
+            return false, fmt.Errorf("A node cannot be its own parent.")
+        }
         nodeInput := model.UpdateNodeInput{
-            Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: node.Nameid}},
+            Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid_old}},
             Set: &model.NodePatch{
                 Parent: &model.NodeRef{Nameid: &receiverid_new},
-                Nameid: &nameid_new,
             },
         }
 
         // update node
         err = db.GetDB().Update("node", nodeInput)
-        if err != nil { return err }
+        if err != nil { return false, err }
+
+        // DQL mutation (extra node update)
+        if nameid_old != nameid_new { // node is a role
+            err = db.GetDB().PatchNameid(nameid_old, nameid_new)
+            if err != nil { return false, err }
+        }
 
     }
 
@@ -272,7 +274,7 @@ func CanChangeTension(uctx *model.UserCtx, t *model.Tension) (bool, error) {
     }
 
     // Check if the user is an assignee of the curent tension
-    // @debug: use checkAssigne, but how to create a context ?
+    // @debug: use checkAssignee function, but how to pass the context ?
     var assignees []interface{}
     res, err := db.GetDB().GetSubFieldById(t.ID, "Tension.assignees", "User.username")
     if err != nil { return false, err }

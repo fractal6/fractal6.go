@@ -29,7 +29,7 @@ func CheckUserRights(uctx *model.UserCtx, nameid string, charac *model.NodeChara
     rootnameid, _ := codec.Nid2rootid(nameid)
     if auth.UserIsOwner(uctx, rootnameid) >= 0 { return true, err }
 
-    // Get the mode of the nearest circle
+    // Get the mode of the node
     if charac == nil {
         charac, err = db.GetDB().GetNodeCharac("nameid", nameid)
         if err != nil { return ok, LogErr("Internal error", err) }
