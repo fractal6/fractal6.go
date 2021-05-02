@@ -42,6 +42,18 @@ func (r *mutationResolver) DeleteNodeFragment(ctx context.Context, filter model.
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (data *model.AddMandatePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (data *model.UpdateMandatePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.MandateFilter) (data *model.DeleteMandatePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (data *model.AddNodeCharacPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -131,15 +143,19 @@ func (r *mutationResolver) DeleteEvent(ctx context.Context, filter model.EventFi
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddMandate(ctx context.Context, input []*model.AddMandateInput) (data *model.AddMandatePayload, errors error) {
+func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput) (data *model.AddContractPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (data *model.UpdateMandatePayload, errors error) {
+func (r *mutationResolver) UpdateContract(ctx context.Context, input model.UpdateContractInput) (data *model.UpdateContractPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.MandateFilter) (data *model.DeleteMandatePayload, errors error) {
+func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.ContractFilter) (data *model.DeleteContractPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput) (data *model.AddVotePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -178,6 +194,14 @@ func (r *queryResolver) GetNodeFragment(ctx context.Context, id string) (data *m
 }
 
 func (r *queryResolver) QueryNodeFragment(ctx context.Context, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) (data []*model.NodeFragment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.Mandate, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) (data []*model.Mandate, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -244,11 +268,15 @@ func (r *queryResolver) QueryEvent(ctx context.Context, filter *model.EventFilte
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.Mandate, errors error) {
+func (r *queryResolver) GetContract(ctx context.Context, id string) (data *model.Contract, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) (data []*model.Mandate, errors error) {
+func (r *queryResolver) QueryContract(ctx context.Context, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) (data []*model.Contract, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryVote(ctx context.Context, order *model.VoteOrder, first *int, offset *int) (data []*model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

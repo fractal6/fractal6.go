@@ -11,8 +11,123 @@ import (
     "zerogov/fractal6.go/db"
 )
 
-func GetNodeCharacStrict() model.NodeCharac {
-    return model.NodeCharac{UserCanJoin: false, Mode: model.NodeModeCoordinated}
+
+// Authorization Hook enum
+type AuthHookValue int
+const (
+    OwnerHook AuthHookValue = 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
+    AuthorHook AuthHookValue = 1 << 1
+    AssigneeHook AuthHookValue = 1 << 2
+)
+
+type EventMap struct {
+    Auth model.ContractType
+    AuthHook AuthHookValue
+    Action func(*model.UserCtx, *model.Tension, *model.EventRef) (bool, error)
+}
+
+type EventsMap = map[model.TensionEvent]EventMap
+var EMAP EventsMap
+
+func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+    var err error
+    var hookEnabled bool = !(em.Auth == model.ContractTypeAnyCoordoDual && GetBlob(tension) != nil )
+    // Check Hook authorization
+    // --
+    if em.AuthHook & AuthorHook == 1 && hookEnabled {
+        // isAuthorCheck: Check if the user is the creator of the ressource
+        if uctx.Username == tension.CreatedBy.Username {
+            return true, nil, err
+        }
+    }
+
+    if em.AuthHook & AssigneeHook == 1 && hookEnabled {
+        // isAssigneeCheck: Check if the user is an assignee of the curent tension
+        // @debug: use checkAssignee function, but how to pass the context ?
+        var assignees []interface{}
+        res, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.assignees", "User.username")
+        if err != nil { return false, nil, err }
+        if res != nil { assignees = res.([]interface{}) }
+        for _, a := range(assignees) {
+            if a.(string) == uctx.Username {
+                return true, nil, err
+            }
+        }
+    }
+
+    // Check the contract authorization
+    // --
+    var f func(*model.UserCtx, *model.Tension, *model.EventRef) (bool, *model.Contract, error)
+    switch em.Auth {
+    case model.ContractTypeAnyParticipants:
+        f = AnyParticipants
+    case model.ContractTypeAnyCoordoDual:
+        f = AnyCoordoDual
+    case model.ContractTypeAnyCoordoSource:
+        f = AnyCoordoSource
+    case model.ContractTypeAnyCoordoTarget:
+        f = AnyCoordoTarget
+    case "": // Empty, passing
+        return true, nil, err
+    default:
+        return false, nil, fmt.Errorf("not implemented contract type.")
+    }
+    return f(uctx, tension, event)
+}
+
+func AnyParticipants(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+    ok, _, err := AnyCoordoTarget(uctx, tension, event)
+    if err != nil { return false, nil, err }
+
+    if ok {
+        //@TODO
+        //return contract
+        return false, nil, nil
+    } else {
+        return false, nil, nil
+    }
+}
+
+func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+    ok1, _, err := AnyCoordoSource(uctx, tension, event)
+    if err != nil { return false, nil, err }
+
+    ok2, _, err := AnyCoordoTarget(uctx, tension, event)
+    if err != nil { return false, nil, err }
+
+    if ok1 && ok2 {
+        return true, nil, err
+    } else if ok1 || ok2 {
+        //@TODO
+        //return contract
+        return false, nil, err
+    } else {
+        return false, nil, err
+    }
+}
+
+func AnyCoordoSource(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+    return AnyCoordo(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
+}
+
+func AnyCoordoTarget(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+    return AnyCoordo(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
+}
+
+//
+// Base authaurisation methods
+//
+
+func AnyCoordo(uctx *model.UserCtx, nameid string, charac *model.NodeCharac) (bool, *model.Contract, error) {
+    // Check user rights
+    ok, err := CheckUserRights(uctx, nameid, charac)
+    if err != nil { return ok, nil, LogErr("Internal error", err) }
+
+    // Check if user has rights in any parents if the node has no Coordo role.
+    if !ok && !db.GetDB().HasCoordos(nameid) {
+        ok, err = CheckUpperRights(uctx, nameid, charac)
+    }
+    return ok, nil, err
 }
 
 // chechUserRight return true if the user has access right (e.g. Coordo) on the given node
@@ -59,6 +174,10 @@ func CheckUpperRights(uctx *model.UserCtx, nameid string, charac *model.NodeChar
 
     return ok, err
 }
+
+//
+// With Ctx method (used in graph/resolver.go)
+//
 
 // Check if an user owns the given object
 func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj interface{}) (bool, error) {
@@ -116,3 +235,6 @@ func CheckAssignees(ctx context.Context, uctx *model.UserCtx, nodeObj interface{
     return false, err
 }
 
+func GetNodeCharacStrict() model.NodeCharac {
+    return model.NodeCharac{UserCanJoin: false, Mode: model.NodeModeCoordinated}
+}

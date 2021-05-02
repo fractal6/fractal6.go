@@ -39,11 +39,31 @@ type AddCommentPayload struct {
 	NumUids *int       `json:"numUids,omitempty"`
 }
 
+type AddContractInput struct {
+	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt    string         `json:"createdAt,omitempty"`
+	UpdatedAt    *string        `json:"updatedAt,omitempty"`
+	Message      *string        `json:"message,omitempty"`
+	Event        *EventRef      `json:"event,omitempty"`
+	Tension      *TensionRef    `json:"tension,omitempty"`
+	Status       ContractStatus `json:"status,omitempty"`
+	Type         ContractType   `json:"type,omitempty"`
+	Candidates   []*VoteRef     `json:"candidates,omitempty"`
+	Participants []*VoteRef     `json:"participants,omitempty"`
+	Comments     []*CommentRef  `json:"comments,omitempty"`
+}
+
+type AddContractPayload struct {
+	Contract []*Contract `json:"contract,omitempty"`
+	NumUids  *int        `json:"numUids,omitempty"`
+}
+
 type AddEventInput struct {
 	CreatedBy *UserRef     `json:"createdBy,omitempty"`
 	CreatedAt string       `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
+	Tension   *TensionRef  `json:"tension,omitempty"`
 	EventType TensionEvent `json:"event_type,omitempty"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
@@ -178,19 +198,20 @@ type AddTensionInput struct {
 	CreatedAt  string         `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	Message    *string        `json:"message,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      string         `json:"title,omitempty"`
-	Type       TensionType    `json:"type_,omitempty"`
 	Emitterid  string         `json:"emitterid,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      string         `json:"title,omitempty"`
+	Type       TensionType    `json:"type_,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
+	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	NBlobs     *int           `json:"n_blobs,omitempty"`
@@ -233,6 +254,17 @@ type AddUserRightsInput struct {
 type AddUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
 	NumUids    *int          `json:"numUids,omitempty"`
+}
+
+type AddVoteInput struct {
+	Node    *NodeRef `json:"node,omitempty"`
+	Content *string  `json:"content,omitempty"`
+	Data    []int    `json:"data,omitempty"`
+}
+
+type AddVotePayload struct {
+	Vote    []*Vote `json:"vote,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AuthRule struct {
@@ -345,6 +377,65 @@ type CommentRef struct {
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
+type Contract struct {
+	Event        *Event         `json:"event,omitempty"`
+	Tension      *Tension       `json:"tension,omitempty"`
+	Status       ContractStatus `json:"status,omitempty"`
+	Type         ContractType   `json:"type,omitempty"`
+	Candidates   []*Vote        `json:"candidates,omitempty"`
+	Participants []*Vote        `json:"participants,omitempty"`
+	Comments     []*Comment     `json:"comments,omitempty"`
+	ID           string         `json:"id,omitempty"`
+	CreatedBy    *User          `json:"createdBy,omitempty"`
+	CreatedAt    string         `json:"createdAt,omitempty"`
+	UpdatedAt    *string        `json:"updatedAt,omitempty"`
+	Message      *string        `json:"message,omitempty"`
+}
+
+type ContractFilter struct {
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	And       *ContractFilter       `json:"and,omitempty"`
+	Or        *ContractFilter       `json:"or,omitempty"`
+	Not       *ContractFilter       `json:"not,omitempty"`
+}
+
+type ContractOrder struct {
+	Asc  *ContractOrderable `json:"asc,omitempty"`
+	Desc *ContractOrderable `json:"desc,omitempty"`
+	Then *ContractOrder     `json:"then,omitempty"`
+}
+
+type ContractPatch struct {
+	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
+	CreatedAt    *string         `json:"createdAt,omitempty"`
+	UpdatedAt    *string         `json:"updatedAt,omitempty"`
+	Message      *string         `json:"message,omitempty"`
+	Event        *EventRef       `json:"event,omitempty"`
+	Tension      *TensionRef     `json:"tension,omitempty"`
+	Status       *ContractStatus `json:"status,omitempty"`
+	Type         *ContractType   `json:"type,omitempty"`
+	Candidates   []*VoteRef      `json:"candidates,omitempty"`
+	Participants []*VoteRef      `json:"participants,omitempty"`
+	Comments     []*CommentRef   `json:"comments,omitempty"`
+}
+
+type ContractRef struct {
+	ID           *string         `json:"id,omitempty"`
+	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
+	CreatedAt    *string         `json:"createdAt,omitempty"`
+	UpdatedAt    *string         `json:"updatedAt,omitempty"`
+	Message      *string         `json:"message,omitempty"`
+	Event        *EventRef       `json:"event,omitempty"`
+	Tension      *TensionRef     `json:"tension,omitempty"`
+	Status       *ContractStatus `json:"status,omitempty"`
+	Type         *ContractType   `json:"type,omitempty"`
+	Candidates   []*VoteRef      `json:"candidates,omitempty"`
+	Participants []*VoteRef      `json:"participants,omitempty"`
+	Comments     []*CommentRef   `json:"comments,omitempty"`
+}
+
 type CustomHTTP struct {
 	URL                  string     `json:"url,omitempty"`
 	Method               HTTPMethod `json:"method,omitempty"`
@@ -375,6 +466,12 @@ type DeleteCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type DeleteContractPayload struct {
+	Contract []*Contract `json:"contract,omitempty"`
+	Msg      *string     `json:"msg,omitempty"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type DeleteEventPayload struct {
@@ -432,6 +529,7 @@ type DeleteUserPayload struct {
 }
 
 type Event struct {
+	Tension   *Tension     `json:"tension,omitempty"`
 	EventType TensionEvent `json:"event_type,omitempty"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
@@ -463,6 +561,7 @@ type EventPatch struct {
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	UpdatedAt *string       `json:"updatedAt,omitempty"`
 	Message   *string       `json:"message,omitempty"`
+	Tension   *TensionRef   `json:"tension,omitempty"`
 	EventType *TensionEvent `json:"event_type,omitempty"`
 	Old       *string       `json:"old,omitempty"`
 	New       *string       `json:"new,omitempty"`
@@ -474,6 +573,7 @@ type EventRef struct {
 	CreatedAt *string       `json:"createdAt,omitempty"`
 	UpdatedAt *string       `json:"updatedAt,omitempty"`
 	Message   *string       `json:"message,omitempty"`
+	Tension   *TensionRef   `json:"tension,omitempty"`
 	EventType *TensionEvent `json:"event_type,omitempty"`
 	Old       *string       `json:"old,omitempty"`
 	New       *string       `json:"new,omitempty"`
@@ -913,19 +1013,20 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Nth        *string        `json:"nth,omitempty"`
-	Title      string         `json:"title,omitempty"`
-	Type       TensionType    `json:"type_,omitempty"`
 	Emitterid  string         `json:"emitterid,omitempty"`
 	Emitter    *Node          `json:"emitter,omitempty"`
 	Receiverid string         `json:"receiverid,omitempty"`
 	Receiver   *Node          `json:"receiver,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      string         `json:"title,omitempty"`
+	Type       TensionType    `json:"type_,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
 	Labels     []*Label       `json:"labels,omitempty"`
 	Assignees  []*User        `json:"assignees,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*Blob        `json:"blobs,omitempty"`
+	Contracts  []*Contract    `json:"contracts,omitempty"`
 	History    []*Event       `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	NBlobs     *int           `json:"n_blobs,omitempty"`
@@ -944,11 +1045,11 @@ type TensionFilter struct {
 	ID         []string                            `json:"id,omitempty"`
 	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
 	Message    *StringFullTextFilter               `json:"message,omitempty"`
+	Emitterid  *StringHashFilterStringRegExpFilter `json:"emitterid,omitempty"`
+	Receiverid *StringHashFilterStringRegExpFilter `json:"receiverid,omitempty"`
 	Nth        *StringTermFilter                   `json:"nth,omitempty"`
 	Title      *StringFullTextFilter               `json:"title,omitempty"`
 	Type       *TensionTypeHash                    `json:"type_,omitempty"`
-	Emitterid  *StringHashFilterStringRegExpFilter `json:"emitterid,omitempty"`
-	Receiverid *StringHashFilterStringRegExpFilter `json:"receiverid,omitempty"`
 	Status     *TensionStatusHash                  `json:"status,omitempty"`
 	And        *TensionFilter                      `json:"and,omitempty"`
 	Or         *TensionFilter                      `json:"or,omitempty"`
@@ -966,19 +1067,20 @@ type TensionPatch struct {
 	CreatedAt  *string        `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	Message    *string        `json:"message,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      *string        `json:"title,omitempty"`
-	Type       *TensionType   `json:"type_,omitempty"`
 	Emitterid  *string        `json:"emitterid,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
 	Receiverid *string        `json:"receiverid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      *string        `json:"title,omitempty"`
+	Type       *TensionType   `json:"type_,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
+	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	NBlobs     *int           `json:"n_blobs,omitempty"`
@@ -990,19 +1092,20 @@ type TensionRef struct {
 	CreatedAt  *string        `json:"createdAt,omitempty"`
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	Message    *string        `json:"message,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      *string        `json:"title,omitempty"`
-	Type       *TensionType   `json:"type_,omitempty"`
 	Emitterid  *string        `json:"emitterid,omitempty"`
 	Emitter    *NodeRef       `json:"emitter,omitempty"`
 	Receiverid *string        `json:"receiverid,omitempty"`
 	Receiver   *NodeRef       `json:"receiver,omitempty"`
+	Nth        *string        `json:"nth,omitempty"`
+	Title      *string        `json:"title,omitempty"`
+	Type       *TensionType   `json:"type_,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
 	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
+	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
 	NComments  *int           `json:"n_comments,omitempty"`
 	NBlobs     *int           `json:"n_blobs,omitempty"`
@@ -1036,6 +1139,17 @@ type UpdateCommentInput struct {
 type UpdateCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type UpdateContractInput struct {
+	Filter *ContractFilter `json:"filter,omitempty"`
+	Set    *ContractPatch  `json:"set,omitempty"`
+	Remove *ContractPatch  `json:"remove,omitempty"`
+}
+
+type UpdateContractPayload struct {
+	Contract []*Contract `json:"contract,omitempty"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type UpdateEventInput struct {
@@ -1225,6 +1339,24 @@ type UserRightsRef struct {
 	MaxPublicOrga *int  `json:"maxPublicOrga,omitempty"`
 }
 
+type Vote struct {
+	Node    *Node   `json:"node,omitempty"`
+	Content *string `json:"content,omitempty"`
+	Data    []int   `json:"data,omitempty"`
+}
+
+type VoteOrder struct {
+	Asc  *VoteOrderable `json:"asc,omitempty"`
+	Desc *VoteOrderable `json:"desc,omitempty"`
+	Then *VoteOrder     `json:"then,omitempty"`
+}
+
+type VoteRef struct {
+	Node    *NodeRef `json:"node,omitempty"`
+	Content *string  `json:"content,omitempty"`
+	Data    []int    `json:"data,omitempty"`
+}
+
 type BlobOrderable string
 
 const (
@@ -1363,6 +1495,137 @@ func (e *CommentOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e CommentOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ContractOrderable string
+
+const (
+	ContractOrderableCreatedAt ContractOrderable = "createdAt"
+	ContractOrderableUpdatedAt ContractOrderable = "updatedAt"
+	ContractOrderableMessage   ContractOrderable = "message"
+)
+
+var AllContractOrderable = []ContractOrderable{
+	ContractOrderableCreatedAt,
+	ContractOrderableUpdatedAt,
+	ContractOrderableMessage,
+}
+
+func (e ContractOrderable) IsValid() bool {
+	switch e {
+	case ContractOrderableCreatedAt, ContractOrderableUpdatedAt, ContractOrderableMessage:
+		return true
+	}
+	return false
+}
+
+func (e ContractOrderable) String() string {
+	return string(e)
+}
+
+func (e *ContractOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ContractOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ContractOrderable", str)
+	}
+	return nil
+}
+
+func (e ContractOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ContractStatus string
+
+const (
+	ContractStatusOpen     ContractStatus = "Open"
+	ContractStatusClosed   ContractStatus = "Closed"
+	ContractStatusCanceled ContractStatus = "Canceled"
+)
+
+var AllContractStatus = []ContractStatus{
+	ContractStatusOpen,
+	ContractStatusClosed,
+	ContractStatusCanceled,
+}
+
+func (e ContractStatus) IsValid() bool {
+	switch e {
+	case ContractStatusOpen, ContractStatusClosed, ContractStatusCanceled:
+		return true
+	}
+	return false
+}
+
+func (e ContractStatus) String() string {
+	return string(e)
+}
+
+func (e *ContractStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ContractStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ContractStatus", str)
+	}
+	return nil
+}
+
+func (e ContractStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ContractType string
+
+const (
+	ContractTypeAnyCoordoDual   ContractType = "AnyCoordoDual"
+	ContractTypeAnyParticipants ContractType = "AnyParticipants"
+	ContractTypeAnyCoordoSource ContractType = "AnyCoordoSource"
+	ContractTypeAnyCoordoTarget ContractType = "AnyCoordoTarget"
+)
+
+var AllContractType = []ContractType{
+	ContractTypeAnyCoordoDual,
+	ContractTypeAnyParticipants,
+	ContractTypeAnyCoordoSource,
+	ContractTypeAnyCoordoTarget,
+}
+
+func (e ContractType) IsValid() bool {
+	switch e {
+	case ContractTypeAnyCoordoDual, ContractTypeAnyParticipants, ContractTypeAnyCoordoSource, ContractTypeAnyCoordoTarget:
+		return true
+	}
+	return false
+}
+
+func (e ContractType) String() string {
+	return string(e)
+}
+
+func (e *ContractType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ContractType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ContractType", str)
+	}
+	return nil
+}
+
+func (e ContractType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -1937,6 +2200,7 @@ const (
 	RoleTypeMember      RoleType = "Member"
 	RoleTypeGuest       RoleType = "Guest"
 	RoleTypeRetired     RoleType = "Retired"
+	RoleTypePending     RoleType = "Pending"
 	RoleTypeCoordinator RoleType = "Coordinator"
 	RoleTypePeer        RoleType = "Peer"
 	RoleTypeBot         RoleType = "Bot"
@@ -1947,6 +2211,7 @@ var AllRoleType = []RoleType{
 	RoleTypeMember,
 	RoleTypeGuest,
 	RoleTypeRetired,
+	RoleTypePending,
 	RoleTypeCoordinator,
 	RoleTypePeer,
 	RoleTypeBot,
@@ -1954,7 +2219,7 @@ var AllRoleType = []RoleType{
 
 func (e RoleType) IsValid() bool {
 	switch e {
-	case RoleTypeOwner, RoleTypeMember, RoleTypeGuest, RoleTypeRetired, RoleTypeCoordinator, RoleTypePeer, RoleTypeBot:
+	case RoleTypeOwner, RoleTypeMember, RoleTypeGuest, RoleTypeRetired, RoleTypePending, RoleTypeCoordinator, RoleTypePeer, RoleTypeBot:
 		return true
 	}
 	return false
@@ -2093,12 +2358,12 @@ const (
 	TensionEventLabelRemoved    TensionEvent = "LabelRemoved"
 	TensionEventBlobCreated     TensionEvent = "BlobCreated"
 	TensionEventBlobCommitted   TensionEvent = "BlobCommitted"
-	TensionEventMoved           TensionEvent = "Moved"
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
 	TensionEventUserJoin        TensionEvent = "UserJoin"
 	TensionEventUserLeft        TensionEvent = "UserLeft"
+	TensionEventMoved           TensionEvent = "Moved"
 )
 
 var AllTensionEvent = []TensionEvent{
@@ -2113,17 +2378,17 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventLabelRemoved,
 	TensionEventBlobCreated,
 	TensionEventBlobCommitted,
-	TensionEventMoved,
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
 	TensionEventUserJoin,
 	TensionEventUserLeft,
+	TensionEventMoved,
 }
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMoved, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoin, TensionEventUserLeft:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoin, TensionEventUserLeft, TensionEventMoved:
 		return true
 	}
 	return false
@@ -2156,10 +2421,10 @@ const (
 	TensionOrderableCreatedAt  TensionOrderable = "createdAt"
 	TensionOrderableUpdatedAt  TensionOrderable = "updatedAt"
 	TensionOrderableMessage    TensionOrderable = "message"
-	TensionOrderableNth        TensionOrderable = "nth"
-	TensionOrderableTitle      TensionOrderable = "title"
 	TensionOrderableEmitterid  TensionOrderable = "emitterid"
 	TensionOrderableReceiverid TensionOrderable = "receiverid"
+	TensionOrderableNth        TensionOrderable = "nth"
+	TensionOrderableTitle      TensionOrderable = "title"
 	TensionOrderableNComments  TensionOrderable = "n_comments"
 	TensionOrderableNBlobs     TensionOrderable = "n_blobs"
 )
@@ -2168,17 +2433,17 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableCreatedAt,
 	TensionOrderableUpdatedAt,
 	TensionOrderableMessage,
-	TensionOrderableNth,
-	TensionOrderableTitle,
 	TensionOrderableEmitterid,
 	TensionOrderableReceiverid,
+	TensionOrderableNth,
+	TensionOrderableTitle,
 	TensionOrderableNComments,
 	TensionOrderableNBlobs,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableNth, TensionOrderableTitle, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNComments, TensionOrderableNBlobs:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNBlobs:
 		return true
 	}
 	return false
@@ -2380,5 +2645,44 @@ func (e *UserRightsOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e UserRightsOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type VoteOrderable string
+
+const (
+	VoteOrderableContent VoteOrderable = "content"
+)
+
+var AllVoteOrderable = []VoteOrderable{
+	VoteOrderableContent,
+}
+
+func (e VoteOrderable) IsValid() bool {
+	switch e {
+	case VoteOrderableContent:
+		return true
+	}
+	return false
+}
+
+func (e VoteOrderable) String() string {
+	return string(e)
+}
+
+func (e *VoteOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = VoteOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid VoteOrderable", str)
+	}
+	return nil
+}
+
+func (e VoteOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

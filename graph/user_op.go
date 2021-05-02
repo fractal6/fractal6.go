@@ -36,16 +36,14 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     tid := tension.ID
     parentid := tension.Receiver.Nameid
 
-    // CanLeaveRole
-    // --
+    // Type check
     if node.RoleType == nil { return false, fmt.Errorf("Node need a role type for this action.") }
     if node.FirstLink == nil { return false, fmt.Errorf("Node need a linked user for this action.") }
 
-    // Check the identity of the user asking
+    // CanLeaveRole
     if *node.FirstLink != uctx.Username {
         return false, fmt.Errorf("Access denied")
     }
-    // --
 
     // Get References
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
@@ -54,7 +52,9 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     case model.RoleTypeOwner:
         return false, fmt.Errorf("Doh, organisation destruction is not yet implemented, WIP.")
     case model.RoleTypeMember:
-        return false, fmt.Errorf("Doh, you avec active role in this organisation.")
+        return false, fmt.Errorf("Doh, you ave active role in this organisation. Please leave your roles first.")
+    case model.RoleTypePending:
+        return false, fmt.Errorf("Doh, you cannot leave peding role. Please reject the invitation.")
     case model.RoleTypeGuest:
         err := db.GetDB().UpgradeMember(nameid, model.RoleTypeRetired)
         if err != nil {return false, err}

@@ -77,7 +77,7 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
     }
 
     // Validate and process Blob Event
-    ok, err := tensionEventHook(uctx, tid, input.History, nil)
+    ok, _,  err := tensionEventHook(uctx, tid, input.History, nil)
     if err != nil || !ok {
         // Delete the tension just added
         e := db.GetDB().DeleteNodes(tid)
@@ -104,16 +104,22 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
         return nil, LogErr("field missing", fmt.Errorf("id field is required in tension filter."))
     }
 
-    // Validate Blob Event
+    // Validate Blob Event prior the mutation
     var bid *string
+    var contract *model.Contract
+    var ok bool
     if input.Set != nil  {
         if len(input.Set.Blobs) > 0 {
             bid = input.Set.Blobs[0].ID
         }
-        ok, err := tensionEventHook(uctx, tids[0], input.Set.History, bid)
+        ok, contract, err = tensionEventHook(uctx, tids[0], input.Set.History, bid)
         if err != nil  { return nil, err }
         if ok {
             return next(ctx)
+        } else if contract != nil {
+            var t  model.Tension
+            t.Contracts = append(t.Contracts, contract)
+            return t, err
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }

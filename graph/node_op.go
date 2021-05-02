@@ -34,7 +34,7 @@ func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFra
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, true)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, true)
     if err != nil || !ok { return ok, err }
 
     err = PushNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -50,7 +50,7 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok { return ok, err }
 
     err = UpdateNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -65,7 +65,7 @@ func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.Nod
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok { return ok, err }
 
     // Check that circle has no children
@@ -95,7 +95,7 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := CanAddNode(uctx, node, nameid, parentid, charac, false)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, false)
     if err != nil || !ok { return ok, err }
 
     // Check that node has no parent archived
@@ -116,8 +116,8 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
     return ok, err
 }
 
-// canAddNode check that a user can add a given role or circle in an organisation.
-func CanAddNode(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, isNew bool) (bool, error) {
+// NodeCheck validate and type checks.
+func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, isNew bool) (bool, error) {
     var ok bool = false
     var err error
 
@@ -141,15 +141,7 @@ func CanAddNode(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid 
         //pass
     }
 
-    // Check user rights
-    ok, err = CheckUserRights(uctx, parentid, charac)
-    if err != nil { return ok, LogErr("Internal error", err) }
-
-    // Check if user has rights of any parents if the node has no Coordo role.
-    if !ok && !db.GetDB().HasCoordos(parentid) {
-        return CheckUpperRights(uctx, parentid, charac)
-    }
-
+    ok = true
     return ok, err
 }
 

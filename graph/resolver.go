@@ -433,7 +433,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, nField
         if ok { return next(ctx) }
     }
 
-    // Check if user has rights of any parents if the node has no Coordo role.
+    // Check if user has rights in any parents if the node has no Coordo role.
     if !ok && ctx.Value("nameid") != nil && !db.GetDB().HasCoordos(ctx.Value("nameid").(string)) { // is a Node
         ok, err = CheckUpperRights(uctx, ctx.Value("nameid").(string), nil)
         if err != nil { return nil, LogErr("Internal error", err) }
@@ -582,7 +582,7 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
 //
 // Go Utils
 //
-func getNestedObj(obj interface {}, field string) interface{} {
+func getNestedObj(obj interface{}, field string) interface{} {
     var source model.JsonAtom
     var target interface{}
 
