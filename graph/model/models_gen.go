@@ -162,6 +162,7 @@ type AddNodeInput struct {
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Contracts    []*VoteRef     `json:"contracts,omitempty"`
 	Shared       *SharedNodeRef `json:"shared,omitempty"`
 }
 
@@ -257,9 +258,10 @@ type AddUserRightsPayload struct {
 }
 
 type AddVoteInput struct {
-	Node    *NodeRef `json:"node,omitempty"`
-	Content *string  `json:"content,omitempty"`
-	Data    []int    `json:"data,omitempty"`
+	Contract *ContractRef `json:"contract,omitempty"`
+	Node     *NodeRef     `json:"node,omitempty"`
+	Content  *string      `json:"content,omitempty"`
+	Data     []int        `json:"data,omitempty"`
 }
 
 type AddVotePayload struct {
@@ -713,6 +715,7 @@ type Node struct {
 	SecondLink   *User       `json:"second_link,omitempty"`
 	Skills       []string    `json:"skills,omitempty"`
 	RoleType     *RoleType   `json:"role_type,omitempty"`
+	Contracts    []*Vote     `json:"contracts,omitempty"`
 	Shared       *SharedNode `json:"shared,omitempty"`
 }
 
@@ -858,6 +861,7 @@ type NodePatch struct {
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Contracts    []*VoteRef     `json:"contracts,omitempty"`
 	Shared       *SharedNodeRef `json:"shared,omitempty"`
 }
 
@@ -892,6 +896,7 @@ type NodeRef struct {
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
 	Skills       []string       `json:"skills,omitempty"`
 	RoleType     *RoleType      `json:"role_type,omitempty"`
+	Contracts    []*VoteRef     `json:"contracts,omitempty"`
 	Shared       *SharedNodeRef `json:"shared,omitempty"`
 }
 
@@ -1340,9 +1345,10 @@ type UserRightsRef struct {
 }
 
 type Vote struct {
-	Node    *Node   `json:"node,omitempty"`
-	Content *string `json:"content,omitempty"`
-	Data    []int   `json:"data,omitempty"`
+	Contract *Contract `json:"contract,omitempty"`
+	Node     *Node     `json:"node,omitempty"`
+	Content  *string   `json:"content,omitempty"`
+	Data     []int     `json:"data,omitempty"`
 }
 
 type VoteOrder struct {
@@ -1352,9 +1358,10 @@ type VoteOrder struct {
 }
 
 type VoteRef struct {
-	Node    *NodeRef `json:"node,omitempty"`
-	Content *string  `json:"content,omitempty"`
-	Data    []int    `json:"data,omitempty"`
+	Contract *ContractRef `json:"contract,omitempty"`
+	Node     *NodeRef     `json:"node,omitempty"`
+	Content  *string      `json:"content,omitempty"`
+	Data     []int        `json:"data,omitempty"`
 }
 
 type BlobOrderable string

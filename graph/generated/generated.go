@@ -345,6 +345,7 @@ type ComplexityRoot struct {
 		About        func(childComplexity int) int
 		Charac       func(childComplexity int, filter *model.NodeCharacFilter) int
 		Children     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		Contracts    func(childComplexity int, order *model.VoteOrder, first *int, offset *int) int
 		CreatedAt    func(childComplexity int) int
 		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
 		Docs         func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
@@ -560,9 +561,10 @@ type ComplexityRoot struct {
 	}
 
 	Vote struct {
-		Content func(childComplexity int) int
-		Data    func(childComplexity int) int
-		Node    func(childComplexity int, filter *model.NodeFilter) int
+		Content  func(childComplexity int) int
+		Contract func(childComplexity int, filter *model.ContractFilter) int
+		Data     func(childComplexity int) int
+		Node     func(childComplexity int, filter *model.NodeFilter) int
 	}
 }
 
@@ -2176,6 +2178,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Children(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Node.contracts":
+		if e.complexity.Node.Contracts == nil {
+			break
+		}
+
+		args, err := ec.field_Node_contracts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Contracts(childComplexity, args["order"].(*model.VoteOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "Node.createdAt":
 		if e.complexity.Node.CreatedAt == nil {
 			break
@@ -3561,6 +3575,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vote.Content(childComplexity), true
 
+	case "Vote.contract":
+		if e.complexity.Vote.Contract == nil {
+			break
+		}
+
+		args, err := ec.field_Vote_contract_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Vote.Contract(childComplexity, args["filter"].(*model.ContractFilter)), true
+
 	case "Vote.data":
 		if e.complexity.Vote.Data == nil {
 			break
@@ -3738,6 +3764,7 @@ type Node @hidePrivate {
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
   role_type: RoleType @search
+  contracts(order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
   shared: SharedNode
 }
 
@@ -3806,7 +3833,7 @@ type Tension @hidePrivate {
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   action: TensionAction
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
-  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: tension)
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]! @hasInverse(field: tension)
   n_comments: Int @count(f: comments)
   n_blobs: Int @count(f: blobs)
@@ -3868,7 +3895,7 @@ type Contract {
   tension(filter: TensionFilter): Tension!
   status: ContractStatus!
   type: ContractType!
-  candidates(order: VoteOrder, first: Int, offset: Int): [Vote!]
+  candidates(order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   participants(order: VoteOrder, first: Int, offset: Int): [Vote!]
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   id: ID!
@@ -3879,6 +3906,7 @@ type Contract {
 }
 
 type Vote {
+  contract(filter: ContractFilter): Contract!
   node(filter: NodeFilter): Node!
   content: String
   data: [Int!]
@@ -4022,25 +4050,25 @@ enum ContractType {
   AnyCoordoTarget
 }
 
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
-
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @cascade on FIELD
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE
-
-directive @cascade on FIELD
-
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE
+
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -4196,6 +4224,7 @@ input AddNodeInput {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
+  contracts: [VoteRef!]
   shared: SharedNodeRef @alter_RO
 }
 
@@ -4245,7 +4274,7 @@ input AddTensionInput {
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
-  contracts: [ContractRef!]
+  contracts: [ContractRef!] @alter_hasRole(n:["receiver"], a:1)
   history: [EventRef!]!
   n_comments: Int
   n_blobs: Int
@@ -4291,6 +4320,7 @@ type AddUserRightsPayload {
 }
 
 input AddVoteInput {
+  contract: ContractRef!
   node: NodeRef!
   content: String
   data: [Int!]
@@ -4906,6 +4936,7 @@ input NodePatch {
   second_link: UserRef @patch_RO
   skills: [String!] @patch_RO
   role_type: RoleType @patch_RO
+  contracts: [VoteRef!]
   shared: SharedNodeRef @alter_RO
 }
 
@@ -4940,6 +4971,7 @@ input NodeRef {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
+  contracts: [VoteRef!]
   shared: SharedNodeRef
 }
 
@@ -5144,7 +5176,7 @@ input TensionPatch {
   comments: [CommentRef!] @alter_hasRoot(n:["emitter","receiver"])
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
-  contracts: [ContractRef!]
+  contracts: [ContractRef!] @alter_hasRole(n:["receiver"], a:1)
   history: [EventRef!]
   n_comments: Int
   n_blobs: Int
@@ -5405,6 +5437,7 @@ enum VoteOrderable {
 }
 
 input VoteRef {
+  contract: ContractRef
   node: NodeRef
   content: String
   data: [Int!]
@@ -7980,6 +8013,39 @@ func (ec *executionContext) field_Node_children_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_contracts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.VoteOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg0, err = ec.unmarshalOVoteOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10053,6 +10119,21 @@ func (ec *executionContext) field_User_tensions_created_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Vote_contract_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ContractFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOContractFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Vote_node_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12016,8 +12097,32 @@ func (ec *executionContext) _Contract_candidates(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Candidates, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Candidates, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "contract")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Vote); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Vote`, tmp)
 	})
 
 	if resTmp == nil {
@@ -17441,6 +17546,66 @@ func (ec *executionContext) _Node_role_type(ctx context.Context, field graphql.C
 	return ec.marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_contracts_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Contracts, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "node")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Vote); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Vote`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Vote)
+	fc.Result = res
+	return ec.marshalOVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_shared(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -20228,8 +20393,32 @@ func (ec *executionContext) _Tension_contracts(ctx context.Context, field graphq
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Contracts, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Contracts, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "tension")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Contract); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Contract`, tmp)
 	})
 
 	if resTmp == nil {
@@ -22274,6 +22463,45 @@ func (ec *executionContext) _UserRights_maxPublicOrga(ctx context.Context, field
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Vote_contract(ctx context.Context, field graphql.CollectedField, obj *model.Vote) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Vote",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Vote_contract_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Contract, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Contract)
+	fc.Result = res
+	return ec.marshalNContract2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContract(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Vote_node(ctx context.Context, field graphql.CollectedField, obj *model.Vote) (ret graphql.Marshaler) {
@@ -24402,6 +24630,14 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
+			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "shared":
 			var err error
 
@@ -24848,9 +25084,35 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
-			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, nil, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ContractRef); ok {
+				it.Contracts = data
+			} else if tmp == nil {
+				it.Contracts = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "history":
 			var err error
@@ -25186,6 +25448,14 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
+		case "contract":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
+			it.Contract, err = ec.unmarshalNContractRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "node":
 			var err error
 
@@ -28712,6 +28982,14 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
+			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "shared":
 			var err error
 
@@ -28987,6 +29265,14 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
 			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
+			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -30244,9 +30530,35 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
-			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"receiver"})
+				if err != nil {
+					return nil, err
+				}
+				a, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRole == nil {
+					return nil, errors.New("directive alter_hasRole is not implemented")
+				}
+				return ec.directives.Alter_hasRole(ctx, obj, directive0, n, nil, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ContractRef); ok {
+				it.Contracts = data
+			} else if tmp == nil {
+				it.Contracts = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "history":
 			var err error
@@ -31610,6 +31922,14 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
+		case "contract":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
+			it.Contract, err = ec.unmarshalOContractRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "node":
 			var err error
 
@@ -32894,6 +33214,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_skills(ctx, field, obj)
 		case "role_type":
 			out.Values[i] = ec._Node_role_type(ctx, field, obj)
+		case "contracts":
+			out.Values[i] = ec._Node_contracts(ctx, field, obj)
 		case "shared":
 			out.Values[i] = ec._Node_shared(ctx, field, obj)
 		default:
@@ -33969,6 +34291,11 @@ func (ec *executionContext) _Vote(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Vote")
+		case "contract":
+			out.Values[i] = ec._Vote_contract(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "node":
 			out.Values[i] = ec._Vote_node(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -36144,6 +36471,14 @@ func (ec *executionContext) unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOContractRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx context.Context, v interface{}) (*model.ContractRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputContractRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOContractStatus2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx context.Context, v interface{}) (*model.ContractStatus, error) {

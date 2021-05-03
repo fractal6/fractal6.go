@@ -98,9 +98,24 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
     if ok1 && ok2 {
         return true, nil, err
     } else if ok1 || ok2 {
-        //@TODO
-        //return contract
-        return false, nil, err
+        var ev model.Event
+        StructMap(*event, &ev)
+        var node model.Node
+        if ok1 {
+            node.Nameid = tension.Emitter.Nameid
+        } else if ok2 {
+            node.Nameid = tension.Receiver.Nameid
+        }
+        contract := &model.Contract{
+            Event: &ev,
+            Tension: tension,
+            Status: model.ContractStatusOpen,
+            Participants: []*model.Vote{&model.Vote{
+                Node: &node,
+                Data: []int{1},
+            }, },
+        }
+        return false, contract, err
     } else {
         return false, nil, err
     }
