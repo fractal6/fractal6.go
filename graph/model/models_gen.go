@@ -47,7 +47,7 @@ type AddContractInput struct {
 	Event        *EventRef      `json:"event,omitempty"`
 	Tension      *TensionRef    `json:"tension,omitempty"`
 	Status       ContractStatus `json:"status,omitempty"`
-	Type         ContractType   `json:"type,omitempty"`
+	ContractType ContractType   `json:"contract_type,omitempty"`
 	Candidates   []*VoteRef     `json:"candidates,omitempty"`
 	Participants []*VoteRef     `json:"participants,omitempty"`
 	Comments     []*CommentRef  `json:"comments,omitempty"`
@@ -260,7 +260,6 @@ type AddUserRightsPayload struct {
 type AddVoteInput struct {
 	Contract *ContractRef `json:"contract,omitempty"`
 	Node     *NodeRef     `json:"node,omitempty"`
-	Content  *string      `json:"content,omitempty"`
 	Data     []int        `json:"data,omitempty"`
 }
 
@@ -383,7 +382,7 @@ type Contract struct {
 	Event        *Event         `json:"event,omitempty"`
 	Tension      *Tension       `json:"tension,omitempty"`
 	Status       ContractStatus `json:"status,omitempty"`
-	Type         ContractType   `json:"type,omitempty"`
+	ContractType ContractType   `json:"contract_type,omitempty"`
 	Candidates   []*Vote        `json:"candidates,omitempty"`
 	Participants []*Vote        `json:"participants,omitempty"`
 	Comments     []*Comment     `json:"comments,omitempty"`
@@ -417,7 +416,7 @@ type ContractPatch struct {
 	Event        *EventRef       `json:"event,omitempty"`
 	Tension      *TensionRef     `json:"tension,omitempty"`
 	Status       *ContractStatus `json:"status,omitempty"`
-	Type         *ContractType   `json:"type,omitempty"`
+	ContractType *ContractType   `json:"contract_type,omitempty"`
 	Candidates   []*VoteRef      `json:"candidates,omitempty"`
 	Participants []*VoteRef      `json:"participants,omitempty"`
 	Comments     []*CommentRef   `json:"comments,omitempty"`
@@ -432,7 +431,7 @@ type ContractRef struct {
 	Event        *EventRef       `json:"event,omitempty"`
 	Tension      *TensionRef     `json:"tension,omitempty"`
 	Status       *ContractStatus `json:"status,omitempty"`
-	Type         *ContractType   `json:"type,omitempty"`
+	ContractType *ContractType   `json:"contract_type,omitempty"`
 	Candidates   []*VoteRef      `json:"candidates,omitempty"`
 	Participants []*VoteRef      `json:"participants,omitempty"`
 	Comments     []*CommentRef   `json:"comments,omitempty"`
@@ -526,6 +525,12 @@ type DeleteTensionPayload struct {
 
 type DeleteUserPayload struct {
 	User    []*User `json:"user,omitempty"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteVotePayload struct {
+	Vote    []*Vote `json:"vote,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
 }
@@ -1256,6 +1261,17 @@ type UpdateUserPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type UpdateVoteInput struct {
+	Filter *VoteFilter `json:"filter,omitempty"`
+	Set    *VotePatch  `json:"set,omitempty"`
+	Remove *VotePatch  `json:"remove,omitempty"`
+}
+
+type UpdateVotePayload struct {
+	Vote    []*Vote `json:"vote,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
 type User struct {
 	ID               string      `json:"id,omitempty"`
 	CreatedAt        string      `json:"createdAt,omitempty"`
@@ -1345,22 +1361,27 @@ type UserRightsRef struct {
 }
 
 type Vote struct {
+	ID       string    `json:"id,omitempty"`
 	Contract *Contract `json:"contract,omitempty"`
 	Node     *Node     `json:"node,omitempty"`
-	Content  *string   `json:"content,omitempty"`
 	Data     []int     `json:"data,omitempty"`
 }
 
-type VoteOrder struct {
-	Asc  *VoteOrderable `json:"asc,omitempty"`
-	Desc *VoteOrderable `json:"desc,omitempty"`
-	Then *VoteOrder     `json:"then,omitempty"`
+type VoteFilter struct {
+	ID  []string    `json:"id,omitempty"`
+	Not *VoteFilter `json:"not,omitempty"`
+}
+
+type VotePatch struct {
+	Contract *ContractRef `json:"contract,omitempty"`
+	Node     *NodeRef     `json:"node,omitempty"`
+	Data     []int        `json:"data,omitempty"`
 }
 
 type VoteRef struct {
+	ID       *string      `json:"id,omitempty"`
 	Contract *ContractRef `json:"contract,omitempty"`
 	Node     *NodeRef     `json:"node,omitempty"`
-	Content  *string      `json:"content,omitempty"`
 	Data     []int        `json:"data,omitempty"`
 }
 
@@ -2652,44 +2673,5 @@ func (e *UserRightsOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e UserRightsOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type VoteOrderable string
-
-const (
-	VoteOrderableContent VoteOrderable = "content"
-)
-
-var AllVoteOrderable = []VoteOrderable{
-	VoteOrderableContent,
-}
-
-func (e VoteOrderable) IsValid() bool {
-	switch e {
-	case VoteOrderableContent:
-		return true
-	}
-	return false
-}
-
-func (e VoteOrderable) String() string {
-	return string(e)
-}
-
-func (e *VoteOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = VoteOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid VoteOrderable", str)
-	}
-	return nil
-}
-
-func (e VoteOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

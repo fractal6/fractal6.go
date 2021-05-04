@@ -159,6 +159,14 @@ func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteIn
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) UpdateVote(ctx context.Context, input model.UpdateVoteInput) (data *model.UpdateVotePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteVote(ctx context.Context, filter model.VoteFilter) (data *model.DeleteVotePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (data *model.AddUserPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -276,7 +284,11 @@ func (r *queryResolver) QueryContract(ctx context.Context, filter *model.Contrac
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryVote(ctx context.Context, order *model.VoteOrder, first *int, offset *int) (data []*model.Vote, errors error) {
+func (r *queryResolver) GetVote(ctx context.Context, id string) (data *model.Vote, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryVote(ctx context.Context, filter *model.VoteFilter, first *int, offset *int) (data []*model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

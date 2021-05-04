@@ -110,6 +110,7 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
             Event: &ev,
             Tension: tension,
             Status: model.ContractStatusOpen,
+            ContractType: model.ContractTypeAnyCoordoDual,
             Participants: []*model.Vote{&model.Vote{
                 Node: &node,
                 Data: []int{1},

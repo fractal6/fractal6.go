@@ -117,9 +117,13 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
         if ok {
             return next(ctx)
         } else if contract != nil {
-            var t  model.Tension
-            t.Contracts = append(t.Contracts, contract)
-            return t, err
+            var t model.UpdateTensionPayload
+            t.Tension = []*model.Tension{&model.Tension{
+                Contracts: []*model.Contract{contract},
+            }}
+            i := 1
+            t.NumUids = &i
+            return &t, err
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }
