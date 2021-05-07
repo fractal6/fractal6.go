@@ -267,7 +267,7 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     // * orga invtation ? <> user invitation hash ?
     // * else check if User Can Join Organisation
     if tension.Receiver.Charac.UserCanJoin {
-        guestid := codec.GuestIdCodec(rootid, uctx.Username)
+        guestid := codec.MemberIdCodec(rootid, uctx.Username)
         ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
         if err != nil { return ok, err }
         if ex {

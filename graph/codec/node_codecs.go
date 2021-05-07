@@ -27,7 +27,7 @@ func NodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, st
     return rootnameid, nameid, err
 }
 
-func GuestIdCodec(rootnameid, username string) (string) {
+func MemberIdCodec(rootnameid, username string) (string) {
     nameid := strings.Join([]string{rootnameid, "","@"+ username}, "#")
     return nameid
 }

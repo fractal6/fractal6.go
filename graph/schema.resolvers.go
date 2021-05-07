@@ -143,8 +143,21 @@ func (r *mutationResolver) DeleteEvent(ctx context.Context, filter model.EventFi
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput) (data *model.AddContractPayload, errors error) {
+func (r *mutationResolver) AddEventFragment(ctx context.Context, input []*model.AddEventFragmentInput) (data *model.AddEventFragmentPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateEventFragment(ctx context.Context, input model.UpdateEventFragmentInput) (data *model.UpdateEventFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model.EventFragmentFilter) (data *model.DeleteEventFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput) (data *model.AddContractPayload, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) UpdateContract(ctx context.Context, input model.UpdateContractInput) (data *model.UpdateContractPayload, errors error) {
@@ -273,6 +286,10 @@ func (r *queryResolver) GetEvent(ctx context.Context, id string) (data *model.Ev
 }
 
 func (r *queryResolver) QueryEvent(ctx context.Context, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) (data []*model.Event, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryEventFragment(ctx context.Context, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) (data []*model.EventFragment, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

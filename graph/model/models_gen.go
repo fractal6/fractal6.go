@@ -40,22 +40,33 @@ type AddCommentPayload struct {
 }
 
 type AddContractInput struct {
-	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt    string         `json:"createdAt,omitempty"`
-	UpdatedAt    *string        `json:"updatedAt,omitempty"`
-	Message      *string        `json:"message,omitempty"`
-	Event        *EventRef      `json:"event,omitempty"`
-	Tension      *TensionRef    `json:"tension,omitempty"`
-	Status       ContractStatus `json:"status,omitempty"`
-	ContractType ContractType   `json:"contract_type,omitempty"`
-	Candidates   []*VoteRef     `json:"candidates,omitempty"`
-	Participants []*VoteRef     `json:"participants,omitempty"`
-	Comments     []*CommentRef  `json:"comments,omitempty"`
+	CreatedBy    *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt    string            `json:"createdAt,omitempty"`
+	UpdatedAt    *string           `json:"updatedAt,omitempty"`
+	Message      *string           `json:"message,omitempty"`
+	Event        *EventFragmentRef `json:"event,omitempty"`
+	Tension      *TensionRef       `json:"tension,omitempty"`
+	Status       ContractStatus    `json:"status,omitempty"`
+	ContractType ContractType      `json:"contract_type,omitempty"`
+	Candidates   []*UserRef        `json:"candidates,omitempty"`
+	Participants []*VoteRef        `json:"participants,omitempty"`
+	Comments     []*CommentRef     `json:"comments,omitempty"`
 }
 
 type AddContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
 	NumUids  *int        `json:"numUids,omitempty"`
+}
+
+type AddEventFragmentInput struct {
+	EventType TensionEvent `json:"event_type,omitempty"`
+	Old       *string      `json:"old,omitempty"`
+	New       *string      `json:"new,omitempty"`
+}
+
+type AddEventFragmentPayload struct {
+	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
+	NumUids       *int             `json:"numUids,omitempty"`
 }
 
 type AddEventInput struct {
@@ -237,6 +248,7 @@ type AddUserInput struct {
 	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
+	Contracts        []*ContractRef `json:"contracts,omitempty"`
 	Bio              *string        `json:"bio,omitempty"`
 	Utc              *string        `json:"utc,omitempty"`
 }
@@ -379,11 +391,11 @@ type CommentRef struct {
 }
 
 type Contract struct {
-	Event        *Event         `json:"event,omitempty"`
+	Event        *EventFragment `json:"event,omitempty"`
 	Tension      *Tension       `json:"tension,omitempty"`
 	Status       ContractStatus `json:"status,omitempty"`
 	ContractType ContractType   `json:"contract_type,omitempty"`
-	Candidates   []*Vote        `json:"candidates,omitempty"`
+	Candidates   []*User        `json:"candidates,omitempty"`
 	Participants []*Vote        `json:"participants,omitempty"`
 	Comments     []*Comment     `json:"comments,omitempty"`
 	ID           string         `json:"id,omitempty"`
@@ -409,32 +421,32 @@ type ContractOrder struct {
 }
 
 type ContractPatch struct {
-	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
-	CreatedAt    *string         `json:"createdAt,omitempty"`
-	UpdatedAt    *string         `json:"updatedAt,omitempty"`
-	Message      *string         `json:"message,omitempty"`
-	Event        *EventRef       `json:"event,omitempty"`
-	Tension      *TensionRef     `json:"tension,omitempty"`
-	Status       *ContractStatus `json:"status,omitempty"`
-	ContractType *ContractType   `json:"contract_type,omitempty"`
-	Candidates   []*VoteRef      `json:"candidates,omitempty"`
-	Participants []*VoteRef      `json:"participants,omitempty"`
-	Comments     []*CommentRef   `json:"comments,omitempty"`
+	CreatedBy    *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt    *string           `json:"createdAt,omitempty"`
+	UpdatedAt    *string           `json:"updatedAt,omitempty"`
+	Message      *string           `json:"message,omitempty"`
+	Event        *EventFragmentRef `json:"event,omitempty"`
+	Tension      *TensionRef       `json:"tension,omitempty"`
+	Status       *ContractStatus   `json:"status,omitempty"`
+	ContractType *ContractType     `json:"contract_type,omitempty"`
+	Candidates   []*UserRef        `json:"candidates,omitempty"`
+	Participants []*VoteRef        `json:"participants,omitempty"`
+	Comments     []*CommentRef     `json:"comments,omitempty"`
 }
 
 type ContractRef struct {
-	ID           *string         `json:"id,omitempty"`
-	CreatedBy    *UserRef        `json:"createdBy,omitempty"`
-	CreatedAt    *string         `json:"createdAt,omitempty"`
-	UpdatedAt    *string         `json:"updatedAt,omitempty"`
-	Message      *string         `json:"message,omitempty"`
-	Event        *EventRef       `json:"event,omitempty"`
-	Tension      *TensionRef     `json:"tension,omitempty"`
-	Status       *ContractStatus `json:"status,omitempty"`
-	ContractType *ContractType   `json:"contract_type,omitempty"`
-	Candidates   []*VoteRef      `json:"candidates,omitempty"`
-	Participants []*VoteRef      `json:"participants,omitempty"`
-	Comments     []*CommentRef   `json:"comments,omitempty"`
+	ID           *string           `json:"id,omitempty"`
+	CreatedBy    *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt    *string           `json:"createdAt,omitempty"`
+	UpdatedAt    *string           `json:"updatedAt,omitempty"`
+	Message      *string           `json:"message,omitempty"`
+	Event        *EventFragmentRef `json:"event,omitempty"`
+	Tension      *TensionRef       `json:"tension,omitempty"`
+	Status       *ContractStatus   `json:"status,omitempty"`
+	ContractType *ContractType     `json:"contract_type,omitempty"`
+	Candidates   []*UserRef        `json:"candidates,omitempty"`
+	Participants []*VoteRef        `json:"participants,omitempty"`
+	Comments     []*CommentRef     `json:"comments,omitempty"`
 }
 
 type CustomHTTP struct {
@@ -473,6 +485,12 @@ type DeleteContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
 	Msg      *string     `json:"msg,omitempty"`
 	NumUids  *int        `json:"numUids,omitempty"`
+}
+
+type DeleteEventFragmentPayload struct {
+	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
+	Msg           *string          `json:"msg,omitempty"`
+	NumUids       *int             `json:"numUids,omitempty"`
 }
 
 type DeleteEventPayload struct {
@@ -555,6 +573,37 @@ type EventFilter struct {
 	And       *EventFilter          `json:"and,omitempty"`
 	Or        *EventFilter          `json:"or,omitempty"`
 	Not       *EventFilter          `json:"not,omitempty"`
+}
+
+type EventFragment struct {
+	EventType TensionEvent `json:"event_type,omitempty"`
+	Old       *string      `json:"old,omitempty"`
+	New       *string      `json:"new,omitempty"`
+}
+
+type EventFragmentFilter struct {
+	EventType *TensionEventHash    `json:"event_type,omitempty"`
+	And       *EventFragmentFilter `json:"and,omitempty"`
+	Or        *EventFragmentFilter `json:"or,omitempty"`
+	Not       *EventFragmentFilter `json:"not,omitempty"`
+}
+
+type EventFragmentOrder struct {
+	Asc  *EventFragmentOrderable `json:"asc,omitempty"`
+	Desc *EventFragmentOrderable `json:"desc,omitempty"`
+	Then *EventFragmentOrder     `json:"then,omitempty"`
+}
+
+type EventFragmentPatch struct {
+	EventType *TensionEvent `json:"event_type,omitempty"`
+	Old       *string       `json:"old,omitempty"`
+	New       *string       `json:"new,omitempty"`
+}
+
+type EventFragmentRef struct {
+	EventType *TensionEvent `json:"event_type,omitempty"`
+	Old       *string       `json:"old,omitempty"`
+	New       *string       `json:"new,omitempty"`
 }
 
 type EventOrder struct {
@@ -1162,6 +1211,17 @@ type UpdateContractPayload struct {
 	NumUids  *int        `json:"numUids,omitempty"`
 }
 
+type UpdateEventFragmentInput struct {
+	Filter *EventFragmentFilter `json:"filter,omitempty"`
+	Set    *EventFragmentPatch  `json:"set,omitempty"`
+	Remove *EventFragmentPatch  `json:"remove,omitempty"`
+}
+
+type UpdateEventFragmentPayload struct {
+	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
+	NumUids       *int             `json:"numUids,omitempty"`
+}
+
 type UpdateEventInput struct {
 	Filter *EventFilter `json:"filter,omitempty"`
 	Set    *EventPatch  `json:"set,omitempty"`
@@ -1287,6 +1347,7 @@ type User struct {
 	BackedRoles      []*Node     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*Tension  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*Tension  `json:"tensions_assigned,omitempty"`
+	Contracts        []*Contract `json:"contracts,omitempty"`
 	Bio              *string     `json:"bio,omitempty"`
 	Utc              *string     `json:"utc,omitempty"`
 }
@@ -1319,6 +1380,7 @@ type UserPatch struct {
 	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
+	Contracts        []*ContractRef `json:"contracts,omitempty"`
 	Bio              *string        `json:"bio,omitempty"`
 	Utc              *string        `json:"utc,omitempty"`
 }
@@ -1338,6 +1400,7 @@ type UserRef struct {
 	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
+	Contracts        []*ContractRef `json:"contracts,omitempty"`
 	Bio              *string        `json:"bio,omitempty"`
 	Utc              *string        `json:"utc,omitempty"`
 }
@@ -1717,6 +1780,47 @@ func (e *DgraphIndex) UnmarshalGQL(v interface{}) error {
 }
 
 func (e DgraphIndex) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventFragmentOrderable string
+
+const (
+	EventFragmentOrderableOld EventFragmentOrderable = "old"
+	EventFragmentOrderableNew EventFragmentOrderable = "new"
+)
+
+var AllEventFragmentOrderable = []EventFragmentOrderable{
+	EventFragmentOrderableOld,
+	EventFragmentOrderableNew,
+}
+
+func (e EventFragmentOrderable) IsValid() bool {
+	switch e {
+	case EventFragmentOrderableOld, EventFragmentOrderableNew:
+		return true
+	}
+	return false
+}
+
+func (e EventFragmentOrderable) String() string {
+	return string(e)
+}
+
+func (e *EventFragmentOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventFragmentOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventFragmentOrderable", str)
+	}
+	return nil
+}
+
+func (e EventFragmentOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

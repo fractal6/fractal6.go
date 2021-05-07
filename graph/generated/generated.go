@@ -98,6 +98,11 @@ type ComplexityRoot struct {
 		NumUids  func(childComplexity int) int
 	}
 
+	AddEventFragmentPayload struct {
+		EventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
+		NumUids       func(childComplexity int) int
+	}
+
 	AddEventPayload struct {
 		Event   func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
@@ -181,12 +186,12 @@ type ComplexityRoot struct {
 	}
 
 	Contract struct {
-		Candidates   func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
+		Candidates   func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		Comments     func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		ContractType func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
-		Event        func(childComplexity int, filter *model.EventFilter) int
+		Event        func(childComplexity int, filter *model.EventFragmentFilter) int
 		ID           func(childComplexity int) int
 		Message      func(childComplexity int) int
 		Participants func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
@@ -211,6 +216,12 @@ type ComplexityRoot struct {
 		Contract func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		Msg      func(childComplexity int) int
 		NumUids  func(childComplexity int) int
+	}
+
+	DeleteEventFragmentPayload struct {
+		EventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
+		Msg           func(childComplexity int) int
+		NumUids       func(childComplexity int) int
 	}
 
 	DeleteEventPayload struct {
@@ -285,6 +296,12 @@ type ComplexityRoot struct {
 		UpdatedAt func(childComplexity int) int
 	}
 
+	EventFragment struct {
+		EventType func(childComplexity int) int
+		New       func(childComplexity int) int
+		Old       func(childComplexity int) int
+	}
+
 	Label struct {
 		Color       func(childComplexity int) int
 		Description func(childComplexity int) int
@@ -306,47 +323,50 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddBlob            func(childComplexity int, input []*model.AddBlobInput) int
-		AddComment         func(childComplexity int, input []*model.AddCommentInput) int
-		AddContract        func(childComplexity int, input []*model.AddContractInput) int
-		AddEvent           func(childComplexity int, input []*model.AddEventInput) int
-		AddLabel           func(childComplexity int, input []*model.AddLabelInput) int
-		AddMandate         func(childComplexity int, input []*model.AddMandateInput) int
-		AddNode            func(childComplexity int, input []*model.AddNodeInput) int
-		AddNodeCharac      func(childComplexity int, input []*model.AddNodeCharacInput) int
-		AddNodeFragment    func(childComplexity int, input []*model.AddNodeFragmentInput) int
-		AddNodeStats       func(childComplexity int, input []*model.AddNodeStatsInput) int
-		AddSharedNode      func(childComplexity int, input []*model.AddSharedNodeInput) int
-		AddTension         func(childComplexity int, input []*model.AddTensionInput) int
-		AddUser            func(childComplexity int, input []*model.AddUserInput) int
-		AddUserRights      func(childComplexity int, input []*model.AddUserRightsInput) int
-		AddVote            func(childComplexity int, input []*model.AddVoteInput) int
-		DeleteBlob         func(childComplexity int, filter model.BlobFilter) int
-		DeleteComment      func(childComplexity int, filter model.CommentFilter) int
-		DeleteContract     func(childComplexity int, filter model.ContractFilter) int
-		DeleteEvent        func(childComplexity int, filter model.EventFilter) int
-		DeleteLabel        func(childComplexity int, filter model.LabelFilter) int
-		DeleteMandate      func(childComplexity int, filter model.MandateFilter) int
-		DeleteNode         func(childComplexity int, filter model.NodeFilter) int
-		DeleteNodeCharac   func(childComplexity int, filter model.NodeCharacFilter) int
-		DeleteNodeFragment func(childComplexity int, filter model.NodeFragmentFilter) int
-		DeletePost         func(childComplexity int, filter model.PostFilter) int
-		DeleteTension      func(childComplexity int, filter model.TensionFilter) int
-		DeleteUser         func(childComplexity int, filter model.UserFilter) int
-		DeleteVote         func(childComplexity int, filter model.VoteFilter) int
-		UpdateBlob         func(childComplexity int, input model.UpdateBlobInput) int
-		UpdateComment      func(childComplexity int, input model.UpdateCommentInput) int
-		UpdateContract     func(childComplexity int, input model.UpdateContractInput) int
-		UpdateEvent        func(childComplexity int, input model.UpdateEventInput) int
-		UpdateLabel        func(childComplexity int, input model.UpdateLabelInput) int
-		UpdateMandate      func(childComplexity int, input model.UpdateMandateInput) int
-		UpdateNode         func(childComplexity int, input model.UpdateNodeInput) int
-		UpdateNodeCharac   func(childComplexity int, input model.UpdateNodeCharacInput) int
-		UpdateNodeFragment func(childComplexity int, input model.UpdateNodeFragmentInput) int
-		UpdatePost         func(childComplexity int, input model.UpdatePostInput) int
-		UpdateTension      func(childComplexity int, input model.UpdateTensionInput) int
-		UpdateUser         func(childComplexity int, input model.UpdateUserInput) int
-		UpdateVote         func(childComplexity int, input model.UpdateVoteInput) int
+		AddBlob             func(childComplexity int, input []*model.AddBlobInput) int
+		AddComment          func(childComplexity int, input []*model.AddCommentInput) int
+		AddContract         func(childComplexity int, input []*model.AddContractInput) int
+		AddEvent            func(childComplexity int, input []*model.AddEventInput) int
+		AddEventFragment    func(childComplexity int, input []*model.AddEventFragmentInput) int
+		AddLabel            func(childComplexity int, input []*model.AddLabelInput) int
+		AddMandate          func(childComplexity int, input []*model.AddMandateInput) int
+		AddNode             func(childComplexity int, input []*model.AddNodeInput) int
+		AddNodeCharac       func(childComplexity int, input []*model.AddNodeCharacInput) int
+		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
+		AddNodeStats        func(childComplexity int, input []*model.AddNodeStatsInput) int
+		AddSharedNode       func(childComplexity int, input []*model.AddSharedNodeInput) int
+		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
+		AddUser             func(childComplexity int, input []*model.AddUserInput) int
+		AddUserRights       func(childComplexity int, input []*model.AddUserRightsInput) int
+		AddVote             func(childComplexity int, input []*model.AddVoteInput) int
+		DeleteBlob          func(childComplexity int, filter model.BlobFilter) int
+		DeleteComment       func(childComplexity int, filter model.CommentFilter) int
+		DeleteContract      func(childComplexity int, filter model.ContractFilter) int
+		DeleteEvent         func(childComplexity int, filter model.EventFilter) int
+		DeleteEventFragment func(childComplexity int, filter model.EventFragmentFilter) int
+		DeleteLabel         func(childComplexity int, filter model.LabelFilter) int
+		DeleteMandate       func(childComplexity int, filter model.MandateFilter) int
+		DeleteNode          func(childComplexity int, filter model.NodeFilter) int
+		DeleteNodeCharac    func(childComplexity int, filter model.NodeCharacFilter) int
+		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
+		DeletePost          func(childComplexity int, filter model.PostFilter) int
+		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
+		DeleteUser          func(childComplexity int, filter model.UserFilter) int
+		DeleteVote          func(childComplexity int, filter model.VoteFilter) int
+		UpdateBlob          func(childComplexity int, input model.UpdateBlobInput) int
+		UpdateComment       func(childComplexity int, input model.UpdateCommentInput) int
+		UpdateContract      func(childComplexity int, input model.UpdateContractInput) int
+		UpdateEvent         func(childComplexity int, input model.UpdateEventInput) int
+		UpdateEventFragment func(childComplexity int, input model.UpdateEventFragmentInput) int
+		UpdateLabel         func(childComplexity int, input model.UpdateLabelInput) int
+		UpdateMandate       func(childComplexity int, input model.UpdateMandateInput) int
+		UpdateNode          func(childComplexity int, input model.UpdateNodeInput) int
+		UpdateNodeCharac    func(childComplexity int, input model.UpdateNodeCharacInput) int
+		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
+		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
+		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
+		UpdateUser          func(childComplexity int, input model.UpdateUserInput) int
+		UpdateVote          func(childComplexity int, input model.UpdateVoteInput) int
 	}
 
 	Node struct {
@@ -422,35 +442,36 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetBlob           func(childComplexity int, id string) int
-		GetComment        func(childComplexity int, id string) int
-		GetContract       func(childComplexity int, id string) int
-		GetEvent          func(childComplexity int, id string) int
-		GetLabel          func(childComplexity int, id string) int
-		GetMandate        func(childComplexity int, id string) int
-		GetNode           func(childComplexity int, id *string, nameid *string) int
-		GetNodeCharac     func(childComplexity int, id string) int
-		GetNodeFragment   func(childComplexity int, id string) int
-		GetPost           func(childComplexity int, id string) int
-		GetTension        func(childComplexity int, id string) int
-		GetUser           func(childComplexity int, id *string, username *string) int
-		GetVote           func(childComplexity int, id string) int
-		QueryBlob         func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		QueryComment      func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		QueryContract     func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
-		QueryEvent        func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
-		QueryLabel        func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		QueryMandate      func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
-		QueryNode         func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		QueryNodeCharac   func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
-		QueryNodeFragment func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
-		QueryNodeStats    func(childComplexity int, order *model.NodeStatsOrder, first *int, offset *int) int
-		QueryPost         func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-		QuerySharedNode   func(childComplexity int, order *model.SharedNodeOrder, first *int, offset *int) int
-		QueryTension      func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		QueryUser         func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		QueryUserRights   func(childComplexity int, order *model.UserRightsOrder, first *int, offset *int) int
-		QueryVote         func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
+		GetBlob            func(childComplexity int, id string) int
+		GetComment         func(childComplexity int, id string) int
+		GetContract        func(childComplexity int, id string) int
+		GetEvent           func(childComplexity int, id string) int
+		GetLabel           func(childComplexity int, id string) int
+		GetMandate         func(childComplexity int, id string) int
+		GetNode            func(childComplexity int, id *string, nameid *string) int
+		GetNodeCharac      func(childComplexity int, id string) int
+		GetNodeFragment    func(childComplexity int, id string) int
+		GetPost            func(childComplexity int, id string) int
+		GetTension         func(childComplexity int, id string) int
+		GetUser            func(childComplexity int, id *string, username *string) int
+		GetVote            func(childComplexity int, id string) int
+		QueryBlob          func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		QueryComment       func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		QueryContract      func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
+		QueryEvent         func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		QueryEventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
+		QueryLabel         func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		QueryMandate       func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
+		QueryNode          func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		QueryNodeCharac    func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
+		QueryNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
+		QueryNodeStats     func(childComplexity int, order *model.NodeStatsOrder, first *int, offset *int) int
+		QueryPost          func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		QuerySharedNode    func(childComplexity int, order *model.SharedNodeOrder, first *int, offset *int) int
+		QueryTension       func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		QueryUser          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		QueryUserRights    func(childComplexity int, order *model.UserRightsOrder, first *int, offset *int) int
+		QueryVote          func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
 	}
 
 	SharedNode struct {
@@ -497,6 +518,11 @@ type ComplexityRoot struct {
 	UpdateContractPayload struct {
 		Contract func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		NumUids  func(childComplexity int) int
+	}
+
+	UpdateEventFragmentPayload struct {
+		EventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
+		NumUids       func(childComplexity int) int
 	}
 
 	UpdateEventPayload struct {
@@ -552,6 +578,7 @@ type ComplexityRoot struct {
 	User struct {
 		BackedRoles      func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		Bio              func(childComplexity int) int
+		Contracts        func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		CreatedAt        func(childComplexity int) int
 		Email            func(childComplexity int) int
 		EmailHash        func(childComplexity int) int
@@ -614,6 +641,9 @@ type MutationResolver interface {
 	AddEvent(ctx context.Context, input []*model.AddEventInput) (*model.AddEventPayload, error)
 	UpdateEvent(ctx context.Context, input model.UpdateEventInput) (*model.UpdateEventPayload, error)
 	DeleteEvent(ctx context.Context, filter model.EventFilter) (*model.DeleteEventPayload, error)
+	AddEventFragment(ctx context.Context, input []*model.AddEventFragmentInput) (*model.AddEventFragmentPayload, error)
+	UpdateEventFragment(ctx context.Context, input model.UpdateEventFragmentInput) (*model.UpdateEventFragmentPayload, error)
+	DeleteEventFragment(ctx context.Context, filter model.EventFragmentFilter) (*model.DeleteEventFragmentPayload, error)
 	AddContract(ctx context.Context, input []*model.AddContractInput) (*model.AddContractPayload, error)
 	UpdateContract(ctx context.Context, input model.UpdateContractInput) (*model.UpdateContractPayload, error)
 	DeleteContract(ctx context.Context, filter model.ContractFilter) (*model.DeleteContractPayload, error)
@@ -648,6 +678,7 @@ type QueryResolver interface {
 	QueryBlob(ctx context.Context, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) ([]*model.Blob, error)
 	GetEvent(ctx context.Context, id string) (*model.Event, error)
 	QueryEvent(ctx context.Context, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) ([]*model.Event, error)
+	QueryEventFragment(ctx context.Context, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) ([]*model.EventFragment, error)
 	GetContract(ctx context.Context, id string) (*model.Contract, error)
 	QueryContract(ctx context.Context, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) ([]*model.Contract, error)
 	GetVote(ctx context.Context, id string) (*model.Vote, error)
@@ -728,6 +759,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddContractPayload.NumUids(childComplexity), true
+
+	case "AddEventFragmentPayload.eventFragment":
+		if e.complexity.AddEventFragmentPayload.EventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_AddEventFragmentPayload_eventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddEventFragmentPayload.EventFragment(childComplexity, args["filter"].(*model.EventFragmentFilter), args["order"].(*model.EventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddEventFragmentPayload.numUids":
+		if e.complexity.AddEventFragmentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddEventFragmentPayload.NumUids(childComplexity), true
 
 	case "AddEventPayload.event":
 		if e.complexity.AddEventPayload.Event == nil {
@@ -1099,7 +1149,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Contract.Candidates(childComplexity, args["filter"].(*model.VoteFilter), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Contract.Candidates(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Contract.comments":
 		if e.complexity.Contract.Comments == nil {
@@ -1149,7 +1199,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Contract.Event(childComplexity, args["filter"].(*model.EventFilter)), true
+		return e.complexity.Contract.Event(childComplexity, args["filter"].(*model.EventFragmentFilter)), true
 
 	case "Contract.id":
 		if e.complexity.Contract.ID == nil {
@@ -1280,6 +1330,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteContractPayload.NumUids(childComplexity), true
+
+	case "DeleteEventFragmentPayload.eventFragment":
+		if e.complexity.DeleteEventFragmentPayload.EventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteEventFragmentPayload_eventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteEventFragmentPayload.EventFragment(childComplexity, args["filter"].(*model.EventFragmentFilter), args["order"].(*model.EventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeleteEventFragmentPayload.msg":
+		if e.complexity.DeleteEventFragmentPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteEventFragmentPayload.Msg(childComplexity), true
+
+	case "DeleteEventFragmentPayload.numUids":
+		if e.complexity.DeleteEventFragmentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteEventFragmentPayload.NumUids(childComplexity), true
 
 	case "DeleteEventPayload.event":
 		if e.complexity.DeleteEventPayload.Event == nil {
@@ -1614,6 +1690,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Event.UpdatedAt(childComplexity), true
 
+	case "EventFragment.event_type":
+		if e.complexity.EventFragment.EventType == nil {
+			break
+		}
+
+		return e.complexity.EventFragment.EventType(childComplexity), true
+
+	case "EventFragment.new":
+		if e.complexity.EventFragment.New == nil {
+			break
+		}
+
+		return e.complexity.EventFragment.New(childComplexity), true
+
+	case "EventFragment.old":
+		if e.complexity.EventFragment.Old == nil {
+			break
+		}
+
+		return e.complexity.EventFragment.Old(childComplexity), true
+
 	case "Label.color":
 		if e.complexity.Label.Color == nil {
 			break
@@ -1769,6 +1866,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddEvent(childComplexity, args["input"].([]*model.AddEventInput)), true
+
+	case "Mutation.addEventFragment":
+		if e.complexity.Mutation.AddEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddEventFragment(childComplexity, args["input"].([]*model.AddEventFragmentInput)), true
 
 	case "Mutation.addLabel":
 		if e.complexity.Mutation.AddLabel == nil {
@@ -1950,6 +2059,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteEvent(childComplexity, args["filter"].(model.EventFilter)), true
 
+	case "Mutation.deleteEventFragment":
+		if e.complexity.Mutation.DeleteEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteEventFragment(childComplexity, args["filter"].(model.EventFragmentFilter)), true
+
 	case "Mutation.deleteLabel":
 		if e.complexity.Mutation.DeleteLabel == nil {
 			break
@@ -2105,6 +2226,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEvent(childComplexity, args["input"].(model.UpdateEventInput)), true
+
+	case "Mutation.updateEventFragment":
+		if e.complexity.Mutation.UpdateEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateEventFragment(childComplexity, args["input"].(model.UpdateEventFragmentInput)), true
 
 	case "Mutation.updateLabel":
 		if e.complexity.Mutation.UpdateLabel == nil {
@@ -2902,6 +3035,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryEvent(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Query.queryEventFragment":
+		if e.complexity.Query.QueryEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryEventFragment(childComplexity, args["filter"].(*model.EventFragmentFilter), args["order"].(*model.EventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "Query.queryLabel":
 		if e.complexity.Query.QueryLabel == nil {
 			break
@@ -3323,6 +3468,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateContractPayload.NumUids(childComplexity), true
 
+	case "UpdateEventFragmentPayload.eventFragment":
+		if e.complexity.UpdateEventFragmentPayload.EventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateEventFragmentPayload_eventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateEventFragmentPayload.EventFragment(childComplexity, args["filter"].(*model.EventFragmentFilter), args["order"].(*model.EventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateEventFragmentPayload.numUids":
+		if e.complexity.UpdateEventFragmentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateEventFragmentPayload.NumUids(childComplexity), true
+
 	case "UpdateEventPayload.event":
 		if e.complexity.UpdateEventPayload.Event == nil {
 			break
@@ -3531,6 +3695,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Bio(childComplexity), true
+
+	case "User.contracts":
+		if e.complexity.User.Contracts == nil {
+			break
+		}
+
+		args, err := ec.field_User_contracts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Contracts(childComplexity, args["filter"].(*model.ContractFilter), args["order"].(*model.ContractOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -3988,13 +4164,19 @@ type Event {
   message: String @search(by: [fulltext])
 }
 
+type EventFragment {
+  event_type: TensionEvent! @search
+  old: String
+  new: String
+}
+
 type Contract {
-  event(filter: EventFilter): Event!
+  event(filter: EventFragmentFilter): EventFragment!
   tension(filter: TensionFilter): Tension!
   status: ContractStatus!
   contract_type: ContractType!
-  candidates(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
-  participants(filter: VoteFilter, first: Int, offset: Int): [Vote!]
+  candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
+  participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   id: ID!
   createdBy(filter: UserFilter): User!
@@ -4025,6 +4207,7 @@ type User {
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second_link)
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: createdBy)
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: assignees)
+  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: candidates)
   bio: String
   utc: String
 }
@@ -4148,25 +4331,25 @@ enum ContractType {
   AnyCoordoTarget
 }
 
-directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
-directive @cascade on FIELD
+directive @remote on OBJECT|INTERFACE
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE
+directive @cascade on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -4204,17 +4387,28 @@ input AddContractInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
-  event: EventRef!
+  event: EventFragmentRef!
   tension: TensionRef!
   status: ContractStatus!
   contract_type: ContractType!
-  candidates: [VoteRef!]
+  candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
 }
 
 type AddContractPayload {
   contract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract]
+  numUids: Int
+}
+
+input AddEventFragmentInput {
+  event_type: TensionEvent!
+  old: String
+  new: String
+}
+
+type AddEventFragmentPayload {
+  eventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   numUids: Int
 }
 
@@ -4373,7 +4567,7 @@ input AddTensionInput {
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
   contracts: [ContractRef!] @alter_hasRole(n:["receiver"], a:1)
-  history: [EventRef!]!
+  history: [EventRef!]! @alter_hasRoot(n:["emitter","receiver"])
   n_comments: Int
   n_blobs: Int
 }
@@ -4395,8 +4589,9 @@ input AddUserInput {
   rights: UserRightsRef! @alter_RO
   roles: [NodeRef!] @alter_RO
   backed_roles: [NodeRef!] @alter_RO
-  tensions_created: [TensionRef!]
-  tensions_assigned: [TensionRef!]
+  tensions_created: [TensionRef!] @alter_RO
+  tensions_assigned: [TensionRef!] @alter_RO
+  contracts: [ContractRef!] @alter_RO
   bio: String
   utc: String
 }
@@ -4558,11 +4753,11 @@ input ContractPatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  event: EventRef @patch_RO
+  event: EventFragmentRef @patch_RO
   tension: TensionRef @patch_RO
   status: ContractStatus @patch_RO
   contract_type: ContractType @patch_RO
-  candidates: [VoteRef!] @patch_RO
+  candidates: [UserRef!] @patch_RO
   participants: [VoteRef!]
   comments: [CommentRef!]
 }
@@ -4573,11 +4768,11 @@ input ContractRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  event: EventRef
+  event: EventFragmentRef
   tension: TensionRef
   status: ContractStatus
   contract_type: ContractType
-  candidates: [VoteRef!]
+  candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
 }
@@ -4618,6 +4813,12 @@ type DeleteCommentPayload {
 
 type DeleteContractPayload {
   contract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract]
+  msg: String
+  numUids: Int
+}
+
+type DeleteEventFragmentPayload {
+  eventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   msg: String
   numUids: Int
 }
@@ -4706,6 +4907,36 @@ input EventFilter {
   and: EventFilter
   or: EventFilter
   not: EventFilter
+}
+
+input EventFragmentFilter {
+  event_type: TensionEvent_hash
+  and: EventFragmentFilter
+  or: EventFragmentFilter
+  not: EventFragmentFilter
+}
+
+input EventFragmentOrder {
+  asc: EventFragmentOrderable
+  desc: EventFragmentOrderable
+  then: EventFragmentOrder
+}
+
+enum EventFragmentOrderable {
+  old
+  new
+}
+
+input EventFragmentPatch {
+  event_type: TensionEvent
+  old: String
+  new: String
+}
+
+input EventFragmentRef {
+  event_type: TensionEvent
+  old: String
+  new: String
 }
 
 input EventOrder {
@@ -4889,6 +5120,9 @@ type Mutation {
   addEvent(input: [AddEventInput!]!): AddEventPayload
   updateEvent(input: UpdateEventInput!): UpdateEventPayload
   deleteEvent(filter: EventFilter!): DeleteEventPayload
+  addEventFragment(input: [AddEventFragmentInput!]!): AddEventFragmentPayload
+  updateEventFragment(input: UpdateEventFragmentInput!): UpdateEventFragmentPayload
+  deleteEventFragment(filter: EventFragmentFilter!): DeleteEventFragmentPayload
   addContract(input: [AddContractInput!]!): AddContractPayload
   updateContract(input: UpdateContractInput!): UpdateContractPayload
   deleteContract(filter: ContractFilter!): DeleteContractPayload
@@ -5159,6 +5393,7 @@ type Query {
   queryBlob(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   getEvent(id: ID!): Event
   queryEvent(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
+  queryEventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   getContract(id: ID!): Contract
   queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract]
   getVote(id: ID!): Vote
@@ -5283,7 +5518,7 @@ input TensionPatch {
   action: TensionAction @alter_hasRoot(n:["emitter","receiver"])
   blobs: [BlobRef!] @alter_hasRoot(n:["emitter","receiver"])
   contracts: [ContractRef!] @alter_hasRole(n:["receiver"], a:1)
-  history: [EventRef!]
+  history: [EventRef!] @alter_hasRoot(n:["emitter","receiver"])
   n_comments: Int
   n_blobs: Int
 }
@@ -5351,6 +5586,17 @@ input UpdateContractInput {
 
 type UpdateContractPayload {
   contract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract]
+  numUids: Int
+}
+
+input UpdateEventFragmentInput {
+  filter: EventFragmentFilter!
+  set: EventFragmentPatch
+  remove: EventFragmentPatch
+}
+
+type UpdateEventFragmentPayload {
+  eventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   numUids: Int
 }
 
@@ -5502,8 +5748,9 @@ input UserPatch {
   rights: UserRightsRef @alter_RO
   roles: [NodeRef!] @alter_RO
   backed_roles: [NodeRef!] @alter_RO
-  tensions_created: [TensionRef!]
-  tensions_assigned: [TensionRef!]
+  tensions_created: [TensionRef!] @alter_RO
+  tensions_assigned: [TensionRef!] @alter_RO
+  contracts: [ContractRef!] @alter_RO
   bio: String @patch_isOwner
   utc: String @patch_isOwner
 }
@@ -5523,6 +5770,7 @@ input UserRef {
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
+  contracts: [ContractRef!]
   bio: String
   utc: String
 }
@@ -6016,6 +6264,48 @@ func (ec *executionContext) field_AddContractPayload_contract_args(ctx context.C
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOContractOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_AddEventFragmentPayload_eventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6564,33 +6854,42 @@ func (ec *executionContext) field_Comment_createdBy_args(ctx context.Context, ra
 func (ec *executionContext) field_Contract_candidates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.VoteFilter
+	var arg0 *model.UserFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOVoteFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+	var arg1 *model.UserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["first"] = arg1
+	args["order"] = arg1
 	var arg2 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
 		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["offset"] = arg2
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -6654,10 +6953,10 @@ func (ec *executionContext) field_Contract_createdBy_args(ctx context.Context, r
 func (ec *executionContext) field_Contract_event_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.EventFilter
+	var arg0 *model.EventFragmentFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6814,6 +7113,48 @@ func (ec *executionContext) field_DeleteContractPayload_contract_args(ctx contex
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOContractOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteEventFragmentPayload_eventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7401,6 +7742,21 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddEventFragmentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddEventFragmentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7660,6 +8016,21 @@ func (ec *executionContext) field_Mutation_deleteContract_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.EventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNEventFragmentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7862,6 +8233,21 @@ func (ec *executionContext) field_Mutation_updateContract_args(ctx context.Conte
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdateContractInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateContractInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateEventFragmentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateEventFragmentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventFragmentInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -8854,6 +9240,48 @@ func (ec *executionContext) field_Query_queryContract_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_queryEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -9778,6 +10206,48 @@ func (ec *executionContext) field_UpdateContractPayload_contract_args(ctx contex
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateEventFragmentPayload_eventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateEventPayload_event_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10222,6 +10692,48 @@ func (ec *executionContext) field_User_backed_roles_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_User_contracts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ContractFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOContractFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ContractOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOContractOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_User_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10613,6 +11125,71 @@ func (ec *executionContext) _AddContractPayload_numUids(ctx context.Context, fie
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AddContractPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddEventFragmentPayload_eventFragment(ctx context.Context, field graphql.CollectedField, obj *model.AddEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddEventFragmentPayload_eventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventFragment)
+	fc.Result = res
+	return ec.marshalOEventFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddEventFragmentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddEventFragmentPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -12174,9 +12751,9 @@ func (ec *executionContext) _Contract_event(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Event)
+	res := resTmp.(*model.EventFragment)
 	fc.Result = res
-	return ec.marshalNEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res)
+	return ec.marshalNEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_tension(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -12331,7 +12908,7 @@ func (ec *executionContext) _Contract_candidates(ctx context.Context, field grap
 			return obj.Candidates, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			field, err := ec.unmarshalNString2string(ctx, "contract")
+			field, err := ec.unmarshalNString2string(ctx, "contracts")
 			if err != nil {
 				return nil, err
 			}
@@ -12348,18 +12925,18 @@ func (ec *executionContext) _Contract_candidates(ctx context.Context, field grap
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]*model.Vote); ok {
+		if data, ok := tmp.([]*model.User); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Vote`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.User`, tmp)
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Vote)
+	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalOVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_participants(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -12386,8 +12963,32 @@ func (ec *executionContext) _Contract_participants(ctx context.Context, field gr
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Participants, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Participants, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "contract")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Vote); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Vote`, tmp)
 	})
 
 	if resTmp == nil {
@@ -12901,6 +13502,100 @@ func (ec *executionContext) _DeleteContractPayload_numUids(ctx context.Context, 
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "DeleteContractPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteEventFragmentPayload_eventFragment(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteEventFragmentPayload_eventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventFragment)
+	fc.Result = res
+	return ec.marshalOEventFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteEventFragmentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteEventFragmentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteEventFragmentPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -14265,6 +14960,116 @@ func (ec *executionContext) _Event_message(ctx context.Context, field graphql.Co
 			return data, nil
 		}
 		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _EventFragment_event_type(ctx context.Context, field graphql.CollectedField, obj *model.EventFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "EventFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.EventType, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(model.TensionEvent); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.TensionEvent`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.TensionEvent)
+	fc.Result = res
+	return ec.marshalNTensionEvent2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _EventFragment_old(ctx context.Context, field graphql.CollectedField, obj *model.EventFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "EventFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Old, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _EventFragment_new(ctx context.Context, field graphql.CollectedField, obj *model.EventFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "EventFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.New, nil
 	})
 
 	if resTmp == nil {
@@ -16124,6 +16929,114 @@ func (ec *executionContext) _Mutation_deleteEvent(ctx context.Context, field gra
 	res := resTmp.(*model.DeleteEventPayload)
 	fc.Result = res
 	return ec.marshalODeleteEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddEventFragment(rctx, args["input"].([]*model.AddEventFragmentInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddEventFragmentPayload)
+	fc.Result = res
+	return ec.marshalOAddEventFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEventFragment(rctx, args["input"].(model.UpdateEventFragmentInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateEventFragmentPayload)
+	fc.Result = res
+	return ec.marshalOUpdateEventFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventFragmentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteEventFragment(rctx, args["filter"].(model.EventFragmentFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteEventFragmentPayload)
+	fc.Result = res
+	return ec.marshalODeleteEventFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventFragmentPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addContract(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -19760,6 +20673,42 @@ func (ec *executionContext) _Query_queryEvent(ctx context.Context, field graphql
 	return ec.marshalOEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_queryEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryEventFragment(rctx, args["filter"].(*model.EventFragmentFilter), args["order"].(*model.EventFragmentOrder), args["first"].(*int), args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventFragment)
+	fc.Result = res
+	return ec.marshalOEventFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_getContract(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -21429,6 +22378,71 @@ func (ec *executionContext) _UpdateContractPayload_numUids(ctx context.Context, 
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UpdateEventFragmentPayload_eventFragment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdateEventFragmentPayload_eventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventFragment)
+	fc.Result = res
+	return ec.marshalOEventFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateEventFragmentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UpdateEventPayload_event(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEventPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -22805,6 +23819,66 @@ func (ec *executionContext) _User_tensions_assigned(ctx context.Context, field g
 	res := resTmp.([]*model.Tension)
 	fc.Result = res
 	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_contracts(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_contracts_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Contracts, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "candidates")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive0, field)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Contract); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Contract`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Contract)
+	fc.Result = res
+	return ec.marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_bio(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -24329,7 +25403,7 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			it.Event, err = ec.unmarshalNEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, v)
+			it.Event, err = ec.unmarshalNEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24361,7 +25435,7 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
-			it.Candidates, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			it.Candidates, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24378,6 +25452,42 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddEventFragmentInput(ctx context.Context, obj interface{}) (model.AddEventFragmentInput, error) {
+	var it model.AddEventFragmentInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "event_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
+			it.EventType, err = ec.unmarshalNTensionEvent2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "old":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
+			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "new":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
+			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25617,9 +26727,31 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			it.History, err = ec.unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.EventRef); ok {
+				it.History = data
+			} else if tmp == nil {
+				it.History = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.EventRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "n_comments":
 			var err error
@@ -25871,17 +27003,79 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_created"))
-			it.TensionsCreated, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.TensionsCreated = data
+			} else if tmp == nil {
+				it.TensionsCreated = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_assigned":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_assigned"))
-			it.TensionsAssigned, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.TensionsAssigned = data
+			} else if tmp == nil {
+				it.TensionsAssigned = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ContractRef); ok {
+				it.Contracts = data
+			} else if tmp == nil {
+				it.Contracts = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "bio":
 			var err error
@@ -26804,7 +27998,7 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, v)
+				return ec.unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.Patch_RO == nil {
@@ -26817,12 +28011,12 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*model.EventRef); ok {
+			if data, ok := tmp.(*model.EventFragmentRef); ok {
 				it.Event = data
 			} else if tmp == nil {
 				it.Event = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.EventRef`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.EventFragmentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
@@ -26908,7 +28102,7 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.Patch_RO == nil {
@@ -26921,12 +28115,12 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.([]*model.VoteRef); ok {
+			if data, ok := tmp.([]*model.UserRef); ok {
 				it.Candidates = data
 			} else if tmp == nil {
 				it.Candidates = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.VoteRef`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "participants":
@@ -27001,7 +28195,7 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			it.Event, err = ec.unmarshalOEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, v)
+			it.Event, err = ec.unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -27033,7 +28227,7 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
-			it.Candidates, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			it.Candidates, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -27254,6 +28448,158 @@ func (ec *executionContext) unmarshalInputEventFilter(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
 			it.Not, err = ec.unmarshalOEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventFragmentFilter(ctx context.Context, obj interface{}) (model.EventFragmentFilter, error) {
+	var it model.EventFragmentFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "event_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
+			it.EventType, err = ec.unmarshalOTensionEvent_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventFragmentOrder(ctx context.Context, obj interface{}) (model.EventFragmentOrder, error) {
+	var it model.EventFragmentOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOEventFragmentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOEventFragmentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOEventFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context, obj interface{}) (model.EventFragmentPatch, error) {
+	var it model.EventFragmentPatch
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "event_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
+			it.EventType, err = ec.unmarshalOTensionEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "old":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
+			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "new":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
+			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventFragmentRef(ctx context.Context, obj interface{}) (model.EventFragmentRef, error) {
+	var it model.EventFragmentRef
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "event_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
+			it.EventType, err = ec.unmarshalOTensionEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "old":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
+			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "new":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
+			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -31073,9 +32419,31 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			it.History, err = ec.unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"emitter", "receiver"})
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_hasRoot == nil {
+					return nil, errors.New("directive alter_hasRoot is not implemented")
+				}
+				return ec.directives.Alter_hasRoot(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.EventRef); ok {
+				it.History = data
+			} else if tmp == nil {
+				it.History = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.EventRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "n_comments":
 			var err error
@@ -31426,6 +32794,42 @@ func (ec *executionContext) unmarshalInputUpdateContractInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
 			it.Remove, err = ec.unmarshalOContractPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateEventFragmentInput(ctx context.Context, obj interface{}) (model.UpdateEventFragmentInput, error) {
+	var it model.UpdateEventFragmentInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOEventFragmentPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOEventFragmentPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -32147,17 +33551,79 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_created"))
-			it.TensionsCreated, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.TensionsCreated = data
+			} else if tmp == nil {
+				it.TensionsCreated = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_assigned":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_assigned"))
-			it.TensionsAssigned, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.TensionsAssigned = data
+			} else if tmp == nil {
+				it.TensionsAssigned = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ContractRef); ok {
+				it.Contracts = data
+			} else if tmp == nil {
+				it.Contracts = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "bio":
 			var err error
@@ -32328,6 +33794,14 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_assigned"))
 			it.TensionsAssigned, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
+			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -32608,6 +34082,32 @@ func (ec *executionContext) _AddContractPayload(ctx context.Context, sel ast.Sel
 			out.Values[i] = ec._AddContractPayload_contract(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._AddContractPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addEventFragmentPayloadImplementors = []string{"AddEventFragmentPayload"}
+
+func (ec *executionContext) _AddEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventFragmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addEventFragmentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddEventFragmentPayload")
+		case "eventFragment":
+			out.Values[i] = ec._AddEventFragmentPayload_eventFragment(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddEventFragmentPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -33185,6 +34685,34 @@ func (ec *executionContext) _DeleteContractPayload(ctx context.Context, sel ast.
 	return out
 }
 
+var deleteEventFragmentPayloadImplementors = []string{"DeleteEventFragmentPayload"}
+
+func (ec *executionContext) _DeleteEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventFragmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventFragmentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteEventFragmentPayload")
+		case "eventFragment":
+			out.Values[i] = ec._DeleteEventFragmentPayload_eventFragment(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeleteEventFragmentPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteEventFragmentPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteEventPayloadImplementors = []string{"DeleteEventPayload"}
 
 func (ec *executionContext) _DeleteEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventPayload) graphql.Marshaler {
@@ -33520,6 +35048,37 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var eventFragmentImplementors = []string{"EventFragment"}
+
+func (ec *executionContext) _EventFragment(ctx context.Context, sel ast.SelectionSet, obj *model.EventFragment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, eventFragmentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EventFragment")
+		case "event_type":
+			out.Values[i] = ec._EventFragment_event_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "old":
+			out.Values[i] = ec._EventFragment_old(ctx, field, obj)
+		case "new":
+			out.Values[i] = ec._EventFragment_new(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var labelImplementors = []string{"Label"}
 
 func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, obj *model.Label) graphql.Marshaler {
@@ -33684,6 +35243,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateEvent(ctx, field)
 		case "deleteEvent":
 			out.Values[i] = ec._Mutation_deleteEvent(ctx, field)
+		case "addEventFragment":
+			out.Values[i] = ec._Mutation_addEventFragment(ctx, field)
+		case "updateEventFragment":
+			out.Values[i] = ec._Mutation_updateEventFragment(ctx, field)
+		case "deleteEventFragment":
+			out.Values[i] = ec._Mutation_deleteEventFragment(ctx, field)
 		case "addContract":
 			out.Values[i] = ec._Mutation_addContract(ctx, field)
 		case "updateContract":
@@ -34250,6 +35815,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_queryEvent(ctx, field)
 				return res
 			})
+		case "queryEventFragment":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryEventFragment(ctx, field)
+				return res
+			})
 		case "getContract":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -34536,6 +36112,32 @@ func (ec *executionContext) _UpdateContractPayload(ctx context.Context, sel ast.
 			out.Values[i] = ec._UpdateContractPayload_contract(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdateContractPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateEventFragmentPayloadImplementors = []string{"UpdateEventFragmentPayload"}
+
+func (ec *executionContext) _UpdateEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventFragmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventFragmentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEventFragmentPayload")
+		case "eventFragment":
+			out.Values[i] = ec._UpdateEventFragmentPayload_eventFragment(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateEventFragmentPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -34870,6 +36472,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_tensions_created(ctx, field, obj)
 		case "tensions_assigned":
 			out.Values[i] = ec._User_tensions_assigned(ctx, field, obj)
+		case "contracts":
+			out.Values[i] = ec._User_contracts(ctx, field, obj)
 		case "bio":
 			out.Values[i] = ec._User_bio(ctx, field, obj)
 		case "utc":
@@ -35281,6 +36885,32 @@ func (ec *executionContext) unmarshalNAddContractInput2ᚕᚖzerogovᚋfractal6�
 
 func (ec *executionContext) unmarshalNAddContractInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInput(ctx context.Context, v interface{}) (*model.AddContractInput, error) {
 	res, err := ec.unmarshalInputAddContractInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddEventFragmentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddEventFragmentInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AddEventFragmentInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddEventFragmentInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddEventFragmentInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentInput(ctx context.Context, v interface{}) (*model.AddEventFragmentInput, error) {
+	res, err := ec.unmarshalInputAddEventFragmentInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -35798,6 +37428,31 @@ func (ec *executionContext) unmarshalNEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx context.Context, sel ast.SelectionSet, v *model.EventFragment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._EventFragment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNEventFragmentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx context.Context, v interface{}) (model.EventFragmentFilter, error) {
+	res, err := ec.unmarshalInputEventFragmentFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx context.Context, v interface{}) (*model.EventFragmentFilter, error) {
+	res, err := ec.unmarshalInputEventFragmentFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx context.Context, v interface{}) (*model.EventFragmentRef, error) {
+	res, err := ec.unmarshalInputEventFragmentRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx context.Context, v interface{}) ([]*model.EventRef, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -36116,6 +37771,11 @@ func (ec *executionContext) unmarshalNUpdateCommentInput2zerogovᚋfractal6ᚗgo
 
 func (ec *executionContext) unmarshalNUpdateContractInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateContractInput(ctx context.Context, v interface{}) (model.UpdateContractInput, error) {
 	res, err := ec.unmarshalInputUpdateContractInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateEventFragmentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventFragmentInput(ctx context.Context, v interface{}) (model.UpdateEventFragmentInput, error) {
+	res, err := ec.unmarshalInputUpdateEventFragmentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -36482,6 +38142,13 @@ func (ec *executionContext) marshalOAddContractPayload2ᚖzerogovᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._AddContractPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddEventFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddEventFragmentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddEventFragmentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddEventPayload) graphql.Marshaler {
@@ -37225,6 +38892,13 @@ func (ec *executionContext) marshalODeleteContractPayload2ᚖzerogovᚋfractal6�
 	return ec._DeleteContractPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalODeleteEventFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteEventFragmentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteEventFragmentPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalODeleteEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteEventPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -37414,6 +39088,101 @@ func (ec *executionContext) unmarshalOEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOEventFragment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx context.Context, sel ast.SelectionSet, v []*model.EventFragment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx context.Context, sel ast.SelectionSet, v *model.EventFragment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._EventFragment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx context.Context, v interface{}) (*model.EventFragmentFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventFragmentFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventFragmentOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx context.Context, v interface{}) (*model.EventFragmentOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventFragmentOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventFragmentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx context.Context, v interface{}) (*model.EventFragmentOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.EventFragmentOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEventFragmentOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx context.Context, sel ast.SelectionSet, v *model.EventFragmentOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOEventFragmentPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx context.Context, v interface{}) (*model.EventFragmentPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventFragmentPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx context.Context, v interface{}) (*model.EventFragmentRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventFragmentRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx context.Context, v interface{}) (*model.EventOrder, error) {
 	if v == nil {
 		return nil, nil
@@ -37468,14 +39237,6 @@ func (ec *executionContext) unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalOEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx context.Context, v interface{}) (*model.EventRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputEventRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
@@ -38929,6 +40690,13 @@ func (ec *executionContext) marshalOUpdateContractPayload2ᚖzerogovᚋfractal6�
 		return graphql.Null
 	}
 	return ec._UpdateContractPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateEventFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateEventFragmentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateEventFragmentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateEventPayload) graphql.Marshaler {

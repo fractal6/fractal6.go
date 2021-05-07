@@ -98,13 +98,13 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
     if ok1 && ok2 {
         return true, nil, err
     } else if ok1 || ok2 {
-        var ev model.Event
+        var ev model.EventFragment
         StructMap(*event, &ev)
-        var node model.Node
+        var rid string
         if ok1 {
-            node.Nameid = tension.Emitter.Nameid
+            rid, _ = codec.Nid2rootid(tension.Emitter.Nameid)
         } else if ok2 {
-            node.Nameid = tension.Receiver.Nameid
+            rid, _ = codec.Nid2rootid(tension.Receiver.Nameid)
         }
         contract := &model.Contract{
             Event: &ev,
@@ -112,7 +112,7 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
             Status: model.ContractStatusOpen,
             ContractType: model.ContractTypeAnyCoordoDual,
             Participants: []*model.Vote{&model.Vote{
-                Node: &node,
+                Node: &model.Node{Nameid: codec.MemberIdCodec(rid, uctx.Username)},
                 Data: []int{1},
             }, },
         }
