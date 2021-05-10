@@ -187,6 +187,7 @@ type ComplexityRoot struct {
 
 	Contract struct {
 		Candidates   func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		ClosedAt     func(childComplexity int) int
 		Comments     func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		ContractType func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
@@ -1150,6 +1151,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.Candidates(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Contract.closedAt":
+		if e.complexity.Contract.ClosedAt == nil {
+			break
+		}
+
+		return e.complexity.Contract.ClosedAt(childComplexity), true
 
 	case "Contract.comments":
 		if e.complexity.Contract.Comments == nil {
@@ -4172,9 +4180,10 @@ type EventFragment {
 
 type Contract {
   event(filter: EventFragmentFilter): EventFragment!
+  closedAt: DateTime @search
   tension(filter: TensionFilter): Tension!
-  status: ContractStatus!
-  contract_type: ContractType!
+  status: ContractStatus! @search
+  contract_type: ContractType! @search
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
   participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
@@ -4331,25 +4340,25 @@ enum ContractType {
   AnyCoordoTarget
 }
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE
+
+directive @cascade on FIELD
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @cascade on FIELD
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -4388,6 +4397,7 @@ input AddContractInput {
   updatedAt: DateTime
   message: String
   event: EventFragmentRef!
+  closedAt: DateTime
   tension: TensionRef!
   status: ContractStatus!
   contract_type: ContractType!
@@ -4731,6 +4741,9 @@ input ContractFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  closedAt: DateTimeFilter
+  status: ContractStatus_hash
+  contract_type: ContractType_hash
   and: ContractFilter
   or: ContractFilter
   not: ContractFilter
@@ -4746,6 +4759,7 @@ enum ContractOrderable {
   createdAt
   updatedAt
   message
+  closedAt
 }
 
 input ContractPatch {
@@ -4754,6 +4768,7 @@ input ContractPatch {
   updatedAt: DateTime
   message: String
   event: EventFragmentRef @patch_RO
+  closedAt: DateTime @patch_RO
   tension: TensionRef @patch_RO
   status: ContractStatus @patch_RO
   contract_type: ContractType @patch_RO
@@ -4769,12 +4784,21 @@ input ContractRef {
   updatedAt: DateTime
   message: String
   event: EventFragmentRef
+  closedAt: DateTime
   tension: TensionRef
   status: ContractStatus
   contract_type: ContractType
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
+}
+
+input ContractStatus_hash {
+  eq: ContractStatus!
+}
+
+input ContractType_hash {
+  eq: ContractType!
 }
 
 input CustomHTTP {
@@ -12756,6 +12780,55 @@ func (ec *executionContext) _Contract_event(ctx context.Context, field graphql.C
 	return ec.marshalNEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Contract_closedAt(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ClosedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Contract_tension(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12832,8 +12905,28 @@ func (ec *executionContext) _Contract_status(ctx context.Context, field graphql.
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Status, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(model.ContractStatus); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.ContractStatus`, tmp)
 	})
 
 	if resTmp == nil {
@@ -12864,8 +12957,28 @@ func (ec *executionContext) _Contract_contract_type(ctx context.Context, field g
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ContractType, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ContractType, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(model.ContractType); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.ContractType`, tmp)
 	})
 
 	if resTmp == nil {
@@ -25407,6 +25520,14 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "tension":
 			var err error
 
@@ -27889,6 +28010,30 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			it.ClosedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOContractStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatusHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contract_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
+			it.ContractType, err = ec.unmarshalOContractType_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractTypeHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "and":
 			var err error
 
@@ -28017,6 +28162,30 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				it.Event = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.EventFragmentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ClosedAt = data
+			} else if tmp == nil {
+				it.ClosedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
@@ -28199,6 +28368,14 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "tension":
 			var err error
 
@@ -28244,6 +28421,46 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputContractStatus_hash(ctx context.Context, obj interface{}) (model.ContractStatusHash, error) {
+	var it model.ContractStatusHash
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalNContractStatus2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputContractType_hash(ctx context.Context, obj interface{}) (model.ContractTypeHash, error) {
+	var it model.ContractTypeHash
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalNContractType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -34550,6 +34767,8 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "closedAt":
+			out.Values[i] = ec._Contract_closedAt(ctx, field, obj)
 		case "tension":
 			out.Values[i] = ec._Contract_tension(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -38824,6 +39043,14 @@ func (ec *executionContext) marshalOContractStatus2ᚖzerogovᚋfractal6ᚗgoᚋ
 	return v
 }
 
+func (ec *executionContext) unmarshalOContractStatus_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatusHash(ctx context.Context, v interface{}) (*model.ContractStatusHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputContractStatus_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOContractType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx context.Context, v interface{}) (*model.ContractType, error) {
 	if v == nil {
 		return nil, nil
@@ -38838,6 +39065,14 @@ func (ec *executionContext) marshalOContractType2ᚖzerogovᚋfractal6ᚗgoᚋgr
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOContractType_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractTypeHash(ctx context.Context, v interface{}) (*model.ContractTypeHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputContractType_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOCustomHTTP2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCustomHTTP(ctx context.Context, v interface{}) (*model.CustomHTTP, error) {

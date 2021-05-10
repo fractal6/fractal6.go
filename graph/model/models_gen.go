@@ -45,6 +45,7 @@ type AddContractInput struct {
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
 	Event        *EventFragmentRef `json:"event,omitempty"`
+	ClosedAt     *string           `json:"closedAt,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       ContractStatus    `json:"status,omitempty"`
 	ContractType ContractType      `json:"contract_type,omitempty"`
@@ -392,6 +393,7 @@ type CommentRef struct {
 
 type Contract struct {
 	Event        *EventFragment `json:"event,omitempty"`
+	ClosedAt     *string        `json:"closedAt,omitempty"`
 	Tension      *Tension       `json:"tension,omitempty"`
 	Status       ContractStatus `json:"status,omitempty"`
 	ContractType ContractType   `json:"contract_type,omitempty"`
@@ -406,12 +408,15 @@ type Contract struct {
 }
 
 type ContractFilter struct {
-	ID        []string              `json:"id,omitempty"`
-	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
-	Message   *StringFullTextFilter `json:"message,omitempty"`
-	And       *ContractFilter       `json:"and,omitempty"`
-	Or        *ContractFilter       `json:"or,omitempty"`
-	Not       *ContractFilter       `json:"not,omitempty"`
+	ID           []string              `json:"id,omitempty"`
+	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message      *StringFullTextFilter `json:"message,omitempty"`
+	ClosedAt     *DateTimeFilter       `json:"closedAt,omitempty"`
+	Status       *ContractStatusHash   `json:"status,omitempty"`
+	ContractType *ContractTypeHash     `json:"contract_type,omitempty"`
+	And          *ContractFilter       `json:"and,omitempty"`
+	Or           *ContractFilter       `json:"or,omitempty"`
+	Not          *ContractFilter       `json:"not,omitempty"`
 }
 
 type ContractOrder struct {
@@ -426,6 +431,7 @@ type ContractPatch struct {
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
 	Event        *EventFragmentRef `json:"event,omitempty"`
+	ClosedAt     *string           `json:"closedAt,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       *ContractStatus   `json:"status,omitempty"`
 	ContractType *ContractType     `json:"contract_type,omitempty"`
@@ -441,12 +447,21 @@ type ContractRef struct {
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
 	Event        *EventFragmentRef `json:"event,omitempty"`
+	ClosedAt     *string           `json:"closedAt,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       *ContractStatus   `json:"status,omitempty"`
 	ContractType *ContractType     `json:"contract_type,omitempty"`
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`
+}
+
+type ContractStatusHash struct {
+	Eq ContractStatus `json:"eq,omitempty"`
+}
+
+type ContractTypeHash struct {
+	Eq ContractType `json:"eq,omitempty"`
 }
 
 type CustomHTTP struct {
@@ -1595,17 +1610,19 @@ const (
 	ContractOrderableCreatedAt ContractOrderable = "createdAt"
 	ContractOrderableUpdatedAt ContractOrderable = "updatedAt"
 	ContractOrderableMessage   ContractOrderable = "message"
+	ContractOrderableClosedAt  ContractOrderable = "closedAt"
 )
 
 var AllContractOrderable = []ContractOrderable{
 	ContractOrderableCreatedAt,
 	ContractOrderableUpdatedAt,
 	ContractOrderableMessage,
+	ContractOrderableClosedAt,
 }
 
 func (e ContractOrderable) IsValid() bool {
 	switch e {
-	case ContractOrderableCreatedAt, ContractOrderableUpdatedAt, ContractOrderableMessage:
+	case ContractOrderableCreatedAt, ContractOrderableUpdatedAt, ContractOrderableMessage, ContractOrderableClosedAt:
 		return true
 	}
 	return false
