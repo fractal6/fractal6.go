@@ -86,20 +86,45 @@ func Init() gen.Config {
     c.Directives.Alter_hasRole = hasRole
     c.Directives.Alter_hasRoot = hasRoot
 
-    // Mutation Hook directives
-    c.Directives.Hook_addTension = addTensionHook
-    c.Directives.Hook_updateTension = updateTensionHook
-    c.Directives.Hook_updateComment = updateCommentHook
-    c.Directives.Hook_updateNode = updateNodeHook
-    c.Directives.Hook_addLabel = addLabelHook
-    c.Directives.Hook_updateLabel = updateLabelHook
+    //
+    // Hook
+    //
 
-    c.Directives.Hook_addTensionPost = addTensionPostHook
-    c.Directives.Hook_updateTensionPost = updateTensionPostHook
-    c.Directives.Hook_updateCommentPost = nothing
+    //Node
+    c.Directives.Hook_getNode = nothing
+    c.Directives.Hook_queryNode = nothing
+    c.Directives.Hook_addNode = nothing
+    c.Directives.Hook_addNodePost = nothing
+    c.Directives.Hook_updateNode = updateNodeHook
     c.Directives.Hook_updateNodePost = nothing
+    //Label
+    c.Directives.Hook_getLabel = nothing
+    c.Directives.Hook_queryLabel = nothing
+    c.Directives.Hook_addLabel = addLabelHook
     c.Directives.Hook_addLabelPost = nothing
+    c.Directives.Hook_updateLabel = updateLabelHook
     c.Directives.Hook_updateLabelPost = nothing
+    //Tension
+    c.Directives.Hook_getTension = nothing
+    c.Directives.Hook_queryTension = nothing
+    c.Directives.Hook_addTension = addTensionHook
+    c.Directives.Hook_addTensionPost = addTensionPostHook
+    c.Directives.Hook_updateTension = updateTensionHook
+    c.Directives.Hook_updateTensionPost = updateTensionPostHook
+    //Comment
+    c.Directives.Hook_getComment = nothing
+    c.Directives.Hook_queryComment = nothing
+    c.Directives.Hook_addComment = nothing
+    c.Directives.Hook_addCommentPost = nothing
+    c.Directives.Hook_updateComment = updateCommentHook
+    c.Directives.Hook_updateCommentPost = nothing
+    //Contract
+    c.Directives.Hook_getContract = nothing
+    c.Directives.Hook_queryContract = nothing
+    c.Directives.Hook_addContract = nothing
+    c.Directives.Hook_addContractPost = nothing
+    c.Directives.Hook_updateContract = nothing
+    c.Directives.Hook_updateContractPost = nothing
 
     return c
 }
@@ -131,6 +156,7 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     // Check that isPrivate is present in payload
     var fok, yes bool
     var nameid string
+    var tid string
     var isPrivate bool = true
     var err error
 
@@ -148,11 +174,10 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required."))
             }
             var nameid string
-            rc := graphql.GetResolverContext(ctx)
-            if rc.Args["nameid"] != nil {
-                nameid = *(rc.Args["nameid"].(*string))
-            } else {
+            if v.Nameid != "" {
                 nameid = v.Nameid
+            } else if rc := graphql.GetResolverContext(ctx); rc.Args["nameid"] != nil {
+                nameid = *(rc.Args["nameid"].(*string))
             }
             // Validate
             isPrivate = v.IsPrivate
@@ -222,6 +247,30 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
                 if yes { break }
             }
 
+        // Get Contract
+        case *model.Contract:
+            var startField bool
+            var inField bool
+            if v == nil { break }
+            // Check fields
+            for _, f := range GetPreloads(ctx) {
+                if f == "tension" { startField = true }
+                if startField && string(f[0]) == "{" { inField = true } // ignore filter etc...
+                if inField && f == "id" { fok = true; break}
+                if inField && string(f[0]) == "}"  { inField = false }
+            }
+            if !fok {
+                // @debug: Query the database if field is not present and print a warning.
+                return nil, LogErr("Access denied", fmt.Errorf("`tension.id' field is required."))
+            }
+            // validate
+            tid = v.Tension.ID
+            nameid_, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.nameid")
+            isPrivate_, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.isPrivate")
+            if err != nil { return nil, err }
+            yes, err = isHidePrivate(ctx, nameid_.(string), isPrivate_.(bool))
+            if err != nil { return nil, err }
+
         default:
             panic("@isPrivate: node type unknonwn: " + fmt.Sprintf("%T", v))
         }
@@ -233,40 +282,6 @@ func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     }
 
     return data, err
-}
-
-func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, error) {
-    var yes bool = true
-    var err error
-
-    if nameid == "" {
-        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required."))
-    } else {
-        // Get the public status of the node
-        //isPrivate, err :=  db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isPrivate")
-        //if err != nil {
-        //    return yes, LogErr("Access denied", err)
-        //}
-        if isPrivate {
-            // check user role.
-            uctx, err := webauth.UserCtxFromContext(ctx)
-            //if err == jwtwebauth.ErrExpired {
-            //    // Uctx claims is not parsed for unverified token
-            //    u, err := db.GetDB().GetUser("username", uctx.Username)
-            //    if err != nil { return yes, LogErr("internal error", err) }
-            //    err = nil
-            //    uctx = *u
-            if err != nil { return yes, LogErr("Access denied", err) }
-
-            rootnameid, err := codec.Nid2rootid(nameid)
-            if auth.UserHasRoot(uctx, rootnameid) {
-                return false, err
-            }
-        } else {
-            yes = false
-        }
-    }
-    return yes, err
 }
 
 func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
@@ -336,7 +351,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field s
         v = d
     }
     // @Debug: Suport only Label right now .
-    // (@debug: get the type asked automatically...)
+    // (@debug: get the type asked automatically (with (get|query)Hook ?)
     t := "Label"
     //a := graphql.GetRequestContext(ctx)
     //b := graphql.CollectFieldsCtx(ctx, nil)
@@ -577,34 +592,4 @@ func extractNameid(ctx context.Context, nodeField string, nodeObj interface{}) (
     }
 
     return nameid, err
-}
-
-//
-// Go Utils
-//
-func getNestedObj(obj interface{}, field string) interface{} {
-    var source model.JsonAtom
-    var target interface{}
-
-    source =  obj.(model.JsonAtom)
-    fields := strings.Split(field, ".")
-
-    for i, f := range fields {
-        target = source[f]
-        if target == nil { return nil }
-        if i < len(fields) -1 {
-            source = target.(model.JsonAtom)
-        }
-    }
-
-    return target
-}
-
-func get(obj model.JsonAtom, field string, deflt interface{}) interface{} {
-    v := obj[field]
-    if v == nil {
-        return deflt
-    }
-
-    return v
 }

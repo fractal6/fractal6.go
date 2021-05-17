@@ -11,25 +11,23 @@ import (
     . "zerogov/fractal6.go/tools"
 )
 
-//
+////////////////////////////////////////////////
 // Node Resolver
-//
+////////////////////////////////////////////////
 
 // Update Node hook
 // - add the nameid field in the context for further inspection in new resolver
 func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    nameid_ := filter["nameid"].(model.JsonAtom)["eq"]
-    if nameid_ != nil {
-        ctx = context.WithValue(ctx, "nameid", nameid_.(string))
+    ctx, _, err := setContextWith(ctx, obj, "nameid")
+    if err != nil {
+        return nil, LogErr("Update node error", err)
     }
-
     return next(ctx)
 }
 
-//
+////////////////////////////////////////////////
 // Label Resolver
-//
+////////////////////////////////////////////////
 
 // Add Label hook | Must pass all
 // + chech that user rights
@@ -50,7 +48,7 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
     label := input[0]
 
     // Check rights
-    if len(label.Nodes) != 1 { return nil, LogErr("Input error", fmt.Errorf("One circle required.")) }
+    if len(label.Nodes) != 1 { return nil, LogErr("Input error", fmt.Errorf("One and only one circle is required.")) }
     nid := label.Nodes[0].Nameid
     charac := GetNodeCharacStrict()
     ok, err := CheckUserRights(uctx, *nid, &charac)
@@ -62,7 +60,7 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
-// Update Label hook | Must past all
+// Update Label hook | Must pass all
 // + check the user rights
 func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
@@ -70,16 +68,13 @@ func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
-    var lid string
     var isNew bool
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    if filter["id"] != nil {
-        ids := filter["id"].([]interface{})
-        if len(ids) != 1 {
-            return nil, LogErr("Update label error", fmt.Errorf("Only one label supported in input."))
-        }
-        lid = ids[0].(string)
-    } else { // assumes rootnameid and name are given
+    ctx, lid, err := setContextWith(ctx, obj, "id")
+    if err != nil {
+        return nil, LogErr("Update tension error", err)
+    }
+    if lid == "" { // assumes rootnameid and name are given
+        filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
         rootnameid := getNestedObj(filter, "rootnameid.eq").(string)
         name := getNestedObj(filter, "name.eq").(string)
         filterName := "Label.rootnameid"
@@ -101,7 +96,7 @@ func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver
     nodes, err := db.GetDB().GetSubFieldById(lid, "Label.nodes", "Node.nameid")
     if err != nil { return nil, LogErr("Internal error", err) }
 
-    // Add label a in a  Circle
+    // Add label a in a Circle
     if isNew {
         // Similar than AddLabel
         if len(input.Set.Nodes) != 1 { return nil, LogErr("Input error", fmt.Errorf("One circle required.")) }

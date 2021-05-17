@@ -12,6 +12,10 @@ import (
     . "zerogov/fractal6.go/tools"
 )
 
+////////////////////////////////////////////////
+// Tension Resolver
+////////////////////////////////////////////////
+
 // Add Tension Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Retrieve userCtx from token
@@ -45,16 +49,12 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     return data, err
 }
 
-// Update Tension hook:
-// * add the id field in the context for further inspection in new resolver
+// Update Tension hook
 func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    ids := filter["id"].([]interface{})
-    if len(ids) != 1 {
-        return nil, LogErr("Update tension error", fmt.Errorf("Only one tension supported in input."))
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil {
+        return nil, LogErr("Update tension error", err)
     }
-
-    ctx = context.WithValue(ctx, "id", ids[0].(string))
     return next(ctx)
 }
 
@@ -132,15 +132,28 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
     return next(ctx)
 }
 
-// Update Comment hook
-// * add the id field in the context for further inspection in new resolver
-func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
-    ids := filter["id"].([]interface{})
-    if len(ids) != 1 {
-        return nil, LogErr("Update comment error", fmt.Errorf("Only one comment supported in input."))
-    }
+////////////////////////////////////////////////
+// Comment Resolver
+////////////////////////////////////////////////
 
-    ctx = context.WithValue(ctx, "id", ids[0].(string))
+// Update Comment hook
+func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil {
+        return nil, LogErr("Update comment error", err)
+    }
+    return next(ctx)
+}
+
+////////////////////////////////////////////////
+// Contract Resolver
+////////////////////////////////////////////////
+
+// Update Contract hook
+func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil {
+        return nil, LogErr("Update contract error", err)
+    }
     return next(ctx)
 }

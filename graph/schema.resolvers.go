@@ -294,7 +294,8 @@ func (r *queryResolver) QueryEventFragment(ctx context.Context, filter *model.Ev
 }
 
 func (r *queryResolver) GetContract(ctx context.Context, id string) (data *model.Contract, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *queryResolver) QueryContract(ctx context.Context, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) (data []*model.Contract, errors error) {

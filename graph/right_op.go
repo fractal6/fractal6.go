@@ -9,6 +9,7 @@ import (
     "zerogov/fractal6.go/graph/codec"
     "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
+    webauth "zerogov/fractal6.go/web/auth"
 )
 
 
@@ -107,6 +108,8 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
             rid, _ = codec.Nid2rootid(tension.Receiver.Nameid)
         }
         contract := &model.Contract{
+            CreatedAt: Now(),
+            CreatedBy: &model.User{Username: uctx.Username},
             Event: &ev,
             Tension: tension,
             Status: model.ContractStatusOpen,
@@ -130,9 +133,9 @@ func AnyCoordoTarget(uctx *model.UserCtx, tension *model.Tension, event *model.E
     return AnyCoordo(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
 }
 
-//
-// Base authaurisation methods
-//
+////////////////////////////////////////////////
+// Base authorization methods
+////////////////////////////////////////////////
 
 func AnyCoordo(uctx *model.UserCtx, nameid string, charac *model.NodeCharac) (bool, *model.Contract, error) {
     // Check user rights
@@ -191,9 +194,9 @@ func CheckUpperRights(uctx *model.UserCtx, nameid string, charac *model.NodeChar
     return ok, err
 }
 
-//
+////////////////////////////////////////////////
 // With Ctx method (used in graph/resolver.go)
-//
+////////////////////////////////////////////////
 
 // Check if an user owns the given object
 func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj interface{}) (bool, error) {
@@ -254,3 +257,38 @@ func CheckAssignees(ctx context.Context, uctx *model.UserCtx, nodeObj interface{
 func GetNodeCharacStrict() model.NodeCharac {
     return model.NodeCharac{UserCanJoin: false, Mode: model.NodeModeCoordinated}
 }
+
+func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, error) {
+    var yes bool = true
+    var err error
+
+    if nameid == "" {
+        err = LogErr("Access denied", fmt.Errorf("`nameid' field is required."))
+    } else {
+        // Get the public status of the node
+        //isPrivate, err :=  db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.isPrivate")
+        //if err != nil {
+        //    return yes, LogErr("Access denied", err)
+        //}
+        if isPrivate {
+            // check user role.
+            uctx, err := webauth.UserCtxFromContext(ctx)
+            //if err == jwtwebauth.ErrExpired {
+            //    // Uctx claims is not parsed for unverified token
+            //    u, err := db.GetDB().GetUser("username", uctx.Username)
+            //    if err != nil { return yes, LogErr("internal error", err) }
+            //    err = nil
+            //    uctx = *u
+            if err != nil { return yes, LogErr("Access denied", err) }
+
+            rootnameid, err := codec.Nid2rootid(nameid)
+            if auth.UserHasRoot(uctx, rootnameid) {
+                return false, err
+            }
+        } else {
+            yes = false
+        }
+    }
+    return yes, err
+}
+
