@@ -18,6 +18,9 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
     var val string
     var err error
     filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
+    if filter[n] == nil {
+        return ctx, val, err
+    }
 
     switch n {
     case "nameid":
