@@ -44,11 +44,11 @@ type AddContractInput struct {
 	CreatedAt    string            `json:"createdAt,omitempty"`
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
-	Event        *EventFragmentRef `json:"event,omitempty"`
-	ClosedAt     *string           `json:"closedAt,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       ContractStatus    `json:"status,omitempty"`
 	ContractType ContractType      `json:"contract_type,omitempty"`
+	ClosedAt     *string           `json:"closedAt,omitempty"`
+	Event        *EventFragmentRef `json:"event,omitempty"`
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`
@@ -392,11 +392,11 @@ type CommentRef struct {
 }
 
 type Contract struct {
-	Event        *EventFragment `json:"event,omitempty"`
-	ClosedAt     *string        `json:"closedAt,omitempty"`
 	Tension      *Tension       `json:"tension,omitempty"`
 	Status       ContractStatus `json:"status,omitempty"`
 	ContractType ContractType   `json:"contract_type,omitempty"`
+	ClosedAt     *string        `json:"closedAt,omitempty"`
+	Event        *EventFragment `json:"event,omitempty"`
 	Candidates   []*User        `json:"candidates,omitempty"`
 	Participants []*Vote        `json:"participants,omitempty"`
 	Comments     []*Comment     `json:"comments,omitempty"`
@@ -411,9 +411,9 @@ type ContractFilter struct {
 	ID           []string              `json:"id,omitempty"`
 	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message      *StringFullTextFilter `json:"message,omitempty"`
-	ClosedAt     *DateTimeFilter       `json:"closedAt,omitempty"`
 	Status       *ContractStatusHash   `json:"status,omitempty"`
 	ContractType *ContractTypeHash     `json:"contract_type,omitempty"`
+	ClosedAt     *DateTimeFilter       `json:"closedAt,omitempty"`
 	And          *ContractFilter       `json:"and,omitempty"`
 	Or           *ContractFilter       `json:"or,omitempty"`
 	Not          *ContractFilter       `json:"not,omitempty"`
@@ -430,11 +430,11 @@ type ContractPatch struct {
 	CreatedAt    *string           `json:"createdAt,omitempty"`
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
-	Event        *EventFragmentRef `json:"event,omitempty"`
-	ClosedAt     *string           `json:"closedAt,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       *ContractStatus   `json:"status,omitempty"`
 	ContractType *ContractType     `json:"contract_type,omitempty"`
+	ClosedAt     *string           `json:"closedAt,omitempty"`
+	Event        *EventFragmentRef `json:"event,omitempty"`
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`
@@ -446,11 +446,11 @@ type ContractRef struct {
 	CreatedAt    *string           `json:"createdAt,omitempty"`
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
-	Event        *EventFragmentRef `json:"event,omitempty"`
-	ClosedAt     *string           `json:"closedAt,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       *ContractStatus   `json:"status,omitempty"`
 	ContractType *ContractType     `json:"contract_type,omitempty"`
+	ClosedAt     *string           `json:"closedAt,omitempty"`
+	Event        *EventFragmentRef `json:"event,omitempty"`
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`

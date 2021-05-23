@@ -52,9 +52,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 // Update Tension hook
 func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil {
-        return nil, LogErr("Update tension error", err)
-    }
+    if err != nil { return nil, LogErr("Update tension error", err) }
     return next(ctx)
 }
 
@@ -80,7 +78,7 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
     ok, _,  err := tensionEventHook(uctx, tid, input.History, nil)
     if err != nil || !ok {
         // Delete the tension just added
-        e := db.GetDB().DeleteNodes(tid)
+        e := db.GetDB().DeepDelete("tension", tid)
         if e != nil { panic(e) }
     }
 
@@ -121,8 +119,6 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
             t.Tension = []*model.Tension{&model.Tension{
                 Contracts: []*model.Contract{contract},
             }}
-            i := 1
-            t.NumUids = &i
             return &t, err
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -139,9 +135,7 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
 // Update Comment hook
 func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil {
-        return nil, LogErr("Update comment error", err)
-    }
+    if err != nil { return nil, LogErr("Update comment error", err) }
     return next(ctx)
 }
 
@@ -149,11 +143,47 @@ func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolv
 // Contract Resolver
 ////////////////////////////////////////////////
 
+// -- todo auth method for contract mutations
+// -- user @alter_hasRole ?
+
+// Add Contract hook
+func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // * Get the tid or error
+    // * get the tensionHook
+    // * call ProcessEvent(tid, nil) (in tension_op)
+    return next(ctx)
+}
+
 // Update Contract hook
 func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil {
-        return nil, LogErr("Update contract error", err)
-    }
+    if err != nil { return nil, LogErr("Update contract error", err) }
     return next(ctx)
+}
+
+// Delete Contract hook
+func deleteContractHookPost(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Retrieve userCtx from token
+    _, err := webauth.UserCtxFromContext(ctx)
+    if err != nil { return nil, LogErr("Access denied", err) }
+
+    // Validate input
+    rc := graphql.GetResolverContext(ctx)
+    filter := rc.Args["filter"].(model.ContractFilter)
+    ids := filter.ID
+    if len(ids) != 1 {
+        return nil, LogErr("delete contract error", fmt.Errorf("Only one contract supported in input."))
+    }
+
+    // Deep delete
+    err = db.GetDB().DeepDelete("contract", ids[0], )
+    if err != nil { return nil, LogErr("Delete contract error", err) }
+
+    var d model.DeleteContractPayload
+    d.Contract = []*model.Contract{&model.Contract{ID: ids[0]}}
+    return &d, err
+
+    //data, err := next(ctx)
+    //if err != nil { return nil, err }
+    //return data, err
 }

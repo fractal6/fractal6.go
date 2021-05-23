@@ -14,16 +14,26 @@ import (
 //
 
 // setContext add the {n} field in the context for further inspection in next resolvers.
+// Its used in the hook_ resolvers for Update and Delete queries.
 func setContextWith(ctx context.Context, obj interface{}, n string) (context.Context, string, error) {
     var val string
     var err error
-    filter := obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
+    var filter model.JsonAtom
+
+    if obj.(model.JsonAtom)["input"] != nil {
+        // Update mutation
+        filter = obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
+    } else if obj.(model.JsonAtom)["filter"] != nil {
+        // Delete mutation
+        filter = obj.(model.JsonAtom)["filter"].(model.JsonAtom)
+    }
+
     if filter[n] == nil {
         return ctx, val, err
     }
 
     switch n {
-    case "nameid":
+    case "nameid", "rootnameid", "username":
         v := filter[n].(model.JsonAtom)["eq"]
         if v != nil {
             val = v.(string)

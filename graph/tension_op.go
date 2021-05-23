@@ -56,7 +56,7 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         em, hasEvent := EMAP[*event.EventType]
         if hasEvent { // Process the special event
                // Get Tension, target Node and blob charac (last if bid undefined)
-               tension, err = db.GetDB().GetTensionHook(tid, bid)
+               tension, err = db.GetDB().GetTensionHook(tid, bid) // @debug: add a needBlob parameter here ?
                if err != nil { return false, nil, LogErr("Access denied", err) }
                if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
 
@@ -67,13 +67,10 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
                // Process event
                if ok {
                    ok, err = em.Action(uctx, tension, event)
-               } else if contract != nil {
-                   tension.Contracts = append(tension.Contracts, contract)
-               }
-
-               // Leave a trace
-               if ok && err == nil {
-                   leaveTrace(tension)
+                   // Leave a trace
+                   if ok && err == nil {
+                       leaveTrace(tension)
+                   }
                }
 
                // Break after the first hooked event

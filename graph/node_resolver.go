@@ -16,12 +16,9 @@ import (
 ////////////////////////////////////////////////
 
 // Update Node hook
-// - add the nameid field in the context for further inspection in new resolver
 func updateNodeHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     ctx, _, err := setContextWith(ctx, obj, "nameid")
-    if err != nil {
-        return nil, LogErr("Update node error", err)
-    }
+    if err != nil { return nil, LogErr("Update node error", err) }
     return next(ctx)
 }
 

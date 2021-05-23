@@ -36,6 +36,7 @@ var TensionHookPayload string = `{
         NodeCharac.mode
     }
   }
+
   Tension.blobs %s {
     uid
     Blob.blob_type

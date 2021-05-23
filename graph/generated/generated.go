@@ -66,6 +66,16 @@ type DirectiveRoot struct {
 	Hook_addNodePost        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTension         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTensionPost     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteComment      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteCommentPost  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContract     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContractPost func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabel        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabelPost    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteNode         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteNodePost     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTension      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTensionPost  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getComment         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getContract        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getLabel           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -4012,6 +4022,10 @@ directive @hook_updateNode on ARGUMENT_DEFINITION
 
 directive @hook_updateNodePost on FIELD_DEFINITION
 
+directive @hook_deleteNode on ARGUMENT_DEFINITION
+
+directive @hook_deleteNodePost on FIELD_DEFINITION
+
 directive @hook_getTension on ARGUMENT_DEFINITION
 
 directive @hook_queryTension on ARGUMENT_DEFINITION
@@ -4023,6 +4037,10 @@ directive @hook_addTensionPost on FIELD_DEFINITION
 directive @hook_updateTension on ARGUMENT_DEFINITION
 
 directive @hook_updateTensionPost on FIELD_DEFINITION
+
+directive @hook_deleteTension on ARGUMENT_DEFINITION
+
+directive @hook_deleteTensionPost on FIELD_DEFINITION
 
 directive @hook_getComment on ARGUMENT_DEFINITION
 
@@ -4036,6 +4054,10 @@ directive @hook_updateComment on ARGUMENT_DEFINITION
 
 directive @hook_updateCommentPost on FIELD_DEFINITION
 
+directive @hook_deleteComment on ARGUMENT_DEFINITION
+
+directive @hook_deleteCommentPost on FIELD_DEFINITION
+
 directive @hook_getLabel on ARGUMENT_DEFINITION
 
 directive @hook_queryLabel on ARGUMENT_DEFINITION
@@ -4048,6 +4070,10 @@ directive @hook_updateLabel on ARGUMENT_DEFINITION
 
 directive @hook_updateLabelPost on FIELD_DEFINITION
 
+directive @hook_deleteLabel on ARGUMENT_DEFINITION
+
+directive @hook_deleteLabelPost on FIELD_DEFINITION
+
 directive @hook_getContract on ARGUMENT_DEFINITION
 
 directive @hook_queryContract on ARGUMENT_DEFINITION
@@ -4059,6 +4085,10 @@ directive @hook_addContractPost on FIELD_DEFINITION
 directive @hook_updateContract on ARGUMENT_DEFINITION
 
 directive @hook_updateContractPost on FIELD_DEFINITION
+
+directive @hook_deleteContract on ARGUMENT_DEFINITION
+
+directive @hook_deleteContractPost on FIELD_DEFINITION
 
 type Node @hidePrivate {
   id: ID!
@@ -4224,11 +4254,11 @@ type EventFragment {
 }
 
 type Contract @hidePrivate {
-  event(filter: EventFragmentFilter): EventFragment!
-  closedAt: DateTime @search
   tension(filter: TensionFilter): Tension!
   status: ContractStatus! @search
   contract_type: ContractType! @search
+  closedAt: DateTime @search
+  event(filter: EventFragmentFilter): EventFragment!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
   participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
@@ -4385,23 +4415,23 @@ enum ContractType {
   AnyCoordoTarget
 }
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT
 
-directive @remote on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP) on FIELD_DEFINITION
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @withSubscription on OBJECT|INTERFACE
 
-directive @custom(http: CustomHTTP) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE
 
 directive @cascade on FIELD
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
@@ -4441,11 +4471,11 @@ input AddContractInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
-  event: EventFragmentRef!
-  closedAt: DateTime
   tension: TensionRef!
   status: ContractStatus!
   contract_type: ContractType!
+  closedAt: DateTime
+  event: EventFragmentRef!
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
@@ -4786,9 +4816,9 @@ input ContractFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  closedAt: DateTimeFilter
   status: ContractStatus_hash
   contract_type: ContractType_hash
+  closedAt: DateTimeFilter
   and: ContractFilter
   or: ContractFilter
   not: ContractFilter
@@ -4812,11 +4842,11 @@ input ContractPatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  event: EventFragmentRef @patch_RO
-  closedAt: DateTime @patch_RO
   tension: TensionRef @patch_RO
   status: ContractStatus @patch_RO
   contract_type: ContractType @patch_RO
+  closedAt: DateTime @patch_RO
+  event: EventFragmentRef @patch_RO
   candidates: [UserRef!] @patch_RO
   participants: [VoteRef!]
   comments: [CommentRef!]
@@ -4828,11 +4858,11 @@ input ContractRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  event: EventFragmentRef
-  closedAt: DateTime
   tension: TensionRef
   status: ContractStatus
   contract_type: ContractType
+  closedAt: DateTime
+  event: EventFragmentRef
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
@@ -5160,7 +5190,7 @@ enum Mode {
 type Mutation {
   addNode(input: [AddNodeInput!]! @hook_addNode): AddNodePayload @hook_addNodePost
   updateNode(input: UpdateNodeInput! @hook_updateNode): UpdateNodePayload @hook_updateNodePost
-  deleteNode(filter: NodeFilter!): DeleteNodePayload
+  deleteNode(filter: NodeFilter! @hook_deleteNode): DeleteNodePayload @hook_deleteNodePost
   addSharedNode(input: [AddSharedNodeInput!]!): AddSharedNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   updateNodeFragment(input: UpdateNodeFragmentInput!): UpdateNodeFragmentPayload
@@ -5176,13 +5206,13 @@ type Mutation {
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]! @hook_addTension): AddTensionPayload @hook_addTensionPost
   updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload @hook_updateTensionPost
-  deleteTension(filter: TensionFilter!): DeleteTensionPayload
+  deleteTension(filter: TensionFilter! @hook_deleteTension): DeleteTensionPayload @hook_deleteTensionPost
   addLabel(input: [AddLabelInput!]! @hook_addLabel): AddLabelPayload @hook_addLabelPost
   updateLabel(input: UpdateLabelInput! @hook_updateLabel): UpdateLabelPayload @hook_updateLabelPost
-  deleteLabel(filter: LabelFilter!): DeleteLabelPayload
+  deleteLabel(filter: LabelFilter! @hook_deleteLabel): DeleteLabelPayload @hook_deleteLabelPost
   addComment(input: [AddCommentInput!]! @hook_addComment): AddCommentPayload @hook_addCommentPost
   updateComment(input: UpdateCommentInput! @hook_updateComment): UpdateCommentPayload @hook_updateCommentPost
-  deleteComment(filter: CommentFilter!): DeleteCommentPayload
+  deleteComment(filter: CommentFilter! @hook_deleteComment): DeleteCommentPayload @hook_deleteCommentPost
   addBlob(input: [AddBlobInput!]!): AddBlobPayload
   updateBlob(input: UpdateBlobInput!): UpdateBlobPayload
   deleteBlob(filter: BlobFilter!): DeleteBlobPayload
@@ -5194,7 +5224,7 @@ type Mutation {
   deleteEventFragment(filter: EventFragmentFilter!): DeleteEventFragmentPayload
   addContract(input: [AddContractInput!]! @hook_addContract): AddContractPayload @hook_addContractPost
   updateContract(input: UpdateContractInput! @hook_updateContract): UpdateContractPayload @hook_updateContractPost
-  deleteContract(filter: ContractFilter!): DeleteContractPayload
+  deleteContract(filter: ContractFilter! @hook_deleteContract): DeleteContractPayload @hook_deleteContractPost
   addVote(input: [AddVoteInput!]!): AddVotePayload
   updateVote(input: UpdateVoteInput!): UpdateVotePayload
   deleteVote(filter: VoteFilter!): DeleteVotePayload
@@ -8112,9 +8142,24 @@ func (ec *executionContext) field_Mutation_deleteComment_args(ctx context.Contex
 	var arg0 model.CommentFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteComment == nil {
+				return nil, errors.New("directive hook_deleteComment is not implemented")
+			}
+			return ec.directives.Hook_deleteComment(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.CommentFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.CommentFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -8127,9 +8172,24 @@ func (ec *executionContext) field_Mutation_deleteContract_args(ctx context.Conte
 	var arg0 model.ContractFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNContractFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNContractFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteContract == nil {
+				return nil, errors.New("directive hook_deleteContract is not implemented")
+			}
+			return ec.directives.Hook_deleteContract(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ContractFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.ContractFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -8172,9 +8232,24 @@ func (ec *executionContext) field_Mutation_deleteLabel_args(ctx context.Context,
 	var arg0 model.LabelFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNLabelFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNLabelFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteLabel == nil {
+				return nil, errors.New("directive hook_deleteLabel is not implemented")
+			}
+			return ec.directives.Hook_deleteLabel(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.LabelFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.LabelFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -8232,9 +8307,24 @@ func (ec *executionContext) field_Mutation_deleteNode_args(ctx context.Context, 
 	var arg0 model.NodeFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteNode == nil {
+				return nil, errors.New("directive hook_deleteNode is not implemented")
+			}
+			return ec.directives.Hook_deleteNode(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.NodeFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.NodeFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -8262,9 +8352,24 @@ func (ec *executionContext) field_Mutation_deleteTension_args(ctx context.Contex
 	var arg0 model.TensionFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNTensionFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNTensionFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteTension == nil {
+				return nil, errors.New("directive hook_deleteTension is not implemented")
+			}
+			return ec.directives.Hook_deleteTension(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.TensionFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.TensionFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -13014,94 +13119,6 @@ func (ec *executionContext) _Comment_updatedAt(ctx context.Context, field graphq
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Contract_event(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Contract",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Contract_event_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Event, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.EventFragment)
-	fc.Result = res
-	return ec.marshalNEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Contract_closedAt(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Contract",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.ClosedAt, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Contract_tension(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13263,6 +13280,94 @@ func (ec *executionContext) _Contract_contract_type(ctx context.Context, field g
 	res := resTmp.(model.ContractType)
 	fc.Result = res
 	return ec.marshalNContractType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_closedAt(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ClosedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_event(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_event_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Event, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventFragment)
+	fc.Result = res
+	return ec.marshalNEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_candidates(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -16237,8 +16342,28 @@ func (ec *executionContext) _Mutation_deleteNode(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteNode(rctx, args["filter"].(model.NodeFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteNode(rctx, args["filter"].(model.NodeFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteNodePost == nil {
+				return nil, errors.New("directive hook_deleteNodePost is not implemented")
+			}
+			return ec.directives.Hook_deleteNodePost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteNodePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteNodePayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -16853,8 +16978,28 @@ func (ec *executionContext) _Mutation_deleteTension(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteTension(rctx, args["filter"].(model.TensionFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteTension(rctx, args["filter"].(model.TensionFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteTensionPost == nil {
+				return nil, errors.New("directive hook_deleteTensionPost is not implemented")
+			}
+			return ec.directives.Hook_deleteTensionPost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteTensionPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteTensionPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -17001,8 +17146,28 @@ func (ec *executionContext) _Mutation_deleteLabel(ctx context.Context, field gra
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteLabel(rctx, args["filter"].(model.LabelFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteLabel(rctx, args["filter"].(model.LabelFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteLabelPost == nil {
+				return nil, errors.New("directive hook_deleteLabelPost is not implemented")
+			}
+			return ec.directives.Hook_deleteLabelPost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteLabelPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteLabelPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -17149,8 +17314,28 @@ func (ec *executionContext) _Mutation_deleteComment(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteComment(rctx, args["filter"].(model.CommentFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteComment(rctx, args["filter"].(model.CommentFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteCommentPost == nil {
+				return nil, errors.New("directive hook_deleteCommentPost is not implemented")
+			}
+			return ec.directives.Hook_deleteCommentPost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteCommentPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteCommentPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -17621,8 +17806,28 @@ func (ec *executionContext) _Mutation_deleteContract(ctx context.Context, field 
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteContract(rctx, args["filter"].(model.ContractFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteContract(rctx, args["filter"].(model.ContractFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteContractPost == nil {
+				return nil, errors.New("directive hook_deleteContractPost is not implemented")
+			}
+			return ec.directives.Hook_deleteContractPost(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteContractPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteContractPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -25977,22 +26182,6 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "event":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			it.Event, err = ec.unmarshalNEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "closedAt":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "tension":
 			var err error
 
@@ -26014,6 +26203,22 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
 			it.ContractType, err = ec.unmarshalNContractType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			it.Event, err = ec.unmarshalNEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -28475,14 +28680,6 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "closedAt":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			it.ClosedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "status":
 			var err error
 
@@ -28496,6 +28693,14 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
 			it.ContractType, err = ec.unmarshalOContractType_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractTypeHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			it.ClosedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -28603,56 +28808,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "event":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.EventFragmentRef); ok {
-				it.Event = data
-			} else if tmp == nil {
-				it.Event = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.EventFragmentRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "closedAt":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.ClosedAt = data
-			} else if tmp == nil {
-				it.ClosedAt = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "tension":
 			var err error
 
@@ -28729,6 +28884,56 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				it.ContractType = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.ContractType`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ClosedAt = data
+			} else if tmp == nil {
+				it.ClosedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.EventFragmentRef); ok {
+				it.Event = data
+			} else if tmp == nil {
+				it.Event = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.EventFragmentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "candidates":
@@ -28825,22 +29030,6 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "event":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			it.Event, err = ec.unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "closedAt":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "tension":
 			var err error
 
@@ -28862,6 +29051,22 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
 			it.ContractType, err = ec.unmarshalOContractType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "closedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
+			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			it.Event, err = ec.unmarshalOEventFragmentRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -35227,13 +35432,6 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Contract")
-		case "event":
-			out.Values[i] = ec._Contract_event(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "closedAt":
-			out.Values[i] = ec._Contract_closedAt(ctx, field, obj)
 		case "tension":
 			out.Values[i] = ec._Contract_tension(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -35246,6 +35444,13 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "contract_type":
 			out.Values[i] = ec._Contract_contract_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "closedAt":
+			out.Values[i] = ec._Contract_closedAt(ctx, field, obj)
+		case "event":
+			out.Values[i] = ec._Contract_event(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

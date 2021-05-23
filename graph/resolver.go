@@ -97,6 +97,8 @@ func Init() gen.Config {
     c.Directives.Hook_addNodePost = nothing
     c.Directives.Hook_updateNode = updateNodeHook
     c.Directives.Hook_updateNodePost = nothing
+    c.Directives.Hook_deleteNode = nothing
+    c.Directives.Hook_deleteNodePost = nothing
     //Label
     c.Directives.Hook_getLabel = nothing
     c.Directives.Hook_queryLabel = nothing
@@ -104,6 +106,8 @@ func Init() gen.Config {
     c.Directives.Hook_addLabelPost = nothing
     c.Directives.Hook_updateLabel = updateLabelHook
     c.Directives.Hook_updateLabelPost = nothing
+    c.Directives.Hook_deleteLabel = nothing
+    c.Directives.Hook_deleteLabelPost = nothing
     //Tension
     c.Directives.Hook_getTension = nothing
     c.Directives.Hook_queryTension = nothing
@@ -111,6 +115,8 @@ func Init() gen.Config {
     c.Directives.Hook_addTensionPost = addTensionPostHook
     c.Directives.Hook_updateTension = updateTensionHook
     c.Directives.Hook_updateTensionPost = updateTensionPostHook
+    c.Directives.Hook_deleteTension = nothing
+    c.Directives.Hook_deleteTensionPost = nothing
     //Comment
     c.Directives.Hook_getComment = nothing
     c.Directives.Hook_queryComment = nothing
@@ -118,6 +124,8 @@ func Init() gen.Config {
     c.Directives.Hook_addCommentPost = nothing
     c.Directives.Hook_updateComment = updateCommentHook
     c.Directives.Hook_updateCommentPost = nothing
+    c.Directives.Hook_deleteComment = nothing
+    c.Directives.Hook_deleteCommentPost = nothing
     //Contract
     c.Directives.Hook_getContract = nothing
     c.Directives.Hook_queryContract = nothing
@@ -125,6 +133,8 @@ func Init() gen.Config {
     c.Directives.Hook_addContractPost = nothing
     c.Directives.Hook_updateContract = nothing
     c.Directives.Hook_updateContractPost = nothing
+    c.Directives.Hook_deleteContract = nothing
+    c.Directives.Hook_deleteContractPost = deleteContractHookPost
 
     return c
 }

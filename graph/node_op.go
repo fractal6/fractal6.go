@@ -251,7 +251,6 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 
     rootnameid, _ := codec.Nid2rootid(nameid)
     if len(delMap) > 0 { // delete the node reference
-        //err = db.GetDB().DeleteEdges("Node.nameid", nameid, delMap) // that do not delete the reverse edge (User.roles)
         if firstLink_ != nil {
             err = webauth.RemoveUserRole(firstLink_.(string), nameid)
             if err != nil { return err }
