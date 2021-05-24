@@ -23,29 +23,29 @@ func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
 }
 
 // usePlayRole return true if the user play the given role (Nameid)
-func UserPlayRole(uctx *model.UserCtx, nameid string) bool {
+func UserPlayRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }
 
-    for _, ur := range uctx.Roles {
+    for i, ur := range uctx.Roles {
         if ur.Nameid == nameid  {
-            return true
+            return i
         }
     }
-    return false
+    return -1
 }
 
-// useHasRoot return true if the user belongs to the given root
-func UserHasRoot(uctx *model.UserCtx, rootnameid string) bool {
+// UserIsMember return true if the user belongs to the given root
+func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
     if e != nil { panic(e) }
 
-    for _, ur := range uctx.Roles {
+    for i, ur := range uctx.Roles {
         if ur.Rootnameid == rootnameid {
-            return true
+            return i
         }
     }
-    return false
+    return -1
 }
 
 // UserIsGuest return true if the user is a guest (has only one role) in the given organisation
@@ -62,8 +62,8 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
     return -1
 }
 
-// useIsMember return true if the user has at least one role in the given node
-func UserIsMember(uctx *model.UserCtx, nameid string) int {
+// UserHasRole return true if the user has at least one role in the given node
+func UserHasRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }
 

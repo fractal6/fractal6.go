@@ -15,7 +15,7 @@ import (
 
 
 // GPRC/DQL Request Template
-var gpmQueries map[string]string = map[string]string{
+var dqlQueries map[string]string = map[string]string{
     // Count objects
     "count": `{
         all(func: uid("{{.id}}")) {
@@ -304,11 +304,11 @@ func (dg Dgraph) Count(id string, fieldName string) int {
         "id":id, "fieldName":fieldName,
     }
     // Send request
-    res, err := dg.QueryGpm("count", maps)
+    res, err := dg.QueryDql("count", maps)
     if err != nil { panic(err) }
 
     // Decode response
-    var r GpmRespCount
+    var r DqlRespCount
     err = json.Unmarshal(res.Json, &r)
     if err != nil { panic(err) }
 
@@ -329,11 +329,11 @@ func (dg Dgraph) GetNodeStats(nameid string) map[string]int {
         "nameid": nameid,
     }
     // Send request
-    res, err := dg.QueryGpm("getNodeStats", maps)
+    res, err := dg.QueryDql("getNodeStats", maps)
     if err != nil { panic(err) }
 
     // Decode response
-    var r GpmRespCount
+    var r DqlRespCount
     err = json.Unmarshal(res.Json, &r)
     if err != nil { panic(err) }
 
@@ -361,13 +361,13 @@ func (dg Dgraph) Exists(fieldName string, value string, filterName, filterValue 
         maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
     }
     // Send request
-    res, err := dg.QueryGpm("exists", maps)
+    res, err := dg.QueryDql("exists", maps)
     if err != nil {
         return false, err
     }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil {
         return false, err
@@ -386,13 +386,13 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
         maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
     }
     // Send request
-    res, err := dg.QueryGpm("getID", maps)
+    res, err := dg.QueryDql("getID", maps)
     if err != nil {
         return result, err
     }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil {
         return result, err
@@ -411,16 +411,16 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) 
         "fieldName": fieldName,
     }
     // Send request
-    res, err := dg.QueryGpm("getFieldById", maps)
+    res, err := dg.QueryDql("getFieldById", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in gpm query: %s %s", fieldName, id)
+        return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, id)
     } else if len(r.All) == 1 {
         x := r.All[0][fieldName]
         return x, nil
@@ -437,16 +437,16 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
         "fieldName": fieldName,
     }
     // Send request
-    res, err := dg.QueryGpm("getFieldByEq", maps)
+    res, err := dg.QueryDql("getFieldByEq", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in gpm query: %s %s", fieldName, objid)
+        return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
     } else if len(r.All) == 1 {
         x := r.All[0][fieldName]
         return x, nil
@@ -463,16 +463,16 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
         "fieldNameTarget": fieldNameTarget,
     }
     // Send request
-    res, err := dg.QueryGpm("getSubFieldById", maps)
+    res, err := dg.QueryDql("getSubFieldById", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in gpm query")
+        return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
         switch x := r.All[0][fieldNameSource].(type) {
         case model.JsonAtom:
@@ -504,16 +504,16 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
         "fieldNameTarget":fieldNameTarget,
     }
     // Send request
-    res, err := dg.QueryGpm("getSubFieldByEq", maps)
+    res, err := dg.QueryDql("getSubFieldByEq", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in gpm query")
+        return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
         switch x := r.All[0][fieldNameSource].(type) {
         case model.JsonAtom:
@@ -546,16 +546,16 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
         "subFieldNameTarget": subFieldNameTarget,
     }
     // Send request
-    res, err := dg.QueryGpm("getSubSubFieldByEq", maps)
+    res, err := dg.QueryDql("getSubSubFieldByEq", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
     if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in gpm query")
+        return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
         x := r.All[0][fieldNameSource].(model.JsonAtom)
         if x != nil {
@@ -577,11 +577,11 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
         "payload": model.UserCtxPayloadDg,
     }
     // Send request
-    res, err := dg.QueryGpm("getUser", maps)
+    res, err := dg.QueryDql("getUser", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -624,11 +624,11 @@ func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac,
         "payload": model.NodeCharacPayloadDg,
     }
     // Send request
-    res, err := dg.QueryGpm("getNode", maps)
+    res, err := dg.QueryDql("getNode", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -670,14 +670,14 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
     var res *api.Response
     var err error
     if isRoot {
-        res, err = dg.QueryGpm("getNodesRoot", maps)
+        res, err = dg.QueryDql("getNodesRoot", maps)
     } else {
-        res, err = dg.QueryGpm("getNodes", maps)
+        res, err = dg.QueryDql("getNodes", maps)
     }
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -713,11 +713,11 @@ func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error)
         "payload": fmt.Sprintf(model.TensionHookPayload, blobFilter),
     }
     // Send request
-    res, err := dg.QueryGpm("getTension", maps)
+    res, err := dg.QueryDql("getTension", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -752,11 +752,11 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.Node, err
         "objid": objid,
     }
     // Send request
-    res, err := dg.QueryGpm("getAllChildren", maps)
+    res, err := dg.QueryDql("getAllChildren", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -786,11 +786,11 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.Node, erro
         "objid": objid,
     }
     // Send request
-    res, err := dg.QueryGpm("getAllMembers", maps)
+    res, err := dg.QueryDql("getAllMembers", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -820,11 +820,11 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.Label, erro
         "objid": objid,
     }
     // Send request
-    res, err := dg.QueryGpm("getAllLabels", maps)
+    res, err := dg.QueryDql("getAllLabels", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -861,11 +861,11 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
     } else {
         panic("Unknow type (tension query)")
     }
-    res, err := dg.QueryGpm(op, *maps)
+    res, err := dg.QueryDql(op, *maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -903,7 +903,7 @@ func (dg Dgraph) GetLastBlobId(tid string) (*string) {
     if err != nil { return nil}
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil}
 
@@ -927,11 +927,11 @@ func (dg Dgraph) HasCoordos(nameid string) (bool) {
         "nameid": nameid,
     }
     // Send request
-    res, err := dg.QueryGpm("getCoordos", maps)
+    res, err := dg.QueryDql("getCoordos", maps)
     if err != nil { return false }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return false }
 
@@ -954,11 +954,11 @@ func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
         "nameid" :nameid,
     }
     // Send request
-    res, err := dg.QueryGpm("getChildren", maps)
+    res, err := dg.QueryDql("getChildren", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -981,11 +981,11 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
         "nameid" :nameid,
     }
     // Send request
-    res, err := dg.QueryGpm("getParents", maps)
+    res, err := dg.QueryDql("getParents", maps)
     if err != nil { return nil, err }
 
     // Decode response
-    var r GpmResp
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
@@ -1024,7 +1024,7 @@ func (dg Dgraph) SetFieldByEq(fieldid string, objid string, predicate string, va
         SetNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1043,7 +1043,7 @@ func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
         SetNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1063,7 +1063,7 @@ func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
         DelNquads: []byte(muDel),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1084,7 +1084,7 @@ func (dg Dgraph) SetPushedFlagBlob(bid string, flag string, tid string, action m
         DelNquads: []byte(muDel),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1103,7 +1103,7 @@ func (dg Dgraph) SetArchivedFlagBlob(bid string, flag string, tid string, action
         SetNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1120,7 +1120,7 @@ func (dg Dgraph) SetNodeSource(nameid string, bid string) error {
         SetNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1142,7 +1142,7 @@ func (dg Dgraph) PatchNameid(nameid_old string, nameid_new string) error {
         SetNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -1170,7 +1170,7 @@ func (dg Dgraph) DeepDelete(t string, id string) (error) {
 
     q = q + strings.Title(t)
     maps := map[string]string{"id": id}
-    query = dg.getGpmQuery(q, maps)
+    query = dg.getDqlQuery(q, maps)
     mu := fmt.Sprintf(`
         %s
         uid(all_ids) * * .
@@ -1180,7 +1180,7 @@ func (dg Dgraph) DeepDelete(t string, id string) (error) {
         DelNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 

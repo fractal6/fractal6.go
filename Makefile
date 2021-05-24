@@ -32,8 +32,13 @@ vendor:
 # Generate Graphql code and schema
 #
 
-generate: schema gen
-genall: schema_all gen
+gen: schema generate
+genall: schema_all generate
+
+dgraph:
+	cd ../schema
+	make dgraph # Do alter Dgraph
+	cd -
 
 schema:
 	cd ../schema
@@ -41,11 +46,12 @@ schema:
 	cd -
 
 schema_all:
+	# dgraph + schema
 	cd ../schema
-	make schema_all # Do alter Dgraph
+	make schema_all
 	cd -
 
-gen:
+generate:
 	go run ./scripts/gqlgen.go && \
 		sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go && \
 		# Don't add omitempty for boolean field has it get remove if set to false!

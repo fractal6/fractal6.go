@@ -16,14 +16,20 @@ import (
 // Authorization Hook enum
 type AuthHookValue int
 const (
-    OwnerHook AuthHookValue = 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
-    AuthorHook AuthHookValue = 1 << 1
-    AssigneeHook AuthHookValue = 1 << 2
+    PassingHook AuthHookValue = 1 // for public event
+    // Graph Role based
+    OwnerHook AuthHookValue = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
+    MemberHook AuthHookValue = 1 << 2
+    SourceCoordoHook AuthHookValue = 1 << 3
+    TargetCoordoHook AuthHookValue = 1 << 4
+    // Granted based
+    AuthorHook AuthHookValue = 1 << 5
+    AssigneeHook AuthHookValue = 1 << 6
 )
 
 type EventMap struct {
-    Auth model.ContractType
-    AuthHook AuthHookValue
+    Validation model.ContractType
+    Auth AuthHookValue
     Action func(*model.UserCtx, *model.Tension, *model.EventRef) (bool, error)
 }
 
@@ -32,17 +38,32 @@ var EMAP EventsMap
 
 func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
     var err error
-    var hookEnabled bool = !(em.Auth == model.ContractTypeAnyCoordoDual && GetBlob(tension) != nil )
+    var hookEnabled bool = !(em.Validation == model.ContractTypeAnyCoordoDual && GetBlob(tension) != nil )
     // Check Hook authorization
     // --
-    if em.AuthHook & AuthorHook == 1 && hookEnabled {
+    if AuthorHook & em.Auth == 1 && hookEnabled {
         // isAuthorCheck: Check if the user is the creator of the ressource
         if uctx.Username == tension.CreatedBy.Username {
             return true, nil, err
         }
     }
 
-    if em.AuthHook & AssigneeHook == 1 && hookEnabled {
+    if MemberHook & em.Auth > 0 && hookEnabled {
+        rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
+        if auth.UserIsMember(uctx, rootid) >= 0 { return true, nil, err }
+    }
+
+    if TargetCoordoHook & em.Auth > 0 && hookEnabled {
+        ok, err := HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
+        if ok { return ok, nil, err }
+    }
+
+    if SourceCoordoHook & em.Auth > 0 && hookEnabled {
+        ok, err := HasCoordoRole(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
+        if ok { return ok, nil, err }
+    }
+
+    if AssigneeHook & em.Auth > 0 && hookEnabled {
         // isAssigneeCheck: Check if the user is an assignee of the curent tension
         // @debug: use checkAssignee function, but how to pass the context ?
         var assignees []interface{}
@@ -56,10 +77,11 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         }
     }
 
+
     // Check the contract authorization
     // --
     var f func(*model.UserCtx, *model.Tension, *model.EventRef) (bool, *model.Contract, error)
-    switch em.Auth {
+    switch em.Validation {
     case model.ContractTypeAnyParticipants:
         f = AnyParticipants
     case model.ContractTypeAnyCoordoDual:
@@ -68,8 +90,8 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         f = AnyCoordoSource
     case model.ContractTypeAnyCoordoTarget:
         f = AnyCoordoTarget
-    case "": // Empty, passing
-        return true, nil, err
+    case "": // Empty, blocking
+        return false, nil, err
     default:
         return false, nil, fmt.Errorf("not implemented contract type.")
     }
@@ -83,17 +105,20 @@ func AnyParticipants(uctx *model.UserCtx, tension *model.Tension, event *model.E
     if ok {
         //@TODO
         //return contract
-        return false, nil, nil
+        panic("not implemented.")
+        //return false, nil, nil
     } else {
         return false, nil, nil
     }
 }
 
 func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
-    ok1, _, err := AnyCoordoSource(uctx, tension, event)
+    // Source
+    ok1, err := HasCoordoRole(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
     if err != nil { return false, nil, err }
 
-    ok2, _, err := AnyCoordoTarget(uctx, tension, event)
+    // Target
+    ok2, err := HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
     if err != nil { return false, nil, err }
 
     if ok1 && ok2 {
@@ -126,30 +151,30 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 }
 
 func AnyCoordoSource(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
-    return AnyCoordo(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
+    panic("not implemented.")
 }
 
 func AnyCoordoTarget(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
-    return AnyCoordo(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
+    panic("not implemented.")
 }
 
 ////////////////////////////////////////////////
 // Base authorization methods
 ////////////////////////////////////////////////
 
-func AnyCoordo(uctx *model.UserCtx, nameid string, charac *model.NodeCharac) (bool, *model.Contract, error) {
+func HasCoordoRole(uctx *model.UserCtx, nameid string, charac *model.NodeCharac) (bool, error) {
     // Check user rights
     ok, err := CheckUserRights(uctx, nameid, charac)
-    if err != nil { return ok, nil, LogErr("Internal error", err) }
+    if err != nil { return ok, LogErr("Internal error", err) }
 
     // Check if user has rights in any parents if the node has no Coordo role.
     if !ok && !db.GetDB().HasCoordos(nameid) {
         ok, err = CheckUpperRights(uctx, nameid, charac)
     }
-    return ok, nil, err
+    return ok, err
 }
 
-// chechUserRight return true if the user has access right (e.g. Coordo) on the given node
+// ChechUserRight return true if the user has access right (e.g. Coordo) on the given node
 func CheckUserRights(uctx *model.UserCtx, nameid string, charac *model.NodeCharac) (bool, error) {
     var ok bool = false
     var err error
@@ -170,7 +195,7 @@ func CheckUserRights(uctx *model.UserCtx, nameid string, charac *model.NodeChara
     }
 
     if charac.Mode == model.NodeModeAgile {
-        ok = auth.UserIsMember(uctx, nameid) >= 0
+        ok = auth.UserHasRole(uctx, nameid) >= 0
     } else if charac.Mode == model.NodeModeCoordinated {
         ok = auth.UserIsCoordo(uctx, nameid) >= 0
     }
@@ -282,7 +307,7 @@ func isHidePrivate(ctx context.Context, nameid string, isPrivate bool) (bool, er
             if err != nil { return yes, LogErr("Access denied", err) }
 
             rootnameid, err := codec.Nid2rootid(nameid)
-            if auth.UserHasRoot(uctx, rootnameid) {
+            if auth.UserIsMember(uctx, rootnameid) >= 0 {
                 return false, err
             }
         } else {

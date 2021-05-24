@@ -42,7 +42,7 @@ type UserCtx struct {
 }
 
 //
-// Dgraph Payload for Gpm query
+// Dgraph Payload for DQL query
 //
 
 // UserCtx Payload

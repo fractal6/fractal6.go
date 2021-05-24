@@ -13,32 +13,65 @@ import (
 
 func init() {
     EMAP = EventsMap{
+        model.TensionEventCreated: EventMap{
+            Auth: MemberHook,
+        },
+        model.TensionEventCommentPushed: EventMap{
+            Auth: MemberHook,
+        },
+        model.TensionEventBlobCreated: EventMap{
+            Auth: MemberHook,
+        },
+        model.TensionEventBlobCommitted: EventMap{
+            Auth: MemberHook,
+        },
+        model.TensionEventTitleUpdated: EventMap{
+            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+        },
+        model.TensionEventReopened: EventMap{
+            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+        },
+        model.TensionEventClosed: EventMap{
+            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+        },
+        model.TensionEventLabelAdded: EventMap{
+            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+        },
+        model.TensionEventLabelRemoved: EventMap{
+            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+        },
+        model.TensionEventAssigneeAdded: EventMap{
+            Auth: TargetCoordoHook | AssigneeHook,
+        },
+        model.TensionEventAssigneeRemoved: EventMap{
+            Auth: TargetCoordoHook | AssigneeHook,
+        },
+        // --- Trigger Action ---
         model.TensionEventBlobPushed: EventMap{
-            Auth: model.ContractTypeAnyCoordoTarget,
-            AuthHook: AssigneeHook,
+            Auth: TargetCoordoHook | AssigneeHook,
             Action: PushBlob,
         },
         model.TensionEventBlobArchived: EventMap{
-            Auth: model.ContractTypeAnyCoordoTarget,
-            AuthHook: AssigneeHook,
+            Auth: TargetCoordoHook | AssigneeHook,
             Action: ArchiveBlob,
         },
         model.TensionEventBlobUnarchived: EventMap{
-            Auth: model.ContractTypeAnyCoordoTarget,
-            AuthHook: AssigneeHook,
+            Auth: TargetCoordoHook | AssigneeHook,
             Action: UnarchiveBlob,
         },
         model.TensionEventUserLeft: EventMap{
             // Authorisation is done is the method for now (to avoid dealing with Guest node two times).
+            Auth: PassingHook,
             Action: UserLeave,
         },
         model.TensionEventUserJoin: EventMap{
             // @FIXFEAT: Either Check Receiver.NodeCharac or contract value to check that user has been invited !
+            Auth: PassingHook,
             Action: UserJoin,
         },
         model.TensionEventMoved: EventMap{
-            Auth: model.ContractTypeAnyCoordoDual,
-            AuthHook: AuthorHook | AssigneeHook,
+            Validation: model.ContractTypeAnyCoordoDual,
+            Auth: AuthorHook | AssigneeHook,
             Action: MoveTension,
         },
     }
@@ -50,35 +83,38 @@ func init() {
 func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
+    var trace bool
     var tension *model.Tension
     var contract *model.Contract
     for _, event := range(events) {
         em, hasEvent := EMAP[*event.EventType]
         if hasEvent { // Process the special event
-               // Get Tension, target Node and blob charac (last if bid undefined)
-               tension, err = db.GetDB().GetTensionHook(tid, bid) // @debug: add a needBlob parameter here ?
-               if err != nil { return false, nil, LogErr("Access denied", err) }
-               if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
+               if tension == nil {
+                   // Get Tension, target Node and blob charac (last if bid undefined)
+                   tension, err = db.GetDB().GetTensionHook(tid, bid) // @debug: add a needBlob parameter here ?
+                   if err != nil { return false, nil, LogErr("Access denied", err) }
+                   if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
+               }
 
                // Check Authorization (optionally generate a contract)
                ok, contract, err = em.Check(uctx, tension, event)
                if err != nil { return ok, nil, err }
+               if !ok { break }
 
-               // Process event
-               if ok {
+               if em.Action != nil { // Trigger Action
                    ok, err = em.Action(uctx, tension, event)
-                   // Leave a trace
-                   if ok && err == nil {
-                       leaveTrace(tension)
-                   }
+                   if ok && err == nil { trace = true }
                }
 
-               // Break after the first hooked event
-               break
+               // Notify users
+               // push notification (somewhere ?!)
+
+           } else {
+               // Minimum level of authorization
            }
-        // else ... notify center
     }
 
+    if trace { leaveTrace(tension) }
     return ok, contract, err
 }
 

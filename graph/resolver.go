@@ -475,13 +475,11 @@ func hasRoot(ctx context.Context, obj interface{}, next graphql.Resolver, nodeFi
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Check that user has the given role on the asked node
-    var ok bool
     var rootnameid string
     for _, nodeField := range nodeFields {
         rootnameid, err = extractRootnameid(ctx, nodeField, obj)
         if err != nil { return nil, LogErr("Internal error", err) }
-        ok = auth.UserHasRoot(uctx, rootnameid)
-        if ok { return next(ctx) }
+        if auth.UserIsMember(uctx, rootnameid) >= 0 { return next(ctx) }
     }
 
     e := LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))

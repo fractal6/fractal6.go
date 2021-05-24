@@ -27,20 +27,23 @@ type Dgraph struct {
     gqlUrl string
     grpcUrl string
 
+    // Auth token
+    gqlToken string
+
     // HTTP/Graphql and GPRC/DQL client template
     gqlTemplates map[string]*QueryString
-    gpmTemplates map[string]*QueryString
+    dqlTemplates map[string]*QueryString
 }
 
 //
 // GRPC/Graphql+- response
 //
 
-type GpmResp struct {
+type DqlResp struct {
     All []map[string]interface{} `json:"all"`
 }
 
-type GpmRespCount struct {
+type DqlRespCount struct {
     All []map[string]int `json:"all"`
 }
 
@@ -115,6 +118,8 @@ func initDB() *Dgraph {
         fmt.Println("Dgraph Grpc addr:", grpcUrl)
     }
 
+    gqlToken := ""
+
     // HTTP/Graphql Request Template
     gqlQueries := map[string]string{
         // QUERIES
@@ -162,12 +167,12 @@ func initDB() *Dgraph {
         }`,
     }
 
-    gpmT := map[string]*QueryString{}
+    dqlT := map[string]*QueryString{}
     gqlT := map[string]*QueryString{}
 
-    for op, q := range(gpmQueries) {
-        gpmT[op] = &QueryString{Q:q}
-        gpmT[op].Init()
+    for op, q := range(dqlQueries) {
+        dqlT[op] = &QueryString{Q:q}
+        dqlT[op].Init()
     }
     for op, q := range(gqlQueries) {
         gqlT[op] = &QueryString{Q:q}
@@ -178,7 +183,8 @@ func initDB() *Dgraph {
     return &Dgraph{
         gqlUrl: dgraphApiUrl,
         grpcUrl: grpcUrl,
-        gpmTemplates: gpmT,
+        gqlToken: gqlToken,
+        dqlTemplates: dqlT,
         gqlTemplates: gqlT,
     }
 }
@@ -187,12 +193,12 @@ func initDB() *Dgraph {
 // Internals
 //
 
-func (dg Dgraph) getGpmQuery(op string, m map[string]string) string {
+func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
     var q string
-    if _q, ok := dg.gpmTemplates[op]; ok {
+    if _q, ok := dg.dqlTemplates[op]; ok {
         q = _q.Format(m)
     } else {
-        panic("unknonw QueryGql op: " + op)
+        panic("unknonw DQL query op: " + op)
     }
     return q
 }
@@ -202,7 +208,7 @@ func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
     if _q, ok := dg.gqlTemplates[op]; ok {
         q = _q.Format(m)
     } else {
-        panic("unknonw QueryGql op: " + op)
+        panic("unknonw GQL query op: " + op)
     }
     return q
 }
@@ -240,9 +246,12 @@ func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
 }
 
 // Post send a post request to the Graphql client.
-func (dg Dgraph) post(data []byte, res interface{}) error {
+func (dg Dgraph) postql(data []byte, res interface{}) error {
     req, err := http.NewRequest("POST", dg.gqlUrl, bytes.NewBuffer(data))
     req.Header.Set("Content-Type", "application/json")
+
+    // Set dgraph token
+    req.Header.Set("X-FRAC6-AUTH", dg.gqlToken)
 
     client := &http.Client{}
     resp, err := client.Do(req)
@@ -259,8 +268,8 @@ func (dg Dgraph) post(data []byte, res interface{}) error {
 //
 
 
-// QueryGpm runs a query on dgraph (...QueryDql)
-func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, error) {
+// QueryDql runs a query on dgraph (...QueryDql)
+func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, error) {
     // init client
     dgc, cancel := dg.getDgraphClient()
     defer cancel()
@@ -269,7 +278,7 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     defer txn.Discard(ctx)
 
     // Get the Query
-    q := dg.getGpmQuery(op, maps)
+    q := dg.getDqlQuery(op, maps)
     // Send Request
     fmt.Println(op)
     //fmt.Println(string(q))
@@ -278,9 +287,9 @@ func (dg Dgraph) QueryGpm(op string, maps map[string]string) (*api.Response, err
     return res, err
 }
 
-//MutateWithQueryGpm runs an upsert block mutation by first querying query
+//MutateWithQueryDql runs an upsert block mutation by first querying query
 //and then mutate based on the result.
-func (dg Dgraph) MutateWithQueryGpm(query string, mu *api.Mutation) (error) {
+func (dg Dgraph) MutateWithQueryDql(query string, mu *api.Mutation) (error) {
     // init client
     dgc, cancel := dg.getDgraphClient()
     defer cancel()
@@ -298,8 +307,8 @@ func (dg Dgraph) MutateWithQueryGpm(query string, mu *api.Mutation) (error) {
     return err
 }
 
-//MutateUpsertGpm adds a new object in the database if it doesn't exist
-func (dg Dgraph) MutateUpsertGpm_(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
+//MutateUpsertDql adds a new object in the database if it doesn't exist
+func (dg Dgraph) MutateUpsertDql_(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
     // init client
     dgc, cancel := dg.getDgraphClient()
     defer cancel()
@@ -408,7 +417,7 @@ func (dg Dgraph) ClearEdges(key string, value string, delMap map[string]interfac
         DelNquads: []byte(mu),
     }
 
-    err := dg.MutateWithQueryGpm(query, mutation)
+    err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
 
@@ -426,7 +435,7 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
     // Send the dgraph request and follow the results
     res := &GqlRes{}
     //fmt.Println("request ->", string(q))
-    err := dg.post([]byte(q), res)
+    err := dg.postql([]byte(q), res)
     //fmt.Println("response ->", res)
     if err != nil {
         return err
@@ -435,7 +444,6 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
         //return fmt.Errorf(string(err))
         return &GraphQLError{string(err)}
     }
-
 
     switch v := data.(type) {
     case model.JsonAtom:

@@ -34,7 +34,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 
     // Check that user as the given emitter role
     emitterid := input[0].Emitterid
-    if !auth.UserPlayRole(uctx, emitterid) {
+    if auth.UserPlayRole(uctx, emitterid) < 0 {
         // if not check for bot access
         r_, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.role_type")
         if err != nil { return nil, LogErr("Internal error", err) }
@@ -148,6 +148,10 @@ func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolv
 
 // Add Contract hook
 func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil { return nil, LogErr("Update contract error", err) }
+
+    // addContractPostHook
     // * Get the tid or error
     // * get the tensionHook
     // * call ProcessEvent(tid, nil) (in tension_op)

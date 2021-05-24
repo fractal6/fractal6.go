@@ -302,6 +302,22 @@ type Blob struct {
 	Message      *string       `json:"message,omitempty"`
 }
 
+type BlobAggregateResult struct {
+	Count           *int    `json:"count,omitempty"`
+	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax    *string `json:"updatedAtMax,omitempty"`
+	MessageMin      *string `json:"messageMin,omitempty"`
+	MessageMax      *string `json:"messageMax,omitempty"`
+	PushedFlagMin   *string `json:"pushedFlagMin,omitempty"`
+	PushedFlagMax   *string `json:"pushedFlagMax,omitempty"`
+	ArchivedFlagMin *string `json:"archivedFlagMin,omitempty"`
+	ArchivedFlagMax *string `json:"archivedFlagMax,omitempty"`
+	MdMin           *string `json:"mdMin,omitempty"`
+	MdMax           *string `json:"mdMax,omitempty"`
+}
+
 type BlobFilter struct {
 	ID           []string              `json:"id,omitempty"`
 	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
@@ -309,8 +325,9 @@ type BlobFilter struct {
 	BlobType     *BlobTypeHash         `json:"blob_type,omitempty"`
 	PushedFlag   *DateTimeFilter       `json:"pushedFlag,omitempty"`
 	ArchivedFlag *DateTimeFilter       `json:"archivedFlag,omitempty"`
-	And          *BlobFilter           `json:"and,omitempty"`
-	Or           *BlobFilter           `json:"or,omitempty"`
+	Has          []*BlobHasFilter      `json:"has,omitempty"`
+	And          []*BlobFilter         `json:"and,omitempty"`
+	Or           []*BlobFilter         `json:"or,omitempty"`
 	Not          *BlobFilter           `json:"not,omitempty"`
 }
 
@@ -348,7 +365,8 @@ type BlobRef struct {
 }
 
 type BlobTypeHash struct {
-	Eq BlobType `json:"eq,omitempty"`
+	Eq *BlobType   `json:"eq,omitempty"`
+	In []*BlobType `json:"in,omitempty"`
 }
 
 type Comment struct {
@@ -359,12 +377,25 @@ type Comment struct {
 	UpdatedAt *string `json:"updatedAt,omitempty"`
 }
 
+type CommentAggregateResult struct {
+	Count        *int    `json:"count,omitempty"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+	VOIDMin      *string `json:"_VOIDMin,omitempty"`
+	VOIDMax      *string `json:"_VOIDMax,omitempty"`
+}
+
 type CommentFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	And       *CommentFilter        `json:"and,omitempty"`
-	Or        *CommentFilter        `json:"or,omitempty"`
+	Has       []*CommentHasFilter   `json:"has,omitempty"`
+	And       []*CommentFilter      `json:"and,omitempty"`
+	Or        []*CommentFilter      `json:"or,omitempty"`
 	Not       *CommentFilter        `json:"not,omitempty"`
 }
 
@@ -391,6 +422,11 @@ type CommentRef struct {
 	Void      *string  `json:"_VOID,omitempty"`
 }
 
+type ContainsFilter struct {
+	Point   *PointRef   `json:"point,omitempty"`
+	Polygon *PolygonRef `json:"polygon,omitempty"`
+}
+
 type Contract struct {
 	Tension      *Tension       `json:"tension,omitempty"`
 	Status       ContractStatus `json:"status,omitempty"`
@@ -407,6 +443,18 @@ type Contract struct {
 	Message      *string        `json:"message,omitempty"`
 }
 
+type ContractAggregateResult struct {
+	Count        *int    `json:"count,omitempty"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+	ClosedAtMin  *string `json:"closedAtMin,omitempty"`
+	ClosedAtMax  *string `json:"closedAtMax,omitempty"`
+}
+
 type ContractFilter struct {
 	ID           []string              `json:"id,omitempty"`
 	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
@@ -414,8 +462,9 @@ type ContractFilter struct {
 	Status       *ContractStatusHash   `json:"status,omitempty"`
 	ContractType *ContractTypeHash     `json:"contract_type,omitempty"`
 	ClosedAt     *DateTimeFilter       `json:"closedAt,omitempty"`
-	And          *ContractFilter       `json:"and,omitempty"`
-	Or           *ContractFilter       `json:"or,omitempty"`
+	Has          []*ContractHasFilter  `json:"has,omitempty"`
+	And          []*ContractFilter     `json:"and,omitempty"`
+	Or           []*ContractFilter     `json:"or,omitempty"`
 	Not          *ContractFilter       `json:"not,omitempty"`
 }
 
@@ -457,11 +506,13 @@ type ContractRef struct {
 }
 
 type ContractStatusHash struct {
-	Eq ContractStatus `json:"eq,omitempty"`
+	Eq *ContractStatus   `json:"eq,omitempty"`
+	In []*ContractStatus `json:"in,omitempty"`
 }
 
 type ContractTypeHash struct {
-	Eq ContractType `json:"eq,omitempty"`
+	Eq *ContractType   `json:"eq,omitempty"`
+	In []*ContractType `json:"in,omitempty"`
 }
 
 type CustomHTTP struct {
@@ -477,11 +528,18 @@ type CustomHTTP struct {
 }
 
 type DateTimeFilter struct {
-	Eq *string `json:"eq,omitempty"`
-	Le *string `json:"le,omitempty"`
-	Lt *string `json:"lt,omitempty"`
-	Ge *string `json:"ge,omitempty"`
-	Gt *string `json:"gt,omitempty"`
+	Eq      *string        `json:"eq,omitempty"`
+	In      []*string      `json:"in,omitempty"`
+	Le      *string        `json:"le,omitempty"`
+	Lt      *string        `json:"lt,omitempty"`
+	Ge      *string        `json:"ge,omitempty"`
+	Gt      *string        `json:"gt,omitempty"`
+	Between *DateTimeRange `json:"between,omitempty"`
+}
+
+type DateTimeRange struct {
+	Min string `json:"min,omitempty"`
+	Max string `json:"max,omitempty"`
 }
 
 type DeleteBlobPayload struct {
@@ -544,10 +602,22 @@ type DeleteNodePayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type DeleteNodeStatsPayload struct {
+	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
+	Msg       *string      `json:"msg,omitempty"`
+	NumUids   *int         `json:"numUids,omitempty"`
+}
+
 type DeletePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteSharedNodePayload struct {
+	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
+	Msg        *string       `json:"msg,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type DeleteTensionPayload struct {
@@ -560,6 +630,12 @@ type DeleteUserPayload struct {
 	User    []*User `json:"user,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteUserRightsPayload struct {
+	UserRights []*UserRights `json:"userRights,omitempty"`
+	Msg        *string       `json:"msg,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type DeleteVotePayload struct {
@@ -580,13 +656,28 @@ type Event struct {
 	Message   *string      `json:"message,omitempty"`
 }
 
+type EventAggregateResult struct {
+	Count        *int    `json:"count,omitempty"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+	OldMin       *string `json:"oldMin,omitempty"`
+	OldMax       *string `json:"oldMax,omitempty"`
+	NewMin       *string `json:"newMin,omitempty"`
+	NewMax       *string `json:"newMax,omitempty"`
+}
+
 type EventFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
 	EventType *TensionEventHash     `json:"event_type,omitempty"`
-	And       *EventFilter          `json:"and,omitempty"`
-	Or        *EventFilter          `json:"or,omitempty"`
+	Has       []*EventHasFilter     `json:"has,omitempty"`
+	And       []*EventFilter        `json:"and,omitempty"`
+	Or        []*EventFilter        `json:"or,omitempty"`
 	Not       *EventFilter          `json:"not,omitempty"`
 }
 
@@ -596,11 +687,20 @@ type EventFragment struct {
 	New       *string      `json:"new,omitempty"`
 }
 
+type EventFragmentAggregateResult struct {
+	Count  *int    `json:"count,omitempty"`
+	OldMin *string `json:"oldMin,omitempty"`
+	OldMax *string `json:"oldMax,omitempty"`
+	NewMin *string `json:"newMin,omitempty"`
+	NewMax *string `json:"newMax,omitempty"`
+}
+
 type EventFragmentFilter struct {
-	EventType *TensionEventHash    `json:"event_type,omitempty"`
-	And       *EventFragmentFilter `json:"and,omitempty"`
-	Or        *EventFragmentFilter `json:"or,omitempty"`
-	Not       *EventFragmentFilter `json:"not,omitempty"`
+	EventType *TensionEventHash         `json:"event_type,omitempty"`
+	Has       []*EventFragmentHasFilter `json:"has,omitempty"`
+	And       []*EventFragmentFilter    `json:"and,omitempty"`
+	Or        []*EventFragmentFilter    `json:"or,omitempty"`
+	Not       *EventFragmentFilter      `json:"not,omitempty"`
 }
 
 type EventFragmentOrder struct {
@@ -651,19 +751,66 @@ type EventRef struct {
 }
 
 type FloatFilter struct {
-	Eq *float64 `json:"eq,omitempty"`
-	Le *float64 `json:"le,omitempty"`
-	Lt *float64 `json:"lt,omitempty"`
-	Ge *float64 `json:"ge,omitempty"`
-	Gt *float64 `json:"gt,omitempty"`
+	Eq      *float64    `json:"eq,omitempty"`
+	In      []*float64  `json:"in,omitempty"`
+	Le      *float64    `json:"le,omitempty"`
+	Lt      *float64    `json:"lt,omitempty"`
+	Ge      *float64    `json:"ge,omitempty"`
+	Gt      *float64    `json:"gt,omitempty"`
+	Between *FloatRange `json:"between,omitempty"`
+}
+
+type FloatRange struct {
+	Min float64 `json:"min,omitempty"`
+	Max float64 `json:"max,omitempty"`
+}
+
+type GenerateMutationParams struct {
+	Add    *bool `json:"add"`
+	Update *bool `json:"update"`
+	Delete *bool `json:"delete"`
+}
+
+type GenerateQueryParams struct {
+	Get       *bool `json:"get"`
+	Query     *bool `json:"query"`
+	Password  *bool `json:"password"`
+	Aggregate *bool `json:"aggregate"`
+}
+
+type Int64Filter struct {
+	Eq      *string     `json:"eq,omitempty"`
+	In      []*string   `json:"in,omitempty"`
+	Le      *string     `json:"le,omitempty"`
+	Lt      *string     `json:"lt,omitempty"`
+	Ge      *string     `json:"ge,omitempty"`
+	Gt      *string     `json:"gt,omitempty"`
+	Between *Int64Range `json:"between,omitempty"`
+}
+
+type Int64Range struct {
+	Min string `json:"min,omitempty"`
+	Max string `json:"max,omitempty"`
 }
 
 type IntFilter struct {
-	Eq *int `json:"eq,omitempty"`
-	Le *int `json:"le,omitempty"`
-	Lt *int `json:"lt,omitempty"`
-	Ge *int `json:"ge,omitempty"`
-	Gt *int `json:"gt,omitempty"`
+	Eq      *int      `json:"eq,omitempty"`
+	In      []*int    `json:"in,omitempty"`
+	Le      *int      `json:"le,omitempty"`
+	Lt      *int      `json:"lt,omitempty"`
+	Ge      *int      `json:"ge,omitempty"`
+	Gt      *int      `json:"gt,omitempty"`
+	Between *IntRange `json:"between,omitempty"`
+}
+
+type IntRange struct {
+	Min int `json:"min,omitempty"`
+	Max int `json:"max,omitempty"`
+}
+
+type IntersectsFilter struct {
+	Polygon      *PolygonRef      `json:"polygon,omitempty"`
+	MultiPolygon *MultiPolygonRef `json:"multiPolygon,omitempty"`
 }
 
 type Label struct {
@@ -678,12 +825,33 @@ type Label struct {
 	NTensions   *int       `json:"n_tensions,omitempty"`
 }
 
+type LabelAggregateResult struct {
+	Count          *int     `json:"count,omitempty"`
+	RootnameidMin  *string  `json:"rootnameidMin,omitempty"`
+	RootnameidMax  *string  `json:"rootnameidMax,omitempty"`
+	NameMin        *string  `json:"nameMin,omitempty"`
+	NameMax        *string  `json:"nameMax,omitempty"`
+	DescriptionMin *string  `json:"descriptionMin,omitempty"`
+	DescriptionMax *string  `json:"descriptionMax,omitempty"`
+	ColorMin       *string  `json:"colorMin,omitempty"`
+	ColorMax       *string  `json:"colorMax,omitempty"`
+	NNodesMin      *int     `json:"n_nodesMin,omitempty"`
+	NNodesMax      *int     `json:"n_nodesMax,omitempty"`
+	NNodesSum      *int     `json:"n_nodesSum,omitempty"`
+	NNodesAvg      *float64 `json:"n_nodesAvg,omitempty"`
+	NTensionsMin   *int     `json:"n_tensionsMin,omitempty"`
+	NTensionsMax   *int     `json:"n_tensionsMax,omitempty"`
+	NTensionsSum   *int     `json:"n_tensionsSum,omitempty"`
+	NTensionsAvg   *float64 `json:"n_tensionsAvg,omitempty"`
+}
+
 type LabelFilter struct {
 	ID         []string                          `json:"id,omitempty"`
 	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
 	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
-	And        *LabelFilter                      `json:"and,omitempty"`
-	Or         *LabelFilter                      `json:"or,omitempty"`
+	Has        []*LabelHasFilter                 `json:"has,omitempty"`
+	And        []*LabelFilter                    `json:"and,omitempty"`
+	Or         []*LabelFilter                    `json:"or,omitempty"`
 	Not        *LabelFilter                      `json:"not,omitempty"`
 }
 
@@ -724,11 +892,24 @@ type Mandate struct {
 	Policies         *string `json:"policies,omitempty"`
 }
 
+type MandateAggregateResult struct {
+	Count               *int    `json:"count,omitempty"`
+	PurposeMin          *string `json:"purposeMin,omitempty"`
+	PurposeMax          *string `json:"purposeMax,omitempty"`
+	ResponsabilitiesMin *string `json:"responsabilitiesMin,omitempty"`
+	ResponsabilitiesMax *string `json:"responsabilitiesMax,omitempty"`
+	DomainsMin          *string `json:"domainsMin,omitempty"`
+	DomainsMax          *string `json:"domainsMax,omitempty"`
+	PoliciesMin         *string `json:"policiesMin,omitempty"`
+	PoliciesMax         *string `json:"policiesMax,omitempty"`
+}
+
 type MandateFilter struct {
 	ID      []string              `json:"id,omitempty"`
 	Purpose *StringFullTextFilter `json:"purpose,omitempty"`
-	And     *MandateFilter        `json:"and,omitempty"`
-	Or      *MandateFilter        `json:"or,omitempty"`
+	Has     []*MandateHasFilter   `json:"has,omitempty"`
+	And     []*MandateFilter      `json:"and,omitempty"`
+	Or      []*MandateFilter      `json:"or,omitempty"`
 	Not     *MandateFilter        `json:"not,omitempty"`
 }
 
@@ -751,6 +932,19 @@ type MandateRef struct {
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
+}
+
+type MultiPolygon struct {
+	Polygons []*Polygon `json:"polygons,omitempty"`
+}
+
+type MultiPolygonRef struct {
+	Polygons []*PolygonRef `json:"polygons,omitempty"`
+}
+
+type NearFilter struct {
+	Distance   float64   `json:"distance,omitempty"`
+	Coordinate *PointRef `json:"coordinate,omitempty"`
 }
 
 type Node struct {
@@ -788,19 +982,52 @@ type Node struct {
 	Shared       *SharedNode `json:"shared,omitempty"`
 }
 
+type NodeAggregateResult struct {
+	Count           *int     `json:"count,omitempty"`
+	CreatedAtMin    *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax    *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin    *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax    *string  `json:"updatedAtMax,omitempty"`
+	NameMin         *string  `json:"nameMin,omitempty"`
+	NameMax         *string  `json:"nameMax,omitempty"`
+	NameidMin       *string  `json:"nameidMin,omitempty"`
+	NameidMax       *string  `json:"nameidMax,omitempty"`
+	RootnameidMin   *string  `json:"rootnameidMin,omitempty"`
+	RootnameidMax   *string  `json:"rootnameidMax,omitempty"`
+	AboutMin        *string  `json:"aboutMin,omitempty"`
+	AboutMax        *string  `json:"aboutMax,omitempty"`
+	NTensionsOutMin *int     `json:"n_tensions_outMin,omitempty"`
+	NTensionsOutMax *int     `json:"n_tensions_outMax,omitempty"`
+	NTensionsOutSum *int     `json:"n_tensions_outSum,omitempty"`
+	NTensionsOutAvg *float64 `json:"n_tensions_outAvg,omitempty"`
+	NTensionsInMin  *int     `json:"n_tensions_inMin,omitempty"`
+	NTensionsInMax  *int     `json:"n_tensions_inMax,omitempty"`
+	NTensionsInSum  *int     `json:"n_tensions_inSum,omitempty"`
+	NTensionsInAvg  *float64 `json:"n_tensions_inAvg,omitempty"`
+	NChildrenMin    *int     `json:"n_childrenMin,omitempty"`
+	NChildrenMax    *int     `json:"n_childrenMax,omitempty"`
+	NChildrenSum    *int     `json:"n_childrenSum,omitempty"`
+	NChildrenAvg    *float64 `json:"n_childrenAvg,omitempty"`
+}
+
 type NodeCharac struct {
 	ID          string   `json:"id,omitempty"`
 	UserCanJoin bool     `json:"userCanJoin"`
 	Mode        NodeMode `json:"mode,omitempty"`
 }
 
+type NodeCharacAggregateResult struct {
+	Count *int `json:"count,omitempty"`
+}
+
 type NodeCharacFilter struct {
-	ID          []string          `json:"id,omitempty"`
-	UserCanJoin *bool             `json:"userCanJoin"`
-	Mode        *NodeModeHash     `json:"mode,omitempty"`
-	And         *NodeCharacFilter `json:"and,omitempty"`
-	Or          *NodeCharacFilter `json:"or,omitempty"`
-	Not         *NodeCharacFilter `json:"not,omitempty"`
+	ID          []string               `json:"id,omitempty"`
+	UserCanJoin *bool                  `json:"userCanJoin"`
+	Mode        *NodeModeHash          `json:"mode,omitempty"`
+	Has         []*NodeCharacHasFilter `json:"has,omitempty"`
+	And         []*NodeCharacFilter    `json:"and,omitempty"`
+	Or          []*NodeCharacFilter    `json:"or,omitempty"`
+	Not         *NodeCharacFilter      `json:"not,omitempty"`
 }
 
 type NodeCharacPatch struct {
@@ -828,8 +1055,9 @@ type NodeFilter struct {
 	IsArchived *bool                               `json:"isArchived"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
 	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
-	And        *NodeFilter                         `json:"and,omitempty"`
-	Or         *NodeFilter                         `json:"or,omitempty"`
+	Has        []*NodeHasFilter                    `json:"has,omitempty"`
+	And        []*NodeFilter                       `json:"and,omitempty"`
+	Or         []*NodeFilter                       `json:"or,omitempty"`
 	Not        *NodeFilter                         `json:"not,omitempty"`
 }
 
@@ -849,9 +1077,26 @@ type NodeFragment struct {
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 }
 
+type NodeFragmentAggregateResult struct {
+	Count         *int    `json:"count,omitempty"`
+	NameMin       *string `json:"nameMin,omitempty"`
+	NameMax       *string `json:"nameMax,omitempty"`
+	NameidMin     *string `json:"nameidMin,omitempty"`
+	NameidMax     *string `json:"nameidMax,omitempty"`
+	AboutMin      *string `json:"aboutMin,omitempty"`
+	AboutMax      *string `json:"aboutMax,omitempty"`
+	FirstLinkMin  *string `json:"first_linkMin,omitempty"`
+	FirstLinkMax  *string `json:"first_linkMax,omitempty"`
+	SecondLinkMin *string `json:"second_linkMin,omitempty"`
+	SecondLinkMax *string `json:"second_linkMax,omitempty"`
+}
+
 type NodeFragmentFilter struct {
-	ID  []string            `json:"id,omitempty"`
-	Not *NodeFragmentFilter `json:"not,omitempty"`
+	ID  []string                 `json:"id,omitempty"`
+	Has []*NodeFragmentHasFilter `json:"has,omitempty"`
+	And []*NodeFragmentFilter    `json:"and,omitempty"`
+	Or  []*NodeFragmentFilter    `json:"or,omitempty"`
+	Not *NodeFragmentFilter      `json:"not,omitempty"`
 }
 
 type NodeFragmentOrder struct {
@@ -892,7 +1137,8 @@ type NodeFragmentRef struct {
 }
 
 type NodeModeHash struct {
-	Eq NodeMode `json:"eq,omitempty"`
+	Eq *NodeMode   `json:"eq,omitempty"`
+	In []*NodeMode `json:"in,omitempty"`
 }
 
 type NodeOrder struct {
@@ -976,10 +1222,44 @@ type NodeStats struct {
 	NRole   *int `json:"n_role,omitempty"`
 }
 
+type NodeStatsAggregateResult struct {
+	Count      *int     `json:"count,omitempty"`
+	NMemberMin *int     `json:"n_memberMin,omitempty"`
+	NMemberMax *int     `json:"n_memberMax,omitempty"`
+	NMemberSum *int     `json:"n_memberSum,omitempty"`
+	NMemberAvg *float64 `json:"n_memberAvg,omitempty"`
+	NGuestMin  *int     `json:"n_guestMin,omitempty"`
+	NGuestMax  *int     `json:"n_guestMax,omitempty"`
+	NGuestSum  *int     `json:"n_guestSum,omitempty"`
+	NGuestAvg  *float64 `json:"n_guestAvg,omitempty"`
+	NCircleMin *int     `json:"n_circleMin,omitempty"`
+	NCircleMax *int     `json:"n_circleMax,omitempty"`
+	NCircleSum *int     `json:"n_circleSum,omitempty"`
+	NCircleAvg *float64 `json:"n_circleAvg,omitempty"`
+	NRoleMin   *int     `json:"n_roleMin,omitempty"`
+	NRoleMax   *int     `json:"n_roleMax,omitempty"`
+	NRoleSum   *int     `json:"n_roleSum,omitempty"`
+	NRoleAvg   *float64 `json:"n_roleAvg,omitempty"`
+}
+
+type NodeStatsFilter struct {
+	Has []*NodeStatsHasFilter `json:"has,omitempty"`
+	And []*NodeStatsFilter    `json:"and,omitempty"`
+	Or  []*NodeStatsFilter    `json:"or,omitempty"`
+	Not *NodeStatsFilter      `json:"not,omitempty"`
+}
+
 type NodeStatsOrder struct {
 	Asc  *NodeStatsOrderable `json:"asc,omitempty"`
 	Desc *NodeStatsOrderable `json:"desc,omitempty"`
 	Then *NodeStatsOrder     `json:"then,omitempty"`
+}
+
+type NodeStatsPatch struct {
+	NMember *int `json:"n_member,omitempty"`
+	NGuest  *int `json:"n_guest,omitempty"`
+	NCircle *int `json:"n_circle,omitempty"`
+	NRole   *int `json:"n_role,omitempty"`
 }
 
 type NodeStatsRef struct {
@@ -990,7 +1270,46 @@ type NodeStatsRef struct {
 }
 
 type NodeTypeHash struct {
-	Eq NodeType `json:"eq,omitempty"`
+	Eq *NodeType   `json:"eq,omitempty"`
+	In []*NodeType `json:"in,omitempty"`
+}
+
+type Point struct {
+	Longitude float64 `json:"longitude,omitempty"`
+	Latitude  float64 `json:"latitude,omitempty"`
+}
+
+type PointGeoFilter struct {
+	Near   *NearFilter   `json:"near,omitempty"`
+	Within *WithinFilter `json:"within,omitempty"`
+}
+
+type PointList struct {
+	Points []*Point `json:"points,omitempty"`
+}
+
+type PointListRef struct {
+	Points []*PointRef `json:"points,omitempty"`
+}
+
+type PointRef struct {
+	Longitude float64 `json:"longitude,omitempty"`
+	Latitude  float64 `json:"latitude,omitempty"`
+}
+
+type Polygon struct {
+	Coordinates []*PointList `json:"coordinates,omitempty"`
+}
+
+type PolygonGeoFilter struct {
+	Near       *NearFilter       `json:"near,omitempty"`
+	Within     *WithinFilter     `json:"within,omitempty"`
+	Contains   *ContainsFilter   `json:"contains,omitempty"`
+	Intersects *IntersectsFilter `json:"intersects,omitempty"`
+}
+
+type PolygonRef struct {
+	Coordinates []*PointListRef `json:"coordinates,omitempty"`
 }
 
 type Post struct {
@@ -1001,12 +1320,23 @@ type Post struct {
 	Message   *string `json:"message,omitempty"`
 }
 
+type PostAggregateResult struct {
+	Count        *int    `json:"count,omitempty"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+}
+
 type PostFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	And       *PostFilter           `json:"and,omitempty"`
-	Or        *PostFilter           `json:"or,omitempty"`
+	Has       []*PostHasFilter      `json:"has,omitempty"`
+	And       []*PostFilter         `json:"and,omitempty"`
+	Or        []*PostFilter         `json:"or,omitempty"`
 	Not       *PostFilter           `json:"not,omitempty"`
 }
 
@@ -1028,7 +1358,8 @@ type PostRef struct {
 }
 
 type RoleTypeHash struct {
-	Eq *RoleType `json:"eq,omitempty"`
+	Eq *RoleType   `json:"eq,omitempty"`
+	In []*RoleType `json:"in,omitempty"`
 }
 
 type SharedNode struct {
@@ -1037,10 +1368,39 @@ type SharedNode struct {
 	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
 }
 
+type SharedNodeAggregateResult struct {
+	Count              *int     `json:"count,omitempty"`
+	NLabelsMin         *int     `json:"n_labelsMin,omitempty"`
+	NLabelsMax         *int     `json:"n_labelsMax,omitempty"`
+	NLabelsSum         *int     `json:"n_labelsSum,omitempty"`
+	NLabelsAvg         *float64 `json:"n_labelsAvg,omitempty"`
+	NTensionsMin       *int     `json:"n_tensionsMin,omitempty"`
+	NTensionsMax       *int     `json:"n_tensionsMax,omitempty"`
+	NTensionsSum       *int     `json:"n_tensionsSum,omitempty"`
+	NTensionsAvg       *float64 `json:"n_tensionsAvg,omitempty"`
+	NClosedTensionsMin *int     `json:"n_closed_tensionsMin,omitempty"`
+	NClosedTensionsMax *int     `json:"n_closed_tensionsMax,omitempty"`
+	NClosedTensionsSum *int     `json:"n_closed_tensionsSum,omitempty"`
+	NClosedTensionsAvg *float64 `json:"n_closed_tensionsAvg,omitempty"`
+}
+
+type SharedNodeFilter struct {
+	Has []*SharedNodeHasFilter `json:"has,omitempty"`
+	And []*SharedNodeFilter    `json:"and,omitempty"`
+	Or  []*SharedNodeFilter    `json:"or,omitempty"`
+	Not *SharedNodeFilter      `json:"not,omitempty"`
+}
+
 type SharedNodeOrder struct {
 	Asc  *SharedNodeOrderable `json:"asc,omitempty"`
 	Desc *SharedNodeOrderable `json:"desc,omitempty"`
 	Then *SharedNodeOrder     `json:"then,omitempty"`
+}
+
+type SharedNodePatch struct {
+	NLabels         *int `json:"n_labels,omitempty"`
+	NTensions       *int `json:"n_tensions,omitempty"`
+	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
 }
 
 type SharedNodeRef struct {
@@ -1050,11 +1410,13 @@ type SharedNodeRef struct {
 }
 
 type StringExactFilter struct {
-	Eq *string `json:"eq,omitempty"`
-	Le *string `json:"le,omitempty"`
-	Lt *string `json:"lt,omitempty"`
-	Ge *string `json:"ge,omitempty"`
-	Gt *string `json:"gt,omitempty"`
+	Eq      *string      `json:"eq,omitempty"`
+	In      []*string    `json:"in,omitempty"`
+	Le      *string      `json:"le,omitempty"`
+	Lt      *string      `json:"lt,omitempty"`
+	Ge      *string      `json:"ge,omitempty"`
+	Gt      *string      `json:"gt,omitempty"`
+	Between *StringRange `json:"between,omitempty"`
 }
 
 type StringFullTextFilter struct {
@@ -1063,18 +1425,26 @@ type StringFullTextFilter struct {
 }
 
 type StringHashFilter struct {
-	Eq *string `json:"eq,omitempty"`
+	Eq *string   `json:"eq,omitempty"`
+	In []*string `json:"in,omitempty"`
 }
 
 type StringHashFilterStringRegExpFilter struct {
-	Eq     *string `json:"eq,omitempty"`
-	Regexp *string `json:"regexp,omitempty"`
+	Eq     *string   `json:"eq,omitempty"`
+	In     []*string `json:"in,omitempty"`
+	Regexp *string   `json:"regexp,omitempty"`
 }
 
 type StringHashFilterStringTermFilter struct {
-	Eq         *string `json:"eq,omitempty"`
-	Allofterms *string `json:"allofterms,omitempty"`
-	Anyofterms *string `json:"anyofterms,omitempty"`
+	Eq         *string   `json:"eq,omitempty"`
+	In         []*string `json:"in,omitempty"`
+	Allofterms *string   `json:"allofterms,omitempty"`
+	Anyofterms *string   `json:"anyofterms,omitempty"`
+}
+
+type StringRange struct {
+	Min string `json:"min,omitempty"`
+	Max string `json:"max,omitempty"`
 }
 
 type StringRegExpFilter struct {
@@ -1111,8 +1481,35 @@ type Tension struct {
 	Message    *string        `json:"message,omitempty"`
 }
 
+type TensionAggregateResult struct {
+	Count         *int     `json:"count,omitempty"`
+	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax  *string  `json:"updatedAtMax,omitempty"`
+	MessageMin    *string  `json:"messageMin,omitempty"`
+	MessageMax    *string  `json:"messageMax,omitempty"`
+	EmitteridMin  *string  `json:"emitteridMin,omitempty"`
+	EmitteridMax  *string  `json:"emitteridMax,omitempty"`
+	ReceiveridMin *string  `json:"receiveridMin,omitempty"`
+	ReceiveridMax *string  `json:"receiveridMax,omitempty"`
+	NthMin        *string  `json:"nthMin,omitempty"`
+	NthMax        *string  `json:"nthMax,omitempty"`
+	TitleMin      *string  `json:"titleMin,omitempty"`
+	TitleMax      *string  `json:"titleMax,omitempty"`
+	NCommentsMin  *int     `json:"n_commentsMin,omitempty"`
+	NCommentsMax  *int     `json:"n_commentsMax,omitempty"`
+	NCommentsSum  *int     `json:"n_commentsSum,omitempty"`
+	NCommentsAvg  *float64 `json:"n_commentsAvg,omitempty"`
+	NBlobsMin     *int     `json:"n_blobsMin,omitempty"`
+	NBlobsMax     *int     `json:"n_blobsMax,omitempty"`
+	NBlobsSum     *int     `json:"n_blobsSum,omitempty"`
+	NBlobsAvg     *float64 `json:"n_blobsAvg,omitempty"`
+}
+
 type TensionEventHash struct {
-	Eq TensionEvent `json:"eq,omitempty"`
+	Eq *TensionEvent   `json:"eq,omitempty"`
+	In []*TensionEvent `json:"in,omitempty"`
 }
 
 type TensionFilter struct {
@@ -1125,8 +1522,9 @@ type TensionFilter struct {
 	Title      *StringFullTextFilter               `json:"title,omitempty"`
 	Type       *TensionTypeHash                    `json:"type_,omitempty"`
 	Status     *TensionStatusHash                  `json:"status,omitempty"`
-	And        *TensionFilter                      `json:"and,omitempty"`
-	Or         *TensionFilter                      `json:"or,omitempty"`
+	Has        []*TensionHasFilter                 `json:"has,omitempty"`
+	And        []*TensionFilter                    `json:"and,omitempty"`
+	Or         []*TensionFilter                    `json:"or,omitempty"`
 	Not        *TensionFilter                      `json:"not,omitempty"`
 }
 
@@ -1186,11 +1584,13 @@ type TensionRef struct {
 }
 
 type TensionStatusHash struct {
-	Eq TensionStatus `json:"eq,omitempty"`
+	Eq *TensionStatus   `json:"eq,omitempty"`
+	In []*TensionStatus `json:"in,omitempty"`
 }
 
 type TensionTypeHash struct {
-	Eq TensionType `json:"eq,omitempty"`
+	Eq *TensionType   `json:"eq,omitempty"`
+	In []*TensionType `json:"in,omitempty"`
 }
 
 type UpdateBlobInput struct {
@@ -1303,6 +1703,17 @@ type UpdateNodePayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type UpdateNodeStatsInput struct {
+	Filter *NodeStatsFilter `json:"filter,omitempty"`
+	Set    *NodeStatsPatch  `json:"set,omitempty"`
+	Remove *NodeStatsPatch  `json:"remove,omitempty"`
+}
+
+type UpdateNodeStatsPayload struct {
+	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
+	NumUids   *int         `json:"numUids,omitempty"`
+}
+
 type UpdatePostInput struct {
 	Filter *PostFilter `json:"filter,omitempty"`
 	Set    *PostPatch  `json:"set,omitempty"`
@@ -1312,6 +1723,17 @@ type UpdatePostInput struct {
 type UpdatePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type UpdateSharedNodeInput struct {
+	Filter *SharedNodeFilter `json:"filter,omitempty"`
+	Set    *SharedNodePatch  `json:"set,omitempty"`
+	Remove *SharedNodePatch  `json:"remove,omitempty"`
+}
+
+type UpdateSharedNodePayload struct {
+	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type UpdateTensionInput struct {
@@ -1334,6 +1756,17 @@ type UpdateUserInput struct {
 type UpdateUserPayload struct {
 	User    []*User `json:"user,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type UpdateUserRightsInput struct {
+	Filter *UserRightsFilter `json:"filter,omitempty"`
+	Set    *UserRightsPatch  `json:"set,omitempty"`
+	Remove *UserRightsPatch  `json:"remove,omitempty"`
+}
+
+type UpdateUserRightsPayload struct {
+	UserRights []*UserRights `json:"userRights,omitempty"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type UpdateVoteInput struct {
@@ -1367,12 +1800,35 @@ type User struct {
 	Utc              *string     `json:"utc,omitempty"`
 }
 
+type UserAggregateResult struct {
+	Count        *int    `json:"count,omitempty"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	LastAckMin   *string `json:"lastAckMin,omitempty"`
+	LastAckMax   *string `json:"lastAckMax,omitempty"`
+	UsernameMin  *string `json:"usernameMin,omitempty"`
+	UsernameMax  *string `json:"usernameMax,omitempty"`
+	NameMin      *string `json:"nameMin,omitempty"`
+	NameMax      *string `json:"nameMax,omitempty"`
+	PasswordMin  *string `json:"passwordMin,omitempty"`
+	PasswordMax  *string `json:"passwordMax,omitempty"`
+	EmailMin     *string `json:"emailMin,omitempty"`
+	EmailMax     *string `json:"emailMax,omitempty"`
+	EmailHashMin *string `json:"emailHashMin,omitempty"`
+	EmailHashMax *string `json:"emailHashMax,omitempty"`
+	BioMin       *string `json:"bioMin,omitempty"`
+	BioMax       *string `json:"bioMax,omitempty"`
+	UtcMin       *string `json:"utcMin,omitempty"`
+	UtcMax       *string `json:"utcMax,omitempty"`
+}
+
 type UserFilter struct {
 	ID       []string          `json:"id,omitempty"`
 	Username *StringHashFilter `json:"username,omitempty"`
 	Email    *StringHashFilter `json:"email,omitempty"`
-	And      *UserFilter       `json:"and,omitempty"`
-	Or       *UserFilter       `json:"or,omitempty"`
+	Has      []*UserHasFilter  `json:"has,omitempty"`
+	And      []*UserFilter     `json:"and,omitempty"`
+	Or       []*UserFilter     `json:"or,omitempty"`
 	Not      *UserFilter       `json:"not,omitempty"`
 }
 
@@ -1426,10 +1882,31 @@ type UserRights struct {
 	MaxPublicOrga int  `json:"maxPublicOrga,omitempty"`
 }
 
+type UserRightsAggregateResult struct {
+	Count            *int     `json:"count,omitempty"`
+	MaxPublicOrgaMin *int     `json:"maxPublicOrgaMin,omitempty"`
+	MaxPublicOrgaMax *int     `json:"maxPublicOrgaMax,omitempty"`
+	MaxPublicOrgaSum *int     `json:"maxPublicOrgaSum,omitempty"`
+	MaxPublicOrgaAvg *float64 `json:"maxPublicOrgaAvg,omitempty"`
+}
+
+type UserRightsFilter struct {
+	Has []*UserRightsHasFilter `json:"has,omitempty"`
+	And []*UserRightsFilter    `json:"and,omitempty"`
+	Or  []*UserRightsFilter    `json:"or,omitempty"`
+	Not *UserRightsFilter      `json:"not,omitempty"`
+}
+
 type UserRightsOrder struct {
 	Asc  *UserRightsOrderable `json:"asc,omitempty"`
 	Desc *UserRightsOrderable `json:"desc,omitempty"`
 	Then *UserRightsOrder     `json:"then,omitempty"`
+}
+
+type UserRightsPatch struct {
+	CanLogin      *bool `json:"canLogin"`
+	CanCreateRoot *bool `json:"canCreateRoot"`
+	MaxPublicOrga *int  `json:"maxPublicOrga,omitempty"`
 }
 
 type UserRightsRef struct {
@@ -1445,9 +1922,16 @@ type Vote struct {
 	Data     []int     `json:"data,omitempty"`
 }
 
+type VoteAggregateResult struct {
+	Count *int `json:"count,omitempty"`
+}
+
 type VoteFilter struct {
-	ID  []string    `json:"id,omitempty"`
-	Not *VoteFilter `json:"not,omitempty"`
+	ID  []string         `json:"id,omitempty"`
+	Has []*VoteHasFilter `json:"has,omitempty"`
+	And []*VoteFilter    `json:"and,omitempty"`
+	Or  []*VoteFilter    `json:"or,omitempty"`
+	Not *VoteFilter      `json:"not,omitempty"`
 }
 
 type VotePatch struct {
@@ -1461,6 +1945,67 @@ type VoteRef struct {
 	Contract *ContractRef `json:"contract,omitempty"`
 	Node     *NodeRef     `json:"node,omitempty"`
 	Data     []int        `json:"data,omitempty"`
+}
+
+type WithinFilter struct {
+	Polygon *PolygonRef `json:"polygon,omitempty"`
+}
+
+type BlobHasFilter string
+
+const (
+	BlobHasFilterCreatedBy    BlobHasFilter = "createdBy"
+	BlobHasFilterCreatedAt    BlobHasFilter = "createdAt"
+	BlobHasFilterUpdatedAt    BlobHasFilter = "updatedAt"
+	BlobHasFilterMessage      BlobHasFilter = "message"
+	BlobHasFilterTension      BlobHasFilter = "tension"
+	BlobHasFilterBlobType     BlobHasFilter = "blob_type"
+	BlobHasFilterPushedFlag   BlobHasFilter = "pushedFlag"
+	BlobHasFilterArchivedFlag BlobHasFilter = "archivedFlag"
+	BlobHasFilterNode         BlobHasFilter = "node"
+	BlobHasFilterMd           BlobHasFilter = "md"
+)
+
+var AllBlobHasFilter = []BlobHasFilter{
+	BlobHasFilterCreatedBy,
+	BlobHasFilterCreatedAt,
+	BlobHasFilterUpdatedAt,
+	BlobHasFilterMessage,
+	BlobHasFilterTension,
+	BlobHasFilterBlobType,
+	BlobHasFilterPushedFlag,
+	BlobHasFilterArchivedFlag,
+	BlobHasFilterNode,
+	BlobHasFilterMd,
+}
+
+func (e BlobHasFilter) IsValid() bool {
+	switch e {
+	case BlobHasFilterCreatedBy, BlobHasFilterCreatedAt, BlobHasFilterUpdatedAt, BlobHasFilterMessage, BlobHasFilterTension, BlobHasFilterBlobType, BlobHasFilterPushedFlag, BlobHasFilterArchivedFlag, BlobHasFilterNode, BlobHasFilterMd:
+		return true
+	}
+	return false
+}
+
+func (e BlobHasFilter) String() string {
+	return string(e)
+}
+
+func (e *BlobHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BlobHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BlobHasFilter", str)
+	}
+	return nil
+}
+
+func (e BlobHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type BlobOrderable string
@@ -1559,6 +2104,53 @@ func (e BlobType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type CommentHasFilter string
+
+const (
+	CommentHasFilterCreatedBy CommentHasFilter = "createdBy"
+	CommentHasFilterCreatedAt CommentHasFilter = "createdAt"
+	CommentHasFilterUpdatedAt CommentHasFilter = "updatedAt"
+	CommentHasFilterMessage   CommentHasFilter = "message"
+	CommentHasFilterVoid      CommentHasFilter = "_VOID"
+)
+
+var AllCommentHasFilter = []CommentHasFilter{
+	CommentHasFilterCreatedBy,
+	CommentHasFilterCreatedAt,
+	CommentHasFilterUpdatedAt,
+	CommentHasFilterMessage,
+	CommentHasFilterVoid,
+}
+
+func (e CommentHasFilter) IsValid() bool {
+	switch e {
+	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterVoid:
+		return true
+	}
+	return false
+}
+
+func (e CommentHasFilter) String() string {
+	return string(e)
+}
+
+func (e *CommentHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = CommentHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid CommentHasFilter", str)
+	}
+	return nil
+}
+
+func (e CommentHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type CommentOrderable string
 
 const (
@@ -1601,6 +2193,67 @@ func (e *CommentOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e CommentOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ContractHasFilter string
+
+const (
+	ContractHasFilterCreatedBy    ContractHasFilter = "createdBy"
+	ContractHasFilterCreatedAt    ContractHasFilter = "createdAt"
+	ContractHasFilterUpdatedAt    ContractHasFilter = "updatedAt"
+	ContractHasFilterMessage      ContractHasFilter = "message"
+	ContractHasFilterTension      ContractHasFilter = "tension"
+	ContractHasFilterStatus       ContractHasFilter = "status"
+	ContractHasFilterContractType ContractHasFilter = "contract_type"
+	ContractHasFilterClosedAt     ContractHasFilter = "closedAt"
+	ContractHasFilterEvent        ContractHasFilter = "event"
+	ContractHasFilterCandidates   ContractHasFilter = "candidates"
+	ContractHasFilterParticipants ContractHasFilter = "participants"
+	ContractHasFilterComments     ContractHasFilter = "comments"
+)
+
+var AllContractHasFilter = []ContractHasFilter{
+	ContractHasFilterCreatedBy,
+	ContractHasFilterCreatedAt,
+	ContractHasFilterUpdatedAt,
+	ContractHasFilterMessage,
+	ContractHasFilterTension,
+	ContractHasFilterStatus,
+	ContractHasFilterContractType,
+	ContractHasFilterClosedAt,
+	ContractHasFilterEvent,
+	ContractHasFilterCandidates,
+	ContractHasFilterParticipants,
+	ContractHasFilterComments,
+}
+
+func (e ContractHasFilter) IsValid() bool {
+	switch e {
+	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterParticipants, ContractHasFilterComments:
+		return true
+	}
+	return false
+}
+
+func (e ContractHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ContractHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ContractHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ContractHasFilter", str)
+	}
+	return nil
+}
+
+func (e ContractHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -1741,6 +2394,7 @@ type DgraphIndex string
 
 const (
 	DgraphIndexInt      DgraphIndex = "int"
+	DgraphIndexInt64    DgraphIndex = "int64"
 	DgraphIndexFloat    DgraphIndex = "float"
 	DgraphIndexBool     DgraphIndex = "bool"
 	DgraphIndexHash     DgraphIndex = "hash"
@@ -1753,10 +2407,12 @@ const (
 	DgraphIndexMonth    DgraphIndex = "month"
 	DgraphIndexDay      DgraphIndex = "day"
 	DgraphIndexHour     DgraphIndex = "hour"
+	DgraphIndexGeo      DgraphIndex = "geo"
 )
 
 var AllDgraphIndex = []DgraphIndex{
 	DgraphIndexInt,
+	DgraphIndexInt64,
 	DgraphIndexFloat,
 	DgraphIndexBool,
 	DgraphIndexHash,
@@ -1769,11 +2425,12 @@ var AllDgraphIndex = []DgraphIndex{
 	DgraphIndexMonth,
 	DgraphIndexDay,
 	DgraphIndexHour,
+	DgraphIndexGeo,
 }
 
 func (e DgraphIndex) IsValid() bool {
 	switch e {
-	case DgraphIndexInt, DgraphIndexFloat, DgraphIndexBool, DgraphIndexHash, DgraphIndexExact, DgraphIndexTerm, DgraphIndexFulltext, DgraphIndexTrigram, DgraphIndexRegexp, DgraphIndexYear, DgraphIndexMonth, DgraphIndexDay, DgraphIndexHour:
+	case DgraphIndexInt, DgraphIndexInt64, DgraphIndexFloat, DgraphIndexBool, DgraphIndexHash, DgraphIndexExact, DgraphIndexTerm, DgraphIndexFulltext, DgraphIndexTrigram, DgraphIndexRegexp, DgraphIndexYear, DgraphIndexMonth, DgraphIndexDay, DgraphIndexHour, DgraphIndexGeo:
 		return true
 	}
 	return false
@@ -1797,6 +2454,49 @@ func (e *DgraphIndex) UnmarshalGQL(v interface{}) error {
 }
 
 func (e DgraphIndex) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventFragmentHasFilter string
+
+const (
+	EventFragmentHasFilterEventType EventFragmentHasFilter = "event_type"
+	EventFragmentHasFilterOld       EventFragmentHasFilter = "old"
+	EventFragmentHasFilterNew       EventFragmentHasFilter = "new"
+)
+
+var AllEventFragmentHasFilter = []EventFragmentHasFilter{
+	EventFragmentHasFilterEventType,
+	EventFragmentHasFilterOld,
+	EventFragmentHasFilterNew,
+}
+
+func (e EventFragmentHasFilter) IsValid() bool {
+	switch e {
+	case EventFragmentHasFilterEventType, EventFragmentHasFilterOld, EventFragmentHasFilterNew:
+		return true
+	}
+	return false
+}
+
+func (e EventFragmentHasFilter) String() string {
+	return string(e)
+}
+
+func (e *EventFragmentHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventFragmentHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventFragmentHasFilter", str)
+	}
+	return nil
+}
+
+func (e EventFragmentHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -1838,6 +2538,59 @@ func (e *EventFragmentOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e EventFragmentOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventHasFilter string
+
+const (
+	EventHasFilterCreatedBy EventHasFilter = "createdBy"
+	EventHasFilterCreatedAt EventHasFilter = "createdAt"
+	EventHasFilterUpdatedAt EventHasFilter = "updatedAt"
+	EventHasFilterMessage   EventHasFilter = "message"
+	EventHasFilterTension   EventHasFilter = "tension"
+	EventHasFilterEventType EventHasFilter = "event_type"
+	EventHasFilterOld       EventHasFilter = "old"
+	EventHasFilterNew       EventHasFilter = "new"
+)
+
+var AllEventHasFilter = []EventHasFilter{
+	EventHasFilterCreatedBy,
+	EventHasFilterCreatedAt,
+	EventHasFilterUpdatedAt,
+	EventHasFilterMessage,
+	EventHasFilterTension,
+	EventHasFilterEventType,
+	EventHasFilterOld,
+	EventHasFilterNew,
+}
+
+func (e EventHasFilter) IsValid() bool {
+	switch e {
+	case EventHasFilterCreatedBy, EventHasFilterCreatedAt, EventHasFilterUpdatedAt, EventHasFilterMessage, EventHasFilterTension, EventHasFilterEventType, EventHasFilterOld, EventHasFilterNew:
+		return true
+	}
+	return false
+}
+
+func (e EventHasFilter) String() string {
+	return string(e)
+}
+
+func (e *EventHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventHasFilter", str)
+	}
+	return nil
+}
+
+func (e EventHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -1935,6 +2688,59 @@ func (e HTTPMethod) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type LabelHasFilter string
+
+const (
+	LabelHasFilterRootnameid  LabelHasFilter = "rootnameid"
+	LabelHasFilterName        LabelHasFilter = "name"
+	LabelHasFilterDescription LabelHasFilter = "description"
+	LabelHasFilterColor       LabelHasFilter = "color"
+	LabelHasFilterTensions    LabelHasFilter = "tensions"
+	LabelHasFilterNodes       LabelHasFilter = "nodes"
+	LabelHasFilterNNodes      LabelHasFilter = "n_nodes"
+	LabelHasFilterNTensions   LabelHasFilter = "n_tensions"
+)
+
+var AllLabelHasFilter = []LabelHasFilter{
+	LabelHasFilterRootnameid,
+	LabelHasFilterName,
+	LabelHasFilterDescription,
+	LabelHasFilterColor,
+	LabelHasFilterTensions,
+	LabelHasFilterNodes,
+	LabelHasFilterNNodes,
+	LabelHasFilterNTensions,
+}
+
+func (e LabelHasFilter) IsValid() bool {
+	switch e {
+	case LabelHasFilterRootnameid, LabelHasFilterName, LabelHasFilterDescription, LabelHasFilterColor, LabelHasFilterTensions, LabelHasFilterNodes, LabelHasFilterNNodes, LabelHasFilterNTensions:
+		return true
+	}
+	return false
+}
+
+func (e LabelHasFilter) String() string {
+	return string(e)
+}
+
+func (e *LabelHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = LabelHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid LabelHasFilter", str)
+	}
+	return nil
+}
+
+func (e LabelHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type LabelOrderable string
 
 const (
@@ -1981,6 +2787,51 @@ func (e *LabelOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e LabelOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type MandateHasFilter string
+
+const (
+	MandateHasFilterPurpose          MandateHasFilter = "purpose"
+	MandateHasFilterResponsabilities MandateHasFilter = "responsabilities"
+	MandateHasFilterDomains          MandateHasFilter = "domains"
+	MandateHasFilterPolicies         MandateHasFilter = "policies"
+)
+
+var AllMandateHasFilter = []MandateHasFilter{
+	MandateHasFilterPurpose,
+	MandateHasFilterResponsabilities,
+	MandateHasFilterDomains,
+	MandateHasFilterPolicies,
+}
+
+func (e MandateHasFilter) IsValid() bool {
+	switch e {
+	case MandateHasFilterPurpose, MandateHasFilterResponsabilities, MandateHasFilterDomains, MandateHasFilterPolicies:
+		return true
+	}
+	return false
+}
+
+func (e MandateHasFilter) String() string {
+	return string(e)
+}
+
+func (e *MandateHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MandateHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MandateHasFilter", str)
+	}
+	return nil
+}
+
+func (e MandateHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -2070,6 +2921,108 @@ func (e Mode) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type NodeCharacHasFilter string
+
+const (
+	NodeCharacHasFilterUserCanJoin NodeCharacHasFilter = "userCanJoin"
+	NodeCharacHasFilterMode        NodeCharacHasFilter = "mode"
+)
+
+var AllNodeCharacHasFilter = []NodeCharacHasFilter{
+	NodeCharacHasFilterUserCanJoin,
+	NodeCharacHasFilterMode,
+}
+
+func (e NodeCharacHasFilter) IsValid() bool {
+	switch e {
+	case NodeCharacHasFilterUserCanJoin, NodeCharacHasFilterMode:
+		return true
+	}
+	return false
+}
+
+func (e NodeCharacHasFilter) String() string {
+	return string(e)
+}
+
+func (e *NodeCharacHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeCharacHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeCharacHasFilter", str)
+	}
+	return nil
+}
+
+func (e NodeCharacHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NodeFragmentHasFilter string
+
+const (
+	NodeFragmentHasFilterName       NodeFragmentHasFilter = "name"
+	NodeFragmentHasFilterNameid     NodeFragmentHasFilter = "nameid"
+	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
+	NodeFragmentHasFilterIsPrivate  NodeFragmentHasFilter = "isPrivate"
+	NodeFragmentHasFilterCharac     NodeFragmentHasFilter = "charac"
+	NodeFragmentHasFilterAbout      NodeFragmentHasFilter = "about"
+	NodeFragmentHasFilterMandate    NodeFragmentHasFilter = "mandate"
+	NodeFragmentHasFilterChildren   NodeFragmentHasFilter = "children"
+	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
+	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
+	NodeFragmentHasFilterSkills     NodeFragmentHasFilter = "skills"
+	NodeFragmentHasFilterRoleType   NodeFragmentHasFilter = "role_type"
+)
+
+var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
+	NodeFragmentHasFilterName,
+	NodeFragmentHasFilterNameid,
+	NodeFragmentHasFilterType,
+	NodeFragmentHasFilterIsPrivate,
+	NodeFragmentHasFilterCharac,
+	NodeFragmentHasFilterAbout,
+	NodeFragmentHasFilterMandate,
+	NodeFragmentHasFilterChildren,
+	NodeFragmentHasFilterFirstLink,
+	NodeFragmentHasFilterSecondLink,
+	NodeFragmentHasFilterSkills,
+	NodeFragmentHasFilterRoleType,
+}
+
+func (e NodeFragmentHasFilter) IsValid() bool {
+	switch e {
+	case NodeFragmentHasFilterName, NodeFragmentHasFilterNameid, NodeFragmentHasFilterType, NodeFragmentHasFilterIsPrivate, NodeFragmentHasFilterCharac, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterChildren, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterSkills, NodeFragmentHasFilterRoleType:
+		return true
+	}
+	return false
+}
+
+func (e NodeFragmentHasFilter) String() string {
+	return string(e)
+}
+
+func (e *NodeFragmentHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeFragmentHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeFragmentHasFilter", str)
+	}
+	return nil
+}
+
+func (e NodeFragmentHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type NodeFragmentOrderable string
 
 const (
@@ -2114,6 +3067,105 @@ func (e *NodeFragmentOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeFragmentOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NodeHasFilter string
+
+const (
+	NodeHasFilterCreatedBy    NodeHasFilter = "createdBy"
+	NodeHasFilterCreatedAt    NodeHasFilter = "createdAt"
+	NodeHasFilterUpdatedAt    NodeHasFilter = "updatedAt"
+	NodeHasFilterName         NodeHasFilter = "name"
+	NodeHasFilterNameid       NodeHasFilter = "nameid"
+	NodeHasFilterRootnameid   NodeHasFilter = "rootnameid"
+	NodeHasFilterParent       NodeHasFilter = "parent"
+	NodeHasFilterChildren     NodeHasFilter = "children"
+	NodeHasFilterType         NodeHasFilter = "type_"
+	NodeHasFilterTensionsOut  NodeHasFilter = "tensions_out"
+	NodeHasFilterTensionsIn   NodeHasFilter = "tensions_in"
+	NodeHasFilterAbout        NodeHasFilter = "about"
+	NodeHasFilterMandate      NodeHasFilter = "mandate"
+	NodeHasFilterDocs         NodeHasFilter = "docs"
+	NodeHasFilterSource       NodeHasFilter = "source"
+	NodeHasFilterNTensionsOut NodeHasFilter = "n_tensions_out"
+	NodeHasFilterNTensionsIn  NodeHasFilter = "n_tensions_in"
+	NodeHasFilterNChildren    NodeHasFilter = "n_children"
+	NodeHasFilterStats        NodeHasFilter = "stats"
+	NodeHasFilterIsRoot       NodeHasFilter = "isRoot"
+	NodeHasFilterIsPersonal   NodeHasFilter = "isPersonal"
+	NodeHasFilterIsPrivate    NodeHasFilter = "isPrivate"
+	NodeHasFilterIsArchived   NodeHasFilter = "isArchived"
+	NodeHasFilterCharac       NodeHasFilter = "charac"
+	NodeHasFilterLabels       NodeHasFilter = "labels"
+	NodeHasFilterFirstLink    NodeHasFilter = "first_link"
+	NodeHasFilterSecondLink   NodeHasFilter = "second_link"
+	NodeHasFilterSkills       NodeHasFilter = "skills"
+	NodeHasFilterRoleType     NodeHasFilter = "role_type"
+	NodeHasFilterContracts    NodeHasFilter = "contracts"
+	NodeHasFilterShared       NodeHasFilter = "shared"
+)
+
+var AllNodeHasFilter = []NodeHasFilter{
+	NodeHasFilterCreatedBy,
+	NodeHasFilterCreatedAt,
+	NodeHasFilterUpdatedAt,
+	NodeHasFilterName,
+	NodeHasFilterNameid,
+	NodeHasFilterRootnameid,
+	NodeHasFilterParent,
+	NodeHasFilterChildren,
+	NodeHasFilterType,
+	NodeHasFilterTensionsOut,
+	NodeHasFilterTensionsIn,
+	NodeHasFilterAbout,
+	NodeHasFilterMandate,
+	NodeHasFilterDocs,
+	NodeHasFilterSource,
+	NodeHasFilterNTensionsOut,
+	NodeHasFilterNTensionsIn,
+	NodeHasFilterNChildren,
+	NodeHasFilterStats,
+	NodeHasFilterIsRoot,
+	NodeHasFilterIsPersonal,
+	NodeHasFilterIsPrivate,
+	NodeHasFilterIsArchived,
+	NodeHasFilterCharac,
+	NodeHasFilterLabels,
+	NodeHasFilterFirstLink,
+	NodeHasFilterSecondLink,
+	NodeHasFilterSkills,
+	NodeHasFilterRoleType,
+	NodeHasFilterContracts,
+	NodeHasFilterShared,
+}
+
+func (e NodeHasFilter) IsValid() bool {
+	switch e {
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterNTensionsOut, NodeHasFilterNTensionsIn, NodeHasFilterNChildren, NodeHasFilterStats, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterIsPrivate, NodeHasFilterIsArchived, NodeHasFilterCharac, NodeHasFilterLabels, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterShared:
+		return true
+	}
+	return false
+}
+
+func (e NodeHasFilter) String() string {
+	return string(e)
+}
+
+func (e *NodeHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeHasFilter", str)
+	}
+	return nil
+}
+
+func (e NodeHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -2213,6 +3265,51 @@ func (e NodeOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type NodeStatsHasFilter string
+
+const (
+	NodeStatsHasFilterNMember NodeStatsHasFilter = "n_member"
+	NodeStatsHasFilterNGuest  NodeStatsHasFilter = "n_guest"
+	NodeStatsHasFilterNCircle NodeStatsHasFilter = "n_circle"
+	NodeStatsHasFilterNRole   NodeStatsHasFilter = "n_role"
+)
+
+var AllNodeStatsHasFilter = []NodeStatsHasFilter{
+	NodeStatsHasFilterNMember,
+	NodeStatsHasFilterNGuest,
+	NodeStatsHasFilterNCircle,
+	NodeStatsHasFilterNRole,
+}
+
+func (e NodeStatsHasFilter) IsValid() bool {
+	switch e {
+	case NodeStatsHasFilterNMember, NodeStatsHasFilterNGuest, NodeStatsHasFilterNCircle, NodeStatsHasFilterNRole:
+		return true
+	}
+	return false
+}
+
+func (e NodeStatsHasFilter) String() string {
+	return string(e)
+}
+
+func (e *NodeStatsHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeStatsHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeStatsHasFilter", str)
+	}
+	return nil
+}
+
+func (e NodeStatsHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type NodeStatsOrderable string
 
 const (
@@ -2296,6 +3393,51 @@ func (e *NodeType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PostHasFilter string
+
+const (
+	PostHasFilterCreatedBy PostHasFilter = "createdBy"
+	PostHasFilterCreatedAt PostHasFilter = "createdAt"
+	PostHasFilterUpdatedAt PostHasFilter = "updatedAt"
+	PostHasFilterMessage   PostHasFilter = "message"
+)
+
+var AllPostHasFilter = []PostHasFilter{
+	PostHasFilterCreatedBy,
+	PostHasFilterCreatedAt,
+	PostHasFilterUpdatedAt,
+	PostHasFilterMessage,
+}
+
+func (e PostHasFilter) IsValid() bool {
+	switch e {
+	case PostHasFilterCreatedBy, PostHasFilterCreatedAt, PostHasFilterUpdatedAt, PostHasFilterMessage:
+		return true
+	}
+	return false
+}
+
+func (e PostHasFilter) String() string {
+	return string(e)
+}
+
+func (e *PostHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PostHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PostHasFilter", str)
+	}
+	return nil
+}
+
+func (e PostHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -2392,6 +3534,49 @@ func (e *RoleType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e RoleType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SharedNodeHasFilter string
+
+const (
+	SharedNodeHasFilterNLabels         SharedNodeHasFilter = "n_labels"
+	SharedNodeHasFilterNTensions       SharedNodeHasFilter = "n_tensions"
+	SharedNodeHasFilterNClosedTensions SharedNodeHasFilter = "n_closed_tensions"
+)
+
+var AllSharedNodeHasFilter = []SharedNodeHasFilter{
+	SharedNodeHasFilterNLabels,
+	SharedNodeHasFilterNTensions,
+	SharedNodeHasFilterNClosedTensions,
+}
+
+func (e SharedNodeHasFilter) IsValid() bool {
+	switch e {
+	case SharedNodeHasFilterNLabels, SharedNodeHasFilterNTensions, SharedNodeHasFilterNClosedTensions:
+		return true
+	}
+	return false
+}
+
+func (e SharedNodeHasFilter) String() string {
+	return string(e)
+}
+
+func (e *SharedNodeHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SharedNodeHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SharedNodeHasFilter", str)
+	}
+	return nil
+}
+
+func (e SharedNodeHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -2564,6 +3749,85 @@ func (e TensionEvent) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type TensionHasFilter string
+
+const (
+	TensionHasFilterCreatedBy  TensionHasFilter = "createdBy"
+	TensionHasFilterCreatedAt  TensionHasFilter = "createdAt"
+	TensionHasFilterUpdatedAt  TensionHasFilter = "updatedAt"
+	TensionHasFilterMessage    TensionHasFilter = "message"
+	TensionHasFilterEmitterid  TensionHasFilter = "emitterid"
+	TensionHasFilterEmitter    TensionHasFilter = "emitter"
+	TensionHasFilterReceiverid TensionHasFilter = "receiverid"
+	TensionHasFilterReceiver   TensionHasFilter = "receiver"
+	TensionHasFilterNth        TensionHasFilter = "nth"
+	TensionHasFilterTitle      TensionHasFilter = "title"
+	TensionHasFilterType       TensionHasFilter = "type_"
+	TensionHasFilterStatus     TensionHasFilter = "status"
+	TensionHasFilterLabels     TensionHasFilter = "labels"
+	TensionHasFilterAssignees  TensionHasFilter = "assignees"
+	TensionHasFilterComments   TensionHasFilter = "comments"
+	TensionHasFilterAction     TensionHasFilter = "action"
+	TensionHasFilterBlobs      TensionHasFilter = "blobs"
+	TensionHasFilterContracts  TensionHasFilter = "contracts"
+	TensionHasFilterHistory    TensionHasFilter = "history"
+	TensionHasFilterNComments  TensionHasFilter = "n_comments"
+	TensionHasFilterNBlobs     TensionHasFilter = "n_blobs"
+)
+
+var AllTensionHasFilter = []TensionHasFilter{
+	TensionHasFilterCreatedBy,
+	TensionHasFilterCreatedAt,
+	TensionHasFilterUpdatedAt,
+	TensionHasFilterMessage,
+	TensionHasFilterEmitterid,
+	TensionHasFilterEmitter,
+	TensionHasFilterReceiverid,
+	TensionHasFilterReceiver,
+	TensionHasFilterNth,
+	TensionHasFilterTitle,
+	TensionHasFilterType,
+	TensionHasFilterStatus,
+	TensionHasFilterLabels,
+	TensionHasFilterAssignees,
+	TensionHasFilterComments,
+	TensionHasFilterAction,
+	TensionHasFilterBlobs,
+	TensionHasFilterContracts,
+	TensionHasFilterHistory,
+	TensionHasFilterNComments,
+	TensionHasFilterNBlobs,
+}
+
+func (e TensionHasFilter) IsValid() bool {
+	switch e {
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterNth, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterLabels, TensionHasFilterAssignees, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNBlobs:
+		return true
+	}
+	return false
+}
+
+func (e TensionHasFilter) String() string {
+	return string(e)
+}
+
+func (e *TensionHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TensionHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TensionHasFilter", str)
+	}
+	return nil
+}
+
+func (e TensionHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type TensionOrderable string
 
 const (
@@ -2703,6 +3967,75 @@ func (e TensionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type UserHasFilter string
+
+const (
+	UserHasFilterCreatedAt        UserHasFilter = "createdAt"
+	UserHasFilterLastAck          UserHasFilter = "lastAck"
+	UserHasFilterUsername         UserHasFilter = "username"
+	UserHasFilterName             UserHasFilter = "name"
+	UserHasFilterPassword         UserHasFilter = "password"
+	UserHasFilterEmail            UserHasFilter = "email"
+	UserHasFilterEmailHash        UserHasFilter = "emailHash"
+	UserHasFilterEmailValidated   UserHasFilter = "emailValidated"
+	UserHasFilterRights           UserHasFilter = "rights"
+	UserHasFilterRoles            UserHasFilter = "roles"
+	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
+	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
+	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
+	UserHasFilterContracts        UserHasFilter = "contracts"
+	UserHasFilterBio              UserHasFilter = "bio"
+	UserHasFilterUtc              UserHasFilter = "utc"
+)
+
+var AllUserHasFilter = []UserHasFilter{
+	UserHasFilterCreatedAt,
+	UserHasFilterLastAck,
+	UserHasFilterUsername,
+	UserHasFilterName,
+	UserHasFilterPassword,
+	UserHasFilterEmail,
+	UserHasFilterEmailHash,
+	UserHasFilterEmailValidated,
+	UserHasFilterRights,
+	UserHasFilterRoles,
+	UserHasFilterBackedRoles,
+	UserHasFilterTensionsCreated,
+	UserHasFilterTensionsAssigned,
+	UserHasFilterContracts,
+	UserHasFilterBio,
+	UserHasFilterUtc,
+}
+
+func (e UserHasFilter) IsValid() bool {
+	switch e {
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterBio, UserHasFilterUtc:
+		return true
+	}
+	return false
+}
+
+func (e UserHasFilter) String() string {
+	return string(e)
+}
+
+func (e *UserHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserHasFilter", str)
+	}
+	return nil
+}
+
+func (e UserHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type UserOrderable string
 
 const (
@@ -2758,6 +4091,49 @@ func (e UserOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type UserRightsHasFilter string
+
+const (
+	UserRightsHasFilterCanLogin      UserRightsHasFilter = "canLogin"
+	UserRightsHasFilterCanCreateRoot UserRightsHasFilter = "canCreateRoot"
+	UserRightsHasFilterMaxPublicOrga UserRightsHasFilter = "maxPublicOrga"
+)
+
+var AllUserRightsHasFilter = []UserRightsHasFilter{
+	UserRightsHasFilterCanLogin,
+	UserRightsHasFilterCanCreateRoot,
+	UserRightsHasFilterMaxPublicOrga,
+}
+
+func (e UserRightsHasFilter) IsValid() bool {
+	switch e {
+	case UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga:
+		return true
+	}
+	return false
+}
+
+func (e UserRightsHasFilter) String() string {
+	return string(e)
+}
+
+func (e *UserRightsHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserRightsHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserRightsHasFilter", str)
+	}
+	return nil
+}
+
+func (e UserRightsHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type UserRightsOrderable string
 
 const (
@@ -2794,5 +4170,48 @@ func (e *UserRightsOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e UserRightsOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type VoteHasFilter string
+
+const (
+	VoteHasFilterContract VoteHasFilter = "contract"
+	VoteHasFilterNode     VoteHasFilter = "node"
+	VoteHasFilterData     VoteHasFilter = "data"
+)
+
+var AllVoteHasFilter = []VoteHasFilter{
+	VoteHasFilterContract,
+	VoteHasFilterNode,
+	VoteHasFilterData,
+}
+
+func (e VoteHasFilter) IsValid() bool {
+	switch e {
+	case VoteHasFilterContract, VoteHasFilterNode, VoteHasFilterData:
+		return true
+	}
+	return false
+}
+
+func (e VoteHasFilter) String() string {
+	return string(e)
+}
+
+func (e *VoteHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = VoteHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid VoteHasFilter", str)
+	}
+	return nil
+}
+
+func (e VoteHasFilter) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

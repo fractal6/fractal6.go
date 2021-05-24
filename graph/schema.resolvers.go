@@ -10,7 +10,7 @@ import (
 	"zerogov/fractal6.go/graph/model"
 )
 
-func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput) (data *model.AddNodePayload, errors error) {
+func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (data *model.AddNodePayload, errors error) {
 	////ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
 	////errors = r.Gqlgen2DgraphMutationResolver(ctx, input, &data)
 	//errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
@@ -27,6 +27,14 @@ func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilt
 }
 
 func (r *mutationResolver) AddSharedNode(ctx context.Context, input []*model.AddSharedNodeInput) (data *model.AddSharedNodePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateSharedNode(ctx context.Context, input model.UpdateSharedNodeInput) (data *model.UpdateSharedNodePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteSharedNode(ctx context.Context, filter model.SharedNodeFilter) (data *model.DeleteSharedNodePayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -67,6 +75,14 @@ func (r *mutationResolver) DeleteNodeCharac(ctx context.Context, filter model.No
 }
 
 func (r *mutationResolver) AddNodeStats(ctx context.Context, input []*model.AddNodeStatsInput) (data *model.AddNodeStatsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateNodeStats(ctx context.Context, input model.UpdateNodeStatsInput) (data *model.UpdateNodeStatsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteNodeStats(ctx context.Context, filter model.NodeStatsFilter) (data *model.DeleteNodeStatsPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -181,7 +197,7 @@ func (r *mutationResolver) DeleteVote(ctx context.Context, filter model.VoteFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput) (data *model.AddUserPayload, errors error) {
+func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserInput, upsert *bool) (data *model.AddUserPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -197,6 +213,14 @@ func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.Add
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) UpdateUserRights(ctx context.Context, input model.UpdateUserRightsInput) (data *model.UpdateUserRightsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteUserRights(ctx context.Context, filter model.UserRightsFilter) (data *model.DeleteUserRightsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data *model.Node, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
@@ -207,7 +231,15 @@ func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter,
 	return data, errors
 }
 
-func (r *queryResolver) QuerySharedNode(ctx context.Context, order *model.SharedNodeOrder, first *int, offset *int) (data []*model.SharedNode, errors error) {
+func (r *queryResolver) AggregateNode(ctx context.Context, filter *model.NodeFilter) (data *model.NodeAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QuerySharedNode(ctx context.Context, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) (data []*model.SharedNode, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateSharedNode(ctx context.Context, filter *model.SharedNodeFilter) (data *model.SharedNodeAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -219,11 +251,19 @@ func (r *queryResolver) QueryNodeFragment(ctx context.Context, filter *model.Nod
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) AggregateNodeFragment(ctx context.Context, filter *model.NodeFragmentFilter) (data *model.NodeFragmentAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetMandate(ctx context.Context, id string) (data *model.Mandate, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) (data []*model.Mandate, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateMandate(ctx context.Context, filter *model.MandateFilter) (data *model.MandateAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -235,7 +275,15 @@ func (r *queryResolver) QueryNodeCharac(ctx context.Context, filter *model.NodeC
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryNodeStats(ctx context.Context, order *model.NodeStatsOrder, first *int, offset *int) (data []*model.NodeStats, errors error) {
+func (r *queryResolver) AggregateNodeCharac(ctx context.Context, filter *model.NodeCharacFilter) (data *model.NodeCharacAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryNodeStats(ctx context.Context, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) (data []*model.NodeStats, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateNodeStats(ctx context.Context, filter *model.NodeStatsFilter) (data *model.NodeStatsAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -244,6 +292,10 @@ func (r *queryResolver) GetPost(ctx context.Context, id string) (data *model.Pos
 }
 
 func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) (data []*model.Post, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregatePost(ctx context.Context, filter *model.PostFilter) (data *model.PostAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -257,6 +309,10 @@ func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionF
 	return data, errors
 }
 
+func (r *queryResolver) AggregateTension(ctx context.Context, filter *model.TensionFilter) (data *model.TensionAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetLabel(ctx context.Context, id string) (data *model.Label, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -266,11 +322,19 @@ func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilte
 	return data, errors
 }
 
+func (r *queryResolver) AggregateLabel(ctx context.Context, filter *model.LabelFilter) (data *model.LabelAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetComment(ctx context.Context, id string) (data *model.Comment, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) (data []*model.Comment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateComment(ctx context.Context, filter *model.CommentFilter) (data *model.CommentAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -282,6 +346,10 @@ func (r *queryResolver) QueryBlob(ctx context.Context, filter *model.BlobFilter,
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) AggregateBlob(ctx context.Context, filter *model.BlobFilter) (data *model.BlobAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetEvent(ctx context.Context, id string) (data *model.Event, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -290,7 +358,15 @@ func (r *queryResolver) QueryEvent(ctx context.Context, filter *model.EventFilte
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) AggregateEvent(ctx context.Context, filter *model.EventFilter) (data *model.EventAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) QueryEventFragment(ctx context.Context, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) (data []*model.EventFragment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateEventFragment(ctx context.Context, filter *model.EventFragmentFilter) (data *model.EventFragmentAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -303,11 +379,19 @@ func (r *queryResolver) QueryContract(ctx context.Context, filter *model.Contrac
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) AggregateContract(ctx context.Context, filter *model.ContractFilter) (data *model.ContractAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetVote(ctx context.Context, id string) (data *model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) QueryVote(ctx context.Context, filter *model.VoteFilter, first *int, offset *int) (data []*model.Vote, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateVote(ctx context.Context, filter *model.VoteFilter) (data *model.VoteAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -321,7 +405,15 @@ func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter,
 	return data, errors
 }
 
-func (r *queryResolver) QueryUserRights(ctx context.Context, order *model.UserRightsOrder, first *int, offset *int) (data []*model.UserRights, errors error) {
+func (r *queryResolver) AggregateUser(ctx context.Context, filter *model.UserFilter) (data *model.UserAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) (data []*model.UserRights, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateUserRights(ctx context.Context, filter *model.UserRightsFilter) (data *model.UserRightsAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
