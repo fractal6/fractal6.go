@@ -156,13 +156,14 @@ func PushNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitte
     StructMap(node, &nodeInput)
 
     // Fix Automatic fields
-    nodeInput.IsRoot = false
-    nodeInput.IsArchived = false
-    nodeInput.Nameid = nameid
-    nodeInput.Rootnameid = rootnameid
     nodeInput.CreatedAt = Now()
     nodeInput.CreatedBy = &model.UserRef{Username: &uctx.Username}
+    nodeInput.Nameid = nameid
+    nodeInput.Rootnameid = rootnameid
     nodeInput.Parent = &model.NodeRef{Nameid: &parentid}
+    nodeInput.IsRoot = false
+    nodeInput.IsArchived = false
+    nodeInput.Rights = 0
     if bid != nil {
         nodeInput.Source = &model.BlobRef{ ID: bid }
     }
@@ -183,7 +184,7 @@ func PushNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitte
     }
 
     // Push the nodes into the database
-    _, err := db.GetDB().Add("node", nodeInput)
+    _, err := db.GetDB().Add(db.DB.GetRootUctx(), "node", nodeInput)
     if err != nil { return err }
 
     // Change Guest to member if user got its first role.
@@ -197,7 +198,7 @@ func PushNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitte
         for _, child := range(children) {
             // Add the child tension
             tensionInput := makeNewChildTension(uctx, emitterid, nameid, child)
-            tid_c, err := db.GetDB().Add("tension", tensionInput)
+            tid_c, err := db.GetDB().Add(db.DB.GetRootUctx(), "tension", tensionInput)
             if err != nil { return err }
             // Push child
             bid_c := db.GetDB().GetLastBlobId(tid_c)
@@ -246,13 +247,13 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
         //Remove: &delNodePatch, // @debug: omitempty issues
     }
     // Update the node in database
-    err = db.GetDB().Update("node", nodeInput)
+    err = db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
     if err != nil { return err }
 
     rootnameid, _ := codec.Nid2rootid(nameid)
     if len(delMap) > 0 { // delete the node reference
         if firstLink_ != nil {
-            err = webauth.RemoveUserRole(firstLink_.(string), nameid)
+            err = db.GetDB().RemoveUserRole(firstLink_.(string), nameid)
             if err != nil { return err }
             err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
         }
@@ -260,11 +261,10 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
     } else if node.FirstLink != nil  {
         // @debug: if the firstlink user has already this role,
         //         the update is useless
-        err = webauth.AddUserRole(*node.FirstLink, nameid)
-        if err != nil { return err }
-        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
+        err := LinkUser(rootnameid, nameid, *node.FirstLink)
         if err != nil { return err }
         if firstLink_ != nil && firstLink_.(string) != *node.FirstLink {
+            // Someone loose his role here...contract ?
             err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
         }
     }

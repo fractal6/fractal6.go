@@ -4,27 +4,37 @@ import (
     "fmt"
     "context"
 
-    . "zerogov/fractal6.go/tools"
     "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/graph/codec"
     "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
     webauth "zerogov/fractal6.go/web/auth"
+    . "zerogov/fractal6.go/tools"
 )
 
+// User Action Rights Enum
+type AuthValue int
+const (
+    Creating       = 1
+    Reopening      = 1 << 1
+    Closing        = 1 << 2
+    TitleUpdating  = 1 << 3
+    CommentPushing = 1 << 4
+)
+var authEventsLut map[model.TensionEvent]AuthValue
 
 // Authorization Hook enum
 type AuthHookValue int
 const (
-    PassingHook AuthHookValue = 1 // for public event
+    PassingHook AuthHookValue      = 1 // for public event
     // Graph Role based
-    OwnerHook AuthHookValue = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
-    MemberHook AuthHookValue = 1 << 2
+    OwnerHook AuthHookValue        = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
+    MemberHook AuthHookValue       = 1 << 2
     SourceCoordoHook AuthHookValue = 1 << 3
     TargetCoordoHook AuthHookValue = 1 << 4
     // Granted based
-    AuthorHook AuthHookValue = 1 << 5
-    AssigneeHook AuthHookValue = 1 << 6
+    AuthorHook AuthHookValue       = 1 << 5
+    AssigneeHook AuthHookValue     = 1 << 6
 )
 
 type EventMap struct {
@@ -35,6 +45,16 @@ type EventMap struct {
 
 type EventsMap = map[model.TensionEvent]EventMap
 var EMAP EventsMap
+
+func init() {
+    authEventsLut = map[model.TensionEvent]AuthValue{
+        model.TensionEventCreated       : Creating,
+        model.TensionEventReopened      : Reopening,
+        model.TensionEventClosed        : Closing,
+        model.TensionEventTitleUpdated  : TitleUpdating,
+        model.TensionEventCommentPushed : CommentPushing,
+    }
+}
 
 func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
     var err error
@@ -77,6 +97,17 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         }
     }
 
+    // <!> Bot Hook <!>
+    // If emitter is a Bot, check its rights
+    if tension.Emitter.RoleType != nil && model.RoleTypeBot == *tension.Emitter.RoleType &&
+    (tension.Emitter.Rights & int(authEventsLut[*event.EventType])) > 0 {
+        // Can only create tension in the parent circle og the bot.
+        if pid, _ := codec.Nid2pid(tension.Emitter.Nameid); pid == tension.Receiver.Nameid {
+            return true, nil, err
+        } else {
+            return false, nil, fmt.Errorf("The tension receiver only support the following node: %s", pid)
+        }
+    }
 
     // Check the contract authorization
     // --

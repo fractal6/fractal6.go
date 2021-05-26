@@ -228,6 +228,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     canLogin := true
     canCreateRoot := false
     maxPublicOrga := 5
+    userType := model.UserTypeRegular
 
     userInput := model.AddUserInput{
         CreatedAt:      now,
@@ -242,10 +243,11 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,
             MaxPublicOrga: &maxPublicOrga,
+            Type: &userType,
         },
     }
 
-    _, err := db.GetDB().Add("user", userInput)
+    _, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "user", userInput)
     if err != nil {
         return nil, err
     }
@@ -306,30 +308,3 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
     return ok, err
 }
 
-//
-// Private user methods
-//
-
-// AddUserRole add a role to the user roles list
-func AddUserRole(username, nameid string) error {
-    userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
-        Set: &model.UserPatch{
-            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-        },
-    }
-    err := db.GetDB().Update("user", userInput)
-    return err
-}
-
-// RemoveUserRole remove a  role to the user roles list
-func RemoveUserRole(username, nameid string) error {
-    userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
-        Remove: &model.UserPatch{
-            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-        },
-    }
-    err := db.GetDB().Update("user", userInput)
-    return err
-}

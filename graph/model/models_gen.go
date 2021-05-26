@@ -169,6 +169,7 @@ type AddNodeInput struct {
 	IsPrivate    bool           `json:"isPrivate"`
 	IsArchived   bool           `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+	Rights       int            `json:"rights,omitempty"`
 	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
@@ -219,8 +220,8 @@ type AddTensionInput struct {
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
+	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
@@ -260,9 +261,10 @@ type AddUserPayload struct {
 }
 
 type AddUserRightsInput struct {
-	CanLogin      bool `json:"canLogin"`
-	CanCreateRoot bool `json:"canCreateRoot"`
-	MaxPublicOrga int  `json:"maxPublicOrga,omitempty"`
+	CanLogin      bool     `json:"canLogin"`
+	CanCreateRoot bool     `json:"canCreateRoot"`
+	MaxPublicOrga int      `json:"maxPublicOrga,omitempty"`
+	Type          UserType `json:"type_,omitempty"`
 }
 
 type AddUserRightsPayload struct {
@@ -973,6 +975,7 @@ type Node struct {
 	IsPrivate    bool        `json:"isPrivate"`
 	IsArchived   bool        `json:"isArchived"`
 	Charac       *NodeCharac `json:"charac,omitempty"`
+	Rights       int         `json:"rights,omitempty"`
 	Labels       []*Label    `json:"labels,omitempty"`
 	FirstLink    *User       `json:"first_link,omitempty"`
 	SecondLink   *User       `json:"second_link,omitempty"`
@@ -1008,6 +1011,10 @@ type NodeAggregateResult struct {
 	NChildrenMax    *int     `json:"n_childrenMax,omitempty"`
 	NChildrenSum    *int     `json:"n_childrenSum,omitempty"`
 	NChildrenAvg    *float64 `json:"n_childrenAvg,omitempty"`
+	RightsMin       *int     `json:"rightsMin,omitempty"`
+	RightsMax       *int     `json:"rightsMax,omitempty"`
+	RightsSum       *int     `json:"rightsSum,omitempty"`
+	RightsAvg       *float64 `json:"rightsAvg,omitempty"`
 }
 
 type NodeCharac struct {
@@ -1171,6 +1178,7 @@ type NodePatch struct {
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+	Rights       *int           `json:"rights,omitempty"`
 	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
@@ -1206,6 +1214,7 @@ type NodeRef struct {
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
+	Rights       *int           `json:"rights,omitempty"`
 	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
@@ -1465,8 +1474,8 @@ type Tension struct {
 	Title      string         `json:"title,omitempty"`
 	Type       TensionType    `json:"type_,omitempty"`
 	Status     TensionStatus  `json:"status,omitempty"`
-	Labels     []*Label       `json:"labels,omitempty"`
 	Assignees  []*User        `json:"assignees,omitempty"`
+	Labels     []*Label       `json:"labels,omitempty"`
 	Comments   []*Comment     `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*Blob        `json:"blobs,omitempty"`
@@ -1547,8 +1556,8 @@ type TensionPatch struct {
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
+	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
@@ -1572,8 +1581,8 @@ type TensionRef struct {
 	Title      *string        `json:"title,omitempty"`
 	Type       *TensionType   `json:"type_,omitempty"`
 	Status     *TensionStatus `json:"status,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Assignees  []*UserRef     `json:"assignees,omitempty"`
+	Labels     []*LabelRef    `json:"labels,omitempty"`
 	Comments   []*CommentRef  `json:"comments,omitempty"`
 	Action     *TensionAction `json:"action,omitempty"`
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
@@ -1877,9 +1886,10 @@ type UserRef struct {
 }
 
 type UserRights struct {
-	CanLogin      bool `json:"canLogin"`
-	CanCreateRoot bool `json:"canCreateRoot"`
-	MaxPublicOrga int  `json:"maxPublicOrga,omitempty"`
+	CanLogin      bool     `json:"canLogin"`
+	CanCreateRoot bool     `json:"canCreateRoot"`
+	MaxPublicOrga int      `json:"maxPublicOrga,omitempty"`
+	Type          UserType `json:"type_,omitempty"`
 }
 
 type UserRightsAggregateResult struct {
@@ -1904,15 +1914,17 @@ type UserRightsOrder struct {
 }
 
 type UserRightsPatch struct {
-	CanLogin      *bool `json:"canLogin"`
-	CanCreateRoot *bool `json:"canCreateRoot"`
-	MaxPublicOrga *int  `json:"maxPublicOrga,omitempty"`
+	CanLogin      *bool     `json:"canLogin"`
+	CanCreateRoot *bool     `json:"canCreateRoot"`
+	MaxPublicOrga *int      `json:"maxPublicOrga,omitempty"`
+	Type          *UserType `json:"type_,omitempty"`
 }
 
 type UserRightsRef struct {
-	CanLogin      *bool `json:"canLogin"`
-	CanCreateRoot *bool `json:"canCreateRoot"`
-	MaxPublicOrga *int  `json:"maxPublicOrga,omitempty"`
+	CanLogin      *bool     `json:"canLogin"`
+	CanCreateRoot *bool     `json:"canCreateRoot"`
+	MaxPublicOrga *int      `json:"maxPublicOrga,omitempty"`
+	Type          *UserType `json:"type_,omitempty"`
 }
 
 type Vote struct {
@@ -3097,6 +3109,7 @@ const (
 	NodeHasFilterIsPrivate    NodeHasFilter = "isPrivate"
 	NodeHasFilterIsArchived   NodeHasFilter = "isArchived"
 	NodeHasFilterCharac       NodeHasFilter = "charac"
+	NodeHasFilterRights       NodeHasFilter = "rights"
 	NodeHasFilterLabels       NodeHasFilter = "labels"
 	NodeHasFilterFirstLink    NodeHasFilter = "first_link"
 	NodeHasFilterSecondLink   NodeHasFilter = "second_link"
@@ -3131,6 +3144,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterIsPrivate,
 	NodeHasFilterIsArchived,
 	NodeHasFilterCharac,
+	NodeHasFilterRights,
 	NodeHasFilterLabels,
 	NodeHasFilterFirstLink,
 	NodeHasFilterSecondLink,
@@ -3142,7 +3156,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterNTensionsOut, NodeHasFilterNTensionsIn, NodeHasFilterNChildren, NodeHasFilterStats, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterIsPrivate, NodeHasFilterIsArchived, NodeHasFilterCharac, NodeHasFilterLabels, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterShared:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterNTensionsOut, NodeHasFilterNTensionsIn, NodeHasFilterNChildren, NodeHasFilterStats, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterIsPrivate, NodeHasFilterIsArchived, NodeHasFilterCharac, NodeHasFilterRights, NodeHasFilterLabels, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterShared:
 		return true
 	}
 	return false
@@ -3222,6 +3236,7 @@ const (
 	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
 	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
 	NodeOrderableNChildren    NodeOrderable = "n_children"
+	NodeOrderableRights       NodeOrderable = "rights"
 )
 
 var AllNodeOrderable = []NodeOrderable{
@@ -3234,11 +3249,12 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableNTensionsOut,
 	NodeOrderableNTensionsIn,
 	NodeOrderableNChildren,
+	NodeOrderableRights,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableRights:
 		return true
 	}
 	return false
@@ -3695,7 +3711,7 @@ const (
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
-	TensionEventUserJoin        TensionEvent = "UserJoin"
+	TensionEventUserJoined      TensionEvent = "UserJoined"
 	TensionEventUserLeft        TensionEvent = "UserLeft"
 	TensionEventMoved           TensionEvent = "Moved"
 )
@@ -3715,14 +3731,14 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
-	TensionEventUserJoin,
+	TensionEventUserJoined,
 	TensionEventUserLeft,
 	TensionEventMoved,
 }
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoin, TensionEventUserLeft, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMoved:
 		return true
 	}
 	return false
@@ -3764,8 +3780,8 @@ const (
 	TensionHasFilterTitle      TensionHasFilter = "title"
 	TensionHasFilterType       TensionHasFilter = "type_"
 	TensionHasFilterStatus     TensionHasFilter = "status"
-	TensionHasFilterLabels     TensionHasFilter = "labels"
 	TensionHasFilterAssignees  TensionHasFilter = "assignees"
+	TensionHasFilterLabels     TensionHasFilter = "labels"
 	TensionHasFilterComments   TensionHasFilter = "comments"
 	TensionHasFilterAction     TensionHasFilter = "action"
 	TensionHasFilterBlobs      TensionHasFilter = "blobs"
@@ -3788,8 +3804,8 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterTitle,
 	TensionHasFilterType,
 	TensionHasFilterStatus,
-	TensionHasFilterLabels,
 	TensionHasFilterAssignees,
+	TensionHasFilterLabels,
 	TensionHasFilterComments,
 	TensionHasFilterAction,
 	TensionHasFilterBlobs,
@@ -3801,7 +3817,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterNth, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterLabels, TensionHasFilterAssignees, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNBlobs:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterNth, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNBlobs:
 		return true
 	}
 	return false
@@ -4097,17 +4113,19 @@ const (
 	UserRightsHasFilterCanLogin      UserRightsHasFilter = "canLogin"
 	UserRightsHasFilterCanCreateRoot UserRightsHasFilter = "canCreateRoot"
 	UserRightsHasFilterMaxPublicOrga UserRightsHasFilter = "maxPublicOrga"
+	UserRightsHasFilterType          UserRightsHasFilter = "type_"
 )
 
 var AllUserRightsHasFilter = []UserRightsHasFilter{
 	UserRightsHasFilterCanLogin,
 	UserRightsHasFilterCanCreateRoot,
 	UserRightsHasFilterMaxPublicOrga,
+	UserRightsHasFilterType,
 }
 
 func (e UserRightsHasFilter) IsValid() bool {
 	switch e {
-	case UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga:
+	case UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga, UserRightsHasFilterType:
 		return true
 	}
 	return false
@@ -4170,6 +4188,47 @@ func (e *UserRightsOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e UserRightsOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserType string
+
+const (
+	UserTypeRegular UserType = "Regular"
+	UserTypeRoot    UserType = "Root"
+)
+
+var AllUserType = []UserType{
+	UserTypeRegular,
+	UserTypeRoot,
+}
+
+func (e UserType) IsValid() bool {
+	switch e {
+	case UserTypeRegular, UserTypeRoot:
+		return true
+	}
+	return false
+}
+
+func (e UserType) String() string {
+	return string(e)
+}
+
+func (e *UserType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserType", str)
+	}
+	return nil
+}
+
+func (e UserType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

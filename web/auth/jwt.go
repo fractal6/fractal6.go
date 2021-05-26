@@ -9,12 +9,13 @@ import (
     "encoding/json"
     "net/http"
     //"github.com/mitchellh/mapstructure"
-    jwt "github.com/dgrijalva/jwt-go"
 
     . "zerogov/fractal6.go/tools"
-    "zerogov/fractal6.go/web/middleware/jwtauth"
 	"zerogov/fractal6.go/graph/model"
 	"zerogov/fractal6.go/db"
+
+    "zerogov/fractal6.go/web/middleware/jwtauth"
+    jwt "github.com/dgrijalva/jwt-go"
 )
 
 var tkMaster *Jwt
@@ -50,7 +51,7 @@ func (Jwt) New() *Jwt {
     roleType := model.RoleTypeCoordinator
     uctx := model.UserCtx{
         Username: "yoda",
-        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true},
+        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
         Roles: []*model.Node{
             {Rootnameid:"sku", Nameid:"sku", RoleType:&roleType},
         },
@@ -69,8 +70,8 @@ func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
     claims := jwt.MapClaims{ tk.tokenClaim: d }
     jwtauth.SetIssuedNow(claims)
     jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
-	_, tokenString, err := tk.tokenAuth.Encode(claims)
-	return Pack64(tokenString), err
+	_, token, err := tk.tokenAuth.Encode(claims)
+	return Pack64(token), err
 }
 
 //
@@ -96,7 +97,7 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
 
 // NexuserCookie create an http cookie that embed a token
 func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
-    tokenString, err := NewUserToken(userCtx)
+    token, err := NewUserToken(userCtx)
     if err != nil {
         return nil, err
     }
@@ -104,7 +105,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
     if buildMode == "PROD" {
         httpCookie = http.Cookie{
             Name: "jwt",
-            Value: tokenString,
+            Value: token,
             Path: "/",
             HttpOnly: true,
             Secure: true,
@@ -115,7 +116,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
     } else {
         httpCookie = http.Cookie{
             Name: "jwt",
-            Value: tokenString,
+            Value: token,
             Path: "/",
             Secure: false,
             SameSite: 2,

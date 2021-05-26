@@ -2,7 +2,6 @@ package middleware
 
 import (
     "net/http"
-
     "zerogov/fractal6.go/web/auth"
 )
 

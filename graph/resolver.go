@@ -53,6 +53,7 @@ func Init() gen.Config {
     c.Directives.Id = nothing
     c.Directives.HasInverse = nothing2
     c.Directives.Search = nothing3
+    c.Directives.Auth = nothing4
 
     //
     // Query
@@ -155,6 +156,10 @@ func nothing2(ctx context.Context, obj interface{}, next graphql.Resolver, key s
 }
 
 func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx []model.DgraphIndex) (interface{}, error) {
+    return next(ctx)
+}
+
+func nothing4(ctx context.Context, obj interface {}, next graphql.Resolver, idx *model.AuthRule, r1 *model.AuthRule, r2 *model.AuthRule, r3 *model.AuthRule, r4 *model.AuthRule) (interface{}, error) {
     return next(ctx)
 }
 

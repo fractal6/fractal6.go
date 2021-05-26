@@ -8,9 +8,13 @@ import (
 	"strings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"zerogov/fractal6.go/tools"
+	jwt "github.com/dgrijalva/jwt-go"
 )
+
+//
+// Part of this code inspired from https://github.com/go-chi/jwtauth/blob/master/jwtauth.go
+//
 
 // Context keys
 var (
@@ -267,9 +271,7 @@ func SetExpiryIn(claims jwt.MapClaims, tm time.Duration) {
 // "jwt".
 func TokenFromCookie(r *http.Request) string {
 	cookie, err := r.Cookie("jwt")
-	if err != nil {
-		return ""
-	}
+	if err != nil { return "" }
     // Compress and encode string
     return tools.Unpack64(cookie.Value)
 }

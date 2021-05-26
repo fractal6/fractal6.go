@@ -55,6 +55,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
         IsPersonal: &isPersonal,
         IsPrivate: false,
         IsArchived: false,
+        Rights: 0,
         Charac: &model.NodeCharacRef{ UserCanJoin: &userCanJoin, Mode: &mode },
         // Common
         CreatedAt: Now(),
@@ -76,12 +77,12 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     owner.Mandate = nil
     nodeInput.Children = []*model.NodeRef{&owner}
     // Gql mutation
-    _, err = db.GetDB().Add("node", nodeInput)
+    _, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Add the root control tension
     tensionInput := graph.MakeNewRootTension(uctx, nameid, nodeInput)
-    tid, err := db.GetDB().Add("tension", tensionInput)
+    tid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "tension", tensionInput)
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Links the source tension
@@ -90,7 +91,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Add the Owner role to the user
-    err = auth.AddUserRole(uctx.Username, nidOwner)
+    err = db.GetDB().AddUserRole(uctx.Username, nidOwner)
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // return result on success
@@ -98,14 +99,3 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     w.Write(data)
 }
 
-// AddUserRole add a role to the user roles list
-func AddUserRole(username, nameid string) error {
-    userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
-        Set: &model.UserPatch{
-            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-        },
-    }
-    err := db.GetDB().Update("user", userInput)
-    return err
-}

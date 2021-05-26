@@ -7,13 +7,13 @@ import (
     "zerogov/fractal6.go/graph/codec"
     "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
-    webauth "zerogov/fractal6.go/web/auth"
     //"zerogov/fractal6.go/text/en"
+    //webauth "zerogov/fractal6.go/web/auth"
     //. "zerogov/fractal6.go/tools"
 )
 
 func LinkUser(rootnameid, nameid, firstLink string) error {
-    err := webauth.AddUserRole(firstLink, nameid)
+    err := db.GetDB().AddUserRole(firstLink, nameid)
     if err != nil { return err }
 
     err = maybeUpdateMembership(rootnameid, firstLink, model.RoleTypeMember)
@@ -23,7 +23,7 @@ func LinkUser(rootnameid, nameid, firstLink string) error {
 }
 
 func UnlinkUser(rootnameid, nameid, firstLink string) error {
-    err := webauth.RemoveUserRole(firstLink, nameid)
+    err := db.GetDB().RemoveUserRole(firstLink, nameid)
     if err != nil { return err }
 
     err = maybeUpdateMembership(rootnameid, firstLink, model.RoleTypeGuest)

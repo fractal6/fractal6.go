@@ -64,7 +64,7 @@ func init() {
             Auth: PassingHook,
             Action: UserLeave,
         },
-        model.TensionEventUserJoin: EventMap{
+        model.TensionEventUserJoined: EventMap{
             // @FIXFEAT: Either Check Receiver.NodeCharac or contract value to check that user has been invited !
             Auth: PassingHook,
             Action: UserJoin,
@@ -351,7 +351,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
         }
 
         // update node
-        err = db.GetDB().Update("node", nodeInput)
+        err = db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
         if err != nil { return false, err }
 
         // DQL mutation (extra node update)
@@ -371,7 +371,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
     }
 
     // update tension
-    err = db.GetDB().Update("tension", tensionInput)
+    err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
     return true, err
 }
 

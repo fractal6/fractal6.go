@@ -3,6 +3,7 @@ package db
 import (
     "fmt"
     "log"
+    "time"
     "bytes"
     "strings"
     "context"
@@ -19,6 +20,9 @@ import (
 
     "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/tools"
+
+    "zerogov/fractal6.go/web/middleware/jwtauth"
+    jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Draph database clients
@@ -27,16 +31,19 @@ type Dgraph struct {
     gqlUrl string
     grpcUrl string
 
-    // Auth token
-    gqlToken string
-
     // HTTP/Graphql and GPRC/DQL client template
     gqlTemplates map[string]*QueryString
     dqlTemplates map[string]*QueryString
 }
 
+type DgraphClaims struct {
+    Username string         `json:"USERNAME"`
+    UserType model.UserType `json:"USERTYPE"`
+    Rootids []string        `json:"ROOTIDS"`
+}
+
 //
-// GRPC/Graphql+- response
+// GRPC/Graphql+-(DQL) response
 //
 
 type DqlResp struct {
@@ -118,20 +125,18 @@ func initDB() *Dgraph {
         fmt.Println("Dgraph Grpc addr:", grpcUrl)
     }
 
-    gqlToken := ""
-
     // HTTP/Graphql Request Template
     gqlQueries := map[string]string{
         // QUERIES
+        "rawQuery": `{
+            "query": "{{.RawQuery}}"
+        }`,
         "query": `{
             "query": "query {{.Args}} {{.QueryName}} {
                 {{.QueryName}} {
                     {{.QueryGraph}}
                 }
             }"
-        }`,
-        "rawQuery": `{
-            "query": "{{.RawQuery}}"
         }`,
 
         // MUTATIONS
@@ -183,7 +188,6 @@ func initDB() *Dgraph {
     return &Dgraph{
         gqlUrl: dgraphApiUrl,
         grpcUrl: grpcUrl,
-        gqlToken: gqlToken,
         dqlTemplates: dqlT,
         gqlTemplates: gqlT,
     }
@@ -245,19 +249,48 @@ func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
     return
 }
 
+func (dg Dgraph) GetRootUctx() model.UserCtx {
+    return model.UserCtx{
+        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
+    }
+}
+
+func (dg Dgraph) buildGqlToken(uctx model.UserCtx) string {
+    // Build claims
+    var rootids []string
+    for _, r := range uctx.Roles {
+        rootids = append(rootids, r.Rootnameid)
+    }
+    dgClaims := DgraphClaims{
+        Username: uctx.Username,
+        Rootids: rootids,
+        UserType: uctx.Rights.Type,
+    }
+    claims := jwt.MapClaims{
+        "https://fractale.co/jwt/claims": dgClaims,
+    }
+    jwtauth.SetIssuedNow(claims)
+    jwtauth.SetExpiry(claims, time.Now().UTC().Add(time.Minute*10))
+
+    // Create token
+    tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
+    _, token, err := tkm.Encode(claims)
+    if err != nil { panic("Dgraph JWT error: " + err.Error()) }
+    return token
+}
+
 // Post send a post request to the Graphql client.
-func (dg Dgraph) postql(data []byte, res interface{}) error {
+func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res interface{}) error {
     req, err := http.NewRequest("POST", dg.gqlUrl, bytes.NewBuffer(data))
     req.Header.Set("Content-Type", "application/json")
 
     // Set dgraph token
-    req.Header.Set("X-FRAC6-AUTH", dg.gqlToken)
+    gqlToken := dg.buildGqlToken(uctx)
+    req.Header.Set("X-Frac6-Auth", gqlToken)
 
     client := &http.Client{}
     resp, err := client.Do(req)
-    if err != nil {
-        return err
-    }
+    if err != nil { return err }
     defer resp.Body.Close()
 
     return json.NewDecoder(resp.Body).Decode(res)
@@ -427,7 +460,7 @@ func (dg Dgraph) ClearEdges(key string, value string, delMap map[string]interfac
 
 // QueryGql query the Dgraph Graphql endpoint by following a http request.
 // It map the result in to given data structure
-func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{}) error {
+func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]string, data interface{}) error {
     // Get the query
     queryName := reqInput["QueryName"]
     q := dg.getGqlQuery(op, reqInput)
@@ -435,7 +468,7 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
     // Send the dgraph request and follow the results
     res := &GqlRes{}
     //fmt.Println("request ->", string(q))
-    err := dg.postql([]byte(q), res)
+    err := dg.postql(uctx, []byte(q), res)
     //fmt.Println("response ->", res)
     if err != nil {
         return err
@@ -484,7 +517,7 @@ func (dg Dgraph) QueryGql(op string, reqInput map[string]string, data interface{
 //
 
 // Add a new vertex
-func (dg Dgraph) Add(vertex string, input interface{}) (string, error) {
+func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (string, error) {
     Vertex := strings.Title(vertex)
     queryName := "add" + Vertex
     inputType := "Add" + Vertex + "Input"
@@ -505,7 +538,7 @@ func (dg Dgraph) Add(vertex string, input interface{}) (string, error) {
 
     // Send request
     payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql("add", reqInput, payload)
+    err := dg.QueryGql(uctx, "add", reqInput, payload)
     if err != nil { return "", err }
     // Extract id result
     res := payload[queryName].(model.JsonAtom)[vertex].([]interface{})[0].(model.JsonAtom)["id"]
@@ -513,7 +546,7 @@ func (dg Dgraph) Add(vertex string, input interface{}) (string, error) {
 }
 
 // Update a vertex
-func (dg Dgraph) Update(vertex string, input interface{}) error {
+func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input interface{}) error {
     Vertex := strings.Title(vertex)
     queryName := "update" + Vertex
     inputType := "Update" + Vertex + "Input"
@@ -532,12 +565,12 @@ func (dg Dgraph) Update(vertex string, input interface{}) error {
 
     // Send request
     payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql("update", reqInput, payload)
+    err := dg.QueryGql(uctx, "update", reqInput, payload)
     return err
 }
 
 // Delete a vertex
-func (dg Dgraph) Delete(vertex string, input interface{}) error {
+func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) error {
     Vertex := strings.Title(vertex)
     queryName := "delete" + Vertex
     inputType :=  Vertex + "Filter"
@@ -556,8 +589,34 @@ func (dg Dgraph) Delete(vertex string, input interface{}) error {
 
     // Send request
     payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql("delete", reqInput, payload)
+    err := dg.QueryGql(uctx, "delete", reqInput, payload)
     return err
 }
 
+//
+// Private User methods
+//
 
+// AddUserRole add a role to the user roles list
+func (dg Dgraph) AddUserRole(username, nameid string) error {
+    userInput := model.UpdateUserInput{
+        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
+        Set: &model.UserPatch{
+            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
+        },
+    }
+    err := dg.Update(dg.GetRootUctx(), "user", userInput)
+    return err
+}
+
+// RemoveUserRole remove a  role to the user roles list
+func (dg Dgraph) RemoveUserRole(username, nameid string) error {
+    userInput := model.UpdateUserInput{
+        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
+        Remove: &model.UserPatch{
+            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
+        },
+    }
+    err := dg.Update(dg.GetRootUctx(), "user", userInput)
+    return err
+}
