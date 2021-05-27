@@ -61,6 +61,19 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
     var hookEnabled bool = !(em.Validation == model.ContractTypeAnyCoordoDual && GetBlob(tension) != nil )
     // Check Hook authorization
     // --
+
+    // <!> Bot Hook <!>
+    // If emitter is a Bot, check its rights
+    if tension.Emitter.RoleType != nil && model.RoleTypeBot == *tension.Emitter.RoleType &&
+    (tension.Emitter.Rights & int(authEventsLut[*event.EventType])) > 0 {
+        // Can only create tension in the parent circle og the bot.
+        if pid, _ := codec.Nid2pid(tension.Emitter.Nameid); pid == tension.Receiver.Nameid {
+            return true, nil, err
+        } else {
+            return false, nil, fmt.Errorf("The tension receiver only support the following node: %s", pid)
+        }
+    }
+
     if AuthorHook & em.Auth == 1 && hookEnabled {
         // isAuthorCheck: Check if the user is the creator of the ressource
         if uctx.Username == tension.CreatedBy.Username {
@@ -94,18 +107,6 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
             if a.(string) == uctx.Username {
                 return true, nil, err
             }
-        }
-    }
-
-    // <!> Bot Hook <!>
-    // If emitter is a Bot, check its rights
-    if tension.Emitter.RoleType != nil && model.RoleTypeBot == *tension.Emitter.RoleType &&
-    (tension.Emitter.Rights & int(authEventsLut[*event.EventType])) > 0 {
-        // Can only create tension in the parent circle og the bot.
-        if pid, _ := codec.Nid2pid(tension.Emitter.Nameid); pid == tension.Receiver.Nameid {
-            return true, nil, err
-        } else {
-            return false, nil, fmt.Errorf("The tension receiver only support the following node: %s", pid)
         }
     }
 

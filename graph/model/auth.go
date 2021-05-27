@@ -16,7 +16,7 @@ type UserCtx struct {
     // limit the DB hit by keeping nodes checked for iat
     // number of time the userctx iat is checked
     Iat            string
-    CheckedNameid  []string
+    CheckedNameid  []string // keep the nameid checked for context session to limit the db requests.
     Hit            int
 }
 

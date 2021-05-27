@@ -129,7 +129,8 @@ func initDB() *Dgraph {
     gqlQueries := map[string]string{
         // QUERIES
         "rawQuery": `{
-            "query": "{{.RawQuery}}"
+            "query": "{{.RawQuery}}",
+            "variables": {{.Variables}}
         }`,
         "query": `{
             "query": "query {{.Args}} {{.QueryName}} {
@@ -255,7 +256,7 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
     }
 }
 
-func (dg Dgraph) buildGqlToken(uctx model.UserCtx) string {
+func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
     // Build claims
     var rootids []string
     for _, r := range uctx.Roles {
@@ -285,7 +286,7 @@ func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res interface{}) error 
     req.Header.Set("Content-Type", "application/json")
 
     // Set dgraph token
-    gqlToken := dg.buildGqlToken(uctx)
+    gqlToken := dg.BuildGqlToken(uctx)
     req.Header.Set("X-Frac6-Auth", gqlToken)
 
     client := &http.Client{}
@@ -299,7 +300,6 @@ func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res interface{}) error 
 //
 // DQL (ex GraphQL+-) Interface
 //
-
 
 // QueryDql runs a query on dgraph (...QueryDql)
 func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, error) {

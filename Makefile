@@ -62,3 +62,8 @@ $(LANGS):
 	wildq -M -i toml -o json '.[] | {name:.name, tasks:.tasks[]|flatten }' ../doc/doc.$@.toml > data/quickdoc.$@.json_
 	jq -s "." data/quickdoc.$@.json_ > data/quickdoc.$@.json
 	rm -f data/quickdoc.$@.json_
+
+# Utils
+
+show_query:
+	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort

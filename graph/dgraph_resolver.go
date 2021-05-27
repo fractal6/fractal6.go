@@ -42,10 +42,14 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     // rc.Field.Name
     queryName := rc.Path().String()
 
+
     // Build the graphql raw request
+    gc := graphql.GetRequestContext(ctx)
+    variables, _ := json.Marshal(gc.Variables)
     reqInput := map[string]string{
         "QueryName": queryName,
-        "RawQuery": tools.QuoteString(graphql.GetRequestContext(ctx).RawQuery),
+        "RawQuery": tools.QuoteString(gc.RawQuery),
+        "Variables": string(variables),
     }
 
     // Send request

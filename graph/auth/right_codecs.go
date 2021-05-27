@@ -1,7 +1,7 @@
 package auth
 
 import (
-    //"fmt"
+    "fmt"
     "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/graph/codec"
     webauth "zerogov/fractal6.go/web/auth"
@@ -29,6 +29,7 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
 
     for i, ur := range uctx.Roles {
         if ur.Nameid == nameid  {
+            fmt.Println(ur)
             return i
         }
     }

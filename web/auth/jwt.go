@@ -1,8 +1,7 @@
 package auth
 
 import (
-    //"fmt"
-    "log"
+    "fmt"
     "time"
     "errors"
     "context"
@@ -42,22 +41,28 @@ type Jwt struct {
 
 // New create a token auth master
 func (Jwt) New() *Jwt {
+    // @DEBUG / secret !
     secret := "frctl6"
 	tk := &Jwt{
         tokenClaim: "user_ctx",
         tokenClaimErr: "user_ctx_err",
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
 	}
-    roleType := model.RoleTypeCoordinator
+    roleType := model.RoleTypeOwner
     uctx := model.UserCtx{
-        Username: "yoda",
+        Username: "dtrckd",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
         Roles: []*model.Node{
-            {Rootnameid:"sku", Nameid:"sku", RoleType:&roleType},
+            {Rootnameid:"f6", Nameid:"f6", RoleType:&roleType},
         },
     }
-    token, _ := tk.issue(uctx, time.Hour*72)
-	log.Println("DEBUG JWT:", Unpack64(token))
+
+    apiToken, _ := tk.issue(uctx, time.Hour*1)
+    dgraphToken := db.GetDB().BuildGqlToken(uctx)
+
+	fmt.Println("Api token:", Unpack64(apiToken))
+	fmt.Println("Dgraph token:", dgraphToken)
+
 	return tk
 }
 

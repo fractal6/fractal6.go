@@ -65,14 +65,17 @@ func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resol
     // Get Input
     data, err := next(ctx)
     if err != nil { return nil, err }
+    if data.(*model.AddTensionPayload) == nil {
+        return nil, LogErr("add tension", fmt.Errorf("no tension added."))
+    }
 
     // Validate input
-    rc := graphql.GetResolverContext(ctx)
-    input := rc.Args["input"].([]*model.AddTensionInput)[0]
     tid := data.(*model.AddTensionPayload).Tension[0].ID
     if tid == "" {
         return nil, LogErr("field missing", fmt.Errorf("id field is required in tension payload"))
     }
+    rc := graphql.GetResolverContext(ctx)
+    input := rc.Args["input"].([]*model.AddTensionInput)[0]
 
     // Validate and process Blob Event
     ok, _,  err := tensionEventHook(uctx, tid, input.History, nil)
@@ -106,7 +109,7 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
     var bid *string
     var contract *model.Contract
     var ok bool
-    if input.Set != nil  {
+    if input.Set != nil {
         if len(input.Set.Blobs) > 0 {
             bid = input.Set.Blobs[0].ID
         }
@@ -125,7 +128,7 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
         }
     }
 
-    return next(ctx)
+    return nil, LogErr("Access denied", fmt.Errorf("Input remove not implemented."))
 }
 
 ////////////////////////////////////////////////

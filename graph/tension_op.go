@@ -12,6 +12,7 @@ import (
 
 
 func init() {
+    // @DEBUG: MemberHook is redundant with @auth schema rulme.
     EMAP = EventsMap{
         model.TensionEventCreated: EventMap{
             Auth: MemberHook,
@@ -86,6 +87,10 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     var trace bool
     var tension *model.Tension
     var contract *model.Contract
+    if events == nil {
+        return false, nil, LogErr("Access denied", fmt.Errorf("No event given."))
+    }
+
     for _, event := range(events) {
         em, hasEvent := EMAP[*event.EventType]
         if hasEvent { // Process the special event
@@ -111,6 +116,7 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 
            } else {
                // Minimum level of authorization
+               return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
            }
     }
 
