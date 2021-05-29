@@ -48,7 +48,7 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
     if len(label.Nodes) != 1 { return nil, LogErr("Input error", fmt.Errorf("One and only one circle is required.")) }
     nid := label.Nodes[0].Nameid
     charac := GetNodeCharacStrict()
-    ok, err := CheckUserRights(uctx, *nid, &charac)
+    ok, err := HasCoordoRole(uctx, *nid, &charac)
     if err != nil { return nil, LogErr("Internal error", err) }
     if ok {
         return data, err
@@ -98,7 +98,7 @@ func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver
         // Similar than AddLabel
         if len(input.Set.Nodes) != 1 { return nil, LogErr("Input error", fmt.Errorf("One circle required.")) }
         nid := input.Set.Nodes[0].Nameid
-        ok, err := CheckUserRights(uctx, *nid, &charac)
+        ok, err := HasCoordoRole(uctx, *nid, &charac)
         if err != nil { return nil, LogErr("Internal error", err) }
         if ok {
             return data, err
@@ -110,15 +110,15 @@ func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver
 
     // Update label
     for _, nid := range nodes.([]interface{}) {
-        ok, err := CheckUserRights(uctx, nid.(string), &charac)
+        ok, err := HasCoordoRole(uctx, nid.(string), &charac)
         if err != nil { return nil, LogErr("Internal error", err) }
         if ok {
             if obj.(model.JsonAtom)["input"].(model.JsonAtom)["remove"] != nil {
                 // user is removing node
                 fmt.Println("remove label here !!! check if removed from tension")
             }
-            //return data, err
-            return next(ctx)
+            return data, err
+            //return next(ctx)
         }
     }
 

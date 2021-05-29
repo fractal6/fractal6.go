@@ -15,12 +15,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add auth rules for bot roles
 
 ### Changed
-- Rename UserJoin event to UserJoined
+- [schema] Rename UserJoin event to UserJoined
 
 ### Fixed
-- gqlast.py gram/graphql.ebnf to handle new directives (@auth and @custom).
-- Bot authoration: can now only create tension in the parent circle of the bot.
-- add level of authoriszation and hook based on tension events (see tensionPostHook)
-- go api now handle graphql variables in queries
-- improve and strenghen the query authorization for Node Post and Tension through @auth directive and resolver hooks.
-
+- [gqlast.py] gram/graphql.ebnf to handle new directives (@auth and @custom).
+- [auth] Bot role type can now only create tension in the parent circle of the bot.
+- [auth] add level of authorization and hook based on tension events (see tensionPostHook)
+- [auth]improve and strenghen the query authorization for Node Post and Tension through @auth directive and resolver hooks.
+- [api] go api now handle graphql variables in queries
+- [api] private organisation can now create they label (the one with the "@" in the url (nameid)). Quote was missing inside the DQL eq filter.
+- [api] int type in schema are not set with omitempty anymore to prevent losing 0 value (aka false value for bool types). Prior to follow request to the backend, Null value are filtered out after Marshall operation, prior 
+- [schema/resolver] directive operating on input object (add/alter/patch) don't need the name of the field anymore in schema.
+- [resolver] @unique directive know work on all types.

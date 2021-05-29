@@ -183,7 +183,7 @@ func deleteContractHookPost(ctx context.Context, obj interface{}, next graphql.R
     }
 
     // Deep delete
-    err = db.GetDB().DeepDelete("contract", ids[0], )
+    err = db.GetDB().DeepDelete("contract", ids[0])
     if err != nil { return nil, LogErr("Delete contract error", err) }
 
     var d model.DeleteContractPayload

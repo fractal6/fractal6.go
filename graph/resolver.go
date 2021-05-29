@@ -6,19 +6,20 @@
 package graph
 
 import (
-    "fmt"
-    "context"
-    "reflect"
-    "strings"
-    "github.com/99designs/gqlgen/graphql"
+	"context"
+	"fmt"
+	"reflect"
+	"strings"
 
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/graph/codec"
-    "zerogov/fractal6.go/graph/auth"
-    "zerogov/fractal6.go/db"
-    . "zerogov/fractal6.go/tools"
-    webauth "zerogov/fractal6.go/web/auth"
-    gen "zerogov/fractal6.go/graph/generated"
+	"github.com/99designs/gqlgen/graphql"
+
+	"zerogov/fractal6.go/db"
+	"zerogov/fractal6.go/graph/auth"
+	"zerogov/fractal6.go/graph/codec"
+	gen "zerogov/fractal6.go/graph/generated"
+	"zerogov/fractal6.go/graph/model"
+	. "zerogov/fractal6.go/tools"
+	webauth "zerogov/fractal6.go/web/auth"
 )
 
 //
@@ -64,9 +65,6 @@ func Init() gen.Config {
     c.Directives.Count = count
     c.Directives.Meta_getNodeStats = getNodeStats
 
-    // Objects directives
-    c.Directives.HidePrivate = hidePrivate
-
     //
     // Mutation
     //
@@ -81,6 +79,7 @@ func Init() gen.Config {
 
     // Add, Update and Remove inputs directives
     c.Directives.Alter_unique = unique
+    c.Directives.Alter_oneByOne = oneByOne
     c.Directives.Alter_toLower = toLower
     c.Directives.Alter_minLength = inputMinLength
     c.Directives.Alter_maxLength = inputMaxLength
@@ -163,141 +162,17 @@ func nothing4(ctx context.Context, obj interface {}, next graphql.Resolver, idx 
     return next(ctx)
 }
 
+
+// To document. Api to access to input query:
+//  rc := graphql.GetResolverContext(ctx)
+//  rqc := graphql.GetRequestContext(ctx)
+//  cfc := graphql.CollectFieldsCtx(ctx, nil)
+//  fc := graphql.GetFieldContext(ctx)
+//  pc := graphql.GetPathContext(ctx) // .*.Field to get the field name
+
 //
 // Query
 //
-
-func hidePrivate(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Check that isPrivate is present in payload
-    var fok, yes bool
-    var nameid string
-    var tid string
-    var isPrivate bool = true
-    var err error
-
-    data, err := next(ctx)
-    if obj == nil {
-        switch v := data.(type) {
-
-        // Get Node
-        case *model.Node:
-            if v == nil { break }
-            // Check fields
-            for _, f := range GetPreloads(ctx) { if f == "isPrivate" {fok = true; break } }
-            if !fok {
-                // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required."))
-            }
-            var nameid string
-            if v.Nameid != "" {
-                nameid = v.Nameid
-            } else if rc := graphql.GetResolverContext(ctx); rc.Args["nameid"] != nil {
-                nameid = *(rc.Args["nameid"].(*string))
-            }
-            // Validate
-            isPrivate = v.IsPrivate
-            yes, err = isHidePrivate(ctx, nameid, isPrivate)
-            if err != nil { return nil, err }
-
-        // Query Nodes
-        case []*model.Node:
-            // Check fields
-            for _, f := range GetPreloads(ctx) { if f == "isPrivate" {fok = true; break } }
-            if !fok {
-                // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`isPrivate' field is required."))
-            }
-            // Validate
-            for _, node := range(v) {
-                nameid = node.Nameid
-                isPrivate = node.IsPrivate
-                yes, err = isHidePrivate(ctx, nameid, isPrivate)
-                if err != nil { return nil, err }
-                if yes { break }
-            }
-
-        // Get Tension
-        case *model.Tension:
-            var startField bool
-            var inField bool
-            if v == nil { break }
-            // Check fields
-            for _, f := range GetPreloads(ctx) {
-                if f == "receiver" { startField = true }
-                if startField && string(f[0]) == "{" { inField = true } // ignore filter etc...
-                if inField && f == "isPrivate" { fok = true; break}
-                if inField && string(f[0]) == "}"  { inField = false }
-            }
-            if !fok {
-                // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`receiver.isPrivate' field is required."))
-            }
-            // validate
-            nameid = v.Receiver.Nameid
-            isPrivate = v.Receiver.IsPrivate
-            yes, err = isHidePrivate(ctx, nameid, isPrivate)
-            if err != nil { return nil, err }
-
-        // Query Tensions
-        case []*model.Tension:
-            var startField bool
-            var inField bool
-            // Check fields
-            for _, f := range GetPreloads(ctx) {
-                if f == "receiver" { startField = true }
-                if startField && string(f[0]) == "{" { inField = true } // ignore filter etc...
-                if inField && f == "isPrivate" { fok = true; break}
-                if inField && string(f[0]) == "}"  { inField = false }
-            }
-            if !fok {
-                // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`receiver.isPrivate' field is required."))
-            }
-            for _, t := range(v) {
-                // validate
-                nameid = t.Receiver.Nameid
-                isPrivate = t.Receiver.IsPrivate
-                yes, err = isHidePrivate(ctx, nameid, isPrivate)
-                if err != nil { return nil, err }
-                if yes { break }
-            }
-
-        // Get Contract
-        case *model.Contract:
-            var startField bool
-            var inField bool
-            if v == nil { break }
-            // Check fields
-            for _, f := range GetPreloads(ctx) {
-                if f == "tension" { startField = true }
-                if startField && string(f[0]) == "{" { inField = true } // ignore filter etc...
-                if inField && f == "id" { fok = true; break}
-                if inField && string(f[0]) == "}"  { inField = false }
-            }
-            if !fok {
-                // @debug: Query the database if field is not present and print a warning.
-                return nil, LogErr("Access denied", fmt.Errorf("`tension.id' field is required."))
-            }
-            // validate
-            tid = v.Tension.ID
-            nameid_, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.nameid")
-            isPrivate_, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.isPrivate")
-            if err != nil { return nil, err }
-            yes, err = isHidePrivate(ctx, nameid_.(string), isPrivate_.(bool))
-            if err != nil { return nil, err }
-
-        default:
-            panic("@isPrivate: node type unknonwn: " + fmt.Sprintf("%T", v))
-        }
-    }
-
-    if yes {
-        // retry with refresh token
-        return nil, LogErr("Access denied", fmt.Errorf("private node"))
-    }
-
-    return data, err
-}
 
 func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
@@ -356,7 +231,7 @@ func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (
 //
 
 // Check uniqueness (@DEBUG follow @unique dgraph field iplementation)
-func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field string, subfield *string) (interface{}, error) {
+func unique(ctx context.Context, obj interface{}, next graphql.Resolver, subfield *string) (interface{}, error) {
     data, err := next(ctx)
     var v string
     switch d := data.(type) {
@@ -365,11 +240,12 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field s
     case string:
         v = d
     }
-    // @Debug: Suport only Label right now .
-    // (@debug: get the type asked automatically (with (get|query)Hook ?)
-    t := "Label"
-    //a := graphql.GetRequestContext(ctx)
-    //b := graphql.CollectFieldsCtx(ctx, nil)
+
+    // Extract the fieldname and type of the object queried
+    field := *graphql.GetPathContext(ctx).Field
+    s :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
+    if len(s) != 2 { return nil, LogErr("@unique", fmt.Errorf("Unknow query name")) }
+    t := s[1]
 
     fieldName := t + "." + field
     id := ctx.Value("id")
@@ -397,7 +273,17 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, field s
     return data, LogErr("Duplicate error", fmt.Errorf("%s is already taken", field))
 }
 
-func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
+//oneByOne ensure that mutation on the given field should contains set least one element.
+func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    data, err := next(ctx)
+    if len(InterfaceSlice(data)) == 1 {
+        return data, err
+    }
+    field := *graphql.GetPathContext(ctx).Field
+    return nil, LogErr("@oneByOne error", fmt.Errorf("Only one object allowed in slice %s", field))
+}
+
+func toLower(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     data, err := next(ctx)
     switch d := data.(type) {
     case *string:
@@ -407,23 +293,46 @@ func toLower(ctx context.Context, obj interface{}, next graphql.Resolver, field 
         v := strings.ToLower(d)
         return v, err
     }
-    return nil, fmt.Errorf("Type unknwown")
+    field := *graphql.GetPathContext(ctx).Field
+    return nil, fmt.Errorf("Type unknwown for field %s", field)
 }
 
-func inputMinLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, min int) (interface{}, error) {
-    v := obj.(model.JsonAtom)[field].(string)
-    if len(v) < min {
-        return nil, fmt.Errorf("`%s' to short. Maximum length is %d", field, min)
+func inputMinLength(ctx context.Context, obj interface{}, next graphql.Resolver, min int) (interface{}, error) {
+    var l int
+    data, err := next(ctx)
+    switch d := data.(type) {
+    case *string:
+        l = len(*d)
+    case string:
+        l = len(d)
+    default:
+        field := *graphql.GetPathContext(ctx).Field
+        return nil, fmt.Errorf("Type unknwown for field %s", field)
     }
-    return next(ctx)
+    if l < min {
+        field := *graphql.GetPathContext(ctx).Field
+        return nil, fmt.Errorf("`%s' to short. Minimum length is %d", field, min)
+    }
+    return data, err
 }
 
-func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, field string, max int) (interface{}, error) {
-    v := obj.(model.JsonAtom)[field].(string)
-    if len(v) > max {
-        return nil, fmt.Errorf("`%s' to long. Maximum length is %d", field, max)
+func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, max int) (interface{}, error) {
+    var l int
+    data, err := next(ctx)
+    switch d := data.(type) {
+    case *string:
+        l = len(*d)
+    case string:
+        l = len(d)
+    default:
+        field := *graphql.GetPathContext(ctx).Field
+        return nil, fmt.Errorf("Type unknwown for field %s", field)
     }
-    return next(ctx)
+    if l > max {
+        field := *graphql.GetPathContext(ctx).Field
+        return nil, fmt.Errorf("`%s' to short. Maximum length is %d", field, max)
+    }
+    return data, err
 }
 
 //

@@ -1,11 +1,17 @@
 package auth
 
 import (
-    "fmt"
+    //"fmt"
     "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/graph/codec"
     webauth "zerogov/fractal6.go/web/auth"
 )
+
+
+/* Authorization function based on the UserCtx struct
+ * got from the user token.
+ */
+
 
 // GetRoles returns the list of the users roles below the given node
 func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
@@ -29,7 +35,6 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
 
     for i, ur := range uctx.Roles {
         if ur.Nameid == nameid  {
-            fmt.Println(ur)
             return i
         }
     }

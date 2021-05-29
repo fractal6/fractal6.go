@@ -403,7 +403,7 @@ func (dg Dgraph) Exists(fieldName string, value string, filterName, filterValue 
         "fieldName":fieldName, "value": value, "filter": "",
     }
     if filterName != nil {
-        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
+        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, *filterName, *filterValue )
     }
     // Send request
     res, err := dg.QueryDql("exists", maps)
@@ -428,7 +428,7 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
         "fieldName":fieldName, "value": value, "filter": "",
     }
     if filterName != nil {
-        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, %s))`, *filterName, *filterValue )
+        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, *filterName, *filterValue )
     }
     // Send request
     res, err := dg.QueryDql("getID", maps)

@@ -511,7 +511,6 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
     return err
 }
 
-
 //
 // Graphql requests
 //
@@ -523,17 +522,13 @@ func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (stri
     inputType := "Add" + Vertex + "Input"
     queryGraph := vertex + ` { id }`
 
-    // Just One Node
-    var ifaces []interface{} = make([]interface{}, 1)
-    ifaces[0] = input
-    inputs, _ := json.Marshal(ifaces)
-
     // Build the string request
+    inputs, _ := tools.MarshalWithoutNil(input)
     reqInput := map[string]string{
         "QueryName": queryName, // function name (e.g addUser)
         "InputType": inputType, // input type name (e.g AddUserInput)
         "QueryGraph": tools.CleanString(queryGraph, true), // output data
-        "InputPayload": string(inputs), // inputs data
+        "InputPayload": "["+string(inputs)+"]", // inputs data -- Just one node
     }
 
     // Send request
@@ -552,10 +547,8 @@ func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input interface{}) er
     inputType := "Update" + Vertex + "Input"
     queryGraph := vertex + ` { id }`
 
-    // Just One Node
-    inputs, _ := json.Marshal(input)
-
     // Build the string request
+    inputs, _ := tools.MarshalWithoutNil(input)
     reqInput := map[string]string{
         "QueryName": queryName, // function name (e.g addUser)
         "InputType": inputType, // input type name (e.g AddUserInput)
@@ -576,10 +569,8 @@ func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) er
     inputType :=  Vertex + "Filter"
     queryGraph := vertex + ` { id }`
 
-    // Just One Node
-    inputs, _ := json.Marshal(input)
-
     // Build the string request
+    inputs, _ := tools.MarshalWithoutNil(input)
     reqInput := map[string]string{
         "QueryName": queryName, // function name (e.g addUser)
         "InputType": inputType, // input type name (e.g AddUserInput)

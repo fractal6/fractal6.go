@@ -253,11 +253,9 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
     rootnameid, _ := codec.Nid2rootid(nameid)
     if len(delMap) > 0 { // delete the node reference
         if firstLink_ != nil {
-            err = db.GetDB().RemoveUserRole(firstLink_.(string), nameid)
+            err := UnlinkUser(rootnameid, nameid, firstLink_.(string))
             if err != nil { return err }
-            err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
         }
-
     } else if node.FirstLink != nil  {
         // @debug: if the firstlink user has already this role,
         //         the update is useless
@@ -265,6 +263,7 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
         if err != nil { return err }
         if firstLink_ != nil && firstLink_.(string) != *node.FirstLink {
             // Someone loose his role here...contract ?
+            // @DEBUG: does the role of the previsou firstLinnk get removed ???!
             err = maybeUpdateMembership(rootnameid, firstLink_.(string), model.RoleTypeGuest)
         }
     }

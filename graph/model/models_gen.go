@@ -23,7 +23,7 @@ type AddBlobInput struct {
 
 type AddBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type AddCommentInput struct {
@@ -36,7 +36,7 @@ type AddCommentInput struct {
 
 type AddCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type AddContractInput struct {
@@ -56,7 +56,7 @@ type AddContractInput struct {
 
 type AddContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
-	NumUids  *int        `json:"numUids,omitempty"`
+	NumUids  *int        `json:"numUids"`
 }
 
 type AddEventFragmentInput struct {
@@ -67,7 +67,7 @@ type AddEventFragmentInput struct {
 
 type AddEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
-	NumUids       *int             `json:"numUids,omitempty"`
+	NumUids       *int             `json:"numUids"`
 }
 
 type AddEventInput struct {
@@ -83,7 +83,7 @@ type AddEventInput struct {
 
 type AddEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
-	NumUids *int     `json:"numUids,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type AddLabelInput struct {
@@ -93,13 +93,13 @@ type AddLabelInput struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
-	NNodes      *int          `json:"n_nodes,omitempty"`
-	NTensions   *int          `json:"n_tensions,omitempty"`
+	NNodes      *int          `json:"n_nodes"`
+	NTensions   *int          `json:"n_tensions"`
 }
 
 type AddLabelPayload struct {
 	Label   []*Label `json:"label,omitempty"`
-	NumUids *int     `json:"numUids,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type AddMandateInput struct {
@@ -111,7 +111,7 @@ type AddMandateInput struct {
 
 type AddMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type AddNodeCharacInput struct {
@@ -121,7 +121,7 @@ type AddNodeCharacInput struct {
 
 type AddNodeCharacPayload struct {
 	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type AddNodeFragmentInput struct {
@@ -141,7 +141,7 @@ type AddNodeFragmentInput struct {
 
 type AddNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
-	NumUids      *int            `json:"numUids,omitempty"`
+	NumUids      *int            `json:"numUids"`
 }
 
 type AddNodeInput struct {
@@ -160,16 +160,16 @@ type AddNodeInput struct {
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	Docs         []*BlobRef     `json:"docs,omitempty"`
 	Source       *BlobRef       `json:"source,omitempty"`
-	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
-	NChildren    *int           `json:"n_children,omitempty"`
+	NTensionsOut *int           `json:"n_tensions_out"`
+	NTensionsIn  *int           `json:"n_tensions_in"`
+	NChildren    *int           `json:"n_children"`
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       bool           `json:"isRoot"`
 	IsPersonal   *bool          `json:"isPersonal"`
 	IsPrivate    bool           `json:"isPrivate"`
 	IsArchived   bool           `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
-	Rights       int            `json:"rights,omitempty"`
+	Rights       int            `json:"rights"`
 	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
@@ -181,30 +181,30 @@ type AddNodeInput struct {
 
 type AddNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type AddNodeStatsInput struct {
-	NMember *int `json:"n_member,omitempty"`
-	NGuest  *int `json:"n_guest,omitempty"`
-	NCircle *int `json:"n_circle,omitempty"`
-	NRole   *int `json:"n_role,omitempty"`
+	NMember *int `json:"n_member"`
+	NGuest  *int `json:"n_guest"`
+	NCircle *int `json:"n_circle"`
+	NRole   *int `json:"n_role"`
 }
 
 type AddNodeStatsPayload struct {
 	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
-	NumUids   *int         `json:"numUids,omitempty"`
+	NumUids   *int         `json:"numUids"`
 }
 
 type AddSharedNodeInput struct {
-	NLabels         *int `json:"n_labels,omitempty"`
-	NTensions       *int `json:"n_tensions,omitempty"`
-	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+	NLabels         *int `json:"n_labels"`
+	NTensions       *int `json:"n_tensions"`
+	NClosedTensions *int `json:"n_closed_tensions"`
 }
 
 type AddSharedNodePayload struct {
 	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type AddTensionInput struct {
@@ -227,13 +227,13 @@ type AddTensionInput struct {
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
-	NBlobs     *int           `json:"n_blobs,omitempty"`
+	NComments  *int           `json:"n_comments"`
+	NBlobs     *int           `json:"n_blobs"`
 }
 
 type AddTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type AddUserInput struct {
@@ -257,30 +257,30 @@ type AddUserInput struct {
 
 type AddUserPayload struct {
 	User    []*User `json:"user,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type AddUserRightsInput struct {
 	CanLogin      bool     `json:"canLogin"`
 	CanCreateRoot bool     `json:"canCreateRoot"`
-	MaxPublicOrga int      `json:"maxPublicOrga,omitempty"`
+	MaxPublicOrga int      `json:"maxPublicOrga"`
 	Type          UserType `json:"type_,omitempty"`
 }
 
 type AddUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type AddVoteInput struct {
 	Contract *ContractRef `json:"contract,omitempty"`
 	Node     *NodeRef     `json:"node,omitempty"`
-	Data     []int        `json:"data,omitempty"`
+	Data     []int        `json:"data"`
 }
 
 type AddVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type AuthRule struct {
@@ -305,7 +305,7 @@ type Blob struct {
 }
 
 type BlobAggregateResult struct {
-	Count           *int    `json:"count,omitempty"`
+	Count           *int    `json:"count"`
 	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
@@ -380,7 +380,7 @@ type Comment struct {
 }
 
 type CommentAggregateResult struct {
-	Count        *int    `json:"count,omitempty"`
+	Count        *int    `json:"count"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -446,7 +446,7 @@ type Contract struct {
 }
 
 type ContractAggregateResult struct {
-	Count        *int    `json:"count,omitempty"`
+	Count        *int    `json:"count"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -547,103 +547,103 @@ type DateTimeRange struct {
 type DeleteBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type DeleteCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type DeleteContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
 	Msg      *string     `json:"msg,omitempty"`
-	NumUids  *int        `json:"numUids,omitempty"`
+	NumUids  *int        `json:"numUids"`
 }
 
 type DeleteEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
 	Msg           *string          `json:"msg,omitempty"`
-	NumUids       *int             `json:"numUids,omitempty"`
+	NumUids       *int             `json:"numUids"`
 }
 
 type DeleteEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
 	Msg     *string  `json:"msg,omitempty"`
-	NumUids *int     `json:"numUids,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type DeleteLabelPayload struct {
 	Label   []*Label `json:"label,omitempty"`
 	Msg     *string  `json:"msg,omitempty"`
-	NumUids *int     `json:"numUids,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type DeleteMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type DeleteNodeCharacPayload struct {
 	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
 	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type DeleteNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
 	Msg          *string         `json:"msg,omitempty"`
-	NumUids      *int            `json:"numUids,omitempty"`
+	NumUids      *int            `json:"numUids"`
 }
 
 type DeleteNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type DeleteNodeStatsPayload struct {
 	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
 	Msg       *string      `json:"msg,omitempty"`
-	NumUids   *int         `json:"numUids,omitempty"`
+	NumUids   *int         `json:"numUids"`
 }
 
 type DeletePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type DeleteSharedNodePayload struct {
 	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
 	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type DeleteTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type DeleteUserPayload struct {
 	User    []*User `json:"user,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type DeleteUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
 	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type DeleteVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type Event struct {
@@ -659,7 +659,7 @@ type Event struct {
 }
 
 type EventAggregateResult struct {
-	Count        *int    `json:"count,omitempty"`
+	Count        *int    `json:"count"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -690,7 +690,7 @@ type EventFragment struct {
 }
 
 type EventFragmentAggregateResult struct {
-	Count  *int    `json:"count,omitempty"`
+	Count  *int    `json:"count"`
 	OldMin *string `json:"oldMin,omitempty"`
 	OldMax *string `json:"oldMax,omitempty"`
 	NewMin *string `json:"newMin,omitempty"`
@@ -796,18 +796,18 @@ type Int64Range struct {
 }
 
 type IntFilter struct {
-	Eq      *int      `json:"eq,omitempty"`
-	In      []*int    `json:"in,omitempty"`
-	Le      *int      `json:"le,omitempty"`
-	Lt      *int      `json:"lt,omitempty"`
-	Ge      *int      `json:"ge,omitempty"`
-	Gt      *int      `json:"gt,omitempty"`
+	Eq      *int      `json:"eq"`
+	In      []*int    `json:"in"`
+	Le      *int      `json:"le"`
+	Lt      *int      `json:"lt"`
+	Ge      *int      `json:"ge"`
+	Gt      *int      `json:"gt"`
 	Between *IntRange `json:"between,omitempty"`
 }
 
 type IntRange struct {
-	Min int `json:"min,omitempty"`
-	Max int `json:"max,omitempty"`
+	Min int `json:"min"`
+	Max int `json:"max"`
 }
 
 type IntersectsFilter struct {
@@ -823,12 +823,12 @@ type Label struct {
 	Color       *string    `json:"color,omitempty"`
 	Tensions    []*Tension `json:"tensions,omitempty"`
 	Nodes       []*Node    `json:"nodes,omitempty"`
-	NNodes      *int       `json:"n_nodes,omitempty"`
-	NTensions   *int       `json:"n_tensions,omitempty"`
+	NNodes      *int       `json:"n_nodes"`
+	NTensions   *int       `json:"n_tensions"`
 }
 
 type LabelAggregateResult struct {
-	Count          *int     `json:"count,omitempty"`
+	Count          *int     `json:"count"`
 	RootnameidMin  *string  `json:"rootnameidMin,omitempty"`
 	RootnameidMax  *string  `json:"rootnameidMax,omitempty"`
 	NameMin        *string  `json:"nameMin,omitempty"`
@@ -837,13 +837,13 @@ type LabelAggregateResult struct {
 	DescriptionMax *string  `json:"descriptionMax,omitempty"`
 	ColorMin       *string  `json:"colorMin,omitempty"`
 	ColorMax       *string  `json:"colorMax,omitempty"`
-	NNodesMin      *int     `json:"n_nodesMin,omitempty"`
-	NNodesMax      *int     `json:"n_nodesMax,omitempty"`
-	NNodesSum      *int     `json:"n_nodesSum,omitempty"`
+	NNodesMin      *int     `json:"n_nodesMin"`
+	NNodesMax      *int     `json:"n_nodesMax"`
+	NNodesSum      *int     `json:"n_nodesSum"`
 	NNodesAvg      *float64 `json:"n_nodesAvg,omitempty"`
-	NTensionsMin   *int     `json:"n_tensionsMin,omitempty"`
-	NTensionsMax   *int     `json:"n_tensionsMax,omitempty"`
-	NTensionsSum   *int     `json:"n_tensionsSum,omitempty"`
+	NTensionsMin   *int     `json:"n_tensionsMin"`
+	NTensionsMax   *int     `json:"n_tensionsMax"`
+	NTensionsSum   *int     `json:"n_tensionsSum"`
 	NTensionsAvg   *float64 `json:"n_tensionsAvg,omitempty"`
 }
 
@@ -870,8 +870,8 @@ type LabelPatch struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
-	NNodes      *int          `json:"n_nodes,omitempty"`
-	NTensions   *int          `json:"n_tensions,omitempty"`
+	NNodes      *int          `json:"n_nodes"`
+	NTensions   *int          `json:"n_tensions"`
 }
 
 type LabelRef struct {
@@ -882,8 +882,8 @@ type LabelRef struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
-	NNodes      *int          `json:"n_nodes,omitempty"`
-	NTensions   *int          `json:"n_tensions,omitempty"`
+	NNodes      *int          `json:"n_nodes"`
+	NTensions   *int          `json:"n_tensions"`
 }
 
 type Mandate struct {
@@ -895,7 +895,7 @@ type Mandate struct {
 }
 
 type MandateAggregateResult struct {
-	Count               *int    `json:"count,omitempty"`
+	Count               *int    `json:"count"`
 	PurposeMin          *string `json:"purposeMin,omitempty"`
 	PurposeMax          *string `json:"purposeMax,omitempty"`
 	ResponsabilitiesMin *string `json:"responsabilitiesMin,omitempty"`
@@ -966,16 +966,16 @@ type Node struct {
 	Mandate      *Mandate    `json:"mandate,omitempty"`
 	Docs         []*Blob     `json:"docs,omitempty"`
 	Source       *Blob       `json:"source,omitempty"`
-	NTensionsOut *int        `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int        `json:"n_tensions_in,omitempty"`
-	NChildren    *int        `json:"n_children,omitempty"`
+	NTensionsOut *int        `json:"n_tensions_out"`
+	NTensionsIn  *int        `json:"n_tensions_in"`
+	NChildren    *int        `json:"n_children"`
 	Stats        *NodeStats  `json:"stats,omitempty"`
 	IsRoot       bool        `json:"isRoot"`
 	IsPersonal   *bool       `json:"isPersonal"`
 	IsPrivate    bool        `json:"isPrivate"`
 	IsArchived   bool        `json:"isArchived"`
 	Charac       *NodeCharac `json:"charac,omitempty"`
-	Rights       int         `json:"rights,omitempty"`
+	Rights       int         `json:"rights"`
 	Labels       []*Label    `json:"labels,omitempty"`
 	FirstLink    *User       `json:"first_link,omitempty"`
 	SecondLink   *User       `json:"second_link,omitempty"`
@@ -986,7 +986,7 @@ type Node struct {
 }
 
 type NodeAggregateResult struct {
-	Count           *int     `json:"count,omitempty"`
+	Count           *int     `json:"count"`
 	CreatedAtMin    *string  `json:"createdAtMin,omitempty"`
 	CreatedAtMax    *string  `json:"createdAtMax,omitempty"`
 	UpdatedAtMin    *string  `json:"updatedAtMin,omitempty"`
@@ -999,21 +999,21 @@ type NodeAggregateResult struct {
 	RootnameidMax   *string  `json:"rootnameidMax,omitempty"`
 	AboutMin        *string  `json:"aboutMin,omitempty"`
 	AboutMax        *string  `json:"aboutMax,omitempty"`
-	NTensionsOutMin *int     `json:"n_tensions_outMin,omitempty"`
-	NTensionsOutMax *int     `json:"n_tensions_outMax,omitempty"`
-	NTensionsOutSum *int     `json:"n_tensions_outSum,omitempty"`
+	NTensionsOutMin *int     `json:"n_tensions_outMin"`
+	NTensionsOutMax *int     `json:"n_tensions_outMax"`
+	NTensionsOutSum *int     `json:"n_tensions_outSum"`
 	NTensionsOutAvg *float64 `json:"n_tensions_outAvg,omitempty"`
-	NTensionsInMin  *int     `json:"n_tensions_inMin,omitempty"`
-	NTensionsInMax  *int     `json:"n_tensions_inMax,omitempty"`
-	NTensionsInSum  *int     `json:"n_tensions_inSum,omitempty"`
+	NTensionsInMin  *int     `json:"n_tensions_inMin"`
+	NTensionsInMax  *int     `json:"n_tensions_inMax"`
+	NTensionsInSum  *int     `json:"n_tensions_inSum"`
 	NTensionsInAvg  *float64 `json:"n_tensions_inAvg,omitempty"`
-	NChildrenMin    *int     `json:"n_childrenMin,omitempty"`
-	NChildrenMax    *int     `json:"n_childrenMax,omitempty"`
-	NChildrenSum    *int     `json:"n_childrenSum,omitempty"`
+	NChildrenMin    *int     `json:"n_childrenMin"`
+	NChildrenMax    *int     `json:"n_childrenMax"`
+	NChildrenSum    *int     `json:"n_childrenSum"`
 	NChildrenAvg    *float64 `json:"n_childrenAvg,omitempty"`
-	RightsMin       *int     `json:"rightsMin,omitempty"`
-	RightsMax       *int     `json:"rightsMax,omitempty"`
-	RightsSum       *int     `json:"rightsSum,omitempty"`
+	RightsMin       *int     `json:"rightsMin"`
+	RightsMax       *int     `json:"rightsMax"`
+	RightsSum       *int     `json:"rightsSum"`
 	RightsAvg       *float64 `json:"rightsAvg,omitempty"`
 }
 
@@ -1024,7 +1024,7 @@ type NodeCharac struct {
 }
 
 type NodeCharacAggregateResult struct {
-	Count *int `json:"count,omitempty"`
+	Count *int `json:"count"`
 }
 
 type NodeCharacFilter struct {
@@ -1085,7 +1085,7 @@ type NodeFragment struct {
 }
 
 type NodeFragmentAggregateResult struct {
-	Count         *int    `json:"count,omitempty"`
+	Count         *int    `json:"count"`
 	NameMin       *string `json:"nameMin,omitempty"`
 	NameMax       *string `json:"nameMax,omitempty"`
 	NameidMin     *string `json:"nameidMin,omitempty"`
@@ -1169,16 +1169,16 @@ type NodePatch struct {
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	Docs         []*BlobRef     `json:"docs,omitempty"`
 	Source       *BlobRef       `json:"source,omitempty"`
-	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
-	NChildren    *int           `json:"n_children,omitempty"`
+	NTensionsOut *int           `json:"n_tensions_out"`
+	NTensionsIn  *int           `json:"n_tensions_in"`
+	NChildren    *int           `json:"n_children"`
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
 	IsPersonal   *bool          `json:"isPersonal"`
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
-	Rights       *int           `json:"rights,omitempty"`
+	Rights       *int           `json:"rights"`
 	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
@@ -1205,16 +1205,16 @@ type NodeRef struct {
 	Mandate      *MandateRef    `json:"mandate,omitempty"`
 	Docs         []*BlobRef     `json:"docs,omitempty"`
 	Source       *BlobRef       `json:"source,omitempty"`
-	NTensionsOut *int           `json:"n_tensions_out,omitempty"`
-	NTensionsIn  *int           `json:"n_tensions_in,omitempty"`
-	NChildren    *int           `json:"n_children,omitempty"`
+	NTensionsOut *int           `json:"n_tensions_out"`
+	NTensionsIn  *int           `json:"n_tensions_in"`
+	NChildren    *int           `json:"n_children"`
 	Stats        *NodeStatsRef  `json:"stats,omitempty"`
 	IsRoot       *bool          `json:"isRoot"`
 	IsPersonal   *bool          `json:"isPersonal"`
 	IsPrivate    *bool          `json:"isPrivate"`
 	IsArchived   *bool          `json:"isArchived"`
 	Charac       *NodeCharacRef `json:"charac,omitempty"`
-	Rights       *int           `json:"rights,omitempty"`
+	Rights       *int           `json:"rights"`
 	Labels       []*LabelRef    `json:"labels,omitempty"`
 	FirstLink    *UserRef       `json:"first_link,omitempty"`
 	SecondLink   *UserRef       `json:"second_link,omitempty"`
@@ -1225,29 +1225,29 @@ type NodeRef struct {
 }
 
 type NodeStats struct {
-	NMember *int `json:"n_member,omitempty"`
-	NGuest  *int `json:"n_guest,omitempty"`
-	NCircle *int `json:"n_circle,omitempty"`
-	NRole   *int `json:"n_role,omitempty"`
+	NMember *int `json:"n_member"`
+	NGuest  *int `json:"n_guest"`
+	NCircle *int `json:"n_circle"`
+	NRole   *int `json:"n_role"`
 }
 
 type NodeStatsAggregateResult struct {
-	Count      *int     `json:"count,omitempty"`
-	NMemberMin *int     `json:"n_memberMin,omitempty"`
-	NMemberMax *int     `json:"n_memberMax,omitempty"`
-	NMemberSum *int     `json:"n_memberSum,omitempty"`
+	Count      *int     `json:"count"`
+	NMemberMin *int     `json:"n_memberMin"`
+	NMemberMax *int     `json:"n_memberMax"`
+	NMemberSum *int     `json:"n_memberSum"`
 	NMemberAvg *float64 `json:"n_memberAvg,omitempty"`
-	NGuestMin  *int     `json:"n_guestMin,omitempty"`
-	NGuestMax  *int     `json:"n_guestMax,omitempty"`
-	NGuestSum  *int     `json:"n_guestSum,omitempty"`
+	NGuestMin  *int     `json:"n_guestMin"`
+	NGuestMax  *int     `json:"n_guestMax"`
+	NGuestSum  *int     `json:"n_guestSum"`
 	NGuestAvg  *float64 `json:"n_guestAvg,omitempty"`
-	NCircleMin *int     `json:"n_circleMin,omitempty"`
-	NCircleMax *int     `json:"n_circleMax,omitempty"`
-	NCircleSum *int     `json:"n_circleSum,omitempty"`
+	NCircleMin *int     `json:"n_circleMin"`
+	NCircleMax *int     `json:"n_circleMax"`
+	NCircleSum *int     `json:"n_circleSum"`
 	NCircleAvg *float64 `json:"n_circleAvg,omitempty"`
-	NRoleMin   *int     `json:"n_roleMin,omitempty"`
-	NRoleMax   *int     `json:"n_roleMax,omitempty"`
-	NRoleSum   *int     `json:"n_roleSum,omitempty"`
+	NRoleMin   *int     `json:"n_roleMin"`
+	NRoleMax   *int     `json:"n_roleMax"`
+	NRoleSum   *int     `json:"n_roleSum"`
 	NRoleAvg   *float64 `json:"n_roleAvg,omitempty"`
 }
 
@@ -1265,17 +1265,17 @@ type NodeStatsOrder struct {
 }
 
 type NodeStatsPatch struct {
-	NMember *int `json:"n_member,omitempty"`
-	NGuest  *int `json:"n_guest,omitempty"`
-	NCircle *int `json:"n_circle,omitempty"`
-	NRole   *int `json:"n_role,omitempty"`
+	NMember *int `json:"n_member"`
+	NGuest  *int `json:"n_guest"`
+	NCircle *int `json:"n_circle"`
+	NRole   *int `json:"n_role"`
 }
 
 type NodeStatsRef struct {
-	NMember *int `json:"n_member,omitempty"`
-	NGuest  *int `json:"n_guest,omitempty"`
-	NCircle *int `json:"n_circle,omitempty"`
-	NRole   *int `json:"n_role,omitempty"`
+	NMember *int `json:"n_member"`
+	NGuest  *int `json:"n_guest"`
+	NCircle *int `json:"n_circle"`
+	NRole   *int `json:"n_role"`
 }
 
 type NodeTypeHash struct {
@@ -1330,7 +1330,7 @@ type Post struct {
 }
 
 type PostAggregateResult struct {
-	Count        *int    `json:"count,omitempty"`
+	Count        *int    `json:"count"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -1372,24 +1372,24 @@ type RoleTypeHash struct {
 }
 
 type SharedNode struct {
-	NLabels         *int `json:"n_labels,omitempty"`
-	NTensions       *int `json:"n_tensions,omitempty"`
-	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+	NLabels         *int `json:"n_labels"`
+	NTensions       *int `json:"n_tensions"`
+	NClosedTensions *int `json:"n_closed_tensions"`
 }
 
 type SharedNodeAggregateResult struct {
-	Count              *int     `json:"count,omitempty"`
-	NLabelsMin         *int     `json:"n_labelsMin,omitempty"`
-	NLabelsMax         *int     `json:"n_labelsMax,omitempty"`
-	NLabelsSum         *int     `json:"n_labelsSum,omitempty"`
+	Count              *int     `json:"count"`
+	NLabelsMin         *int     `json:"n_labelsMin"`
+	NLabelsMax         *int     `json:"n_labelsMax"`
+	NLabelsSum         *int     `json:"n_labelsSum"`
 	NLabelsAvg         *float64 `json:"n_labelsAvg,omitempty"`
-	NTensionsMin       *int     `json:"n_tensionsMin,omitempty"`
-	NTensionsMax       *int     `json:"n_tensionsMax,omitempty"`
-	NTensionsSum       *int     `json:"n_tensionsSum,omitempty"`
+	NTensionsMin       *int     `json:"n_tensionsMin"`
+	NTensionsMax       *int     `json:"n_tensionsMax"`
+	NTensionsSum       *int     `json:"n_tensionsSum"`
 	NTensionsAvg       *float64 `json:"n_tensionsAvg,omitempty"`
-	NClosedTensionsMin *int     `json:"n_closed_tensionsMin,omitempty"`
-	NClosedTensionsMax *int     `json:"n_closed_tensionsMax,omitempty"`
-	NClosedTensionsSum *int     `json:"n_closed_tensionsSum,omitempty"`
+	NClosedTensionsMin *int     `json:"n_closed_tensionsMin"`
+	NClosedTensionsMax *int     `json:"n_closed_tensionsMax"`
+	NClosedTensionsSum *int     `json:"n_closed_tensionsSum"`
 	NClosedTensionsAvg *float64 `json:"n_closed_tensionsAvg,omitempty"`
 }
 
@@ -1407,15 +1407,15 @@ type SharedNodeOrder struct {
 }
 
 type SharedNodePatch struct {
-	NLabels         *int `json:"n_labels,omitempty"`
-	NTensions       *int `json:"n_tensions,omitempty"`
-	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+	NLabels         *int `json:"n_labels"`
+	NTensions       *int `json:"n_tensions"`
+	NClosedTensions *int `json:"n_closed_tensions"`
 }
 
 type SharedNodeRef struct {
-	NLabels         *int `json:"n_labels,omitempty"`
-	NTensions       *int `json:"n_tensions,omitempty"`
-	NClosedTensions *int `json:"n_closed_tensions,omitempty"`
+	NLabels         *int `json:"n_labels"`
+	NTensions       *int `json:"n_tensions"`
+	NClosedTensions *int `json:"n_closed_tensions"`
 }
 
 type StringExactFilter struct {
@@ -1481,8 +1481,8 @@ type Tension struct {
 	Blobs      []*Blob        `json:"blobs,omitempty"`
 	Contracts  []*Contract    `json:"contracts,omitempty"`
 	History    []*Event       `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
-	NBlobs     *int           `json:"n_blobs,omitempty"`
+	NComments  *int           `json:"n_comments"`
+	NBlobs     *int           `json:"n_blobs"`
 	ID         string         `json:"id,omitempty"`
 	CreatedBy  *User          `json:"createdBy,omitempty"`
 	CreatedAt  string         `json:"createdAt,omitempty"`
@@ -1491,7 +1491,7 @@ type Tension struct {
 }
 
 type TensionAggregateResult struct {
-	Count         *int     `json:"count,omitempty"`
+	Count         *int     `json:"count"`
 	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
 	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
 	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
@@ -1506,13 +1506,13 @@ type TensionAggregateResult struct {
 	NthMax        *string  `json:"nthMax,omitempty"`
 	TitleMin      *string  `json:"titleMin,omitempty"`
 	TitleMax      *string  `json:"titleMax,omitempty"`
-	NCommentsMin  *int     `json:"n_commentsMin,omitempty"`
-	NCommentsMax  *int     `json:"n_commentsMax,omitempty"`
-	NCommentsSum  *int     `json:"n_commentsSum,omitempty"`
+	NCommentsMin  *int     `json:"n_commentsMin"`
+	NCommentsMax  *int     `json:"n_commentsMax"`
+	NCommentsSum  *int     `json:"n_commentsSum"`
 	NCommentsAvg  *float64 `json:"n_commentsAvg,omitempty"`
-	NBlobsMin     *int     `json:"n_blobsMin,omitempty"`
-	NBlobsMax     *int     `json:"n_blobsMax,omitempty"`
-	NBlobsSum     *int     `json:"n_blobsSum,omitempty"`
+	NBlobsMin     *int     `json:"n_blobsMin"`
+	NBlobsMax     *int     `json:"n_blobsMax"`
+	NBlobsSum     *int     `json:"n_blobsSum"`
 	NBlobsAvg     *float64 `json:"n_blobsAvg,omitempty"`
 }
 
@@ -1563,8 +1563,8 @@ type TensionPatch struct {
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
-	NBlobs     *int           `json:"n_blobs,omitempty"`
+	NComments  *int           `json:"n_comments"`
+	NBlobs     *int           `json:"n_blobs"`
 }
 
 type TensionRef struct {
@@ -1588,8 +1588,8 @@ type TensionRef struct {
 	Blobs      []*BlobRef     `json:"blobs,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	History    []*EventRef    `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments,omitempty"`
-	NBlobs     *int           `json:"n_blobs,omitempty"`
+	NComments  *int           `json:"n_comments"`
+	NBlobs     *int           `json:"n_blobs"`
 }
 
 type TensionStatusHash struct {
@@ -1610,7 +1610,7 @@ type UpdateBlobInput struct {
 
 type UpdateBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type UpdateCommentInput struct {
@@ -1621,7 +1621,7 @@ type UpdateCommentInput struct {
 
 type UpdateCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type UpdateContractInput struct {
@@ -1632,7 +1632,7 @@ type UpdateContractInput struct {
 
 type UpdateContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
-	NumUids  *int        `json:"numUids,omitempty"`
+	NumUids  *int        `json:"numUids"`
 }
 
 type UpdateEventFragmentInput struct {
@@ -1643,7 +1643,7 @@ type UpdateEventFragmentInput struct {
 
 type UpdateEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
-	NumUids       *int             `json:"numUids,omitempty"`
+	NumUids       *int             `json:"numUids"`
 }
 
 type UpdateEventInput struct {
@@ -1654,7 +1654,7 @@ type UpdateEventInput struct {
 
 type UpdateEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
-	NumUids *int     `json:"numUids,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type UpdateLabelInput struct {
@@ -1665,7 +1665,7 @@ type UpdateLabelInput struct {
 
 type UpdateLabelPayload struct {
 	Label   []*Label `json:"label,omitempty"`
-	NumUids *int     `json:"numUids,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type UpdateMandateInput struct {
@@ -1676,7 +1676,7 @@ type UpdateMandateInput struct {
 
 type UpdateMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type UpdateNodeCharacInput struct {
@@ -1687,7 +1687,7 @@ type UpdateNodeCharacInput struct {
 
 type UpdateNodeCharacPayload struct {
 	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type UpdateNodeFragmentInput struct {
@@ -1698,7 +1698,7 @@ type UpdateNodeFragmentInput struct {
 
 type UpdateNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
-	NumUids      *int            `json:"numUids,omitempty"`
+	NumUids      *int            `json:"numUids"`
 }
 
 type UpdateNodeInput struct {
@@ -1709,7 +1709,7 @@ type UpdateNodeInput struct {
 
 type UpdateNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type UpdateNodeStatsInput struct {
@@ -1720,7 +1720,7 @@ type UpdateNodeStatsInput struct {
 
 type UpdateNodeStatsPayload struct {
 	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
-	NumUids   *int         `json:"numUids,omitempty"`
+	NumUids   *int         `json:"numUids"`
 }
 
 type UpdatePostInput struct {
@@ -1731,7 +1731,7 @@ type UpdatePostInput struct {
 
 type UpdatePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type UpdateSharedNodeInput struct {
@@ -1742,7 +1742,7 @@ type UpdateSharedNodeInput struct {
 
 type UpdateSharedNodePayload struct {
 	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type UpdateTensionInput struct {
@@ -1753,7 +1753,7 @@ type UpdateTensionInput struct {
 
 type UpdateTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type UpdateUserInput struct {
@@ -1764,7 +1764,7 @@ type UpdateUserInput struct {
 
 type UpdateUserPayload struct {
 	User    []*User `json:"user,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type UpdateUserRightsInput struct {
@@ -1775,7 +1775,7 @@ type UpdateUserRightsInput struct {
 
 type UpdateUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
-	NumUids    *int          `json:"numUids,omitempty"`
+	NumUids    *int          `json:"numUids"`
 }
 
 type UpdateVoteInput struct {
@@ -1786,7 +1786,7 @@ type UpdateVoteInput struct {
 
 type UpdateVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
-	NumUids *int    `json:"numUids,omitempty"`
+	NumUids *int    `json:"numUids"`
 }
 
 type User struct {
@@ -1810,7 +1810,7 @@ type User struct {
 }
 
 type UserAggregateResult struct {
-	Count        *int    `json:"count,omitempty"`
+	Count        *int    `json:"count"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	LastAckMin   *string `json:"lastAckMin,omitempty"`
@@ -1888,15 +1888,15 @@ type UserRef struct {
 type UserRights struct {
 	CanLogin      bool     `json:"canLogin"`
 	CanCreateRoot bool     `json:"canCreateRoot"`
-	MaxPublicOrga int      `json:"maxPublicOrga,omitempty"`
+	MaxPublicOrga int      `json:"maxPublicOrga"`
 	Type          UserType `json:"type_,omitempty"`
 }
 
 type UserRightsAggregateResult struct {
-	Count            *int     `json:"count,omitempty"`
-	MaxPublicOrgaMin *int     `json:"maxPublicOrgaMin,omitempty"`
-	MaxPublicOrgaMax *int     `json:"maxPublicOrgaMax,omitempty"`
-	MaxPublicOrgaSum *int     `json:"maxPublicOrgaSum,omitempty"`
+	Count            *int     `json:"count"`
+	MaxPublicOrgaMin *int     `json:"maxPublicOrgaMin"`
+	MaxPublicOrgaMax *int     `json:"maxPublicOrgaMax"`
+	MaxPublicOrgaSum *int     `json:"maxPublicOrgaSum"`
 	MaxPublicOrgaAvg *float64 `json:"maxPublicOrgaAvg,omitempty"`
 }
 
@@ -1916,14 +1916,14 @@ type UserRightsOrder struct {
 type UserRightsPatch struct {
 	CanLogin      *bool     `json:"canLogin"`
 	CanCreateRoot *bool     `json:"canCreateRoot"`
-	MaxPublicOrga *int      `json:"maxPublicOrga,omitempty"`
+	MaxPublicOrga *int      `json:"maxPublicOrga"`
 	Type          *UserType `json:"type_,omitempty"`
 }
 
 type UserRightsRef struct {
 	CanLogin      *bool     `json:"canLogin"`
 	CanCreateRoot *bool     `json:"canCreateRoot"`
-	MaxPublicOrga *int      `json:"maxPublicOrga,omitempty"`
+	MaxPublicOrga *int      `json:"maxPublicOrga"`
 	Type          *UserType `json:"type_,omitempty"`
 }
 
@@ -1931,11 +1931,11 @@ type Vote struct {
 	ID       string    `json:"id,omitempty"`
 	Contract *Contract `json:"contract,omitempty"`
 	Node     *Node     `json:"node,omitempty"`
-	Data     []int     `json:"data,omitempty"`
+	Data     []int     `json:"data"`
 }
 
 type VoteAggregateResult struct {
-	Count *int `json:"count,omitempty"`
+	Count *int `json:"count"`
 }
 
 type VoteFilter struct {
@@ -1949,14 +1949,14 @@ type VoteFilter struct {
 type VotePatch struct {
 	Contract *ContractRef `json:"contract,omitempty"`
 	Node     *NodeRef     `json:"node,omitempty"`
-	Data     []int        `json:"data,omitempty"`
+	Data     []int        `json:"data"`
 }
 
 type VoteRef struct {
 	ID       *string      `json:"id,omitempty"`
 	Contract *ContractRef `json:"contract,omitempty"`
 	Node     *NodeRef     `json:"node,omitempty"`
-	Data     []int        `json:"data,omitempty"`
+	Data     []int        `json:"data"`
 }
 
 type WithinFilter struct {
