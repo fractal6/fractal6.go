@@ -11,8 +11,9 @@ import (
 )
 
 
+var EMAP EventsMap
+
 func init() {
-    // @DEBUG: MemberHook is redundant with @auth schema rulme.
     EMAP = EventsMap{
         model.TensionEventCreated: EventMap{
             Auth: MemberHook,
@@ -72,15 +73,14 @@ func init() {
         },
         model.TensionEventMoved: EventMap{
             Validation: model.ContractTypeAnyCoordoDual,
-            Auth: AuthorHook | AssigneeHook,
+            Auth: AuthorHook | SourceCoordoHook | TargetCoordoHook | AssigneeHook,
             Action: MoveTension,
         },
     }
 }
 
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload) with
-// * its last blob if bid is null
-// * the given blob otherwiser
+// All events present in tension.History must pass.
 func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
@@ -120,7 +120,7 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
            }
     }
 
-    if trace { leaveTrace(tension) }
+    if ok && trace { leaveTrace(tension) }
     return ok, contract, err
 }
 

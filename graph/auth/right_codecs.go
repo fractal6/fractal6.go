@@ -33,8 +33,8 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }
 
-    for i, ur := range uctx.Roles {
-        if ur.Nameid == nameid  {
+    for i, r := range uctx.Roles {
+        if r.Nameid == nameid  {
             return i
         }
     }
@@ -46,8 +46,8 @@ func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
     if e != nil { panic(e) }
 
-    for i, ur := range uctx.Roles {
-        if ur.Rootnameid == rootnameid {
+    for i, r := range uctx.Roles {
+        if r.Rootnameid == rootnameid {
             return i
         }
     }
@@ -69,16 +69,15 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
 }
 
 // UserHasRole return true if the user has at least one role in the given node
+// other than a Guest role.
 func UserHasRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }
 
-    for i, ur := range uctx.Roles {
-        pid, err := codec.Nid2pid(ur.Nameid)
-        if err != nil {
-            panic(err.Error())
-        }
-        if pid == nameid {
+    for i, r := range uctx.Roles {
+        pid, err := codec.Nid2pid(r.Nameid)
+        if err != nil { panic(err.Error()) }
+        if *r.RoleType != model.RoleTypeGuest && pid == nameid {
             return i
         }
     }
@@ -90,12 +89,12 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }
 
-    for i, ur := range uctx.Roles {
-        pid, err := codec.Nid2pid(ur.Nameid)
+    for i, r := range uctx.Roles {
+        pid, err := codec.Nid2pid(r.Nameid)
         if err != nil {
-            panic("bad nameid format for coordo test: "+ ur.Nameid)
+            panic("bad nameid format for coordo test: "+ r.Nameid)
         }
-        if pid == nameid && *ur.RoleType == model.RoleTypeCoordinator {
+        if pid == nameid && *r.RoleType == model.RoleTypeCoordinator {
             return i
         }
     }

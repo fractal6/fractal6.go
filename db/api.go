@@ -128,6 +128,15 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
+    "getSubSubFieldById": `{
+        all(func: uid({{.id}})) {
+            {{.fieldNameSource}} {
+                {{.fieldNameTarget}} {
+                    {{.subFieldNameTarget}}
+                }
+            }
+        }
+    }`,
     "getSubSubFieldByEq": `{
         all(func: eq({{.fieldid}}, "{{.value}}")) {
             {{.fieldNameSource}} {
@@ -580,7 +589,39 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
     return nil, err
 }
 
-// Returns a subfield from Eq
+// Returns a subsubfield from uid
+func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (interface{}, error) {
+    // Format Query
+    maps := map[string]string{
+        "id": id,
+        "fieldNameSource": fieldNameSource,
+        "fieldNameTarget": fieldNameTarget,
+        "subFieldNameTarget": subFieldNameTarget,
+    }
+    // Send request
+    res, err := dg.QueryDql("getSubSubFieldById", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple in DQL query")
+    } else if len(r.All) == 1 {
+        x := r.All[0][fieldNameSource].(model.JsonAtom)
+        if x != nil {
+            y := x[fieldNameTarget].(model.JsonAtom)
+            if y != nil {
+                return y[subFieldNameTarget], nil
+            }
+        }
+    }
+    return nil, err
+}
+
+// Returns a subsubfield from Eq
 func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{

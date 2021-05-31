@@ -53,7 +53,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     }
 
     // Send request
-    uctx, err := webauth.UserCtxFromContext(ctx)
+    uctx, err := webauth.GetUserContext(ctx)
     if err != nil { uctx = &model.UserCtx{} }
     err = db.QueryGql(*uctx, "rawQuery", reqInput, data)
     if err != nil {
@@ -90,7 +90,7 @@ func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}
     op := string(mutCtx.type_)
 
     // Send request
-    uctx, err := webauth.UserCtxFromContext(ctx)
+    uctx, err := webauth.GetUserContext(ctx)
     if err != nil { uctx = &model.UserCtx{} }
     err = db.QueryGql(*uctx, op, reqInput, data)
     if err != nil {

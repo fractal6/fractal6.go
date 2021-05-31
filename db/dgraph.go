@@ -536,6 +536,9 @@ func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (stri
     err := dg.QueryGql(uctx, "add", reqInput, payload)
     if err != nil { return "", err }
     // Extract id result
+    if payload[queryName] == nil {
+        return "", fmt.Errorf("Unauthorized request. Possibly, name already exists.")
+    }
     res := payload[queryName].(model.JsonAtom)[vertex].([]interface{})[0].(model.JsonAtom)["id"]
     return res.(string), err
 }
@@ -559,6 +562,9 @@ func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input interface{}) er
     // Send request
     payload := make(model.JsonAtom, 1)
     err := dg.QueryGql(uctx, "update", reqInput, payload)
+    if payload[queryName] == nil && err == nil {
+        return fmt.Errorf("Unauthorized request. Possibly, name already exists.")
+    }
     return err
 }
 
@@ -581,6 +587,9 @@ func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) er
     // Send request
     payload := make(model.JsonAtom, 1)
     err := dg.QueryGql(uctx, "delete", reqInput, payload)
+    if payload[queryName] == nil && err == nil {
+        return fmt.Errorf("Unauthorized request.")
+    }
     return err
 }
 

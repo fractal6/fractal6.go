@@ -21,6 +21,7 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
     var filter model.JsonAtom
 
     if obj.(model.JsonAtom)["input"] != nil {
+        if obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"] == nil { panic("add mutation not supported here.") }
         // Update mutation
         filter = obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)
     } else if obj.(model.JsonAtom)["filter"] != nil {
@@ -50,6 +51,18 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
     return ctx, val, err
 }
 
+func setContextWithID(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil { return nil, err }
+    return next(ctx)
+}
+
+func setContextWithNameid(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "nameid")
+    if err != nil { return nil, err }
+    return next(ctx)
+}
+
 func getNestedObj(obj interface{}, field string) interface{} {
     var source model.JsonAtom
     var target interface{}
@@ -67,6 +80,7 @@ func getNestedObj(obj interface{}, field string) interface{} {
 
     return target
 }
+
 
 func get(obj model.JsonAtom, field string, deflt interface{}) interface{} {
     v := obj[field]

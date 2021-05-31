@@ -6,106 +6,68 @@ import (
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/graph/auth"
     "zerogov/fractal6.go/db"
     webauth"zerogov/fractal6.go/web/auth"
     . "zerogov/fractal6.go/tools"
 )
 
+
 ////////////////////////////////////////////////
 // Tension Resolver
 ////////////////////////////////////////////////
+//
 
-// Add Tension Hook
+// Add Tension - Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Retrieve userCtx from token
-    uctx, err := webauth.UserCtxFromContext(ctx)
+    // Get User context
+    uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
-    // Get input
-    data, err := next(ctx)
-    if err != nil { return nil, err }
-
-    // Validate input
-    input := data.([]*model.AddTensionInput)
-    if len(input) != 1 {
-        return nil, LogErr("Add tension error", fmt.Errorf("Only one tension supported in input."))
+    // Validate Input
+    inputs := graphql.GetResolverContext(ctx).Args["input"].([]*model.AddTensionInput)
+    if len(inputs) != 1 {
+        return nil, LogErr("add tension", fmt.Errorf("One and only one tension allowed."))
     }
-
-    // Check that user as the given emitter role
-    emitterid := input[0].Emitterid
-    if auth.UserPlayRole(uctx, emitterid) < 0 {
-        // if not check for bot access
-        r_, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.role_type")
-        if err != nil { return nil, LogErr("Internal error", err) }
-        isArchived, err := db.GetDB().GetFieldByEq("Node.nameid", emitterid, "Node.isArchived")
-        if err != nil { return nil, LogErr("Internal error", err) }
-        if r_ == nil { return data, err }
-        if model.RoleType(r_.(string)) != model.RoleTypeBot || isArchived.(bool) {
-            return nil, LogErr("Access denied", fmt.Errorf("you do not own this node"))
-        }
+    if !PayloadContains(ctx, "id") {
+        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension payload"))
     }
+    input := inputs[0]
 
-    return data, err
-}
-
-// Update Tension hook
-func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil { return nil, LogErr("Update tension error", err) }
-    return next(ctx)
-}
-
-// Add Tension Post Hook
-func addTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Retrieve userCtx from token
-    uctx, err := webauth.UserCtxFromContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
-
-    // Get Input
+    // Execute query
     data, err := next(ctx)
     if err != nil { return nil, err }
     if data.(*model.AddTensionPayload) == nil {
         return nil, LogErr("add tension", fmt.Errorf("no tension added."))
     }
-
-    // Validate input
-    tid := data.(*model.AddTensionPayload).Tension[0].ID
-    if tid == "" {
-        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension payload"))
-    }
-    rc := graphql.GetResolverContext(ctx)
-    input := rc.Args["input"].([]*model.AddTensionInput)[0]
+    id := data.(*model.AddTensionPayload).Tension[0].ID
 
     // Validate and process Blob Event
-    ok, _,  err := tensionEventHook(uctx, tid, input.History, nil)
-    if err != nil || !ok {
+    ok, _,  err := tensionEventHook(uctx, id, input.History, nil)
+    if !ok || err != nil {
         // Delete the tension just added
-        e := db.GetDB().DeepDelete("tension", tid)
+        e := db.GetDB().DeepDelete("tension", id)
         if e != nil { panic(e) }
     }
-
-    if err != nil  { return nil, err }
-    if ok { return data, err }
-
+    if ok || err != nil {
+        return data, err
+    }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
-// Update Tension Post Hook
-func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Retrieve userCtx from token
-    uctx, err := webauth.UserCtxFromContext(ctx)
+// Update Tension - Hook
+func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Get User context
+    uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
-    rc := graphql.GetResolverContext(ctx)
-    input := rc.Args["input"].(model.UpdateTensionInput)
-    tids := input.Filter.ID
-    if len(tids) == 0 {
-        return nil, LogErr("field missing", fmt.Errorf("id field is required in tension filter."))
+    input := graphql.GetResolverContext(ctx).Args["input"].(model.UpdateTensionInput)
+    ids := input.Filter.ID
+    if len(ids) != 1 {
+        return nil, LogErr("update tension", fmt.Errorf("One and only one tension allowed."))
     }
 
-    // Validate Blob Event prior the mutation
+    // Validate Event prior the mutation
     var bid *string
     var contract *model.Contract
     var ok bool
@@ -113,7 +75,7 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
         if len(input.Set.Blobs) > 0 {
             bid = input.Set.Blobs[0].ID
         }
-        ok, contract, err = tensionEventHook(uctx, tids[0], input.Set.History, bid)
+        ok, contract, err = tensionEventHook(uctx, ids[0], input.Set.History, bid)
         if err != nil  { return nil, err }
         if ok {
             return next(ctx)
@@ -131,66 +93,4 @@ func updateTensionPostHook(ctx context.Context, obj interface{}, next graphql.Re
     return nil, LogErr("Access denied", fmt.Errorf("Input remove not implemented."))
 }
 
-////////////////////////////////////////////////
-// Comment Resolver
-////////////////////////////////////////////////
 
-// Update Comment hook
-func updateCommentHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil { return nil, LogErr("Update comment error", err) }
-    return next(ctx)
-}
-
-////////////////////////////////////////////////
-// Contract Resolver
-////////////////////////////////////////////////
-
-// -- todo auth method for contract mutations
-// -- user @alter_hasRole ?
-
-// Add Contract hook
-func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil { return nil, LogErr("Update contract error", err) }
-
-    // addContractPostHook
-    // * Get the tid or error
-    // * get the tensionHook
-    // * call ProcessEvent(tid, nil) (in tension_op)
-    return next(ctx)
-}
-
-// Update Contract hook
-func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil { return nil, LogErr("Update contract error", err) }
-    return next(ctx)
-}
-
-// Delete Contract hook
-func deleteContractHookPost(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Retrieve userCtx from token
-    _, err := webauth.UserCtxFromContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
-
-    // Validate input
-    rc := graphql.GetResolverContext(ctx)
-    filter := rc.Args["filter"].(model.ContractFilter)
-    ids := filter.ID
-    if len(ids) != 1 {
-        return nil, LogErr("delete contract error", fmt.Errorf("Only one contract supported in input."))
-    }
-
-    // Deep delete
-    err = db.GetDB().DeepDelete("contract", ids[0])
-    if err != nil { return nil, LogErr("Delete contract error", err) }
-
-    var d model.DeleteContractPayload
-    d.Contract = []*model.Contract{&model.Contract{ID: ids[0]}}
-    return &d, err
-
-    //data, err := next(ctx)
-    //if err != nil { return nil, err }
-    //return data, err
-}

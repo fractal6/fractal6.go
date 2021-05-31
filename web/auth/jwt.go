@@ -171,7 +171,7 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
     return ctx
 }
 
-func UserCtxFromContext(ctx context.Context) (*model.UserCtx, error) {
+func GetUserContext(ctx context.Context) (*model.UserCtx, error) {
     uctx := ctx.Value(tkMaster.tokenClaim).(*model.UserCtx)
     userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
     if userCtxErr != nil { return uctx, userCtxErr.(error) }

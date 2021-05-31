@@ -9,13 +9,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### New
 - This changelog file
 - Add contracts object queries.
+    - Member of an organisation can add (contract are automatically created for coordo that try to move a blobed tension)
+    - Member can update (push or edit on comment) on contract.
+    - Author and coordo can delete a contract
 - Add more control over authorizations (through tension events)
 - Use dgraph auth rule in schema with JWT token
 - [schema] add **Node.rights** and **User.type_** fields
 - Add auth rules for bot roles
+- deepDelete operation implemented. The children node to delete should be definide in `db/api.go` in the `delete<Type>` entry.
 
 ### Changed
 - [schema] Rename UserJoin event to UserJoined
+- [resolver] rename UserCtxFromContext to GetUserContext
+- [schema] hook directive renamed with Input suffix for argumants directive and without suffix {query}{Type} for field query/mutation.
 
 ### Fixed
 - [gqlast.py] gram/graphql.ebnf to handle new directives (@auth and @custom).

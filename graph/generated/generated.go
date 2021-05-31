@@ -40,76 +40,73 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Add_isOwner             func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
-	Alter_RO                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Alter_hasRole           func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, u *string, a *int) (res interface{}, err error)
-	Alter_hasRoot           func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string) (res interface{}, err error)
-	Alter_maxLength         func(ctx context.Context, obj interface{}, next graphql.Resolver, n int) (res interface{}, err error)
-	Alter_minLength         func(ctx context.Context, obj interface{}, next graphql.Resolver, n int) (res interface{}, err error)
-	Alter_oneByOne          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Alter_toLower           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Alter_unique            func(ctx context.Context, obj interface{}, next graphql.Resolver, on *string) (res interface{}, err error)
-	Auth                    func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
-	CacheControl            func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
-	Cascade                 func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
-	Count                   func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
-	Custom                  func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
-	Dgraph                  func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
-	Generate                func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
-	HasInverse              func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
-	Hidden                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addComment         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addCommentPost     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addContract        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addContractPost    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addLabel           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addLabelPost       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addNode            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addNodePost        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTension         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTensionPost     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteComment      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteCommentPost  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteContract     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteContractPost func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteLabel        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteLabelPost    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteNode         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteNodePost     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteTension      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteTensionPost  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getComment         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getContract        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getLabel           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getNode            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getTension         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryComment       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryContract      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryLabel         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryNode          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateComment      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateCommentPost  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateContract     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateContractPost func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateLabel        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateLabelPost    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateNode         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateNodePost     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTension      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTensionPost  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Lambda                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	LambdaOnMutate          func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
-	Meta_getNodeStats       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_RO                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Patch_hasRole           func(ctx context.Context, obj interface{}, next graphql.Resolver, n []string, u *string, a *int) (res interface{}, err error)
-	Patch_isOwner           func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
-	Remote                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	RemoteResponse          func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
-	Search                  func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
-	Secret                  func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
-	WithSubscription        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Add_isOwner              func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
+	Alter_RO                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Alter_maxLength          func(ctx context.Context, obj interface{}, next graphql.Resolver, n int) (res interface{}, err error)
+	Alter_minLength          func(ctx context.Context, obj interface{}, next graphql.Resolver, n int) (res interface{}, err error)
+	Alter_oneByOne           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Alter_toLower            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Alter_unique             func(ctx context.Context, obj interface{}, next graphql.Resolver, on *string) (res interface{}, err error)
+	Auth                     func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
+	CacheControl             func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
+	Cascade                  func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
+	Count                    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
+	Custom                   func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
+	Dgraph                   func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
+	Generate                 func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
+	HasInverse               func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
+	Hidden                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addComment          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addCommentInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addContract         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addLabel            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addNode             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addNodeInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTension          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteComment       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteCommentInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContract      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContractInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabel         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabelInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteNode          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteNodeInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getCommentInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getNodeInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryCommentInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryContractInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryLabelInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryNodeInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryTensionInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateComment       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateCommentInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateContract      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateContractInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateLabel         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateLabelInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateNode          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateNodeInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Lambda                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	LambdaOnMutate           func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
+	Meta_getNodeStats        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_RO                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Patch_isOwner            func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
+	Remote                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	RemoteResponse           func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
+	Search                   func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
+	Secret                   func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
+	WithSubscription         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -6215,15 +6212,9 @@ directive @alter_minLength(n: Int!) on INPUT_FIELD_DEFINITION
 
 directive @alter_maxLength(n: Int!) on INPUT_FIELD_DEFINITION
 
-directive @alter_unique(on: String) on INPUT_FIELD_DEFINITION
-
 directive @alter_oneByOne on INPUT_FIELD_DEFINITION
 
-directive @patch_hasRole(n: [String!]!, u: String, a: Int) on INPUT_FIELD_DEFINITION
-
-directive @alter_hasRole(n: [String!]!, u: String, a: Int) on INPUT_FIELD_DEFINITION
-
-directive @alter_hasRoot(n: [String!]!) on INPUT_FIELD_DEFINITION
+directive @alter_unique(on: String) on INPUT_FIELD_DEFINITION
 
 directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
 
@@ -6233,85 +6224,85 @@ directive @patch_RO on INPUT_FIELD_DEFINITION
 
 directive @alter_RO on INPUT_FIELD_DEFINITION
 
-directive @hook_getNode on ARGUMENT_DEFINITION
+directive @hook_getNodeInput on ARGUMENT_DEFINITION
 
-directive @hook_queryNode on ARGUMENT_DEFINITION
+directive @hook_queryNodeInput on ARGUMENT_DEFINITION
 
-directive @hook_addNode on ARGUMENT_DEFINITION
+directive @hook_addNodeInput on ARGUMENT_DEFINITION
 
-directive @hook_addNodePost on FIELD_DEFINITION
+directive @hook_updateNodeInput on ARGUMENT_DEFINITION
 
-directive @hook_updateNode on ARGUMENT_DEFINITION
+directive @hook_deleteNodeInput on ARGUMENT_DEFINITION
 
-directive @hook_updateNodePost on FIELD_DEFINITION
+directive @hook_addNode on FIELD_DEFINITION
 
-directive @hook_deleteNode on ARGUMENT_DEFINITION
+directive @hook_updateNode on FIELD_DEFINITION
 
-directive @hook_deleteNodePost on FIELD_DEFINITION
+directive @hook_deleteNode on FIELD_DEFINITION
 
-directive @hook_getTension on ARGUMENT_DEFINITION
+directive @hook_getTensionInput on ARGUMENT_DEFINITION
 
-directive @hook_queryTension on ARGUMENT_DEFINITION
+directive @hook_queryTensionInput on ARGUMENT_DEFINITION
 
-directive @hook_addTension on ARGUMENT_DEFINITION
+directive @hook_addTensionInput on ARGUMENT_DEFINITION
 
-directive @hook_addTensionPost on FIELD_DEFINITION
+directive @hook_updateTensionInput on ARGUMENT_DEFINITION
 
-directive @hook_updateTension on ARGUMENT_DEFINITION
+directive @hook_deleteTensionInput on ARGUMENT_DEFINITION
 
-directive @hook_updateTensionPost on FIELD_DEFINITION
+directive @hook_addTension on FIELD_DEFINITION
 
-directive @hook_deleteTension on ARGUMENT_DEFINITION
+directive @hook_updateTension on FIELD_DEFINITION
 
-directive @hook_deleteTensionPost on FIELD_DEFINITION
+directive @hook_deleteTension on FIELD_DEFINITION
 
-directive @hook_getComment on ARGUMENT_DEFINITION
+directive @hook_getCommentInput on ARGUMENT_DEFINITION
 
-directive @hook_queryComment on ARGUMENT_DEFINITION
+directive @hook_queryCommentInput on ARGUMENT_DEFINITION
 
-directive @hook_addComment on ARGUMENT_DEFINITION
+directive @hook_addCommentInput on ARGUMENT_DEFINITION
 
-directive @hook_addCommentPost on FIELD_DEFINITION
+directive @hook_updateCommentInput on ARGUMENT_DEFINITION
 
-directive @hook_updateComment on ARGUMENT_DEFINITION
+directive @hook_deleteCommentInput on ARGUMENT_DEFINITION
 
-directive @hook_updateCommentPost on FIELD_DEFINITION
+directive @hook_addComment on FIELD_DEFINITION
 
-directive @hook_deleteComment on ARGUMENT_DEFINITION
+directive @hook_updateComment on FIELD_DEFINITION
 
-directive @hook_deleteCommentPost on FIELD_DEFINITION
+directive @hook_deleteComment on FIELD_DEFINITION
 
-directive @hook_getLabel on ARGUMENT_DEFINITION
+directive @hook_getLabelInput on ARGUMENT_DEFINITION
 
-directive @hook_queryLabel on ARGUMENT_DEFINITION
+directive @hook_queryLabelInput on ARGUMENT_DEFINITION
 
-directive @hook_addLabel on ARGUMENT_DEFINITION
+directive @hook_addLabelInput on ARGUMENT_DEFINITION
 
-directive @hook_addLabelPost on FIELD_DEFINITION
+directive @hook_updateLabelInput on ARGUMENT_DEFINITION
 
-directive @hook_updateLabel on ARGUMENT_DEFINITION
+directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
 
-directive @hook_updateLabelPost on FIELD_DEFINITION
+directive @hook_addLabel on FIELD_DEFINITION
 
-directive @hook_deleteLabel on ARGUMENT_DEFINITION
+directive @hook_updateLabel on FIELD_DEFINITION
 
-directive @hook_deleteLabelPost on FIELD_DEFINITION
+directive @hook_deleteLabel on FIELD_DEFINITION
 
-directive @hook_getContract on ARGUMENT_DEFINITION
+directive @hook_getContractInput on ARGUMENT_DEFINITION
 
-directive @hook_queryContract on ARGUMENT_DEFINITION
+directive @hook_queryContractInput on ARGUMENT_DEFINITION
 
-directive @hook_addContract on ARGUMENT_DEFINITION
+directive @hook_addContractInput on ARGUMENT_DEFINITION
 
-directive @hook_addContractPost on FIELD_DEFINITION
+directive @hook_updateContractInput on ARGUMENT_DEFINITION
 
-directive @hook_updateContract on ARGUMENT_DEFINITION
+directive @hook_deleteContractInput on ARGUMENT_DEFINITION
 
-directive @hook_updateContractPost on FIELD_DEFINITION
+directive @hook_addContract on FIELD_DEFINITION
 
-directive @hook_deleteContract on ARGUMENT_DEFINITION
+directive @hook_updateContract on FIELD_DEFINITION
 
-directive @hook_deleteContractPost on FIELD_DEFINITION
+directive @hook_deleteContract on FIELD_DEFINITION
 
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
@@ -6485,7 +6476,17 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   n_tensions: Int @count(f: tensions)
 }
 
-type Comment {
+type Comment @auth(add:{ rule:"""query ($USERNAME: String!) {
+      queryComment {
+        createdBy(filter: {username: {eq: $USERNAME}}) { username }
+      }
+  }"""
+}, update:{ rule:"""query ($USERNAME: String!) {
+      queryComment {
+        createdBy(filter: {username: {eq: $USERNAME}}) { username }
+      }
+  }"""
+}) {
   message: String! @search(by: [fulltext])
   id: ID!
   createdBy(filter: UserFilter): User!
@@ -6708,35 +6709,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6855,12 +6856,12 @@ type AddNodeCharacPayload {
 }
 
 input AddNodeFragmentInput {
-  name: String @alter_minLength(f:"name", n:1)
-  nameid: String @alter_toLower(f:"nameid")
+  name: String @alter_minLength(n:1)
+  nameid: String @alter_toLower
   type_: NodeType
   isPrivate: Boolean
   charac: NodeCharacRef
-  about: String @alter_maxLength(f:"about", n:280)
+  about: String @alter_maxLength(n:280)
   mandate: MandateRef
   children: [NodeFragmentRef!]
   first_link: String
@@ -6947,14 +6948,14 @@ input AddTensionInput {
   receiverid: String!
   receiver: NodeRef!
   nth: String
-  title: String! @alter_minLength(f:"title", n:1)
+  title: String! @alter_minLength(n:1)
   type_: TensionType!
   status: TensionStatus!
   assignees: [UserRef!]
   labels: [LabelRef!]
-  comments: [CommentRef!]
+  comments: [CommentRef!] @alter_oneByOne
   action: TensionAction
-  blobs: [BlobRef!]
+  blobs: [BlobRef!] @alter_oneByOne
   contracts: [ContractRef!]
   history: [EventRef!]!
   n_comments: Int
@@ -7156,7 +7157,7 @@ input CommentPatch {
   createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  message: String @patch_isOwner(u:"createdBy")
+  message: String
   _VOID: String
 }
 
@@ -7238,7 +7239,7 @@ input ContractPatch {
   closedAt: DateTime @patch_RO
   event: EventFragmentRef @patch_RO
   candidates: [UserRef!] @patch_RO
-  participants: [VoteRef!]
+  participants: [VoteRef!] @patch_RO
   comments: [CommentRef!]
 }
 
@@ -7757,9 +7758,9 @@ input MultiPolygonRef {
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]!, upsert: Boolean @hook_addNode): AddNodePayload @hook_addNodePost
-  updateNode(input: UpdateNodeInput! @hook_updateNode): UpdateNodePayload @hook_updateNodePost
-  deleteNode(filter: NodeFilter! @hook_deleteNode): DeleteNodePayload @hook_deleteNodePost
+  addNode(input: [AddNodeInput!]!, upsert: Boolean @hook_addNodeInput): AddNodePayload @hook_addNode
+  updateNode(input: UpdateNodeInput! @hook_updateNodeInput): UpdateNodePayload @hook_updateNode
+  deleteNode(filter: NodeFilter! @hook_deleteNodeInput): DeleteNodePayload @hook_deleteNode
   addSharedNode(input: [AddSharedNodeInput!]!): AddSharedNodePayload
   updateSharedNode(input: UpdateSharedNodeInput!): UpdateSharedNodePayload
   deleteSharedNode(filter: SharedNodeFilter!): DeleteSharedNodePayload
@@ -7777,15 +7778,15 @@ type Mutation {
   deleteNodeStats(filter: NodeStatsFilter!): DeleteNodeStatsPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
-  addTension(input: [AddTensionInput!]! @hook_addTension): AddTensionPayload @hook_addTensionPost
-  updateTension(input: UpdateTensionInput! @hook_updateTension): UpdateTensionPayload @hook_updateTensionPost
-  deleteTension(filter: TensionFilter! @hook_deleteTension): DeleteTensionPayload @hook_deleteTensionPost
-  addLabel(input: [AddLabelInput!]! @hook_addLabel): AddLabelPayload @hook_addLabelPost
-  updateLabel(input: UpdateLabelInput! @hook_updateLabel): UpdateLabelPayload @hook_updateLabelPost
-  deleteLabel(filter: LabelFilter! @hook_deleteLabel): DeleteLabelPayload @hook_deleteLabelPost
-  addComment(input: [AddCommentInput!]! @hook_addComment): AddCommentPayload @hook_addCommentPost
-  updateComment(input: UpdateCommentInput! @hook_updateComment): UpdateCommentPayload @hook_updateCommentPost
-  deleteComment(filter: CommentFilter! @hook_deleteComment): DeleteCommentPayload @hook_deleteCommentPost
+  addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
+  updateTension(input: UpdateTensionInput! @hook_updateTensionInput): UpdateTensionPayload @hook_updateTension
+  deleteTension(filter: TensionFilter! @hook_deleteTensionInput): DeleteTensionPayload @hook_deleteTension
+  addLabel(input: [AddLabelInput!]! @hook_addLabelInput): AddLabelPayload @hook_addLabel
+  updateLabel(input: UpdateLabelInput! @hook_updateLabelInput): UpdateLabelPayload @hook_updateLabel
+  deleteLabel(filter: LabelFilter! @hook_deleteLabelInput): DeleteLabelPayload @hook_deleteLabel
+  addComment(input: [AddCommentInput!]! @hook_addCommentInput): AddCommentPayload @hook_addComment
+  updateComment(input: UpdateCommentInput! @hook_updateCommentInput): UpdateCommentPayload @hook_updateComment
+  deleteComment(filter: CommentFilter! @hook_deleteCommentInput): DeleteCommentPayload @hook_deleteComment
   addBlob(input: [AddBlobInput!]!): AddBlobPayload
   updateBlob(input: UpdateBlobInput!): UpdateBlobPayload
   deleteBlob(filter: BlobFilter!): DeleteBlobPayload
@@ -7795,9 +7796,9 @@ type Mutation {
   addEventFragment(input: [AddEventFragmentInput!]!): AddEventFragmentPayload
   updateEventFragment(input: UpdateEventFragmentInput!): UpdateEventFragmentPayload
   deleteEventFragment(filter: EventFragmentFilter!): DeleteEventFragmentPayload
-  addContract(input: [AddContractInput!]! @hook_addContract): AddContractPayload @hook_addContractPost
-  updateContract(input: UpdateContractInput! @hook_updateContract): UpdateContractPayload @hook_updateContractPost
-  deleteContract(filter: ContractFilter! @hook_deleteContract): DeleteContractPayload @hook_deleteContractPost
+  addContract(input: [AddContractInput!]! @hook_addContractInput): AddContractPayload @hook_addContract
+  updateContract(input: UpdateContractInput! @hook_updateContractInput): UpdateContractPayload @hook_updateContract
+  deleteContract(filter: ContractFilter! @hook_deleteContractInput): DeleteContractPayload @hook_deleteContract
   addVote(input: [AddVoteInput!]!): AddVotePayload
   updateVote(input: UpdateVoteInput!): UpdateVotePayload
   deleteVote(filter: VoteFilter!): DeleteVotePayload
@@ -7948,12 +7949,12 @@ enum NodeFragmentOrderable {
 }
 
 input NodeFragmentPatch {
-  name: String @alter_minLength(f:"name", n:1)
-  nameid: String @alter_toLower(f:"nameid")
+  name: String @alter_minLength(n:1)
+  nameid: String @alter_toLower
   type_: NodeType
   isPrivate: Boolean
   charac: NodeCharacRef
-  about: String @alter_maxLength(f:"about", n:280)
+  about: String @alter_maxLength(n:280)
   mandate: MandateRef
   children: [NodeFragmentRef!]
   first_link: String
@@ -8262,8 +8263,8 @@ input PostRef {
 }
 
 type Query {
-  getNode(id: ID, nameid: String @hook_getNode): Node
-  queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int @hook_queryNode): [Node]
+  getNode(id: ID, nameid: String @hook_getNodeInput): Node
+  queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int @hook_queryNodeInput): [Node]
   aggregateNode(filter: NodeFilter): NodeAggregateResult
   querySharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
   aggregateSharedNode(filter: SharedNodeFilter): SharedNodeAggregateResult
@@ -8281,14 +8282,14 @@ type Query {
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
-  getTension(id: ID! @hook_getTension): Tension
-  queryTension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int @hook_queryTension): [Tension]
+  getTension(id: ID! @hook_getTensionInput): Tension
+  queryTension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int @hook_queryTensionInput): [Tension]
   aggregateTension(filter: TensionFilter): TensionAggregateResult
-  getLabel(id: ID! @hook_getLabel): Label
-  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabel): [Label]
+  getLabel(id: ID! @hook_getLabelInput): Label
+  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabelInput): [Label]
   aggregateLabel(filter: LabelFilter): LabelAggregateResult
-  getComment(id: ID! @hook_getComment): Comment
-  queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int @hook_queryComment): [Comment]
+  getComment(id: ID! @hook_getCommentInput): Comment
+  queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int @hook_queryCommentInput): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
   getBlob(id: ID!): Blob
   queryBlob(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
@@ -8298,8 +8299,8 @@ type Query {
   aggregateEvent(filter: EventFilter): EventAggregateResult
   queryEventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   aggregateEventFragment(filter: EventFragmentFilter): EventFragmentAggregateResult
-  getContract(id: ID! @hook_getContract): Contract
-  queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContract): [Contract]
+  getContract(id: ID! @hook_getContractInput): Contract
+  queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContractInput): [Contract]
   aggregateContract(filter: ContractFilter): ContractAggregateResult
   getVote(id: ID!): Vote
   queryVote(filter: VoteFilter, first: Int, offset: Int): [Vote]
@@ -8515,14 +8516,14 @@ input TensionPatch {
   receiverid: String @patch_RO
   receiver: NodeRef @patch_RO
   nth: String
-  title: String @alter_minLength(f:"title", n:1)
+  title: String @alter_minLength(n:1)
   type_: TensionType
   status: TensionStatus
   assignees: [UserRef!]
   labels: [LabelRef!]
-  comments: [CommentRef!]
+  comments: [CommentRef!] @alter_oneByOne
   action: TensionAction
-  blobs: [BlobRef!]
+  blobs: [BlobRef!] @alter_oneByOne
   contracts: [ContractRef!]
   history: [EventRef!]
   n_comments: Int
@@ -8961,54 +8962,6 @@ func (ec *executionContext) dir_add_isOwner_args(ctx context.Context, rawArgs ma
 	return args, nil
 }
 
-func (ec *executionContext) dir_alter_hasRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["n"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n"))
-		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["n"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["u"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("u"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["u"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["a"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("a"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["a"] = arg2
-	return args, nil
-}
-
-func (ec *executionContext) dir_alter_hasRoot_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["n"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n"))
-		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["n"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) dir_alter_maxLength_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -9276,39 +9229,6 @@ func (ec *executionContext) dir_lambdaOnMutate_args(ctx context.Context, rawArgs
 		}
 	}
 	args["delete"] = arg2
-	return args, nil
-}
-
-func (ec *executionContext) dir_patch_hasRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["n"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n"))
-		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["n"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["u"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("u"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["u"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["a"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("a"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["a"] = arg2
 	return args, nil
 }
 
@@ -11092,10 +11012,10 @@ func (ec *executionContext) field_Mutation_addComment_args(ctx context.Context, 
 			return ec.unmarshalNAddCommentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInputᚄ(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addComment == nil {
-				return nil, errors.New("directive hook_addComment is not implemented")
+			if ec.directives.Hook_addCommentInput == nil {
+				return nil, errors.New("directive hook_addCommentInput is not implemented")
 			}
-			return ec.directives.Hook_addComment(ctx, rawArgs, directive0)
+			return ec.directives.Hook_addCommentInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11124,10 +11044,10 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 			return ec.unmarshalNAddContractInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInputᚄ(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addContract == nil {
-				return nil, errors.New("directive hook_addContract is not implemented")
+			if ec.directives.Hook_addContractInput == nil {
+				return nil, errors.New("directive hook_addContractInput is not implemented")
 			}
-			return ec.directives.Hook_addContract(ctx, rawArgs, directive0)
+			return ec.directives.Hook_addContractInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11186,10 +11106,10 @@ func (ec *executionContext) field_Mutation_addLabel_args(ctx context.Context, ra
 			return ec.unmarshalNAddLabelInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddLabelInputᚄ(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addLabel == nil {
-				return nil, errors.New("directive hook_addLabel is not implemented")
+			if ec.directives.Hook_addLabelInput == nil {
+				return nil, errors.New("directive hook_addLabelInput is not implemented")
 			}
-			return ec.directives.Hook_addLabel(ctx, rawArgs, directive0)
+			return ec.directives.Hook_addLabelInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11285,10 +11205,10 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addNode == nil {
-				return nil, errors.New("directive hook_addNode is not implemented")
+			if ec.directives.Hook_addNodeInput == nil {
+				return nil, errors.New("directive hook_addNodeInput is not implemented")
 			}
-			return ec.directives.Hook_addNode(ctx, rawArgs, directive0)
+			return ec.directives.Hook_addNodeInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11332,10 +11252,10 @@ func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, 
 			return ec.unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addTension == nil {
-				return nil, errors.New("directive hook_addTension is not implemented")
+			if ec.directives.Hook_addTensionInput == nil {
+				return nil, errors.New("directive hook_addTensionInput is not implemented")
 			}
-			return ec.directives.Hook_addTension(ctx, rawArgs, directive0)
+			return ec.directives.Hook_addTensionInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11433,10 +11353,10 @@ func (ec *executionContext) field_Mutation_deleteComment_args(ctx context.Contex
 			return ec.unmarshalNCommentFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteComment == nil {
-				return nil, errors.New("directive hook_deleteComment is not implemented")
+			if ec.directives.Hook_deleteCommentInput == nil {
+				return nil, errors.New("directive hook_deleteCommentInput is not implemented")
 			}
-			return ec.directives.Hook_deleteComment(ctx, rawArgs, directive0)
+			return ec.directives.Hook_deleteCommentInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11463,10 +11383,10 @@ func (ec *executionContext) field_Mutation_deleteContract_args(ctx context.Conte
 			return ec.unmarshalNContractFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteContract == nil {
-				return nil, errors.New("directive hook_deleteContract is not implemented")
+			if ec.directives.Hook_deleteContractInput == nil {
+				return nil, errors.New("directive hook_deleteContractInput is not implemented")
 			}
-			return ec.directives.Hook_deleteContract(ctx, rawArgs, directive0)
+			return ec.directives.Hook_deleteContractInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11523,10 +11443,10 @@ func (ec *executionContext) field_Mutation_deleteLabel_args(ctx context.Context,
 			return ec.unmarshalNLabelFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteLabel == nil {
-				return nil, errors.New("directive hook_deleteLabel is not implemented")
+			if ec.directives.Hook_deleteLabelInput == nil {
+				return nil, errors.New("directive hook_deleteLabelInput is not implemented")
 			}
-			return ec.directives.Hook_deleteLabel(ctx, rawArgs, directive0)
+			return ec.directives.Hook_deleteLabelInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11613,10 +11533,10 @@ func (ec *executionContext) field_Mutation_deleteNode_args(ctx context.Context, 
 			return ec.unmarshalNNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteNode == nil {
-				return nil, errors.New("directive hook_deleteNode is not implemented")
+			if ec.directives.Hook_deleteNodeInput == nil {
+				return nil, errors.New("directive hook_deleteNodeInput is not implemented")
 			}
-			return ec.directives.Hook_deleteNode(ctx, rawArgs, directive0)
+			return ec.directives.Hook_deleteNodeInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11673,10 +11593,10 @@ func (ec *executionContext) field_Mutation_deleteTension_args(ctx context.Contex
 			return ec.unmarshalNTensionFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteTension == nil {
-				return nil, errors.New("directive hook_deleteTension is not implemented")
+			if ec.directives.Hook_deleteTensionInput == nil {
+				return nil, errors.New("directive hook_deleteTensionInput is not implemented")
 			}
-			return ec.directives.Hook_deleteTension(ctx, rawArgs, directive0)
+			return ec.directives.Hook_deleteTensionInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11763,10 +11683,10 @@ func (ec *executionContext) field_Mutation_updateComment_args(ctx context.Contex
 			return ec.unmarshalNUpdateCommentInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentInput(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateComment == nil {
-				return nil, errors.New("directive hook_updateComment is not implemented")
+			if ec.directives.Hook_updateCommentInput == nil {
+				return nil, errors.New("directive hook_updateCommentInput is not implemented")
 			}
-			return ec.directives.Hook_updateComment(ctx, rawArgs, directive0)
+			return ec.directives.Hook_updateCommentInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11793,10 +11713,10 @@ func (ec *executionContext) field_Mutation_updateContract_args(ctx context.Conte
 			return ec.unmarshalNUpdateContractInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateContractInput(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateContract == nil {
-				return nil, errors.New("directive hook_updateContract is not implemented")
+			if ec.directives.Hook_updateContractInput == nil {
+				return nil, errors.New("directive hook_updateContractInput is not implemented")
 			}
-			return ec.directives.Hook_updateContract(ctx, rawArgs, directive0)
+			return ec.directives.Hook_updateContractInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11853,10 +11773,10 @@ func (ec *executionContext) field_Mutation_updateLabel_args(ctx context.Context,
 			return ec.unmarshalNUpdateLabelInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateLabelInput(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateLabel == nil {
-				return nil, errors.New("directive hook_updateLabel is not implemented")
+			if ec.directives.Hook_updateLabelInput == nil {
+				return nil, errors.New("directive hook_updateLabelInput is not implemented")
 			}
-			return ec.directives.Hook_updateLabel(ctx, rawArgs, directive0)
+			return ec.directives.Hook_updateLabelInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -11943,10 +11863,10 @@ func (ec *executionContext) field_Mutation_updateNode_args(ctx context.Context, 
 			return ec.unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateNode == nil {
-				return nil, errors.New("directive hook_updateNode is not implemented")
+			if ec.directives.Hook_updateNodeInput == nil {
+				return nil, errors.New("directive hook_updateNodeInput is not implemented")
 			}
-			return ec.directives.Hook_updateNode(ctx, rawArgs, directive0)
+			return ec.directives.Hook_updateNodeInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -12003,10 +11923,10 @@ func (ec *executionContext) field_Mutation_updateTension_args(ctx context.Contex
 			return ec.unmarshalNUpdateTensionInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionInput(ctx, tmp)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateTension == nil {
-				return nil, errors.New("directive hook_updateTension is not implemented")
+			if ec.directives.Hook_updateTensionInput == nil {
+				return nil, errors.New("directive hook_updateTensionInput is not implemented")
 			}
-			return ec.directives.Hook_updateTension(ctx, rawArgs, directive0)
+			return ec.directives.Hook_updateTensionInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -12826,10 +12746,10 @@ func (ec *executionContext) field_Query_getComment_args(ctx context.Context, raw
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getComment == nil {
-				return nil, errors.New("directive hook_getComment is not implemented")
+			if ec.directives.Hook_getCommentInput == nil {
+				return nil, errors.New("directive hook_getCommentInput is not implemented")
 			}
-			return ec.directives.Hook_getComment(ctx, rawArgs, directive0)
+			return ec.directives.Hook_getCommentInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -12854,10 +12774,10 @@ func (ec *executionContext) field_Query_getContract_args(ctx context.Context, ra
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getContract == nil {
-				return nil, errors.New("directive hook_getContract is not implemented")
+			if ec.directives.Hook_getContractInput == nil {
+				return nil, errors.New("directive hook_getContractInput is not implemented")
 			}
-			return ec.directives.Hook_getContract(ctx, rawArgs, directive0)
+			return ec.directives.Hook_getContractInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -12897,10 +12817,10 @@ func (ec *executionContext) field_Query_getLabel_args(ctx context.Context, rawAr
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getLabel == nil {
-				return nil, errors.New("directive hook_getLabel is not implemented")
+			if ec.directives.Hook_getLabelInput == nil {
+				return nil, errors.New("directive hook_getLabelInput is not implemented")
 			}
-			return ec.directives.Hook_getLabel(ctx, rawArgs, directive0)
+			return ec.directives.Hook_getLabelInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -12979,10 +12899,10 @@ func (ec *executionContext) field_Query_getNode_args(ctx context.Context, rawArg
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getNode == nil {
-				return nil, errors.New("directive hook_getNode is not implemented")
+			if ec.directives.Hook_getNodeInput == nil {
+				return nil, errors.New("directive hook_getNodeInput is not implemented")
 			}
-			return ec.directives.Hook_getNode(ctx, rawArgs, directive0)
+			return ec.directives.Hook_getNodeInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -13024,10 +12944,10 @@ func (ec *executionContext) field_Query_getTension_args(ctx context.Context, raw
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getTension == nil {
-				return nil, errors.New("directive hook_getTension is not implemented")
+			if ec.directives.Hook_getTensionInput == nil {
+				return nil, errors.New("directive hook_getTensionInput is not implemented")
 			}
-			return ec.directives.Hook_getTension(ctx, rawArgs, directive0)
+			return ec.directives.Hook_getTensionInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -13160,10 +13080,10 @@ func (ec *executionContext) field_Query_queryComment_args(ctx context.Context, r
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryComment == nil {
-				return nil, errors.New("directive hook_queryComment is not implemented")
+			if ec.directives.Hook_queryCommentInput == nil {
+				return nil, errors.New("directive hook_queryCommentInput is not implemented")
 			}
-			return ec.directives.Hook_queryComment(ctx, rawArgs, directive0)
+			return ec.directives.Hook_queryCommentInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -13217,10 +13137,10 @@ func (ec *executionContext) field_Query_queryContract_args(ctx context.Context, 
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryContract == nil {
-				return nil, errors.New("directive hook_queryContract is not implemented")
+			if ec.directives.Hook_queryContractInput == nil {
+				return nil, errors.New("directive hook_queryContractInput is not implemented")
 			}
-			return ec.directives.Hook_queryContract(ctx, rawArgs, directive0)
+			return ec.directives.Hook_queryContractInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -13358,10 +13278,10 @@ func (ec *executionContext) field_Query_queryLabel_args(ctx context.Context, raw
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryLabel == nil {
-				return nil, errors.New("directive hook_queryLabel is not implemented")
+			if ec.directives.Hook_queryLabelInput == nil {
+				return nil, errors.New("directive hook_queryLabelInput is not implemented")
 			}
-			return ec.directives.Hook_queryLabel(ctx, rawArgs, directive0)
+			return ec.directives.Hook_queryLabelInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -13574,10 +13494,10 @@ func (ec *executionContext) field_Query_queryNode_args(ctx context.Context, rawA
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryNode == nil {
-				return nil, errors.New("directive hook_queryNode is not implemented")
+			if ec.directives.Hook_queryNodeInput == nil {
+				return nil, errors.New("directive hook_queryNodeInput is not implemented")
 			}
-			return ec.directives.Hook_queryNode(ctx, rawArgs, directive0)
+			return ec.directives.Hook_queryNodeInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -13715,10 +13635,10 @@ func (ec *executionContext) field_Query_queryTension_args(ctx context.Context, r
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryTension == nil {
-				return nil, errors.New("directive hook_queryTension is not implemented")
+			if ec.directives.Hook_queryTensionInput == nil {
+				return nil, errors.New("directive hook_queryTensionInput is not implemented")
 			}
-			return ec.directives.Hook_queryTension(ctx, rawArgs, directive0)
+			return ec.directives.Hook_queryTensionInput(ctx, rawArgs, directive0)
 		}
 
 		tmp, err = directive1(ctx)
@@ -15290,8 +15210,36 @@ func (ec *executionContext) _AddCommentPayload_comment(ctx context.Context, fiel
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comment, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Comment, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -18077,8 +18025,36 @@ func (ec *executionContext) _Contract_comments(ctx context.Context, field graphq
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comments, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Comments, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -18673,8 +18649,36 @@ func (ec *executionContext) _DeleteCommentPayload_comment(ctx context.Context, f
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comment, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Comment, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -22675,10 +22679,10 @@ func (ec *executionContext) _Mutation_addNode(ctx context.Context, field graphql
 			return ec.resolvers.Mutation().AddNode(rctx, args["input"].([]*model.AddNodeInput), args["upsert"].(*bool))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addNodePost == nil {
-				return nil, errors.New("directive hook_addNodePost is not implemented")
+			if ec.directives.Hook_addNode == nil {
+				return nil, errors.New("directive hook_addNode is not implemented")
 			}
-			return ec.directives.Hook_addNodePost(ctx, nil, directive0)
+			return ec.directives.Hook_addNode(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -22731,10 +22735,10 @@ func (ec *executionContext) _Mutation_updateNode(ctx context.Context, field grap
 			return ec.resolvers.Mutation().UpdateNode(rctx, args["input"].(model.UpdateNodeInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateNodePost == nil {
-				return nil, errors.New("directive hook_updateNodePost is not implemented")
+			if ec.directives.Hook_updateNode == nil {
+				return nil, errors.New("directive hook_updateNode is not implemented")
 			}
-			return ec.directives.Hook_updateNodePost(ctx, nil, directive0)
+			return ec.directives.Hook_updateNode(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -22787,10 +22791,10 @@ func (ec *executionContext) _Mutation_deleteNode(ctx context.Context, field grap
 			return ec.resolvers.Mutation().DeleteNode(rctx, args["filter"].(model.NodeFilter))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteNodePost == nil {
-				return nil, errors.New("directive hook_deleteNodePost is not implemented")
+			if ec.directives.Hook_deleteNode == nil {
+				return nil, errors.New("directive hook_deleteNode is not implemented")
 			}
-			return ec.directives.Hook_deleteNodePost(ctx, nil, directive0)
+			return ec.directives.Hook_deleteNode(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23455,10 +23459,10 @@ func (ec *executionContext) _Mutation_addTension(ctx context.Context, field grap
 			return ec.resolvers.Mutation().AddTension(rctx, args["input"].([]*model.AddTensionInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addTensionPost == nil {
-				return nil, errors.New("directive hook_addTensionPost is not implemented")
+			if ec.directives.Hook_addTension == nil {
+				return nil, errors.New("directive hook_addTension is not implemented")
 			}
-			return ec.directives.Hook_addTensionPost(ctx, nil, directive0)
+			return ec.directives.Hook_addTension(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23511,10 +23515,10 @@ func (ec *executionContext) _Mutation_updateTension(ctx context.Context, field g
 			return ec.resolvers.Mutation().UpdateTension(rctx, args["input"].(model.UpdateTensionInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateTensionPost == nil {
-				return nil, errors.New("directive hook_updateTensionPost is not implemented")
+			if ec.directives.Hook_updateTension == nil {
+				return nil, errors.New("directive hook_updateTension is not implemented")
 			}
-			return ec.directives.Hook_updateTensionPost(ctx, nil, directive0)
+			return ec.directives.Hook_updateTension(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23567,10 +23571,10 @@ func (ec *executionContext) _Mutation_deleteTension(ctx context.Context, field g
 			return ec.resolvers.Mutation().DeleteTension(rctx, args["filter"].(model.TensionFilter))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteTensionPost == nil {
-				return nil, errors.New("directive hook_deleteTensionPost is not implemented")
+			if ec.directives.Hook_deleteTension == nil {
+				return nil, errors.New("directive hook_deleteTension is not implemented")
 			}
-			return ec.directives.Hook_deleteTensionPost(ctx, nil, directive0)
+			return ec.directives.Hook_deleteTension(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23623,10 +23627,10 @@ func (ec *executionContext) _Mutation_addLabel(ctx context.Context, field graphq
 			return ec.resolvers.Mutation().AddLabel(rctx, args["input"].([]*model.AddLabelInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addLabelPost == nil {
-				return nil, errors.New("directive hook_addLabelPost is not implemented")
+			if ec.directives.Hook_addLabel == nil {
+				return nil, errors.New("directive hook_addLabel is not implemented")
 			}
-			return ec.directives.Hook_addLabelPost(ctx, nil, directive0)
+			return ec.directives.Hook_addLabel(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23679,10 +23683,10 @@ func (ec *executionContext) _Mutation_updateLabel(ctx context.Context, field gra
 			return ec.resolvers.Mutation().UpdateLabel(rctx, args["input"].(model.UpdateLabelInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateLabelPost == nil {
-				return nil, errors.New("directive hook_updateLabelPost is not implemented")
+			if ec.directives.Hook_updateLabel == nil {
+				return nil, errors.New("directive hook_updateLabel is not implemented")
 			}
-			return ec.directives.Hook_updateLabelPost(ctx, nil, directive0)
+			return ec.directives.Hook_updateLabel(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23735,10 +23739,10 @@ func (ec *executionContext) _Mutation_deleteLabel(ctx context.Context, field gra
 			return ec.resolvers.Mutation().DeleteLabel(rctx, args["filter"].(model.LabelFilter))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteLabelPost == nil {
-				return nil, errors.New("directive hook_deleteLabelPost is not implemented")
+			if ec.directives.Hook_deleteLabel == nil {
+				return nil, errors.New("directive hook_deleteLabel is not implemented")
 			}
-			return ec.directives.Hook_deleteLabelPost(ctx, nil, directive0)
+			return ec.directives.Hook_deleteLabel(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23791,10 +23795,10 @@ func (ec *executionContext) _Mutation_addComment(ctx context.Context, field grap
 			return ec.resolvers.Mutation().AddComment(rctx, args["input"].([]*model.AddCommentInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addCommentPost == nil {
-				return nil, errors.New("directive hook_addCommentPost is not implemented")
+			if ec.directives.Hook_addComment == nil {
+				return nil, errors.New("directive hook_addComment is not implemented")
 			}
-			return ec.directives.Hook_addCommentPost(ctx, nil, directive0)
+			return ec.directives.Hook_addComment(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23847,10 +23851,10 @@ func (ec *executionContext) _Mutation_updateComment(ctx context.Context, field g
 			return ec.resolvers.Mutation().UpdateComment(rctx, args["input"].(model.UpdateCommentInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateCommentPost == nil {
-				return nil, errors.New("directive hook_updateCommentPost is not implemented")
+			if ec.directives.Hook_updateComment == nil {
+				return nil, errors.New("directive hook_updateComment is not implemented")
 			}
-			return ec.directives.Hook_updateCommentPost(ctx, nil, directive0)
+			return ec.directives.Hook_updateComment(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -23903,10 +23907,10 @@ func (ec *executionContext) _Mutation_deleteComment(ctx context.Context, field g
 			return ec.resolvers.Mutation().DeleteComment(rctx, args["filter"].(model.CommentFilter))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteCommentPost == nil {
-				return nil, errors.New("directive hook_deleteCommentPost is not implemented")
+			if ec.directives.Hook_deleteComment == nil {
+				return nil, errors.New("directive hook_deleteComment is not implemented")
 			}
-			return ec.directives.Hook_deleteCommentPost(ctx, nil, directive0)
+			return ec.directives.Hook_deleteComment(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -24283,10 +24287,10 @@ func (ec *executionContext) _Mutation_addContract(ctx context.Context, field gra
 			return ec.resolvers.Mutation().AddContract(rctx, args["input"].([]*model.AddContractInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addContractPost == nil {
-				return nil, errors.New("directive hook_addContractPost is not implemented")
+			if ec.directives.Hook_addContract == nil {
+				return nil, errors.New("directive hook_addContract is not implemented")
 			}
-			return ec.directives.Hook_addContractPost(ctx, nil, directive0)
+			return ec.directives.Hook_addContract(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -24339,10 +24343,10 @@ func (ec *executionContext) _Mutation_updateContract(ctx context.Context, field 
 			return ec.resolvers.Mutation().UpdateContract(rctx, args["input"].(model.UpdateContractInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateContractPost == nil {
-				return nil, errors.New("directive hook_updateContractPost is not implemented")
+			if ec.directives.Hook_updateContract == nil {
+				return nil, errors.New("directive hook_updateContract is not implemented")
 			}
-			return ec.directives.Hook_updateContractPost(ctx, nil, directive0)
+			return ec.directives.Hook_updateContract(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -24395,10 +24399,10 @@ func (ec *executionContext) _Mutation_deleteContract(ctx context.Context, field 
 			return ec.resolvers.Mutation().DeleteContract(rctx, args["filter"].(model.ContractFilter))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteContractPost == nil {
-				return nil, errors.New("directive hook_deleteContractPost is not implemented")
+			if ec.directives.Hook_deleteContract == nil {
+				return nil, errors.New("directive hook_deleteContract is not implemented")
 			}
-			return ec.directives.Hook_deleteContractPost(ctx, nil, directive0)
+			return ec.directives.Hook_deleteContract(ctx, nil, directive0)
 		}
 
 		tmp, err := directive1(rctx)
@@ -30379,8 +30383,36 @@ func (ec *executionContext) _Query_getComment(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetComment(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetComment(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -30415,8 +30447,36 @@ func (ec *executionContext) _Query_queryComment(ctx context.Context, field graph
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryComment(rctx, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().QueryComment(rctx, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -32291,8 +32351,36 @@ func (ec *executionContext) _Tension_comments(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comments, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Comments, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -33592,8 +33680,36 @@ func (ec *executionContext) _UpdateCommentPayload_comment(ctx context.Context, f
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comment, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Comment, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			update, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryComment {\n        createdBy(filter: {username: {eq: $USERNAME}}) { username }\n      }\n  }"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, nil, add, update, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Comment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Comment`, tmp)
 	})
 
 	if resTmp == nil {
@@ -38944,9 +39060,27 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
-			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_oneByOne == nil {
+					return nil, errors.New("directive alter_oneByOne is not implemented")
+				}
+				return ec.directives.Alter_oneByOne(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.CommentRef); ok {
+				it.Comments = data
+			} else if tmp == nil {
+				it.Comments = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "action":
 			var err error
@@ -38960,9 +39094,27 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blobs"))
-			it.Blobs, err = ec.unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_oneByOne == nil {
+					return nil, errors.New("directive alter_oneByOne is not implemented")
+				}
+				return ec.directives.Alter_oneByOne(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.BlobRef); ok {
+				it.Blobs = data
+			} else if tmp == nil {
+				it.Blobs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.BlobRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
 			var err error
@@ -40016,29 +40168,9 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				u, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Patch_isOwner == nil {
-					return nil, errors.New("directive patch_isOwner is not implemented")
-				}
-				return ec.directives.Patch_isOwner(ctx, obj, directive0, u)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Message = data
-			} else if tmp == nil {
-				it.Message = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "_VOID":
 			var err error
@@ -40466,9 +40598,27 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			it.Participants, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.VoteRef); ok {
+				it.Participants = data
+			} else if tmp == nil {
+				it.Participants = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.VoteRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comments":
 			var err error
@@ -45398,9 +45548,27 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
-			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_oneByOne == nil {
+					return nil, errors.New("directive alter_oneByOne is not implemented")
+				}
+				return ec.directives.Alter_oneByOne(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.CommentRef); ok {
+				it.Comments = data
+			} else if tmp == nil {
+				it.Comments = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.CommentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "action":
 			var err error
@@ -45414,9 +45582,27 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blobs"))
-			it.Blobs, err = ec.unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_oneByOne == nil {
+					return nil, errors.New("directive alter_oneByOne is not implemented")
+				}
+				return ec.directives.Alter_oneByOne(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.BlobRef); ok {
+				it.Blobs = data
+			} else if tmp == nil {
+				it.Blobs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.BlobRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
 			var err error
@@ -52460,36 +52646,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalNTension2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx context.Context, sel ast.SelectionSet, v *model.Tension) graphql.Marshaler {
