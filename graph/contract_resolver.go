@@ -111,13 +111,14 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
     author, err := db.GetDB().GetSubFieldById(ids[0], "Post.createdBy", "User.username")
     if err != nil { return nil, err }
     if author == nil { panic("empty createdBy field") }
-    ok = author.(string) != uctx.Username
+    ok = author.(string) == uctx.Username
     // OR has rights (coordo or assigned).
     if !ok {
         nameid, err := db.GetDB().GetSubFieldById(ids[0], "Contract.tension", "Tension.receiverid")
         if err != nil { return nil, err }
         if nameid == nil { panic("empty receiverid field") }
-        ok, err = auth.HasCoordoRole(uctx, nameid.(string), nil)
+        charac := GetNodeCharacStrict()
+        ok, err = auth.HasCoordoRole(uctx, nameid.(string), &charac)
         if err != nil { return nil, err }
     }
     if !ok {
