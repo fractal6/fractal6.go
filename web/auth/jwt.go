@@ -48,15 +48,7 @@ func (Jwt) New() *Jwt {
         tokenClaimErr: "user_ctx_err",
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
 	}
-    roleType := model.RoleTypeOwner
-    uctx := model.UserCtx{
-        Username: "dtrckd",
-        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
-        Roles: []*model.Node{
-            {Rootnameid:"f6", Nameid:"f6", RoleType:&roleType},
-        },
-    }
-
+    uctx := db.DB.GetRootUctx()
     apiToken, _ := tk.issue(uctx, time.Hour*1)
     dgraphToken := db.GetDB().BuildGqlToken(uctx)
 

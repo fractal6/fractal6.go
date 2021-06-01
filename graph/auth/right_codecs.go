@@ -77,7 +77,7 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
     for i, r := range uctx.Roles {
         pid, err := codec.Nid2pid(r.Nameid)
         if err != nil { panic(err.Error()) }
-        if *r.RoleType != model.RoleTypeGuest && pid == nameid {
+        if pid == nameid && *r.RoleType != model.RoleTypeGuest {
             return i
         }
     }
@@ -91,9 +91,7 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
 
     for i, r := range uctx.Roles {
         pid, err := codec.Nid2pid(r.Nameid)
-        if err != nil {
-            panic("bad nameid format for coordo test: "+ r.Nameid)
-        }
+        if err != nil { panic(err.Error()) }
         if pid == nameid && *r.RoleType == model.RoleTypeCoordinator {
             return i
         }

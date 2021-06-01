@@ -252,6 +252,7 @@ func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
 
 func (dg Dgraph) GetRootUctx() model.UserCtx {
     return model.UserCtx{
+        Username: "root",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
     }
 }
