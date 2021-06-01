@@ -44,6 +44,8 @@ schema:
 	cd ../schema
 	make schema # Do not alter Dgraph
 	cd -
+	mkdir -p schema/
+	cp ../schema/gen/*.graphql schema/
 
 generate:
 	# go generate ./... | go run github.com/99designs/gqlgen generate
