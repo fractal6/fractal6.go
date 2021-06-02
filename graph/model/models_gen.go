@@ -430,19 +430,22 @@ type ContainsFilter struct {
 }
 
 type Contract struct {
-	Tension      *Tension       `json:"tension,omitempty"`
-	Status       ContractStatus `json:"status,omitempty"`
-	ContractType ContractType   `json:"contract_type,omitempty"`
-	ClosedAt     *string        `json:"closedAt,omitempty"`
-	Event        *EventFragment `json:"event,omitempty"`
-	Candidates   []*User        `json:"candidates,omitempty"`
-	Participants []*Vote        `json:"participants,omitempty"`
-	Comments     []*Comment     `json:"comments,omitempty"`
-	ID           string         `json:"id,omitempty"`
-	CreatedBy    *User          `json:"createdBy,omitempty"`
-	CreatedAt    string         `json:"createdAt,omitempty"`
-	UpdatedAt    *string        `json:"updatedAt,omitempty"`
-	Message      *string        `json:"message,omitempty"`
+	Tension               *Tension                `json:"tension,omitempty"`
+	Status                ContractStatus          `json:"status,omitempty"`
+	ContractType          ContractType            `json:"contract_type,omitempty"`
+	ClosedAt              *string                 `json:"closedAt,omitempty"`
+	Event                 *EventFragment          `json:"event,omitempty"`
+	Candidates            []*User                 `json:"candidates,omitempty"`
+	Participants          []*Vote                 `json:"participants,omitempty"`
+	Comments              []*Comment              `json:"comments,omitempty"`
+	CandidatesAggregate   *UserAggregateResult    `json:"candidatesAggregate,omitempty"`
+	ParticipantsAggregate *VoteAggregateResult    `json:"participantsAggregate,omitempty"`
+	CommentsAggregate     *CommentAggregateResult `json:"commentsAggregate,omitempty"`
+	ID                    string                  `json:"id,omitempty"`
+	CreatedBy             *User                   `json:"createdBy,omitempty"`
+	CreatedAt             string                  `json:"createdAt,omitempty"`
+	UpdatedAt             *string                 `json:"updatedAt,omitempty"`
+	Message               *string                 `json:"message,omitempty"`
 }
 
 type ContractAggregateResult struct {
@@ -816,15 +819,17 @@ type IntersectsFilter struct {
 }
 
 type Label struct {
-	ID          string     `json:"id,omitempty"`
-	Rootnameid  string     `json:"rootnameid,omitempty"`
-	Name        string     `json:"name,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	Color       *string    `json:"color,omitempty"`
-	Tensions    []*Tension `json:"tensions,omitempty"`
-	Nodes       []*Node    `json:"nodes,omitempty"`
-	NNodes      *int       `json:"n_nodes"`
-	NTensions   *int       `json:"n_tensions"`
+	ID                string                  `json:"id,omitempty"`
+	Rootnameid        string                  `json:"rootnameid,omitempty"`
+	Name              string                  `json:"name,omitempty"`
+	Description       *string                 `json:"description,omitempty"`
+	Color             *string                 `json:"color,omitempty"`
+	Tensions          []*Tension              `json:"tensions,omitempty"`
+	Nodes             []*Node                 `json:"nodes,omitempty"`
+	NNodes            *int                    `json:"n_nodes"`
+	NTensions         *int                    `json:"n_tensions"`
+	TensionsAggregate *TensionAggregateResult `json:"tensionsAggregate,omitempty"`
+	NodesAggregate    *NodeAggregateResult    `json:"nodesAggregate,omitempty"`
 }
 
 type LabelAggregateResult struct {
@@ -950,39 +955,45 @@ type NearFilter struct {
 }
 
 type Node struct {
-	ID           string      `json:"id,omitempty"`
-	CreatedBy    *User       `json:"createdBy,omitempty"`
-	CreatedAt    string      `json:"createdAt,omitempty"`
-	UpdatedAt    *string     `json:"updatedAt,omitempty"`
-	Name         string      `json:"name,omitempty"`
-	Nameid       string      `json:"nameid,omitempty"`
-	Rootnameid   string      `json:"rootnameid,omitempty"`
-	Parent       *Node       `json:"parent,omitempty"`
-	Children     []*Node     `json:"children,omitempty"`
-	Type         NodeType    `json:"type_,omitempty"`
-	TensionsOut  []*Tension  `json:"tensions_out,omitempty"`
-	TensionsIn   []*Tension  `json:"tensions_in,omitempty"`
-	About        *string     `json:"about,omitempty"`
-	Mandate      *Mandate    `json:"mandate,omitempty"`
-	Docs         []*Blob     `json:"docs,omitempty"`
-	Source       *Blob       `json:"source,omitempty"`
-	NTensionsOut *int        `json:"n_tensions_out"`
-	NTensionsIn  *int        `json:"n_tensions_in"`
-	NChildren    *int        `json:"n_children"`
-	Stats        *NodeStats  `json:"stats,omitempty"`
-	IsRoot       bool        `json:"isRoot"`
-	IsPersonal   *bool       `json:"isPersonal"`
-	IsPrivate    bool        `json:"isPrivate"`
-	IsArchived   bool        `json:"isArchived"`
-	Charac       *NodeCharac `json:"charac,omitempty"`
-	Rights       int         `json:"rights"`
-	Labels       []*Label    `json:"labels,omitempty"`
-	FirstLink    *User       `json:"first_link,omitempty"`
-	SecondLink   *User       `json:"second_link,omitempty"`
-	Skills       []string    `json:"skills,omitempty"`
-	RoleType     *RoleType   `json:"role_type,omitempty"`
-	Contracts    []*Vote     `json:"contracts,omitempty"`
-	Shared       *SharedNode `json:"shared,omitempty"`
+	ID                   string                  `json:"id,omitempty"`
+	CreatedBy            *User                   `json:"createdBy,omitempty"`
+	CreatedAt            string                  `json:"createdAt,omitempty"`
+	UpdatedAt            *string                 `json:"updatedAt,omitempty"`
+	Name                 string                  `json:"name,omitempty"`
+	Nameid               string                  `json:"nameid,omitempty"`
+	Rootnameid           string                  `json:"rootnameid,omitempty"`
+	Parent               *Node                   `json:"parent,omitempty"`
+	Children             []*Node                 `json:"children,omitempty"`
+	Type                 NodeType                `json:"type_,omitempty"`
+	TensionsOut          []*Tension              `json:"tensions_out,omitempty"`
+	TensionsIn           []*Tension              `json:"tensions_in,omitempty"`
+	About                *string                 `json:"about,omitempty"`
+	Mandate              *Mandate                `json:"mandate,omitempty"`
+	Docs                 []*Blob                 `json:"docs,omitempty"`
+	Source               *Blob                   `json:"source,omitempty"`
+	NTensionsOut         *int                    `json:"n_tensions_out"`
+	NTensionsIn          *int                    `json:"n_tensions_in"`
+	NChildren            *int                    `json:"n_children"`
+	Stats                *NodeStats              `json:"stats,omitempty"`
+	IsRoot               bool                    `json:"isRoot"`
+	IsPersonal           *bool                   `json:"isPersonal"`
+	IsPrivate            bool                    `json:"isPrivate"`
+	IsArchived           bool                    `json:"isArchived"`
+	Charac               *NodeCharac             `json:"charac,omitempty"`
+	Rights               int                     `json:"rights"`
+	Labels               []*Label                `json:"labels,omitempty"`
+	FirstLink            *User                   `json:"first_link,omitempty"`
+	SecondLink           *User                   `json:"second_link,omitempty"`
+	Skills               []string                `json:"skills,omitempty"`
+	RoleType             *RoleType               `json:"role_type,omitempty"`
+	Contracts            []*Vote                 `json:"contracts,omitempty"`
+	Shared               *SharedNode             `json:"shared,omitempty"`
+	ChildrenAggregate    *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
+	TensionsOutAggregate *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
+	TensionsInAggregate  *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
+	DocsAggregate        *BlobAggregateResult    `json:"docsAggregate,omitempty"`
+	LabelsAggregate      *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
+	ContractsAggregate   *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
 }
 
 type NodeAggregateResult struct {
@@ -1069,19 +1080,20 @@ type NodeFilter struct {
 }
 
 type NodeFragment struct {
-	ID         string          `json:"id,omitempty"`
-	Name       *string         `json:"name,omitempty"`
-	Nameid     *string         `json:"nameid,omitempty"`
-	Type       *NodeType       `json:"type_,omitempty"`
-	IsPrivate  *bool           `json:"isPrivate"`
-	Charac     *NodeCharac     `json:"charac,omitempty"`
-	About      *string         `json:"about,omitempty"`
-	Mandate    *Mandate        `json:"mandate,omitempty"`
-	Children   []*NodeFragment `json:"children,omitempty"`
-	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
-	Skills     []string        `json:"skills,omitempty"`
-	RoleType   *RoleType       `json:"role_type,omitempty"`
+	ID                string                       `json:"id,omitempty"`
+	Name              *string                      `json:"name,omitempty"`
+	Nameid            *string                      `json:"nameid,omitempty"`
+	Type              *NodeType                    `json:"type_,omitempty"`
+	IsPrivate         *bool                        `json:"isPrivate"`
+	Charac            *NodeCharac                  `json:"charac,omitempty"`
+	About             *string                      `json:"about,omitempty"`
+	Mandate           *Mandate                     `json:"mandate,omitempty"`
+	Children          []*NodeFragment              `json:"children,omitempty"`
+	FirstLink         *string                      `json:"first_link,omitempty"`
+	SecondLink        *string                      `json:"second_link,omitempty"`
+	Skills            []string                     `json:"skills,omitempty"`
+	RoleType          *RoleType                    `json:"role_type,omitempty"`
+	ChildrenAggregate *NodeFragmentAggregateResult `json:"childrenAggregate,omitempty"`
 }
 
 type NodeFragmentAggregateResult struct {
@@ -1466,28 +1478,34 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Emitterid  string         `json:"emitterid,omitempty"`
-	Emitter    *Node          `json:"emitter,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
-	Receiver   *Node          `json:"receiver,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      string         `json:"title,omitempty"`
-	Type       TensionType    `json:"type_,omitempty"`
-	Status     TensionStatus  `json:"status,omitempty"`
-	Assignees  []*User        `json:"assignees,omitempty"`
-	Labels     []*Label       `json:"labels,omitempty"`
-	Comments   []*Comment     `json:"comments,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Blobs      []*Blob        `json:"blobs,omitempty"`
-	Contracts  []*Contract    `json:"contracts,omitempty"`
-	History    []*Event       `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments"`
-	NBlobs     *int           `json:"n_blobs"`
-	ID         string         `json:"id,omitempty"`
-	CreatedBy  *User          `json:"createdBy,omitempty"`
-	CreatedAt  string         `json:"createdAt,omitempty"`
-	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	Message    *string        `json:"message,omitempty"`
+	Emitterid          string                   `json:"emitterid,omitempty"`
+	Emitter            *Node                    `json:"emitter,omitempty"`
+	Receiverid         string                   `json:"receiverid,omitempty"`
+	Receiver           *Node                    `json:"receiver,omitempty"`
+	Nth                *string                  `json:"nth,omitempty"`
+	Title              string                   `json:"title,omitempty"`
+	Type               TensionType              `json:"type_,omitempty"`
+	Status             TensionStatus            `json:"status,omitempty"`
+	Assignees          []*User                  `json:"assignees,omitempty"`
+	Labels             []*Label                 `json:"labels,omitempty"`
+	Comments           []*Comment               `json:"comments,omitempty"`
+	Action             *TensionAction           `json:"action,omitempty"`
+	Blobs              []*Blob                  `json:"blobs,omitempty"`
+	Contracts          []*Contract              `json:"contracts,omitempty"`
+	History            []*Event                 `json:"history,omitempty"`
+	NComments          *int                     `json:"n_comments"`
+	NBlobs             *int                     `json:"n_blobs"`
+	AssigneesAggregate *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
+	LabelsAggregate    *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
+	CommentsAggregate  *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
+	BlobsAggregate     *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
+	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
+	HistoryAggregate   *EventAggregateResult    `json:"historyAggregate,omitempty"`
+	ID                 string                   `json:"id,omitempty"`
+	CreatedBy          *User                    `json:"createdBy,omitempty"`
+	CreatedAt          string                   `json:"createdAt,omitempty"`
+	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
+	Message            *string                  `json:"message,omitempty"`
 }
 
 type TensionAggregateResult struct {
@@ -1790,23 +1808,28 @@ type UpdateVotePayload struct {
 }
 
 type User struct {
-	ID               string      `json:"id,omitempty"`
-	CreatedAt        string      `json:"createdAt,omitempty"`
-	LastAck          string      `json:"lastAck,omitempty"`
-	Username         string      `json:"username,omitempty"`
-	Name             *string     `json:"name,omitempty"`
-	Password         string      `json:"password,omitempty"`
-	Email            string      `json:"email,omitempty"`
-	EmailHash        *string     `json:"emailHash,omitempty"`
-	EmailValidated   bool        `json:"emailValidated"`
-	Rights           *UserRights `json:"rights,omitempty"`
-	Roles            []*Node     `json:"roles,omitempty"`
-	BackedRoles      []*Node     `json:"backed_roles,omitempty"`
-	TensionsCreated  []*Tension  `json:"tensions_created,omitempty"`
-	TensionsAssigned []*Tension  `json:"tensions_assigned,omitempty"`
-	Contracts        []*Contract `json:"contracts,omitempty"`
-	Bio              *string     `json:"bio,omitempty"`
-	Utc              *string     `json:"utc,omitempty"`
+	ID                        string                   `json:"id,omitempty"`
+	CreatedAt                 string                   `json:"createdAt,omitempty"`
+	LastAck                   string                   `json:"lastAck,omitempty"`
+	Username                  string                   `json:"username,omitempty"`
+	Name                      *string                  `json:"name,omitempty"`
+	Password                  string                   `json:"password,omitempty"`
+	Email                     string                   `json:"email,omitempty"`
+	EmailHash                 *string                  `json:"emailHash,omitempty"`
+	EmailValidated            bool                     `json:"emailValidated"`
+	Rights                    *UserRights              `json:"rights,omitempty"`
+	Roles                     []*Node                  `json:"roles,omitempty"`
+	BackedRoles               []*Node                  `json:"backed_roles,omitempty"`
+	TensionsCreated           []*Tension               `json:"tensions_created,omitempty"`
+	TensionsAssigned          []*Tension               `json:"tensions_assigned,omitempty"`
+	Contracts                 []*Contract              `json:"contracts,omitempty"`
+	Bio                       *string                  `json:"bio,omitempty"`
+	Utc                       *string                  `json:"utc,omitempty"`
+	RolesAggregate            *NodeAggregateResult     `json:"rolesAggregate,omitempty"`
+	BackedRolesAggregate      *NodeAggregateResult     `json:"backed_rolesAggregate,omitempty"`
+	TensionsCreatedAggregate  *TensionAggregateResult  `json:"tensions_createdAggregate,omitempty"`
+	TensionsAssignedAggregate *TensionAggregateResult  `json:"tensions_assignedAggregate,omitempty"`
+	ContractsAggregate        *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 }
 
 type UserAggregateResult struct {

@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [schema] add **Node.rights** and **User.type_** fields
 - Add auth rules for bot roles
 - deepDelete operation implemented. The children node to delete should be definide in `db/api.go` in the `delete<Type>` entry.
+- aggregate queries and fields are not generated thanks to a gqlast update.
 
 ### Changed
 - [schema] Rename UserJoin event to UserJoined

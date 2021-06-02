@@ -147,6 +147,13 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   role_type: RoleType @search
   contracts(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
   shared(filter: SharedNodeFilter): SharedNode
+
+  childrenAggregate(filter: NodeFilter): NodeAggregateResult
+  tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
+  tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
+  docsAggregate(filter: BlobFilter): BlobAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  contractsAggregate(filter: VoteFilter): VoteAggregateResult
 }
 
 type SharedNode {
@@ -169,6 +176,8 @@ type NodeFragment {
   second_link: String
   skills: [String!]
   role_type: RoleType
+
+  childrenAggregate(filter: NodeFragmentFilter): NodeFragmentAggregateResult
 }
 
 type Mandate {
@@ -251,6 +260,13 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]! @hasInverse(field: tension)
   n_comments: Int @count(f: comments)
   n_blobs: Int @count(f: blobs)
+
+  assigneesAggregate(filter: UserFilter): UserAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  commentsAggregate(filter: CommentFilter): CommentAggregateResult
+  blobsAggregate(filter: BlobFilter): BlobAggregateResult
+  contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  historyAggregate(filter: EventFilter): EventAggregateResult
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
@@ -278,6 +294,9 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
   n_nodes: Int @count(f: nodes)
   n_tensions: Int @count(f: tensions)
+
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type Comment @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -348,6 +367,10 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
   participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
+
+  candidatesAggregate(filter: UserFilter): UserAggregateResult
+  participantsAggregate(filter: VoteFilter): VoteAggregateResult
+  commentsAggregate(filter: CommentFilter): CommentAggregateResult
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
@@ -380,6 +403,12 @@ type User {
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: candidates)
   bio: String
   utc: String
+
+  rolesAggregate(filter: NodeFilter): NodeAggregateResult
+  backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
+  tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
+  tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
+  contractsAggregate(filter: ContractFilter): ContractAggregateResult
 }
 
 type UserRights {
@@ -510,35 +539,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!

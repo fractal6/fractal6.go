@@ -241,19 +241,22 @@ type ComplexityRoot struct {
 	}
 
 	Contract struct {
-		Candidates   func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		ClosedAt     func(childComplexity int) int
-		Comments     func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		ContractType func(childComplexity int) int
-		CreatedAt    func(childComplexity int) int
-		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
-		Event        func(childComplexity int, filter *model.EventFragmentFilter) int
-		ID           func(childComplexity int) int
-		Message      func(childComplexity int) int
-		Participants func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
-		Status       func(childComplexity int) int
-		Tension      func(childComplexity int, filter *model.TensionFilter) int
-		UpdatedAt    func(childComplexity int) int
+		Candidates            func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		CandidatesAggregate   func(childComplexity int, filter *model.UserFilter) int
+		ClosedAt              func(childComplexity int) int
+		Comments              func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CommentsAggregate     func(childComplexity int, filter *model.CommentFilter) int
+		ContractType          func(childComplexity int) int
+		CreatedAt             func(childComplexity int) int
+		CreatedBy             func(childComplexity int, filter *model.UserFilter) int
+		Event                 func(childComplexity int, filter *model.EventFragmentFilter) int
+		ID                    func(childComplexity int) int
+		Message               func(childComplexity int) int
+		Participants          func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
+		ParticipantsAggregate func(childComplexity int, filter *model.VoteFilter) int
+		Status                func(childComplexity int) int
+		Tension               func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt             func(childComplexity int) int
 	}
 
 	ContractAggregateResult struct {
@@ -411,15 +414,17 @@ type ComplexityRoot struct {
 	}
 
 	Label struct {
-		Color       func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		NNodes      func(childComplexity int) int
-		NTensions   func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Nodes       func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		Rootnameid  func(childComplexity int) int
-		Tensions    func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		Color             func(childComplexity int) int
+		Description       func(childComplexity int) int
+		ID                func(childComplexity int) int
+		NNodes            func(childComplexity int) int
+		NTensions         func(childComplexity int) int
+		Name              func(childComplexity int) int
+		Nodes             func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		NodesAggregate    func(childComplexity int, filter *model.NodeFilter) int
+		Rootnameid        func(childComplexity int) int
+		Tensions          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsAggregate func(childComplexity int, filter *model.TensionFilter) int
 	}
 
 	LabelAggregateResult struct {
@@ -520,39 +525,45 @@ type ComplexityRoot struct {
 	}
 
 	Node struct {
-		About        func(childComplexity int) int
-		Charac       func(childComplexity int, filter *model.NodeCharacFilter) int
-		Children     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		Contracts    func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
-		CreatedAt    func(childComplexity int) int
-		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
-		Docs         func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		FirstLink    func(childComplexity int, filter *model.UserFilter) int
-		ID           func(childComplexity int) int
-		IsArchived   func(childComplexity int) int
-		IsPersonal   func(childComplexity int) int
-		IsPrivate    func(childComplexity int) int
-		IsRoot       func(childComplexity int) int
-		Labels       func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		Mandate      func(childComplexity int, filter *model.MandateFilter) int
-		NChildren    func(childComplexity int) int
-		NTensionsIn  func(childComplexity int) int
-		NTensionsOut func(childComplexity int) int
-		Name         func(childComplexity int) int
-		Nameid       func(childComplexity int) int
-		Parent       func(childComplexity int, filter *model.NodeFilter) int
-		Rights       func(childComplexity int) int
-		RoleType     func(childComplexity int) int
-		Rootnameid   func(childComplexity int) int
-		SecondLink   func(childComplexity int, filter *model.UserFilter) int
-		Shared       func(childComplexity int, filter *model.SharedNodeFilter) int
-		Skills       func(childComplexity int) int
-		Source       func(childComplexity int, filter *model.BlobFilter) int
-		Stats        func(childComplexity int, filter *model.NodeStatsFilter) int
-		TensionsIn   func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsOut  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		Type         func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
+		About                func(childComplexity int) int
+		Charac               func(childComplexity int, filter *model.NodeCharacFilter) int
+		Children             func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		ChildrenAggregate    func(childComplexity int, filter *model.NodeFilter) int
+		Contracts            func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
+		ContractsAggregate   func(childComplexity int, filter *model.VoteFilter) int
+		CreatedAt            func(childComplexity int) int
+		CreatedBy            func(childComplexity int, filter *model.UserFilter) int
+		Docs                 func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		DocsAggregate        func(childComplexity int, filter *model.BlobFilter) int
+		FirstLink            func(childComplexity int, filter *model.UserFilter) int
+		ID                   func(childComplexity int) int
+		IsArchived           func(childComplexity int) int
+		IsPersonal           func(childComplexity int) int
+		IsPrivate            func(childComplexity int) int
+		IsRoot               func(childComplexity int) int
+		Labels               func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate      func(childComplexity int, filter *model.LabelFilter) int
+		Mandate              func(childComplexity int, filter *model.MandateFilter) int
+		NChildren            func(childComplexity int) int
+		NTensionsIn          func(childComplexity int) int
+		NTensionsOut         func(childComplexity int) int
+		Name                 func(childComplexity int) int
+		Nameid               func(childComplexity int) int
+		Parent               func(childComplexity int, filter *model.NodeFilter) int
+		Rights               func(childComplexity int) int
+		RoleType             func(childComplexity int) int
+		Rootnameid           func(childComplexity int) int
+		SecondLink           func(childComplexity int, filter *model.UserFilter) int
+		Shared               func(childComplexity int, filter *model.SharedNodeFilter) int
+		Skills               func(childComplexity int) int
+		Source               func(childComplexity int, filter *model.BlobFilter) int
+		Stats                func(childComplexity int, filter *model.NodeStatsFilter) int
+		TensionsIn           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsInAggregate  func(childComplexity int, filter *model.TensionFilter) int
+		TensionsOut          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOutAggregate func(childComplexity int, filter *model.TensionFilter) int
+		Type                 func(childComplexity int) int
+		UpdatedAt            func(childComplexity int) int
 	}
 
 	NodeAggregateResult struct {
@@ -598,19 +609,20 @@ type ComplexityRoot struct {
 	}
 
 	NodeFragment struct {
-		About      func(childComplexity int) int
-		Charac     func(childComplexity int, filter *model.NodeCharacFilter) int
-		Children   func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
-		FirstLink  func(childComplexity int) int
-		ID         func(childComplexity int) int
-		IsPrivate  func(childComplexity int) int
-		Mandate    func(childComplexity int, filter *model.MandateFilter) int
-		Name       func(childComplexity int) int
-		Nameid     func(childComplexity int) int
-		RoleType   func(childComplexity int) int
-		SecondLink func(childComplexity int) int
-		Skills     func(childComplexity int) int
-		Type       func(childComplexity int) int
+		About             func(childComplexity int) int
+		Charac            func(childComplexity int, filter *model.NodeCharacFilter) int
+		Children          func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
+		ChildrenAggregate func(childComplexity int, filter *model.NodeFragmentFilter) int
+		FirstLink         func(childComplexity int) int
+		ID                func(childComplexity int) int
+		IsPrivate         func(childComplexity int) int
+		Mandate           func(childComplexity int, filter *model.MandateFilter) int
+		Name              func(childComplexity int) int
+		Nameid            func(childComplexity int) int
+		RoleType          func(childComplexity int) int
+		SecondLink        func(childComplexity int) int
+		Skills            func(childComplexity int) int
+		Type              func(childComplexity int) int
 	}
 
 	NodeFragmentAggregateResult struct {
@@ -758,28 +770,34 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Action     func(childComplexity int) int
-		Assignees  func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		Blobs      func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		Comments   func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		Contracts  func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
-		CreatedAt  func(childComplexity int) int
-		CreatedBy  func(childComplexity int, filter *model.UserFilter) int
-		Emitter    func(childComplexity int, filter *model.NodeFilter) int
-		Emitterid  func(childComplexity int) int
-		History    func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
-		ID         func(childComplexity int) int
-		Labels     func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		Message    func(childComplexity int) int
-		NBlobs     func(childComplexity int) int
-		NComments  func(childComplexity int) int
-		Nth        func(childComplexity int) int
-		Receiver   func(childComplexity int, filter *model.NodeFilter) int
-		Receiverid func(childComplexity int) int
-		Status     func(childComplexity int) int
-		Title      func(childComplexity int) int
-		Type       func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
+		Action             func(childComplexity int) int
+		Assignees          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		AssigneesAggregate func(childComplexity int, filter *model.UserFilter) int
+		Blobs              func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		BlobsAggregate     func(childComplexity int, filter *model.BlobFilter) int
+		Comments           func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CommentsAggregate  func(childComplexity int, filter *model.CommentFilter) int
+		Contracts          func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
+		ContractsAggregate func(childComplexity int, filter *model.ContractFilter) int
+		CreatedAt          func(childComplexity int) int
+		CreatedBy          func(childComplexity int, filter *model.UserFilter) int
+		Emitter            func(childComplexity int, filter *model.NodeFilter) int
+		Emitterid          func(childComplexity int) int
+		History            func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		HistoryAggregate   func(childComplexity int, filter *model.EventFilter) int
+		ID                 func(childComplexity int) int
+		Labels             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate    func(childComplexity int, filter *model.LabelFilter) int
+		Message            func(childComplexity int) int
+		NBlobs             func(childComplexity int) int
+		NComments          func(childComplexity int) int
+		Nth                func(childComplexity int) int
+		Receiver           func(childComplexity int, filter *model.NodeFilter) int
+		Receiverid         func(childComplexity int) int
+		Status             func(childComplexity int) int
+		Title              func(childComplexity int) int
+		Type               func(childComplexity int) int
+		UpdatedAt          func(childComplexity int) int
 	}
 
 	TensionAggregateResult struct {
@@ -894,23 +912,28 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		BackedRoles      func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		Bio              func(childComplexity int) int
-		Contracts        func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
-		CreatedAt        func(childComplexity int) int
-		Email            func(childComplexity int) int
-		EmailHash        func(childComplexity int) int
-		EmailValidated   func(childComplexity int) int
-		ID               func(childComplexity int) int
-		LastAck          func(childComplexity int) int
-		Name             func(childComplexity int) int
-		Password         func(childComplexity int) int
-		Rights           func(childComplexity int, filter *model.UserRightsFilter) int
-		Roles            func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		TensionsAssigned func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsCreated  func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		Username         func(childComplexity int) int
-		Utc              func(childComplexity int) int
+		BackedRoles               func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		BackedRolesAggregate      func(childComplexity int, filter *model.NodeFilter) int
+		Bio                       func(childComplexity int) int
+		Contracts                 func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
+		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
+		CreatedAt                 func(childComplexity int) int
+		Email                     func(childComplexity int) int
+		EmailHash                 func(childComplexity int) int
+		EmailValidated            func(childComplexity int) int
+		ID                        func(childComplexity int) int
+		LastAck                   func(childComplexity int) int
+		Name                      func(childComplexity int) int
+		Password                  func(childComplexity int) int
+		Rights                    func(childComplexity int, filter *model.UserRightsFilter) int
+		Roles                     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		RolesAggregate            func(childComplexity int, filter *model.NodeFilter) int
+		TensionsAssigned          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsAssignedAggregate func(childComplexity int, filter *model.TensionFilter) int
+		TensionsCreated           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsCreatedAggregate  func(childComplexity int, filter *model.TensionFilter) int
+		Username                  func(childComplexity int) int
+		Utc                       func(childComplexity int) int
 	}
 
 	UserAggregateResult struct {
@@ -1681,6 +1704,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Contract.Candidates(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Contract.candidatesAggregate":
+		if e.complexity.Contract.CandidatesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Contract_candidatesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Contract.CandidatesAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
+
 	case "Contract.closedAt":
 		if e.complexity.Contract.ClosedAt == nil {
 			break
@@ -1699,6 +1734,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.Comments(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Contract.commentsAggregate":
+		if e.complexity.Contract.CommentsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Contract_commentsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Contract.CommentsAggregate(childComplexity, args["filter"].(*model.CommentFilter)), true
 
 	case "Contract.contract_type":
 		if e.complexity.Contract.ContractType == nil {
@@ -1763,6 +1810,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.Participants(childComplexity, args["filter"].(*model.VoteFilter), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Contract.participantsAggregate":
+		if e.complexity.Contract.ParticipantsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Contract_participantsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Contract.ParticipantsAggregate(childComplexity, args["filter"].(*model.VoteFilter)), true
 
 	case "Contract.status":
 		if e.complexity.Contract.Status == nil {
@@ -2555,6 +2614,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Label.Nodes(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Label.nodesAggregate":
+		if e.complexity.Label.NodesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Label_nodesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Label.NodesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
 	case "Label.rootnameid":
 		if e.complexity.Label.Rootnameid == nil {
 			break
@@ -2573,6 +2644,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Label.Tensions(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Label.tensionsAggregate":
+		if e.complexity.Label.TensionsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Label_tensionsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Label.TensionsAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "LabelAggregateResult.colorMax":
 		if e.complexity.LabelAggregateResult.ColorMax == nil {
@@ -3429,6 +3512,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Children(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Node.childrenAggregate":
+		if e.complexity.Node.ChildrenAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_childrenAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.ChildrenAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
 	case "Node.contracts":
 		if e.complexity.Node.Contracts == nil {
 			break
@@ -3440,6 +3535,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Contracts(childComplexity, args["filter"].(*model.VoteFilter), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.contractsAggregate":
+		if e.complexity.Node.ContractsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_contractsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.ContractsAggregate(childComplexity, args["filter"].(*model.VoteFilter)), true
 
 	case "Node.createdAt":
 		if e.complexity.Node.CreatedAt == nil {
@@ -3471,6 +3578,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Docs(childComplexity, args["filter"].(*model.BlobFilter), args["order"].(*model.BlobOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.docsAggregate":
+		if e.complexity.Node.DocsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_docsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.DocsAggregate(childComplexity, args["filter"].(*model.BlobFilter)), true
 
 	case "Node.first_link":
 		if e.complexity.Node.FirstLink == nil {
@@ -3530,6 +3649,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Labels(childComplexity, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.labelsAggregate":
+		if e.complexity.Node.LabelsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_labelsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
 
 	case "Node.mandate":
 		if e.complexity.Node.Mandate == nil {
@@ -3678,6 +3809,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.TensionsIn(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Node.tensions_inAggregate":
+		if e.complexity.Node.TensionsInAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_tensions_inAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.TensionsInAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
+
 	case "Node.tensions_out":
 		if e.complexity.Node.TensionsOut == nil {
 			break
@@ -3689,6 +3832,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.TensionsOut(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.tensions_outAggregate":
+		if e.complexity.Node.TensionsOutAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_tensions_outAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.TensionsOutAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "Node.type_":
 		if e.complexity.Node.Type == nil {
@@ -3965,6 +4120,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeFragment.Children(childComplexity, args["filter"].(*model.NodeFragmentFilter), args["order"].(*model.NodeFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "NodeFragment.childrenAggregate":
+		if e.complexity.NodeFragment.ChildrenAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_NodeFragment_childrenAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.NodeFragment.ChildrenAggregate(childComplexity, args["filter"].(*model.NodeFragmentFilter)), true
 
 	case "NodeFragment.first_link":
 		if e.complexity.NodeFragment.FirstLink == nil {
@@ -5077,6 +5244,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Assignees(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Tension.assigneesAggregate":
+		if e.complexity.Tension.AssigneesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_assigneesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.AssigneesAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
+
 	case "Tension.blobs":
 		if e.complexity.Tension.Blobs == nil {
 			break
@@ -5088,6 +5267,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.Blobs(childComplexity, args["filter"].(*model.BlobFilter), args["order"].(*model.BlobOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Tension.blobsAggregate":
+		if e.complexity.Tension.BlobsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_blobsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.BlobsAggregate(childComplexity, args["filter"].(*model.BlobFilter)), true
 
 	case "Tension.comments":
 		if e.complexity.Tension.Comments == nil {
@@ -5101,6 +5292,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Comments(childComplexity, args["filter"].(*model.CommentFilter), args["order"].(*model.CommentOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Tension.commentsAggregate":
+		if e.complexity.Tension.CommentsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_commentsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.CommentsAggregate(childComplexity, args["filter"].(*model.CommentFilter)), true
+
 	case "Tension.contracts":
 		if e.complexity.Tension.Contracts == nil {
 			break
@@ -5112,6 +5315,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.Contracts(childComplexity, args["filter"].(*model.ContractFilter), args["order"].(*model.ContractOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Tension.contractsAggregate":
+		if e.complexity.Tension.ContractsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_contractsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.ContractsAggregate(childComplexity, args["filter"].(*model.ContractFilter)), true
 
 	case "Tension.createdAt":
 		if e.complexity.Tension.CreatedAt == nil {
@@ -5163,6 +5378,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.History(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Tension.historyAggregate":
+		if e.complexity.Tension.HistoryAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_historyAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.HistoryAggregate(childComplexity, args["filter"].(*model.EventFilter)), true
+
 	case "Tension.id":
 		if e.complexity.Tension.ID == nil {
 			break
@@ -5181,6 +5408,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tension.Labels(childComplexity, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Tension.labelsAggregate":
+		if e.complexity.Tension.LabelsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_labelsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
 
 	case "Tension.message":
 		if e.complexity.Tension.Message == nil {
@@ -5753,6 +5992,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.BackedRoles(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "User.backed_rolesAggregate":
+		if e.complexity.User.BackedRolesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_backed_rolesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.BackedRolesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
 	case "User.bio":
 		if e.complexity.User.Bio == nil {
 			break
@@ -5771,6 +6022,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Contracts(childComplexity, args["filter"].(*model.ContractFilter), args["order"].(*model.ContractOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.contractsAggregate":
+		if e.complexity.User.ContractsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_contractsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.ContractsAggregate(childComplexity, args["filter"].(*model.ContractFilter)), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -5852,6 +6115,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Roles(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "User.rolesAggregate":
+		if e.complexity.User.RolesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_rolesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.RolesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
 	case "User.tensions_assigned":
 		if e.complexity.User.TensionsAssigned == nil {
 			break
@@ -5864,6 +6139,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.TensionsAssigned(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "User.tensions_assignedAggregate":
+		if e.complexity.User.TensionsAssignedAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_tensions_assignedAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.TensionsAssignedAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
+
 	case "User.tensions_created":
 		if e.complexity.User.TensionsCreated == nil {
 			break
@@ -5875,6 +6162,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.TensionsCreated(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.tensions_createdAggregate":
+		if e.complexity.User.TensionsCreatedAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_tensions_createdAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.TensionsCreatedAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "User.username":
 		if e.complexity.User.Username == nil {
@@ -6346,6 +6645,13 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   role_type: RoleType @search
   contracts(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
   shared(filter: SharedNodeFilter): SharedNode
+
+  childrenAggregate(filter: NodeFilter): NodeAggregateResult
+  tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
+  tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
+  docsAggregate(filter: BlobFilter): BlobAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  contractsAggregate(filter: VoteFilter): VoteAggregateResult
 }
 
 type SharedNode {
@@ -6368,6 +6674,8 @@ type NodeFragment {
   second_link: String
   skills: [String!]
   role_type: RoleType
+
+  childrenAggregate(filter: NodeFragmentFilter): NodeFragmentAggregateResult
 }
 
 type Mandate {
@@ -6450,6 +6758,13 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]! @hasInverse(field: tension)
   n_comments: Int @count(f: comments)
   n_blobs: Int @count(f: blobs)
+
+  assigneesAggregate(filter: UserFilter): UserAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  commentsAggregate(filter: CommentFilter): CommentAggregateResult
+  blobsAggregate(filter: BlobFilter): BlobAggregateResult
+  contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  historyAggregate(filter: EventFilter): EventAggregateResult
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
@@ -6477,6 +6792,9 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
   n_nodes: Int @count(f: nodes)
   n_tensions: Int @count(f: tensions)
+
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type Comment @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -6547,6 +6865,10 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
   participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
+
+  candidatesAggregate(filter: UserFilter): UserAggregateResult
+  participantsAggregate(filter: VoteFilter): VoteAggregateResult
+  commentsAggregate(filter: CommentFilter): CommentAggregateResult
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
@@ -6579,6 +6901,12 @@ type User {
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: candidates)
   bio: String
   utc: String
+
+  rolesAggregate(filter: NodeFilter): NodeAggregateResult
+  backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
+  tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
+  tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
+  contractsAggregate(filter: ContractFilter): ContractAggregateResult
 }
 
 type UserRights {
@@ -6709,35 +7037,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10015,6 +10343,21 @@ func (ec *executionContext) field_Comment_createdBy_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Contract_candidatesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Contract_candidates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10054,6 +10397,21 @@ func (ec *executionContext) field_Contract_candidates_args(ctx context.Context, 
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Contract_commentsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -10121,6 +10479,21 @@ func (ec *executionContext) field_Contract_event_args(ctx context.Context, rawAr
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOEventFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Contract_participantsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.VoteFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOVoteFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -10903,6 +11276,21 @@ func (ec *executionContext) field_Event_tension_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_Label_nodesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Label_nodes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10942,6 +11330,21 @@ func (ec *executionContext) field_Label_nodes_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Label_tensionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -12003,6 +12406,21 @@ func (ec *executionContext) field_NodeFragment_charac_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_NodeFragment_childrenAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFragmentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_NodeFragment_children_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12075,6 +12493,21 @@ func (ec *executionContext) field_Node_charac_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_childrenAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_children_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12114,6 +12547,21 @@ func (ec *executionContext) field_Node_children_args(ctx context.Context, rawArg
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_contractsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.VoteFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOVoteFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -12157,6 +12605,21 @@ func (ec *executionContext) field_Node_createdBy_args(ctx context.Context, rawAr
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_docsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BlobFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12214,6 +12677,21 @@ func (ec *executionContext) field_Node_first_link_args(ctx context.Context, rawA
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_labelsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.LabelFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOLabelFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12354,6 +12832,21 @@ func (ec *executionContext) field_Node_stats_args(ctx context.Context, rawArgs m
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_tensions_inAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_tensions_in_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12393,6 +12886,21 @@ func (ec *executionContext) field_Node_tensions_in_args(ctx context.Context, raw
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_tensions_outAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -13774,6 +14282,21 @@ func (ec *executionContext) field_Query_queryVote_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Tension_assigneesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Tension_assignees_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13813,6 +14336,21 @@ func (ec *executionContext) field_Tension_assignees_args(ctx context.Context, ra
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_blobsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BlobFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -13858,6 +14396,21 @@ func (ec *executionContext) field_Tension_blobs_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_Tension_commentsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOCommentFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Tension_comments_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13897,6 +14450,21 @@ func (ec *executionContext) field_Tension_comments_args(ctx context.Context, raw
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_contractsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ContractFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOContractFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -13972,6 +14540,21 @@ func (ec *executionContext) field_Tension_emitter_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Tension_historyAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Tension_history_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14011,6 +14594,21 @@ func (ec *executionContext) field_Tension_history_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_labelsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.LabelFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOLabelFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -14767,6 +15365,21 @@ func (ec *executionContext) field_UpdateVotePayload_vote_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_User_backed_rolesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_User_backed_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14806,6 +15419,21 @@ func (ec *executionContext) field_User_backed_roles_args(ctx context.Context, ra
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_User_contractsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ContractFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOContractFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -14866,6 +15494,21 @@ func (ec *executionContext) field_User_rights_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
+func (ec *executionContext) field_User_rolesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_User_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14908,6 +15551,21 @@ func (ec *executionContext) field_User_roles_args(ctx context.Context, rawArgs m
 	return args, nil
 }
 
+func (ec *executionContext) field_User_tensions_assignedAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_User_tensions_assigned_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14947,6 +15605,21 @@ func (ec *executionContext) field_User_tensions_assigned_args(ctx context.Contex
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_User_tensions_createdAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -18055,6 +18728,114 @@ func (ec *executionContext) _Contract_comments(ctx context.Context, field graphq
 	res := resTmp.([]*model.Comment)
 	fc.Result = res
 	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_candidatesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_candidatesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CandidatesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_participantsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_participantsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ParticipantsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.VoteAggregateResult)
+	fc.Result = res
+	return ec.marshalOVoteAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_commentsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_commentsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CommentsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CommentAggregateResult)
+	fc.Result = res
+	return ec.marshalOCommentAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_id(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -21675,6 +22456,78 @@ func (ec *executionContext) _Label_n_tensions(ctx context.Context, field graphql
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Label_tensionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Label",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Label_tensionsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Label_nodesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Label",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Label_nodesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NodesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _LabelAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.LabelAggregateResult) (ret graphql.Marshaler) {
@@ -26376,6 +27229,222 @@ func (ec *executionContext) _Node_shared(ctx context.Context, field graphql.Coll
 	return ec.marshalOSharedNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_childrenAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_childrenAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChildrenAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_tensions_outAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_tensions_outAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsOutAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_tensions_inAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_tensions_inAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsInAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_docsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_docsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.BlobAggregateResult)
+	fc.Result = res
+	return ec.marshalOBlobAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_labelsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_labelsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LabelsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LabelAggregateResult)
+	fc.Result = res
+	return ec.marshalOLabelAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_contractsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_contractsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.VoteAggregateResult)
+	fc.Result = res
+	return ec.marshalOVoteAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NodeAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -27781,6 +28850,42 @@ func (ec *executionContext) _NodeFragment_role_type(ctx context.Context, field g
 	res := resTmp.(*model.RoleType)
 	fc.Result = res
 	return ec.marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragment_childrenAggregate(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NodeFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_NodeFragment_childrenAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChildrenAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeFragmentAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeFragmentAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeFragmentAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragmentAggregateResult) (ret graphql.Marshaler) {
@@ -32695,6 +33800,222 @@ func (ec *executionContext) _Tension_n_blobs(ctx context.Context, field graphql.
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Tension_assigneesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_assigneesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssigneesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_labelsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_labelsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LabelsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LabelAggregateResult)
+	fc.Result = res
+	return ec.marshalOLabelAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_commentsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_commentsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CommentsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CommentAggregateResult)
+	fc.Result = res
+	return ec.marshalOCommentAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_blobsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_blobsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BlobsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.BlobAggregateResult)
+	fc.Result = res
+	return ec.marshalOBlobAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_contractsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_contractsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ContractAggregateResult)
+	fc.Result = res
+	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_historyAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_historyAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HistoryAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventAggregateResult)
+	fc.Result = res
+	return ec.marshalOEventAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Tension_id(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -35665,6 +36986,186 @@ func (ec *executionContext) _User_utc(ctx context.Context, field graphql.Collect
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_rolesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RolesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_backed_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_backed_rolesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BackedRolesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_tensions_createdAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_tensions_createdAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsCreatedAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_tensions_assignedAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_tensions_assignedAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsAssignedAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_contractsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_contractsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ContractAggregateResult)
+	fc.Result = res
+	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
@@ -48080,6 +49581,12 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Contract_participants(ctx, field, obj)
 		case "comments":
 			out.Values[i] = ec._Contract_comments(ctx, field, obj)
+		case "candidatesAggregate":
+			out.Values[i] = ec._Contract_candidatesAggregate(ctx, field, obj)
+		case "participantsAggregate":
+			out.Values[i] = ec._Contract_participantsAggregate(ctx, field, obj)
+		case "commentsAggregate":
+			out.Values[i] = ec._Contract_commentsAggregate(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Contract_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -48826,6 +50333,10 @@ func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Label_n_nodes(ctx, field, obj)
 		case "n_tensions":
 			out.Values[i] = ec._Label_n_tensions(ctx, field, obj)
+		case "tensionsAggregate":
+			out.Values[i] = ec._Label_tensionsAggregate(ctx, field, obj)
+		case "nodesAggregate":
+			out.Values[i] = ec._Label_nodesAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49237,6 +50748,18 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
 		case "shared":
 			out.Values[i] = ec._Node_shared(ctx, field, obj)
+		case "childrenAggregate":
+			out.Values[i] = ec._Node_childrenAggregate(ctx, field, obj)
+		case "tensions_outAggregate":
+			out.Values[i] = ec._Node_tensions_outAggregate(ctx, field, obj)
+		case "tensions_inAggregate":
+			out.Values[i] = ec._Node_tensions_inAggregate(ctx, field, obj)
+		case "docsAggregate":
+			out.Values[i] = ec._Node_docsAggregate(ctx, field, obj)
+		case "labelsAggregate":
+			out.Values[i] = ec._Node_labelsAggregate(ctx, field, obj)
+		case "contractsAggregate":
+			out.Values[i] = ec._Node_contractsAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49429,6 +50952,8 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._NodeFragment_skills(ctx, field, obj)
 		case "role_type":
 			out.Values[i] = ec._NodeFragment_role_type(ctx, field, obj)
+		case "childrenAggregate":
+			out.Values[i] = ec._NodeFragment_childrenAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -50425,6 +51950,18 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
 		case "n_blobs":
 			out.Values[i] = ec._Tension_n_blobs(ctx, field, obj)
+		case "assigneesAggregate":
+			out.Values[i] = ec._Tension_assigneesAggregate(ctx, field, obj)
+		case "labelsAggregate":
+			out.Values[i] = ec._Tension_labelsAggregate(ctx, field, obj)
+		case "commentsAggregate":
+			out.Values[i] = ec._Tension_commentsAggregate(ctx, field, obj)
+		case "blobsAggregate":
+			out.Values[i] = ec._Tension_blobsAggregate(ctx, field, obj)
+		case "contractsAggregate":
+			out.Values[i] = ec._Tension_contractsAggregate(ctx, field, obj)
+		case "historyAggregate":
+			out.Values[i] = ec._Tension_historyAggregate(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Tension_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -51034,6 +52571,16 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_bio(ctx, field, obj)
 		case "utc":
 			out.Values[i] = ec._User_utc(ctx, field, obj)
+		case "rolesAggregate":
+			out.Values[i] = ec._User_rolesAggregate(ctx, field, obj)
+		case "backed_rolesAggregate":
+			out.Values[i] = ec._User_backed_rolesAggregate(ctx, field, obj)
+		case "tensions_createdAggregate":
+			out.Values[i] = ec._User_tensions_createdAggregate(ctx, field, obj)
+		case "tensions_assignedAggregate":
+			out.Values[i] = ec._User_tensions_assignedAggregate(ctx, field, obj)
+		case "contractsAggregate":
+			out.Values[i] = ec._User_contractsAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
