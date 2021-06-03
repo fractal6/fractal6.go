@@ -192,7 +192,6 @@ var dqlQueries map[string]string = map[string]string{
 
         all(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
             Node.{{.fieldid}}
-            Node.isPrivate
         }
     }`,
     "getAllMembers": `{
@@ -212,9 +211,7 @@ var dqlQueries map[string]string = map[string]string{
             }
             Node.parent {
                 Node.nameid
-                Node.isPrivate
             }
-            Node.isPrivate
         }
     }`,
     "getAllLabels": `{
@@ -247,8 +244,8 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Post.createdAt
             Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
-            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
+            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
             Tension.title
             Tension.status
             Tension.type_
@@ -275,8 +272,8 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Post.createdAt
             Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
-            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
+            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
             Tension.title
             Tension.status
             Tension.type_
@@ -303,8 +300,8 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Post.createdAt
             Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
-            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} Node.isPrivate }
+            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
+            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
             Tension.title
             Tension.status
             Tension.type_
@@ -752,7 +749,6 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
         "regex": regex,
         "payload": `{
             Node.nameid
-            Node.isPrivate
         }`,
     }
 

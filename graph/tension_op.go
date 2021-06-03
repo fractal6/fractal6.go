@@ -334,6 +334,8 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 
 func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
     var err error
+    if event.Old == nil { return false, fmt.Errorf("event.old must be defined.") }
+    if event.New == nil { return false, fmt.Errorf("event.new must be defined.") }
     receiverid_old := *event.Old // == tension.Receiverid
     receiverid_new := *event.New
 

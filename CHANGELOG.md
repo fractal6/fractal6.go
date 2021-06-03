@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [schema] Rename UserJoin event to UserJoined
 - [resolver] rename UserCtxFromContext to GetUserContext
 - [schema] hook directive renamed with Input suffix for argumants directive and without suffix {query}{Type} for field query/mutation.
+- [schema] introduce the @meta directive on field to aggregate count data with DQL requests.
+
+### Removed
+- isPrivate extra field for request validation is no longer with @auth schema directives.
 
 ### Fixed
 - [gqlast.py] gram/graphql.ebnf to handle new directives (@auth and @custom).
