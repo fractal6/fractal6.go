@@ -145,38 +145,34 @@ type AddNodeFragmentPayload struct {
 }
 
 type AddNodeInput struct {
-	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt    string         `json:"createdAt,omitempty"`
-	UpdatedAt    *string        `json:"updatedAt,omitempty"`
-	Name         string         `json:"name,omitempty"`
-	Nameid       string         `json:"nameid,omitempty"`
-	Rootnameid   string         `json:"rootnameid,omitempty"`
-	Parent       *NodeRef       `json:"parent,omitempty"`
-	Children     []*NodeRef     `json:"children,omitempty"`
-	Type         NodeType       `json:"type_,omitempty"`
-	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
-	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
-	About        *string        `json:"about,omitempty"`
-	Mandate      *MandateRef    `json:"mandate,omitempty"`
-	Docs         []*BlobRef     `json:"docs,omitempty"`
-	Source       *BlobRef       `json:"source,omitempty"`
-	NTensionsOut *int           `json:"n_tensions_out"`
-	NTensionsIn  *int           `json:"n_tensions_in"`
-	NChildren    *int           `json:"n_children"`
-	Stats        *NodeStatsRef  `json:"stats,omitempty"`
-	IsRoot       bool           `json:"isRoot"`
-	IsPersonal   *bool          `json:"isPersonal"`
-	IsPrivate    bool           `json:"isPrivate"`
-	IsArchived   bool           `json:"isArchived"`
-	Charac       *NodeCharacRef `json:"charac,omitempty"`
-	Rights       int            `json:"rights"`
-	Labels       []*LabelRef    `json:"labels,omitempty"`
-	FirstLink    *UserRef       `json:"first_link,omitempty"`
-	SecondLink   *UserRef       `json:"second_link,omitempty"`
-	Skills       []string       `json:"skills,omitempty"`
-	RoleType     *RoleType      `json:"role_type,omitempty"`
-	Contracts    []*VoteRef     `json:"contracts,omitempty"`
-	Shared       *SharedNodeRef `json:"shared,omitempty"`
+	CreatedBy   *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt   string         `json:"createdAt,omitempty"`
+	UpdatedAt   *string        `json:"updatedAt,omitempty"`
+	Name        string         `json:"name,omitempty"`
+	Nameid      string         `json:"nameid,omitempty"`
+	Rootnameid  string         `json:"rootnameid,omitempty"`
+	Parent      *NodeRef       `json:"parent,omitempty"`
+	Children    []*NodeRef     `json:"children,omitempty"`
+	Type        NodeType       `json:"type_,omitempty"`
+	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
+	About       *string        `json:"about,omitempty"`
+	Mandate     *MandateRef    `json:"mandate,omitempty"`
+	Docs        []*BlobRef     `json:"docs,omitempty"`
+	Source      *BlobRef       `json:"source,omitempty"`
+	IsRoot      bool           `json:"isRoot"`
+	IsPersonal  *bool          `json:"isPersonal"`
+	IsPrivate   bool           `json:"isPrivate"`
+	IsArchived  bool           `json:"isArchived"`
+	Charac      *NodeCharacRef `json:"charac,omitempty"`
+	Rights      int            `json:"rights"`
+	Labels      []*LabelRef    `json:"labels,omitempty"`
+	FirstLink   *UserRef       `json:"first_link,omitempty"`
+	SecondLink  *UserRef       `json:"second_link,omitempty"`
+	Skills      []string       `json:"skills,omitempty"`
+	RoleType    *RoleType      `json:"role_type,omitempty"`
+	Contracts   []*VoteRef     `json:"contracts,omitempty"`
+	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -184,51 +180,38 @@ type AddNodePayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
-type AddNodeStatsInput struct {
-	NMember *int `json:"n_member"`
-	NGuest  *int `json:"n_guest"`
-	NCircle *int `json:"n_circle"`
-	NRole   *int `json:"n_role"`
+type AddOrgaAggInput struct {
+	NMembers *int `json:"n_members"`
+	NGuests  *int `json:"n_guests"`
 }
 
-type AddNodeStatsPayload struct {
-	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
-	NumUids   *int         `json:"numUids"`
-}
-
-type AddSharedNodeInput struct {
-	NLabels         *int `json:"n_labels"`
-	NTensions       *int `json:"n_tensions"`
-	NClosedTensions *int `json:"n_closed_tensions"`
-}
-
-type AddSharedNodePayload struct {
-	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
-	NumUids    *int          `json:"numUids"`
+type AddOrgaAggPayload struct {
+	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type AddTensionInput struct {
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt  string         `json:"createdAt,omitempty"`
-	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	Message    *string        `json:"message,omitempty"`
-	Emitterid  string         `json:"emitterid,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
-	Receiverid string         `json:"receiverid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      string         `json:"title,omitempty"`
-	Type       TensionType    `json:"type_,omitempty"`
-	Status     TensionStatus  `json:"status,omitempty"`
-	Assignees  []*UserRef     `json:"assignees,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
-	Comments   []*CommentRef  `json:"comments,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Blobs      []*BlobRef     `json:"blobs,omitempty"`
-	Contracts  []*ContractRef `json:"contracts,omitempty"`
-	History    []*EventRef    `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments"`
-	NBlobs     *int           `json:"n_blobs"`
+	CreatedBy      *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt      string         `json:"createdAt,omitempty"`
+	UpdatedAt      *string        `json:"updatedAt,omitempty"`
+	Message        *string        `json:"message,omitempty"`
+	Emitterid      string         `json:"emitterid,omitempty"`
+	Emitter        *NodeRef       `json:"emitter,omitempty"`
+	Receiverid     string         `json:"receiverid,omitempty"`
+	Receiver       *NodeRef       `json:"receiver,omitempty"`
+	Nth            *string        `json:"nth,omitempty"`
+	Title          string         `json:"title,omitempty"`
+	Type           TensionType    `json:"type_,omitempty"`
+	Status         TensionStatus  `json:"status,omitempty"`
+	Assignees      []*UserRef     `json:"assignees,omitempty"`
+	Labels         []*LabelRef    `json:"labels,omitempty"`
+	Comments       []*CommentRef  `json:"comments,omitempty"`
+	Action         *TensionAction `json:"action,omitempty"`
+	Blobs          []*BlobRef     `json:"blobs,omitempty"`
+	Contracts      []*ContractRef `json:"contracts,omitempty"`
+	History        []*EventRef    `json:"history,omitempty"`
+	NComments      *int           `json:"n_comments"`
+	NOpenContracts *int           `json:"n_open_contracts"`
 }
 
 type AddTensionPayload struct {
@@ -607,22 +590,16 @@ type DeleteNodePayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
-type DeleteNodeStatsPayload struct {
-	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
-	Msg       *string      `json:"msg,omitempty"`
-	NumUids   *int         `json:"numUids"`
+type DeleteOrgaAggPayload struct {
+	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
+	Msg     *string    `json:"msg,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type DeletePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids"`
-}
-
-type DeleteSharedNodePayload struct {
-	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
-	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids"`
 }
 
 type DeleteTensionPayload struct {
@@ -971,10 +948,6 @@ type Node struct {
 	Mandate              *Mandate                `json:"mandate,omitempty"`
 	Docs                 []*Blob                 `json:"docs,omitempty"`
 	Source               *Blob                   `json:"source,omitempty"`
-	NTensionsOut         *int                    `json:"n_tensions_out"`
-	NTensionsIn          *int                    `json:"n_tensions_in"`
-	NChildren            *int                    `json:"n_children"`
-	Stats                *NodeStats              `json:"stats,omitempty"`
 	IsRoot               bool                    `json:"isRoot"`
 	IsPersonal           *bool                   `json:"isPersonal"`
 	IsPrivate            bool                    `json:"isPrivate"`
@@ -987,7 +960,7 @@ type Node struct {
 	Skills               []string                `json:"skills,omitempty"`
 	RoleType             *RoleType               `json:"role_type,omitempty"`
 	Contracts            []*Vote                 `json:"contracts,omitempty"`
-	Shared               *SharedNode             `json:"shared,omitempty"`
+	OrgaAgg              *OrgaAgg                `json:"orga_agg,omitempty"`
 	ChildrenAggregate    *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
 	TensionsOutAggregate *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate  *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
@@ -997,35 +970,23 @@ type Node struct {
 }
 
 type NodeAggregateResult struct {
-	Count           *int     `json:"count"`
-	CreatedAtMin    *string  `json:"createdAtMin,omitempty"`
-	CreatedAtMax    *string  `json:"createdAtMax,omitempty"`
-	UpdatedAtMin    *string  `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax    *string  `json:"updatedAtMax,omitempty"`
-	NameMin         *string  `json:"nameMin,omitempty"`
-	NameMax         *string  `json:"nameMax,omitempty"`
-	NameidMin       *string  `json:"nameidMin,omitempty"`
-	NameidMax       *string  `json:"nameidMax,omitempty"`
-	RootnameidMin   *string  `json:"rootnameidMin,omitempty"`
-	RootnameidMax   *string  `json:"rootnameidMax,omitempty"`
-	AboutMin        *string  `json:"aboutMin,omitempty"`
-	AboutMax        *string  `json:"aboutMax,omitempty"`
-	NTensionsOutMin *int     `json:"n_tensions_outMin"`
-	NTensionsOutMax *int     `json:"n_tensions_outMax"`
-	NTensionsOutSum *int     `json:"n_tensions_outSum"`
-	NTensionsOutAvg *float64 `json:"n_tensions_outAvg,omitempty"`
-	NTensionsInMin  *int     `json:"n_tensions_inMin"`
-	NTensionsInMax  *int     `json:"n_tensions_inMax"`
-	NTensionsInSum  *int     `json:"n_tensions_inSum"`
-	NTensionsInAvg  *float64 `json:"n_tensions_inAvg,omitempty"`
-	NChildrenMin    *int     `json:"n_childrenMin"`
-	NChildrenMax    *int     `json:"n_childrenMax"`
-	NChildrenSum    *int     `json:"n_childrenSum"`
-	NChildrenAvg    *float64 `json:"n_childrenAvg,omitempty"`
-	RightsMin       *int     `json:"rightsMin"`
-	RightsMax       *int     `json:"rightsMax"`
-	RightsSum       *int     `json:"rightsSum"`
-	RightsAvg       *float64 `json:"rightsAvg,omitempty"`
+	Count         *int     `json:"count"`
+	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax  *string  `json:"updatedAtMax,omitempty"`
+	NameMin       *string  `json:"nameMin,omitempty"`
+	NameMax       *string  `json:"nameMax,omitempty"`
+	NameidMin     *string  `json:"nameidMin,omitempty"`
+	NameidMax     *string  `json:"nameidMax,omitempty"`
+	RootnameidMin *string  `json:"rootnameidMin,omitempty"`
+	RootnameidMax *string  `json:"rootnameidMax,omitempty"`
+	AboutMin      *string  `json:"aboutMin,omitempty"`
+	AboutMax      *string  `json:"aboutMax,omitempty"`
+	RightsMin     *int     `json:"rightsMin"`
+	RightsMax     *int     `json:"rightsMax"`
+	RightsSum     *int     `json:"rightsSum"`
+	RightsAvg     *float64 `json:"rightsAvg,omitempty"`
 }
 
 type NodeCharac struct {
@@ -1167,132 +1128,110 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt    *string        `json:"createdAt,omitempty"`
-	UpdatedAt    *string        `json:"updatedAt,omitempty"`
-	Name         *string        `json:"name,omitempty"`
-	Rootnameid   *string        `json:"rootnameid,omitempty"`
-	Parent       *NodeRef       `json:"parent,omitempty"`
-	Children     []*NodeRef     `json:"children,omitempty"`
-	Type         *NodeType      `json:"type_,omitempty"`
-	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
-	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
-	About        *string        `json:"about,omitempty"`
-	Mandate      *MandateRef    `json:"mandate,omitempty"`
-	Docs         []*BlobRef     `json:"docs,omitempty"`
-	Source       *BlobRef       `json:"source,omitempty"`
-	NTensionsOut *int           `json:"n_tensions_out"`
-	NTensionsIn  *int           `json:"n_tensions_in"`
-	NChildren    *int           `json:"n_children"`
-	Stats        *NodeStatsRef  `json:"stats,omitempty"`
-	IsRoot       *bool          `json:"isRoot"`
-	IsPersonal   *bool          `json:"isPersonal"`
-	IsPrivate    *bool          `json:"isPrivate"`
-	IsArchived   *bool          `json:"isArchived"`
-	Charac       *NodeCharacRef `json:"charac,omitempty"`
-	Rights       *int           `json:"rights"`
-	Labels       []*LabelRef    `json:"labels,omitempty"`
-	FirstLink    *UserRef       `json:"first_link,omitempty"`
-	SecondLink   *UserRef       `json:"second_link,omitempty"`
-	Skills       []string       `json:"skills,omitempty"`
-	RoleType     *RoleType      `json:"role_type,omitempty"`
-	Contracts    []*VoteRef     `json:"contracts,omitempty"`
-	Shared       *SharedNodeRef `json:"shared,omitempty"`
+	CreatedBy   *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt   *string        `json:"createdAt,omitempty"`
+	UpdatedAt   *string        `json:"updatedAt,omitempty"`
+	Name        *string        `json:"name,omitempty"`
+	Rootnameid  *string        `json:"rootnameid,omitempty"`
+	Parent      *NodeRef       `json:"parent,omitempty"`
+	Children    []*NodeRef     `json:"children,omitempty"`
+	Type        *NodeType      `json:"type_,omitempty"`
+	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
+	About       *string        `json:"about,omitempty"`
+	Mandate     *MandateRef    `json:"mandate,omitempty"`
+	Docs        []*BlobRef     `json:"docs,omitempty"`
+	Source      *BlobRef       `json:"source,omitempty"`
+	IsRoot      *bool          `json:"isRoot"`
+	IsPersonal  *bool          `json:"isPersonal"`
+	IsPrivate   *bool          `json:"isPrivate"`
+	IsArchived  *bool          `json:"isArchived"`
+	Charac      *NodeCharacRef `json:"charac,omitempty"`
+	Rights      *int           `json:"rights"`
+	Labels      []*LabelRef    `json:"labels,omitempty"`
+	FirstLink   *UserRef       `json:"first_link,omitempty"`
+	SecondLink  *UserRef       `json:"second_link,omitempty"`
+	Skills      []string       `json:"skills,omitempty"`
+	RoleType    *RoleType      `json:"role_type,omitempty"`
+	Contracts   []*VoteRef     `json:"contracts,omitempty"`
+	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
 }
 
 type NodeRef struct {
-	ID           *string        `json:"id,omitempty"`
-	CreatedBy    *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt    *string        `json:"createdAt,omitempty"`
-	UpdatedAt    *string        `json:"updatedAt,omitempty"`
-	Name         *string        `json:"name,omitempty"`
-	Nameid       *string        `json:"nameid,omitempty"`
-	Rootnameid   *string        `json:"rootnameid,omitempty"`
-	Parent       *NodeRef       `json:"parent,omitempty"`
-	Children     []*NodeRef     `json:"children,omitempty"`
-	Type         *NodeType      `json:"type_,omitempty"`
-	TensionsOut  []*TensionRef  `json:"tensions_out,omitempty"`
-	TensionsIn   []*TensionRef  `json:"tensions_in,omitempty"`
-	About        *string        `json:"about,omitempty"`
-	Mandate      *MandateRef    `json:"mandate,omitempty"`
-	Docs         []*BlobRef     `json:"docs,omitempty"`
-	Source       *BlobRef       `json:"source,omitempty"`
-	NTensionsOut *int           `json:"n_tensions_out"`
-	NTensionsIn  *int           `json:"n_tensions_in"`
-	NChildren    *int           `json:"n_children"`
-	Stats        *NodeStatsRef  `json:"stats,omitempty"`
-	IsRoot       *bool          `json:"isRoot"`
-	IsPersonal   *bool          `json:"isPersonal"`
-	IsPrivate    *bool          `json:"isPrivate"`
-	IsArchived   *bool          `json:"isArchived"`
-	Charac       *NodeCharacRef `json:"charac,omitempty"`
-	Rights       *int           `json:"rights"`
-	Labels       []*LabelRef    `json:"labels,omitempty"`
-	FirstLink    *UserRef       `json:"first_link,omitempty"`
-	SecondLink   *UserRef       `json:"second_link,omitempty"`
-	Skills       []string       `json:"skills,omitempty"`
-	RoleType     *RoleType      `json:"role_type,omitempty"`
-	Contracts    []*VoteRef     `json:"contracts,omitempty"`
-	Shared       *SharedNodeRef `json:"shared,omitempty"`
-}
-
-type NodeStats struct {
-	NMember *int `json:"n_member"`
-	NGuest  *int `json:"n_guest"`
-	NCircle *int `json:"n_circle"`
-	NRole   *int `json:"n_role"`
-}
-
-type NodeStatsAggregateResult struct {
-	Count      *int     `json:"count"`
-	NMemberMin *int     `json:"n_memberMin"`
-	NMemberMax *int     `json:"n_memberMax"`
-	NMemberSum *int     `json:"n_memberSum"`
-	NMemberAvg *float64 `json:"n_memberAvg,omitempty"`
-	NGuestMin  *int     `json:"n_guestMin"`
-	NGuestMax  *int     `json:"n_guestMax"`
-	NGuestSum  *int     `json:"n_guestSum"`
-	NGuestAvg  *float64 `json:"n_guestAvg,omitempty"`
-	NCircleMin *int     `json:"n_circleMin"`
-	NCircleMax *int     `json:"n_circleMax"`
-	NCircleSum *int     `json:"n_circleSum"`
-	NCircleAvg *float64 `json:"n_circleAvg,omitempty"`
-	NRoleMin   *int     `json:"n_roleMin"`
-	NRoleMax   *int     `json:"n_roleMax"`
-	NRoleSum   *int     `json:"n_roleSum"`
-	NRoleAvg   *float64 `json:"n_roleAvg,omitempty"`
-}
-
-type NodeStatsFilter struct {
-	Has []*NodeStatsHasFilter `json:"has,omitempty"`
-	And []*NodeStatsFilter    `json:"and,omitempty"`
-	Or  []*NodeStatsFilter    `json:"or,omitempty"`
-	Not *NodeStatsFilter      `json:"not,omitempty"`
-}
-
-type NodeStatsOrder struct {
-	Asc  *NodeStatsOrderable `json:"asc,omitempty"`
-	Desc *NodeStatsOrderable `json:"desc,omitempty"`
-	Then *NodeStatsOrder     `json:"then,omitempty"`
-}
-
-type NodeStatsPatch struct {
-	NMember *int `json:"n_member"`
-	NGuest  *int `json:"n_guest"`
-	NCircle *int `json:"n_circle"`
-	NRole   *int `json:"n_role"`
-}
-
-type NodeStatsRef struct {
-	NMember *int `json:"n_member"`
-	NGuest  *int `json:"n_guest"`
-	NCircle *int `json:"n_circle"`
-	NRole   *int `json:"n_role"`
+	ID          *string        `json:"id,omitempty"`
+	CreatedBy   *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt   *string        `json:"createdAt,omitempty"`
+	UpdatedAt   *string        `json:"updatedAt,omitempty"`
+	Name        *string        `json:"name,omitempty"`
+	Nameid      *string        `json:"nameid,omitempty"`
+	Rootnameid  *string        `json:"rootnameid,omitempty"`
+	Parent      *NodeRef       `json:"parent,omitempty"`
+	Children    []*NodeRef     `json:"children,omitempty"`
+	Type        *NodeType      `json:"type_,omitempty"`
+	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
+	About       *string        `json:"about,omitempty"`
+	Mandate     *MandateRef    `json:"mandate,omitempty"`
+	Docs        []*BlobRef     `json:"docs,omitempty"`
+	Source      *BlobRef       `json:"source,omitempty"`
+	IsRoot      *bool          `json:"isRoot"`
+	IsPersonal  *bool          `json:"isPersonal"`
+	IsPrivate   *bool          `json:"isPrivate"`
+	IsArchived  *bool          `json:"isArchived"`
+	Charac      *NodeCharacRef `json:"charac,omitempty"`
+	Rights      *int           `json:"rights"`
+	Labels      []*LabelRef    `json:"labels,omitempty"`
+	FirstLink   *UserRef       `json:"first_link,omitempty"`
+	SecondLink  *UserRef       `json:"second_link,omitempty"`
+	Skills      []string       `json:"skills,omitempty"`
+	RoleType    *RoleType      `json:"role_type,omitempty"`
+	Contracts   []*VoteRef     `json:"contracts,omitempty"`
+	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
 }
 
 type NodeTypeHash struct {
 	Eq *NodeType   `json:"eq,omitempty"`
 	In []*NodeType `json:"in,omitempty"`
+}
+
+type OrgaAgg struct {
+	NMembers *int `json:"n_members"`
+	NGuests  *int `json:"n_guests"`
+}
+
+type OrgaAggAggregateResult struct {
+	Count       *int     `json:"count"`
+	NMembersMin *int     `json:"n_membersMin"`
+	NMembersMax *int     `json:"n_membersMax"`
+	NMembersSum *int     `json:"n_membersSum"`
+	NMembersAvg *float64 `json:"n_membersAvg,omitempty"`
+	NGuestsMin  *int     `json:"n_guestsMin"`
+	NGuestsMax  *int     `json:"n_guestsMax"`
+	NGuestsSum  *int     `json:"n_guestsSum"`
+	NGuestsAvg  *float64 `json:"n_guestsAvg,omitempty"`
+}
+
+type OrgaAggFilter struct {
+	Has []*OrgaAggHasFilter `json:"has,omitempty"`
+	And []*OrgaAggFilter    `json:"and,omitempty"`
+	Or  []*OrgaAggFilter    `json:"or,omitempty"`
+	Not *OrgaAggFilter      `json:"not,omitempty"`
+}
+
+type OrgaAggOrder struct {
+	Asc  *OrgaAggOrderable `json:"asc,omitempty"`
+	Desc *OrgaAggOrderable `json:"desc,omitempty"`
+	Then *OrgaAggOrder     `json:"then,omitempty"`
+}
+
+type OrgaAggPatch struct {
+	NMembers *int `json:"n_members"`
+	NGuests  *int `json:"n_guests"`
+}
+
+type OrgaAggRef struct {
+	NMembers *int `json:"n_members"`
+	NGuests  *int `json:"n_guests"`
 }
 
 type Point struct {
@@ -1383,53 +1322,6 @@ type RoleTypeHash struct {
 	In []*RoleType `json:"in,omitempty"`
 }
 
-type SharedNode struct {
-	NLabels         *int `json:"n_labels"`
-	NTensions       *int `json:"n_tensions"`
-	NClosedTensions *int `json:"n_closed_tensions"`
-}
-
-type SharedNodeAggregateResult struct {
-	Count              *int     `json:"count"`
-	NLabelsMin         *int     `json:"n_labelsMin"`
-	NLabelsMax         *int     `json:"n_labelsMax"`
-	NLabelsSum         *int     `json:"n_labelsSum"`
-	NLabelsAvg         *float64 `json:"n_labelsAvg,omitempty"`
-	NTensionsMin       *int     `json:"n_tensionsMin"`
-	NTensionsMax       *int     `json:"n_tensionsMax"`
-	NTensionsSum       *int     `json:"n_tensionsSum"`
-	NTensionsAvg       *float64 `json:"n_tensionsAvg,omitempty"`
-	NClosedTensionsMin *int     `json:"n_closed_tensionsMin"`
-	NClosedTensionsMax *int     `json:"n_closed_tensionsMax"`
-	NClosedTensionsSum *int     `json:"n_closed_tensionsSum"`
-	NClosedTensionsAvg *float64 `json:"n_closed_tensionsAvg,omitempty"`
-}
-
-type SharedNodeFilter struct {
-	Has []*SharedNodeHasFilter `json:"has,omitempty"`
-	And []*SharedNodeFilter    `json:"and,omitempty"`
-	Or  []*SharedNodeFilter    `json:"or,omitempty"`
-	Not *SharedNodeFilter      `json:"not,omitempty"`
-}
-
-type SharedNodeOrder struct {
-	Asc  *SharedNodeOrderable `json:"asc,omitempty"`
-	Desc *SharedNodeOrderable `json:"desc,omitempty"`
-	Then *SharedNodeOrder     `json:"then,omitempty"`
-}
-
-type SharedNodePatch struct {
-	NLabels         *int `json:"n_labels"`
-	NTensions       *int `json:"n_tensions"`
-	NClosedTensions *int `json:"n_closed_tensions"`
-}
-
-type SharedNodeRef struct {
-	NLabels         *int `json:"n_labels"`
-	NTensions       *int `json:"n_tensions"`
-	NClosedTensions *int `json:"n_closed_tensions"`
-}
-
 type StringExactFilter struct {
 	Eq      *string      `json:"eq,omitempty"`
 	In      []*string    `json:"in,omitempty"`
@@ -1494,7 +1386,7 @@ type Tension struct {
 	Contracts          []*Contract              `json:"contracts,omitempty"`
 	History            []*Event                 `json:"history,omitempty"`
 	NComments          *int                     `json:"n_comments"`
-	NBlobs             *int                     `json:"n_blobs"`
+	NOpenContracts     *int                     `json:"n_open_contracts"`
 	AssigneesAggregate *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
 	LabelsAggregate    *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
 	CommentsAggregate  *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
@@ -1509,29 +1401,29 @@ type Tension struct {
 }
 
 type TensionAggregateResult struct {
-	Count         *int     `json:"count"`
-	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
-	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
-	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax  *string  `json:"updatedAtMax,omitempty"`
-	MessageMin    *string  `json:"messageMin,omitempty"`
-	MessageMax    *string  `json:"messageMax,omitempty"`
-	EmitteridMin  *string  `json:"emitteridMin,omitempty"`
-	EmitteridMax  *string  `json:"emitteridMax,omitempty"`
-	ReceiveridMin *string  `json:"receiveridMin,omitempty"`
-	ReceiveridMax *string  `json:"receiveridMax,omitempty"`
-	NthMin        *string  `json:"nthMin,omitempty"`
-	NthMax        *string  `json:"nthMax,omitempty"`
-	TitleMin      *string  `json:"titleMin,omitempty"`
-	TitleMax      *string  `json:"titleMax,omitempty"`
-	NCommentsMin  *int     `json:"n_commentsMin"`
-	NCommentsMax  *int     `json:"n_commentsMax"`
-	NCommentsSum  *int     `json:"n_commentsSum"`
-	NCommentsAvg  *float64 `json:"n_commentsAvg,omitempty"`
-	NBlobsMin     *int     `json:"n_blobsMin"`
-	NBlobsMax     *int     `json:"n_blobsMax"`
-	NBlobsSum     *int     `json:"n_blobsSum"`
-	NBlobsAvg     *float64 `json:"n_blobsAvg,omitempty"`
+	Count             *int     `json:"count"`
+	CreatedAtMin      *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax      *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin      *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax      *string  `json:"updatedAtMax,omitempty"`
+	MessageMin        *string  `json:"messageMin,omitempty"`
+	MessageMax        *string  `json:"messageMax,omitempty"`
+	EmitteridMin      *string  `json:"emitteridMin,omitempty"`
+	EmitteridMax      *string  `json:"emitteridMax,omitempty"`
+	ReceiveridMin     *string  `json:"receiveridMin,omitempty"`
+	ReceiveridMax     *string  `json:"receiveridMax,omitempty"`
+	NthMin            *string  `json:"nthMin,omitempty"`
+	NthMax            *string  `json:"nthMax,omitempty"`
+	TitleMin          *string  `json:"titleMin,omitempty"`
+	TitleMax          *string  `json:"titleMax,omitempty"`
+	NCommentsMin      *int     `json:"n_commentsMin"`
+	NCommentsMax      *int     `json:"n_commentsMax"`
+	NCommentsSum      *int     `json:"n_commentsSum"`
+	NCommentsAvg      *float64 `json:"n_commentsAvg,omitempty"`
+	NOpenContractsMin *int     `json:"n_open_contractsMin"`
+	NOpenContractsMax *int     `json:"n_open_contractsMax"`
+	NOpenContractsSum *int     `json:"n_open_contractsSum"`
+	NOpenContractsAvg *float64 `json:"n_open_contractsAvg,omitempty"`
 }
 
 type TensionEventHash struct {
@@ -1562,52 +1454,52 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt  *string        `json:"createdAt,omitempty"`
-	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	Message    *string        `json:"message,omitempty"`
-	Emitterid  *string        `json:"emitterid,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      *string        `json:"title,omitempty"`
-	Type       *TensionType   `json:"type_,omitempty"`
-	Status     *TensionStatus `json:"status,omitempty"`
-	Assignees  []*UserRef     `json:"assignees,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
-	Comments   []*CommentRef  `json:"comments,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Blobs      []*BlobRef     `json:"blobs,omitempty"`
-	Contracts  []*ContractRef `json:"contracts,omitempty"`
-	History    []*EventRef    `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments"`
-	NBlobs     *int           `json:"n_blobs"`
+	CreatedBy      *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt      *string        `json:"createdAt,omitempty"`
+	UpdatedAt      *string        `json:"updatedAt,omitempty"`
+	Message        *string        `json:"message,omitempty"`
+	Emitterid      *string        `json:"emitterid,omitempty"`
+	Emitter        *NodeRef       `json:"emitter,omitempty"`
+	Receiverid     *string        `json:"receiverid,omitempty"`
+	Receiver       *NodeRef       `json:"receiver,omitempty"`
+	Nth            *string        `json:"nth,omitempty"`
+	Title          *string        `json:"title,omitempty"`
+	Type           *TensionType   `json:"type_,omitempty"`
+	Status         *TensionStatus `json:"status,omitempty"`
+	Assignees      []*UserRef     `json:"assignees,omitempty"`
+	Labels         []*LabelRef    `json:"labels,omitempty"`
+	Comments       []*CommentRef  `json:"comments,omitempty"`
+	Action         *TensionAction `json:"action,omitempty"`
+	Blobs          []*BlobRef     `json:"blobs,omitempty"`
+	Contracts      []*ContractRef `json:"contracts,omitempty"`
+	History        []*EventRef    `json:"history,omitempty"`
+	NComments      *int           `json:"n_comments"`
+	NOpenContracts *int           `json:"n_open_contracts"`
 }
 
 type TensionRef struct {
-	ID         *string        `json:"id,omitempty"`
-	CreatedBy  *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt  *string        `json:"createdAt,omitempty"`
-	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	Message    *string        `json:"message,omitempty"`
-	Emitterid  *string        `json:"emitterid,omitempty"`
-	Emitter    *NodeRef       `json:"emitter,omitempty"`
-	Receiverid *string        `json:"receiverid,omitempty"`
-	Receiver   *NodeRef       `json:"receiver,omitempty"`
-	Nth        *string        `json:"nth,omitempty"`
-	Title      *string        `json:"title,omitempty"`
-	Type       *TensionType   `json:"type_,omitempty"`
-	Status     *TensionStatus `json:"status,omitempty"`
-	Assignees  []*UserRef     `json:"assignees,omitempty"`
-	Labels     []*LabelRef    `json:"labels,omitempty"`
-	Comments   []*CommentRef  `json:"comments,omitempty"`
-	Action     *TensionAction `json:"action,omitempty"`
-	Blobs      []*BlobRef     `json:"blobs,omitempty"`
-	Contracts  []*ContractRef `json:"contracts,omitempty"`
-	History    []*EventRef    `json:"history,omitempty"`
-	NComments  *int           `json:"n_comments"`
-	NBlobs     *int           `json:"n_blobs"`
+	ID             *string        `json:"id,omitempty"`
+	CreatedBy      *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt      *string        `json:"createdAt,omitempty"`
+	UpdatedAt      *string        `json:"updatedAt,omitempty"`
+	Message        *string        `json:"message,omitempty"`
+	Emitterid      *string        `json:"emitterid,omitempty"`
+	Emitter        *NodeRef       `json:"emitter,omitempty"`
+	Receiverid     *string        `json:"receiverid,omitempty"`
+	Receiver       *NodeRef       `json:"receiver,omitempty"`
+	Nth            *string        `json:"nth,omitempty"`
+	Title          *string        `json:"title,omitempty"`
+	Type           *TensionType   `json:"type_,omitempty"`
+	Status         *TensionStatus `json:"status,omitempty"`
+	Assignees      []*UserRef     `json:"assignees,omitempty"`
+	Labels         []*LabelRef    `json:"labels,omitempty"`
+	Comments       []*CommentRef  `json:"comments,omitempty"`
+	Action         *TensionAction `json:"action,omitempty"`
+	Blobs          []*BlobRef     `json:"blobs,omitempty"`
+	Contracts      []*ContractRef `json:"contracts,omitempty"`
+	History        []*EventRef    `json:"history,omitempty"`
+	NComments      *int           `json:"n_comments"`
+	NOpenContracts *int           `json:"n_open_contracts"`
 }
 
 type TensionStatusHash struct {
@@ -1730,15 +1622,15 @@ type UpdateNodePayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
-type UpdateNodeStatsInput struct {
-	Filter *NodeStatsFilter `json:"filter,omitempty"`
-	Set    *NodeStatsPatch  `json:"set,omitempty"`
-	Remove *NodeStatsPatch  `json:"remove,omitempty"`
+type UpdateOrgaAggInput struct {
+	Filter *OrgaAggFilter `json:"filter,omitempty"`
+	Set    *OrgaAggPatch  `json:"set,omitempty"`
+	Remove *OrgaAggPatch  `json:"remove,omitempty"`
 }
 
-type UpdateNodeStatsPayload struct {
-	NodeStats []*NodeStats `json:"nodeStats,omitempty"`
-	NumUids   *int         `json:"numUids"`
+type UpdateOrgaAggPayload struct {
+	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type UpdatePostInput struct {
@@ -1750,17 +1642,6 @@ type UpdatePostInput struct {
 type UpdatePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	NumUids *int    `json:"numUids"`
-}
-
-type UpdateSharedNodeInput struct {
-	Filter *SharedNodeFilter `json:"filter,omitempty"`
-	Set    *SharedNodePatch  `json:"set,omitempty"`
-	Remove *SharedNodePatch  `json:"remove,omitempty"`
-}
-
-type UpdateSharedNodePayload struct {
-	SharedNode []*SharedNode `json:"sharedNode,omitempty"`
-	NumUids    *int          `json:"numUids"`
 }
 
 type UpdateTensionInput struct {
@@ -3108,38 +2989,34 @@ func (e NodeFragmentOrderable) MarshalGQL(w io.Writer) {
 type NodeHasFilter string
 
 const (
-	NodeHasFilterCreatedBy    NodeHasFilter = "createdBy"
-	NodeHasFilterCreatedAt    NodeHasFilter = "createdAt"
-	NodeHasFilterUpdatedAt    NodeHasFilter = "updatedAt"
-	NodeHasFilterName         NodeHasFilter = "name"
-	NodeHasFilterNameid       NodeHasFilter = "nameid"
-	NodeHasFilterRootnameid   NodeHasFilter = "rootnameid"
-	NodeHasFilterParent       NodeHasFilter = "parent"
-	NodeHasFilterChildren     NodeHasFilter = "children"
-	NodeHasFilterType         NodeHasFilter = "type_"
-	NodeHasFilterTensionsOut  NodeHasFilter = "tensions_out"
-	NodeHasFilterTensionsIn   NodeHasFilter = "tensions_in"
-	NodeHasFilterAbout        NodeHasFilter = "about"
-	NodeHasFilterMandate      NodeHasFilter = "mandate"
-	NodeHasFilterDocs         NodeHasFilter = "docs"
-	NodeHasFilterSource       NodeHasFilter = "source"
-	NodeHasFilterNTensionsOut NodeHasFilter = "n_tensions_out"
-	NodeHasFilterNTensionsIn  NodeHasFilter = "n_tensions_in"
-	NodeHasFilterNChildren    NodeHasFilter = "n_children"
-	NodeHasFilterStats        NodeHasFilter = "stats"
-	NodeHasFilterIsRoot       NodeHasFilter = "isRoot"
-	NodeHasFilterIsPersonal   NodeHasFilter = "isPersonal"
-	NodeHasFilterIsPrivate    NodeHasFilter = "isPrivate"
-	NodeHasFilterIsArchived   NodeHasFilter = "isArchived"
-	NodeHasFilterCharac       NodeHasFilter = "charac"
-	NodeHasFilterRights       NodeHasFilter = "rights"
-	NodeHasFilterLabels       NodeHasFilter = "labels"
-	NodeHasFilterFirstLink    NodeHasFilter = "first_link"
-	NodeHasFilterSecondLink   NodeHasFilter = "second_link"
-	NodeHasFilterSkills       NodeHasFilter = "skills"
-	NodeHasFilterRoleType     NodeHasFilter = "role_type"
-	NodeHasFilterContracts    NodeHasFilter = "contracts"
-	NodeHasFilterShared       NodeHasFilter = "shared"
+	NodeHasFilterCreatedBy   NodeHasFilter = "createdBy"
+	NodeHasFilterCreatedAt   NodeHasFilter = "createdAt"
+	NodeHasFilterUpdatedAt   NodeHasFilter = "updatedAt"
+	NodeHasFilterName        NodeHasFilter = "name"
+	NodeHasFilterNameid      NodeHasFilter = "nameid"
+	NodeHasFilterRootnameid  NodeHasFilter = "rootnameid"
+	NodeHasFilterParent      NodeHasFilter = "parent"
+	NodeHasFilterChildren    NodeHasFilter = "children"
+	NodeHasFilterType        NodeHasFilter = "type_"
+	NodeHasFilterTensionsOut NodeHasFilter = "tensions_out"
+	NodeHasFilterTensionsIn  NodeHasFilter = "tensions_in"
+	NodeHasFilterAbout       NodeHasFilter = "about"
+	NodeHasFilterMandate     NodeHasFilter = "mandate"
+	NodeHasFilterDocs        NodeHasFilter = "docs"
+	NodeHasFilterSource      NodeHasFilter = "source"
+	NodeHasFilterIsRoot      NodeHasFilter = "isRoot"
+	NodeHasFilterIsPersonal  NodeHasFilter = "isPersonal"
+	NodeHasFilterIsPrivate   NodeHasFilter = "isPrivate"
+	NodeHasFilterIsArchived  NodeHasFilter = "isArchived"
+	NodeHasFilterCharac      NodeHasFilter = "charac"
+	NodeHasFilterRights      NodeHasFilter = "rights"
+	NodeHasFilterLabels      NodeHasFilter = "labels"
+	NodeHasFilterFirstLink   NodeHasFilter = "first_link"
+	NodeHasFilterSecondLink  NodeHasFilter = "second_link"
+	NodeHasFilterSkills      NodeHasFilter = "skills"
+	NodeHasFilterRoleType    NodeHasFilter = "role_type"
+	NodeHasFilterContracts   NodeHasFilter = "contracts"
+	NodeHasFilterOrgaAgg     NodeHasFilter = "orga_agg"
 )
 
 var AllNodeHasFilter = []NodeHasFilter{
@@ -3158,10 +3035,6 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterMandate,
 	NodeHasFilterDocs,
 	NodeHasFilterSource,
-	NodeHasFilterNTensionsOut,
-	NodeHasFilterNTensionsIn,
-	NodeHasFilterNChildren,
-	NodeHasFilterStats,
 	NodeHasFilterIsRoot,
 	NodeHasFilterIsPersonal,
 	NodeHasFilterIsPrivate,
@@ -3174,12 +3047,12 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterSkills,
 	NodeHasFilterRoleType,
 	NodeHasFilterContracts,
-	NodeHasFilterShared,
+	NodeHasFilterOrgaAgg,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterNTensionsOut, NodeHasFilterNTensionsIn, NodeHasFilterNChildren, NodeHasFilterStats, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterIsPrivate, NodeHasFilterIsArchived, NodeHasFilterCharac, NodeHasFilterRights, NodeHasFilterLabels, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterShared:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterIsPrivate, NodeHasFilterIsArchived, NodeHasFilterCharac, NodeHasFilterRights, NodeHasFilterLabels, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
 		return true
 	}
 	return false
@@ -3250,16 +3123,13 @@ func (e NodeMode) MarshalGQL(w io.Writer) {
 type NodeOrderable string
 
 const (
-	NodeOrderableCreatedAt    NodeOrderable = "createdAt"
-	NodeOrderableUpdatedAt    NodeOrderable = "updatedAt"
-	NodeOrderableName         NodeOrderable = "name"
-	NodeOrderableNameid       NodeOrderable = "nameid"
-	NodeOrderableRootnameid   NodeOrderable = "rootnameid"
-	NodeOrderableAbout        NodeOrderable = "about"
-	NodeOrderableNTensionsOut NodeOrderable = "n_tensions_out"
-	NodeOrderableNTensionsIn  NodeOrderable = "n_tensions_in"
-	NodeOrderableNChildren    NodeOrderable = "n_children"
-	NodeOrderableRights       NodeOrderable = "rights"
+	NodeOrderableCreatedAt  NodeOrderable = "createdAt"
+	NodeOrderableUpdatedAt  NodeOrderable = "updatedAt"
+	NodeOrderableName       NodeOrderable = "name"
+	NodeOrderableNameid     NodeOrderable = "nameid"
+	NodeOrderableRootnameid NodeOrderable = "rootnameid"
+	NodeOrderableAbout      NodeOrderable = "about"
+	NodeOrderableRights     NodeOrderable = "rights"
 )
 
 var AllNodeOrderable = []NodeOrderable{
@@ -3269,15 +3139,12 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableNameid,
 	NodeOrderableRootnameid,
 	NodeOrderableAbout,
-	NodeOrderableNTensionsOut,
-	NodeOrderableNTensionsIn,
-	NodeOrderableNChildren,
 	NodeOrderableRights,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableNTensionsOut, NodeOrderableNTensionsIn, NodeOrderableNChildren, NodeOrderableRights:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableRights:
 		return true
 	}
 	return false
@@ -3301,96 +3168,6 @@ func (e *NodeOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type NodeStatsHasFilter string
-
-const (
-	NodeStatsHasFilterNMember NodeStatsHasFilter = "n_member"
-	NodeStatsHasFilterNGuest  NodeStatsHasFilter = "n_guest"
-	NodeStatsHasFilterNCircle NodeStatsHasFilter = "n_circle"
-	NodeStatsHasFilterNRole   NodeStatsHasFilter = "n_role"
-)
-
-var AllNodeStatsHasFilter = []NodeStatsHasFilter{
-	NodeStatsHasFilterNMember,
-	NodeStatsHasFilterNGuest,
-	NodeStatsHasFilterNCircle,
-	NodeStatsHasFilterNRole,
-}
-
-func (e NodeStatsHasFilter) IsValid() bool {
-	switch e {
-	case NodeStatsHasFilterNMember, NodeStatsHasFilterNGuest, NodeStatsHasFilterNCircle, NodeStatsHasFilterNRole:
-		return true
-	}
-	return false
-}
-
-func (e NodeStatsHasFilter) String() string {
-	return string(e)
-}
-
-func (e *NodeStatsHasFilter) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = NodeStatsHasFilter(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid NodeStatsHasFilter", str)
-	}
-	return nil
-}
-
-func (e NodeStatsHasFilter) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type NodeStatsOrderable string
-
-const (
-	NodeStatsOrderableNMember NodeStatsOrderable = "n_member"
-	NodeStatsOrderableNGuest  NodeStatsOrderable = "n_guest"
-	NodeStatsOrderableNCircle NodeStatsOrderable = "n_circle"
-	NodeStatsOrderableNRole   NodeStatsOrderable = "n_role"
-)
-
-var AllNodeStatsOrderable = []NodeStatsOrderable{
-	NodeStatsOrderableNMember,
-	NodeStatsOrderableNGuest,
-	NodeStatsOrderableNCircle,
-	NodeStatsOrderableNRole,
-}
-
-func (e NodeStatsOrderable) IsValid() bool {
-	switch e {
-	case NodeStatsOrderableNMember, NodeStatsOrderableNGuest, NodeStatsOrderableNCircle, NodeStatsOrderableNRole:
-		return true
-	}
-	return false
-}
-
-func (e NodeStatsOrderable) String() string {
-	return string(e)
-}
-
-func (e *NodeStatsOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = NodeStatsOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid NodeStatsOrderable", str)
-	}
-	return nil
-}
-
-func (e NodeStatsOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -3432,6 +3209,88 @@ func (e *NodeType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type OrgaAggHasFilter string
+
+const (
+	OrgaAggHasFilterNMembers OrgaAggHasFilter = "n_members"
+	OrgaAggHasFilterNGuests  OrgaAggHasFilter = "n_guests"
+)
+
+var AllOrgaAggHasFilter = []OrgaAggHasFilter{
+	OrgaAggHasFilterNMembers,
+	OrgaAggHasFilterNGuests,
+}
+
+func (e OrgaAggHasFilter) IsValid() bool {
+	switch e {
+	case OrgaAggHasFilterNMembers, OrgaAggHasFilterNGuests:
+		return true
+	}
+	return false
+}
+
+func (e OrgaAggHasFilter) String() string {
+	return string(e)
+}
+
+func (e *OrgaAggHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = OrgaAggHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid OrgaAggHasFilter", str)
+	}
+	return nil
+}
+
+func (e OrgaAggHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type OrgaAggOrderable string
+
+const (
+	OrgaAggOrderableNMembers OrgaAggOrderable = "n_members"
+	OrgaAggOrderableNGuests  OrgaAggOrderable = "n_guests"
+)
+
+var AllOrgaAggOrderable = []OrgaAggOrderable{
+	OrgaAggOrderableNMembers,
+	OrgaAggOrderableNGuests,
+}
+
+func (e OrgaAggOrderable) IsValid() bool {
+	switch e {
+	case OrgaAggOrderableNMembers, OrgaAggOrderableNGuests:
+		return true
+	}
+	return false
+}
+
+func (e OrgaAggOrderable) String() string {
+	return string(e)
+}
+
+func (e *OrgaAggOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = OrgaAggOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid OrgaAggOrderable", str)
+	}
+	return nil
+}
+
+func (e OrgaAggOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -3576,92 +3435,6 @@ func (e RoleType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type SharedNodeHasFilter string
-
-const (
-	SharedNodeHasFilterNLabels         SharedNodeHasFilter = "n_labels"
-	SharedNodeHasFilterNTensions       SharedNodeHasFilter = "n_tensions"
-	SharedNodeHasFilterNClosedTensions SharedNodeHasFilter = "n_closed_tensions"
-)
-
-var AllSharedNodeHasFilter = []SharedNodeHasFilter{
-	SharedNodeHasFilterNLabels,
-	SharedNodeHasFilterNTensions,
-	SharedNodeHasFilterNClosedTensions,
-}
-
-func (e SharedNodeHasFilter) IsValid() bool {
-	switch e {
-	case SharedNodeHasFilterNLabels, SharedNodeHasFilterNTensions, SharedNodeHasFilterNClosedTensions:
-		return true
-	}
-	return false
-}
-
-func (e SharedNodeHasFilter) String() string {
-	return string(e)
-}
-
-func (e *SharedNodeHasFilter) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = SharedNodeHasFilter(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid SharedNodeHasFilter", str)
-	}
-	return nil
-}
-
-func (e SharedNodeHasFilter) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type SharedNodeOrderable string
-
-const (
-	SharedNodeOrderableNLabels         SharedNodeOrderable = "n_labels"
-	SharedNodeOrderableNTensions       SharedNodeOrderable = "n_tensions"
-	SharedNodeOrderableNClosedTensions SharedNodeOrderable = "n_closed_tensions"
-)
-
-var AllSharedNodeOrderable = []SharedNodeOrderable{
-	SharedNodeOrderableNLabels,
-	SharedNodeOrderableNTensions,
-	SharedNodeOrderableNClosedTensions,
-}
-
-func (e SharedNodeOrderable) IsValid() bool {
-	switch e {
-	case SharedNodeOrderableNLabels, SharedNodeOrderableNTensions, SharedNodeOrderableNClosedTensions:
-		return true
-	}
-	return false
-}
-
-func (e SharedNodeOrderable) String() string {
-	return string(e)
-}
-
-func (e *SharedNodeOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = SharedNodeOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid SharedNodeOrderable", str)
-	}
-	return nil
-}
-
-func (e SharedNodeOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
 type TensionAction string
 
 const (
@@ -3791,27 +3564,27 @@ func (e TensionEvent) MarshalGQL(w io.Writer) {
 type TensionHasFilter string
 
 const (
-	TensionHasFilterCreatedBy  TensionHasFilter = "createdBy"
-	TensionHasFilterCreatedAt  TensionHasFilter = "createdAt"
-	TensionHasFilterUpdatedAt  TensionHasFilter = "updatedAt"
-	TensionHasFilterMessage    TensionHasFilter = "message"
-	TensionHasFilterEmitterid  TensionHasFilter = "emitterid"
-	TensionHasFilterEmitter    TensionHasFilter = "emitter"
-	TensionHasFilterReceiverid TensionHasFilter = "receiverid"
-	TensionHasFilterReceiver   TensionHasFilter = "receiver"
-	TensionHasFilterNth        TensionHasFilter = "nth"
-	TensionHasFilterTitle      TensionHasFilter = "title"
-	TensionHasFilterType       TensionHasFilter = "type_"
-	TensionHasFilterStatus     TensionHasFilter = "status"
-	TensionHasFilterAssignees  TensionHasFilter = "assignees"
-	TensionHasFilterLabels     TensionHasFilter = "labels"
-	TensionHasFilterComments   TensionHasFilter = "comments"
-	TensionHasFilterAction     TensionHasFilter = "action"
-	TensionHasFilterBlobs      TensionHasFilter = "blobs"
-	TensionHasFilterContracts  TensionHasFilter = "contracts"
-	TensionHasFilterHistory    TensionHasFilter = "history"
-	TensionHasFilterNComments  TensionHasFilter = "n_comments"
-	TensionHasFilterNBlobs     TensionHasFilter = "n_blobs"
+	TensionHasFilterCreatedBy      TensionHasFilter = "createdBy"
+	TensionHasFilterCreatedAt      TensionHasFilter = "createdAt"
+	TensionHasFilterUpdatedAt      TensionHasFilter = "updatedAt"
+	TensionHasFilterMessage        TensionHasFilter = "message"
+	TensionHasFilterEmitterid      TensionHasFilter = "emitterid"
+	TensionHasFilterEmitter        TensionHasFilter = "emitter"
+	TensionHasFilterReceiverid     TensionHasFilter = "receiverid"
+	TensionHasFilterReceiver       TensionHasFilter = "receiver"
+	TensionHasFilterNth            TensionHasFilter = "nth"
+	TensionHasFilterTitle          TensionHasFilter = "title"
+	TensionHasFilterType           TensionHasFilter = "type_"
+	TensionHasFilterStatus         TensionHasFilter = "status"
+	TensionHasFilterAssignees      TensionHasFilter = "assignees"
+	TensionHasFilterLabels         TensionHasFilter = "labels"
+	TensionHasFilterComments       TensionHasFilter = "comments"
+	TensionHasFilterAction         TensionHasFilter = "action"
+	TensionHasFilterBlobs          TensionHasFilter = "blobs"
+	TensionHasFilterContracts      TensionHasFilter = "contracts"
+	TensionHasFilterHistory        TensionHasFilter = "history"
+	TensionHasFilterNComments      TensionHasFilter = "n_comments"
+	TensionHasFilterNOpenContracts TensionHasFilter = "n_open_contracts"
 )
 
 var AllTensionHasFilter = []TensionHasFilter{
@@ -3835,12 +3608,12 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterContracts,
 	TensionHasFilterHistory,
 	TensionHasFilterNComments,
-	TensionHasFilterNBlobs,
+	TensionHasFilterNOpenContracts,
 }
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterNth, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNBlobs:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterNth, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false
@@ -3870,15 +3643,15 @@ func (e TensionHasFilter) MarshalGQL(w io.Writer) {
 type TensionOrderable string
 
 const (
-	TensionOrderableCreatedAt  TensionOrderable = "createdAt"
-	TensionOrderableUpdatedAt  TensionOrderable = "updatedAt"
-	TensionOrderableMessage    TensionOrderable = "message"
-	TensionOrderableEmitterid  TensionOrderable = "emitterid"
-	TensionOrderableReceiverid TensionOrderable = "receiverid"
-	TensionOrderableNth        TensionOrderable = "nth"
-	TensionOrderableTitle      TensionOrderable = "title"
-	TensionOrderableNComments  TensionOrderable = "n_comments"
-	TensionOrderableNBlobs     TensionOrderable = "n_blobs"
+	TensionOrderableCreatedAt      TensionOrderable = "createdAt"
+	TensionOrderableUpdatedAt      TensionOrderable = "updatedAt"
+	TensionOrderableMessage        TensionOrderable = "message"
+	TensionOrderableEmitterid      TensionOrderable = "emitterid"
+	TensionOrderableReceiverid     TensionOrderable = "receiverid"
+	TensionOrderableNth            TensionOrderable = "nth"
+	TensionOrderableTitle          TensionOrderable = "title"
+	TensionOrderableNComments      TensionOrderable = "n_comments"
+	TensionOrderableNOpenContracts TensionOrderable = "n_open_contracts"
 )
 
 var AllTensionOrderable = []TensionOrderable{
@@ -3890,12 +3663,12 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableNth,
 	TensionOrderableTitle,
 	TensionOrderableNComments,
-	TensionOrderableNBlobs,
+	TensionOrderableNOpenContracts,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNBlobs:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNOpenContracts:
 		return true
 	}
 	return false

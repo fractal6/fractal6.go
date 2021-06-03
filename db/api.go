@@ -67,7 +67,7 @@ var dqlQueries map[string]string = map[string]string{
             count({{.fieldName}})
         }
     }`,
-    "getNodeStats": `{
+    "getOrgaAgg": `{
         var(func: eq(Node.nameid, "{{.nameid}}"))  {
             Node.children @filter(eq(Node.role_type, "Guest")) {
                 guest as count(uid)
@@ -78,24 +78,29 @@ var dqlQueries map[string]string = map[string]string{
                 member as count(uid)
             }
         }
-
-        var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
-            c as Node.children @filter(NOT eq(Node.isArchived, true))
-        }
-        var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
-            circle as count(uid)
-        }
-        var(func: uid(c)) @filter(eq(Node.type_, "Role")) {
-            role as count(uid)
-        }
-
         all() {
-            n_member: sum(val(member))
-            n_guest: sum(val(guest))
-            n_role: sum(val(role))
-            n_circle: sum(val(circle))
+            n_members: sum(val(member))
+            n_guests: sum(val(guest))
         }
     }`,
+    // Get the total number of roles and circle recursively
+    //    var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+    //        c as Node.children @filter(NOT eq(Node.isArchived, true))
+    //    }
+    //    var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
+    //        circle as count(uid)
+    //    }
+    //    var(func: uid(c)) @filter(eq(Node.type_, "Role")) {
+    //        role as count(uid)
+    //    }
+
+    //    all() {
+    //        n_member: sum(val(member))
+    //        n_guest: sum(val(guest))
+    //        n_role: sum(val(role))
+    //        n_circle: sum(val(circle))
+    //    }
+    //}`,
     // Query existance
     "exists": `{
         all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
@@ -377,32 +382,31 @@ func (dg Dgraph) Count(id string, fieldName string) int {
     return values[0]
 }
 
-func (dg Dgraph) GetNodeStats(nameid string) map[string]int {
+func (dg Dgraph) Meta(k, v, f string) map[string]interface{} {
     // Format Query
     maps := map[string]string{
-        "nameid": nameid,
+        k: v,
     }
     // Send request
-    res, err := dg.QueryDql("getNodeStats", maps)
+    res, err := dg.QueryDql(f, maps)
     if err != nil { panic(err) }
 
     // Decode response
-    var r DqlRespCount
+    var r DqlResp
     err = json.Unmarshal(res.Json, &r)
     if err != nil { panic(err) }
 
     // Extract result
     if len(r.All) == 0 {
-        panic("no stats for: "+ nameid)
+        panic("no result for: "+ k)
     }
-    stats := make(map[string]int, len(r.All))
+    agg := make(map[string]interface{}, len(r.All))
     for _, s := range r.All {
-        for k, v := range s {
-            stats[k] = v
+        for n, m := range s {
+            agg[n] = m
         }
     }
-
-    return stats
+    return agg
 }
 
 // Probe if an object exists.

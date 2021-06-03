@@ -99,7 +99,7 @@ type DirectiveRoot struct {
 	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Lambda                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	LambdaOnMutate           func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
-	Meta_getNodeStats        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Meta                     func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k string) (res interface{}, err error)
 	Patch_RO                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Patch_isOwner            func(ctx context.Context, obj interface{}, next graphql.Resolver, u *string) (res interface{}, err error)
 	Remote                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -160,14 +160,9 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	AddNodeStatsPayload struct {
-		NodeStats func(childComplexity int, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) int
-		NumUids   func(childComplexity int) int
-	}
-
-	AddSharedNodePayload struct {
-		NumUids    func(childComplexity int) int
-		SharedNode func(childComplexity int, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) int
+	AddOrgaAggPayload struct {
+		NumUids func(childComplexity int) int
+		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 	}
 
 	AddTensionPayload struct {
@@ -331,22 +326,16 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	DeleteNodeStatsPayload struct {
-		Msg       func(childComplexity int) int
-		NodeStats func(childComplexity int, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) int
-		NumUids   func(childComplexity int) int
+	DeleteOrgaAggPayload struct {
+		Msg     func(childComplexity int) int
+		NumUids func(childComplexity int) int
+		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 	}
 
 	DeletePostPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-	}
-
-	DeleteSharedNodePayload struct {
-		Msg        func(childComplexity int) int
-		NumUids    func(childComplexity int) int
-		SharedNode func(childComplexity int, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) int
 	}
 
 	DeleteTensionPayload struct {
@@ -482,8 +471,7 @@ type ComplexityRoot struct {
 		AddNode             func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
 		AddNodeCharac       func(childComplexity int, input []*model.AddNodeCharacInput) int
 		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
-		AddNodeStats        func(childComplexity int, input []*model.AddNodeStatsInput) int
-		AddSharedNode       func(childComplexity int, input []*model.AddSharedNodeInput) int
+		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
 		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser             func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
 		AddUserRights       func(childComplexity int, input []*model.AddUserRightsInput) int
@@ -498,9 +486,8 @@ type ComplexityRoot struct {
 		DeleteNode          func(childComplexity int, filter model.NodeFilter) int
 		DeleteNodeCharac    func(childComplexity int, filter model.NodeCharacFilter) int
 		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
-		DeleteNodeStats     func(childComplexity int, filter model.NodeStatsFilter) int
+		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
 		DeletePost          func(childComplexity int, filter model.PostFilter) int
-		DeleteSharedNode    func(childComplexity int, filter model.SharedNodeFilter) int
 		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
 		DeleteUser          func(childComplexity int, filter model.UserFilter) int
 		DeleteUserRights    func(childComplexity int, filter model.UserRightsFilter) int
@@ -515,9 +502,8 @@ type ComplexityRoot struct {
 		UpdateNode          func(childComplexity int, input model.UpdateNodeInput) int
 		UpdateNodeCharac    func(childComplexity int, input model.UpdateNodeCharacInput) int
 		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
-		UpdateNodeStats     func(childComplexity int, input model.UpdateNodeStatsInput) int
+		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
 		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
-		UpdateSharedNode    func(childComplexity int, input model.UpdateSharedNodeInput) int
 		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
 		UpdateUser          func(childComplexity int, input model.UpdateUserInput) int
 		UpdateUserRights    func(childComplexity int, input model.UpdateUserRightsInput) int
@@ -544,20 +530,16 @@ type ComplexityRoot struct {
 		Labels               func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		LabelsAggregate      func(childComplexity int, filter *model.LabelFilter) int
 		Mandate              func(childComplexity int, filter *model.MandateFilter) int
-		NChildren            func(childComplexity int) int
-		NTensionsIn          func(childComplexity int) int
-		NTensionsOut         func(childComplexity int) int
 		Name                 func(childComplexity int) int
 		Nameid               func(childComplexity int) int
+		OrgaAgg              func(childComplexity int, filter *model.OrgaAggFilter) int
 		Parent               func(childComplexity int, filter *model.NodeFilter) int
 		Rights               func(childComplexity int) int
 		RoleType             func(childComplexity int) int
 		Rootnameid           func(childComplexity int) int
 		SecondLink           func(childComplexity int, filter *model.UserFilter) int
-		Shared               func(childComplexity int, filter *model.SharedNodeFilter) int
 		Skills               func(childComplexity int) int
 		Source               func(childComplexity int, filter *model.BlobFilter) int
-		Stats                func(childComplexity int, filter *model.NodeStatsFilter) int
 		TensionsIn           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		TensionsInAggregate  func(childComplexity int, filter *model.TensionFilter) int
 		TensionsOut          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -567,35 +549,23 @@ type ComplexityRoot struct {
 	}
 
 	NodeAggregateResult struct {
-		AboutMax        func(childComplexity int) int
-		AboutMin        func(childComplexity int) int
-		Count           func(childComplexity int) int
-		CreatedAtMax    func(childComplexity int) int
-		CreatedAtMin    func(childComplexity int) int
-		NChildrenAvg    func(childComplexity int) int
-		NChildrenMax    func(childComplexity int) int
-		NChildrenMin    func(childComplexity int) int
-		NChildrenSum    func(childComplexity int) int
-		NTensionsInAvg  func(childComplexity int) int
-		NTensionsInMax  func(childComplexity int) int
-		NTensionsInMin  func(childComplexity int) int
-		NTensionsInSum  func(childComplexity int) int
-		NTensionsOutAvg func(childComplexity int) int
-		NTensionsOutMax func(childComplexity int) int
-		NTensionsOutMin func(childComplexity int) int
-		NTensionsOutSum func(childComplexity int) int
-		NameMax         func(childComplexity int) int
-		NameMin         func(childComplexity int) int
-		NameidMax       func(childComplexity int) int
-		NameidMin       func(childComplexity int) int
-		RightsAvg       func(childComplexity int) int
-		RightsMax       func(childComplexity int) int
-		RightsMin       func(childComplexity int) int
-		RightsSum       func(childComplexity int) int
-		RootnameidMax   func(childComplexity int) int
-		RootnameidMin   func(childComplexity int) int
-		UpdatedAtMax    func(childComplexity int) int
-		UpdatedAtMin    func(childComplexity int) int
+		AboutMax      func(childComplexity int) int
+		AboutMin      func(childComplexity int) int
+		Count         func(childComplexity int) int
+		CreatedAtMax  func(childComplexity int) int
+		CreatedAtMin  func(childComplexity int) int
+		NameMax       func(childComplexity int) int
+		NameMin       func(childComplexity int) int
+		NameidMax     func(childComplexity int) int
+		NameidMin     func(childComplexity int) int
+		RightsAvg     func(childComplexity int) int
+		RightsMax     func(childComplexity int) int
+		RightsMin     func(childComplexity int) int
+		RightsSum     func(childComplexity int) int
+		RootnameidMax func(childComplexity int) int
+		RootnameidMin func(childComplexity int) int
+		UpdatedAtMax  func(childComplexity int) int
+		UpdatedAtMin  func(childComplexity int) int
 	}
 
 	NodeCharac struct {
@@ -639,31 +609,21 @@ type ComplexityRoot struct {
 		SecondLinkMin func(childComplexity int) int
 	}
 
-	NodeStats struct {
-		NCircle func(childComplexity int) int
-		NGuest  func(childComplexity int) int
-		NMember func(childComplexity int) int
-		NRole   func(childComplexity int) int
+	OrgaAgg struct {
+		NGuests  func(childComplexity int) int
+		NMembers func(childComplexity int) int
 	}
 
-	NodeStatsAggregateResult struct {
-		Count      func(childComplexity int) int
-		NCircleAvg func(childComplexity int) int
-		NCircleMax func(childComplexity int) int
-		NCircleMin func(childComplexity int) int
-		NCircleSum func(childComplexity int) int
-		NGuestAvg  func(childComplexity int) int
-		NGuestMax  func(childComplexity int) int
-		NGuestMin  func(childComplexity int) int
-		NGuestSum  func(childComplexity int) int
-		NMemberAvg func(childComplexity int) int
-		NMemberMax func(childComplexity int) int
-		NMemberMin func(childComplexity int) int
-		NMemberSum func(childComplexity int) int
-		NRoleAvg   func(childComplexity int) int
-		NRoleMax   func(childComplexity int) int
-		NRoleMin   func(childComplexity int) int
-		NRoleSum   func(childComplexity int) int
+	OrgaAggAggregateResult struct {
+		Count       func(childComplexity int) int
+		NGuestsAvg  func(childComplexity int) int
+		NGuestsMax  func(childComplexity int) int
+		NGuestsMin  func(childComplexity int) int
+		NGuestsSum  func(childComplexity int) int
+		NMembersAvg func(childComplexity int) int
+		NMembersMax func(childComplexity int) int
+		NMembersMin func(childComplexity int) int
+		NMembersSum func(childComplexity int) int
 	}
 
 	Point struct {
@@ -708,9 +668,8 @@ type ComplexityRoot struct {
 		AggregateNode          func(childComplexity int, filter *model.NodeFilter) int
 		AggregateNodeCharac    func(childComplexity int, filter *model.NodeCharacFilter) int
 		AggregateNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter) int
-		AggregateNodeStats     func(childComplexity int, filter *model.NodeStatsFilter) int
+		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
 		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
-		AggregateSharedNode    func(childComplexity int, filter *model.SharedNodeFilter) int
 		AggregateTension       func(childComplexity int, filter *model.TensionFilter) int
 		AggregateUser          func(childComplexity int, filter *model.UserFilter) int
 		AggregateUserRights    func(childComplexity int, filter *model.UserRightsFilter) int
@@ -738,35 +697,12 @@ type ComplexityRoot struct {
 		QueryNode              func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		QueryNodeCharac        func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
 		QueryNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
-		QueryNodeStats         func(childComplexity int, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) int
+		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-		QuerySharedNode        func(childComplexity int, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) int
 		QueryTension           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		QueryUser              func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		QueryUserRights        func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
 		QueryVote              func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
-	}
-
-	SharedNode struct {
-		NClosedTensions func(childComplexity int) int
-		NLabels         func(childComplexity int) int
-		NTensions       func(childComplexity int) int
-	}
-
-	SharedNodeAggregateResult struct {
-		Count              func(childComplexity int) int
-		NClosedTensionsAvg func(childComplexity int) int
-		NClosedTensionsMax func(childComplexity int) int
-		NClosedTensionsMin func(childComplexity int) int
-		NClosedTensionsSum func(childComplexity int) int
-		NLabelsAvg         func(childComplexity int) int
-		NLabelsMax         func(childComplexity int) int
-		NLabelsMin         func(childComplexity int) int
-		NLabelsSum         func(childComplexity int) int
-		NTensionsAvg       func(childComplexity int) int
-		NTensionsMax       func(childComplexity int) int
-		NTensionsMin       func(childComplexity int) int
-		NTensionsSum       func(childComplexity int) int
 	}
 
 	Tension struct {
@@ -789,8 +725,8 @@ type ComplexityRoot struct {
 		Labels             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		LabelsAggregate    func(childComplexity int, filter *model.LabelFilter) int
 		Message            func(childComplexity int) int
-		NBlobs             func(childComplexity int) int
 		NComments          func(childComplexity int) int
+		NOpenContracts     func(childComplexity int) int
 		Nth                func(childComplexity int) int
 		Receiver           func(childComplexity int, filter *model.NodeFilter) int
 		Receiverid         func(childComplexity int) int
@@ -801,29 +737,29 @@ type ComplexityRoot struct {
 	}
 
 	TensionAggregateResult struct {
-		Count         func(childComplexity int) int
-		CreatedAtMax  func(childComplexity int) int
-		CreatedAtMin  func(childComplexity int) int
-		EmitteridMax  func(childComplexity int) int
-		EmitteridMin  func(childComplexity int) int
-		MessageMax    func(childComplexity int) int
-		MessageMin    func(childComplexity int) int
-		NBlobsAvg     func(childComplexity int) int
-		NBlobsMax     func(childComplexity int) int
-		NBlobsMin     func(childComplexity int) int
-		NBlobsSum     func(childComplexity int) int
-		NCommentsAvg  func(childComplexity int) int
-		NCommentsMax  func(childComplexity int) int
-		NCommentsMin  func(childComplexity int) int
-		NCommentsSum  func(childComplexity int) int
-		NthMax        func(childComplexity int) int
-		NthMin        func(childComplexity int) int
-		ReceiveridMax func(childComplexity int) int
-		ReceiveridMin func(childComplexity int) int
-		TitleMax      func(childComplexity int) int
-		TitleMin      func(childComplexity int) int
-		UpdatedAtMax  func(childComplexity int) int
-		UpdatedAtMin  func(childComplexity int) int
+		Count             func(childComplexity int) int
+		CreatedAtMax      func(childComplexity int) int
+		CreatedAtMin      func(childComplexity int) int
+		EmitteridMax      func(childComplexity int) int
+		EmitteridMin      func(childComplexity int) int
+		MessageMax        func(childComplexity int) int
+		MessageMin        func(childComplexity int) int
+		NCommentsAvg      func(childComplexity int) int
+		NCommentsMax      func(childComplexity int) int
+		NCommentsMin      func(childComplexity int) int
+		NCommentsSum      func(childComplexity int) int
+		NOpenContractsAvg func(childComplexity int) int
+		NOpenContractsMax func(childComplexity int) int
+		NOpenContractsMin func(childComplexity int) int
+		NOpenContractsSum func(childComplexity int) int
+		NthMax            func(childComplexity int) int
+		NthMin            func(childComplexity int) int
+		ReceiveridMax     func(childComplexity int) int
+		ReceiveridMin     func(childComplexity int) int
+		TitleMax          func(childComplexity int) int
+		TitleMin          func(childComplexity int) int
+		UpdatedAtMax      func(childComplexity int) int
+		UpdatedAtMin      func(childComplexity int) int
 	}
 
 	UpdateBlobPayload struct {
@@ -876,19 +812,14 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	UpdateNodeStatsPayload struct {
-		NodeStats func(childComplexity int, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) int
-		NumUids   func(childComplexity int) int
+	UpdateOrgaAggPayload struct {
+		NumUids func(childComplexity int) int
+		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 	}
 
 	UpdatePostPayload struct {
 		NumUids func(childComplexity int) int
 		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-	}
-
-	UpdateSharedNodePayload struct {
-		NumUids    func(childComplexity int) int
-		SharedNode func(childComplexity int, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) int
 	}
 
 	UpdateTensionPayload struct {
@@ -989,9 +920,6 @@ type MutationResolver interface {
 	AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (*model.AddNodePayload, error)
 	UpdateNode(ctx context.Context, input model.UpdateNodeInput) (*model.UpdateNodePayload, error)
 	DeleteNode(ctx context.Context, filter model.NodeFilter) (*model.DeleteNodePayload, error)
-	AddSharedNode(ctx context.Context, input []*model.AddSharedNodeInput) (*model.AddSharedNodePayload, error)
-	UpdateSharedNode(ctx context.Context, input model.UpdateSharedNodeInput) (*model.UpdateSharedNodePayload, error)
-	DeleteSharedNode(ctx context.Context, filter model.SharedNodeFilter) (*model.DeleteSharedNodePayload, error)
 	AddNodeFragment(ctx context.Context, input []*model.AddNodeFragmentInput) (*model.AddNodeFragmentPayload, error)
 	UpdateNodeFragment(ctx context.Context, input model.UpdateNodeFragmentInput) (*model.UpdateNodeFragmentPayload, error)
 	DeleteNodeFragment(ctx context.Context, filter model.NodeFragmentFilter) (*model.DeleteNodeFragmentPayload, error)
@@ -1001,9 +929,9 @@ type MutationResolver interface {
 	AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (*model.AddNodeCharacPayload, error)
 	UpdateNodeCharac(ctx context.Context, input model.UpdateNodeCharacInput) (*model.UpdateNodeCharacPayload, error)
 	DeleteNodeCharac(ctx context.Context, filter model.NodeCharacFilter) (*model.DeleteNodeCharacPayload, error)
-	AddNodeStats(ctx context.Context, input []*model.AddNodeStatsInput) (*model.AddNodeStatsPayload, error)
-	UpdateNodeStats(ctx context.Context, input model.UpdateNodeStatsInput) (*model.UpdateNodeStatsPayload, error)
-	DeleteNodeStats(ctx context.Context, filter model.NodeStatsFilter) (*model.DeleteNodeStatsPayload, error)
+	AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (*model.AddOrgaAggPayload, error)
+	UpdateOrgaAgg(ctx context.Context, input model.UpdateOrgaAggInput) (*model.UpdateOrgaAggPayload, error)
+	DeleteOrgaAgg(ctx context.Context, filter model.OrgaAggFilter) (*model.DeleteOrgaAggPayload, error)
 	UpdatePost(ctx context.Context, input model.UpdatePostInput) (*model.UpdatePostPayload, error)
 	DeletePost(ctx context.Context, filter model.PostFilter) (*model.DeletePostPayload, error)
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
@@ -1041,8 +969,6 @@ type QueryResolver interface {
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
 	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]*model.Node, error)
 	AggregateNode(ctx context.Context, filter *model.NodeFilter) (*model.NodeAggregateResult, error)
-	QuerySharedNode(ctx context.Context, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) ([]*model.SharedNode, error)
-	AggregateSharedNode(ctx context.Context, filter *model.SharedNodeFilter) (*model.SharedNodeAggregateResult, error)
 	GetNodeFragment(ctx context.Context, id string) (*model.NodeFragment, error)
 	QueryNodeFragment(ctx context.Context, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) ([]*model.NodeFragment, error)
 	AggregateNodeFragment(ctx context.Context, filter *model.NodeFragmentFilter) (*model.NodeFragmentAggregateResult, error)
@@ -1052,8 +978,8 @@ type QueryResolver interface {
 	GetNodeCharac(ctx context.Context, id string) (*model.NodeCharac, error)
 	QueryNodeCharac(ctx context.Context, filter *model.NodeCharacFilter, first *int, offset *int) ([]*model.NodeCharac, error)
 	AggregateNodeCharac(ctx context.Context, filter *model.NodeCharacFilter) (*model.NodeCharacAggregateResult, error)
-	QueryNodeStats(ctx context.Context, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) ([]*model.NodeStats, error)
-	AggregateNodeStats(ctx context.Context, filter *model.NodeStatsFilter) (*model.NodeStatsAggregateResult, error)
+	QueryOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) ([]*model.OrgaAgg, error)
+	AggregateOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter) (*model.OrgaAggAggregateResult, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
 	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]*model.Post, error)
 	AggregatePost(ctx context.Context, filter *model.PostFilter) (*model.PostAggregateResult, error)
@@ -1292,43 +1218,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AddNodePayload.NumUids(childComplexity), true
 
-	case "AddNodeStatsPayload.nodeStats":
-		if e.complexity.AddNodeStatsPayload.NodeStats == nil {
+	case "AddOrgaAggPayload.numUids":
+		if e.complexity.AddOrgaAggPayload.NumUids == nil {
 			break
 		}
 
-		args, err := ec.field_AddNodeStatsPayload_nodeStats_args(context.TODO(), rawArgs)
+		return e.complexity.AddOrgaAggPayload.NumUids(childComplexity), true
+
+	case "AddOrgaAggPayload.orgaAgg":
+		if e.complexity.AddOrgaAggPayload.OrgaAgg == nil {
+			break
+		}
+
+		args, err := ec.field_AddOrgaAggPayload_orgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.AddNodeStatsPayload.NodeStats(childComplexity, args["filter"].(*model.NodeStatsFilter), args["order"].(*model.NodeStatsOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "AddNodeStatsPayload.numUids":
-		if e.complexity.AddNodeStatsPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.AddNodeStatsPayload.NumUids(childComplexity), true
-
-	case "AddSharedNodePayload.numUids":
-		if e.complexity.AddSharedNodePayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.AddSharedNodePayload.NumUids(childComplexity), true
-
-	case "AddSharedNodePayload.sharedNode":
-		if e.complexity.AddSharedNodePayload.SharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_AddSharedNodePayload_sharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.AddSharedNodePayload.SharedNode(childComplexity, args["filter"].(*model.SharedNodeFilter), args["order"].(*model.SharedNodeOrder), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.AddOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddTensionPayload.numUids":
 		if e.complexity.AddTensionPayload.NumUids == nil {
@@ -2172,31 +2079,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteNodePayload.NumUids(childComplexity), true
 
-	case "DeleteNodeStatsPayload.msg":
-		if e.complexity.DeleteNodeStatsPayload.Msg == nil {
+	case "DeleteOrgaAggPayload.msg":
+		if e.complexity.DeleteOrgaAggPayload.Msg == nil {
 			break
 		}
 
-		return e.complexity.DeleteNodeStatsPayload.Msg(childComplexity), true
+		return e.complexity.DeleteOrgaAggPayload.Msg(childComplexity), true
 
-	case "DeleteNodeStatsPayload.nodeStats":
-		if e.complexity.DeleteNodeStatsPayload.NodeStats == nil {
+	case "DeleteOrgaAggPayload.numUids":
+		if e.complexity.DeleteOrgaAggPayload.NumUids == nil {
 			break
 		}
 
-		args, err := ec.field_DeleteNodeStatsPayload_nodeStats_args(context.TODO(), rawArgs)
+		return e.complexity.DeleteOrgaAggPayload.NumUids(childComplexity), true
+
+	case "DeleteOrgaAggPayload.orgaAgg":
+		if e.complexity.DeleteOrgaAggPayload.OrgaAgg == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteOrgaAggPayload_orgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.DeleteNodeStatsPayload.NodeStats(childComplexity, args["filter"].(*model.NodeStatsFilter), args["order"].(*model.NodeStatsOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "DeleteNodeStatsPayload.numUids":
-		if e.complexity.DeleteNodeStatsPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.DeleteNodeStatsPayload.NumUids(childComplexity), true
+		return e.complexity.DeleteOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeletePostPayload.msg":
 		if e.complexity.DeletePostPayload.Msg == nil {
@@ -2223,32 +2130,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeletePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "DeleteSharedNodePayload.msg":
-		if e.complexity.DeleteSharedNodePayload.Msg == nil {
-			break
-		}
-
-		return e.complexity.DeleteSharedNodePayload.Msg(childComplexity), true
-
-	case "DeleteSharedNodePayload.numUids":
-		if e.complexity.DeleteSharedNodePayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.DeleteSharedNodePayload.NumUids(childComplexity), true
-
-	case "DeleteSharedNodePayload.sharedNode":
-		if e.complexity.DeleteSharedNodePayload.SharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_DeleteSharedNodePayload_sharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.DeleteSharedNodePayload.SharedNode(childComplexity, args["filter"].(*model.SharedNodeFilter), args["order"].(*model.SharedNodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeleteTensionPayload.msg":
 		if e.complexity.DeleteTensionPayload.Msg == nil {
@@ -3001,29 +2882,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddNodeFragment(childComplexity, args["input"].([]*model.AddNodeFragmentInput)), true
 
-	case "Mutation.addNodeStats":
-		if e.complexity.Mutation.AddNodeStats == nil {
+	case "Mutation.addOrgaAgg":
+		if e.complexity.Mutation.AddOrgaAgg == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_addNodeStats_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addOrgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddNodeStats(childComplexity, args["input"].([]*model.AddNodeStatsInput)), true
-
-	case "Mutation.addSharedNode":
-		if e.complexity.Mutation.AddSharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addSharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddSharedNode(childComplexity, args["input"].([]*model.AddSharedNodeInput)), true
+		return e.complexity.Mutation.AddOrgaAgg(childComplexity, args["input"].([]*model.AddOrgaAggInput)), true
 
 	case "Mutation.addTension":
 		if e.complexity.Mutation.AddTension == nil {
@@ -3193,17 +3062,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteNodeFragment(childComplexity, args["filter"].(model.NodeFragmentFilter)), true
 
-	case "Mutation.deleteNodeStats":
-		if e.complexity.Mutation.DeleteNodeStats == nil {
+	case "Mutation.deleteOrgaAgg":
+		if e.complexity.Mutation.DeleteOrgaAgg == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteNodeStats_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteOrgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteNodeStats(childComplexity, args["filter"].(model.NodeStatsFilter)), true
+		return e.complexity.Mutation.DeleteOrgaAgg(childComplexity, args["filter"].(model.OrgaAggFilter)), true
 
 	case "Mutation.deletePost":
 		if e.complexity.Mutation.DeletePost == nil {
@@ -3216,18 +3085,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeletePost(childComplexity, args["filter"].(model.PostFilter)), true
-
-	case "Mutation.deleteSharedNode":
-		if e.complexity.Mutation.DeleteSharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteSharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteSharedNode(childComplexity, args["filter"].(model.SharedNodeFilter)), true
 
 	case "Mutation.deleteTension":
 		if e.complexity.Mutation.DeleteTension == nil {
@@ -3397,17 +3254,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateNodeFragment(childComplexity, args["input"].(model.UpdateNodeFragmentInput)), true
 
-	case "Mutation.updateNodeStats":
-		if e.complexity.Mutation.UpdateNodeStats == nil {
+	case "Mutation.updateOrgaAgg":
+		if e.complexity.Mutation.UpdateOrgaAgg == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateNodeStats_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateOrgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateNodeStats(childComplexity, args["input"].(model.UpdateNodeStatsInput)), true
+		return e.complexity.Mutation.UpdateOrgaAgg(childComplexity, args["input"].(model.UpdateOrgaAggInput)), true
 
 	case "Mutation.updatePost":
 		if e.complexity.Mutation.UpdatePost == nil {
@@ -3420,18 +3277,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdatePost(childComplexity, args["input"].(model.UpdatePostInput)), true
-
-	case "Mutation.updateSharedNode":
-		if e.complexity.Mutation.UpdateSharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateSharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateSharedNode(childComplexity, args["input"].(model.UpdateSharedNodeInput)), true
 
 	case "Mutation.updateTension":
 		if e.complexity.Mutation.UpdateTension == nil {
@@ -3674,27 +3519,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
 
-	case "Node.n_children":
-		if e.complexity.Node.NChildren == nil {
-			break
-		}
-
-		return e.complexity.Node.NChildren(childComplexity), true
-
-	case "Node.n_tensions_in":
-		if e.complexity.Node.NTensionsIn == nil {
-			break
-		}
-
-		return e.complexity.Node.NTensionsIn(childComplexity), true
-
-	case "Node.n_tensions_out":
-		if e.complexity.Node.NTensionsOut == nil {
-			break
-		}
-
-		return e.complexity.Node.NTensionsOut(childComplexity), true
-
 	case "Node.name":
 		if e.complexity.Node.Name == nil {
 			break
@@ -3708,6 +3532,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Nameid(childComplexity), true
+
+	case "Node.orga_agg":
+		if e.complexity.Node.OrgaAgg == nil {
+			break
+		}
+
+		args, err := ec.field_Node_orga_agg_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter)), true
 
 	case "Node.parent":
 		if e.complexity.Node.Parent == nil {
@@ -3754,18 +3590,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.SecondLink(childComplexity, args["filter"].(*model.UserFilter)), true
 
-	case "Node.shared":
-		if e.complexity.Node.Shared == nil {
-			break
-		}
-
-		args, err := ec.field_Node_shared_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.Shared(childComplexity, args["filter"].(*model.SharedNodeFilter)), true
-
 	case "Node.skills":
 		if e.complexity.Node.Skills == nil {
 			break
@@ -3784,18 +3608,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Source(childComplexity, args["filter"].(*model.BlobFilter)), true
-
-	case "Node.stats":
-		if e.complexity.Node.Stats == nil {
-			break
-		}
-
-		args, err := ec.field_Node_stats_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.Stats(childComplexity, args["filter"].(*model.NodeStatsFilter)), true
 
 	case "Node.tensions_in":
 		if e.complexity.Node.TensionsIn == nil {
@@ -3893,90 +3705,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeAggregateResult.CreatedAtMin(childComplexity), true
-
-	case "NodeAggregateResult.n_childrenAvg":
-		if e.complexity.NodeAggregateResult.NChildrenAvg == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NChildrenAvg(childComplexity), true
-
-	case "NodeAggregateResult.n_childrenMax":
-		if e.complexity.NodeAggregateResult.NChildrenMax == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NChildrenMax(childComplexity), true
-
-	case "NodeAggregateResult.n_childrenMin":
-		if e.complexity.NodeAggregateResult.NChildrenMin == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NChildrenMin(childComplexity), true
-
-	case "NodeAggregateResult.n_childrenSum":
-		if e.complexity.NodeAggregateResult.NChildrenSum == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NChildrenSum(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_inAvg":
-		if e.complexity.NodeAggregateResult.NTensionsInAvg == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsInAvg(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_inMax":
-		if e.complexity.NodeAggregateResult.NTensionsInMax == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsInMax(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_inMin":
-		if e.complexity.NodeAggregateResult.NTensionsInMin == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsInMin(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_inSum":
-		if e.complexity.NodeAggregateResult.NTensionsInSum == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsInSum(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_outAvg":
-		if e.complexity.NodeAggregateResult.NTensionsOutAvg == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsOutAvg(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_outMax":
-		if e.complexity.NodeAggregateResult.NTensionsOutMax == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsOutMax(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_outMin":
-		if e.complexity.NodeAggregateResult.NTensionsOutMin == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsOutMin(childComplexity), true
-
-	case "NodeAggregateResult.n_tensions_outSum":
-		if e.complexity.NodeAggregateResult.NTensionsOutSum == nil {
-			break
-		}
-
-		return e.complexity.NodeAggregateResult.NTensionsOutSum(childComplexity), true
 
 	case "NodeAggregateResult.nameMax":
 		if e.complexity.NodeAggregateResult.NameMax == nil {
@@ -4285,152 +4013,82 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NodeFragmentAggregateResult.SecondLinkMin(childComplexity), true
 
-	case "NodeStats.n_circle":
-		if e.complexity.NodeStats.NCircle == nil {
+	case "OrgaAgg.n_guests":
+		if e.complexity.OrgaAgg.NGuests == nil {
 			break
 		}
 
-		return e.complexity.NodeStats.NCircle(childComplexity), true
+		return e.complexity.OrgaAgg.NGuests(childComplexity), true
 
-	case "NodeStats.n_guest":
-		if e.complexity.NodeStats.NGuest == nil {
+	case "OrgaAgg.n_members":
+		if e.complexity.OrgaAgg.NMembers == nil {
 			break
 		}
 
-		return e.complexity.NodeStats.NGuest(childComplexity), true
+		return e.complexity.OrgaAgg.NMembers(childComplexity), true
 
-	case "NodeStats.n_member":
-		if e.complexity.NodeStats.NMember == nil {
+	case "OrgaAggAggregateResult.count":
+		if e.complexity.OrgaAggAggregateResult.Count == nil {
 			break
 		}
 
-		return e.complexity.NodeStats.NMember(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.Count(childComplexity), true
 
-	case "NodeStats.n_role":
-		if e.complexity.NodeStats.NRole == nil {
+	case "OrgaAggAggregateResult.n_guestsAvg":
+		if e.complexity.OrgaAggAggregateResult.NGuestsAvg == nil {
 			break
 		}
 
-		return e.complexity.NodeStats.NRole(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NGuestsAvg(childComplexity), true
 
-	case "NodeStatsAggregateResult.count":
-		if e.complexity.NodeStatsAggregateResult.Count == nil {
+	case "OrgaAggAggregateResult.n_guestsMax":
+		if e.complexity.OrgaAggAggregateResult.NGuestsMax == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.Count(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NGuestsMax(childComplexity), true
 
-	case "NodeStatsAggregateResult.n_circleAvg":
-		if e.complexity.NodeStatsAggregateResult.NCircleAvg == nil {
+	case "OrgaAggAggregateResult.n_guestsMin":
+		if e.complexity.OrgaAggAggregateResult.NGuestsMin == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.NCircleAvg(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NGuestsMin(childComplexity), true
 
-	case "NodeStatsAggregateResult.n_circleMax":
-		if e.complexity.NodeStatsAggregateResult.NCircleMax == nil {
+	case "OrgaAggAggregateResult.n_guestsSum":
+		if e.complexity.OrgaAggAggregateResult.NGuestsSum == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.NCircleMax(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NGuestsSum(childComplexity), true
 
-	case "NodeStatsAggregateResult.n_circleMin":
-		if e.complexity.NodeStatsAggregateResult.NCircleMin == nil {
+	case "OrgaAggAggregateResult.n_membersAvg":
+		if e.complexity.OrgaAggAggregateResult.NMembersAvg == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.NCircleMin(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NMembersAvg(childComplexity), true
 
-	case "NodeStatsAggregateResult.n_circleSum":
-		if e.complexity.NodeStatsAggregateResult.NCircleSum == nil {
+	case "OrgaAggAggregateResult.n_membersMax":
+		if e.complexity.OrgaAggAggregateResult.NMembersMax == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.NCircleSum(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NMembersMax(childComplexity), true
 
-	case "NodeStatsAggregateResult.n_guestAvg":
-		if e.complexity.NodeStatsAggregateResult.NGuestAvg == nil {
+	case "OrgaAggAggregateResult.n_membersMin":
+		if e.complexity.OrgaAggAggregateResult.NMembersMin == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.NGuestAvg(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NMembersMin(childComplexity), true
 
-	case "NodeStatsAggregateResult.n_guestMax":
-		if e.complexity.NodeStatsAggregateResult.NGuestMax == nil {
+	case "OrgaAggAggregateResult.n_membersSum":
+		if e.complexity.OrgaAggAggregateResult.NMembersSum == nil {
 			break
 		}
 
-		return e.complexity.NodeStatsAggregateResult.NGuestMax(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_guestMin":
-		if e.complexity.NodeStatsAggregateResult.NGuestMin == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NGuestMin(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_guestSum":
-		if e.complexity.NodeStatsAggregateResult.NGuestSum == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NGuestSum(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_memberAvg":
-		if e.complexity.NodeStatsAggregateResult.NMemberAvg == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NMemberAvg(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_memberMax":
-		if e.complexity.NodeStatsAggregateResult.NMemberMax == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NMemberMax(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_memberMin":
-		if e.complexity.NodeStatsAggregateResult.NMemberMin == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NMemberMin(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_memberSum":
-		if e.complexity.NodeStatsAggregateResult.NMemberSum == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NMemberSum(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_roleAvg":
-		if e.complexity.NodeStatsAggregateResult.NRoleAvg == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NRoleAvg(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_roleMax":
-		if e.complexity.NodeStatsAggregateResult.NRoleMax == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NRoleMax(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_roleMin":
-		if e.complexity.NodeStatsAggregateResult.NRoleMin == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NRoleMin(childComplexity), true
-
-	case "NodeStatsAggregateResult.n_roleSum":
-		if e.complexity.NodeStatsAggregateResult.NRoleSum == nil {
-			break
-		}
-
-		return e.complexity.NodeStatsAggregateResult.NRoleSum(childComplexity), true
+		return e.complexity.OrgaAggAggregateResult.NMembersSum(childComplexity), true
 
 	case "Point.latitude":
 		if e.complexity.Point.Latitude == nil {
@@ -4669,17 +4327,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateNodeFragment(childComplexity, args["filter"].(*model.NodeFragmentFilter)), true
 
-	case "Query.aggregateNodeStats":
-		if e.complexity.Query.AggregateNodeStats == nil {
+	case "Query.aggregateOrgaAgg":
+		if e.complexity.Query.AggregateOrgaAgg == nil {
 			break
 		}
 
-		args, err := ec.field_Query_aggregateNodeStats_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_aggregateOrgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.AggregateNodeStats(childComplexity, args["filter"].(*model.NodeStatsFilter)), true
+		return e.complexity.Query.AggregateOrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter)), true
 
 	case "Query.aggregatePost":
 		if e.complexity.Query.AggregatePost == nil {
@@ -4692,18 +4350,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AggregatePost(childComplexity, args["filter"].(*model.PostFilter)), true
-
-	case "Query.aggregateSharedNode":
-		if e.complexity.Query.AggregateSharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_Query_aggregateSharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.AggregateSharedNode(childComplexity, args["filter"].(*model.SharedNodeFilter)), true
 
 	case "Query.aggregateTension":
 		if e.complexity.Query.AggregateTension == nil {
@@ -5029,17 +4675,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryNodeFragment(childComplexity, args["filter"].(*model.NodeFragmentFilter), args["order"].(*model.NodeFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
 
-	case "Query.queryNodeStats":
-		if e.complexity.Query.QueryNodeStats == nil {
+	case "Query.queryOrgaAgg":
+		if e.complexity.Query.QueryOrgaAgg == nil {
 			break
 		}
 
-		args, err := ec.field_Query_queryNodeStats_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_queryOrgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.QueryNodeStats(childComplexity, args["filter"].(*model.NodeStatsFilter), args["order"].(*model.NodeStatsOrder), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.QueryOrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryPost":
 		if e.complexity.Query.QueryPost == nil {
@@ -5052,18 +4698,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryPost(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "Query.querySharedNode":
-		if e.complexity.Query.QuerySharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_Query_querySharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.QuerySharedNode(childComplexity, args["filter"].(*model.SharedNodeFilter), args["order"].(*model.SharedNodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryTension":
 		if e.complexity.Query.QueryTension == nil {
@@ -5112,118 +4746,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryVote(childComplexity, args["filter"].(*model.VoteFilter), args["first"].(*int), args["offset"].(*int)), true
-
-	case "SharedNode.n_closed_tensions":
-		if e.complexity.SharedNode.NClosedTensions == nil {
-			break
-		}
-
-		return e.complexity.SharedNode.NClosedTensions(childComplexity), true
-
-	case "SharedNode.n_labels":
-		if e.complexity.SharedNode.NLabels == nil {
-			break
-		}
-
-		return e.complexity.SharedNode.NLabels(childComplexity), true
-
-	case "SharedNode.n_tensions":
-		if e.complexity.SharedNode.NTensions == nil {
-			break
-		}
-
-		return e.complexity.SharedNode.NTensions(childComplexity), true
-
-	case "SharedNodeAggregateResult.count":
-		if e.complexity.SharedNodeAggregateResult.Count == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.Count(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_closed_tensionsAvg":
-		if e.complexity.SharedNodeAggregateResult.NClosedTensionsAvg == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NClosedTensionsAvg(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_closed_tensionsMax":
-		if e.complexity.SharedNodeAggregateResult.NClosedTensionsMax == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NClosedTensionsMax(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_closed_tensionsMin":
-		if e.complexity.SharedNodeAggregateResult.NClosedTensionsMin == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NClosedTensionsMin(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_closed_tensionsSum":
-		if e.complexity.SharedNodeAggregateResult.NClosedTensionsSum == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NClosedTensionsSum(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_labelsAvg":
-		if e.complexity.SharedNodeAggregateResult.NLabelsAvg == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NLabelsAvg(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_labelsMax":
-		if e.complexity.SharedNodeAggregateResult.NLabelsMax == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NLabelsMax(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_labelsMin":
-		if e.complexity.SharedNodeAggregateResult.NLabelsMin == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NLabelsMin(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_labelsSum":
-		if e.complexity.SharedNodeAggregateResult.NLabelsSum == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NLabelsSum(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_tensionsAvg":
-		if e.complexity.SharedNodeAggregateResult.NTensionsAvg == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NTensionsAvg(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_tensionsMax":
-		if e.complexity.SharedNodeAggregateResult.NTensionsMax == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NTensionsMax(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_tensionsMin":
-		if e.complexity.SharedNodeAggregateResult.NTensionsMin == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NTensionsMin(childComplexity), true
-
-	case "SharedNodeAggregateResult.n_tensionsSum":
-		if e.complexity.SharedNodeAggregateResult.NTensionsSum == nil {
-			break
-		}
-
-		return e.complexity.SharedNodeAggregateResult.NTensionsSum(childComplexity), true
 
 	case "Tension.action":
 		if e.complexity.Tension.Action == nil {
@@ -5428,19 +4950,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Message(childComplexity), true
 
-	case "Tension.n_blobs":
-		if e.complexity.Tension.NBlobs == nil {
-			break
-		}
-
-		return e.complexity.Tension.NBlobs(childComplexity), true
-
 	case "Tension.n_comments":
 		if e.complexity.Tension.NComments == nil {
 			break
 		}
 
 		return e.complexity.Tension.NComments(childComplexity), true
+
+	case "Tension.n_open_contracts":
+		if e.complexity.Tension.NOpenContracts == nil {
+			break
+		}
+
+		return e.complexity.Tension.NOpenContracts(childComplexity), true
 
 	case "Tension.nth":
 		if e.complexity.Tension.Nth == nil {
@@ -5545,34 +5067,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TensionAggregateResult.MessageMin(childComplexity), true
 
-	case "TensionAggregateResult.n_blobsAvg":
-		if e.complexity.TensionAggregateResult.NBlobsAvg == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NBlobsAvg(childComplexity), true
-
-	case "TensionAggregateResult.n_blobsMax":
-		if e.complexity.TensionAggregateResult.NBlobsMax == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NBlobsMax(childComplexity), true
-
-	case "TensionAggregateResult.n_blobsMin":
-		if e.complexity.TensionAggregateResult.NBlobsMin == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NBlobsMin(childComplexity), true
-
-	case "TensionAggregateResult.n_blobsSum":
-		if e.complexity.TensionAggregateResult.NBlobsSum == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NBlobsSum(childComplexity), true
-
 	case "TensionAggregateResult.n_commentsAvg":
 		if e.complexity.TensionAggregateResult.NCommentsAvg == nil {
 			break
@@ -5600,6 +5094,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TensionAggregateResult.NCommentsSum(childComplexity), true
+
+	case "TensionAggregateResult.n_open_contractsAvg":
+		if e.complexity.TensionAggregateResult.NOpenContractsAvg == nil {
+			break
+		}
+
+		return e.complexity.TensionAggregateResult.NOpenContractsAvg(childComplexity), true
+
+	case "TensionAggregateResult.n_open_contractsMax":
+		if e.complexity.TensionAggregateResult.NOpenContractsMax == nil {
+			break
+		}
+
+		return e.complexity.TensionAggregateResult.NOpenContractsMax(childComplexity), true
+
+	case "TensionAggregateResult.n_open_contractsMin":
+		if e.complexity.TensionAggregateResult.NOpenContractsMin == nil {
+			break
+		}
+
+		return e.complexity.TensionAggregateResult.NOpenContractsMin(childComplexity), true
+
+	case "TensionAggregateResult.n_open_contractsSum":
+		if e.complexity.TensionAggregateResult.NOpenContractsSum == nil {
+			break
+		}
+
+		return e.complexity.TensionAggregateResult.NOpenContractsSum(childComplexity), true
 
 	case "TensionAggregateResult.nthMax":
 		if e.complexity.TensionAggregateResult.NthMax == nil {
@@ -5847,24 +5369,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateNodePayload.NumUids(childComplexity), true
 
-	case "UpdateNodeStatsPayload.nodeStats":
-		if e.complexity.UpdateNodeStatsPayload.NodeStats == nil {
+	case "UpdateOrgaAggPayload.numUids":
+		if e.complexity.UpdateOrgaAggPayload.NumUids == nil {
 			break
 		}
 
-		args, err := ec.field_UpdateNodeStatsPayload_nodeStats_args(context.TODO(), rawArgs)
+		return e.complexity.UpdateOrgaAggPayload.NumUids(childComplexity), true
+
+	case "UpdateOrgaAggPayload.orgaAgg":
+		if e.complexity.UpdateOrgaAggPayload.OrgaAgg == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateOrgaAggPayload_orgaAgg_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.UpdateNodeStatsPayload.NodeStats(childComplexity, args["filter"].(*model.NodeStatsFilter), args["order"].(*model.NodeStatsOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "UpdateNodeStatsPayload.numUids":
-		if e.complexity.UpdateNodeStatsPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.UpdateNodeStatsPayload.NumUids(childComplexity), true
+		return e.complexity.UpdateOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "UpdatePostPayload.numUids":
 		if e.complexity.UpdatePostPayload.NumUids == nil {
@@ -5884,25 +5406,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdatePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "UpdateSharedNodePayload.numUids":
-		if e.complexity.UpdateSharedNodePayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.UpdateSharedNodePayload.NumUids(childComplexity), true
-
-	case "UpdateSharedNodePayload.sharedNode":
-		if e.complexity.UpdateSharedNodePayload.SharedNode == nil {
-			break
-		}
-
-		args, err := ec.field_UpdateSharedNodePayload_sharedNode_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.UpdateSharedNodePayload.SharedNode(childComplexity, args["filter"].(*model.SharedNodeFilter), args["order"].(*model.SharedNodeOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "UpdateTensionPayload.numUids":
 		if e.complexity.UpdateTensionPayload.NumUids == nil {
@@ -6503,7 +6006,7 @@ directive @hidden on FIELD_DEFINITION
 
 directive @count(f: String!) on FIELD_DEFINITION
 
-directive @meta_getNodeStats on FIELD_DEFINITION
+directive @meta(f: String!, k: String!) on FIELD_DEFINITION
 
 directive @alter_toLower on INPUT_FIELD_DEFINITION
 
@@ -6628,10 +6131,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   mandate(filter: MandateFilter): Mandate
   docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   source(filter: BlobFilter): Blob
-  n_tensions_out: Int @count(f: tensions_out)
-  n_tensions_in: Int @count(f: tensions_in)
-  n_children: Int @count(f: children)
-  stats(filter: NodeStatsFilter): NodeStats @meta_getNodeStats
   isRoot: Boolean! @search
   isPersonal: Boolean @search
   isPrivate: Boolean! @search
@@ -6644,7 +6143,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   skills: [String!] @search(by: [term])
   role_type: RoleType @search
   contracts(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
-  shared(filter: SharedNodeFilter): SharedNode
+  orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -6652,12 +6151,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   docsAggregate(filter: BlobFilter): BlobAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
-}
-
-type SharedNode {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
 }
 
 type NodeFragment {
@@ -6692,11 +6185,9 @@ type NodeCharac {
   mode: NodeMode! @search
 }
 
-type NodeStats {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
+type OrgaAgg {
+  n_members: Int
+  n_guests: Int
 }
 
 type Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -6756,8 +6247,8 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: tension)
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]! @hasInverse(field: tension)
-  n_comments: Int @count(f: comments)
-  n_blobs: Int @count(f: blobs)
+  n_comments: Int
+  n_open_contracts: Int
 
   assigneesAggregate(filter: UserFilter): UserAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
@@ -6790,8 +6281,8 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   color: String
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
-  n_nodes: Int @count(f: nodes)
-  n_tensions: Int @count(f: tensions)
+  n_nodes: Int
+  n_tensions: Int
 
   tensionsAggregate(filter: TensionFilter): TensionAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -7037,35 +6528,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7219,10 +6710,6 @@ input AddNodeInput {
   mandate: MandateRef
   docs: [BlobRef]
   source: BlobRef
-  n_tensions_out: Int
-  n_tensions_in: Int
-  n_children: Int
-  stats: NodeStatsRef
   isRoot: Boolean!
   isPersonal: Boolean
   isPrivate: Boolean!
@@ -7235,7 +6722,7 @@ input AddNodeInput {
   skills: [String!]
   role_type: RoleType
   contracts: [VoteRef!]
-  shared: SharedNodeRef @alter_RO
+  orga_agg: OrgaAggRef
 }
 
 type AddNodePayload {
@@ -7243,26 +6730,13 @@ type AddNodePayload {
   numUids: Int
 }
 
-input AddNodeStatsInput {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
+input AddOrgaAggInput {
+  n_members: Int
+  n_guests: Int
 }
 
-type AddNodeStatsPayload {
-  nodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
-  numUids: Int
-}
-
-input AddSharedNodeInput {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
-}
-
-type AddSharedNodePayload {
-  sharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
+type AddOrgaAggPayload {
+  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   numUids: Int
 }
 
@@ -7287,7 +6761,7 @@ input AddTensionInput {
   contracts: [ContractRef!]
   history: [EventRef!]!
   n_comments: Int
-  n_blobs: Int
+  n_open_contracts: Int
 }
 
 type AddTensionPayload {
@@ -7686,20 +7160,14 @@ type DeleteNodePayload {
   numUids: Int
 }
 
-type DeleteNodeStatsPayload {
-  nodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
+type DeleteOrgaAggPayload {
+  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   msg: String
   numUids: Int
 }
 
 type DeletePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
-  msg: String
-  numUids: Int
-}
-
-type DeleteSharedNodePayload {
-  sharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
   msg: String
   numUids: Int
 }
@@ -8089,9 +7557,6 @@ type Mutation {
   addNode(input: [AddNodeInput!]!, upsert: Boolean @hook_addNodeInput): AddNodePayload @hook_addNode
   updateNode(input: UpdateNodeInput! @hook_updateNodeInput): UpdateNodePayload @hook_updateNode
   deleteNode(filter: NodeFilter! @hook_deleteNodeInput): DeleteNodePayload @hook_deleteNode
-  addSharedNode(input: [AddSharedNodeInput!]!): AddSharedNodePayload
-  updateSharedNode(input: UpdateSharedNodeInput!): UpdateSharedNodePayload
-  deleteSharedNode(filter: SharedNodeFilter!): DeleteSharedNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   updateNodeFragment(input: UpdateNodeFragmentInput!): UpdateNodeFragmentPayload
   deleteNodeFragment(filter: NodeFragmentFilter!): DeleteNodeFragmentPayload
@@ -8101,9 +7566,9 @@ type Mutation {
   addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
   updateNodeCharac(input: UpdateNodeCharacInput!): UpdateNodeCharacPayload
   deleteNodeCharac(filter: NodeCharacFilter!): DeleteNodeCharacPayload
-  addNodeStats(input: [AddNodeStatsInput!]!): AddNodeStatsPayload
-  updateNodeStats(input: UpdateNodeStatsInput!): UpdateNodeStatsPayload
-  deleteNodeStats(filter: NodeStatsFilter!): DeleteNodeStatsPayload
+  addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
+  updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
+  deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
@@ -8157,18 +7622,6 @@ type NodeAggregateResult {
   rootnameidMax: String
   aboutMin: String
   aboutMax: String
-  n_tensions_outMin: Int
-  n_tensions_outMax: Int
-  n_tensions_outSum: Int
-  n_tensions_outAvg: Float
-  n_tensions_inMin: Int
-  n_tensions_inMax: Int
-  n_tensions_inSum: Int
-  n_tensions_inAvg: Float
-  n_childrenMin: Int
-  n_childrenMax: Int
-  n_childrenSum: Int
-  n_childrenAvg: Float
   rightsMin: Int
   rightsMax: Int
   rightsSum: Int
@@ -8323,10 +7776,6 @@ enum NodeHasFilter {
   mandate
   docs
   source
-  n_tensions_out
-  n_tensions_in
-  n_children
-  stats
   isRoot
   isPersonal
   isPrivate
@@ -8339,7 +7788,7 @@ enum NodeHasFilter {
   skills
   role_type
   contracts
-  shared
+  orga_agg
 }
 
 input NodeMode_hash {
@@ -8360,9 +7809,6 @@ enum NodeOrderable {
   nameid
   rootnameid
   about
-  n_tensions_out
-  n_tensions_in
-  n_children
   rights
 }
 
@@ -8381,10 +7827,6 @@ input NodePatch {
   mandate: MandateRef @patch_RO
   docs: [BlobRef] @patch_RO
   source: BlobRef @patch_RO
-  n_tensions_out: Int
-  n_tensions_in: Int
-  n_children: Int
-  stats: NodeStatsRef
   isRoot: Boolean @patch_RO
   isPersonal: Boolean @patch_RO
   isPrivate: Boolean @patch_RO
@@ -8397,7 +7839,7 @@ input NodePatch {
   skills: [String!] @patch_RO
   role_type: RoleType @patch_RO
   contracts: [VoteRef!]
-  shared: SharedNodeRef @alter_RO
+  orga_agg: OrgaAggRef
 }
 
 input NodeRef {
@@ -8417,10 +7859,6 @@ input NodeRef {
   mandate: MandateRef
   docs: [BlobRef]
   source: BlobRef
-  n_tensions_out: Int
-  n_tensions_in: Int
-  n_children: Int
-  stats: NodeStatsRef
   isRoot: Boolean
   isPersonal: Boolean
   isPrivate: Boolean
@@ -8433,73 +7871,57 @@ input NodeRef {
   skills: [String!]
   role_type: RoleType
   contracts: [VoteRef!]
-  shared: SharedNodeRef
-}
-
-type NodeStatsAggregateResult {
-  count: Int
-  n_memberMin: Int
-  n_memberMax: Int
-  n_memberSum: Int
-  n_memberAvg: Float
-  n_guestMin: Int
-  n_guestMax: Int
-  n_guestSum: Int
-  n_guestAvg: Float
-  n_circleMin: Int
-  n_circleMax: Int
-  n_circleSum: Int
-  n_circleAvg: Float
-  n_roleMin: Int
-  n_roleMax: Int
-  n_roleSum: Int
-  n_roleAvg: Float
-}
-
-input NodeStatsFilter {
-  has: [NodeStatsHasFilter]
-  and: [NodeStatsFilter]
-  or: [NodeStatsFilter]
-  not: NodeStatsFilter
-}
-
-enum NodeStatsHasFilter {
-  n_member
-  n_guest
-  n_circle
-  n_role
-}
-
-input NodeStatsOrder {
-  asc: NodeStatsOrderable
-  desc: NodeStatsOrderable
-  then: NodeStatsOrder
-}
-
-enum NodeStatsOrderable {
-  n_member
-  n_guest
-  n_circle
-  n_role
-}
-
-input NodeStatsPatch {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
-}
-
-input NodeStatsRef {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
+  orga_agg: OrgaAggRef
 }
 
 input NodeType_hash {
   eq: NodeType
   in: [NodeType]
+}
+
+type OrgaAggAggregateResult {
+  count: Int
+  n_membersMin: Int
+  n_membersMax: Int
+  n_membersSum: Int
+  n_membersAvg: Float
+  n_guestsMin: Int
+  n_guestsMax: Int
+  n_guestsSum: Int
+  n_guestsAvg: Float
+}
+
+input OrgaAggFilter {
+  has: [OrgaAggHasFilter]
+  and: [OrgaAggFilter]
+  or: [OrgaAggFilter]
+  not: OrgaAggFilter
+}
+
+enum OrgaAggHasFilter {
+  n_members
+  n_guests
+}
+
+input OrgaAggOrder {
+  asc: OrgaAggOrderable
+  desc: OrgaAggOrderable
+  then: OrgaAggOrder
+}
+
+enum OrgaAggOrderable {
+  n_members
+  n_guests
+}
+
+input OrgaAggPatch {
+  n_members: Int
+  n_guests: Int
+}
+
+input OrgaAggRef {
+  n_members: Int
+  n_guests: Int
 }
 
 type Point {
@@ -8594,8 +8016,6 @@ type Query {
   getNode(id: ID, nameid: String @hook_getNodeInput): Node
   queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int @hook_queryNodeInput): [Node]
   aggregateNode(filter: NodeFilter): NodeAggregateResult
-  querySharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
-  aggregateSharedNode(filter: SharedNodeFilter): SharedNodeAggregateResult
   getNodeFragment(id: ID!): NodeFragment
   queryNodeFragment(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment]
   aggregateNodeFragment(filter: NodeFragmentFilter): NodeFragmentAggregateResult
@@ -8605,8 +8025,8 @@ type Query {
   getNodeCharac(id: ID!): NodeCharac
   queryNodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
   aggregateNodeCharac(filter: NodeCharacFilter): NodeCharacAggregateResult
-  queryNodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
-  aggregateNodeStats(filter: NodeStatsFilter): NodeStatsAggregateResult
+  queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
@@ -8643,59 +8063,6 @@ type Query {
 input RoleType_hash {
   eq: RoleType
   in: [RoleType]
-}
-
-type SharedNodeAggregateResult {
-  count: Int
-  n_labelsMin: Int
-  n_labelsMax: Int
-  n_labelsSum: Int
-  n_labelsAvg: Float
-  n_tensionsMin: Int
-  n_tensionsMax: Int
-  n_tensionsSum: Int
-  n_tensionsAvg: Float
-  n_closed_tensionsMin: Int
-  n_closed_tensionsMax: Int
-  n_closed_tensionsSum: Int
-  n_closed_tensionsAvg: Float
-}
-
-input SharedNodeFilter {
-  has: [SharedNodeHasFilter]
-  and: [SharedNodeFilter]
-  or: [SharedNodeFilter]
-  not: SharedNodeFilter
-}
-
-enum SharedNodeHasFilter {
-  n_labels
-  n_tensions
-  n_closed_tensions
-}
-
-input SharedNodeOrder {
-  asc: SharedNodeOrderable
-  desc: SharedNodeOrderable
-  then: SharedNodeOrder
-}
-
-enum SharedNodeOrderable {
-  n_labels
-  n_tensions
-  n_closed_tensions
-}
-
-input SharedNodePatch {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
-}
-
-input SharedNodeRef {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
 }
 
 input StringExactFilter {
@@ -8765,10 +8132,10 @@ type TensionAggregateResult {
   n_commentsMax: Int
   n_commentsSum: Int
   n_commentsAvg: Float
-  n_blobsMin: Int
-  n_blobsMax: Int
-  n_blobsSum: Int
-  n_blobsAvg: Float
+  n_open_contractsMin: Int
+  n_open_contractsMax: Int
+  n_open_contractsSum: Int
+  n_open_contractsAvg: Float
 }
 
 input TensionEvent_hash {
@@ -8813,7 +8180,7 @@ enum TensionHasFilter {
   contracts
   history
   n_comments
-  n_blobs
+  n_open_contracts
 }
 
 input TensionOrder {
@@ -8831,7 +8198,7 @@ enum TensionOrderable {
   nth
   title
   n_comments
-  n_blobs
+  n_open_contracts
 }
 
 input TensionPatch {
@@ -8855,7 +8222,7 @@ input TensionPatch {
   contracts: [ContractRef!]
   history: [EventRef!]
   n_comments: Int
-  n_blobs: Int
+  n_open_contracts: Int
 }
 
 input TensionRef {
@@ -8880,7 +8247,7 @@ input TensionRef {
   contracts: [ContractRef!]
   history: [EventRef!]
   n_comments: Int
-  n_blobs: Int
+  n_open_contracts: Int
 }
 
 input TensionStatus_hash {
@@ -9003,14 +8370,14 @@ type UpdateNodePayload {
   numUids: Int
 }
 
-input UpdateNodeStatsInput {
-  filter: NodeStatsFilter!
-  set: NodeStatsPatch
-  remove: NodeStatsPatch
+input UpdateOrgaAggInput {
+  filter: OrgaAggFilter!
+  set: OrgaAggPatch
+  remove: OrgaAggPatch
 }
 
-type UpdateNodeStatsPayload {
-  nodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
+type UpdateOrgaAggPayload {
+  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   numUids: Int
 }
 
@@ -9022,17 +8389,6 @@ input UpdatePostInput {
 
 type UpdatePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
-  numUids: Int
-}
-
-input UpdateSharedNodeInput {
-  filter: SharedNodeFilter!
-  set: SharedNodePatch
-  remove: SharedNodePatch
-}
-
-type UpdateSharedNodePayload {
-  sharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
   numUids: Int
 }
 
@@ -9560,6 +8916,30 @@ func (ec *executionContext) dir_lambdaOnMutate_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) dir_meta_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["f"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("f"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["f"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["k"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("k"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["k"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) dir_patch_isOwner_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10040,64 +9420,22 @@ func (ec *executionContext) field_AddNodePayload_node_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_AddNodeStatsPayload_nodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_AddOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.NodeStatsFilter
+	var arg0 *model.OrgaAggFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.NodeStatsOrder
+	var arg1 *model.OrgaAggOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalONodeStatsOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_AddSharedNodePayload_sharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SharedNodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.SharedNodeOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOSharedNodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -10961,22 +10299,22 @@ func (ec *executionContext) field_DeleteNodePayload_node_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_DeleteNodeStatsPayload_nodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_DeleteOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.NodeStatsFilter
+	var arg0 *model.OrgaAggFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.NodeStatsOrder
+	var arg1 *model.OrgaAggOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalONodeStatsOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -11019,48 +10357,6 @@ func (ec *executionContext) field_DeletePostPayload_post_args(ctx context.Contex
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_DeleteSharedNodePayload_sharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SharedNodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.SharedNodeOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOSharedNodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -11576,21 +10872,6 @@ func (ec *executionContext) field_Mutation_addNodeFragment_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_addNodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []*model.AddNodeStatsInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddNodeStatsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeStatsInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11630,13 +10911,13 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_addSharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_addOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*model.AddSharedNodeInput
+	var arg0 []*model.AddOrgaAggInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddSharedNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddSharedNodeInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddOrgaAggInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -11911,21 +11192,6 @@ func (ec *executionContext) field_Mutation_deleteNodeFragment_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteNodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NodeStatsFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNNodeStatsFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_deleteNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11956,13 +11222,13 @@ func (ec *executionContext) field_Mutation_deleteNode_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.PostFilter
+	var arg0 model.OrgaAggFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNPostFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNOrgaAggFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -11971,13 +11237,13 @@ func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteSharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.SharedNodeFilter
+	var arg0 model.PostFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNSharedNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNPostFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12241,21 +11507,6 @@ func (ec *executionContext) field_Mutation_updateNodeFragment_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateNodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.UpdateNodeStatsInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateNodeStatsInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeStatsInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updateNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12286,13 +11537,13 @@ func (ec *executionContext) field_Mutation_updateNode_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.UpdatePostInput
+	var arg0 model.UpdateOrgaAggInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdatePostInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateOrgaAggInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12301,13 +11552,13 @@ func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateSharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.UpdateSharedNodeInput
+	var arg0 model.UpdatePostInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateSharedNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateSharedNodeInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdatePostInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12757,6 +12008,21 @@ func (ec *executionContext) field_Node_mandate_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_orga_agg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.OrgaAggFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12787,21 +12053,6 @@ func (ec *executionContext) field_Node_second_link_args(ctx context.Context, raw
 	return args, nil
 }
 
-func (ec *executionContext) field_Node_shared_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SharedNodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Node_source_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12809,21 +12060,6 @@ func (ec *executionContext) field_Node_source_args(ctx context.Context, rawArgs 
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOBlobFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_stats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeStatsFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -13111,21 +12347,6 @@ func (ec *executionContext) field_Query_aggregateNodeFragment_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_aggregateNodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeStatsFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_aggregateNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13141,13 +12362,13 @@ func (ec *executionContext) field_Query_aggregateNode_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_aggregateOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.PostFilter
+	var arg0 *model.OrgaAggFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -13156,13 +12377,13 @@ func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_aggregateSharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.SharedNodeFilter
+	var arg0 *model.PostFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -13925,48 +13146,6 @@ func (ec *executionContext) field_Query_queryNodeFragment_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_queryNodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeStatsFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.NodeStatsOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalONodeStatsOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_queryNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14024,22 +13203,22 @@ func (ec *executionContext) field_Query_queryNode_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_queryOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.PostFilter
+	var arg0 *model.OrgaAggFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.PostOrder
+	var arg1 *model.OrgaAggOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -14066,22 +13245,22 @@ func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_querySharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.SharedNodeFilter
+	var arg0 *model.PostFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.SharedNodeOrder
+	var arg1 *model.PostOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOSharedNodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -15080,22 +14259,22 @@ func (ec *executionContext) field_UpdateNodePayload_node_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_UpdateNodeStatsPayload_nodeStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_UpdateOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.NodeStatsFilter
+	var arg0 *model.OrgaAggFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.NodeStatsOrder
+	var arg1 *model.OrgaAggOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalONodeStatsOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -15138,48 +14317,6 @@ func (ec *executionContext) field_UpdatePostPayload_post_args(ctx context.Contex
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_UpdateSharedNodePayload_sharedNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SharedNodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.SharedNodeOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOSharedNodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -16540,7 +15677,7 @@ func (ec *executionContext) _AddNodePayload_numUids(ctx context.Context, field g
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AddNodeStatsPayload_nodeStats(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _AddOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField, obj *model.AddOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -16548,7 +15685,7 @@ func (ec *executionContext) _AddNodeStatsPayload_nodeStats(ctx context.Context, 
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "AddNodeStatsPayload",
+		Object:     "AddOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -16557,7 +15694,7 @@ func (ec *executionContext) _AddNodeStatsPayload_nodeStats(ctx context.Context, 
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_AddNodeStatsPayload_nodeStats_args(ctx, rawArgs)
+	args, err := ec.field_AddOrgaAggPayload_orgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -16565,18 +15702,18 @@ func (ec *executionContext) _AddNodeStatsPayload_nodeStats(ctx context.Context, 
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NodeStats, nil
+		return obj.OrgaAgg, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NodeStats)
+	res := resTmp.([]*model.OrgaAgg)
 	fc.Result = res
-	return ec.marshalONodeStats2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx, field.Selections, res)
+	return ec.marshalOOrgaAgg2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AddNodeStatsPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _AddOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -16584,72 +15721,7 @@ func (ec *executionContext) _AddNodeStatsPayload_numUids(ctx context.Context, fi
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "AddNodeStatsPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AddSharedNodePayload_sharedNode(ctx context.Context, field graphql.CollectedField, obj *model.AddSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AddSharedNodePayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_AddSharedNodePayload_sharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SharedNode, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.SharedNode)
-	fc.Result = res
-	return ec.marshalOSharedNode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AddSharedNodePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AddSharedNodePayload",
+		Object:     "AddOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -20340,7 +19412,7 @@ func (ec *executionContext) _DeleteNodePayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DeleteNodeStatsPayload_nodeStats(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _DeleteOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -20348,7 +19420,7 @@ func (ec *executionContext) _DeleteNodeStatsPayload_nodeStats(ctx context.Contex
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "DeleteNodeStatsPayload",
+		Object:     "DeleteOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -20357,7 +19429,7 @@ func (ec *executionContext) _DeleteNodeStatsPayload_nodeStats(ctx context.Contex
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_DeleteNodeStatsPayload_nodeStats_args(ctx, rawArgs)
+	args, err := ec.field_DeleteOrgaAggPayload_orgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -20365,18 +19437,18 @@ func (ec *executionContext) _DeleteNodeStatsPayload_nodeStats(ctx context.Contex
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NodeStats, nil
+		return obj.OrgaAgg, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NodeStats)
+	res := resTmp.([]*model.OrgaAgg)
 	fc.Result = res
-	return ec.marshalONodeStats2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx, field.Selections, res)
+	return ec.marshalOOrgaAgg2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DeleteNodeStatsPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _DeleteOrgaAggPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -20384,7 +19456,7 @@ func (ec *executionContext) _DeleteNodeStatsPayload_msg(ctx context.Context, fie
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "DeleteNodeStatsPayload",
+		Object:     "DeleteOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -20405,7 +19477,7 @@ func (ec *executionContext) _DeleteNodeStatsPayload_msg(ctx context.Context, fie
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DeleteNodeStatsPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _DeleteOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -20413,7 +19485,7 @@ func (ec *executionContext) _DeleteNodeStatsPayload_numUids(ctx context.Context,
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "DeleteNodeStatsPayload",
+		Object:     "DeleteOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -20532,100 +19604,6 @@ func (ec *executionContext) _DeletePostPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "DeletePostPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _DeleteSharedNodePayload_sharedNode(ctx context.Context, field graphql.CollectedField, obj *model.DeleteSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "DeleteSharedNodePayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_DeleteSharedNodePayload_sharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SharedNode, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.SharedNode)
-	fc.Result = res
-	return ec.marshalOSharedNode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _DeleteSharedNodePayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "DeleteSharedNodePayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Msg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _DeleteSharedNodePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "DeleteSharedNodePayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -22369,32 +21347,8 @@ func (ec *executionContext) _Label_n_nodes(ctx context.Context, field graphql.Co
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NNodes, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "nodes")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return obj.NNodes, nil
 	})
 
 	if resTmp == nil {
@@ -22422,32 +21376,8 @@ func (ec *executionContext) _Label_n_tensions(ctx context.Context, field graphql
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NTensions, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "tensions")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return obj.NTensions, nil
 	})
 
 	if resTmp == nil {
@@ -23659,114 +22589,6 @@ func (ec *executionContext) _Mutation_deleteNode(ctx context.Context, field grap
 	return ec.marshalODeleteNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodePayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_addSharedNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addSharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddSharedNode(rctx, args["input"].([]*model.AddSharedNodeInput))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.AddSharedNodePayload)
-	fc.Result = res
-	return ec.marshalOAddSharedNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddSharedNodePayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_updateSharedNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateSharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateSharedNode(rctx, args["input"].(model.UpdateSharedNodeInput))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.UpdateSharedNodePayload)
-	fc.Result = res
-	return ec.marshalOUpdateSharedNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateSharedNodePayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_deleteSharedNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteSharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSharedNode(rctx, args["filter"].(model.SharedNodeFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.DeleteSharedNodePayload)
-	fc.Result = res
-	return ec.marshalODeleteSharedNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteSharedNodePayload(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mutation_addNodeFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -24091,7 +22913,7 @@ func (ec *executionContext) _Mutation_deleteNodeCharac(ctx context.Context, fiel
 	return ec.marshalODeleteNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodeCharacPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_addNodeStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_addOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -24108,7 +22930,7 @@ func (ec *executionContext) _Mutation_addNodeStats(ctx context.Context, field gr
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addNodeStats_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_addOrgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -24116,18 +22938,18 @@ func (ec *executionContext) _Mutation_addNodeStats(ctx context.Context, field gr
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddNodeStats(rctx, args["input"].([]*model.AddNodeStatsInput))
+		return ec.resolvers.Mutation().AddOrgaAgg(rctx, args["input"].([]*model.AddOrgaAggInput))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.AddNodeStatsPayload)
+	res := resTmp.(*model.AddOrgaAggPayload)
 	fc.Result = res
-	return ec.marshalOAddNodeStatsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeStatsPayload(ctx, field.Selections, res)
+	return ec.marshalOAddOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateNodeStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -24144,7 +22966,7 @@ func (ec *executionContext) _Mutation_updateNodeStats(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateNodeStats_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateOrgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -24152,18 +22974,18 @@ func (ec *executionContext) _Mutation_updateNodeStats(ctx context.Context, field
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateNodeStats(rctx, args["input"].(model.UpdateNodeStatsInput))
+		return ec.resolvers.Mutation().UpdateOrgaAgg(rctx, args["input"].(model.UpdateOrgaAggInput))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UpdateNodeStatsPayload)
+	res := resTmp.(*model.UpdateOrgaAggPayload)
 	fc.Result = res
-	return ec.marshalOUpdateNodeStatsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeStatsPayload(ctx, field.Selections, res)
+	return ec.marshalOUpdateOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_deleteNodeStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_deleteOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -24180,7 +23002,7 @@ func (ec *executionContext) _Mutation_deleteNodeStats(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteNodeStats_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_deleteOrgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -24188,15 +23010,15 @@ func (ec *executionContext) _Mutation_deleteNodeStats(ctx context.Context, field
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteNodeStats(rctx, args["filter"].(model.NodeStatsFilter))
+		return ec.resolvers.Mutation().DeleteOrgaAgg(rctx, args["filter"].(model.OrgaAggFilter))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteNodeStatsPayload)
+	res := resTmp.(*model.DeleteOrgaAggPayload)
 	fc.Result = res
-	return ec.marshalODeleteNodeStatsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodeStatsPayload(ctx, field.Selections, res)
+	return ec.marshalODeleteOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteOrgaAggPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updatePost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -26408,221 +25230,6 @@ func (ec *executionContext) _Node_source(ctx context.Context, field graphql.Coll
 	return ec.marshalOBlob2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_n_tensions_out(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NTensionsOut, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "tensions_out")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_n_tensions_in(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NTensionsIn, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "tensions_in")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_n_children(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NChildren, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "children")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_stats(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_stats_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Stats, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Meta_getNodeStats == nil {
-				return nil, errors.New("directive meta_getNodeStats is not implemented")
-			}
-			return ec.directives.Meta_getNodeStats(ctx, obj, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.NodeStats); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeStats`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeStats)
-	fc.Result = res
-	return ec.marshalONodeStats2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -27193,7 +25800,7 @@ func (ec *executionContext) _Node_contracts(ctx context.Context, field graphql.C
 	return ec.marshalOVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_shared(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+func (ec *executionContext) _Node_orga_agg(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -27210,23 +25817,51 @@ func (ec *executionContext) _Node_shared(ctx context.Context, field graphql.Coll
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_shared_args(ctx, rawArgs)
+	args, err := ec.field_Node_orga_agg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Shared, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.OrgaAgg, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "getOrgaAgg")
+			if err != nil {
+				return nil, err
+			}
+			k, err := ec.unmarshalNString2string(ctx, "nameid")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Meta == nil {
+				return nil, errors.New("directive meta is not implemented")
+			}
+			return ec.directives.Meta(ctx, obj, directive0, f, k)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.OrgaAgg); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.OrgaAgg`, tmp)
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.SharedNode)
+	res := resTmp.(*model.OrgaAgg)
 	fc.Result = res
-	return ec.marshalOSharedNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, field.Selections, res)
+	return ec.marshalOOrgaAgg2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Node_childrenAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
@@ -27820,354 +26455,6 @@ func (ec *executionContext) _NodeAggregateResult_aboutMax(ctx context.Context, f
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_outMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsOutMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_outMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsOutMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_outSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsOutSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_outAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsOutAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_inMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsInMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_inMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsInMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_inSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsInSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_tensions_inAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsInAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_childrenMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NChildrenMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_childrenMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NChildrenMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_childrenSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NChildrenSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_childrenAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NChildrenAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeAggregateResult_rightsMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
@@ -29207,7 +27494,7 @@ func (ec *executionContext) _NodeFragmentAggregateResult_second_linkMax(ctx cont
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStats_n_member(ctx context.Context, field graphql.CollectedField, obj *model.NodeStats) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAgg_n_members(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAgg) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29215,7 +27502,7 @@ func (ec *executionContext) _NodeStats_n_member(ctx context.Context, field graph
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStats",
+		Object:     "OrgaAgg",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29225,7 +27512,7 @@ func (ec *executionContext) _NodeStats_n_member(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NMember, nil
+		return obj.NMembers, nil
 	})
 
 	if resTmp == nil {
@@ -29236,7 +27523,7 @@ func (ec *executionContext) _NodeStats_n_member(ctx context.Context, field graph
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStats_n_guest(ctx context.Context, field graphql.CollectedField, obj *model.NodeStats) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAgg_n_guests(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAgg) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29244,7 +27531,7 @@ func (ec *executionContext) _NodeStats_n_guest(ctx context.Context, field graphq
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStats",
+		Object:     "OrgaAgg",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29254,7 +27541,7 @@ func (ec *executionContext) _NodeStats_n_guest(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NGuest, nil
+		return obj.NGuests, nil
 	})
 
 	if resTmp == nil {
@@ -29265,7 +27552,7 @@ func (ec *executionContext) _NodeStats_n_guest(ctx context.Context, field graphq
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStats_n_circle(ctx context.Context, field graphql.CollectedField, obj *model.NodeStats) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29273,65 +27560,7 @@ func (ec *executionContext) _NodeStats_n_circle(ctx context.Context, field graph
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStats",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NCircle, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStats_n_role(ctx context.Context, field graphql.CollectedField, obj *model.NodeStats) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStats",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NRole, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29352,7 +27581,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_count(ctx context.Context,
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_memberMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_membersMin(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29360,7 +27589,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberMin(ctx context.Co
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29370,7 +27599,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberMin(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NMemberMin, nil
+		return obj.NMembersMin, nil
 	})
 
 	if resTmp == nil {
@@ -29381,7 +27610,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberMin(ctx context.Co
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_memberMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_membersMax(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29389,7 +27618,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberMax(ctx context.Co
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29399,7 +27628,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberMax(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NMemberMax, nil
+		return obj.NMembersMax, nil
 	})
 
 	if resTmp == nil {
@@ -29410,7 +27639,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberMax(ctx context.Co
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_memberSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_membersSum(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29418,7 +27647,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberSum(ctx context.Co
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29428,7 +27657,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberSum(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NMemberSum, nil
+		return obj.NMembersSum, nil
 	})
 
 	if resTmp == nil {
@@ -29439,7 +27668,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberSum(ctx context.Co
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_memberAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_membersAvg(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29447,7 +27676,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberAvg(ctx context.Co
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29457,7 +27686,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberAvg(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NMemberAvg, nil
+		return obj.NMembersAvg, nil
 	})
 
 	if resTmp == nil {
@@ -29468,7 +27697,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_memberAvg(ctx context.Co
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_guestMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_guestsMin(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29476,7 +27705,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestMin(ctx context.Con
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29486,7 +27715,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestMin(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestMin, nil
+		return obj.NGuestsMin, nil
 	})
 
 	if resTmp == nil {
@@ -29497,7 +27726,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestMin(ctx context.Con
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_guestMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_guestsMax(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29505,7 +27734,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestMax(ctx context.Con
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29515,7 +27744,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestMax(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestMax, nil
+		return obj.NGuestsMax, nil
 	})
 
 	if resTmp == nil {
@@ -29526,7 +27755,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestMax(ctx context.Con
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_guestSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_guestsSum(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29534,7 +27763,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestSum(ctx context.Con
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29544,7 +27773,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestSum(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestSum, nil
+		return obj.NGuestsSum, nil
 	})
 
 	if resTmp == nil {
@@ -29555,7 +27784,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestSum(ctx context.Con
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeStatsAggregateResult_n_guestAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrgaAggAggregateResult_n_guestsAvg(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -29563,7 +27792,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestAvg(ctx context.Con
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
+		Object:     "OrgaAggAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -29573,239 +27802,7 @@ func (ec *executionContext) _NodeStatsAggregateResult_n_guestAvg(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_circleMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NCircleMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_circleMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NCircleMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_circleSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NCircleSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_circleAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NCircleAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_roleMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NRoleMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_roleMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NRoleMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_roleSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NRoleSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeStatsAggregateResult_n_roleAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeStatsAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeStatsAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NRoleAvg, nil
+		return obj.NGuestsAvg, nil
 	})
 
 	if resTmp == nil {
@@ -30508,78 +28505,6 @@ func (ec *executionContext) _Query_aggregateNode(ctx context.Context, field grap
 	return ec.marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_querySharedNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_querySharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QuerySharedNode(rctx, args["filter"].(*model.SharedNodeFilter), args["order"].(*model.SharedNodeOrder), args["first"].(*int), args["offset"].(*int))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.SharedNode)
-	fc.Result = res
-	return ec.marshalOSharedNode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_aggregateSharedNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_aggregateSharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateSharedNode(rctx, args["filter"].(*model.SharedNodeFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.SharedNodeAggregateResult)
-	fc.Result = res
-	return ec.marshalOSharedNodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeAggregateResult(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Query_getNodeFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -30904,7 +28829,7 @@ func (ec *executionContext) _Query_aggregateNodeCharac(ctx context.Context, fiel
 	return ec.marshalONodeCharacAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacAggregateResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_queryNodeStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_queryOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -30921,7 +28846,7 @@ func (ec *executionContext) _Query_queryNodeStats(ctx context.Context, field gra
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_queryNodeStats_args(ctx, rawArgs)
+	args, err := ec.field_Query_queryOrgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -30929,18 +28854,18 @@ func (ec *executionContext) _Query_queryNodeStats(ctx context.Context, field gra
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryNodeStats(rctx, args["filter"].(*model.NodeStatsFilter), args["order"].(*model.NodeStatsOrder), args["first"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().QueryOrgaAgg(rctx, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NodeStats)
+	res := resTmp.([]*model.OrgaAgg)
 	fc.Result = res
-	return ec.marshalONodeStats2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx, field.Selections, res)
+	return ec.marshalOOrgaAgg2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_aggregateNodeStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_aggregateOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -30957,7 +28882,7 @@ func (ec *executionContext) _Query_aggregateNodeStats(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_aggregateNodeStats_args(ctx, rawArgs)
+	args, err := ec.field_Query_aggregateOrgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -30965,15 +28890,15 @@ func (ec *executionContext) _Query_aggregateNodeStats(ctx context.Context, field
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateNodeStats(rctx, args["filter"].(*model.NodeStatsFilter))
+		return ec.resolvers.Query().AggregateOrgaAgg(rctx, args["filter"].(*model.OrgaAggFilter))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.NodeStatsAggregateResult)
+	res := resTmp.(*model.OrgaAggAggregateResult)
 	fc.Result = res
-	return ec.marshalONodeStatsAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsAggregateResult(ctx, field.Selections, res)
+	return ec.marshalOOrgaAggAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -32405,470 +30330,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SharedNode_n_labels(ctx context.Context, field graphql.CollectedField, obj *model.SharedNode) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNode",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NLabels, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNode_n_tensions(ctx context.Context, field graphql.CollectedField, obj *model.SharedNode) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNode",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensions, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNode_n_closed_tensions(ctx context.Context, field graphql.CollectedField, obj *model.SharedNode) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNode",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NClosedTensions, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_labelsMin(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NLabelsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_labelsMax(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NLabelsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_labelsSum(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NLabelsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_labelsAvg(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NLabelsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_tensionsMin(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_tensionsMax(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_tensionsSum(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_tensionsAvg(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NTensionsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_closed_tensionsMin(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NClosedTensionsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_closed_tensionsMax(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NClosedTensionsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_closed_tensionsSum(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NClosedTensionsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SharedNodeAggregateResult_n_closed_tensionsAvg(ctx context.Context, field graphql.CollectedField, obj *model.SharedNodeAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SharedNodeAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NClosedTensionsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Tension_emitterid(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -33711,32 +31172,8 @@ func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graph
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NComments, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "comments")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return obj.NComments, nil
 	})
 
 	if resTmp == nil {
@@ -33747,7 +31184,7 @@ func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graph
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_n_blobs(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tension_n_open_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -33764,32 +31201,8 @@ func (ec *executionContext) _Tension_n_blobs(ctx context.Context, field graphql.
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NBlobs, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "blobs")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Count == nil {
-				return nil, errors.New("directive count is not implemented")
-			}
-			return ec.directives.Count(ctx, obj, directive0, f)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return obj.NOpenContracts, nil
 	})
 
 	if resTmp == nil {
@@ -34772,7 +32185,7 @@ func (ec *executionContext) _TensionAggregateResult_n_commentsAvg(ctx context.Co
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TensionAggregateResult_n_blobsMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _TensionAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -34790,7 +32203,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsMin(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NBlobsMin, nil
+		return obj.NOpenContractsMin, nil
 	})
 
 	if resTmp == nil {
@@ -34801,7 +32214,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsMin(ctx context.Conte
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TensionAggregateResult_n_blobsMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _TensionAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -34819,7 +32232,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsMax(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NBlobsMax, nil
+		return obj.NOpenContractsMax, nil
 	})
 
 	if resTmp == nil {
@@ -34830,7 +32243,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsMax(ctx context.Conte
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TensionAggregateResult_n_blobsSum(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _TensionAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -34848,7 +32261,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsSum(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NBlobsSum, nil
+		return obj.NOpenContractsSum, nil
 	})
 
 	if resTmp == nil {
@@ -34859,7 +32272,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsSum(ctx context.Conte
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TensionAggregateResult_n_blobsAvg(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _TensionAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -34877,7 +32290,7 @@ func (ec *executionContext) _TensionAggregateResult_n_blobsAvg(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NBlobsAvg, nil
+		return obj.NOpenContractsAvg, nil
 	})
 
 	if resTmp == nil {
@@ -35634,7 +33047,7 @@ func (ec *executionContext) _UpdateNodePayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _UpdateNodeStatsPayload_nodeStats(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _UpdateOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField, obj *model.UpdateOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -35642,7 +33055,7 @@ func (ec *executionContext) _UpdateNodeStatsPayload_nodeStats(ctx context.Contex
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "UpdateNodeStatsPayload",
+		Object:     "UpdateOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -35651,7 +33064,7 @@ func (ec *executionContext) _UpdateNodeStatsPayload_nodeStats(ctx context.Contex
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_UpdateNodeStatsPayload_nodeStats_args(ctx, rawArgs)
+	args, err := ec.field_UpdateOrgaAggPayload_orgaAgg_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -35659,18 +33072,18 @@ func (ec *executionContext) _UpdateNodeStatsPayload_nodeStats(ctx context.Contex
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NodeStats, nil
+		return obj.OrgaAgg, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NodeStats)
+	res := resTmp.([]*model.OrgaAgg)
 	fc.Result = res
-	return ec.marshalONodeStats2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx, field.Selections, res)
+	return ec.marshalOOrgaAgg2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _UpdateNodeStatsPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNodeStatsPayload) (ret graphql.Marshaler) {
+func (ec *executionContext) _UpdateOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateOrgaAggPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -35678,7 +33091,7 @@ func (ec *executionContext) _UpdateNodeStatsPayload_numUids(ctx context.Context,
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "UpdateNodeStatsPayload",
+		Object:     "UpdateOrgaAggPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -35768,71 +33181,6 @@ func (ec *executionContext) _UpdatePostPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "UpdatePostPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UpdateSharedNodePayload_sharedNode(ctx context.Context, field graphql.CollectedField, obj *model.UpdateSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UpdateSharedNodePayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_UpdateSharedNodePayload_sharedNode_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SharedNode, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.SharedNode)
-	fc.Result = res
-	return ec.marshalOSharedNode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UpdateSharedNodePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateSharedNodePayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UpdateSharedNodePayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -40139,38 +37487,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "n_tensions_out":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions_out"))
-			it.NTensionsOut, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_tensions_in":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions_in"))
-			it.NTensionsIn, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_children":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_children"))
-			it.NChildren, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "stats":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stats"))
-			it.Stats, err = ec.unmarshalONodeStatsRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "isRoot":
 			var err error
 
@@ -40281,73 +37597,11 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "shared":
+		case "orga_agg":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shared"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOSharedNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Alter_RO == nil {
-					return nil, errors.New("directive alter_RO is not implemented")
-				}
-				return ec.directives.Alter_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.SharedNodeRef); ok {
-				it.Shared = data
-			} else if tmp == nil {
-				it.Shared = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.SharedNodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputAddNodeStatsInput(ctx context.Context, obj interface{}) (model.AddNodeStatsInput, error) {
-	var it model.AddNodeStatsInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "n_member":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_member"))
-			it.NMember, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_guest":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guest"))
-			it.NGuest, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_circle":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_circle"))
-			it.NCircle, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_role":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_role"))
-			it.NRole, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
+			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -40357,33 +37611,25 @@ func (ec *executionContext) unmarshalInputAddNodeStatsInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddSharedNodeInput(ctx context.Context, obj interface{}) (model.AddSharedNodeInput, error) {
-	var it model.AddSharedNodeInput
+func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, obj interface{}) (model.AddOrgaAggInput, error) {
+	var it model.AddOrgaAggInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
 		switch k {
-		case "n_labels":
+		case "n_members":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_labels"))
-			it.NLabels, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_members"))
+			it.NMembers, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "n_tensions":
+		case "n_guests":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions"))
-			it.NTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_closed_tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_closed_tensions"))
-			it.NClosedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
+			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -40613,11 +37859,11 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "n_blobs":
+		case "n_open_contracts":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_blobs"))
-			it.NBlobs, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
+			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -44971,38 +42217,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.BlobRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "n_tensions_out":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions_out"))
-			it.NTensionsOut, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_tensions_in":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions_in"))
-			it.NTensionsIn, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_children":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_children"))
-			it.NChildren, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "stats":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stats"))
-			it.Stats, err = ec.unmarshalONodeStatsRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "isRoot":
 			var err error
 
@@ -45285,31 +42499,13 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "shared":
+		case "orga_agg":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shared"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOSharedNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Alter_RO == nil {
-					return nil, errors.New("directive alter_RO is not implemented")
-				}
-				return ec.directives.Alter_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
+			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.SharedNodeRef); ok {
-				it.Shared = data
-			} else if tmp == nil {
-				it.Shared = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.SharedNodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		}
 	}
@@ -45451,38 +42647,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "n_tensions_out":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions_out"))
-			it.NTensionsOut, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_tensions_in":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions_in"))
-			it.NTensionsIn, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_children":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_children"))
-			it.NChildren, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "stats":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stats"))
-			it.Stats, err = ec.unmarshalONodeStatsRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "isRoot":
 			var err error
 
@@ -45579,179 +42743,11 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "shared":
+		case "orga_agg":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shared"))
-			it.Shared, err = ec.unmarshalOSharedNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNodeStatsFilter(ctx context.Context, obj interface{}) (model.NodeStatsFilter, error) {
-	var it model.NodeStatsFilter
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "has":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalONodeStatsHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "and":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalONodeStatsFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "or":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalONodeStatsFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "not":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNodeStatsOrder(ctx context.Context, obj interface{}) (model.NodeStatsOrder, error) {
-	var it model.NodeStatsOrder
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "asc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalONodeStatsOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "desc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalONodeStatsOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "then":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalONodeStatsOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrder(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNodeStatsPatch(ctx context.Context, obj interface{}) (model.NodeStatsPatch, error) {
-	var it model.NodeStatsPatch
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "n_member":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_member"))
-			it.NMember, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_guest":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guest"))
-			it.NGuest, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_circle":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_circle"))
-			it.NCircle, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_role":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_role"))
-			it.NRole, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNodeStatsRef(ctx context.Context, obj interface{}) (model.NodeStatsRef, error) {
-	var it model.NodeStatsRef
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "n_member":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_member"))
-			it.NMember, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_guest":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guest"))
-			it.NGuest, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_circle":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_circle"))
-			it.NCircle, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_role":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_role"))
-			it.NRole, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
+			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -45780,6 +42776,142 @@ func (ec *executionContext) unmarshalInputNodeType_hash(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
 			it.In, err = ec.unmarshalONodeType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOrgaAggFilter(ctx context.Context, obj interface{}) (model.OrgaAggFilter, error) {
+	var it model.OrgaAggFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOOrgaAggHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOOrgaAggFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOOrgaAggFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOrgaAggOrder(ctx context.Context, obj interface{}) (model.OrgaAggOrder, error) {
+	var it model.OrgaAggOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOOrgaAggOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOOrgaAggOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOrgaAggPatch(ctx context.Context, obj interface{}) (model.OrgaAggPatch, error) {
+	var it model.OrgaAggPatch
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "n_members":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_members"))
+			it.NMembers, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_guests":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
+			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOrgaAggRef(ctx context.Context, obj interface{}) (model.OrgaAggRef, error) {
+	var it model.OrgaAggRef
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "n_members":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_members"))
+			it.NMembers, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_guests":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
+			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -46190,158 +43322,6 @@ func (ec *executionContext) unmarshalInputRoleType_hash(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
 			it.In, err = ec.unmarshalORoleType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputSharedNodeFilter(ctx context.Context, obj interface{}) (model.SharedNodeFilter, error) {
-	var it model.SharedNodeFilter
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "has":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOSharedNodeHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "and":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOSharedNodeFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "or":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOSharedNodeFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "not":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputSharedNodeOrder(ctx context.Context, obj interface{}) (model.SharedNodeOrder, error) {
-	var it model.SharedNodeOrder
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "asc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOSharedNodeOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "desc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOSharedNodeOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "then":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOSharedNodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrder(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputSharedNodePatch(ctx context.Context, obj interface{}) (model.SharedNodePatch, error) {
-	var it model.SharedNodePatch
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "n_labels":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_labels"))
-			it.NLabels, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions"))
-			it.NTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_closed_tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_closed_tensions"))
-			it.NClosedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputSharedNodeRef(ctx context.Context, obj interface{}) (model.SharedNodeRef, error) {
-	var it model.SharedNodeRef
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "n_labels":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_labels"))
-			it.NLabels, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_tensions"))
-			it.NTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_closed_tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_closed_tensions"))
-			it.NClosedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47101,11 +44081,11 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "n_blobs":
+		case "n_open_contracts":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_blobs"))
-			it.NBlobs, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
+			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47289,11 +44269,11 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "n_blobs":
+		case "n_open_contracts":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_blobs"))
-			it.NBlobs, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
+			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47719,8 +44699,8 @@ func (ec *executionContext) unmarshalInputUpdateNodeInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateNodeStatsInput(ctx context.Context, obj interface{}) (model.UpdateNodeStatsInput, error) {
-	var it model.UpdateNodeStatsInput
+func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context, obj interface{}) (model.UpdateOrgaAggInput, error) {
+	var it model.UpdateOrgaAggInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -47729,7 +44709,7 @@ func (ec *executionContext) unmarshalInputUpdateNodeStatsInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNNodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, v)
+			it.Filter, err = ec.unmarshalNOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47737,7 +44717,7 @@ func (ec *executionContext) unmarshalInputUpdateNodeStatsInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalONodeStatsPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsPatch(ctx, v)
+			it.Set, err = ec.unmarshalOOrgaAggPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47745,7 +44725,7 @@ func (ec *executionContext) unmarshalInputUpdateNodeStatsInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalONodeStatsPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsPatch(ctx, v)
+			it.Remove, err = ec.unmarshalOOrgaAggPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47782,42 +44762,6 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
 			it.Remove, err = ec.unmarshalOPostPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateSharedNodeInput(ctx context.Context, obj interface{}) (model.UpdateSharedNodeInput, error) {
-	var it model.UpdateSharedNodeInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "filter":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "set":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOSharedNodePatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodePatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOSharedNodePatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -49195,47 +46139,21 @@ func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var addNodeStatsPayloadImplementors = []string{"AddNodeStatsPayload"}
+var addOrgaAggPayloadImplementors = []string{"AddOrgaAggPayload"}
 
-func (ec *executionContext) _AddNodeStatsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeStatsPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addNodeStatsPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddNodeStatsPayload")
-		case "nodeStats":
-			out.Values[i] = ec._AddNodeStatsPayload_nodeStats(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._AddNodeStatsPayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var addSharedNodePayloadImplementors = []string{"AddSharedNodePayload"}
-
-func (ec *executionContext) _AddSharedNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddSharedNodePayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addSharedNodePayloadImplementors)
+func (ec *executionContext) _AddOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddOrgaAggPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addOrgaAggPayloadImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddSharedNodePayload")
-		case "sharedNode":
-			out.Values[i] = ec._AddSharedNodePayload_sharedNode(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("AddOrgaAggPayload")
+		case "orgaAgg":
+			out.Values[i] = ec._AddOrgaAggPayload_orgaAgg(ctx, field, obj)
 		case "numUids":
-			out.Values[i] = ec._AddSharedNodePayload_numUids(ctx, field, obj)
+			out.Values[i] = ec._AddOrgaAggPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49937,23 +46855,23 @@ func (ec *executionContext) _DeleteNodePayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var deleteNodeStatsPayloadImplementors = []string{"DeleteNodeStatsPayload"}
+var deleteOrgaAggPayloadImplementors = []string{"DeleteOrgaAggPayload"}
 
-func (ec *executionContext) _DeleteNodeStatsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodeStatsPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNodeStatsPayloadImplementors)
+func (ec *executionContext) _DeleteOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteOrgaAggPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteOrgaAggPayloadImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteNodeStatsPayload")
-		case "nodeStats":
-			out.Values[i] = ec._DeleteNodeStatsPayload_nodeStats(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("DeleteOrgaAggPayload")
+		case "orgaAgg":
+			out.Values[i] = ec._DeleteOrgaAggPayload_orgaAgg(ctx, field, obj)
 		case "msg":
-			out.Values[i] = ec._DeleteNodeStatsPayload_msg(ctx, field, obj)
+			out.Values[i] = ec._DeleteOrgaAggPayload_msg(ctx, field, obj)
 		case "numUids":
-			out.Values[i] = ec._DeleteNodeStatsPayload_numUids(ctx, field, obj)
+			out.Values[i] = ec._DeleteOrgaAggPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49982,34 +46900,6 @@ func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._DeletePostPayload_msg(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._DeletePostPayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var deleteSharedNodePayloadImplementors = []string{"DeleteSharedNodePayload"}
-
-func (ec *executionContext) _DeleteSharedNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteSharedNodePayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteSharedNodePayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteSharedNodePayload")
-		case "sharedNode":
-			out.Values[i] = ec._DeleteSharedNodePayload_sharedNode(ctx, field, obj)
-		case "msg":
-			out.Values[i] = ec._DeleteSharedNodePayload_msg(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._DeleteSharedNodePayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -50530,12 +47420,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateNode(ctx, field)
 		case "deleteNode":
 			out.Values[i] = ec._Mutation_deleteNode(ctx, field)
-		case "addSharedNode":
-			out.Values[i] = ec._Mutation_addSharedNode(ctx, field)
-		case "updateSharedNode":
-			out.Values[i] = ec._Mutation_updateSharedNode(ctx, field)
-		case "deleteSharedNode":
-			out.Values[i] = ec._Mutation_deleteSharedNode(ctx, field)
 		case "addNodeFragment":
 			out.Values[i] = ec._Mutation_addNodeFragment(ctx, field)
 		case "updateNodeFragment":
@@ -50554,12 +47438,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateNodeCharac(ctx, field)
 		case "deleteNodeCharac":
 			out.Values[i] = ec._Mutation_deleteNodeCharac(ctx, field)
-		case "addNodeStats":
-			out.Values[i] = ec._Mutation_addNodeStats(ctx, field)
-		case "updateNodeStats":
-			out.Values[i] = ec._Mutation_updateNodeStats(ctx, field)
-		case "deleteNodeStats":
-			out.Values[i] = ec._Mutation_deleteNodeStats(ctx, field)
+		case "addOrgaAgg":
+			out.Values[i] = ec._Mutation_addOrgaAgg(ctx, field)
+		case "updateOrgaAgg":
+			out.Values[i] = ec._Mutation_updateOrgaAgg(ctx, field)
+		case "deleteOrgaAgg":
+			out.Values[i] = ec._Mutation_deleteOrgaAgg(ctx, field)
 		case "updatePost":
 			out.Values[i] = ec._Mutation_updatePost(ctx, field)
 		case "deletePost":
@@ -50699,14 +47583,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_docs(ctx, field, obj)
 		case "source":
 			out.Values[i] = ec._Node_source(ctx, field, obj)
-		case "n_tensions_out":
-			out.Values[i] = ec._Node_n_tensions_out(ctx, field, obj)
-		case "n_tensions_in":
-			out.Values[i] = ec._Node_n_tensions_in(ctx, field, obj)
-		case "n_children":
-			out.Values[i] = ec._Node_n_children(ctx, field, obj)
-		case "stats":
-			out.Values[i] = ec._Node_stats(ctx, field, obj)
 		case "isRoot":
 			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -50746,8 +47622,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_role_type(ctx, field, obj)
 		case "contracts":
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
-		case "shared":
-			out.Values[i] = ec._Node_shared(ctx, field, obj)
+		case "orga_agg":
+			out.Values[i] = ec._Node_orga_agg(ctx, field, obj)
 		case "childrenAggregate":
 			out.Values[i] = ec._Node_childrenAggregate(ctx, field, obj)
 		case "tensions_outAggregate":
@@ -50808,30 +47684,6 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._NodeAggregateResult_aboutMin(ctx, field, obj)
 		case "aboutMax":
 			out.Values[i] = ec._NodeAggregateResult_aboutMax(ctx, field, obj)
-		case "n_tensions_outMin":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_outMin(ctx, field, obj)
-		case "n_tensions_outMax":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_outMax(ctx, field, obj)
-		case "n_tensions_outSum":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_outSum(ctx, field, obj)
-		case "n_tensions_outAvg":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_outAvg(ctx, field, obj)
-		case "n_tensions_inMin":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_inMin(ctx, field, obj)
-		case "n_tensions_inMax":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_inMax(ctx, field, obj)
-		case "n_tensions_inSum":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_inSum(ctx, field, obj)
-		case "n_tensions_inAvg":
-			out.Values[i] = ec._NodeAggregateResult_n_tensions_inAvg(ctx, field, obj)
-		case "n_childrenMin":
-			out.Values[i] = ec._NodeAggregateResult_n_childrenMin(ctx, field, obj)
-		case "n_childrenMax":
-			out.Values[i] = ec._NodeAggregateResult_n_childrenMax(ctx, field, obj)
-		case "n_childrenSum":
-			out.Values[i] = ec._NodeAggregateResult_n_childrenSum(ctx, field, obj)
-		case "n_childrenAvg":
-			out.Values[i] = ec._NodeAggregateResult_n_childrenAvg(ctx, field, obj)
 		case "rightsMin":
 			out.Values[i] = ec._NodeAggregateResult_rightsMin(ctx, field, obj)
 		case "rightsMax":
@@ -51009,25 +47861,21 @@ func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, se
 	return out
 }
 
-var nodeStatsImplementors = []string{"NodeStats"}
+var orgaAggImplementors = []string{"OrgaAgg"}
 
-func (ec *executionContext) _NodeStats(ctx context.Context, sel ast.SelectionSet, obj *model.NodeStats) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, nodeStatsImplementors)
+func (ec *executionContext) _OrgaAgg(ctx context.Context, sel ast.SelectionSet, obj *model.OrgaAgg) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, orgaAggImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("NodeStats")
-		case "n_member":
-			out.Values[i] = ec._NodeStats_n_member(ctx, field, obj)
-		case "n_guest":
-			out.Values[i] = ec._NodeStats_n_guest(ctx, field, obj)
-		case "n_circle":
-			out.Values[i] = ec._NodeStats_n_circle(ctx, field, obj)
-		case "n_role":
-			out.Values[i] = ec._NodeStats_n_role(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("OrgaAgg")
+		case "n_members":
+			out.Values[i] = ec._OrgaAgg_n_members(ctx, field, obj)
+		case "n_guests":
+			out.Values[i] = ec._OrgaAgg_n_guests(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -51039,51 +47887,35 @@ func (ec *executionContext) _NodeStats(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
-var nodeStatsAggregateResultImplementors = []string{"NodeStatsAggregateResult"}
+var orgaAggAggregateResultImplementors = []string{"OrgaAggAggregateResult"}
 
-func (ec *executionContext) _NodeStatsAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NodeStatsAggregateResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, nodeStatsAggregateResultImplementors)
+func (ec *executionContext) _OrgaAggAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.OrgaAggAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, orgaAggAggregateResultImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("NodeStatsAggregateResult")
+			out.Values[i] = graphql.MarshalString("OrgaAggAggregateResult")
 		case "count":
-			out.Values[i] = ec._NodeStatsAggregateResult_count(ctx, field, obj)
-		case "n_memberMin":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_memberMin(ctx, field, obj)
-		case "n_memberMax":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_memberMax(ctx, field, obj)
-		case "n_memberSum":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_memberSum(ctx, field, obj)
-		case "n_memberAvg":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_memberAvg(ctx, field, obj)
-		case "n_guestMin":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_guestMin(ctx, field, obj)
-		case "n_guestMax":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_guestMax(ctx, field, obj)
-		case "n_guestSum":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_guestSum(ctx, field, obj)
-		case "n_guestAvg":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_guestAvg(ctx, field, obj)
-		case "n_circleMin":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_circleMin(ctx, field, obj)
-		case "n_circleMax":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_circleMax(ctx, field, obj)
-		case "n_circleSum":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_circleSum(ctx, field, obj)
-		case "n_circleAvg":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_circleAvg(ctx, field, obj)
-		case "n_roleMin":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_roleMin(ctx, field, obj)
-		case "n_roleMax":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_roleMax(ctx, field, obj)
-		case "n_roleSum":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_roleSum(ctx, field, obj)
-		case "n_roleAvg":
-			out.Values[i] = ec._NodeStatsAggregateResult_n_roleAvg(ctx, field, obj)
+			out.Values[i] = ec._OrgaAggAggregateResult_count(ctx, field, obj)
+		case "n_membersMin":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_membersMin(ctx, field, obj)
+		case "n_membersMax":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_membersMax(ctx, field, obj)
+		case "n_membersSum":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_membersSum(ctx, field, obj)
+		case "n_membersAvg":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_membersAvg(ctx, field, obj)
+		case "n_guestsMin":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsMin(ctx, field, obj)
+		case "n_guestsMax":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsMax(ctx, field, obj)
+		case "n_guestsSum":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsSum(ctx, field, obj)
+		case "n_guestsAvg":
+			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsAvg(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -51306,28 +48138,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_aggregateNode(ctx, field)
 				return res
 			})
-		case "querySharedNode":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_querySharedNode(ctx, field)
-				return res
-			})
-		case "aggregateSharedNode":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_aggregateSharedNode(ctx, field)
-				return res
-			})
 		case "getNodeFragment":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -51427,7 +48237,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_aggregateNodeCharac(ctx, field)
 				return res
 			})
-		case "queryNodeStats":
+		case "queryOrgaAgg":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -51435,10 +48245,10 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_queryNodeStats(ctx, field)
+				res = ec._Query_queryOrgaAgg(ctx, field)
 				return res
 			})
-		case "aggregateNodeStats":
+		case "aggregateOrgaAgg":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -51446,7 +48256,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_aggregateNodeStats(ctx, field)
+				res = ec._Query_aggregateOrgaAgg(ctx, field)
 				return res
 			})
 		case "getPost":
@@ -51805,82 +48615,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var sharedNodeImplementors = []string{"SharedNode"}
-
-func (ec *executionContext) _SharedNode(ctx context.Context, sel ast.SelectionSet, obj *model.SharedNode) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sharedNodeImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SharedNode")
-		case "n_labels":
-			out.Values[i] = ec._SharedNode_n_labels(ctx, field, obj)
-		case "n_tensions":
-			out.Values[i] = ec._SharedNode_n_tensions(ctx, field, obj)
-		case "n_closed_tensions":
-			out.Values[i] = ec._SharedNode_n_closed_tensions(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var sharedNodeAggregateResultImplementors = []string{"SharedNodeAggregateResult"}
-
-func (ec *executionContext) _SharedNodeAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.SharedNodeAggregateResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sharedNodeAggregateResultImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SharedNodeAggregateResult")
-		case "count":
-			out.Values[i] = ec._SharedNodeAggregateResult_count(ctx, field, obj)
-		case "n_labelsMin":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_labelsMin(ctx, field, obj)
-		case "n_labelsMax":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_labelsMax(ctx, field, obj)
-		case "n_labelsSum":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_labelsSum(ctx, field, obj)
-		case "n_labelsAvg":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_labelsAvg(ctx, field, obj)
-		case "n_tensionsMin":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_tensionsMin(ctx, field, obj)
-		case "n_tensionsMax":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_tensionsMax(ctx, field, obj)
-		case "n_tensionsSum":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_tensionsSum(ctx, field, obj)
-		case "n_tensionsAvg":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_tensionsAvg(ctx, field, obj)
-		case "n_closed_tensionsMin":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_closed_tensionsMin(ctx, field, obj)
-		case "n_closed_tensionsMax":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_closed_tensionsMax(ctx, field, obj)
-		case "n_closed_tensionsSum":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_closed_tensionsSum(ctx, field, obj)
-		case "n_closed_tensionsAvg":
-			out.Values[i] = ec._SharedNodeAggregateResult_n_closed_tensionsAvg(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var tensionImplementors = []string{"Tension"}
 
 func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, obj *model.Tension) graphql.Marshaler {
@@ -51948,8 +48682,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
-		case "n_blobs":
-			out.Values[i] = ec._Tension_n_blobs(ctx, field, obj)
+		case "n_open_contracts":
+			out.Values[i] = ec._Tension_n_open_contracts(ctx, field, obj)
 		case "assigneesAggregate":
 			out.Values[i] = ec._Tension_assigneesAggregate(ctx, field, obj)
 		case "labelsAggregate":
@@ -52041,14 +48775,14 @@ func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast
 			out.Values[i] = ec._TensionAggregateResult_n_commentsSum(ctx, field, obj)
 		case "n_commentsAvg":
 			out.Values[i] = ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
-		case "n_blobsMin":
-			out.Values[i] = ec._TensionAggregateResult_n_blobsMin(ctx, field, obj)
-		case "n_blobsMax":
-			out.Values[i] = ec._TensionAggregateResult_n_blobsMax(ctx, field, obj)
-		case "n_blobsSum":
-			out.Values[i] = ec._TensionAggregateResult_n_blobsSum(ctx, field, obj)
-		case "n_blobsAvg":
-			out.Values[i] = ec._TensionAggregateResult_n_blobsAvg(ctx, field, obj)
+		case "n_open_contractsMin":
+			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMin(ctx, field, obj)
+		case "n_open_contractsMax":
+			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMax(ctx, field, obj)
+		case "n_open_contractsSum":
+			out.Values[i] = ec._TensionAggregateResult_n_open_contractsSum(ctx, field, obj)
+		case "n_open_contractsAvg":
+			out.Values[i] = ec._TensionAggregateResult_n_open_contractsAvg(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52320,21 +49054,21 @@ func (ec *executionContext) _UpdateNodePayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var updateNodeStatsPayloadImplementors = []string{"UpdateNodeStatsPayload"}
+var updateOrgaAggPayloadImplementors = []string{"UpdateOrgaAggPayload"}
 
-func (ec *executionContext) _UpdateNodeStatsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNodeStatsPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, updateNodeStatsPayloadImplementors)
+func (ec *executionContext) _UpdateOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateOrgaAggPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateOrgaAggPayloadImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateNodeStatsPayload")
-		case "nodeStats":
-			out.Values[i] = ec._UpdateNodeStatsPayload_nodeStats(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("UpdateOrgaAggPayload")
+		case "orgaAgg":
+			out.Values[i] = ec._UpdateOrgaAggPayload_orgaAgg(ctx, field, obj)
 		case "numUids":
-			out.Values[i] = ec._UpdateNodeStatsPayload_numUids(ctx, field, obj)
+			out.Values[i] = ec._UpdateOrgaAggPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52361,32 +49095,6 @@ func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._UpdatePostPayload_post(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdatePostPayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var updateSharedNodePayloadImplementors = []string{"UpdateSharedNodePayload"}
-
-func (ec *executionContext) _UpdateSharedNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateSharedNodePayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, updateSharedNodePayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateSharedNodePayload")
-		case "sharedNode":
-			out.Values[i] = ec._UpdateSharedNodePayload_sharedNode(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._UpdateSharedNodePayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53294,7 +50002,7 @@ func (ec *executionContext) unmarshalNAddNodeInput2ᚖzerogovᚋfractal6ᚗgoᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNAddNodeStatsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeStatsInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeStatsInput, error) {
+func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInputᚄ(ctx context.Context, v interface{}) ([]*model.AddOrgaAggInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		if tmp1, ok := v.([]interface{}); ok {
@@ -53304,10 +50012,10 @@ func (ec *executionContext) unmarshalNAddNodeStatsInput2ᚕᚖzerogovᚋfractal6
 		}
 	}
 	var err error
-	res := make([]*model.AddNodeStatsInput, len(vSlice))
+	res := make([]*model.AddOrgaAggInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAddNodeStatsInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeStatsInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAddOrgaAggInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -53315,34 +50023,8 @@ func (ec *executionContext) unmarshalNAddNodeStatsInput2ᚕᚖzerogovᚋfractal6
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNAddNodeStatsInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeStatsInput(ctx context.Context, v interface{}) (*model.AddNodeStatsInput, error) {
-	res, err := ec.unmarshalInputAddNodeStatsInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNAddSharedNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddSharedNodeInputᚄ(ctx context.Context, v interface{}) ([]*model.AddSharedNodeInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.AddSharedNodeInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAddSharedNodeInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddSharedNodeInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddSharedNodeInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddSharedNodeInput(ctx context.Context, v interface{}) (*model.AddSharedNodeInput, error) {
-	res, err := ec.unmarshalInputAddSharedNodeInput(ctx, v)
+func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInput(ctx context.Context, v interface{}) (*model.AddOrgaAggInput, error) {
+	res, err := ec.unmarshalInputAddOrgaAggInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -53893,16 +50575,6 @@ func (ec *executionContext) unmarshalNNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNodeStatsFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx context.Context, v interface{}) (model.NodeStatsFilter, error) {
-	res, err := ec.unmarshalInputNodeStatsFilter(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx context.Context, v interface{}) (*model.NodeStatsFilter, error) {
-	res, err := ec.unmarshalInputNodeStatsFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx context.Context, v interface{}) (model.NodeType, error) {
 	var res model.NodeType
 	err := res.UnmarshalGQL(v)
@@ -53911,6 +50583,16 @@ func (ec *executionContext) unmarshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraph�
 
 func (ec *executionContext) marshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx context.Context, sel ast.SelectionSet, v model.NodeType) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNOrgaAggFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (model.OrgaAggFilter, error) {
+	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (*model.OrgaAggFilter, error) {
+	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPoint2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Point) graphql.Marshaler {
@@ -54142,16 +50824,6 @@ func (ec *executionContext) unmarshalNPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgr
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNSharedNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx context.Context, v interface{}) (model.SharedNodeFilter, error) {
-	res, err := ec.unmarshalInputSharedNodeFilter(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx context.Context, v interface{}) (*model.SharedNodeFilter, error) {
-	res, err := ec.unmarshalInputSharedNodeFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -54272,18 +50944,13 @@ func (ec *executionContext) unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateNodeStatsInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeStatsInput(ctx context.Context, v interface{}) (model.UpdateNodeStatsInput, error) {
-	res, err := ec.unmarshalInputUpdateNodeStatsInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateOrgaAggInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggInput(ctx context.Context, v interface{}) (model.UpdateOrgaAggInput, error) {
+	res, err := ec.unmarshalInputUpdateOrgaAggInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNUpdatePostInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx context.Context, v interface{}) (model.UpdatePostInput, error) {
 	res, err := ec.unmarshalInputUpdatePostInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUpdateSharedNodeInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateSharedNodeInput(ctx context.Context, v interface{}) (model.UpdateSharedNodeInput, error) {
-	res, err := ec.unmarshalInputUpdateSharedNodeInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -54691,18 +51358,11 @@ func (ec *executionContext) marshalOAddNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋ
 	return ec._AddNodePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOAddNodeStatsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeStatsPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddNodeStatsPayload) graphql.Marshaler {
+func (ec *executionContext) marshalOAddOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddOrgaAggPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._AddNodeStatsPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOAddSharedNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddSharedNodePayload(ctx context.Context, sel ast.SelectionSet, v *model.AddSharedNodePayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._AddSharedNodePayload(ctx, sel, v)
+	return ec._AddOrgaAggPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddTensionPayload) graphql.Marshaler {
@@ -56032,11 +52692,11 @@ func (ec *executionContext) marshalODeleteNodePayload2ᚖzerogovᚋfractal6ᚗgo
 	return ec._DeleteNodePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalODeleteNodeStatsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodeStatsPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteNodeStatsPayload) graphql.Marshaler {
+func (ec *executionContext) marshalODeleteOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteOrgaAggPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._DeleteNodeStatsPayload(ctx, sel, v)
+	return ec._DeleteOrgaAggPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeletePostPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeletePostPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeletePostPayload) graphql.Marshaler {
@@ -56044,13 +52704,6 @@ func (ec *executionContext) marshalODeletePostPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._DeletePostPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalODeleteSharedNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteSharedNodePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteSharedNodePayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._DeleteSharedNodePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteTensionPayload) graphql.Marshaler {
@@ -58171,212 +54824,6 @@ func (ec *executionContext) unmarshalONodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONodeStats2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx context.Context, sel ast.SelectionSet, v []*model.NodeStats) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalONodeStats2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalONodeStats2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStats(ctx context.Context, sel ast.SelectionSet, v *model.NodeStats) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._NodeStats(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalONodeStatsAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.NodeStatsAggregateResult) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._NodeStatsAggregateResult(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalONodeStatsFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx context.Context, v interface{}) ([]*model.NodeStatsFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.NodeStatsFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalONodeStatsFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsFilter(ctx context.Context, v interface{}) (*model.NodeStatsFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeStatsFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalONodeStatsHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx context.Context, v interface{}) ([]*model.NodeStatsHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.NodeStatsHasFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalONodeStatsHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalONodeStatsHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.NodeStatsHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalONodeStatsHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalONodeStatsHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx context.Context, v interface{}) (*model.NodeStatsHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.NodeStatsHasFilter)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalONodeStatsHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.NodeStatsHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalONodeStatsOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrder(ctx context.Context, v interface{}) (*model.NodeStatsOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeStatsOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalONodeStatsOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrderable(ctx context.Context, v interface{}) (*model.NodeStatsOrderable, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.NodeStatsOrderable)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalONodeStatsOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsOrderable(ctx context.Context, sel ast.SelectionSet, v *model.NodeStatsOrderable) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalONodeStatsPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsPatch(ctx context.Context, v interface{}) (*model.NodeStatsPatch, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeStatsPatch(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalONodeStatsRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeStatsRef(ctx context.Context, v interface{}) (*model.NodeStatsRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeStatsRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalONodeType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx context.Context, v interface{}) ([]*model.NodeType, error) {
 	if v == nil {
 		return nil, nil
@@ -58462,6 +54909,212 @@ func (ec *executionContext) unmarshalONodeType_hash2ᚖzerogovᚋfractal6ᚗgo�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputNodeType_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOOrgaAgg2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx context.Context, sel ast.SelectionSet, v []*model.OrgaAgg) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOOrgaAgg2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOOrgaAgg2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAgg) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._OrgaAgg(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOOrgaAggAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAggAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._OrgaAggAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOOrgaAggFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) ([]*model.OrgaAggFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.OrgaAggFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (*model.OrgaAggFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOOrgaAggHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, v interface{}) ([]*model.OrgaAggHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.OrgaAggHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOOrgaAggHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOOrgaAggHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.OrgaAggHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOOrgaAggHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) unmarshalOOrgaAggHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, v interface{}) (*model.OrgaAggHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.OrgaAggHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOOrgaAggHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAggHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx context.Context, v interface{}) (*model.OrgaAggOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOrgaAggOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOOrgaAggOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx context.Context, v interface{}) (*model.OrgaAggOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.OrgaAggOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOOrgaAggOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAggOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOOrgaAggPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggPatch(ctx context.Context, v interface{}) (*model.OrgaAggPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOrgaAggPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOOrgaAggRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx context.Context, v interface{}) (*model.OrgaAggRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOrgaAggRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -58764,212 +55417,6 @@ func (ec *executionContext) unmarshalORoleType_hash2ᚖzerogovᚋfractal6ᚗgo�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputRoleType_hash(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOSharedNode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx context.Context, sel ast.SelectionSet, v []*model.SharedNode) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOSharedNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalOSharedNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNode(ctx context.Context, sel ast.SelectionSet, v *model.SharedNode) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SharedNode(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOSharedNodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.SharedNodeAggregateResult) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SharedNodeAggregateResult(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOSharedNodeFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx context.Context, v interface{}) ([]*model.SharedNodeFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.SharedNodeFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalOSharedNodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeFilter(ctx context.Context, v interface{}) (*model.SharedNodeFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputSharedNodeFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOSharedNodeHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx context.Context, v interface{}) ([]*model.SharedNodeHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.SharedNodeHasFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOSharedNodeHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOSharedNodeHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.SharedNodeHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOSharedNodeHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalOSharedNodeHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx context.Context, v interface{}) (*model.SharedNodeHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.SharedNodeHasFilter)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOSharedNodeHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.SharedNodeHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOSharedNodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrder(ctx context.Context, v interface{}) (*model.SharedNodeOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputSharedNodeOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOSharedNodeOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrderable(ctx context.Context, v interface{}) (*model.SharedNodeOrderable, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.SharedNodeOrderable)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOSharedNodeOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeOrderable(ctx context.Context, sel ast.SelectionSet, v *model.SharedNodeOrderable) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOSharedNodePatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodePatch(ctx context.Context, v interface{}) (*model.SharedNodePatch, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputSharedNodePatch(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOSharedNodeRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐSharedNodeRef(ctx context.Context, v interface{}) (*model.SharedNodeRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputSharedNodeRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -59737,11 +56184,11 @@ func (ec *executionContext) marshalOUpdateNodePayload2ᚖzerogovᚋfractal6ᚗgo
 	return ec._UpdateNodePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOUpdateNodeStatsPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeStatsPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateNodeStatsPayload) graphql.Marshaler {
+func (ec *executionContext) marshalOUpdateOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateOrgaAggPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._UpdateNodeStatsPayload(ctx, sel, v)
+	return ec._UpdateOrgaAggPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdatePostPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdatePostPayload) graphql.Marshaler {
@@ -59749,13 +56196,6 @@ func (ec *executionContext) marshalOUpdatePostPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._UpdatePostPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOUpdateSharedNodePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateSharedNodePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateSharedNodePayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._UpdateSharedNodePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateTensionPayload) graphql.Marshaler {

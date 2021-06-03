@@ -8,6 +8,7 @@ import (
     "strings"
     "encoding/json"
     "github.com/spf13/viper"
+    "github.com/mitchellh/mapstructure"
 )
 
 //Now returns the current time formated with RFC3339
@@ -75,6 +76,15 @@ func Struct2Map(item interface{}) map[string]interface{} {
     itemRaw, _ := json.Marshal(item)
     json.Unmarshal(itemRaw, &amap)
     return amap
+}
+
+func Map2Struct(item map[string]interface{}, res interface{}) error {
+    decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+            Result: res,
+            TagName: "json",
+        })
+    err = decoder.Decode(item)
+    return err
 }
 
 //MarshalWithoutNil marshal an struct but removed all empty (null) edges.

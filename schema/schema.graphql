@@ -5,7 +5,7 @@ directive @hidden on FIELD_DEFINITION
 
 directive @count(f: String!) on FIELD_DEFINITION
 
-directive @meta_getNodeStats on FIELD_DEFINITION
+directive @meta(f: String!, k: String!) on FIELD_DEFINITION
 
 directive @alter_toLower on INPUT_FIELD_DEFINITION
 
@@ -130,10 +130,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   mandate(filter: MandateFilter): Mandate
   docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   source(filter: BlobFilter): Blob
-  n_tensions_out: Int @count(f: tensions_out)
-  n_tensions_in: Int @count(f: tensions_in)
-  n_children: Int @count(f: children)
-  stats(filter: NodeStatsFilter): NodeStats @meta_getNodeStats
   isRoot: Boolean! @search
   isPersonal: Boolean @search
   isPrivate: Boolean! @search
@@ -146,7 +142,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   skills: [String!] @search(by: [term])
   role_type: RoleType @search
   contracts(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
-  shared(filter: SharedNodeFilter): SharedNode
+  orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -154,12 +150,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   docsAggregate(filter: BlobFilter): BlobAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
-}
-
-type SharedNode {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
 }
 
 type NodeFragment {
@@ -194,11 +184,9 @@ type NodeCharac {
   mode: NodeMode! @search
 }
 
-type NodeStats {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
+type OrgaAgg {
+  n_members: Int
+  n_guests: Int
 }
 
 type Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -258,8 +246,8 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: tension)
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]! @hasInverse(field: tension)
-  n_comments: Int @count(f: comments)
-  n_blobs: Int @count(f: blobs)
+  n_comments: Int
+  n_open_contracts: Int
 
   assigneesAggregate(filter: UserFilter): UserAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
@@ -292,8 +280,8 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   color: String
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
-  n_nodes: Int @count(f: nodes)
-  n_tensions: Int @count(f: tensions)
+  n_nodes: Int
+  n_tensions: Int
 
   tensionsAggregate(filter: TensionFilter): TensionAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -539,35 +527,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -721,10 +709,6 @@ input AddNodeInput {
   mandate: MandateRef
   docs: [BlobRef]
   source: BlobRef
-  n_tensions_out: Int
-  n_tensions_in: Int
-  n_children: Int
-  stats: NodeStatsRef
   isRoot: Boolean!
   isPersonal: Boolean
   isPrivate: Boolean!
@@ -737,7 +721,7 @@ input AddNodeInput {
   skills: [String!]
   role_type: RoleType
   contracts: [VoteRef!]
-  shared: SharedNodeRef @alter_RO
+  orga_agg: OrgaAggRef
 }
 
 type AddNodePayload {
@@ -745,26 +729,13 @@ type AddNodePayload {
   numUids: Int
 }
 
-input AddNodeStatsInput {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
+input AddOrgaAggInput {
+  n_members: Int
+  n_guests: Int
 }
 
-type AddNodeStatsPayload {
-  nodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
-  numUids: Int
-}
-
-input AddSharedNodeInput {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
-}
-
-type AddSharedNodePayload {
-  sharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
+type AddOrgaAggPayload {
+  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   numUids: Int
 }
 
@@ -789,7 +760,7 @@ input AddTensionInput {
   contracts: [ContractRef!]
   history: [EventRef!]!
   n_comments: Int
-  n_blobs: Int
+  n_open_contracts: Int
 }
 
 type AddTensionPayload {
@@ -1188,20 +1159,14 @@ type DeleteNodePayload {
   numUids: Int
 }
 
-type DeleteNodeStatsPayload {
-  nodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
+type DeleteOrgaAggPayload {
+  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   msg: String
   numUids: Int
 }
 
 type DeletePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
-  msg: String
-  numUids: Int
-}
-
-type DeleteSharedNodePayload {
-  sharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
   msg: String
   numUids: Int
 }
@@ -1591,9 +1556,6 @@ type Mutation {
   addNode(input: [AddNodeInput!]!, upsert: Boolean @hook_addNodeInput): AddNodePayload @hook_addNode
   updateNode(input: UpdateNodeInput! @hook_updateNodeInput): UpdateNodePayload @hook_updateNode
   deleteNode(filter: NodeFilter! @hook_deleteNodeInput): DeleteNodePayload @hook_deleteNode
-  addSharedNode(input: [AddSharedNodeInput!]!): AddSharedNodePayload
-  updateSharedNode(input: UpdateSharedNodeInput!): UpdateSharedNodePayload
-  deleteSharedNode(filter: SharedNodeFilter!): DeleteSharedNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   updateNodeFragment(input: UpdateNodeFragmentInput!): UpdateNodeFragmentPayload
   deleteNodeFragment(filter: NodeFragmentFilter!): DeleteNodeFragmentPayload
@@ -1603,9 +1565,9 @@ type Mutation {
   addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
   updateNodeCharac(input: UpdateNodeCharacInput!): UpdateNodeCharacPayload
   deleteNodeCharac(filter: NodeCharacFilter!): DeleteNodeCharacPayload
-  addNodeStats(input: [AddNodeStatsInput!]!): AddNodeStatsPayload
-  updateNodeStats(input: UpdateNodeStatsInput!): UpdateNodeStatsPayload
-  deleteNodeStats(filter: NodeStatsFilter!): DeleteNodeStatsPayload
+  addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
+  updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
+  deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
@@ -1659,18 +1621,6 @@ type NodeAggregateResult {
   rootnameidMax: String
   aboutMin: String
   aboutMax: String
-  n_tensions_outMin: Int
-  n_tensions_outMax: Int
-  n_tensions_outSum: Int
-  n_tensions_outAvg: Float
-  n_tensions_inMin: Int
-  n_tensions_inMax: Int
-  n_tensions_inSum: Int
-  n_tensions_inAvg: Float
-  n_childrenMin: Int
-  n_childrenMax: Int
-  n_childrenSum: Int
-  n_childrenAvg: Float
   rightsMin: Int
   rightsMax: Int
   rightsSum: Int
@@ -1825,10 +1775,6 @@ enum NodeHasFilter {
   mandate
   docs
   source
-  n_tensions_out
-  n_tensions_in
-  n_children
-  stats
   isRoot
   isPersonal
   isPrivate
@@ -1841,7 +1787,7 @@ enum NodeHasFilter {
   skills
   role_type
   contracts
-  shared
+  orga_agg
 }
 
 input NodeMode_hash {
@@ -1862,9 +1808,6 @@ enum NodeOrderable {
   nameid
   rootnameid
   about
-  n_tensions_out
-  n_tensions_in
-  n_children
   rights
 }
 
@@ -1883,10 +1826,6 @@ input NodePatch {
   mandate: MandateRef @patch_RO
   docs: [BlobRef] @patch_RO
   source: BlobRef @patch_RO
-  n_tensions_out: Int
-  n_tensions_in: Int
-  n_children: Int
-  stats: NodeStatsRef
   isRoot: Boolean @patch_RO
   isPersonal: Boolean @patch_RO
   isPrivate: Boolean @patch_RO
@@ -1899,7 +1838,7 @@ input NodePatch {
   skills: [String!] @patch_RO
   role_type: RoleType @patch_RO
   contracts: [VoteRef!]
-  shared: SharedNodeRef @alter_RO
+  orga_agg: OrgaAggRef
 }
 
 input NodeRef {
@@ -1919,10 +1858,6 @@ input NodeRef {
   mandate: MandateRef
   docs: [BlobRef]
   source: BlobRef
-  n_tensions_out: Int
-  n_tensions_in: Int
-  n_children: Int
-  stats: NodeStatsRef
   isRoot: Boolean
   isPersonal: Boolean
   isPrivate: Boolean
@@ -1935,73 +1870,57 @@ input NodeRef {
   skills: [String!]
   role_type: RoleType
   contracts: [VoteRef!]
-  shared: SharedNodeRef
-}
-
-type NodeStatsAggregateResult {
-  count: Int
-  n_memberMin: Int
-  n_memberMax: Int
-  n_memberSum: Int
-  n_memberAvg: Float
-  n_guestMin: Int
-  n_guestMax: Int
-  n_guestSum: Int
-  n_guestAvg: Float
-  n_circleMin: Int
-  n_circleMax: Int
-  n_circleSum: Int
-  n_circleAvg: Float
-  n_roleMin: Int
-  n_roleMax: Int
-  n_roleSum: Int
-  n_roleAvg: Float
-}
-
-input NodeStatsFilter {
-  has: [NodeStatsHasFilter]
-  and: [NodeStatsFilter]
-  or: [NodeStatsFilter]
-  not: NodeStatsFilter
-}
-
-enum NodeStatsHasFilter {
-  n_member
-  n_guest
-  n_circle
-  n_role
-}
-
-input NodeStatsOrder {
-  asc: NodeStatsOrderable
-  desc: NodeStatsOrderable
-  then: NodeStatsOrder
-}
-
-enum NodeStatsOrderable {
-  n_member
-  n_guest
-  n_circle
-  n_role
-}
-
-input NodeStatsPatch {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
-}
-
-input NodeStatsRef {
-  n_member: Int
-  n_guest: Int
-  n_circle: Int
-  n_role: Int
+  orga_agg: OrgaAggRef
 }
 
 input NodeType_hash {
   eq: NodeType
   in: [NodeType]
+}
+
+type OrgaAggAggregateResult {
+  count: Int
+  n_membersMin: Int
+  n_membersMax: Int
+  n_membersSum: Int
+  n_membersAvg: Float
+  n_guestsMin: Int
+  n_guestsMax: Int
+  n_guestsSum: Int
+  n_guestsAvg: Float
+}
+
+input OrgaAggFilter {
+  has: [OrgaAggHasFilter]
+  and: [OrgaAggFilter]
+  or: [OrgaAggFilter]
+  not: OrgaAggFilter
+}
+
+enum OrgaAggHasFilter {
+  n_members
+  n_guests
+}
+
+input OrgaAggOrder {
+  asc: OrgaAggOrderable
+  desc: OrgaAggOrderable
+  then: OrgaAggOrder
+}
+
+enum OrgaAggOrderable {
+  n_members
+  n_guests
+}
+
+input OrgaAggPatch {
+  n_members: Int
+  n_guests: Int
+}
+
+input OrgaAggRef {
+  n_members: Int
+  n_guests: Int
 }
 
 type Point {
@@ -2096,8 +2015,6 @@ type Query {
   getNode(id: ID, nameid: String @hook_getNodeInput): Node
   queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int @hook_queryNodeInput): [Node]
   aggregateNode(filter: NodeFilter): NodeAggregateResult
-  querySharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
-  aggregateSharedNode(filter: SharedNodeFilter): SharedNodeAggregateResult
   getNodeFragment(id: ID!): NodeFragment
   queryNodeFragment(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment]
   aggregateNodeFragment(filter: NodeFragmentFilter): NodeFragmentAggregateResult
@@ -2107,8 +2024,8 @@ type Query {
   getNodeCharac(id: ID!): NodeCharac
   queryNodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
   aggregateNodeCharac(filter: NodeCharacFilter): NodeCharacAggregateResult
-  queryNodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
-  aggregateNodeStats(filter: NodeStatsFilter): NodeStatsAggregateResult
+  queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
@@ -2145,59 +2062,6 @@ type Query {
 input RoleType_hash {
   eq: RoleType
   in: [RoleType]
-}
-
-type SharedNodeAggregateResult {
-  count: Int
-  n_labelsMin: Int
-  n_labelsMax: Int
-  n_labelsSum: Int
-  n_labelsAvg: Float
-  n_tensionsMin: Int
-  n_tensionsMax: Int
-  n_tensionsSum: Int
-  n_tensionsAvg: Float
-  n_closed_tensionsMin: Int
-  n_closed_tensionsMax: Int
-  n_closed_tensionsSum: Int
-  n_closed_tensionsAvg: Float
-}
-
-input SharedNodeFilter {
-  has: [SharedNodeHasFilter]
-  and: [SharedNodeFilter]
-  or: [SharedNodeFilter]
-  not: SharedNodeFilter
-}
-
-enum SharedNodeHasFilter {
-  n_labels
-  n_tensions
-  n_closed_tensions
-}
-
-input SharedNodeOrder {
-  asc: SharedNodeOrderable
-  desc: SharedNodeOrderable
-  then: SharedNodeOrder
-}
-
-enum SharedNodeOrderable {
-  n_labels
-  n_tensions
-  n_closed_tensions
-}
-
-input SharedNodePatch {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
-}
-
-input SharedNodeRef {
-  n_labels: Int
-  n_tensions: Int
-  n_closed_tensions: Int
 }
 
 input StringExactFilter {
@@ -2267,10 +2131,10 @@ type TensionAggregateResult {
   n_commentsMax: Int
   n_commentsSum: Int
   n_commentsAvg: Float
-  n_blobsMin: Int
-  n_blobsMax: Int
-  n_blobsSum: Int
-  n_blobsAvg: Float
+  n_open_contractsMin: Int
+  n_open_contractsMax: Int
+  n_open_contractsSum: Int
+  n_open_contractsAvg: Float
 }
 
 input TensionEvent_hash {
@@ -2315,7 +2179,7 @@ enum TensionHasFilter {
   contracts
   history
   n_comments
-  n_blobs
+  n_open_contracts
 }
 
 input TensionOrder {
@@ -2333,7 +2197,7 @@ enum TensionOrderable {
   nth
   title
   n_comments
-  n_blobs
+  n_open_contracts
 }
 
 input TensionPatch {
@@ -2357,7 +2221,7 @@ input TensionPatch {
   contracts: [ContractRef!]
   history: [EventRef!]
   n_comments: Int
-  n_blobs: Int
+  n_open_contracts: Int
 }
 
 input TensionRef {
@@ -2382,7 +2246,7 @@ input TensionRef {
   contracts: [ContractRef!]
   history: [EventRef!]
   n_comments: Int
-  n_blobs: Int
+  n_open_contracts: Int
 }
 
 input TensionStatus_hash {
@@ -2505,14 +2369,14 @@ type UpdateNodePayload {
   numUids: Int
 }
 
-input UpdateNodeStatsInput {
-  filter: NodeStatsFilter!
-  set: NodeStatsPatch
-  remove: NodeStatsPatch
+input UpdateOrgaAggInput {
+  filter: OrgaAggFilter!
+  set: OrgaAggPatch
+  remove: OrgaAggPatch
 }
 
-type UpdateNodeStatsPayload {
-  nodeStats(filter: NodeStatsFilter, order: NodeStatsOrder, first: Int, offset: Int): [NodeStats]
+type UpdateOrgaAggPayload {
+  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   numUids: Int
 }
 
@@ -2524,17 +2388,6 @@ input UpdatePostInput {
 
 type UpdatePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
-  numUids: Int
-}
-
-input UpdateSharedNodeInput {
-  filter: SharedNodeFilter!
-  set: SharedNodePatch
-  remove: SharedNodePatch
-}
-
-type UpdateSharedNodePayload {
-  sharedNode(filter: SharedNodeFilter, order: SharedNodeOrder, first: Int, offset: Int): [SharedNode]
   numUids: Int
 }
 

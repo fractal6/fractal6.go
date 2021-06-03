@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-
 	"github.com/99designs/gqlgen/graphql"
 
 	"zerogov/fractal6.go/db"
@@ -61,7 +60,7 @@ func Init() gen.Config {
     // Fields directives
     c.Directives.Hidden = hidden
     c.Directives.Count = count
-    c.Directives.Meta_getNodeStats = getNodeStats
+    c.Directives.Meta = meta
 
     //
     // Mutation / Input Fields
@@ -204,30 +203,39 @@ func count(ctx context.Context, obj interface{}, next graphql.Resolver, field st
     return next(ctx)
 }
 
-func getNodeStats(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    rc := graphql.GetResolverContext(ctx)
-    fieldName := rc.Field.Name
+func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k string) (interface{}, error) {
+    data, err:= next(ctx)
+    if err != nil { return nil, err }
 
-    // Reflect to get obj data info
-    // DEBUG: use type switch instead ? (less modular but faster?)
-    nameid := reflect.ValueOf(obj).Elem().FieldByName("Nameid").String()
-    if nameid == "" {
-        err := fmt.Errorf("`nameid' field is needed to query `%s'", fieldName)
+    // @debug: obj cast Doesnt worl here why ?!
+    //v := obj.(model.JsonAtom)[k]
+    // Using reflexion
+    v := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(k)).String()
+    if v == "" {
+        rc := graphql.GetResolverContext(ctx)
+        fieldName := rc.Field.Name
+        err := fmt.Errorf("`%s' field is needed to query `%s'", k, fieldName)
         return nil, err
     }
-    stats := db.GetDB().GetNodeStats(nameid)
-    n_guest := stats["n_guest"]
-    n_member := stats["n_member"]
-    stats_ := model.NodeStats{
-        NGuest: &n_guest,
-        NMember: &n_member,
-    }
-    reflect.ValueOf(obj).Elem().FieldByName("Stats").Set(reflect.ValueOf(&stats_))
+    res := db.GetDB().Meta(k, v, f)
+    if err != nil { return nil, err }
+    err = Map2Struct(res, &data)
+    return data, err
+
+    // Rewrite graph result with reflection
+    //n_guest := stats["n_guest"]
+    //n_member := stats["n_member"]
+    //stats_ := model.NodeStats{
+    //    NGuest: &n_guest,
+    //    NMember: &n_member,
+    //}
+    //reflect.ValueOf(obj).Elem().FieldByName("Stats"v).Set(reflect.ValueOf(&stats_))
+    //
     //for k, v := range stats {
     //    goFieldfDef := ToGoNameFormat(k)
     //    reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&stats))
     //}
-    return next(ctx)
+    //return next(ctx)
 }
 
 //

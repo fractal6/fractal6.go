@@ -26,18 +26,6 @@ func (r *mutationResolver) DeleteNode(ctx context.Context, filter model.NodeFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddSharedNode(ctx context.Context, input []*model.AddSharedNodeInput) (data *model.AddSharedNodePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) UpdateSharedNode(ctx context.Context, input model.UpdateSharedNodeInput) (data *model.UpdateSharedNodePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteSharedNode(ctx context.Context, filter model.SharedNodeFilter) (data *model.DeleteSharedNodePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *mutationResolver) AddNodeFragment(ctx context.Context, input []*model.AddNodeFragmentInput) (data *model.AddNodeFragmentPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -74,15 +62,15 @@ func (r *mutationResolver) DeleteNodeCharac(ctx context.Context, filter model.No
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddNodeStats(ctx context.Context, input []*model.AddNodeStatsInput) (data *model.AddNodeStatsPayload, errors error) {
+func (r *mutationResolver) AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (data *model.AddOrgaAggPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateNodeStats(ctx context.Context, input model.UpdateNodeStatsInput) (data *model.UpdateNodeStatsPayload, errors error) {
+func (r *mutationResolver) UpdateOrgaAgg(ctx context.Context, input model.UpdateOrgaAggInput) (data *model.UpdateOrgaAggPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteNodeStats(ctx context.Context, filter model.NodeStatsFilter) (data *model.DeleteNodeStatsPayload, errors error) {
+func (r *mutationResolver) DeleteOrgaAgg(ctx context.Context, filter model.OrgaAggFilter) (data *model.DeleteOrgaAggPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -235,14 +223,6 @@ func (r *queryResolver) AggregateNode(ctx context.Context, filter *model.NodeFil
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QuerySharedNode(ctx context.Context, filter *model.SharedNodeFilter, order *model.SharedNodeOrder, first *int, offset *int) (data []*model.SharedNode, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) AggregateSharedNode(ctx context.Context, filter *model.SharedNodeFilter) (data *model.SharedNodeAggregateResult, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) GetNodeFragment(ctx context.Context, id string) (data *model.NodeFragment, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -279,11 +259,11 @@ func (r *queryResolver) AggregateNodeCharac(ctx context.Context, filter *model.N
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryNodeStats(ctx context.Context, filter *model.NodeStatsFilter, order *model.NodeStatsOrder, first *int, offset *int) (data []*model.NodeStats, errors error) {
+func (r *queryResolver) QueryOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) (data []*model.OrgaAgg, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) AggregateNodeStats(ctx context.Context, filter *model.NodeStatsFilter) (data *model.NodeStatsAggregateResult, errors error) {
+func (r *queryResolver) AggregateOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter) (data *model.OrgaAggAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
