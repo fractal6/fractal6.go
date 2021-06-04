@@ -347,10 +347,22 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
         _, nameid_new, err := codec.NodeIdCodec(receiverid_new, *node.Nameid, *node.Type)
         if err != nil { return false, err }
 
-        // node input
+        // test root node
+        if codec.IsRoot(tension.Emitter.Nameid) {
+            return false, fmt.Errorf("You can't move the root node.")
+        }
+        // test self-loop
         if receiverid_new == nameid_new {
             return false, fmt.Errorf("A node cannot be its own parent.")
         }
+        // test recursion
+        isChild, err := db.GetDB().IsChild(nameid_old, receiverid_new)
+        if err != nil { return false, err }
+        if isChild {
+            return false, fmt.Errorf("You can't move a node in their children.")
+        }
+
+        // node input
         nodeInput := model.UpdateNodeInput{
             Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid_old}},
             Set: &model.NodePatch{

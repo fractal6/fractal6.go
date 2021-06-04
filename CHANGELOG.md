@@ -8,14 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### New
 - This changelog file
-- Add contracts object queries.
+- [major]tension and node can be moved (except Root, self-loop and recursion).
+- [major] Add contracts object queries.
     - Member of an organisation can add (contract are automatically created for coordo that try to move a blobed tension)
     - Member can update (push or edit on comment) on contract.
     - Author and coordo can delete a contract
 - Add more control over authorizations (through tension events)
-- Use dgraph auth rule in schema with JWT token
+- [auth] Use dgraph auth rule in schema with JWT token (Root test, Bot Ownership and Memership test)
 - [schema] add **Node.rights** and **User.type_** fields
-- Add auth rules for bot roles
+- [auth] Add auth rules for bot roles
 - deepDelete operation implemented. The children node to delete should be definide in `db/api.go` in the `delete<Type>` entry.
 - aggregate queries and fields are not generated thanks to a gqlast update.
 

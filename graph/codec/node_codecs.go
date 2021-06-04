@@ -61,6 +61,11 @@ func Nid2rootid(nid string) (string, error) {
     return parts[0], nil
 }
 
+func IsRoot(nid string) (bool) {
+    parts := strings.Split(nid, "#")
+    return len(parts) == 1
+}
+
 func IsCircle(nid string) (bool) {
     parts := strings.Split(nid, "#")
     return len(parts) == 1 || len(parts) == 2

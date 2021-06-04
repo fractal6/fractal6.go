@@ -101,10 +101,6 @@ var dqlQueries map[string]string = map[string]string{
     //        n_circle: sum(val(circle))
     //    }
     //}`,
-    // Query existance
-    "exists": `{
-        all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
-    }`,
     "getID": `{
         all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
     }`,
@@ -170,6 +166,17 @@ var dqlQueries map[string]string = map[string]string{
     "getTension": `{
         all(func: uid("{{.id}}"))
         {{.payload}}
+    }`,
+    // Boolean
+    "exists": `{
+        all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
+    }`,
+    "isChild": `{
+        var(func: eq(Node.nameid, "{{.parent}}")) @recurse {
+            uid
+            u as Node.children @filter(eq(Node.nameid, "{{.child}}"))
+        }
+        all(func: uid(u)) { uid }
     }`,
     // Get multiple objects
     "getChildren": `{
@@ -320,27 +327,27 @@ var dqlQueries map[string]string = map[string]string{
         id as var(func: uid({{.id}})) {
           rid_emitter as Tension.emitter
           rid_receiver as Tension.receiver
-		  a as Tension.comments
-		  b as Tension.blobs {
+          a as Tension.comments
+          b as Tension.blobs {
               bb as Blob.node {
                   bb1 as NodeFragment.charac
                   bb2 as NodeFragment.children
                   bb3 as NodeFragment.mandate
               }
           }
-		  c as Tension.contracts
-		  d as Tension.history
+          c as Tension.contracts
+          d as Tension.history
         }
         all(func: uid(id,a,b,c,d,bb,bb1,bb2,bb3)) {
             all_ids as uid
         }
     }`,
     "deleteContract": `{
-		id as var(func: uid({{.id}})) {
+        id as var(func: uid({{.id}})) {
           rid as Contract.tension
           a as Contract.event
-		  b as Contract.participants
-		  c as Contract.comments
+          b as Contract.participants
+          c as Contract.comments
         }
         all(func: uid(id,a,b,c)) {
             all_ids as uid
@@ -381,9 +388,7 @@ func (dg Dgraph) Count(id string, fieldName string) int {
 
 func (dg Dgraph) Meta(k, v, f string) map[string]interface{} {
     // Format Query
-    maps := map[string]string{
-        k: v,
-    }
+    maps := map[string]string{k: v}
     // Send request
     res, err := dg.QueryDql(f, maps)
     if err != nil { panic(err) }
@@ -410,23 +415,37 @@ func (dg Dgraph) Meta(k, v, f string) map[string]interface{} {
 func (dg Dgraph) Exists(fieldName string, value string, filterName, filterValue *string) (bool, error) {
     // Format Query
     maps := map[string]string{
-        "fieldName":fieldName, "value": value, "filter": "",
+        "fieldName": fieldName,
+        "value": value,
+        "filter": "",
     }
     if filterName != nil {
         maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, *filterName, *filterValue )
     }
     // Send request
     res, err := dg.QueryDql("exists", maps)
-    if err != nil {
-        return false, err
-    }
-
+    if err != nil { return false, err }
     // Decode response
     var r DqlResp
     err = json.Unmarshal(res.Json, &r)
-    if err != nil {
-        return false, err
+    if err != nil { return false, err }
+    return len(r.All) > 0, nil
+}
+
+//IsChild returns true is a node parent has the given child.
+func (dg Dgraph) IsChild(parent, child string) (bool, error) {
+    // Format Query
+    maps := map[string]string{
+        "parent": parent,
+        "child": child,
     }
+    // Send request
+    res, err := dg.QueryDql("isChild", maps)
+    if err != nil { return false, err }
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return false, err }
     return len(r.All) > 0, nil
 }
 
@@ -435,23 +454,20 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
     result := []string{}
     // Format Query
     maps := map[string]string{
-        "fieldName":fieldName, "value": value, "filter": "",
+        "fieldName":fieldName,
+        "value": value,
+        "filter": "",
     }
     if filterName != nil {
         maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, *filterName, *filterValue )
     }
     // Send request
     res, err := dg.QueryDql("getID", maps)
-    if err != nil {
-        return result, err
-    }
-
+    if err != nil { return result, err }
     // Decode response
     var r DqlResp
     err = json.Unmarshal(res.Json, &r)
-    if err != nil {
-        return result, err
-    }
+    if err != nil { return result, err }
     for _, x := range r.All {
         result = append(result, x["uid"].(string))
     }
@@ -1136,7 +1152,7 @@ func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
 // Remove the user link in the last blob if user match
 func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
     query := fmt.Sprintf(`query {
-		var(func: uid(%s)) {
+        var(func: uid(%s)) {
           Tension.blobs (orderdesc: Post.createdAt, first: 1) {
             n as Blob.node @filter(eq(NodeFragment.first_link, "%s"))
           }
