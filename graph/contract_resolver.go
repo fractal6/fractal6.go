@@ -3,6 +3,7 @@ package graph
 import (
     "fmt"
     "context"
+	"reflect"
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
@@ -136,4 +137,45 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
     //data, err := next(ctx)
     //if err != nil { return nil, err }
     //return data, err
+}
+
+// -------------------------------------------------------------------
+
+func isContractValidator(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Get User context
+    uctx, err := webauth.GetUserContext(ctx)
+    if err != nil { return nil, LogErr("Access denied", err) }
+
+    id := reflect.ValueOf(obj).Elem().FieldByName("ID").String()
+    if id == "" {
+        rc := graphql.GetResolverContext(ctx)
+        err := fmt.Errorf("`id' field is needed to query `%s'", rc.Field.Name)
+        return nil, err
+    }
+
+    _, err = next(ctx)
+    if err != nil { return nil, err }
+
+    data := false
+    d := obj.(*model.Contract)
+
+    // Exit if contract is not open
+    if d.Status != model.ContractStatusOpen {
+        return &data, err
+    }
+
+    // If user has already voted
+    // NOT CHECKING, user can change its vote.
+
+    // Check if user has validation rights
+    var e model.EventRef
+    StructMap(d.Event, &e)
+    events := []*model.EventRef{&e}
+    ok, c, err := tensionEventCheck(uctx, d.Tension.ID, events, nil)
+    if err != nil { return nil, LogErr("Internal error", err) }
+    if ok || c != nil {
+        data = true
+    }
+
+    return &data, err
 }

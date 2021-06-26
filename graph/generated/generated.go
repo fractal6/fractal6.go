@@ -97,6 +97,7 @@ type DirectiveRoot struct {
 	Hook_updateTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	IsContractValidator      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Lambda                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	LambdaOnMutate           func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
 	Meta                     func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k string) (res interface{}, err error)
@@ -246,6 +247,7 @@ type ComplexityRoot struct {
 		CreatedBy             func(childComplexity int, filter *model.UserFilter) int
 		Event                 func(childComplexity int, filter *model.EventFragmentFilter) int
 		ID                    func(childComplexity int) int
+		IsValidator           func(childComplexity int) int
 		Message               func(childComplexity int) int
 		Participants          func(childComplexity int, filter *model.VoteFilter, first *int, offset *int) int
 		ParticipantsAggregate func(childComplexity int, filter *model.VoteFilter) int
@@ -1698,6 +1700,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.ID(childComplexity), true
+
+	case "Contract.isValidator":
+		if e.complexity.Contract.IsValidator == nil {
+			break
+		}
+
+		return e.complexity.Contract.IsValidator(childComplexity), true
 
 	case "Contract.message":
 		if e.complexity.Contract.Message == nil {
@@ -6008,6 +6017,8 @@ directive @count(f: String!) on FIELD_DEFINITION
 
 directive @meta(f: String!, k: String!) on FIELD_DEFINITION
 
+directive @isContractValidator on FIELD_DEFINITION
+
 directive @alter_toLower on INPUT_FIELD_DEFINITION
 
 directive @alter_minLength(n: Int!) on INPUT_FIELD_DEFINITION
@@ -6356,6 +6367,7 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
   participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
+  isValidator: Boolean @isContractValidator
 
   candidatesAggregate(filter: UserFilter): UserAggregateResult
   participantsAggregate(filter: VoteFilter): VoteAggregateResult
@@ -6528,35 +6540,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @id on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @lambda on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6602,6 +6614,7 @@ input AddContractInput {
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
+  isValidator: Boolean
 }
 
 type AddContractPayload {
@@ -7015,6 +7028,7 @@ enum ContractHasFilter {
   candidates
   participants
   comments
+  isValidator
 }
 
 input ContractOrder {
@@ -7043,6 +7057,7 @@ input ContractPatch {
   candidates: [UserRef!] @patch_RO
   participants: [VoteRef!] @patch_RO
   comments: [CommentRef!]
+  isValidator: Boolean
 }
 
 input ContractRef {
@@ -7059,6 +7074,7 @@ input ContractRef {
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
+  isValidator: Boolean
 }
 
 input ContractStatus_hash {
@@ -17800,6 +17816,55 @@ func (ec *executionContext) _Contract_comments(ctx context.Context, field graphq
 	res := resTmp.([]*model.Comment)
 	fc.Result = res
 	return ec.marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_isValidator(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.IsValidator, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsContractValidator == nil {
+				return nil, errors.New("directive isContractValidator is not implemented")
+			}
+			return ec.directives.IsContractValidator(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_candidatesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -36825,6 +36890,14 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "isValidator":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isValidator"))
+			it.IsValidator, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -39347,6 +39420,14 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "isValidator":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isValidator"))
+			it.IsValidator, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -39460,6 +39541,14 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			it.Comments, err = ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isValidator":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isValidator"))
+			it.IsValidator, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -46499,6 +46588,8 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Contract_participants(ctx, field, obj)
 		case "comments":
 			out.Values[i] = ec._Contract_comments(ctx, field, obj)
+		case "isValidator":
+			out.Values[i] = ec._Contract_isValidator(ctx, field, obj)
 		case "candidatesAggregate":
 			out.Values[i] = ec._Contract_candidatesAggregate(ctx, field, obj)
 		case "participantsAggregate":

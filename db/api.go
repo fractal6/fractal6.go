@@ -14,7 +14,7 @@ import (
 )
 
 
-var tensionHookPayload string = `{
+var tensionHookPayload string = `
   uid
   Post.createdBy { User.username }
   Tension.action
@@ -31,7 +31,8 @@ var tensionHookPayload string = `{
         NodeCharac.mode
     }
   }
-
+`
+var tensionBlobHookPayload string = `
   Tension.blobs %s {
     uid
     Blob.blob_type
@@ -57,7 +58,7 @@ var tensionHookPayload string = `{
     }
 
   }
-}`
+`
 
 // GPRC/DQL Request Template
 var dqlQueries map[string]string = map[string]string{
@@ -802,18 +803,27 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
 }
 
 // Returns the tension hook content
-func (dg Dgraph) GetTensionHook(tid string, bid *string) (*model.Tension, error) {
+func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.Tension, error) {
     // Format Query
-    var blobFilter string
-    if bid == nil {
-        blobFilter = "(orderdesc: Post.createdAt, first: 1)"
+    var maps map[string]string
+    if withBlob {
+        var blobFilter string
+        if bid == nil {
+            blobFilter = "(orderdesc: Post.createdAt, first: 1)"
+        } else {
+            blobFilter = fmt.Sprintf(`@filter(uid(%s))`, *bid)
+        }
+        maps = map[string]string{
+            "id": tid,
+            "payload": "{" + tensionHookPayload + fmt.Sprintf(tensionBlobHookPayload, blobFilter) + "}",
+        }
     } else {
-        blobFilter = fmt.Sprintf(`@filter(uid(%s))`, *bid)
+        maps = map[string]string{
+            "id": tid,
+            "payload": "{" + tensionHookPayload + "}",
+        }
     }
-    maps := map[string]string{
-        "id": tid,
-        "payload": fmt.Sprintf(tensionHookPayload, blobFilter),
-    }
+
     // Send request
     res, err := dg.QueryDql("getTension", maps)
     if err != nil { return nil, err }

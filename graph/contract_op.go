@@ -32,14 +32,15 @@ func init() {
             Auth: SourceCoordoHook,
         },
         model.TensionEventMoved: EventMap{
-            Auth: MemberHook, // should be ideally like in tensions_op...
+            Auth: AuthorHook | SourceCoordoHook | TargetCoordoHook | AssigneeHook,
         },
     }
 }
 
 
+// contractEventHook is applied for addContract query directives.
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload).
-// The rvent present in contract.Event must pass
+// All events in History must pass.
 func contractEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
@@ -54,11 +55,10 @@ func contractEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef
         if hasEvent { // Process the special event
                if tension == nil {
                    // Get Tension, target Node and blob charac (last if bid undefined)
-                   tension, err = db.GetDB().GetTensionHook(tid, bid) // @debug: add a needBlob parameter here ?
+                   tension, err = db.GetDB().GetTensionHook(tid, false, nil)
                    if err != nil { return false, nil, LogErr("Access denied", err) }
                    if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
                }
-
 
                // Check Authorization (optionally generate a contract)
                ok, contract, err = em.Check(uctx, tension, event)

@@ -7,6 +7,8 @@ directive @count(f: String!) on FIELD_DEFINITION
 
 directive @meta(f: String!, k: String!) on FIELD_DEFINITION
 
+directive @isContractValidator on FIELD_DEFINITION
+
 directive @alter_toLower on INPUT_FIELD_DEFINITION
 
 directive @alter_minLength(n: Int!) on INPUT_FIELD_DEFINITION
@@ -355,6 +357,7 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
   participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
+  isValidator: Boolean @isContractValidator
 
   candidatesAggregate(filter: UserFilter): UserAggregateResult
   participantsAggregate(filter: VoteFilter): VoteAggregateResult
@@ -527,35 +530,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @id on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @lambda on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -601,6 +604,7 @@ input AddContractInput {
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
+  isValidator: Boolean
 }
 
 type AddContractPayload {
@@ -1014,6 +1018,7 @@ enum ContractHasFilter {
   candidates
   participants
   comments
+  isValidator
 }
 
 input ContractOrder {
@@ -1042,6 +1047,7 @@ input ContractPatch {
   candidates: [UserRef!] @patch_RO
   participants: [VoteRef!] @patch_RO
   comments: [CommentRef!]
+  isValidator: Boolean
 }
 
 input ContractRef {
@@ -1058,6 +1064,7 @@ input ContractRef {
   candidates: [UserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
+  isValidator: Boolean
 }
 
 input ContractStatus_hash {

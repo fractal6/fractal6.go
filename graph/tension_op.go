@@ -79,8 +79,9 @@ func init() {
     }
 }
 
+// tensionEventHook is applied for addTension and updateTension query directives.
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload) with
-// All events present in tension.History must pass.
+// All events in History must pass.
 func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
@@ -96,7 +97,7 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         if hasEvent { // Process the special event
                if tension == nil {
                    // Get Tension, target Node and blob charac (last if bid undefined)
-                   tension, err = db.GetDB().GetTensionHook(tid, bid) // @debug: add a needBlob parameter here ?
+                   tension, err = db.GetDB().GetTensionHook(tid, true, bid)
                    if err != nil { return false, nil, LogErr("Access denied", err) }
                    if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
                }
@@ -121,6 +122,40 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     }
 
     if ok && trace { leaveTrace(tension) }
+    return ok, contract, err
+}
+
+// tensionEventCheck is a simplified version of tensionEventHook the just returns
+// the result of the event without processing actions.
+func tensionEventCheck(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
+    var ok bool = true
+    var err error
+    var tension *model.Tension
+    var contract *model.Contract
+    if events == nil {
+        return false, nil, LogErr("Access denied", fmt.Errorf("No event given."))
+    }
+
+    for _, event := range(events) {
+        em, hasEvent := EMAP[*event.EventType]
+        if hasEvent { // Process the special event
+               if tension == nil {
+                   // Get Tension, target Node and blob charac (last if bid undefined)
+                   tension, err = db.GetDB().GetTensionHook(tid, true, bid)
+                   if err != nil { return false, nil, LogErr("Access denied", err) }
+                   if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
+               }
+
+               // Check Authorization (optionally generate a contract)
+               ok, contract, err = em.Check(uctx, tension, event)
+               if err != nil { return ok, nil, err }
+               if !ok { break }
+           } else {
+               // Minimum level of authorization
+               return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
+           }
+    }
+
     return ok, contract, err
 }
 

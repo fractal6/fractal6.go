@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add more control over authorizations (through tension events)
 - [auth] Use dgraph auth rule in schema with JWT token (Root test, Bot Ownership and Memership test)
 - [schema] add **Node.rights** and **User.type_** fields
+- [schema] add **isContractValidator** directive for Contract "meta" literal.
 - [auth] Add auth rules for bot roles
 - deepDelete operation implemented. The children node to delete should be definide in `db/api.go` in the `delete<Type>` entry.
 - aggregate queries and fields are not generated thanks to a gqlast update.

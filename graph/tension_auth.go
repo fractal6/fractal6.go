@@ -11,7 +11,11 @@ import (
     . "zerogov/fractal6.go/tools"
 )
 
-// Node Action Rights Enum
+// Node Action Rights Enum.
+// Each node has a rights value (literal) which is set of activated rights.
+// Those rights are encoded as a XOR between the different possible actions.
+// Note that the `authEventsLut` map which rights are needed for each event to
+// be triggered.
 type AuthValue int
 const (
     Creating       = 1
@@ -22,7 +26,9 @@ const (
 )
 var authEventsLut map[model.TensionEvent]AuthValue
 
-// Authorization Hook enum
+// Authorization Hook enum.
+// Each event have a set of hook activated to allow user
+// to trigger an event.
 type AuthHookValue int
 const (
     PassingHook AuthHookValue      = 1 // for public event
@@ -153,12 +159,16 @@ func AnyParticipants(uctx *model.UserCtx, tension *model.Tension, event *model.E
 }
 
 func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
-    // Source
-    ok1, err := auth.HasCoordoRole(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
+    if event.Old == nil || event.New == nil { return false, nil, fmt.Errorf("old and new event data must be defined.") }
+    // @debug manege event.old values in general ?
+    event.Old = &tension.Receiver.Nameid
+    nameidNew := *event.New
+    // Source (old destination)
+    ok1, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
     if err != nil { return false, nil, err }
 
-    // Target
-    ok2, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
+    // Target (New destination)
+    ok2, err := auth.HasCoordoRole(uctx, nameidNew, nil)
     if err != nil { return false, nil, err }
 
     if ok1 && ok2 {
@@ -168,9 +178,9 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
         StructMap(*event, &ev)
         var rid string
         if ok1 {
-            rid, _ = codec.Nid2rootid(tension.Emitter.Nameid)
-        } else if ok2 {
             rid, _ = codec.Nid2rootid(tension.Receiver.Nameid)
+        } else if ok2 {
+            rid, _ = codec.Nid2rootid(nameidNew)
         }
         contract := &model.Contract{
             CreatedAt: Now(),

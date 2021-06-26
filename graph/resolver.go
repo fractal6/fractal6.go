@@ -61,6 +61,7 @@ func Init() gen.Config {
     c.Directives.Hidden = hidden
     c.Directives.Count = count
     c.Directives.Meta = meta
+    c.Directives.IsContractValidator = isContractValidator
 
     //
     // Mutation / Input Fields
@@ -207,7 +208,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
     data, err:= next(ctx)
     if err != nil { return nil, err }
 
-    // @debug: obj cast Doesnt worl here why ?!
+    // @debug: obj cast Doesnt work here why ?!
     //v := obj.(model.JsonAtom)[k]
     // Using reflexion
     v := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(k)).String()

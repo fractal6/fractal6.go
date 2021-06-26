@@ -52,6 +52,7 @@ type AddContractInput struct {
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`
+	IsValidator  *bool             `json:"isValidator"`
 }
 
 type AddContractPayload struct {
@@ -421,6 +422,7 @@ type Contract struct {
 	Candidates            []*User                 `json:"candidates,omitempty"`
 	Participants          []*Vote                 `json:"participants,omitempty"`
 	Comments              []*Comment              `json:"comments,omitempty"`
+	IsValidator           *bool                   `json:"isValidator"`
 	CandidatesAggregate   *UserAggregateResult    `json:"candidatesAggregate,omitempty"`
 	ParticipantsAggregate *VoteAggregateResult    `json:"participantsAggregate,omitempty"`
 	CommentsAggregate     *CommentAggregateResult `json:"commentsAggregate,omitempty"`
@@ -475,6 +477,7 @@ type ContractPatch struct {
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`
+	IsValidator  *bool             `json:"isValidator"`
 }
 
 type ContractRef struct {
@@ -491,6 +494,7 @@ type ContractRef struct {
 	Candidates   []*UserRef        `json:"candidates,omitempty"`
 	Participants []*VoteRef        `json:"participants,omitempty"`
 	Comments     []*CommentRef     `json:"comments,omitempty"`
+	IsValidator  *bool             `json:"isValidator"`
 }
 
 type ContractStatusHash struct {
@@ -2127,6 +2131,7 @@ const (
 	ContractHasFilterCandidates   ContractHasFilter = "candidates"
 	ContractHasFilterParticipants ContractHasFilter = "participants"
 	ContractHasFilterComments     ContractHasFilter = "comments"
+	ContractHasFilterIsValidator  ContractHasFilter = "isValidator"
 )
 
 var AllContractHasFilter = []ContractHasFilter{
@@ -2142,11 +2147,12 @@ var AllContractHasFilter = []ContractHasFilter{
 	ContractHasFilterCandidates,
 	ContractHasFilterParticipants,
 	ContractHasFilterComments,
+	ContractHasFilterIsValidator,
 }
 
 func (e ContractHasFilter) IsValid() bool {
 	switch e {
-	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterParticipants, ContractHasFilterComments:
+	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterParticipants, ContractHasFilterComments, ContractHasFilterIsValidator:
 		return true
 	}
 	return false
