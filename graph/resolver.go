@@ -138,6 +138,16 @@ func Init() gen.Config {
     c.Directives.Hook_addContract = addContractHook
     c.Directives.Hook_updateContract = updateContractHook
     c.Directives.Hook_deleteContract = deleteContractHook
+    //Vote
+    c.Directives.Hook_getVoteInput = nothing
+    c.Directives.Hook_queryVoteInput = nothing
+    c.Directives.Hook_addVoteInput = nothing
+    c.Directives.Hook_updateVoteInput = nothing
+    c.Directives.Hook_deleteVoteInput = nothing
+    // --
+    c.Directives.Hook_addVote = addVoteHook
+    c.Directives.Hook_updateVote = nothing
+    c.Directives.Hook_deleteVote = nothing
 
     return c
 }
@@ -230,7 +240,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
     //    NGuest: &n_guest,
     //    NMember: &n_member,
     //}
-    //reflect.ValueOf(obj).Elem().FieldByName("Stats"v).Set(reflect.ValueOf(&stats_))
+    //reflect.ValueOf(obj).Elem().FieldByName("Stats").Set(reflect.ValueOf(&stats_))
     //
     //for k, v := range stats {
     //    goFieldfDef := ToGoNameFormat(k)

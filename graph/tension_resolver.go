@@ -15,7 +15,7 @@ import (
 ////////////////////////////////////////////////
 // Tension Resolver
 ////////////////////////////////////////////////
-//
+
 
 // Add Tension - Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {

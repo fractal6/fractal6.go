@@ -19,6 +19,8 @@ directive @alter_oneByOne on INPUT_FIELD_DEFINITION
 
 directive @alter_unique(on: String) on INPUT_FIELD_DEFINITION
 
+directive @alter_setVoteId on INPUT_FIELD_DEFINITION
+
 directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
 
 directive @patch_isOwner(u: String) on INPUT_FIELD_DEFINITION
@@ -107,6 +109,22 @@ directive @hook_updateContract on FIELD_DEFINITION
 
 directive @hook_deleteContract on FIELD_DEFINITION
 
+directive @hook_getVoteInput on ARGUMENT_DEFINITION
+
+directive @hook_queryVoteInput on ARGUMENT_DEFINITION
+
+directive @hook_addVoteInput on ARGUMENT_DEFINITION
+
+directive @hook_updateVoteInput on ARGUMENT_DEFINITION
+
+directive @hook_deleteVoteInput on ARGUMENT_DEFINITION
+
+directive @hook_addVote on FIELD_DEFINITION
+
+directive @hook_updateVote on FIELD_DEFINITION
+
+directive @hook_deleteVote on FIELD_DEFINITION
+
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
         queryNode(filter: {isPrivate: false}) { id }
@@ -143,7 +161,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
   role_type: RoleType @search
-  contracts(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
+  contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
@@ -266,7 +284,7 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
-        queryLabel { 
+        queryLabel {
           nodes(filter: {isPrivate: false}) { id }
         }
     }"""
@@ -355,7 +373,7 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   closedAt: DateTime @search
   event(filter: EventFragmentFilter): EventFragment!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
-  participants(filter: VoteFilter, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
+  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
 
@@ -369,11 +387,23 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   message: String @search(by: [fulltext])
 }
 
-type Vote {
+type Vote @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($USERNAME: String!) {
+      queryVote {
+        node { first_link(filter: {username: {eq: $USERNAME}}) { username } }
+      }
+    }"""
+}]
+}) {
   id: ID!
+  voteId: String! @id
   contract(filter: ContractFilter): Contract!
   node(filter: NodeFilter): Node!
   data: [Int!]
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime! @search
+  updatedAt: DateTime
+  message: String @search(by: [fulltext])
 }
 
 type User {
@@ -516,10 +546,14 @@ enum ContractStatus {
 
 enum ContractType {
 
+
   AnyCoordoDual
+
   AnyParticipants
 
+
   AnyCoordoSource
+
   AnyCoordoTarget
 }
 
@@ -530,25 +564,23 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @id on FIELD_DEFINITION
-
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
@@ -556,9 +588,11 @@ directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: Auth
 
 directive @lambda on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -809,13 +843,18 @@ type AddUserRightsPayload {
 }
 
 input AddVoteInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  message: String
+  voteId: String!
   contract: ContractRef!
   node: NodeRef!
   data: [Int!]
 }
 
 type AddVotePayload {
-  vote(filter: VoteFilter, first: Int, offset: Int): [Vote]
+  vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   numUids: Int
 }
 
@@ -1197,7 +1236,7 @@ type DeleteUserRightsPayload {
 }
 
 type DeleteVotePayload {
-  vote(filter: VoteFilter, first: Int, offset: Int): [Vote]
+  vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   msg: String
   numUids: Int
 }
@@ -1598,9 +1637,9 @@ type Mutation {
   addContract(input: [AddContractInput!]! @hook_addContractInput): AddContractPayload @hook_addContract
   updateContract(input: UpdateContractInput! @hook_updateContractInput): UpdateContractPayload @hook_updateContract
   deleteContract(filter: ContractFilter! @hook_deleteContractInput): DeleteContractPayload @hook_deleteContract
-  addVote(input: [AddVoteInput!]!): AddVotePayload
-  updateVote(input: UpdateVoteInput!): UpdateVotePayload
-  deleteVote(filter: VoteFilter!): DeleteVotePayload
+  addVote(input: [AddVoteInput!]!@hook_addVoteInput, upsert: Boolean ) : AddVotePayload @hook_addVote
+  updateVote(input: UpdateVoteInput! @hook_updateVoteInput): UpdateVotePayload @hook_updateVote
+  deleteVote(filter: VoteFilter! @hook_deleteVoteInput): DeleteVotePayload @hook_deleteVote
   addUser(input: [AddUserInput!]!, upsert: Boolean): AddUserPayload
   updateUser(input: UpdateUserInput!): UpdateUserPayload
   deleteUser(filter: UserFilter!): DeleteUserPayload
@@ -2056,8 +2095,8 @@ type Query {
   getContract(id: ID! @hook_getContractInput): Contract
   queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContractInput): [Contract]
   aggregateContract(filter: ContractFilter): ContractAggregateResult
-  getVote(id: ID!): Vote
-  queryVote(filter: VoteFilter, first: Int, offset: Int): [Vote]
+  getVote(id: ID, voteId: String @hook_getVoteInput): Vote
+  queryVote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int @hook_queryVoteInput): [Vote]
   aggregateVote(filter: VoteFilter): VoteAggregateResult
   getUser(id: ID, username: String): User
   queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
@@ -2438,7 +2477,7 @@ input UpdateVoteInput {
 }
 
 type UpdateVotePayload {
-  vote(filter: VoteFilter, first: Int, offset: Int): [Vote]
+  vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   numUids: Int
 }
 
@@ -2597,10 +2636,21 @@ input UserRightsRef {
 
 type VoteAggregateResult {
   count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
+  messageMin: String
+  messageMax: String
+  voteIdMin: String
+  voteIdMax: String
 }
 
 input VoteFilter {
   id: [ID!]
+  createdAt: DateTimeFilter
+  message: StringFullTextFilter
+  voteId: StringHashFilter
   has: [VoteHasFilter]
   and: [VoteFilter]
   or: [VoteFilter]
@@ -2608,12 +2658,34 @@ input VoteFilter {
 }
 
 enum VoteHasFilter {
+  createdBy
+  createdAt
+  updatedAt
+  message
+  voteId
   contract
   node
   data
 }
 
+input VoteOrder {
+  asc: VoteOrderable
+  desc: VoteOrderable
+  then: VoteOrder
+}
+
+enum VoteOrderable {
+  createdAt
+  updatedAt
+  message
+  voteId
+}
+
 input VotePatch {
+  createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime
+  message: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]
@@ -2621,6 +2693,11 @@ input VotePatch {
 
 input VoteRef {
   id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime
+  message: String
+  voteId: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]

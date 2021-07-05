@@ -4,6 +4,7 @@ import (
     "fmt"
     "context"
     "strings"
+    "reflect"
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
@@ -128,6 +129,8 @@ func GetPreloadString(prefix, name string) string {
   return fname
 }
 
+// PayloadContains return true if the query payload contains the given field,
+// by looking the raw json query (trough collected fields)
 func PayloadContains(ctx context.Context, field string) bool {
     fields := graphql.CollectFieldsCtx(ctx, nil)[0]
     for _, c := range(graphql.CollectFields(graphql.GetRequestContext(ctx), fields.SelectionSet, nil)) {
@@ -136,4 +139,12 @@ func PayloadContains(ctx context.Context, field string) bool {
         }
     }
     return false
+}
+
+// PayloadContains return true if the query payload contains the given field,
+// by looking the reflected Go varaible. It is used for input hook when
+// the payload is not available in the context.
+func PayloadContainsGo(obj interface{}, field string) bool {
+    n := reflect.ValueOf(obj).Elem().FieldByName(field).String()
+    return n != ""
 }

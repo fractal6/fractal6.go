@@ -3,7 +3,6 @@ package graph
 import (
     "fmt"
     "context"
-	"reflect"
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
@@ -45,10 +44,9 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
     tid := *input.Tension.ID
 
     // Validate and process Blob Event
-    var e model.EventRef
-    StructMap(*input.Event, &e)
-    events := []*model.EventRef{&e}
-    ok, _,  err := contractEventHook(uctx, tid, events, nil)
+    var event model.EventRef
+    StructMap(*input.Event, &event)
+    ok, _,  err := contractEventHook(uctx, tid, &event, nil)
     if !ok || err != nil {
         // Delete the tension just added
         e := db.GetDB().DeepDelete("contract", id)
@@ -80,11 +78,13 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
     }
 
     //c := input.Set.Comments[0]
+    // @obsolete ??
+    // use only add/upsert insead.
 
     data, err := next(ctx)
     if err != nil { return nil, err }
-    if data.(*model.AddContractPayload) == nil {
-        return nil, LogErr("add contract", fmt.Errorf("no contract updated."))
+    if data.(*model.UpdateContractPayload) == nil {
+        return nil, LogErr("update contract", fmt.Errorf("no contract updated."))
     }
 
     // notify participants and candidates
@@ -139,18 +139,16 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
     //return data, err
 }
 
-// -------------------------------------------------------------------
+// ------------------------------------------------------------------- Contracts
 
 func isContractValidator(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
-    id := reflect.ValueOf(obj).Elem().FieldByName("ID").String()
-    if id == "" {
-        rc := graphql.GetResolverContext(ctx)
-        err := fmt.Errorf("`id' field is needed to query `%s'", rc.Field.Name)
-        return nil, err
+    // Validate input
+    if !PayloadContainsGo(ctx, "ID") {
+        return nil, LogErr("field missing", fmt.Errorf("id field is required in vote payload"))
     }
 
     _, err = next(ctx)
@@ -167,15 +165,64 @@ func isContractValidator(ctx context.Context, obj interface{}, next graphql.Reso
     // If user has already voted
     // NOT CHECKING, user can change its vote.
 
-    // Check if user has validation rights
-    var e model.EventRef
-    StructMap(d.Event, &e)
-    events := []*model.EventRef{&e}
-    ok, c, err := tensionEventCheck(uctx, d.Tension.ID, events, nil)
-    if err != nil { return nil, LogErr("Internal error", err) }
-    if ok || c != nil {
-        data = true
-    }
+    // Check rights
+    data, _, _, err = hasContractRight(uctx, d)
 
     return &data, err
 }
+
+////////////////////////////////////////////////
+// Vote Resolver
+////////////////////////////////////////////////
+
+
+func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    // Get User context
+    uctx, err := webauth.GetUserContext(ctx)
+    if err != nil { return nil, LogErr("Access denied", err) }
+
+    // Validate Input
+    inputs := graphql.GetResolverContext(ctx).Args["input"].([]*model.AddVoteInput)
+    if len(inputs) != 1 {
+        return nil, LogErr("add vote", fmt.Errorf("One and only one vote allowed."))
+    }
+    if !PayloadContains(ctx, "id") {
+        return nil, LogErr("field missing", fmt.Errorf("id field is required in vote payload"))
+    }
+    input := inputs[0]
+    if len(input.Data) != 1 {
+        return nil, LogErr("add vote", fmt.Errorf("One and only one vote is required."))
+    }
+    vote := input.Data[0]
+    cid := *input.Contract.ID
+    nameid := *input.Node.Nameid
+
+    // Ensure the vote ID
+    if input.VoteID != cid + "#" + nameid {
+        return nil, LogErr("add vote", fmt.Errorf("bad format for voteID."))
+    }
+
+    // Try to add vote
+    d, err := next(ctx)
+    if err != nil { return nil, err }
+    data := d.(*model.AddVotePayload)
+    if data == nil {
+        return nil, LogErr("add vote", fmt.Errorf("no vote added."))
+    }
+    id := data.Vote[0].ID
+
+    // Post process vote
+    ok, status, err := processVote(uctx, cid, id, vote)
+    if !ok || err != nil {
+        vi := model.VoteFilter{ID:[]string{id}}
+        e := db.GetDB().Delete(*uctx, "vote", vi)
+        if e != nil { panic(e) }
+        return nil, err
+    }
+
+    data.Vote[0].Contract.Status = status
+
+    return data, err
+}
+
+

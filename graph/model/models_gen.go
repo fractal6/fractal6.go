@@ -257,9 +257,14 @@ type AddUserRightsPayload struct {
 }
 
 type AddVoteInput struct {
-	Contract *ContractRef `json:"contract,omitempty"`
-	Node     *NodeRef     `json:"node,omitempty"`
-	Data     []int        `json:"data"`
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	CreatedAt string       `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	VoteID    string       `json:"voteId,omitempty"`
+	Contract  *ContractRef `json:"contract,omitempty"`
+	Node      *NodeRef     `json:"node,omitempty"`
+	Data      []int        `json:"data"`
 }
 
 type AddVotePayload struct {
@@ -1836,35 +1841,66 @@ type UserRightsRef struct {
 }
 
 type Vote struct {
-	ID       string    `json:"id,omitempty"`
-	Contract *Contract `json:"contract,omitempty"`
-	Node     *Node     `json:"node,omitempty"`
-	Data     []int     `json:"data"`
+	ID        string    `json:"id,omitempty"`
+	VoteID    string    `json:"voteId,omitempty"`
+	Contract  *Contract `json:"contract,omitempty"`
+	Node      *Node     `json:"node,omitempty"`
+	Data      []int     `json:"data"`
+	CreatedBy *User     `json:"createdBy,omitempty"`
+	CreatedAt string    `json:"createdAt,omitempty"`
+	UpdatedAt *string   `json:"updatedAt,omitempty"`
+	Message   *string   `json:"message,omitempty"`
 }
 
 type VoteAggregateResult struct {
-	Count *int `json:"count"`
+	Count        *int    `json:"count"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+	VoteIDMin    *string `json:"voteIdMin,omitempty"`
+	VoteIDMax    *string `json:"voteIdMax,omitempty"`
 }
 
 type VoteFilter struct {
-	ID  []string         `json:"id,omitempty"`
-	Has []*VoteHasFilter `json:"has,omitempty"`
-	And []*VoteFilter    `json:"and,omitempty"`
-	Or  []*VoteFilter    `json:"or,omitempty"`
-	Not *VoteFilter      `json:"not,omitempty"`
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	VoteID    *StringHashFilter     `json:"voteId,omitempty"`
+	Has       []*VoteHasFilter      `json:"has,omitempty"`
+	And       []*VoteFilter         `json:"and,omitempty"`
+	Or        []*VoteFilter         `json:"or,omitempty"`
+	Not       *VoteFilter           `json:"not,omitempty"`
+}
+
+type VoteOrder struct {
+	Asc  *VoteOrderable `json:"asc,omitempty"`
+	Desc *VoteOrderable `json:"desc,omitempty"`
+	Then *VoteOrder     `json:"then,omitempty"`
 }
 
 type VotePatch struct {
-	Contract *ContractRef `json:"contract,omitempty"`
-	Node     *NodeRef     `json:"node,omitempty"`
-	Data     []int        `json:"data"`
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	CreatedAt *string      `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	Contract  *ContractRef `json:"contract,omitempty"`
+	Node      *NodeRef     `json:"node,omitempty"`
+	Data      []int        `json:"data"`
 }
 
 type VoteRef struct {
-	ID       *string      `json:"id,omitempty"`
-	Contract *ContractRef `json:"contract,omitempty"`
-	Node     *NodeRef     `json:"node,omitempty"`
-	Data     []int        `json:"data"`
+	ID        *string      `json:"id,omitempty"`
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	CreatedAt *string      `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	VoteID    *string      `json:"voteId,omitempty"`
+	Contract  *ContractRef `json:"contract,omitempty"`
+	Node      *NodeRef     `json:"node,omitempty"`
+	Data      []int        `json:"data"`
 }
 
 type WithinFilter struct {
@@ -4037,12 +4073,22 @@ func (e UserType) MarshalGQL(w io.Writer) {
 type VoteHasFilter string
 
 const (
-	VoteHasFilterContract VoteHasFilter = "contract"
-	VoteHasFilterNode     VoteHasFilter = "node"
-	VoteHasFilterData     VoteHasFilter = "data"
+	VoteHasFilterCreatedBy VoteHasFilter = "createdBy"
+	VoteHasFilterCreatedAt VoteHasFilter = "createdAt"
+	VoteHasFilterUpdatedAt VoteHasFilter = "updatedAt"
+	VoteHasFilterMessage   VoteHasFilter = "message"
+	VoteHasFilterVoteID    VoteHasFilter = "voteId"
+	VoteHasFilterContract  VoteHasFilter = "contract"
+	VoteHasFilterNode      VoteHasFilter = "node"
+	VoteHasFilterData      VoteHasFilter = "data"
 )
 
 var AllVoteHasFilter = []VoteHasFilter{
+	VoteHasFilterCreatedBy,
+	VoteHasFilterCreatedAt,
+	VoteHasFilterUpdatedAt,
+	VoteHasFilterMessage,
+	VoteHasFilterVoteID,
 	VoteHasFilterContract,
 	VoteHasFilterNode,
 	VoteHasFilterData,
@@ -4050,7 +4096,7 @@ var AllVoteHasFilter = []VoteHasFilter{
 
 func (e VoteHasFilter) IsValid() bool {
 	switch e {
-	case VoteHasFilterContract, VoteHasFilterNode, VoteHasFilterData:
+	case VoteHasFilterCreatedBy, VoteHasFilterCreatedAt, VoteHasFilterUpdatedAt, VoteHasFilterMessage, VoteHasFilterVoteID, VoteHasFilterContract, VoteHasFilterNode, VoteHasFilterData:
 		return true
 	}
 	return false
@@ -4074,5 +4120,50 @@ func (e *VoteHasFilter) UnmarshalGQL(v interface{}) error {
 }
 
 func (e VoteHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type VoteOrderable string
+
+const (
+	VoteOrderableCreatedAt VoteOrderable = "createdAt"
+	VoteOrderableUpdatedAt VoteOrderable = "updatedAt"
+	VoteOrderableMessage   VoteOrderable = "message"
+	VoteOrderableVoteID    VoteOrderable = "voteId"
+)
+
+var AllVoteOrderable = []VoteOrderable{
+	VoteOrderableCreatedAt,
+	VoteOrderableUpdatedAt,
+	VoteOrderableMessage,
+	VoteOrderableVoteID,
+}
+
+func (e VoteOrderable) IsValid() bool {
+	switch e {
+	case VoteOrderableCreatedAt, VoteOrderableUpdatedAt, VoteOrderableMessage, VoteOrderableVoteID:
+		return true
+	}
+	return false
+}
+
+func (e VoteOrderable) String() string {
+	return string(e)
+}
+
+func (e *VoteOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = VoteOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid VoteOrderable", str)
+	}
+	return nil
+}
+
+func (e VoteOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

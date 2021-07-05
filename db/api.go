@@ -60,6 +60,20 @@ var tensionBlobHookPayload string = `
   }
 `
 
+var contractHookPayload string = `{
+  uid
+  Contract.tension { uid }
+  Contract.status
+  Contract.contract_type
+  Contract.event {
+    EventFragment.event_type
+    EventFragment.old
+    EventFragment.new
+  }
+  Contract.candidates { User.username }
+  Contract.participants { uid }
+}`
+
 // GPRC/DQL Request Template
 var dqlQueries map[string]string = map[string]string{
     // Count objects
@@ -164,7 +178,7 @@ var dqlQueries map[string]string = map[string]string{
         all(func: regexp(Node.nameid, /{{.regex}}/)) @filter(eq(Node.isRoot, true))
         {{.payload}}
     }`,
-    "getTension": `{
+    "getObject": `{
         all(func: uid("{{.id}}"))
         {{.payload}}
     }`,
@@ -825,7 +839,7 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
     }
 
     // Send request
-    res, err := dg.QueryDql("getTension", maps)
+    res, err := dg.QueryDql("getObject", maps)
     if err != nil { return nil, err }
 
     // Decode response
@@ -836,6 +850,46 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
     var obj model.Tension
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple tension for @uid: %s", tid)
+    } else if len(r.All) == 1 {
+        config := &mapstructure.DecoderConfig{
+            Result: &obj,
+            TagName: "json",
+            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+                if to == reflect.Struct {
+                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    return nv, nil
+                }
+                return v, nil
+            },
+        }
+        decoder, err := mapstructure.NewDecoder(config)
+        if err != nil { return nil, err }
+        err = decoder.Decode(r.All[0])
+        if err != nil { return nil, err }
+    }
+    return &obj, err
+}
+
+// Returns the contract hook content
+func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
+    // Format Query
+    maps := map[string]string{
+        "id": cid,
+        "payload": "{" + contractHookPayload + "}",
+    }
+
+    // Send request
+    res, err := dg.QueryDql("getObject", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var obj model.Contract
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple contract for @uid: %s", cid)
     } else if len(r.All) == 1 {
         config := &mapstructure.DecoderConfig{
             Result: &obj,
@@ -1122,6 +1176,23 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 
 // DQL Mutations
 
+// SetFieldById set a predicate for the given node in the DB
+func (dg Dgraph) SetFieldById(objid string, predicate string, val string) error {
+    query := fmt.Sprintf(`query {
+        node as var(func: uid(%s))
+    }`, objid)
+
+    mu := fmt.Sprintf(`
+        uid(node) <%s> "%s" .
+    `, predicate, val)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryDql(query, mutation)
+    return err
+}
 // SetFieldByEq set a predicate for the given node in the DB
 func (dg Dgraph) SetFieldByEq(fieldid string, objid string, predicate string, val string) error {
     query := fmt.Sprintf(`query {

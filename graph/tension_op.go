@@ -93,68 +93,58 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     }
 
     for _, event := range(events) {
-        em, hasEvent := EMAP[*event.EventType]
-        if hasEvent { // Process the special event
-               if tension == nil {
-                   // Get Tension, target Node and blob charac (last if bid undefined)
-                   tension, err = db.GetDB().GetTensionHook(tid, true, bid)
-                   if err != nil { return false, nil, LogErr("Access denied", err) }
-                   if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
-               }
+        if tension == nil {
+            // Fetch Tension, target Node and blob charac (last if bid undefined)
+            tension, err = db.GetDB().GetTensionHook(tid, true, bid)
+            if err != nil { return false, nil, LogErr("Access denied", err) }
+        }
 
-               // Check Authorization (optionally generate a contract)
-               ok, contract, err = em.Check(uctx, tension, event)
-               if err != nil { return ok, nil, err }
-               if !ok { break }
+        // Process event
+        ok, contract, err = processEvent(uctx, &EMAP, tension, event, true, true, true)
+        if !ok || err != nil { break }
+        if ok && err == nil { trace = true }
 
-               if em.Action != nil { // Trigger Action
-                   ok, err = em.Action(uctx, tension, event)
-                   if ok && err == nil { trace = true }
-               }
-
-               // Notify users
-               // push notification (somewhere ?!)
-
-           } else {
-               // Minimum level of authorization
-               return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
-           }
     }
 
     if ok && trace { leaveTrace(tension) }
     return ok, contract, err
 }
 
-// tensionEventCheck is a simplified version of tensionEventHook the just returns
-// the result of the event without processing actions.
-func tensionEventCheck(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
-    var ok bool = true
+func processEvent(uctx *model.UserCtx, mp *EventsMap, tension *model.Tension, event *model.EventRef, doCheck, doProcess, doNotify bool) (bool, *model.Contract, error) {
+    var ok bool
     var err error
-    var tension *model.Tension
     var contract *model.Contract
-    if events == nil {
-        return false, nil, LogErr("Access denied", fmt.Errorf("No event given."))
+
+    if tension == nil {
+        return ok, contract, LogErr("Access denied", fmt.Errorf("tension not found."))
     }
 
-    for _, event := range(events) {
-        em, hasEvent := EMAP[*event.EventType]
-        if hasEvent { // Process the special event
-               if tension == nil {
-                   // Get Tension, target Node and blob charac (last if bid undefined)
-                   tension, err = db.GetDB().GetTensionHook(tid, true, bid)
-                   if err != nil { return false, nil, LogErr("Access denied", err) }
-                   if tension == nil { return false, nil, LogErr("Access denied", fmt.Errorf("tension not found.")) }
-               }
-
-               // Check Authorization (optionally generate a contract)
-               ok, contract, err = em.Check(uctx, tension, event)
-               if err != nil { return ok, nil, err }
-               if !ok { break }
-           } else {
-               // Minimum level of authorization
-               return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
-           }
+    var m EventsMap
+    if m == nil {
+        m = EMAP
+    } else {
+        m = *mp
     }
+
+    em, hasEvent := m[*event.EventType]
+    if !hasEvent { // Minimum level of authorization
+        return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
+    }
+
+    if doCheck {
+        // Check Authorization (optionally generate a contract)
+        ok, contract, err = em.Check(uctx, tension, event)
+        if !ok || err != nil { return ok, contract, err }
+    }
+
+    if doProcess && em.Action != nil {
+        // Trigger Action
+        ok, err = em.Action(uctx, tension, event)
+        if !ok || err != nil { return ok, contract, err }
+    }
+
+    // Notify users
+    // push notification (somewhere ?!)
 
     return ok, contract, err
 }

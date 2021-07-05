@@ -66,6 +66,10 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         em.Validation != model.ContractTypeAnyCoordoDual ||
         GetBlob(tension) == nil) // Moving node, doc etc
 
+    if tension == nil || event == nil {
+        return false, nil, fmt.Errorf("empty tension or event.")
+    }
+
     // Exception Hook
     // --
 

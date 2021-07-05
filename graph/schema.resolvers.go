@@ -173,8 +173,9 @@ func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.Cont
 	return data, errors
 }
 
-func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput) (data *model.AddVotePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (data *model.AddVotePayload, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) UpdateVote(ctx context.Context, input model.UpdateVoteInput) (data *model.UpdateVotePayload, errors error) {
@@ -363,11 +364,11 @@ func (r *queryResolver) AggregateContract(ctx context.Context, filter *model.Con
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetVote(ctx context.Context, id string) (data *model.Vote, errors error) {
+func (r *queryResolver) GetVote(ctx context.Context, id *string, voteID *string) (data *model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryVote(ctx context.Context, filter *model.VoteFilter, first *int, offset *int) (data []*model.Vote, errors error) {
+func (r *queryResolver) QueryVote(ctx context.Context, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) (data []*model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
