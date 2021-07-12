@@ -71,7 +71,7 @@ var contractHookPayload string = `{
     EventFragment.new
   }
   Contract.candidates { User.username }
-  Contract.participants { uid }
+  Contract.participants { Vote.data Vote.Node { Node.nameid } }
 }`
 
 // GPRC/DQL Request Template
@@ -116,17 +116,17 @@ var dqlQueries map[string]string = map[string]string{
     //        n_circle: sum(val(circle))
     //    }
     //}`,
+    // Get literal value
     "getID": `{
         all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
     }`,
-    // Get single object
     "getFieldById": `{
         all(func: uid("{{.id}}")) {
             {{.fieldName}}
         }
     }`,
     "getFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.objid}}")) {
+        all(func: eq({{.fieldid}}, "{{.value}}")) {
             {{.fieldName}}
         }
     }`,
@@ -178,8 +178,12 @@ var dqlQueries map[string]string = map[string]string{
         all(func: regexp(Node.nameid, /{{.regex}}/)) @filter(eq(Node.isRoot, true))
         {{.payload}}
     }`,
-    "getObject": `{
+    "getTensionHook": `{
         all(func: uid("{{.id}}"))
+        {{.payload}}
+    }`,
+    "getContractHook": `{
+        all(func: eq(Contract.contractid, "{{.id}}"))
         {{.payload}}
     }`,
     // Boolean
@@ -519,7 +523,7 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
-        "objid": objid,
+        "value": objid,
         "fieldName": fieldName,
     }
     // Send request
@@ -531,13 +535,11 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
-    } else if len(r.All) == 1 {
-        x := r.All[0][fieldName]
-        return x, nil
+    if len(r.All) !=1 {
+        return nil, fmt.Errorf("Only one resuts allowed for DQL query: %s %s", fieldName, objid)
     }
-    return nil, err
+    x := r.All[0][fieldName]
+    return x, err
 }
 
 // Returns a subfield from uid
@@ -839,7 +841,7 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
     }
 
     // Send request
-    res, err := dg.QueryDql("getObject", maps)
+    res, err := dg.QueryDql("getTensionHook", maps)
     if err != nil { return nil, err }
 
     // Decode response
@@ -879,7 +881,7 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
     }
 
     // Send request
-    res, err := dg.QueryDql("getObject", maps)
+    res, err := dg.QueryDql("getContractHook", maps)
     if err != nil { return nil, err }
 
     // Decode response

@@ -27,8 +27,7 @@ const (
 var authEventsLut map[model.TensionEvent]AuthValue
 
 // Authorization Hook enum.
-// Each event have a set of hook activated to allow user
-// to trigger an event.
+// Each event have a set of hook activated to allow user to trigger an event.
 type AuthHookValue int
 const (
     PassingHook AuthHookValue      = 1 // for public event
@@ -41,8 +40,17 @@ const (
     // Granted based
     AuthorHook AuthHookValue       = 1 << 6
     AssigneeHook AuthHookValue     = 1 << 7
+    // Other
+    CandidateHook AuthHookValue    = 1 << 8
 )
 
+// If an event has a Validation (function) attached, the tension need to satisfy the authorization in
+// both direction. Specific constraint must be implemented in the cooresponding function. Ie, to invite a user
+// a AnyParticipate validation method is created, and the constraint is that at a candidate and a coordo must validate.
+// Validation function return a triplet:
+// ok bool -> ok means the contract has been validated and can be closed.
+// contract -> returns the updated contract if is has been altered else nil
+// err -> is something got wrong
 type EventMap struct {
     Validation model.ContractType
     Auth AuthHookValue
@@ -60,11 +68,12 @@ func init() {
     }
 }
 
-func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+    var ok bool
     var err error
     var hookEnabled bool =(
-        em.Validation != model.ContractTypeAnyCoordoDual ||
-        GetBlob(tension) == nil) // Moving node, doc etc
+        em.Validation == "" ||
+        (contract == nil && GetBlob(tension) == nil)) // Moving node, doc etc
 
     if tension == nil || event == nil {
         return false, nil, fmt.Errorf("empty tension or event.")
@@ -72,9 +81,44 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
 
     // Exception Hook
     // --
+    if hookEnabled {
+        ok, err = em.checkTensionAuth(uctx, tension, event, contract)
+        if ok || err != nil { return ok, contract, err }
+    }
+
+    if contract != nil {
+        // Exit if contract is not open
+        if contract.Status != "" && contract.Status != model.ContractStatusOpen {
+            return ok, contract, fmt.Errorf("Contract status is closed or missing.")
+        }
+    }
+
+    // Check the contract authorization
+    // --
+    var f func(*model.UserCtx, *model.Tension, *model.EventRef, *model.Contract) (bool, *model.Contract, error)
+    switch em.Validation {
+    case model.ContractTypeAnyCandidates:
+        f = em.AnyCandidates
+    case model.ContractTypeAnyCoordoDual:
+        f = em.AnyCoordoDual
+    case model.ContractTypeAnyCoordoSource:
+        f = em.AnyCoordoSource
+    case model.ContractTypeAnyCoordoTarget:
+        f = em.AnyCoordoTarget
+    case "": // Empty, blocking
+        return false, nil, err
+    default:
+        return false, nil, fmt.Errorf("not implemented contract type.")
+    }
+
+    return f(uctx, tension, event, contract)
+}
+
+func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, error) {
+    var err error
 
     if em.Auth == PassingHook {
-        return true, nil, err
+        return true, err
     }
 
     // <!> Bot Hook <!>
@@ -83,101 +127,115 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
     (tension.Emitter.Rights & int(authEventsLut[*event.EventType])) > 0 {
         // Can only create tension in the parent circle og the bot.
         if pid, _ := codec.Nid2pid(tension.Emitter.Nameid); pid == tension.Receiver.Nameid {
-            return true, nil, err
+            return true, err
         } else {
-            return false, nil, fmt.Errorf("The tension receiver only support the following node: %s", pid)
+            return false, fmt.Errorf("The tension receiver only support the following node: %s", pid)
         }
     }
 
     // Check Hook authorization
     // --
 
-    if AuthorHook & em.Auth > 0 && hookEnabled {
+    if AuthorHook & em.Auth > 0 {
         // isAuthorCheck: Check if the user is the creator of the ressource
         if uctx.Username == tension.CreatedBy.Username {
-            return true, nil, err
+            return true, err
         }
     }
 
-    if MemberHook & em.Auth > 0 && hookEnabled {
+    if MemberHook & em.Auth > 0 {
         rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
-        if auth.UserIsMember(uctx, rootid) >= 0 { return true, nil, err }
+        if auth.UserIsMember(uctx, rootid) >= 0 { return true, err }
     }
 
-    if TargetCoordoHook & em.Auth > 0 && hookEnabled {
+    if TargetCoordoHook & em.Auth > 0 {
         ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
-        if ok { return ok, nil, err }
+        if ok { return ok, err }
     }
 
-    if SourceCoordoHook & em.Auth > 0 && hookEnabled {
+    if SourceCoordoHook & em.Auth > 0 {
         ok, err := auth.HasCoordoRole(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
-        if ok { return ok, nil, err }
+        if ok { return ok,  err }
     }
 
-    if AssigneeHook & em.Auth > 0 && hookEnabled {
+    if AssigneeHook & em.Auth > 0 {
         // isAssigneeCheck: Check if the user is an assignee of the curent tension
         // @debug: use checkAssignee function, but how to pass the context ?
         var assignees []interface{}
         res, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.assignees", "User.username")
-        if err != nil { return false, nil, err }
+        if err != nil { return false, err }
         if res != nil { assignees = res.([]interface{}) }
         for _, a := range(assignees) {
             if a.(string) == uctx.Username {
-                return true, nil, err
+                return true, err
             }
         }
     }
 
-    // Check the contract authorization
-    // --
-    var f func(*model.UserCtx, *model.Tension, *model.EventRef) (bool, *model.Contract, error)
-    switch em.Validation {
-    case model.ContractTypeAnyParticipants:
-        f = AnyParticipants
-    case model.ContractTypeAnyCoordoDual:
-        f = AnyCoordoDual
-    case model.ContractTypeAnyCoordoSource:
-        f = AnyCoordoSource
-    case model.ContractTypeAnyCoordoTarget:
-        f = AnyCoordoTarget
-    case "": // Empty, blocking
-        return false, nil, err
-    default:
-        return false, nil, fmt.Errorf("not implemented contract type.")
+    if CandidateHook & em.Auth > 0 && contract != nil {
+        // Check if uctx is a contract candidate
+        for _, c := range contract.Candidates {
+            if c.Username == uctx.Username {
+                return true, err
+            }
+        }
     }
-    return f(uctx, tension, event)
+
+    return false, err
 }
 
-func AnyParticipants(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
-    ok, _, err := AnyCoordoTarget(uctx, tension, event)
+func (em EventMap) AnyCandidates(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+    ok, err := em.checkTensionAuth(uctx, tension, event, contract)
     if err != nil { return false, nil, err }
 
-    if ok {
-        //@TODO
-        //return contract
-        panic("not implemented.")
-        //return false, nil, nil
+    if !ok {
+        return false, contract, err
+    }
+
+    // Check Vote
+    v := 0
+    for _, p := range contract.Participants {
+        // @Debug don't allow more than two vote....
+        v += p.Data[0]
+    }
+    // if two vote (coordo + other(coordo) -> ok
+    if v >= 2 {
+        contract.Status = model.ContractStatusClosed
+        return true, contract, err
     } else {
-        return false, nil, nil
+        contract.Status = model.ContractStatusCanceled
+        return false, contract, err
     }
 }
 
-func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+func (em EventMap) AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     if event.Old == nil || event.New == nil { return false, nil, fmt.Errorf("old and new event data must be defined.") }
     // @debug manege event.old values in general ?
-    event.Old = &tension.Receiver.Nameid
+    if *event.Old != tension.Receiver.Nameid {
+        return false, nil, fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid)
+    }
+
     nameidNew := *event.New
+
     // Source (old destination)
-    ok1, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
+    ok1, err := em.checkTensionAuth(uctx, tension, event, contract)
     if err != nil { return false, nil, err }
 
-    // Target (New destination)
-    ok2, err := auth.HasCoordoRole(uctx, nameidNew, nil)
+    // Fetch tension target/Dual
+    tid2, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", nameidNew, "Node.source", "Blob.tension", "uid")
+    if tid2 == nil { return false, nil, fmt.Errorf("tension source not found.") }
+    tension2, err := db.GetDB().GetTensionHook(tid2.(string), false, nil)
+    if err != nil { return false, nil, err }
+    if tension2 == nil { return false, nil, fmt.Errorf("target tension fetch failed.") }
+
+    // Target (new destination)
+    ok2, err := em.checkTensionAuth(uctx, tension2, event, contract)
     if err != nil { return false, nil, err }
 
-    if ok1 && ok2 {
-        return true, nil, err
-    } else if ok1 || ok2 {
+    // The (contract == nil) check means that the contract is not created yet.
+    if (ok1 && ok2) && contract == nil {
+        return true, contract, err
+    } else if (ok1 || ok2) && contract == nil {
         var ev model.EventFragment
         StructMap(*event, &ev)
         var rid string
@@ -186,7 +244,9 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
         } else if ok2 {
             rid, _ = codec.Nid2rootid(nameidNew)
         }
+        contractid := codec.ContractIdCodec(tension.Receiver.Nameid, *event.EventType, *event.Old, *event.New)
         contract := &model.Contract{
+            Contractid: contractid,
             CreatedAt: Now(),
             CreatedBy: &model.User{Username: uctx.Username},
             Event: &ev,
@@ -194,21 +254,37 @@ func AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
             Status: model.ContractStatusOpen,
             ContractType: model.ContractTypeAnyCoordoDual,
             Participants: []*model.Vote{&model.Vote{
+                Voteid: codec.VoteIdCodec(contractid, codec.MemberIdCodec(rid, uctx.Username)),
                 Node: &model.Node{Nameid: codec.MemberIdCodec(rid, uctx.Username)},
                 Data: []int{1},
             }, },
         }
         return false, contract, err
+    } else if ok1 || ok2 {
+        // Check Vote
+        v := 0
+        for _, p := range contract.Participants {
+            // @Debug don't allow more than two vote....
+            v += p.Data[0]
+        }
+        // if two vote (coordo + other(coordo) -> ok
+        if v >= 2 {
+            contract.Status = model.ContractStatusClosed
+            return true, contract, err
+        } else {
+            contract.Status = model.ContractStatusCanceled
+            return true, contract, err
+        }
     } else {
-        return false, nil, err
+        return false, contract, err
     }
 }
 
-func AnyCoordoSource(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+func (em EventMap) AnyCoordoSource(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     panic("not implemented.")
 }
 
-func AnyCoordoTarget(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, *model.Contract, error) {
+func (em EventMap) AnyCoordoTarget(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     panic("not implemented.")
 }
 

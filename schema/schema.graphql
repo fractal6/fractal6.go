@@ -19,8 +19,6 @@ directive @alter_oneByOne on INPUT_FIELD_DEFINITION
 
 directive @alter_unique(on: String) on INPUT_FIELD_DEFINITION
 
-directive @alter_setVoteId on INPUT_FIELD_DEFINITION
-
 directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
 
 directive @patch_isOwner(u: String) on INPUT_FIELD_DEFINITION
@@ -284,7 +282,7 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
-        queryLabel {
+        queryLabel { 
           nodes(filter: {isPrivate: false}) { id }
         }
     }"""
@@ -367,13 +365,14 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
     }"""
 }]
 }) {
+  contractid: String! @id
   tension(filter: TensionFilter): Tension!
   status: ContractStatus! @search
   contract_type: ContractType! @search
   closedAt: DateTime @search
   event(filter: EventFragmentFilter): EventFragment!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
-  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
+  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]! @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
 
@@ -396,10 +395,10 @@ type Vote @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }]
 }) {
   id: ID!
-  voteId: String! @id
+  voteid: String! @id
   contract(filter: ContractFilter): Contract!
   node(filter: NodeFilter): Node!
-  data: [Int!]
+  data: [Int!]!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -549,7 +548,7 @@ enum ContractType {
 
   AnyCoordoDual
 
-  AnyParticipants
+  AnyCandidates
 
 
   AnyCoordoSource
@@ -564,35 +563,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -630,13 +629,14 @@ input AddContractInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
+  contractid: String!
   tension: TensionRef!
   status: ContractStatus!
   contract_type: ContractType!
   closedAt: DateTime
   event: EventFragmentRef!
   candidates: [UserRef!]
-  participants: [VoteRef!]
+  participants: [VoteRef!]!
   comments: [CommentRef!]
   isValidator: Boolean
 }
@@ -847,10 +847,10 @@ input AddVoteInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
-  voteId: String!
+  voteid: String!
   contract: ContractRef!
   node: NodeRef!
-  data: [Int!]
+  data: [Int!]!
 }
 
 type AddVotePayload {
@@ -1027,6 +1027,8 @@ type ContractAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
+  contractidMin: String
+  contractidMax: String
   closedAtMin: DateTime
   closedAtMax: DateTime
 }
@@ -1035,6 +1037,7 @@ input ContractFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  contractid: StringHashFilter
   status: ContractStatus_hash
   contract_type: ContractType_hash
   closedAt: DateTimeFilter
@@ -1049,6 +1052,7 @@ enum ContractHasFilter {
   createdAt
   updatedAt
   message
+  contractid
   tension
   status
   contract_type
@@ -1070,6 +1074,7 @@ enum ContractOrderable {
   createdAt
   updatedAt
   message
+  contractid
   closedAt
 }
 
@@ -1095,6 +1100,7 @@ input ContractRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
+  contractid: String
   tension: TensionRef
   status: ContractStatus
   contract_type: ContractType
@@ -1634,10 +1640,10 @@ type Mutation {
   addEventFragment(input: [AddEventFragmentInput!]!): AddEventFragmentPayload
   updateEventFragment(input: UpdateEventFragmentInput!): UpdateEventFragmentPayload
   deleteEventFragment(filter: EventFragmentFilter!): DeleteEventFragmentPayload
-  addContract(input: [AddContractInput!]! @hook_addContractInput): AddContractPayload @hook_addContract
+  addContract(input: [AddContractInput!]!, upsert: Boolean @hook_addContractInput): AddContractPayload @hook_addContract
   updateContract(input: UpdateContractInput! @hook_updateContractInput): UpdateContractPayload @hook_updateContract
   deleteContract(filter: ContractFilter! @hook_deleteContractInput): DeleteContractPayload @hook_deleteContract
-  addVote(input: [AddVoteInput!]!@hook_addVoteInput, upsert: Boolean ) : AddVotePayload @hook_addVote
+  addVote(input: [AddVoteInput!]!, upsert: Boolean @hook_addVoteInput): AddVotePayload @hook_addVote
   updateVote(input: UpdateVoteInput! @hook_updateVoteInput): UpdateVotePayload @hook_updateVote
   deleteVote(filter: VoteFilter! @hook_deleteVoteInput): DeleteVotePayload @hook_deleteVote
   addUser(input: [AddUserInput!]!, upsert: Boolean): AddUserPayload
@@ -2092,10 +2098,10 @@ type Query {
   aggregateEvent(filter: EventFilter): EventAggregateResult
   queryEventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   aggregateEventFragment(filter: EventFragmentFilter): EventFragmentAggregateResult
-  getContract(id: ID! @hook_getContractInput): Contract
+  getContract(id: ID, contractid: String @hook_getContractInput): Contract
   queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContractInput): [Contract]
   aggregateContract(filter: ContractFilter): ContractAggregateResult
-  getVote(id: ID, voteId: String @hook_getVoteInput): Vote
+  getVote(id: ID, voteid: String @hook_getVoteInput): Vote
   queryVote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int @hook_queryVoteInput): [Vote]
   aggregateVote(filter: VoteFilter): VoteAggregateResult
   getUser(id: ID, username: String): User
@@ -2642,15 +2648,15 @@ type VoteAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
-  voteIdMin: String
-  voteIdMax: String
+  voteidMin: String
+  voteidMax: String
 }
 
 input VoteFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  voteId: StringHashFilter
+  voteid: StringHashFilter
   has: [VoteHasFilter]
   and: [VoteFilter]
   or: [VoteFilter]
@@ -2662,7 +2668,7 @@ enum VoteHasFilter {
   createdAt
   updatedAt
   message
-  voteId
+  voteid
   contract
   node
   data
@@ -2678,7 +2684,7 @@ enum VoteOrderable {
   createdAt
   updatedAt
   message
-  voteId
+  voteid
 }
 
 input VotePatch {
@@ -2697,7 +2703,7 @@ input VoteRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  voteId: String
+  voteid: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]

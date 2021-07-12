@@ -32,6 +32,16 @@ func MemberIdCodec(rootnameid, username string) (string) {
     return nameid
 }
 
+func ContractIdCodec(receiverid string, event_type model.TensionEvent, old, new_ string) (string) {
+    nameid := strings.Join([]string{receiverid, string(event_type),old, new_}, "#")
+    return nameid
+}
+
+func VoteIdCodec(contractid string, nid string) (string) {
+    nameid := strings.Join([]string{contractid, nid}, "#")
+    return nameid
+}
+
 // Get the parent nameid from the given nameid (ROLE)
 // @debug nearestCircleId
 func Nid2pid(nid string) (string, error) {

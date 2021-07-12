@@ -6,6 +6,7 @@ import (
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
+    "zerogov/fractal6.go/graph/codec"
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/graph/auth"
     webauth"zerogov/fractal6.go/web/auth"
@@ -46,7 +47,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
     // Validate and process Blob Event
     var event model.EventRef
     StructMap(*input.Event, &event)
-    ok, _,  err := contractEventHook(uctx, tid, &event, nil)
+    ok, err := contractEventHook(uctx, tid, &event, nil)
     if !ok || err != nil {
         // Delete the tension just added
         e := db.GetDB().DeepDelete("contract", id)
@@ -157,16 +158,11 @@ func isContractValidator(ctx context.Context, obj interface{}, next graphql.Reso
     data := false
     d := obj.(*model.Contract)
 
-    // Exit if contract is not open
-    if d.Status != model.ContractStatusOpen {
-        return &data, err
-    }
-
     // If user has already voted
     // NOT CHECKING, user can change its vote.
 
     // Check rights
-    data, _, _, err = hasContractRight(uctx, d)
+    data, err = hasContractRight(uctx, d)
 
     return &data, err
 }
@@ -190,16 +186,18 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
         return nil, LogErr("field missing", fmt.Errorf("id field is required in vote payload"))
     }
     input := inputs[0]
-    if len(input.Data) != 1 {
-        return nil, LogErr("add vote", fmt.Errorf("One and only one vote is required."))
-    }
-    vote := input.Data[0]
-    cid := *input.Contract.ID
+    cid := *input.Contract.Contractid
     nameid := *input.Node.Nameid
+    //vote := input.Data[0]
 
     // Ensure the vote ID
-    if input.VoteID != cid + "#" + nameid {
+    if input.Voteid != cid + "#" + nameid {
         return nil, LogErr("add vote", fmt.Errorf("bad format for voteID."))
+    }
+    // Ensure that user own the vote
+    rid, _ := codec.Nid2rootid(nameid)
+    if nameid != codec.MemberIdCodec(rid, uctx.Username) {
+        return nil, LogErr("add vote", fmt.Errorf("You should own yout vote."))
     }
 
     // Try to add vote
@@ -209,18 +207,18 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     if data == nil {
         return nil, LogErr("add vote", fmt.Errorf("no vote added."))
     }
-    id := data.Vote[0].ID
 
     // Post process vote
-    ok, status, err := processVote(uctx, cid, id, vote)
+    ok, contract, err := processVote(uctx, cid)
     if !ok || err != nil {
+        id := data.Vote[0].ID
         vi := model.VoteFilter{ID:[]string{id}}
         e := db.GetDB().Delete(*uctx, "vote", vi)
         if e != nil { panic(e) }
         return nil, err
     }
 
-    data.Vote[0].Contract.Status = status
+    data.Vote[0].Contract = contract
 
     return data, err
 }

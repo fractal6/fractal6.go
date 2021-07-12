@@ -159,7 +159,7 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput) (data *model.AddContractPayload, errors error) {
+func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
@@ -351,7 +351,7 @@ func (r *queryResolver) AggregateEventFragment(ctx context.Context, filter *mode
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetContract(ctx context.Context, id string) (data *model.Contract, errors error) {
+func (r *queryResolver) GetContract(ctx context.Context, id *string, contractid *string) (data *model.Contract, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
@@ -364,7 +364,7 @@ func (r *queryResolver) AggregateContract(ctx context.Context, filter *model.Con
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetVote(ctx context.Context, id *string, voteID *string) (data *model.Vote, errors error) {
+func (r *queryResolver) GetVote(ctx context.Context, id *string, voteid *string) (data *model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

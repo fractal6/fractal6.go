@@ -44,6 +44,7 @@ type AddContractInput struct {
 	CreatedAt    string            `json:"createdAt,omitempty"`
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
+	Contractid   string            `json:"contractid,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       ContractStatus    `json:"status,omitempty"`
 	ContractType ContractType      `json:"contract_type,omitempty"`
@@ -261,7 +262,7 @@ type AddVoteInput struct {
 	CreatedAt string       `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
-	VoteID    string       `json:"voteId,omitempty"`
+	Voteid    string       `json:"voteid,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Node      *NodeRef     `json:"node,omitempty"`
 	Data      []int        `json:"data"`
@@ -419,6 +420,7 @@ type ContainsFilter struct {
 }
 
 type Contract struct {
+	Contractid            string                  `json:"contractid,omitempty"`
 	Tension               *Tension                `json:"tension,omitempty"`
 	Status                ContractStatus          `json:"status,omitempty"`
 	ContractType          ContractType            `json:"contract_type,omitempty"`
@@ -439,21 +441,24 @@ type Contract struct {
 }
 
 type ContractAggregateResult struct {
-	Count        *int    `json:"count"`
-	CreatedAtMin *string `json:"createdAtMin,omitempty"`
-	CreatedAtMax *string `json:"createdAtMax,omitempty"`
-	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
-	MessageMin   *string `json:"messageMin,omitempty"`
-	MessageMax   *string `json:"messageMax,omitempty"`
-	ClosedAtMin  *string `json:"closedAtMin,omitempty"`
-	ClosedAtMax  *string `json:"closedAtMax,omitempty"`
+	Count         *int    `json:"count"`
+	CreatedAtMin  *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax  *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin  *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax  *string `json:"updatedAtMax,omitempty"`
+	MessageMin    *string `json:"messageMin,omitempty"`
+	MessageMax    *string `json:"messageMax,omitempty"`
+	ContractidMin *string `json:"contractidMin,omitempty"`
+	ContractidMax *string `json:"contractidMax,omitempty"`
+	ClosedAtMin   *string `json:"closedAtMin,omitempty"`
+	ClosedAtMax   *string `json:"closedAtMax,omitempty"`
 }
 
 type ContractFilter struct {
 	ID           []string              `json:"id,omitempty"`
 	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message      *StringFullTextFilter `json:"message,omitempty"`
+	Contractid   *StringHashFilter     `json:"contractid,omitempty"`
 	Status       *ContractStatusHash   `json:"status,omitempty"`
 	ContractType *ContractTypeHash     `json:"contract_type,omitempty"`
 	ClosedAt     *DateTimeFilter       `json:"closedAt,omitempty"`
@@ -491,6 +496,7 @@ type ContractRef struct {
 	CreatedAt    *string           `json:"createdAt,omitempty"`
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
+	Contractid   *string           `json:"contractid,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       *ContractStatus   `json:"status,omitempty"`
 	ContractType *ContractType     `json:"contract_type,omitempty"`
@@ -1842,7 +1848,7 @@ type UserRightsRef struct {
 
 type Vote struct {
 	ID        string    `json:"id,omitempty"`
-	VoteID    string    `json:"voteId,omitempty"`
+	Voteid    string    `json:"voteid,omitempty"`
 	Contract  *Contract `json:"contract,omitempty"`
 	Node      *Node     `json:"node,omitempty"`
 	Data      []int     `json:"data"`
@@ -1860,15 +1866,15 @@ type VoteAggregateResult struct {
 	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
 	MessageMin   *string `json:"messageMin,omitempty"`
 	MessageMax   *string `json:"messageMax,omitempty"`
-	VoteIDMin    *string `json:"voteIdMin,omitempty"`
-	VoteIDMax    *string `json:"voteIdMax,omitempty"`
+	VoteidMin    *string `json:"voteidMin,omitempty"`
+	VoteidMax    *string `json:"voteidMax,omitempty"`
 }
 
 type VoteFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
 	Message   *StringFullTextFilter `json:"message,omitempty"`
-	VoteID    *StringHashFilter     `json:"voteId,omitempty"`
+	Voteid    *StringHashFilter     `json:"voteid,omitempty"`
 	Has       []*VoteHasFilter      `json:"has,omitempty"`
 	And       []*VoteFilter         `json:"and,omitempty"`
 	Or        []*VoteFilter         `json:"or,omitempty"`
@@ -1897,7 +1903,7 @@ type VoteRef struct {
 	CreatedAt *string      `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
-	VoteID    *string      `json:"voteId,omitempty"`
+	Voteid    *string      `json:"voteid,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Node      *NodeRef     `json:"node,omitempty"`
 	Data      []int        `json:"data"`
@@ -2159,6 +2165,7 @@ const (
 	ContractHasFilterCreatedAt    ContractHasFilter = "createdAt"
 	ContractHasFilterUpdatedAt    ContractHasFilter = "updatedAt"
 	ContractHasFilterMessage      ContractHasFilter = "message"
+	ContractHasFilterContractid   ContractHasFilter = "contractid"
 	ContractHasFilterTension      ContractHasFilter = "tension"
 	ContractHasFilterStatus       ContractHasFilter = "status"
 	ContractHasFilterContractType ContractHasFilter = "contract_type"
@@ -2175,6 +2182,7 @@ var AllContractHasFilter = []ContractHasFilter{
 	ContractHasFilterCreatedAt,
 	ContractHasFilterUpdatedAt,
 	ContractHasFilterMessage,
+	ContractHasFilterContractid,
 	ContractHasFilterTension,
 	ContractHasFilterStatus,
 	ContractHasFilterContractType,
@@ -2188,7 +2196,7 @@ var AllContractHasFilter = []ContractHasFilter{
 
 func (e ContractHasFilter) IsValid() bool {
 	switch e {
-	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterParticipants, ContractHasFilterComments, ContractHasFilterIsValidator:
+	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterContractid, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterParticipants, ContractHasFilterComments, ContractHasFilterIsValidator:
 		return true
 	}
 	return false
@@ -2218,22 +2226,24 @@ func (e ContractHasFilter) MarshalGQL(w io.Writer) {
 type ContractOrderable string
 
 const (
-	ContractOrderableCreatedAt ContractOrderable = "createdAt"
-	ContractOrderableUpdatedAt ContractOrderable = "updatedAt"
-	ContractOrderableMessage   ContractOrderable = "message"
-	ContractOrderableClosedAt  ContractOrderable = "closedAt"
+	ContractOrderableCreatedAt  ContractOrderable = "createdAt"
+	ContractOrderableUpdatedAt  ContractOrderable = "updatedAt"
+	ContractOrderableMessage    ContractOrderable = "message"
+	ContractOrderableContractid ContractOrderable = "contractid"
+	ContractOrderableClosedAt   ContractOrderable = "closedAt"
 )
 
 var AllContractOrderable = []ContractOrderable{
 	ContractOrderableCreatedAt,
 	ContractOrderableUpdatedAt,
 	ContractOrderableMessage,
+	ContractOrderableContractid,
 	ContractOrderableClosedAt,
 }
 
 func (e ContractOrderable) IsValid() bool {
 	switch e {
-	case ContractOrderableCreatedAt, ContractOrderableUpdatedAt, ContractOrderableMessage, ContractOrderableClosedAt:
+	case ContractOrderableCreatedAt, ContractOrderableUpdatedAt, ContractOrderableMessage, ContractOrderableContractid, ContractOrderableClosedAt:
 		return true
 	}
 	return false
@@ -2307,21 +2317,21 @@ type ContractType string
 
 const (
 	ContractTypeAnyCoordoDual   ContractType = "AnyCoordoDual"
-	ContractTypeAnyParticipants ContractType = "AnyParticipants"
+	ContractTypeAnyCandidates   ContractType = "AnyCandidates"
 	ContractTypeAnyCoordoSource ContractType = "AnyCoordoSource"
 	ContractTypeAnyCoordoTarget ContractType = "AnyCoordoTarget"
 )
 
 var AllContractType = []ContractType{
 	ContractTypeAnyCoordoDual,
-	ContractTypeAnyParticipants,
+	ContractTypeAnyCandidates,
 	ContractTypeAnyCoordoSource,
 	ContractTypeAnyCoordoTarget,
 }
 
 func (e ContractType) IsValid() bool {
 	switch e {
-	case ContractTypeAnyCoordoDual, ContractTypeAnyParticipants, ContractTypeAnyCoordoSource, ContractTypeAnyCoordoTarget:
+	case ContractTypeAnyCoordoDual, ContractTypeAnyCandidates, ContractTypeAnyCoordoSource, ContractTypeAnyCoordoTarget:
 		return true
 	}
 	return false
@@ -4077,7 +4087,7 @@ const (
 	VoteHasFilterCreatedAt VoteHasFilter = "createdAt"
 	VoteHasFilterUpdatedAt VoteHasFilter = "updatedAt"
 	VoteHasFilterMessage   VoteHasFilter = "message"
-	VoteHasFilterVoteID    VoteHasFilter = "voteId"
+	VoteHasFilterVoteid    VoteHasFilter = "voteid"
 	VoteHasFilterContract  VoteHasFilter = "contract"
 	VoteHasFilterNode      VoteHasFilter = "node"
 	VoteHasFilterData      VoteHasFilter = "data"
@@ -4088,7 +4098,7 @@ var AllVoteHasFilter = []VoteHasFilter{
 	VoteHasFilterCreatedAt,
 	VoteHasFilterUpdatedAt,
 	VoteHasFilterMessage,
-	VoteHasFilterVoteID,
+	VoteHasFilterVoteid,
 	VoteHasFilterContract,
 	VoteHasFilterNode,
 	VoteHasFilterData,
@@ -4096,7 +4106,7 @@ var AllVoteHasFilter = []VoteHasFilter{
 
 func (e VoteHasFilter) IsValid() bool {
 	switch e {
-	case VoteHasFilterCreatedBy, VoteHasFilterCreatedAt, VoteHasFilterUpdatedAt, VoteHasFilterMessage, VoteHasFilterVoteID, VoteHasFilterContract, VoteHasFilterNode, VoteHasFilterData:
+	case VoteHasFilterCreatedBy, VoteHasFilterCreatedAt, VoteHasFilterUpdatedAt, VoteHasFilterMessage, VoteHasFilterVoteid, VoteHasFilterContract, VoteHasFilterNode, VoteHasFilterData:
 		return true
 	}
 	return false
@@ -4129,19 +4139,19 @@ const (
 	VoteOrderableCreatedAt VoteOrderable = "createdAt"
 	VoteOrderableUpdatedAt VoteOrderable = "updatedAt"
 	VoteOrderableMessage   VoteOrderable = "message"
-	VoteOrderableVoteID    VoteOrderable = "voteId"
+	VoteOrderableVoteid    VoteOrderable = "voteid"
 )
 
 var AllVoteOrderable = []VoteOrderable{
 	VoteOrderableCreatedAt,
 	VoteOrderableUpdatedAt,
 	VoteOrderableMessage,
-	VoteOrderableVoteID,
+	VoteOrderableVoteid,
 }
 
 func (e VoteOrderable) IsValid() bool {
 	switch e {
-	case VoteOrderableCreatedAt, VoteOrderableUpdatedAt, VoteOrderableMessage, VoteOrderableVoteID:
+	case VoteOrderableCreatedAt, VoteOrderableUpdatedAt, VoteOrderableMessage, VoteOrderableVoteid:
 		return true
 	}
 	return false

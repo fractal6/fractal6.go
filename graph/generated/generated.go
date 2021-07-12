@@ -45,7 +45,6 @@ type DirectiveRoot struct {
 	Alter_maxLength          func(ctx context.Context, obj interface{}, next graphql.Resolver, n int) (res interface{}, err error)
 	Alter_minLength          func(ctx context.Context, obj interface{}, next graphql.Resolver, n int) (res interface{}, err error)
 	Alter_oneByOne           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Alter_setVoteId          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Alter_toLower            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Alter_unique             func(ctx context.Context, obj interface{}, next graphql.Resolver, on *string) (res interface{}, err error)
 	Auth                     func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
@@ -252,6 +251,7 @@ type ComplexityRoot struct {
 		Comments              func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		CommentsAggregate     func(childComplexity int, filter *model.CommentFilter) int
 		ContractType          func(childComplexity int) int
+		Contractid            func(childComplexity int) int
 		CreatedAt             func(childComplexity int) int
 		CreatedBy             func(childComplexity int, filter *model.UserFilter) int
 		Event                 func(childComplexity int, filter *model.EventFragmentFilter) int
@@ -266,15 +266,17 @@ type ComplexityRoot struct {
 	}
 
 	ContractAggregateResult struct {
-		ClosedAtMax  func(childComplexity int) int
-		ClosedAtMin  func(childComplexity int) int
-		Count        func(childComplexity int) int
-		CreatedAtMax func(childComplexity int) int
-		CreatedAtMin func(childComplexity int) int
-		MessageMax   func(childComplexity int) int
-		MessageMin   func(childComplexity int) int
-		UpdatedAtMax func(childComplexity int) int
-		UpdatedAtMin func(childComplexity int) int
+		ClosedAtMax   func(childComplexity int) int
+		ClosedAtMin   func(childComplexity int) int
+		ContractidMax func(childComplexity int) int
+		ContractidMin func(childComplexity int) int
+		Count         func(childComplexity int) int
+		CreatedAtMax  func(childComplexity int) int
+		CreatedAtMin  func(childComplexity int) int
+		MessageMax    func(childComplexity int) int
+		MessageMin    func(childComplexity int) int
+		UpdatedAtMax  func(childComplexity int) int
+		UpdatedAtMin  func(childComplexity int) int
 	}
 
 	DeleteBlobPayload struct {
@@ -474,7 +476,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddBlob             func(childComplexity int, input []*model.AddBlobInput) int
 		AddComment          func(childComplexity int, input []*model.AddCommentInput) int
-		AddContract         func(childComplexity int, input []*model.AddContractInput) int
+		AddContract         func(childComplexity int, input []*model.AddContractInput, upsert *bool) int
 		AddEvent            func(childComplexity int, input []*model.AddEventInput) int
 		AddEventFragment    func(childComplexity int, input []*model.AddEventFragmentInput) int
 		AddLabel            func(childComplexity int, input []*model.AddLabelInput) int
@@ -687,7 +689,7 @@ type ComplexityRoot struct {
 		AggregateVote          func(childComplexity int, filter *model.VoteFilter) int
 		GetBlob                func(childComplexity int, id string) int
 		GetComment             func(childComplexity int, id string) int
-		GetContract            func(childComplexity int, id string) int
+		GetContract            func(childComplexity int, id *string, contractid *string) int
 		GetEvent               func(childComplexity int, id string) int
 		GetLabel               func(childComplexity int, id string) int
 		GetMandate             func(childComplexity int, id string) int
@@ -697,7 +699,7 @@ type ComplexityRoot struct {
 		GetPost                func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
 		GetUser                func(childComplexity int, id *string, username *string) int
-		GetVote                func(childComplexity int, id *string, voteID *string) int
+		GetVote                func(childComplexity int, id *string, voteid *string) int
 		QueryBlob              func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
 		QueryComment           func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		QueryContract          func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
@@ -924,7 +926,7 @@ type ComplexityRoot struct {
 		Message   func(childComplexity int) int
 		Node      func(childComplexity int, filter *model.NodeFilter) int
 		UpdatedAt func(childComplexity int) int
-		VoteID    func(childComplexity int) int
+		Voteid    func(childComplexity int) int
 	}
 
 	VoteAggregateResult struct {
@@ -935,8 +937,8 @@ type ComplexityRoot struct {
 		MessageMin   func(childComplexity int) int
 		UpdatedAtMax func(childComplexity int) int
 		UpdatedAtMin func(childComplexity int) int
-		VoteIDMax    func(childComplexity int) int
-		VoteIDMin    func(childComplexity int) int
+		VoteidMax    func(childComplexity int) int
+		VoteidMin    func(childComplexity int) int
 	}
 }
 
@@ -976,7 +978,7 @@ type MutationResolver interface {
 	AddEventFragment(ctx context.Context, input []*model.AddEventFragmentInput) (*model.AddEventFragmentPayload, error)
 	UpdateEventFragment(ctx context.Context, input model.UpdateEventFragmentInput) (*model.UpdateEventFragmentPayload, error)
 	DeleteEventFragment(ctx context.Context, filter model.EventFragmentFilter) (*model.DeleteEventFragmentPayload, error)
-	AddContract(ctx context.Context, input []*model.AddContractInput) (*model.AddContractPayload, error)
+	AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (*model.AddContractPayload, error)
 	UpdateContract(ctx context.Context, input model.UpdateContractInput) (*model.UpdateContractPayload, error)
 	DeleteContract(ctx context.Context, filter model.ContractFilter) (*model.DeleteContractPayload, error)
 	AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (*model.AddVotePayload, error)
@@ -1024,10 +1026,10 @@ type QueryResolver interface {
 	AggregateEvent(ctx context.Context, filter *model.EventFilter) (*model.EventAggregateResult, error)
 	QueryEventFragment(ctx context.Context, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) ([]*model.EventFragment, error)
 	AggregateEventFragment(ctx context.Context, filter *model.EventFragmentFilter) (*model.EventFragmentAggregateResult, error)
-	GetContract(ctx context.Context, id string) (*model.Contract, error)
+	GetContract(ctx context.Context, id *string, contractid *string) (*model.Contract, error)
 	QueryContract(ctx context.Context, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) ([]*model.Contract, error)
 	AggregateContract(ctx context.Context, filter *model.ContractFilter) (*model.ContractAggregateResult, error)
-	GetVote(ctx context.Context, id *string, voteID *string) (*model.Vote, error)
+	GetVote(ctx context.Context, id *string, voteid *string) (*model.Vote, error)
 	QueryVote(ctx context.Context, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) ([]*model.Vote, error)
 	AggregateVote(ctx context.Context, filter *model.VoteFilter) (*model.VoteAggregateResult, error)
 	GetUser(ctx context.Context, id *string, username *string) (*model.User, error)
@@ -1685,6 +1687,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Contract.ContractType(childComplexity), true
 
+	case "Contract.contractid":
+		if e.complexity.Contract.Contractid == nil {
+			break
+		}
+
+		return e.complexity.Contract.Contractid(childComplexity), true
+
 	case "Contract.createdAt":
 		if e.complexity.Contract.CreatedAt == nil {
 			break
@@ -1800,6 +1809,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ContractAggregateResult.ClosedAtMin(childComplexity), true
+
+	case "ContractAggregateResult.contractidMax":
+		if e.complexity.ContractAggregateResult.ContractidMax == nil {
+			break
+		}
+
+		return e.complexity.ContractAggregateResult.ContractidMax(childComplexity), true
+
+	case "ContractAggregateResult.contractidMin":
+		if e.complexity.ContractAggregateResult.ContractidMin == nil {
+			break
+		}
+
+		return e.complexity.ContractAggregateResult.ContractidMin(childComplexity), true
 
 	case "ContractAggregateResult.count":
 		if e.complexity.ContractAggregateResult.Count == nil {
@@ -2827,7 +2850,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddContract(childComplexity, args["input"].([]*model.AddContractInput)), true
+		return e.complexity.Mutation.AddContract(childComplexity, args["input"].([]*model.AddContractInput), args["upsert"].(*bool)), true
 
 	case "Mutation.addEvent":
 		if e.complexity.Mutation.AddEvent == nil {
@@ -4464,7 +4487,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetContract(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.GetContract(childComplexity, args["id"].(*string), args["contractid"].(*string)), true
 
 	case "Query.getEvent":
 		if e.complexity.Query.GetEvent == nil {
@@ -4584,7 +4607,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetVote(childComplexity, args["id"].(*string), args["voteId"].(*string)), true
+		return e.complexity.Query.GetVote(childComplexity, args["id"].(*string), args["voteid"].(*string)), true
 
 	case "Query.queryBlob":
 		if e.complexity.Query.QueryBlob == nil {
@@ -5990,12 +6013,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vote.UpdatedAt(childComplexity), true
 
-	case "Vote.voteId":
-		if e.complexity.Vote.VoteID == nil {
+	case "Vote.voteid":
+		if e.complexity.Vote.Voteid == nil {
 			break
 		}
 
-		return e.complexity.Vote.VoteID(childComplexity), true
+		return e.complexity.Vote.Voteid(childComplexity), true
 
 	case "VoteAggregateResult.count":
 		if e.complexity.VoteAggregateResult.Count == nil {
@@ -6046,19 +6069,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.VoteAggregateResult.UpdatedAtMin(childComplexity), true
 
-	case "VoteAggregateResult.voteIdMax":
-		if e.complexity.VoteAggregateResult.VoteIDMax == nil {
+	case "VoteAggregateResult.voteidMax":
+		if e.complexity.VoteAggregateResult.VoteidMax == nil {
 			break
 		}
 
-		return e.complexity.VoteAggregateResult.VoteIDMax(childComplexity), true
+		return e.complexity.VoteAggregateResult.VoteidMax(childComplexity), true
 
-	case "VoteAggregateResult.voteIdMin":
-		if e.complexity.VoteAggregateResult.VoteIDMin == nil {
+	case "VoteAggregateResult.voteidMin":
+		if e.complexity.VoteAggregateResult.VoteidMin == nil {
 			break
 		}
 
-		return e.complexity.VoteAggregateResult.VoteIDMin(childComplexity), true
+		return e.complexity.VoteAggregateResult.VoteidMin(childComplexity), true
 
 	}
 	return 0, false
@@ -6146,8 +6169,6 @@ directive @alter_maxLength(n: Int!) on INPUT_FIELD_DEFINITION
 directive @alter_oneByOne on INPUT_FIELD_DEFINITION
 
 directive @alter_unique(on: String) on INPUT_FIELD_DEFINITION
-
-directive @alter_setVoteId on INPUT_FIELD_DEFINITION
 
 directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
 
@@ -6412,7 +6433,7 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
-        queryLabel {
+        queryLabel { 
           nodes(filter: {isPrivate: false}) { id }
         }
     }"""
@@ -6495,13 +6516,14 @@ type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
     }"""
 }]
 }) {
+  contractid: String! @id
   tension(filter: TensionFilter): Tension!
   status: ContractStatus! @search
   contract_type: ContractType! @search
   closedAt: DateTime @search
   event(filter: EventFragmentFilter): EventFragment!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
-  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: contract)
+  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]! @hasInverse(field: contract)
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
 
@@ -6524,10 +6546,10 @@ type Vote @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }]
 }) {
   id: ID!
-  voteId: String! @id
+  voteid: String! @id
   contract(filter: ContractFilter): Contract!
   node(filter: NodeFilter): Node!
-  data: [Int!]
+  data: [Int!]!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime! @search
   updatedAt: DateTime
@@ -6677,7 +6699,7 @@ enum ContractType {
 
   AnyCoordoDual
 
-  AnyParticipants
+  AnyCandidates
 
 
   AnyCoordoSource
@@ -6692,35 +6714,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6758,13 +6780,14 @@ input AddContractInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
+  contractid: String!
   tension: TensionRef!
   status: ContractStatus!
   contract_type: ContractType!
   closedAt: DateTime
   event: EventFragmentRef!
   candidates: [UserRef!]
-  participants: [VoteRef!]
+  participants: [VoteRef!]!
   comments: [CommentRef!]
   isValidator: Boolean
 }
@@ -6975,10 +6998,10 @@ input AddVoteInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
-  voteId: String!
+  voteid: String!
   contract: ContractRef!
   node: NodeRef!
-  data: [Int!]
+  data: [Int!]!
 }
 
 type AddVotePayload {
@@ -7155,6 +7178,8 @@ type ContractAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
+  contractidMin: String
+  contractidMax: String
   closedAtMin: DateTime
   closedAtMax: DateTime
 }
@@ -7163,6 +7188,7 @@ input ContractFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
+  contractid: StringHashFilter
   status: ContractStatus_hash
   contract_type: ContractType_hash
   closedAt: DateTimeFilter
@@ -7177,6 +7203,7 @@ enum ContractHasFilter {
   createdAt
   updatedAt
   message
+  contractid
   tension
   status
   contract_type
@@ -7198,6 +7225,7 @@ enum ContractOrderable {
   createdAt
   updatedAt
   message
+  contractid
   closedAt
 }
 
@@ -7223,6 +7251,7 @@ input ContractRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
+  contractid: String
   tension: TensionRef
   status: ContractStatus
   contract_type: ContractType
@@ -7762,10 +7791,10 @@ type Mutation {
   addEventFragment(input: [AddEventFragmentInput!]!): AddEventFragmentPayload
   updateEventFragment(input: UpdateEventFragmentInput!): UpdateEventFragmentPayload
   deleteEventFragment(filter: EventFragmentFilter!): DeleteEventFragmentPayload
-  addContract(input: [AddContractInput!]! @hook_addContractInput): AddContractPayload @hook_addContract
+  addContract(input: [AddContractInput!]!, upsert: Boolean @hook_addContractInput): AddContractPayload @hook_addContract
   updateContract(input: UpdateContractInput! @hook_updateContractInput): UpdateContractPayload @hook_updateContract
   deleteContract(filter: ContractFilter! @hook_deleteContractInput): DeleteContractPayload @hook_deleteContract
-  addVote(input: [AddVoteInput!]!@hook_addVoteInput, upsert: Boolean ) : AddVotePayload @hook_addVote
+  addVote(input: [AddVoteInput!]!, upsert: Boolean @hook_addVoteInput): AddVotePayload @hook_addVote
   updateVote(input: UpdateVoteInput! @hook_updateVoteInput): UpdateVotePayload @hook_updateVote
   deleteVote(filter: VoteFilter! @hook_deleteVoteInput): DeleteVotePayload @hook_deleteVote
   addUser(input: [AddUserInput!]!, upsert: Boolean): AddUserPayload
@@ -8220,10 +8249,10 @@ type Query {
   aggregateEvent(filter: EventFilter): EventAggregateResult
   queryEventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   aggregateEventFragment(filter: EventFragmentFilter): EventFragmentAggregateResult
-  getContract(id: ID! @hook_getContractInput): Contract
+  getContract(id: ID, contractid: String @hook_getContractInput): Contract
   queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContractInput): [Contract]
   aggregateContract(filter: ContractFilter): ContractAggregateResult
-  getVote(id: ID, voteId: String @hook_getVoteInput): Vote
+  getVote(id: ID, voteid: String @hook_getVoteInput): Vote
   queryVote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int @hook_queryVoteInput): [Vote]
   aggregateVote(filter: VoteFilter): VoteAggregateResult
   getUser(id: ID, username: String): User
@@ -8770,15 +8799,15 @@ type VoteAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
-  voteIdMin: String
-  voteIdMax: String
+  voteidMin: String
+  voteidMax: String
 }
 
 input VoteFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  voteId: StringHashFilter
+  voteid: StringHashFilter
   has: [VoteHasFilter]
   and: [VoteFilter]
   or: [VoteFilter]
@@ -8790,7 +8819,7 @@ enum VoteHasFilter {
   createdAt
   updatedAt
   message
-  voteId
+  voteid
   contract
   node
   data
@@ -8806,7 +8835,7 @@ enum VoteOrderable {
   createdAt
   updatedAt
   message
-  voteId
+  voteid
 }
 
 input VotePatch {
@@ -8825,7 +8854,7 @@ input VoteRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  voteId: String
+  voteid: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]
@@ -10977,9 +11006,16 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 	var arg0 []*model.AddContractInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		directive0 := func(ctx context.Context) (interface{}, error) {
-			return ec.unmarshalNAddContractInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddContractInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_addContractInput == nil {
 				return nil, errors.New("directive hook_addContractInput is not implemented")
@@ -10991,15 +11027,15 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
-		if data, ok := tmp.([]*model.AddContractInput); ok {
-			arg0 = data
+		if data, ok := tmp.(*bool); ok {
+			arg1 = data
 		} else if tmp == nil {
-			arg0 = nil
+			arg1 = nil
 		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddContractInput`, tmp))
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp))
 		}
 	}
-	args["input"] = arg0
+	args["upsert"] = arg1
 	return args, nil
 }
 
@@ -11241,9 +11277,16 @@ func (ec *executionContext) field_Mutation_addVote_args(ctx context.Context, raw
 	var arg0 []*model.AddVoteInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		directive0 := func(ctx context.Context) (interface{}, error) {
-			return ec.unmarshalNAddVoteInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddVoteInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddVoteInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddVoteInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_addVoteInput == nil {
 				return nil, errors.New("directive hook_addVoteInput is not implemented")
@@ -11255,21 +11298,12 @@ func (ec *executionContext) field_Mutation_addVote_args(ctx context.Context, raw
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
-		if data, ok := tmp.([]*model.AddVoteInput); ok {
-			arg0 = data
+		if data, ok := tmp.(*bool); ok {
+			arg1 = data
 		} else if tmp == nil {
-			arg0 = nil
+			arg1 = nil
 		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddVoteInput`, tmp))
-		}
-	}
-	args["input"] = arg0
-	var arg1 *bool
-	if tmp, ok := rawArgs["upsert"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
-		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp))
 		}
 	}
 	args["upsert"] = arg1
@@ -12801,10 +12835,19 @@ func (ec *executionContext) field_Query_getComment_args(ctx context.Context, raw
 func (ec *executionContext) field_Query_getContract_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["contractid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_getContractInput == nil {
 				return nil, errors.New("directive hook_getContractInput is not implemented")
@@ -12816,13 +12859,15 @@ func (ec *executionContext) field_Query_getContract_args(ctx context.Context, ra
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
-		if data, ok := tmp.(string); ok {
-			arg0 = data
+		if data, ok := tmp.(*string); ok {
+			arg1 = data
+		} else if tmp == nil {
+			arg1 = nil
 		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp))
 		}
 	}
-	args["id"] = arg0
+	args["contractid"] = arg1
 	return args, nil
 }
 
@@ -13033,8 +13078,8 @@ func (ec *executionContext) field_Query_getVote_args(ctx context.Context, rawArg
 	}
 	args["id"] = arg0
 	var arg1 *string
-	if tmp, ok := rawArgs["voteId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteId"))
+	if tmp, ok := rawArgs["voteid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
 		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_getVoteInput == nil {
@@ -13055,7 +13100,7 @@ func (ec *executionContext) field_Query_getVote_args(ctx context.Context, rawArg
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp))
 		}
 	}
-	args["voteId"] = arg1
+	args["voteid"] = arg1
 	return args, nil
 }
 
@@ -15708,7 +15753,7 @@ func (ec *executionContext) _AddLabelPayload_label(ctx context.Context, field gr
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -17762,6 +17807,58 @@ func (ec *executionContext) _CommentAggregateResult__VOIDMax(ctx context.Context
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Contract_contractid(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Contractid, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Id == nil {
+				return nil, errors.New("directive id is not implemented")
+			}
+			return ec.directives.Id(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Contract_tension(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18144,11 +18241,14 @@ func (ec *executionContext) _Contract_participants(ctx context.Context, field gr
 	})
 
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.Vote)
 	fc.Result = res
-	return ec.marshalOVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
+	return ec.marshalNVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_comments(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -18776,6 +18876,64 @@ func (ec *executionContext) _ContractAggregateResult_messageMax(ctx context.Cont
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ContractAggregateResult_contractidMin(ctx context.Context, field graphql.CollectedField, obj *model.ContractAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ContractAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractidMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ContractAggregateResult_contractidMax(ctx context.Context, field graphql.CollectedField, obj *model.ContractAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ContractAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractidMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ContractAggregateResult_closedAtMin(ctx context.Context, field graphql.CollectedField, obj *model.ContractAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -19381,7 +19539,7 @@ func (ec *executionContext) _DeleteLabelPayload_label(ctx context.Context, field
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -24429,7 +24587,7 @@ func (ec *executionContext) _Mutation_addContract(ctx context.Context, field gra
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().AddContract(rctx, args["input"].([]*model.AddContractInput))
+			return ec.resolvers.Mutation().AddContract(rctx, args["input"].([]*model.AddContractInput), args["upsert"].(*bool))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_addContract == nil {
@@ -26077,7 +26235,7 @@ func (ec *executionContext) _Node_labels(ctx context.Context, field graphql.Coll
 			return obj.Labels, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29802,7 +29960,7 @@ func (ec *executionContext) _Query_getLabel(ctx context.Context, field graphql.C
 			return ec.resolvers.Query().GetLabel(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29862,7 +30020,7 @@ func (ec *executionContext) _Query_queryLabel(ctx context.Context, field graphql
 			return ec.resolvers.Query().QueryLabel(rctx, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30399,7 +30557,7 @@ func (ec *executionContext) _Query_getContract(ctx context.Context, field graphq
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetContract(rctx, args["id"].(string))
+			return ec.resolvers.Query().GetContract(rctx, args["id"].(*string), args["contractid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
@@ -30555,7 +30713,7 @@ func (ec *executionContext) _Query_getVote(ctx context.Context, field graphql.Co
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetVote(rctx, args["id"].(*string), args["voteId"].(*string))
+			return ec.resolvers.Query().GetVote(rctx, args["id"].(*string), args["voteid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			add, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n      queryVote {\n        node { first_link(filter: {username: {eq: $USERNAME}}) { username } }\n      }\n    }"}}})
@@ -31442,7 +31600,7 @@ func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.C
 			return obj.Labels, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -33303,7 +33461,7 @@ func (ec *executionContext) _UpdateLabelPayload_label(ctx context.Context, field
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel {\n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35996,7 +36154,7 @@ func (ec *executionContext) _Vote_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Vote_voteId(ctx context.Context, field graphql.CollectedField, obj *model.Vote) (ret graphql.Marshaler) {
+func (ec *executionContext) _Vote_voteid(ctx context.Context, field graphql.CollectedField, obj *model.Vote) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -36015,7 +36173,7 @@ func (ec *executionContext) _Vote_voteId(ctx context.Context, field graphql.Coll
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return obj.VoteID, nil
+			return obj.Voteid, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Id == nil {
@@ -36196,11 +36354,14 @@ func (ec *executionContext) _Vote_data(ctx context.Context, field graphql.Collec
 	})
 
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.([]int)
 	fc.Result = res
-	return ec.marshalOInt2ᚕintᚄ(ctx, field.Selections, res)
+	return ec.marshalNInt2ᚕintᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Vote_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Vote) (ret graphql.Marshaler) {
@@ -36579,7 +36740,7 @@ func (ec *executionContext) _VoteAggregateResult_messageMax(ctx context.Context,
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _VoteAggregateResult_voteIdMin(ctx context.Context, field graphql.CollectedField, obj *model.VoteAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _VoteAggregateResult_voteidMin(ctx context.Context, field graphql.CollectedField, obj *model.VoteAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -36597,7 +36758,7 @@ func (ec *executionContext) _VoteAggregateResult_voteIdMin(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.VoteIDMin, nil
+		return obj.VoteidMin, nil
 	})
 
 	if resTmp == nil {
@@ -36608,7 +36769,7 @@ func (ec *executionContext) _VoteAggregateResult_voteIdMin(ctx context.Context, 
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _VoteAggregateResult_voteIdMax(ctx context.Context, field graphql.CollectedField, obj *model.VoteAggregateResult) (ret graphql.Marshaler) {
+func (ec *executionContext) _VoteAggregateResult_voteidMax(ctx context.Context, field graphql.CollectedField, obj *model.VoteAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -36626,7 +36787,7 @@ func (ec *executionContext) _VoteAggregateResult_voteIdMax(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.VoteIDMax, nil
+		return obj.VoteidMax, nil
 	})
 
 	if resTmp == nil {
@@ -37842,6 +38003,14 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "contractid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
+			it.Contractid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "tension":
 			var err error
 
@@ -37894,7 +38063,7 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			it.Participants, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			it.Participants, err = ec.unmarshalNVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -39364,11 +39533,11 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "voteId":
+		case "voteid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteId"))
-			it.VoteID, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
+			it.Voteid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -39392,7 +39561,7 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-			it.Data, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			it.Data, err = ec.unmarshalNInt2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -40152,6 +40321,14 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "contractid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
+			it.Contractid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "status":
 			var err error
 
@@ -40533,6 +40710,14 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contractid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
+			it.Contractid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -46894,11 +47079,11 @@ func (ec *executionContext) unmarshalInputVoteFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "voteId":
+		case "voteid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteId"))
-			it.VoteID, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
+			it.Voteid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47090,11 +47275,11 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "voteId":
+		case "voteid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteId"))
-			it.VoteID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
+			it.Voteid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47748,6 +47933,11 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Contract")
+		case "contractid":
+			out.Values[i] = ec._Contract_contractid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "tension":
 			out.Values[i] = ec._Contract_tension(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -47774,6 +47964,9 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Contract_candidates(ctx, field, obj)
 		case "participants":
 			out.Values[i] = ec._Contract_participants(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "comments":
 			out.Values[i] = ec._Contract_comments(ctx, field, obj)
 		case "isValidator":
@@ -47839,6 +48032,10 @@ func (ec *executionContext) _ContractAggregateResult(ctx context.Context, sel as
 			out.Values[i] = ec._ContractAggregateResult_messageMin(ctx, field, obj)
 		case "messageMax":
 			out.Values[i] = ec._ContractAggregateResult_messageMax(ctx, field, obj)
+		case "contractidMin":
+			out.Values[i] = ec._ContractAggregateResult_contractidMin(ctx, field, obj)
+		case "contractidMax":
+			out.Values[i] = ec._ContractAggregateResult_contractidMax(ctx, field, obj)
 		case "closedAtMin":
 			out.Values[i] = ec._ContractAggregateResult_closedAtMin(ctx, field, obj)
 		case "closedAtMax":
@@ -50729,8 +50926,8 @@ func (ec *executionContext) _Vote(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "voteId":
-			out.Values[i] = ec._Vote_voteId(ctx, field, obj)
+		case "voteid":
+			out.Values[i] = ec._Vote_voteid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -50746,6 +50943,9 @@ func (ec *executionContext) _Vote(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "data":
 			out.Values[i] = ec._Vote_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdBy":
 			out.Values[i] = ec._Vote_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -50796,10 +50996,10 @@ func (ec *executionContext) _VoteAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._VoteAggregateResult_messageMin(ctx, field, obj)
 		case "messageMax":
 			out.Values[i] = ec._VoteAggregateResult_messageMax(ctx, field, obj)
-		case "voteIdMin":
-			out.Values[i] = ec._VoteAggregateResult_voteIdMin(ctx, field, obj)
-		case "voteIdMax":
-			out.Values[i] = ec._VoteAggregateResult_voteIdMax(ctx, field, obj)
+		case "voteidMin":
+			out.Values[i] = ec._VoteAggregateResult_voteidMin(ctx, field, obj)
+		case "voteidMax":
+			out.Values[i] = ec._VoteAggregateResult_voteidMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -51754,6 +51954,36 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNInt642string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -52348,6 +52578,43 @@ func (ec *executionContext) marshalNUserType2zerogovᚋfractal6ᚗgoᚋgraphᚋm
 	return v
 }
 
+func (ec *executionContext) marshalNVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Vote) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVote2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVote(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNVote2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVote(ctx context.Context, sel ast.SelectionSet, v *model.Vote) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -52366,6 +52633,27 @@ func (ec *executionContext) unmarshalNVoteFilter2zerogovᚋfractal6ᚗgoᚋgraph
 func (ec *executionContext) unmarshalNVoteFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx context.Context, v interface{}) (*model.VoteFilter, error) {
 	res, err := ec.unmarshalInputVoteFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx context.Context, v interface{}) ([]*model.VoteRef, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.VoteRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNVoteRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalNVoteRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRef(ctx context.Context, v interface{}) (*model.VoteRef, error) {

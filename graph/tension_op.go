@@ -68,7 +68,8 @@ func init() {
         },
         model.TensionEventUserJoined: EventMap{
             // @FIXFEAT: Either Check Receiver.NodeCharac or contract value to check that user has been invited !
-            Auth: PassingHook,
+            Validation: model.ContractTypeAnyCandidates,
+            Auth: TargetCoordoHook | CandidateHook,
             Action: UserJoin,
         },
         model.TensionEventMoved: EventMap{
@@ -85,7 +86,6 @@ func init() {
 func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
-    var trace bool
     var tension *model.Tension
     var contract *model.Contract
     if events == nil {
@@ -93,58 +93,73 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     }
 
     for _, event := range(events) {
-        if tension == nil {
+        if tension == nil { // don't fetch if there is no events (Comment updated...)
             // Fetch Tension, target Node and blob charac (last if bid undefined)
             tension, err = db.GetDB().GetTensionHook(tid, true, bid)
             if err != nil { return false, nil, LogErr("Access denied", err) }
         }
 
         // Process event
-        ok, contract, err = processEvent(uctx, &EMAP, tension, event, true, true, true)
+        ok, contract, err = processEvent(uctx, tension, event, nil, true, true, true)
         if !ok || err != nil { break }
-        if ok && err == nil { trace = true }
 
     }
 
-    if ok && trace { leaveTrace(tension) }
     return ok, contract, err
 }
 
-func processEvent(uctx *model.UserCtx, mp *EventsMap, tension *model.Tension, event *model.EventRef, doCheck, doProcess, doNotify bool) (bool, *model.Contract, error) {
+func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract, doCheck, doProcess, doNotify bool) (bool, *model.Contract, error) {
     var ok bool
     var err error
-    var contract *model.Contract
 
     if tension == nil {
         return ok, contract, LogErr("Access denied", fmt.Errorf("tension not found."))
     }
 
-    var m EventsMap
-    if m == nil {
-        m = EMAP
-    } else {
-        m = *mp
-    }
-
-    em, hasEvent := m[*event.EventType]
+    em, hasEvent := EMAP[*event.EventType]
     if !hasEvent { // Minimum level of authorization
         return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
     }
 
+    // Check Authorization (optionally generate a contract)
     if doCheck {
-        // Check Authorization (optionally generate a contract)
-        ok, contract, err = em.Check(uctx, tension, event)
+        ok, contract, err = em.Check(uctx, tension, event, contract)
         if !ok || err != nil { return ok, contract, err }
     }
 
-    if doProcess && em.Action != nil {
-        // Trigger Action
+    act := contract == nil || contract.Status == model.ContractStatusClosed
+
+    // Trigger Action
+    if act && doProcess && em.Action != nil {
         ok, err = em.Action(uctx, tension, event)
         if !ok || err != nil { return ok, contract, err }
+        // leave trace
+        leaveTrace(tension)
+    }
+
+    // Set contract status if any
+    if contract != nil {
+        err = db.GetDB().SetFieldById(contract.ID, "Contract.status", string(contract.Status))
+        if err != nil { return false, contract, err }
+
+        // Assumes contract is either closed or cancelled.
+        err = db.GetDB().SetFieldById(contract.ID, "Contract.contractid", contract.ID)
+        if err != nil { return false, contract, err }
     }
 
     // Notify users
-    // push notification (somewhere ?!)
+    if doNotify {
+        // push notification (somewhere ?!)
+        //if act {
+            // * participants
+            // * candidates
+            // * assigness
+            // * coordo
+            // * suscriber
+        //} else {
+            //notify only the participants and candidates
+            // inform what has beend voted...
+    }
 
     return ok, contract, err
 }
@@ -358,9 +373,12 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 
 
 func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+    if event.Old == nil || event.New == nil { return false, fmt.Errorf("old and new event data must be defined.") }
+    if *event.Old != tension.Receiver.Nameid {
+        return false, fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid)
+    }
+
     var err error
-    if event.Old == nil { return false, fmt.Errorf("event.old must be defined.") }
-    if event.New == nil { return false, fmt.Errorf("event.new must be defined.") }
     receiverid_old := *event.Old // == tension.Receiverid
     receiverid_new := *event.New
 
