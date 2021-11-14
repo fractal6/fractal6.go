@@ -1,16 +1,17 @@
 package db
 
 import (
-    "fmt"
-    "strings"
-    "context"
-    "reflect"
-    "encoding/json"
-    "github.com/mitchellh/mapstructure"
-    "github.com/dgraph-io/dgo/v200/protos/api"
+	"context"
+	"encoding/json"
+	"fmt"
+	"reflect"
+	"strings"
 
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/tools"
+	"github.com/dgraph-io/dgo/v200/protos/api"
+	"github.com/mitchellh/mapstructure"
+
+	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/tools"
 )
 
 
@@ -336,6 +337,27 @@ var dqlQueries map[string]string = map[string]string{
             n_comments: count(Tension.comments)
         }
     }`,
+    "getTensionCount": `{
+        var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
+            tensions_in as Node.tensions_in {{.tensionFilter}} @cascade {
+                uid
+                {{.authorsFilter}}
+                {{.labelsFilter}}
+            }
+            tensions_out as Node.tensions_out {{.tensionFilter}} @cascade {
+                uid
+                {{.authorsFilter}}
+                {{.labelsFilter}}
+            }
+        }
+
+        all(func: uid(tensions_in, tensions_out)) @filter(eq(Tension.status, "Open")) {
+            count: count(uid)
+        }
+        all2(func: uid(tensions_in, tensions_out)) @filter(eq(Tension.status, "Closed")) {
+            count: count(uid)
+        }
+    }`,
     "getCoordos": `{
         all(func: eq(Node.nameid, "{{.nameid}}")) {
             Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
@@ -535,7 +557,9 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    if len(r.All) !=1 {
+    if len(r.All) == 0 {
+        return nil, err
+    } else if len(r.All) > 1 {
         return nil, fmt.Errorf("Only one resuts allowed for DQL query: %s %s", fieldName, objid)
     }
     x := r.All[0][fieldName]
@@ -1053,6 +1077,26 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
     if err != nil { return nil, err }
     err = decoder.Decode(r.All)
     return data, err
+}
+
+func (dg Dgraph) GetTensionsCount(q TensionQuery) (map[string]int, error) {
+    // Format Query
+    maps, err := FormatTensionIntExtMap(q)
+    if err != nil { return nil, err }
+    // Send request
+    res, err := dg.QueryDql("getTensionCount", *maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlRespCount
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    if len(r.All) > 0 && len(r.All2) > 0 {
+        v := map[string]int{"open":r.All[0]["count"], "closed":r.All2[0]["count"]}
+        return v, err
+    }
+    return nil, err
 }
 
 func (dg Dgraph) GetLastBlobId(tid string) (*string) {

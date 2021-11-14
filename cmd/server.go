@@ -111,6 +111,7 @@ func RunServer() {
             r.Post("/tensions_int", handle6.TensionsInt)
             r.Post("/tensions_ext", handle6.TensionsExt)
             r.Post("/tensions_all", handle6.TensionsAll)
+            r.Post("/tensions_count", handle6.TensionsCount)
         })
     })
 

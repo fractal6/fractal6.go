@@ -186,3 +186,31 @@ func TensionsAll(w http.ResponseWriter, r *http.Request) {
     }
     w.Write(jsonData)
 }
+
+func TensionsCount(w http.ResponseWriter, r *http.Request) {
+	var q db.TensionQuery
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get sub labels
+    DB := db.GetDB()
+    data, err := DB.GetTensionsCount(q)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}

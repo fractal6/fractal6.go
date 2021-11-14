@@ -52,6 +52,7 @@ type DqlResp struct {
 
 type DqlRespCount struct {
     All []map[string]int `json:"all"`
+    All2 []map[string]int `json:"all2"`
 }
 
 //
