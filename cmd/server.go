@@ -95,6 +95,8 @@ func RunServer() {
             r.Post("/signup", handle6.Signup)
             r.Post("/login", handle6.Login)
             r.Post("/tokenack", handle6.TokenAck)
+            r.Post("/resetpasswordchallenge", handle6.ResetPasswordChallenge)
+            r.Post("/resetpassword", handle6.ResetPassword)
 
             // Organisation
             r.Post("/createorga", handle6.CreateOrga)

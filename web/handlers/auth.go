@@ -1,16 +1,26 @@
 package handlers
 
 import (
-    //"fmt"
+    "fmt"
     "strings"
+    "time"
     "net/http"
     "encoding/json"
+    "github.com/steambap/captcha"
+
 
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/web/auth"
+    "zerogov/fractal6.go/web/sessions"
     "zerogov/fractal6.go/graph/model"
     . "zerogov/fractal6.go/tools"
 )
+
+var cache sessions.Session
+
+func init() {
+    cache = sessions.GetCache()
+}
 
 
 // Signup register a new user and gives it a token.
@@ -181,4 +191,70 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 //func Logout(w http.ResponseWriter, r *http.Request) {
 //    // The client deletes the cookies or session.
 //}
+
+
+func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
+    var token string
+
+    // Get the visitor unique token or create a new one.
+    c, err := r.Cookie("challenge_token")
+    if err == http.ErrNoCookie {
+        // generate a token
+        token = sessions.GenerateToken()
+        fmt.Println("new cookie")
+    } else if err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    } else {
+        token = c.Value
+        fmt.Println("old cookie")
+    }
+    fmt.Println(token, "|", err)
+
+    // create a captcha of 150x50px
+    data, _ := captcha.NewMathExpr(150, 50)
+
+    // Save the token and challenge result in cache
+    // with timeout to clear it.
+    _, err = cache.Do("SETEX", token, "300", data.Text)
+
+	// Set the new token as the users `session_token` cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "challenge_token",
+		Value:   token,
+        HttpOnly: true,
+        Secure: true,
+		Expires: time.Now().Add(300 * time.Second),
+	})
+
+    //data, err := json.Marshal(challenge)
+    //if err != nil {
+    //    http.Error(w, err.Error(), 500)
+	//	return
+    //}
+
+    //w.Write(data)
+    data.writeImage(w)
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var creds model.UserCreds
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Email is required
+    if creds.Email == "" {
+        http.Error(w, "An email is required", 400)
+		return
+    }
+
+    //
+
+}
 

@@ -8,6 +8,8 @@ require (
 	github.com/dgraph-io/dgo/v200 v200.0.0-20200502013902-3336867fe8a1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
+	github.com/gofrs/uuid v4.1.0+incompatible
+	github.com/gomodule/redigo v1.8.5
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/pkg/errors v0.9.1 // indirect
@@ -15,6 +17,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
+	github.com/steambap/captcha v1.4.1
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
