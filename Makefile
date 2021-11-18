@@ -17,6 +17,11 @@ default: build gen
 #
 
 run:
+	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
+	# * JWT_SECRET
+	# * DGRAPH_SECRET
+	# * EMAIL_API_KEY
+	# * EMAIL_API_URL
 	go run main.go run
 
 build:

@@ -2,6 +2,7 @@ package auth
 
 import (
     "fmt"
+    "os"
     "time"
     "errors"
     "context"
@@ -19,9 +20,11 @@ import (
 
 var tkMaster *Jwt
 var buildMode string
+var jwtSecret string
 
 func init () {
-    tkMaster = Jwt{}.New()
+    // Get Jwt private key
+    jwtSecret = os.Getenv("JWT_SECRET")
 
     // Get env mode
     if buildMode == "" {
@@ -29,6 +32,9 @@ func init () {
     } else {
         buildMode = "PROD"
     }
+
+    // Init token master
+    tkMaster = Jwt{}.New()
 }
 
 type Jwt struct {
@@ -41,12 +47,10 @@ type Jwt struct {
 
 // New create a token auth master
 func (Jwt) New() *Jwt {
-    // @DEBUG / secret !
-    secret := "frctl6"
 	tk := &Jwt{
         tokenClaim: "user_ctx",
         tokenClaimErr: "user_ctx_err",
-		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
+		tokenAuth: jwtauth.New("HS256", []byte(jwtSecret), nil),
 	}
     uctx := db.DB.GetRootUctx()
     apiToken, _ := tk.issue(uctx, time.Hour*1)

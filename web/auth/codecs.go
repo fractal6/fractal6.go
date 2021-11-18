@@ -117,8 +117,8 @@ func ValidateEmail(e string) error {
             if i == len(ns)-1 && !strings.Contains(n, ".")  {
                 return ErrBadEmailFormat
             }
-            err := ValidateUsername(n)
-            if err != nil {
+            err := ValidateName(n)
+            if err != nil || hasReservedURI(n) {
                 return ErrBadEmailFormat
             }
         }

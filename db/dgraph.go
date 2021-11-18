@@ -3,6 +3,7 @@ package db
 import (
     "fmt"
     "log"
+    "os"
     "time"
     "bytes"
     "strings"
@@ -24,6 +25,8 @@ import (
     "zerogov/fractal6.go/web/middleware/jwtauth"
     jwt "github.com/dgrijalva/jwt-go"
 )
+
+var dgraphSecret string
 
 // Draph database clients
 type Dgraph struct {
@@ -103,6 +106,9 @@ func (q QueryString) Format(maps map[string]string) string {
 var DB *Dgraph
 
 func init () {
+    // Get Jwt private key
+    dgraphSecret = os.Getenv("DGRAPH_SECRET")
+
     DB = initDB()
 }
 
@@ -277,6 +283,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
 
     // Create token
     tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
+    //tkm := jwtauth.New("HS256", []byte(dgraphSecret), []byte("checkJwkToken_or_pubkey"))
     _, token, err := tkm.Encode(claims)
     if err != nil { panic("Dgraph JWT error: " + err.Error()) }
     return token

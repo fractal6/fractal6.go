@@ -12,6 +12,7 @@ import (
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/web/sessions"
+    "zerogov/fractal6.go/web/email"
     "zerogov/fractal6.go/graph/model"
     . "zerogov/fractal6.go/tools"
 )
@@ -201,22 +202,26 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
     if err == http.ErrNoCookie {
         // generate a token
         token = sessions.GenerateToken()
-        fmt.Println("new cookie")
     } else if err != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     } else {
         token = c.Value
-        fmt.Println("old cookie")
     }
-    fmt.Println(token, "|", err)
 
     // create a captcha of 150x50px
-    data, _ := captcha.NewMathExpr(150, 50)
+    data, _ := captcha.New(150, 50, func(options *captcha.Options) {
+		options.CharPreset = "abcdefghkmnpqrstuvwxyz0123456789"
+	})
+    //data, _ := captcha.NewMathExpr(150, 50)
 
     // Save the token and challenge result in cache
     // with timeout to clear it.
     _, err = cache.Do("SETEX", token, "300", data.Text)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
 
 	// Set the new token as the users `session_token` cookie
 	http.SetCookie(w, &http.Cookie{
@@ -227,21 +232,17 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(300 * time.Second),
 	})
 
-    //data, err := json.Marshal(challenge)
-    //if err != nil {
-    //    http.Error(w, err.Error(), 500)
-	//	return
-    //}
-
-    //w.Write(data)
-    data.writeImage(w)
+    data.WriteImage(w)
 }
 
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
-	var creds model.UserCreds
+    var data  struct {
+        Email string
+        Challenge string
+    }
 
 	// Get the JSON body and decode into UserCreds
-	err := json.NewDecoder(r.Body).Decode(&creds)
+	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		// Body structure error
         http.Error(w, err.Error(), 400)
@@ -249,12 +250,58 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Email is required
-    if creds.Email == "" {
+    if data.Email == "" {
         http.Error(w, "An email is required", 400)
 		return
     }
 
-    //
+    // Check email format
+    err = auth.ValidateEmail(data.Email)
+    if err != nil {
+        http.Error(w, err.Error(), 400)
+		return
+    }
 
+    // Try to Extract session token
+    c, err := r.Cookie("challenge_token")
+    if err != nil || c.Value == "" {
+        http.Error(w, "Unauthorized, please try again later", 400)
+		return
+    }
+    token := c.Value
+
+    // Get the challenge from cache
+    //expected, err := redis.String(cache.Do("GET", token))
+    expected, err := cache.Do("GET", token)
+    if fmt.Sprintf("%s", expected) != data.Challenge {
+        w.Write([]byte("false"))
+        return
+    }
+
+    // Return true after here in any case, to prevent
+    // the email database to be probe.
+    ex, _ := db.GetDB().Exists("User.email", data.Email, nil, nil)
+    if ex {
+        // Actual send the reset email
+        //
+        // Set the cache with a token to identify the user
+        token_url_redirect := sessions.GenerateToken()
+        _, err = cache.Do("SETEX", token_url_redirect, "3800", data.Email)
+        if err != nil {
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        err = email.SendResetEmail(data.Email, token_url_redirect)
+        if err != nil { panic(err) }
+    }
+
+    // Invalidate the challenge token if passed
+    _, err = cache.Do("DEL", token)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+    w.Write([]byte("true"))
 }
 
