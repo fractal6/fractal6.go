@@ -147,6 +147,20 @@ func ValidatePassword(p string) error {
     return nil
 }
 
+// This secondary validation method is here ensure compatibility between
+// old user that may not satisfy the primary validation method.
+// @hint: this could be used to sent email alert if pasword to weak.
+func ValidateSimplePassword(p string) error {
+    // Size control
+    if len(p) < 8 {
+        return ErrPasswordTooShort
+    }
+    if len(p) > 100 {
+        return ErrPasswordTooLong
+    }
+    return nil
+}
+
 //
 // String utils
 //

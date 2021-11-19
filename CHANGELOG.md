@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### New
 - This changelog file
+- [major] add the reset password feature.
 - [major]tension and node can be moved (except Root, self-loop and recursion).
 - [major] Add contracts object queries.
     - Member of an organisation can add (contract are automatically created for coordo that try to move a blobed tension)

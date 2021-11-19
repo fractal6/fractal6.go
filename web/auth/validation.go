@@ -73,9 +73,9 @@ var (
             "location": "name"
         }]
     }`)
-    ErrBadPassword = errors.New(`{
+    ErrWrongPassword = errors.New(`{
         "errors":[{
-            "message":"Bad Password.",
+            "message":"Wrong Password.",
             "location": "password"
         }]
     }`)
@@ -136,7 +136,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     password := creds.Password
 
     // Validate signin form
-    err := ValidatePassword(password)
+    err := ValidateSimplePassword(password)
     if err != nil {
         return nil, err
     } else if len(username) > 1 {
@@ -163,7 +163,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     // Compare hashed password.
     ok := tools.VerifyPassword(userCtx.Password, password)
     if !ok {
-        return nil, ErrBadPassword
+        return nil, ErrWrongPassword
     }
     // Hide the password !
     userCtx.Password = ""

@@ -62,7 +62,7 @@ func init() {
             Action: UnarchiveBlob,
         },
         model.TensionEventUserLeft: EventMap{
-            // Authorisation is done is the method for now (to avoid dealing with Guest node two times).
+            // Authorisation is done in the method for now (to avoid dealing with Guest node two times).
             Auth: PassingHook,
             Action: UserLeave,
         },
