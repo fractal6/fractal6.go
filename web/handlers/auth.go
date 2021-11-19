@@ -1,20 +1,21 @@
 package handlers
 
 import (
-    "fmt"
-    "strings"
-    "time"
-    "net/http"
-    "encoding/json"
-    "github.com/steambap/captcha"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
+	"github.com/steambap/captcha"
 
-    "zerogov/fractal6.go/db"
-    "zerogov/fractal6.go/web/auth"
-    "zerogov/fractal6.go/web/sessions"
-    "zerogov/fractal6.go/web/email"
-    "zerogov/fractal6.go/graph/model"
-    . "zerogov/fractal6.go/tools"
+	"zerogov/fractal6.go/db"
+	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/tools"
+	. "zerogov/fractal6.go/tools"
+	"zerogov/fractal6.go/web/auth"
+	"zerogov/fractal6.go/web/email"
+	"zerogov/fractal6.go/web/sessions"
 )
 
 var cache sessions.Session
@@ -203,7 +204,7 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
         // generate a token
         token = sessions.GenerateToken()
     } else if err != nil {
-        w.WriteHeader(http.StatusBadRequest)
+        http.Error(w, err.Error(), 500)
         return
     } else {
         token = c.Value
@@ -219,7 +220,7 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
     // with timeout to clear it.
     _, err = cache.Do("SETEX", token, "300", data.Text)
     if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
+        http.Error(w, err.Error(), 500)
         return
     }
 
@@ -273,6 +274,10 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
     // Get the challenge from cache
     //expected, err := redis.String(cache.Do("GET", token))
     expected, err := cache.Do("GET", token)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
     if fmt.Sprintf("%s", expected) != data.Challenge {
         w.Write([]byte("false"))
         return
@@ -288,7 +293,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
         token_url_redirect := sessions.GenerateToken()
         _, err = cache.Do("SETEX", token_url_redirect, "3800", data.Email)
         if err != nil {
-            w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, err.Error(), 500)
             return
         }
         err = email.SendResetEmail(data.Email, token_url_redirect)
@@ -298,10 +303,91 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
     // Invalidate the challenge token if passed
     _, err = cache.Do("DEL", token)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+        http.Error(w, err.Error(), 500)
 		return
 	}
 
     w.Write([]byte("true"))
 }
+
+func ResetPassword2(w http.ResponseWriter, r *http.Request) {
+    var data  struct {
+        Password string
+        Password2 string
+        Token string
+    }
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Check password
+    if data.Password != data.Password2 {
+        http.Error(w, "The passwords does not match.", 400)
+		return
+    }
+
+	if err = auth.ValidatePassword(data.Password); err != nil {
+        http.Error(w, err.Error(), 400)
+		return
+    }
+
+    // Check that the cache contains the token
+    mail_, err := cache.Do("GET", data.Token)
+	if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+	}
+    if mail_ == nil {
+        w.Write([]byte("false"))
+        return
+    }
+
+	// Set the new password for the given user
+    err = db.GetDB().SetFieldByEq("User.email", fmt.Sprintf("%s", mail_), "User.password", tools.HashPassword(data.Password))
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Invalidate the reset token if passed
+    _, err = cache.Do("DEL", data.Token)
+	if err != nil { panic(err) }
+
+    w.Write([]byte("true"))
+}
+
+// Check that the cache contains the given token
+func UuidCheck(w http.ResponseWriter, r *http.Request) {
+    var data struct {
+        Token string
+    }
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Check that the cache contains the token
+    x, err := cache.Do("GET", data.Token)
+	if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+	}
+    if x == nil {
+        w.Write([]byte("false"))
+        return
+    }
+
+    w.Write([]byte("true"))
+}
+
+
 

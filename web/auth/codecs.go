@@ -10,6 +10,8 @@ var stripReg *re.Regexp
 var specialReg *re.Regexp
 var specialSoftReg *re.Regexp
 var reservedURIReg *re.Regexp
+var numReg *re.Regexp
+var letterReg *re.Regexp
 
 func init() {
     //special := "@!#<>{}`'\"" + `%\\`
@@ -17,6 +19,8 @@ func init() {
     special := `\@\!\#\<\>\{\}\%\'\"\\` + "`"
     specialSoft := `\!\#\<\>\{\}\%\'\"\\` + "`"
     reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
+    numReg = re.MustCompile(`[0-9]`)
+    letterReg = re.MustCompile(`[a-zA-Z]`)
     stripReg = re.MustCompile(`^\s|\s$`)
     specialReg = re.MustCompile(`[`+special+`]`)
     specialSoftReg = re.MustCompile(`[`+specialSoft+`]`)
@@ -136,6 +140,9 @@ func ValidatePassword(p string) error {
     }
     if len(p) > 100 {
         return ErrPasswordTooLong
+    }
+    if (numReg.MatchString(p) && letterReg.MatchString(p)) == false {
+        return ErrPasswordRequirements
     }
     return nil
 }

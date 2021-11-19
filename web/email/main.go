@@ -28,10 +28,10 @@ func SendResetEmail(email, token string) error {
 	</head>
 	<body>
 	<h2> Forgot your password?</h2>
-	<p>To reset your password at <b>fractale.co</b>, click the link below:</p>
+	<p>To reset your password at <b>fractale.co</b>, click the link below (valid one hour):</p>
 	<a href="%s">%s</a>
 	<br><br>
-	<p>If you are not at the origin of this request, please ignore this mail</p>
+	<p>If you are not at the origin of this request, please ignore this mail.</p>
 	</body>
     </html>`, url_redirect, url_redirect)
 

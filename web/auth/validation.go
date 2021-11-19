@@ -91,6 +91,12 @@ var (
             "location": "password"
         }]
     }`)
+    ErrPasswordRequirements = errors.New(`{
+        "errors":[{
+            "message":"Password need to contains at least one number.",
+            "location": "password"
+        }]
+    }`)
     // Upsert error
     ErrUsernameExist = errors.New(`{
         "errors":[{
