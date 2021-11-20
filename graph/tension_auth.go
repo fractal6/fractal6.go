@@ -11,8 +11,8 @@ import (
     . "zerogov/fractal6.go/tools"
 )
 
-// Node Action Rights Enum.
-// Each node has a rights value (literal) which is set of activated rights.
+// Node Action **Rights** Enum.
+// Each node has a rights value (literal) which represents a set of activated rights.
 // Those rights are encoded as a XOR between the different possible actions.
 // Note that the `authEventsLut` map which rights are needed for each event to
 // be triggered.
@@ -22,12 +22,14 @@ const (
     Reopening      = 1 << 1
     Closing        = 1 << 2
     TitleUpdating  = 1 << 3
-    CommentPushing = 1 << 4
+    TypeUpdating   = 1 << 4
+    CommentPushing = 1 << 5
+    // To be completed
 )
 var authEventsLut map[model.TensionEvent]AuthValue
 
-// Authorization Hook enum.
-// Each event have a set of hook activated to allow user to trigger an event.
+// Authorization **Hook** Enum.
+// Each event have a set of hook activated to allow users to trigger an event.
 type AuthHookValue int
 const (
     PassingHook AuthHookValue      = 1 // for public event
@@ -64,6 +66,7 @@ func init() {
         model.TensionEventReopened      : Reopening,
         model.TensionEventClosed        : Closing,
         model.TensionEventTitleUpdated  : TitleUpdating,
+        model.TensionEventTypeUpdated  : TypeUpdating,
         model.TensionEventCommentPushed : CommentPushing,
     }
 }
@@ -123,9 +126,9 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 
     // <!> Bot Hook <!>
     // If emitter is a Bot, check its rights
-    if tension.Emitter.RoleType != nil && model.RoleTypeBot == *tension.Emitter.RoleType &&
+    if tension.Emitter.RoleType != nil && *tension.Emitter.RoleType == model.RoleTypeBot &&
     (tension.Emitter.Rights & int(authEventsLut[*event.EventType])) > 0 {
-        // Can only create tension in the parent circle og the bot.
+        // Can only create tension in the parent circle of the bot.
         if pid, _ := codec.Nid2pid(tension.Emitter.Nameid); pid == tension.Receiver.Nameid {
             return true, err
         } else {

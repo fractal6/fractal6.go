@@ -30,6 +30,9 @@ func init() {
         model.TensionEventTitleUpdated: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
         },
+        model.TensionEventTypeUpdated: EventMap{
+            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+        },
         model.TensionEventReopened: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
         },

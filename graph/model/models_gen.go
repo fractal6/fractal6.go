@@ -3549,6 +3549,7 @@ const (
 	TensionEventReopened        TensionEvent = "Reopened"
 	TensionEventClosed          TensionEvent = "Closed"
 	TensionEventTitleUpdated    TensionEvent = "TitleUpdated"
+	TensionEventTypeUpdated     TensionEvent = "TypeUpdated"
 	TensionEventCommentPushed   TensionEvent = "CommentPushed"
 	TensionEventAssigneeAdded   TensionEvent = "AssigneeAdded"
 	TensionEventAssigneeRemoved TensionEvent = "AssigneeRemoved"
@@ -3569,6 +3570,7 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventReopened,
 	TensionEventClosed,
 	TensionEventTitleUpdated,
+	TensionEventTypeUpdated,
 	TensionEventCommentPushed,
 	TensionEventAssigneeAdded,
 	TensionEventAssigneeRemoved,
@@ -3586,7 +3588,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMoved:
 		return true
 	}
 	return false
