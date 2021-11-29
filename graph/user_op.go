@@ -54,7 +54,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     case model.RoleTypeMember:
         return false, fmt.Errorf("Doh, you ave active role in this organisation. Please leave your roles first.")
     case model.RoleTypePending:
-        return false, fmt.Errorf("Doh, you cannot leave peding role. Please reject the invitation.")
+        return false, fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation.")
     case model.RoleTypeGuest:
         err := db.GetDB().UpgradeMember(nameid, model.RoleTypeRetired)
         if err != nil {return false, err}

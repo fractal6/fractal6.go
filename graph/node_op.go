@@ -34,7 +34,7 @@ func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFra
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, true)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
     if err != nil || !ok { return ok, err }
 
     err = PushNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -46,11 +46,20 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     parentid := tension.Receiver.Nameid
     charac := tension.Receiver.Charac
 
+    // Prevent Auth properties to be changed from
+    // blob Pushed as unentended update can occurs
+    // as Peer role can pushed blob.
+    node.Charac = nil
+    node.IsPrivate = nil
+    node.RoleType = nil
+    node.FirstLink = nil
+    node.SecondLink = nil
+
     // Get References
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, false)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
     if err != nil || !ok { return ok, err }
 
     err = UpdateNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -65,7 +74,7 @@ func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.Nod
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, false)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
     if err != nil || !ok { return ok, err }
 
     // Check that circle has no children
@@ -95,7 +104,7 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, false)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
     if err != nil || !ok { return ok, err }
 
     // Check that node has no parent archived
@@ -117,28 +126,30 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
 }
 
 // NodeCheck validate and type checks.
-func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, isNew bool) (bool, error) {
+func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, action *model.TensionAction) (bool, error) {
     var ok bool = false
     var err error
 
     name := *node.Name
-    nodeType := *node.Type
-    roleType := node.RoleType
-
     rootnameid, _ := codec.Nid2rootid(nameid)
+
     err = webauth.ValidateNameid(nameid, rootnameid)
     if err != nil { return ok, err }
     err = webauth.ValidateName(name)
     if err != nil { return ok, err }
 
-    // RoleType Hook
-    if nodeType == model.NodeTypeRole {
-        // Validate input
-        if roleType == nil {
-            err = fmt.Errorf("role should have a RoleType.")
+    if *action == model.TensionActionNewRole {
+        // RoleType Hook
+        nodeType := *node.Type
+        roleType := node.RoleType
+        if nodeType == model.NodeTypeRole {
+            // Validate input
+            if roleType == nil {
+                err = fmt.Errorf("role should have a RoleType.")
+            }
+        } else if nodeType == model.NodeTypeCircle {
+            //pass
         }
-    } else if nodeType == model.NodeTypeCircle {
-        //pass
     }
 
     ok = true

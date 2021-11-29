@@ -2022,24 +2022,22 @@ func (e BlobOrderable) MarshalGQL(w io.Writer) {
 type BlobType string
 
 const (
-	BlobTypeOnNode      BlobType = "OnNode"
-	BlobTypeOnAbout     BlobType = "OnAbout"
-	BlobTypeOnMandate   BlobType = "OnMandate"
-	BlobTypeOnFirstLink BlobType = "OnFirstLink"
-	BlobTypeOnDoc       BlobType = "OnDoc"
+	BlobTypeOnNode    BlobType = "OnNode"
+	BlobTypeOnAbout   BlobType = "OnAbout"
+	BlobTypeOnMandate BlobType = "OnMandate"
+	BlobTypeOnDoc     BlobType = "OnDoc"
 )
 
 var AllBlobType = []BlobType{
 	BlobTypeOnNode,
 	BlobTypeOnAbout,
 	BlobTypeOnMandate,
-	BlobTypeOnFirstLink,
 	BlobTypeOnDoc,
 }
 
 func (e BlobType) IsValid() bool {
 	switch e {
-	case BlobTypeOnNode, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnFirstLink, BlobTypeOnDoc:
+	case BlobTypeOnNode, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnDoc:
 		return true
 	}
 	return false
@@ -3562,6 +3560,9 @@ const (
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
 	TensionEventUserJoined      TensionEvent = "UserJoined"
 	TensionEventUserLeft        TensionEvent = "UserLeft"
+	TensionEventMemberLinked    TensionEvent = "MemberLinked"
+	TensionEventMemberUnlinked  TensionEvent = "MemberUnlinked"
+	TensionEventNodeAuth        TensionEvent = "NodeAuth"
 	TensionEventMoved           TensionEvent = "Moved"
 )
 
@@ -3583,12 +3584,15 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventBlobUnarchived,
 	TensionEventUserJoined,
 	TensionEventUserLeft,
+	TensionEventMemberLinked,
+	TensionEventMemberUnlinked,
+	TensionEventNodeAuth,
 	TensionEventMoved,
 }
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventNodeAuth, TensionEventMoved:
 		return true
 	}
 	return false
