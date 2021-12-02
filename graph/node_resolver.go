@@ -31,11 +31,11 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
     inputs := graphql.GetResolverContext(ctx).Args["input"].([]*model.AddLabelInput)
     // Authorization
     // Check that user satisfy strict condition (coordo roles on node linked)
-    charac := GetNodeCharacStrict()
+    mode := model.NodeModeCoordinated
     for _, input := range inputs {
         if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         node := input.Nodes[0]
-        ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &charac)
+        ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -55,18 +55,18 @@ func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver
     var nodes []*model.NodeRef
     if input.Set != nil {
         if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
-        nodes = append(nodes,  input.Set.Nodes[0])
+        nodes = append(nodes, input.Set.Nodes[0])
     }
     if input.Remove != nil {
         if len(input.Remove.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
-        nodes = append(nodes,  input.Remove.Nodes[0])
+        nodes = append(nodes, input.Remove.Nodes[0])
     }
 
     // Authorization
     // Check that user satisfy strict condition (coordo roles on node linked)
-    charac := GetNodeCharacStrict()
+    mode := model.NodeModeCoordinated
     for _, node := range nodes {
-        ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &charac)
+        ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))

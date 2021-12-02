@@ -40,10 +40,10 @@ func init() {
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
         },
         model.TensionEventLabelAdded: EventMap{
-            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+            Auth: TargetCoordoHook | AuthorHook | AssigneeHook,
         },
         model.TensionEventLabelRemoved: EventMap{
-            Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+            Auth: TargetCoordoHook | AuthorHook | AssigneeHook,
         },
         model.TensionEventAssigneeAdded: EventMap{
             Auth: TargetCoordoHook | AssigneeHook,
@@ -70,7 +70,7 @@ func init() {
             Action: UserLeave,
         },
         model.TensionEventUserJoined: EventMap{
-            // @FIXFEAT: Either Check Receiver.NodeCharac or contract value to check that user has been invited !
+            // @FIXFEAT: Either Check Receiver NodeCharac or contract value to check that user has been invited !
             Validation: model.ContractTypeAnyCandidates,
             Auth: TargetCoordoHook | CandidateHook,
             Action: UserJoin,
@@ -86,7 +86,7 @@ func init() {
 // tensionEventHook is applied for addTension and updateTension query directives.
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload) with
 // All events in History must pass.
-func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, bid *string) (bool, *model.Contract, error) {
+func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, blob *model.BlobRef) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
     var tension *model.Tension
@@ -98,12 +98,14 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     for _, event := range(events) {
         if tension == nil { // don't fetch if there is no events (Comment updated...)
             // Fetch Tension, target Node and blob charac (last if bid undefined)
+            var bid *string
+            if blob != nil { bid = blob.ID }
             tension, err = db.GetDB().GetTensionHook(tid, true, bid)
             if err != nil { return false, nil, LogErr("Access denied", err) }
         }
 
         // Process event
-        ok, contract, err = processEvent(uctx, tension, event, nil, true, true, true)
+        ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true, true)
         if !ok || err != nil { break }
 
     }
@@ -111,7 +113,8 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     return ok, contract, err
 }
 
-func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract, doCheck, doProcess, doNotify bool) (bool, *model.Contract, error) {
+func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, blob *model.BlobRef, contract *model.Contract,
+                    doCheck, doProcess, doNotify bool) (bool, *model.Contract, error) {
     var ok bool
     var err error
 
@@ -134,7 +137,7 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 
     // Trigger Action
     if act && doProcess && em.Action != nil {
-        ok, err = em.Action(uctx, tension, event)
+        ok, err = em.Action(uctx, tension, event, blob)
         if !ok || err != nil { return ok, contract, err }
         // leave trace
         leaveTrace(tension)
@@ -198,7 +201,7 @@ func leaveTrace(tension *model.Tension) {
 // Event Actions
 //
 
-func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     // Add or Update Node
     // --
     // 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
@@ -242,7 +245,7 @@ func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     return ok, err
 }
 
-func ArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+func ArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     // Archived Node
     // * link or unlink role
     // * set archive event and flag
@@ -272,7 +275,7 @@ func ArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.Event
     return ok, err
 }
 
-func UnarchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+func UnarchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     // Unarchived Node
     // * link or unlink role
     // * set archive event and flag
@@ -302,7 +305,7 @@ func UnarchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
     return ok, err
 }
 
-func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     // Remove user reference
     // * remove User role
     // * unlink Orga role (Guest/Member) if role_type is Guest|Member
@@ -332,7 +335,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
 }
 
 
-func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     var ok bool
     // Only root node can be join
     // --
@@ -348,11 +351,12 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     // check the invitation if a hash is given
     // * orga invtation ? <> user invitation hash ?
     // * else check if User Can Join Organisation
-    if tension.Receiver.Charac.UserCanJoin {
+    if *tension.Receiver.UserCanJoin  {
         guestid := codec.MemberIdCodec(rootid, uctx.Username)
         ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
         if err != nil { return ok, err }
         if ex {
+            // Ensure a correct state for this Guest node.
             err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)
         } else {
             rt := model.RoleTypeGuest
@@ -363,9 +367,8 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
                 RoleType: &rt,
                 Type: &t,
                 FirstLink: &uctx.Username,
-                IsPrivate: &tension.Receiver.IsPrivate,
-                Charac: tension.Receiver.Charac,
             }
+            auth.InheritNodeCharacDefault(n, tension.Receiver)
             err = PushNode(uctx, nil, n, "", guestid, rootid)
         }
         ok = true
@@ -375,7 +378,7 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 }
 
 
-func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) (bool, error) {
+func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     if event.Old == nil || event.New == nil { return false, fmt.Errorf("old and new event data must be defined.") }
     if *event.Old != tension.Receiver.Nameid {
         return false, fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid)

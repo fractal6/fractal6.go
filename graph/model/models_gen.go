@@ -116,24 +116,14 @@ type AddMandatePayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
-type AddNodeCharacInput struct {
-	UserCanJoin bool     `json:"userCanJoin"`
-	Mode        NodeMode `json:"mode,omitempty"`
-}
-
-type AddNodeCharacPayload struct {
-	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
-	NumUids    *int          `json:"numUids"`
-}
-
 type AddNodeFragmentInput struct {
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
-	IsPrivate  *bool              `json:"isPrivate"`
-	Charac     *NodeCharacRef     `json:"charac,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Visibility *NodeVisibility    `json:"visibility,omitempty"`
+	Mode       *NodeMode          `json:"mode,omitempty"`
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
@@ -162,13 +152,14 @@ type AddNodeInput struct {
 	Mandate     *MandateRef    `json:"mandate,omitempty"`
 	Docs        []*BlobRef     `json:"docs,omitempty"`
 	Source      *BlobRef       `json:"source,omitempty"`
+	Labels      []*LabelRef    `json:"labels,omitempty"`
+	Visibility  NodeVisibility `json:"visibility,omitempty"`
+	Mode        NodeMode       `json:"mode,omitempty"`
+	Rights      int            `json:"rights"`
+	IsArchived  bool           `json:"isArchived"`
 	IsRoot      bool           `json:"isRoot"`
 	IsPersonal  *bool          `json:"isPersonal"`
-	IsPrivate   bool           `json:"isPrivate"`
-	IsArchived  bool           `json:"isArchived"`
-	Charac      *NodeCharacRef `json:"charac,omitempty"`
-	Rights      int            `json:"rights"`
-	Labels      []*LabelRef    `json:"labels,omitempty"`
+	UserCanJoin *bool          `json:"userCanJoin"`
 	FirstLink   *UserRef       `json:"first_link,omitempty"`
 	SecondLink  *UserRef       `json:"second_link,omitempty"`
 	Skills      []string       `json:"skills,omitempty"`
@@ -587,12 +578,6 @@ type DeleteMandatePayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
-type DeleteNodeCharacPayload struct {
-	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
-	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids"`
-}
-
 type DeleteNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
 	Msg          *string         `json:"msg,omitempty"`
@@ -963,13 +948,14 @@ type Node struct {
 	Mandate              *Mandate                `json:"mandate,omitempty"`
 	Docs                 []*Blob                 `json:"docs,omitempty"`
 	Source               *Blob                   `json:"source,omitempty"`
+	Labels               []*Label                `json:"labels,omitempty"`
+	Visibility           NodeVisibility          `json:"visibility,omitempty"`
+	Mode                 NodeMode                `json:"mode,omitempty"`
+	Rights               int                     `json:"rights"`
+	IsArchived           bool                    `json:"isArchived"`
 	IsRoot               bool                    `json:"isRoot"`
 	IsPersonal           *bool                   `json:"isPersonal"`
-	IsPrivate            bool                    `json:"isPrivate"`
-	IsArchived           bool                    `json:"isArchived"`
-	Charac               *NodeCharac             `json:"charac,omitempty"`
-	Rights               int                     `json:"rights"`
-	Labels               []*Label                `json:"labels,omitempty"`
+	UserCanJoin          *bool                   `json:"userCanJoin"`
 	FirstLink            *User                   `json:"first_link,omitempty"`
 	SecondLink           *User                   `json:"second_link,omitempty"`
 	Skills               []string                `json:"skills,omitempty"`
@@ -1004,37 +990,6 @@ type NodeAggregateResult struct {
 	RightsAvg     *float64 `json:"rightsAvg,omitempty"`
 }
 
-type NodeCharac struct {
-	ID          string   `json:"id,omitempty"`
-	UserCanJoin bool     `json:"userCanJoin"`
-	Mode        NodeMode `json:"mode,omitempty"`
-}
-
-type NodeCharacAggregateResult struct {
-	Count *int `json:"count"`
-}
-
-type NodeCharacFilter struct {
-	ID          []string               `json:"id,omitempty"`
-	UserCanJoin *bool                  `json:"userCanJoin"`
-	Mode        *NodeModeHash          `json:"mode,omitempty"`
-	Has         []*NodeCharacHasFilter `json:"has,omitempty"`
-	And         []*NodeCharacFilter    `json:"and,omitempty"`
-	Or          []*NodeCharacFilter    `json:"or,omitempty"`
-	Not         *NodeCharacFilter      `json:"not,omitempty"`
-}
-
-type NodeCharacPatch struct {
-	UserCanJoin *bool     `json:"userCanJoin"`
-	Mode        *NodeMode `json:"mode,omitempty"`
-}
-
-type NodeCharacRef struct {
-	ID          *string   `json:"id,omitempty"`
-	UserCanJoin *bool     `json:"userCanJoin"`
-	Mode        *NodeMode `json:"mode,omitempty"`
-}
-
 type NodeFilter struct {
 	ID         []string                            `json:"id,omitempty"`
 	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
@@ -1043,10 +998,11 @@ type NodeFilter struct {
 	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
 	Type       *NodeTypeHash                       `json:"type_,omitempty"`
 	About      *StringFullTextFilter               `json:"about,omitempty"`
+	Visibility *NodeVisibilityHash                 `json:"visibility,omitempty"`
+	Mode       *NodeModeHash                       `json:"mode,omitempty"`
+	IsArchived *bool                               `json:"isArchived"`
 	IsRoot     *bool                               `json:"isRoot"`
 	IsPersonal *bool                               `json:"isPersonal"`
-	IsPrivate  *bool                               `json:"isPrivate"`
-	IsArchived *bool                               `json:"isArchived"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
 	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
 	Has        []*NodeHasFilter                    `json:"has,omitempty"`
@@ -1060,10 +1016,10 @@ type NodeFragment struct {
 	Name              *string                      `json:"name,omitempty"`
 	Nameid            *string                      `json:"nameid,omitempty"`
 	Type              *NodeType                    `json:"type_,omitempty"`
-	IsPrivate         *bool                        `json:"isPrivate"`
-	Charac            *NodeCharac                  `json:"charac,omitempty"`
 	About             *string                      `json:"about,omitempty"`
 	Mandate           *Mandate                     `json:"mandate,omitempty"`
+	Visibility        *NodeVisibility              `json:"visibility,omitempty"`
+	Mode              *NodeMode                    `json:"mode,omitempty"`
 	Children          []*NodeFragment              `json:"children,omitempty"`
 	FirstLink         *string                      `json:"first_link,omitempty"`
 	SecondLink        *string                      `json:"second_link,omitempty"`
@@ -1104,10 +1060,10 @@ type NodeFragmentPatch struct {
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
-	IsPrivate  *bool              `json:"isPrivate"`
-	Charac     *NodeCharacRef     `json:"charac,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Visibility *NodeVisibility    `json:"visibility,omitempty"`
+	Mode       *NodeMode          `json:"mode,omitempty"`
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
@@ -1120,10 +1076,10 @@ type NodeFragmentRef struct {
 	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
 	Type       *NodeType          `json:"type_,omitempty"`
-	IsPrivate  *bool              `json:"isPrivate"`
-	Charac     *NodeCharacRef     `json:"charac,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Visibility *NodeVisibility    `json:"visibility,omitempty"`
+	Mode       *NodeMode          `json:"mode,omitempty"`
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
@@ -1143,70 +1099,77 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedBy   *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt   *string        `json:"createdAt,omitempty"`
-	UpdatedAt   *string        `json:"updatedAt,omitempty"`
-	Name        *string        `json:"name,omitempty"`
-	Rootnameid  *string        `json:"rootnameid,omitempty"`
-	Parent      *NodeRef       `json:"parent,omitempty"`
-	Children    []*NodeRef     `json:"children,omitempty"`
-	Type        *NodeType      `json:"type_,omitempty"`
-	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
-	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
-	About       *string        `json:"about,omitempty"`
-	Mandate     *MandateRef    `json:"mandate,omitempty"`
-	Docs        []*BlobRef     `json:"docs,omitempty"`
-	Source      *BlobRef       `json:"source,omitempty"`
-	IsRoot      *bool          `json:"isRoot"`
-	IsPersonal  *bool          `json:"isPersonal"`
-	IsPrivate   *bool          `json:"isPrivate"`
-	IsArchived  *bool          `json:"isArchived"`
-	Charac      *NodeCharacRef `json:"charac,omitempty"`
-	Rights      *int           `json:"rights"`
-	Labels      []*LabelRef    `json:"labels,omitempty"`
-	FirstLink   *UserRef       `json:"first_link,omitempty"`
-	SecondLink  *UserRef       `json:"second_link,omitempty"`
-	Skills      []string       `json:"skills,omitempty"`
-	RoleType    *RoleType      `json:"role_type,omitempty"`
-	Contracts   []*VoteRef     `json:"contracts,omitempty"`
-	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
+	CreatedBy   *UserRef        `json:"createdBy,omitempty"`
+	CreatedAt   *string         `json:"createdAt,omitempty"`
+	UpdatedAt   *string         `json:"updatedAt,omitempty"`
+	Name        *string         `json:"name,omitempty"`
+	Rootnameid  *string         `json:"rootnameid,omitempty"`
+	Parent      *NodeRef        `json:"parent,omitempty"`
+	Children    []*NodeRef      `json:"children,omitempty"`
+	Type        *NodeType       `json:"type_,omitempty"`
+	TensionsOut []*TensionRef   `json:"tensions_out,omitempty"`
+	TensionsIn  []*TensionRef   `json:"tensions_in,omitempty"`
+	About       *string         `json:"about,omitempty"`
+	Mandate     *MandateRef     `json:"mandate,omitempty"`
+	Docs        []*BlobRef      `json:"docs,omitempty"`
+	Source      *BlobRef        `json:"source,omitempty"`
+	Labels      []*LabelRef     `json:"labels,omitempty"`
+	Visibility  *NodeVisibility `json:"visibility,omitempty"`
+	Mode        *NodeMode       `json:"mode,omitempty"`
+	Rights      *int            `json:"rights"`
+	IsArchived  *bool           `json:"isArchived"`
+	IsRoot      *bool           `json:"isRoot"`
+	IsPersonal  *bool           `json:"isPersonal"`
+	UserCanJoin *bool           `json:"userCanJoin"`
+	FirstLink   *UserRef        `json:"first_link,omitempty"`
+	SecondLink  *UserRef        `json:"second_link,omitempty"`
+	Skills      []string        `json:"skills,omitempty"`
+	RoleType    *RoleType       `json:"role_type,omitempty"`
+	Contracts   []*VoteRef      `json:"contracts,omitempty"`
+	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
 }
 
 type NodeRef struct {
-	ID          *string        `json:"id,omitempty"`
-	CreatedBy   *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt   *string        `json:"createdAt,omitempty"`
-	UpdatedAt   *string        `json:"updatedAt,omitempty"`
-	Name        *string        `json:"name,omitempty"`
-	Nameid      *string        `json:"nameid,omitempty"`
-	Rootnameid  *string        `json:"rootnameid,omitempty"`
-	Parent      *NodeRef       `json:"parent,omitempty"`
-	Children    []*NodeRef     `json:"children,omitempty"`
-	Type        *NodeType      `json:"type_,omitempty"`
-	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
-	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
-	About       *string        `json:"about,omitempty"`
-	Mandate     *MandateRef    `json:"mandate,omitempty"`
-	Docs        []*BlobRef     `json:"docs,omitempty"`
-	Source      *BlobRef       `json:"source,omitempty"`
-	IsRoot      *bool          `json:"isRoot"`
-	IsPersonal  *bool          `json:"isPersonal"`
-	IsPrivate   *bool          `json:"isPrivate"`
-	IsArchived  *bool          `json:"isArchived"`
-	Charac      *NodeCharacRef `json:"charac,omitempty"`
-	Rights      *int           `json:"rights"`
-	Labels      []*LabelRef    `json:"labels,omitempty"`
-	FirstLink   *UserRef       `json:"first_link,omitempty"`
-	SecondLink  *UserRef       `json:"second_link,omitempty"`
-	Skills      []string       `json:"skills,omitempty"`
-	RoleType    *RoleType      `json:"role_type,omitempty"`
-	Contracts   []*VoteRef     `json:"contracts,omitempty"`
-	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
+	ID          *string         `json:"id,omitempty"`
+	CreatedBy   *UserRef        `json:"createdBy,omitempty"`
+	CreatedAt   *string         `json:"createdAt,omitempty"`
+	UpdatedAt   *string         `json:"updatedAt,omitempty"`
+	Name        *string         `json:"name,omitempty"`
+	Nameid      *string         `json:"nameid,omitempty"`
+	Rootnameid  *string         `json:"rootnameid,omitempty"`
+	Parent      *NodeRef        `json:"parent,omitempty"`
+	Children    []*NodeRef      `json:"children,omitempty"`
+	Type        *NodeType       `json:"type_,omitempty"`
+	TensionsOut []*TensionRef   `json:"tensions_out,omitempty"`
+	TensionsIn  []*TensionRef   `json:"tensions_in,omitempty"`
+	About       *string         `json:"about,omitempty"`
+	Mandate     *MandateRef     `json:"mandate,omitempty"`
+	Docs        []*BlobRef      `json:"docs,omitempty"`
+	Source      *BlobRef        `json:"source,omitempty"`
+	Labels      []*LabelRef     `json:"labels,omitempty"`
+	Visibility  *NodeVisibility `json:"visibility,omitempty"`
+	Mode        *NodeMode       `json:"mode,omitempty"`
+	Rights      *int            `json:"rights"`
+	IsArchived  *bool           `json:"isArchived"`
+	IsRoot      *bool           `json:"isRoot"`
+	IsPersonal  *bool           `json:"isPersonal"`
+	UserCanJoin *bool           `json:"userCanJoin"`
+	FirstLink   *UserRef        `json:"first_link,omitempty"`
+	SecondLink  *UserRef        `json:"second_link,omitempty"`
+	Skills      []string        `json:"skills,omitempty"`
+	RoleType    *RoleType       `json:"role_type,omitempty"`
+	Contracts   []*VoteRef      `json:"contracts,omitempty"`
+	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
 }
 
 type NodeTypeHash struct {
 	Eq *NodeType   `json:"eq,omitempty"`
 	In []*NodeType `json:"in,omitempty"`
+}
+
+type NodeVisibilityHash struct {
+	Eq *NodeVisibility   `json:"eq,omitempty"`
+	In []*NodeVisibility `json:"in,omitempty"`
 }
 
 type OrgaAgg struct {
@@ -1602,17 +1565,6 @@ type UpdateMandateInput struct {
 type UpdateMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
 	NumUids *int       `json:"numUids"`
-}
-
-type UpdateNodeCharacInput struct {
-	Filter *NodeCharacFilter `json:"filter,omitempty"`
-	Set    *NodeCharacPatch  `json:"set,omitempty"`
-	Remove *NodeCharacPatch  `json:"remove,omitempty"`
-}
-
-type UpdateNodeCharacPayload struct {
-	NodeCharac []*NodeCharac `json:"nodeCharac,omitempty"`
-	NumUids    *int          `json:"numUids"`
 }
 
 type UpdateNodeFragmentInput struct {
@@ -2887,57 +2839,16 @@ func (e Mode) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type NodeCharacHasFilter string
-
-const (
-	NodeCharacHasFilterUserCanJoin NodeCharacHasFilter = "userCanJoin"
-	NodeCharacHasFilterMode        NodeCharacHasFilter = "mode"
-)
-
-var AllNodeCharacHasFilter = []NodeCharacHasFilter{
-	NodeCharacHasFilterUserCanJoin,
-	NodeCharacHasFilterMode,
-}
-
-func (e NodeCharacHasFilter) IsValid() bool {
-	switch e {
-	case NodeCharacHasFilterUserCanJoin, NodeCharacHasFilterMode:
-		return true
-	}
-	return false
-}
-
-func (e NodeCharacHasFilter) String() string {
-	return string(e)
-}
-
-func (e *NodeCharacHasFilter) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = NodeCharacHasFilter(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid NodeCharacHasFilter", str)
-	}
-	return nil
-}
-
-func (e NodeCharacHasFilter) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
 type NodeFragmentHasFilter string
 
 const (
 	NodeFragmentHasFilterName       NodeFragmentHasFilter = "name"
 	NodeFragmentHasFilterNameid     NodeFragmentHasFilter = "nameid"
 	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
-	NodeFragmentHasFilterIsPrivate  NodeFragmentHasFilter = "isPrivate"
-	NodeFragmentHasFilterCharac     NodeFragmentHasFilter = "charac"
 	NodeFragmentHasFilterAbout      NodeFragmentHasFilter = "about"
 	NodeFragmentHasFilterMandate    NodeFragmentHasFilter = "mandate"
+	NodeFragmentHasFilterVisibility NodeFragmentHasFilter = "visibility"
+	NodeFragmentHasFilterMode       NodeFragmentHasFilter = "mode"
 	NodeFragmentHasFilterChildren   NodeFragmentHasFilter = "children"
 	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
 	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
@@ -2949,10 +2860,10 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 	NodeFragmentHasFilterName,
 	NodeFragmentHasFilterNameid,
 	NodeFragmentHasFilterType,
-	NodeFragmentHasFilterIsPrivate,
-	NodeFragmentHasFilterCharac,
 	NodeFragmentHasFilterAbout,
 	NodeFragmentHasFilterMandate,
+	NodeFragmentHasFilterVisibility,
+	NodeFragmentHasFilterMode,
 	NodeFragmentHasFilterChildren,
 	NodeFragmentHasFilterFirstLink,
 	NodeFragmentHasFilterSecondLink,
@@ -2962,7 +2873,7 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 
 func (e NodeFragmentHasFilter) IsValid() bool {
 	switch e {
-	case NodeFragmentHasFilterName, NodeFragmentHasFilterNameid, NodeFragmentHasFilterType, NodeFragmentHasFilterIsPrivate, NodeFragmentHasFilterCharac, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterChildren, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterSkills, NodeFragmentHasFilterRoleType:
+	case NodeFragmentHasFilterName, NodeFragmentHasFilterNameid, NodeFragmentHasFilterType, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterChildren, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterSkills, NodeFragmentHasFilterRoleType:
 		return true
 	}
 	return false
@@ -3054,13 +2965,14 @@ const (
 	NodeHasFilterMandate     NodeHasFilter = "mandate"
 	NodeHasFilterDocs        NodeHasFilter = "docs"
 	NodeHasFilterSource      NodeHasFilter = "source"
+	NodeHasFilterLabels      NodeHasFilter = "labels"
+	NodeHasFilterVisibility  NodeHasFilter = "visibility"
+	NodeHasFilterMode        NodeHasFilter = "mode"
+	NodeHasFilterRights      NodeHasFilter = "rights"
+	NodeHasFilterIsArchived  NodeHasFilter = "isArchived"
 	NodeHasFilterIsRoot      NodeHasFilter = "isRoot"
 	NodeHasFilterIsPersonal  NodeHasFilter = "isPersonal"
-	NodeHasFilterIsPrivate   NodeHasFilter = "isPrivate"
-	NodeHasFilterIsArchived  NodeHasFilter = "isArchived"
-	NodeHasFilterCharac      NodeHasFilter = "charac"
-	NodeHasFilterRights      NodeHasFilter = "rights"
-	NodeHasFilterLabels      NodeHasFilter = "labels"
+	NodeHasFilterUserCanJoin NodeHasFilter = "userCanJoin"
 	NodeHasFilterFirstLink   NodeHasFilter = "first_link"
 	NodeHasFilterSecondLink  NodeHasFilter = "second_link"
 	NodeHasFilterSkills      NodeHasFilter = "skills"
@@ -3085,13 +2997,14 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterMandate,
 	NodeHasFilterDocs,
 	NodeHasFilterSource,
+	NodeHasFilterLabels,
+	NodeHasFilterVisibility,
+	NodeHasFilterMode,
+	NodeHasFilterRights,
+	NodeHasFilterIsArchived,
 	NodeHasFilterIsRoot,
 	NodeHasFilterIsPersonal,
-	NodeHasFilterIsPrivate,
-	NodeHasFilterIsArchived,
-	NodeHasFilterCharac,
-	NodeHasFilterRights,
-	NodeHasFilterLabels,
+	NodeHasFilterUserCanJoin,
 	NodeHasFilterFirstLink,
 	NodeHasFilterSecondLink,
 	NodeHasFilterSkills,
@@ -3102,7 +3015,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterIsPrivate, NodeHasFilterIsArchived, NodeHasFilterCharac, NodeHasFilterRights, NodeHasFilterLabels, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterLabels, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
 		return true
 	}
 	return false
@@ -3259,6 +3172,49 @@ func (e *NodeType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NodeVisibility string
+
+const (
+	NodeVisibilityPublic  NodeVisibility = "Public"
+	NodeVisibilityPrivate NodeVisibility = "Private"
+	NodeVisibilitySecret  NodeVisibility = "Secret"
+)
+
+var AllNodeVisibility = []NodeVisibility{
+	NodeVisibilityPublic,
+	NodeVisibilityPrivate,
+	NodeVisibilitySecret,
+}
+
+func (e NodeVisibility) IsValid() bool {
+	switch e {
+	case NodeVisibilityPublic, NodeVisibilityPrivate, NodeVisibilitySecret:
+		return true
+	}
+	return false
+}
+
+func (e NodeVisibility) String() string {
+	return string(e)
+}
+
+func (e *NodeVisibility) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NodeVisibility(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NodeVisibility", str)
+	}
+	return nil
+}
+
+func (e NodeVisibility) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -3562,7 +3518,8 @@ const (
 	TensionEventUserLeft        TensionEvent = "UserLeft"
 	TensionEventMemberLinked    TensionEvent = "MemberLinked"
 	TensionEventMemberUnlinked  TensionEvent = "MemberUnlinked"
-	TensionEventNodeAuth        TensionEvent = "NodeAuth"
+	TensionEventAuthority       TensionEvent = "Authority"
+	TensionEventVisibility      TensionEvent = "Visibility"
 	TensionEventMoved           TensionEvent = "Moved"
 )
 
@@ -3586,13 +3543,14 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventUserLeft,
 	TensionEventMemberLinked,
 	TensionEventMemberUnlinked,
-	TensionEventNodeAuth,
+	TensionEventAuthority,
+	TensionEventVisibility,
 	TensionEventMoved,
 }
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventNodeAuth, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
 		return true
 	}
 	return false

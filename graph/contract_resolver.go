@@ -119,8 +119,8 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
         nameid, err := db.GetDB().GetSubFieldById(ids[0], "Contract.tension", "Tension.receiverid")
         if err != nil { return nil, err }
         if nameid == nil { panic("empty receiverid field") }
-        charac := GetNodeCharacStrict()
-        ok, err = auth.HasCoordoRole(uctx, nameid.(string), &charac)
+        mode := model.NodeModeCoordinated
+        ok, err = auth.HasCoordoRole(uctx, nameid.(string), &mode)
         if err != nil { return nil, err }
     }
     if !ok {

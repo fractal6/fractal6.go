@@ -68,14 +68,14 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
     }
 
     // Validate Event prior the mutation
-    var bid *string
+    var blob *model.BlobRef
     var contract *model.Contract
     var ok bool
     if input.Set != nil {
         if len(input.Set.Blobs) > 0 {
-            bid = input.Set.Blobs[0].ID
+            blob = input.Set.Blobs[0]
         }
-        ok, contract, err = tensionEventHook(uctx, ids[0], input.Set.History, bid)
+        ok, contract, err = tensionEventHook(uctx, ids[0], input.Set.History, blob)
         if err != nil  { return nil, err }
         if ok {
             return next(ctx)

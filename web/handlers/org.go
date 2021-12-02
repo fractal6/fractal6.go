@@ -25,7 +25,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Check format
-    nameid := form.Nameid + "@" + uctx.Username
+    nameid := form.Nameid + "@" + uctx.Username // is personal namespace
     err = auth.ValidateNameid(nameid, nameid)
 	if err != nil { http.Error(w, err.Error(), 400); return }
     nidOwner := nameid + "##" + "@" + uctx.Username
@@ -38,25 +38,30 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     uid_, _ := db.GetDB().GetFieldByEq("User.username", uctx.Username, "uid")
     uid := uid_.(string)
 
-    // Create the new node
+    // @TODO
+    userCanJoin := true
     isPersonal := true
-    userCanJoin := false
+    visibility := model.NodeVisibilityPublic
     mode := model.NodeModeCoordinated
+
+    // Create the new node
     nodeInput := model.AddNodeInput{
         // Form
         Name: form.Name,
         Nameid: nameid,
         Rootnameid: nameid,
         About: form.About,
-        Mandate: &model.MandateRef{ Purpose: form.Purpose },
         // Default
         Type: model.NodeTypeCircle,
         IsRoot: true,
         IsPersonal: &isPersonal,
-        IsPrivate: false,
-        IsArchived: false,
+        Mandate: &model.MandateRef{ Purpose: form.Purpose },
+        // Permission
+        UserCanJoin: &userCanJoin,
+        Visibility: visibility,
+        Mode: mode,
         Rights: 0,
-        Charac: &model.NodeCharacRef{ UserCanJoin: &userCanJoin, Mode: &mode },
+        IsArchived: false,
         // Common
         CreatedAt: Now(),
         CreatedBy: &model.UserRef{ID: &uid},

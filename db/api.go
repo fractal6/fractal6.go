@@ -26,11 +26,9 @@ var tensionHookPayload string = `
   }
   Tension.receiver {
     Node.nameid
-    Node.isPrivate
-    Node.charac {
-        NodeCharac.userCanJoin
-        NodeCharac.mode
-    }
+    Node.visibility
+    Node.mode
+    Node.userCanJoin
   }
 `
 var tensionBlobHookPayload string = `
@@ -271,8 +269,8 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Post.createdAt
             Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
-            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
+            Tension.receiver { Node.nameid Node.name Node.role_type }
+            Tension.emitter { Node.nameid Node.name Node.role_type }
             Tension.title
             Tension.status
             Tension.type_
@@ -299,8 +297,8 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Post.createdAt
             Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
-            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
+            Tension.receiver { Node.nameid Node.name Node.role_type }
+            Tension.emitter { Node.nameid Node.name Node.role_type }
             Tension.title
             Tension.status
             Tension.type_
@@ -327,8 +325,8 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Post.createdAt
             Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
-            Tension.emitter { Node.nameid Node.name Node.role_type Node.charac {NodeCharac.userCanJoin NodeCharac.mode} }
+            Tension.receiver { Node.nameid Node.name Node.role_type }
+            Tension.emitter { Node.nameid Node.name Node.role_type }
             Tension.title
             Tension.status
             Tension.type_
@@ -371,15 +369,14 @@ var dqlQueries map[string]string = map[string]string{
           a as Tension.comments
           b as Tension.blobs {
               bb as Blob.node {
-                  bb1 as NodeFragment.charac
-                  bb2 as NodeFragment.children
-                  bb3 as NodeFragment.mandate
+                  bb1 as NodeFragment.children
+                  bb2 as NodeFragment.mandate
               }
           }
           c as Tension.contracts
           d as Tension.history
         }
-        all(func: uid(id,a,b,c,d,bb,bb1,bb2,bb3)) {
+        all(func: uid(id,a,b,c,d,bb,bb1,bb2)) {
             all_ids as uid
         }
     }`,
@@ -757,46 +754,6 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
         }
     }
     return &user, err
-}
-
-// Returns the node charac
-func (dg Dgraph) GetNodeCharac(fieldid string, objid string) (*model.NodeCharac, error) {
-    // Format Query
-    maps := map[string]string{
-        "fieldid": fieldid,
-        "objid": objid,
-        "payload": model.NodeCharacPayloadDg,
-    }
-    // Send request
-    res, err := dg.QueryDql("getNode", maps)
-    if err != nil { return nil, err }
-
-    // Decode response
-    var r DqlResp
-    err = json.Unmarshal(res.Json, &r)
-    if err != nil { return nil, err }
-
-    var obj model.NodeCharac
-    if len(r.All) > 1 {
-        return nil, fmt.Errorf("Got multiple node charac for @id: %s, %s", fieldid, objid)
-    } else if len(r.All) == 1 {
-        config := &mapstructure.DecoderConfig{
-            Result: &obj,
-            TagName: "json",
-            DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-                if to == reflect.Struct {
-                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
-                    return nv, nil
-                }
-                return v, nil
-            },
-        }
-        decoder, err := mapstructure.NewDecoder(config)
-        if err != nil { return nil, err }
-        err = decoder.Decode(r.All[0][model.NodeCharacNF])
-        if err != nil { return nil, err }
-    }
-    return &obj, err
 }
 
 // Returns the matching nodes

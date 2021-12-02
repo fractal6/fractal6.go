@@ -27,7 +27,7 @@ func contractEventHook(uctx *model.UserCtx, tid string, event *model.EventRef, b
     }
 
     // Process event
-    ok, contract, err = processEvent(uctx, tension, event, nil, true, true, true)
+    ok, contract, err = processEvent(uctx, tension, event, nil, nil, true, true, true)
     ok = ok || contract != nil
 
     return ok, err
@@ -49,7 +49,7 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     // Process event
     var event model.EventRef
     StructMap(contract.Event, &event)
-    ok, contract, err = processEvent(uctx, tension, &event, contract, true, true, true)
+    ok, contract, err = processEvent(uctx, tension, &event, nil, contract, true, true, true)
     if err != nil { return false, contract, err }
 
     return ok, contract, err
@@ -69,7 +69,7 @@ func hasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, erro
     tension, err := db.GetDB().GetTensionHook(contract.Tension.ID, false, nil)
     if err != nil { return false, err }
 
-    ok, c, err := processEvent(uctx, tension, &event, nil, true, false, false)
+    ok, c, err := processEvent(uctx, tension, &event, nil, nil, true, false, false)
     return ok||c!=nil, err
 }
 

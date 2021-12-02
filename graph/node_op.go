@@ -7,34 +7,25 @@ import (
 
     "zerogov/fractal6.go/graph/model"
     "zerogov/fractal6.go/graph/codec"
+    "zerogov/fractal6.go/graph/auth"
     webauth "zerogov/fractal6.go/web/auth"
     "zerogov/fractal6.go/db"
     "zerogov/fractal6.go/text/en"
     . "zerogov/fractal6.go/tools"
 )
 
-// tryAddNode add a new node is user has the correct right
-// * it inherits node charac
+// tryAddNode add a new node if user has the correct right
 func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
-    //tid := tension.ID
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
-    charac := tension.Receiver.Charac
-    isPrivate := tension.Receiver.IsPrivate
 
-    // Inherits node properties
-    if node.Charac == nil {
-        node.Charac = charac
-    }
-    if node.IsPrivate == nil {
-        node.IsPrivate = &isPrivate
-    }
+    auth.InheritNodeCharacDefault(node, tension.Receiver)
 
     // Get References
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     err = PushNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -44,22 +35,21 @@ func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFra
 func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
-    charac := tension.Receiver.Charac
 
-    // Prevent Auth properties to be changed from
-    // blob Pushed as unentended update can occurs
-    // as Peer role can pushed blob.
-    node.Charac = nil
-    node.IsPrivate = nil
-    node.RoleType = nil
+    // Prevent Auth properties to be changed from blob pushes
+    // as unentended update can occurs as Peer role can pushed blob.
+    // It means, that each of the properties below should have their own events
+    node.Visibility = nil
+    node.Mode = nil
     node.FirstLink = nil
     node.SecondLink = nil
+    node.RoleType = nil
 
     // Get References
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     err = UpdateNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -68,13 +58,12 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 
 func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     parentid := tension.Receiver.Nameid
-    charac := tension.Receiver.Charac
 
     // Get References
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     // Check that circle has no children
@@ -98,13 +87,12 @@ func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.Nod
 }
 func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     parentid := tension.Receiver.Nameid
-    charac := tension.Receiver.Charac
 
     // Get References
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, charac, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     // Check that node has no parent archived
@@ -126,7 +114,7 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
 }
 
 // NodeCheck validate and type checks.
-func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, charac *model.NodeCharac, action *model.TensionAction) (bool, error) {
+func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, action *model.TensionAction) (bool, error) {
     var ok bool = false
     var err error
 
@@ -188,7 +176,7 @@ func PushNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitte
         nodeInput.Children = nil
         for i, c := range(node.Children) {
             if c.FirstLink != nil {
-                child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node.Charac, node.IsPrivate)
+                child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node)
                 children = append(children, child)
             }
         }
@@ -286,7 +274,7 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 // Internals
 //
 
-func makeNewChild(i int, username string, parentid string, roleType model.RoleType, charac *model.NodeCharac, isPrivate *bool) model.NodeFragment {
+func makeNewChild(i int, username string, parentid string, roleType model.RoleType, node *model.NodeFragment) model.NodeFragment {
     //name := "Coordinator"
     name := string(roleType)
     nameid := parentid +"#"+ name + strconv.Itoa(i)
@@ -298,12 +286,12 @@ func makeNewChild(i int, username string, parentid string, roleType model.RoleTy
         Type: &type_,
         RoleType: &roleType,
         FirstLink: &fs,
-        Charac: charac,
-        IsPrivate: isPrivate,
     }
+    var nodeProxy *model.Node
+    StructMap(node, &nodeProxy)
+    auth.InheritNodeCharacDefault(&child, nodeProxy)
     if roleType == model.RoleTypeCoordinator {
-        mandate := model.Mandate{Purpose: en.CoordoPurpose}
-        child.Mandate = &mandate
+        child.Mandate = &model.Mandate{Purpose: en.CoordoPurpose}
     }
     return child
 }

@@ -56,7 +56,7 @@ const (
 type EventMap struct {
     Validation model.ContractType
     Auth AuthHookValue
-    Action func(*model.UserCtx, *model.Tension, *model.EventRef) (bool, error)
+    Action func(*model.UserCtx, *model.Tension, *model.EventRef, *model.BlobRef) (bool, error)
 }
 type EventsMap = map[model.TensionEvent]EventMap
 
@@ -129,6 +129,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     if tension.Emitter.RoleType != nil && *tension.Emitter.RoleType == model.RoleTypeBot &&
     (tension.Emitter.Rights & int(authEventsLut[*event.EventType])) > 0 {
         // Can only create tension in the parent circle of the bot.
+        // @DEBUG: run the BOT logics here...
         if pid, _ := codec.Nid2pid(tension.Emitter.Nameid); pid == tension.Receiver.Nameid {
             return true, err
         } else {
@@ -152,12 +153,12 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     }
 
     if TargetCoordoHook & em.Auth > 0 {
-        ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, tension.Receiver.Charac)
+        ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
         if ok { return ok, err }
     }
 
     if SourceCoordoHook & em.Auth > 0 {
-        ok, err := auth.HasCoordoRole(uctx, tension.Emitter.Nameid, tension.Emitter.Charac)
+        ok, err := auth.HasCoordoRole(uctx, tension.Emitter.Nameid, &tension.Emitter.Mode)
         if ok { return ok,  err }
     }
 
@@ -320,9 +321,5 @@ func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField stri
 
     // Check user ID match
     return uctx.Username == username, err
-}
-
-func GetNodeCharacStrict() model.NodeCharac {
-    return model.NodeCharac{UserCanJoin: false, Mode: model.NodeModeCoordinated}
 }
 

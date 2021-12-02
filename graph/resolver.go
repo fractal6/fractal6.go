@@ -282,6 +282,8 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, subfiel
             return nil, LogErr("Value Error", fmt.Errorf("%s or id is required.", *subfield))
         }
         filterValue := s.(string)
+
+        // Check existence
         ex, err :=  db.GetDB().Exists(fieldName, v, &filterName, &filterValue)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ex {

@@ -154,11 +154,6 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	AddNodeCharacPayload struct {
-		NodeCharac func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
-		NumUids    func(childComplexity int) int
-	}
-
 	AddNodeFragmentPayload struct {
 		NodeFragment func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
 		NumUids      func(childComplexity int) int
@@ -321,12 +316,6 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
-	DeleteNodeCharacPayload struct {
-		Msg        func(childComplexity int) int
-		NodeCharac func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
-		NumUids    func(childComplexity int) int
-	}
-
 	DeleteNodeFragmentPayload struct {
 		Msg          func(childComplexity int) int
 		NodeFragment func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
@@ -482,7 +471,6 @@ type ComplexityRoot struct {
 		AddLabel            func(childComplexity int, input []*model.AddLabelInput) int
 		AddMandate          func(childComplexity int, input []*model.AddMandateInput) int
 		AddNode             func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
-		AddNodeCharac       func(childComplexity int, input []*model.AddNodeCharacInput) int
 		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
 		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
 		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
@@ -497,7 +485,6 @@ type ComplexityRoot struct {
 		DeleteLabel         func(childComplexity int, filter model.LabelFilter) int
 		DeleteMandate       func(childComplexity int, filter model.MandateFilter) int
 		DeleteNode          func(childComplexity int, filter model.NodeFilter) int
-		DeleteNodeCharac    func(childComplexity int, filter model.NodeCharacFilter) int
 		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
 		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
 		DeletePost          func(childComplexity int, filter model.PostFilter) int
@@ -513,7 +500,6 @@ type ComplexityRoot struct {
 		UpdateLabel         func(childComplexity int, input model.UpdateLabelInput) int
 		UpdateMandate       func(childComplexity int, input model.UpdateMandateInput) int
 		UpdateNode          func(childComplexity int, input model.UpdateNodeInput) int
-		UpdateNodeCharac    func(childComplexity int, input model.UpdateNodeCharacInput) int
 		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
 		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
 		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
@@ -525,7 +511,6 @@ type ComplexityRoot struct {
 
 	Node struct {
 		About                func(childComplexity int) int
-		Charac               func(childComplexity int, filter *model.NodeCharacFilter) int
 		Children             func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		ChildrenAggregate    func(childComplexity int, filter *model.NodeFilter) int
 		Contracts            func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
@@ -538,11 +523,11 @@ type ComplexityRoot struct {
 		ID                   func(childComplexity int) int
 		IsArchived           func(childComplexity int) int
 		IsPersonal           func(childComplexity int) int
-		IsPrivate            func(childComplexity int) int
 		IsRoot               func(childComplexity int) int
 		Labels               func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		LabelsAggregate      func(childComplexity int, filter *model.LabelFilter) int
 		Mandate              func(childComplexity int, filter *model.MandateFilter) int
+		Mode                 func(childComplexity int) int
 		Name                 func(childComplexity int) int
 		Nameid               func(childComplexity int) int
 		OrgaAgg              func(childComplexity int, filter *model.OrgaAggFilter) int
@@ -559,6 +544,8 @@ type ComplexityRoot struct {
 		TensionsOutAggregate func(childComplexity int, filter *model.TensionFilter) int
 		Type                 func(childComplexity int) int
 		UpdatedAt            func(childComplexity int) int
+		UserCanJoin          func(childComplexity int) int
+		Visibility           func(childComplexity int) int
 	}
 
 	NodeAggregateResult struct {
@@ -581,31 +568,21 @@ type ComplexityRoot struct {
 		UpdatedAtMin  func(childComplexity int) int
 	}
 
-	NodeCharac struct {
-		ID          func(childComplexity int) int
-		Mode        func(childComplexity int) int
-		UserCanJoin func(childComplexity int) int
-	}
-
-	NodeCharacAggregateResult struct {
-		Count func(childComplexity int) int
-	}
-
 	NodeFragment struct {
 		About             func(childComplexity int) int
-		Charac            func(childComplexity int, filter *model.NodeCharacFilter) int
 		Children          func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
 		ChildrenAggregate func(childComplexity int, filter *model.NodeFragmentFilter) int
 		FirstLink         func(childComplexity int) int
 		ID                func(childComplexity int) int
-		IsPrivate         func(childComplexity int) int
 		Mandate           func(childComplexity int, filter *model.MandateFilter) int
+		Mode              func(childComplexity int) int
 		Name              func(childComplexity int) int
 		Nameid            func(childComplexity int) int
 		RoleType          func(childComplexity int) int
 		SecondLink        func(childComplexity int) int
 		Skills            func(childComplexity int) int
 		Type              func(childComplexity int) int
+		Visibility        func(childComplexity int) int
 	}
 
 	NodeFragmentAggregateResult struct {
@@ -679,7 +656,6 @@ type ComplexityRoot struct {
 		AggregateLabel         func(childComplexity int, filter *model.LabelFilter) int
 		AggregateMandate       func(childComplexity int, filter *model.MandateFilter) int
 		AggregateNode          func(childComplexity int, filter *model.NodeFilter) int
-		AggregateNodeCharac    func(childComplexity int, filter *model.NodeCharacFilter) int
 		AggregateNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter) int
 		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
 		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
@@ -694,7 +670,6 @@ type ComplexityRoot struct {
 		GetLabel               func(childComplexity int, id string) int
 		GetMandate             func(childComplexity int, id string) int
 		GetNode                func(childComplexity int, id *string, nameid *string) int
-		GetNodeCharac          func(childComplexity int, id string) int
 		GetNodeFragment        func(childComplexity int, id string) int
 		GetPost                func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
@@ -708,7 +683,6 @@ type ComplexityRoot struct {
 		QueryLabel             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		QueryMandate           func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		QueryNode              func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		QueryNodeCharac        func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
 		QueryNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
 		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
@@ -808,11 +782,6 @@ type ComplexityRoot struct {
 	UpdateMandatePayload struct {
 		Mandate func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
-	}
-
-	UpdateNodeCharacPayload struct {
-		NodeCharac func(childComplexity int, filter *model.NodeCharacFilter, first *int, offset *int) int
-		NumUids    func(childComplexity int) int
 	}
 
 	UpdateNodeFragmentPayload struct {
@@ -952,9 +921,6 @@ type MutationResolver interface {
 	AddMandate(ctx context.Context, input []*model.AddMandateInput) (*model.AddMandatePayload, error)
 	UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (*model.UpdateMandatePayload, error)
 	DeleteMandate(ctx context.Context, filter model.MandateFilter) (*model.DeleteMandatePayload, error)
-	AddNodeCharac(ctx context.Context, input []*model.AddNodeCharacInput) (*model.AddNodeCharacPayload, error)
-	UpdateNodeCharac(ctx context.Context, input model.UpdateNodeCharacInput) (*model.UpdateNodeCharacPayload, error)
-	DeleteNodeCharac(ctx context.Context, filter model.NodeCharacFilter) (*model.DeleteNodeCharacPayload, error)
 	AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (*model.AddOrgaAggPayload, error)
 	UpdateOrgaAgg(ctx context.Context, input model.UpdateOrgaAggInput) (*model.UpdateOrgaAggPayload, error)
 	DeleteOrgaAgg(ctx context.Context, filter model.OrgaAggFilter) (*model.DeleteOrgaAggPayload, error)
@@ -1001,9 +967,6 @@ type QueryResolver interface {
 	GetMandate(ctx context.Context, id string) (*model.Mandate, error)
 	QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) ([]*model.Mandate, error)
 	AggregateMandate(ctx context.Context, filter *model.MandateFilter) (*model.MandateAggregateResult, error)
-	GetNodeCharac(ctx context.Context, id string) (*model.NodeCharac, error)
-	QueryNodeCharac(ctx context.Context, filter *model.NodeCharacFilter, first *int, offset *int) ([]*model.NodeCharac, error)
-	AggregateNodeCharac(ctx context.Context, filter *model.NodeCharacFilter) (*model.NodeCharacAggregateResult, error)
 	QueryOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) ([]*model.OrgaAgg, error)
 	AggregateOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter) (*model.OrgaAggAggregateResult, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
@@ -1186,25 +1149,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddMandatePayload.NumUids(childComplexity), true
-
-	case "AddNodeCharacPayload.nodeCharac":
-		if e.complexity.AddNodeCharacPayload.NodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_AddNodeCharacPayload_nodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.AddNodeCharacPayload.NodeCharac(childComplexity, args["filter"].(*model.NodeCharacFilter), args["first"].(*int), args["offset"].(*int)), true
-
-	case "AddNodeCharacPayload.numUids":
-		if e.complexity.AddNodeCharacPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.AddNodeCharacPayload.NumUids(childComplexity), true
 
 	case "AddNodeFragmentPayload.nodeFragment":
 		if e.complexity.AddNodeFragmentPayload.NodeFragment == nil {
@@ -2055,32 +1999,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteMandatePayload.NumUids(childComplexity), true
 
-	case "DeleteNodeCharacPayload.msg":
-		if e.complexity.DeleteNodeCharacPayload.Msg == nil {
-			break
-		}
-
-		return e.complexity.DeleteNodeCharacPayload.Msg(childComplexity), true
-
-	case "DeleteNodeCharacPayload.nodeCharac":
-		if e.complexity.DeleteNodeCharacPayload.NodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_DeleteNodeCharacPayload_nodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.DeleteNodeCharacPayload.NodeCharac(childComplexity, args["filter"].(*model.NodeCharacFilter), args["first"].(*int), args["offset"].(*int)), true
-
-	case "DeleteNodeCharacPayload.numUids":
-		if e.complexity.DeleteNodeCharacPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.DeleteNodeCharacPayload.NumUids(childComplexity), true
-
 	case "DeleteNodeFragmentPayload.msg":
 		if e.complexity.DeleteNodeFragmentPayload.Msg == nil {
 			break
@@ -2912,18 +2830,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddNode(childComplexity, args["input"].([]*model.AddNodeInput), args["upsert"].(*bool)), true
 
-	case "Mutation.addNodeCharac":
-		if e.complexity.Mutation.AddNodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addNodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddNodeCharac(childComplexity, args["input"].([]*model.AddNodeCharacInput)), true
-
 	case "Mutation.addNodeFragment":
 		if e.complexity.Mutation.AddNodeFragment == nil {
 			break
@@ -3091,18 +2997,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteNode(childComplexity, args["filter"].(model.NodeFilter)), true
-
-	case "Mutation.deleteNodeCharac":
-		if e.complexity.Mutation.DeleteNodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteNodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteNodeCharac(childComplexity, args["filter"].(model.NodeCharacFilter)), true
 
 	case "Mutation.deleteNodeFragment":
 		if e.complexity.Mutation.DeleteNodeFragment == nil {
@@ -3284,18 +3178,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateNode(childComplexity, args["input"].(model.UpdateNodeInput)), true
 
-	case "Mutation.updateNodeCharac":
-		if e.complexity.Mutation.UpdateNodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateNodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateNodeCharac(childComplexity, args["input"].(model.UpdateNodeCharacInput)), true
-
 	case "Mutation.updateNodeFragment":
 		if e.complexity.Mutation.UpdateNodeFragment == nil {
 			break
@@ -3386,18 +3268,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.About(childComplexity), true
-
-	case "Node.charac":
-		if e.complexity.Node.Charac == nil {
-			break
-		}
-
-		args, err := ec.field_Node_charac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.Charac(childComplexity, args["filter"].(*model.NodeCharacFilter)), true
 
 	case "Node.children":
 		if e.complexity.Node.Children == nil {
@@ -3523,13 +3393,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.IsPersonal(childComplexity), true
 
-	case "Node.isPrivate":
-		if e.complexity.Node.IsPrivate == nil {
-			break
-		}
-
-		return e.complexity.Node.IsPrivate(childComplexity), true
-
 	case "Node.isRoot":
 		if e.complexity.Node.IsRoot == nil {
 			break
@@ -3572,6 +3435,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
+
+	case "Node.mode":
+		if e.complexity.Node.Mode == nil {
+			break
+		}
+
+		return e.complexity.Node.Mode(childComplexity), true
 
 	case "Node.name":
 		if e.complexity.Node.Name == nil {
@@ -3725,6 +3595,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.UpdatedAt(childComplexity), true
 
+	case "Node.userCanJoin":
+		if e.complexity.Node.UserCanJoin == nil {
+			break
+		}
+
+		return e.complexity.Node.UserCanJoin(childComplexity), true
+
+	case "Node.visibility":
+		if e.complexity.Node.Visibility == nil {
+			break
+		}
+
+		return e.complexity.Node.Visibility(childComplexity), true
+
 	case "NodeAggregateResult.aboutMax":
 		if e.complexity.NodeAggregateResult.AboutMax == nil {
 			break
@@ -3844,52 +3728,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NodeAggregateResult.UpdatedAtMin(childComplexity), true
 
-	case "NodeCharac.id":
-		if e.complexity.NodeCharac.ID == nil {
-			break
-		}
-
-		return e.complexity.NodeCharac.ID(childComplexity), true
-
-	case "NodeCharac.mode":
-		if e.complexity.NodeCharac.Mode == nil {
-			break
-		}
-
-		return e.complexity.NodeCharac.Mode(childComplexity), true
-
-	case "NodeCharac.userCanJoin":
-		if e.complexity.NodeCharac.UserCanJoin == nil {
-			break
-		}
-
-		return e.complexity.NodeCharac.UserCanJoin(childComplexity), true
-
-	case "NodeCharacAggregateResult.count":
-		if e.complexity.NodeCharacAggregateResult.Count == nil {
-			break
-		}
-
-		return e.complexity.NodeCharacAggregateResult.Count(childComplexity), true
-
 	case "NodeFragment.about":
 		if e.complexity.NodeFragment.About == nil {
 			break
 		}
 
 		return e.complexity.NodeFragment.About(childComplexity), true
-
-	case "NodeFragment.charac":
-		if e.complexity.NodeFragment.Charac == nil {
-			break
-		}
-
-		args, err := ec.field_NodeFragment_charac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.NodeFragment.Charac(childComplexity, args["filter"].(*model.NodeCharacFilter)), true
 
 	case "NodeFragment.children":
 		if e.complexity.NodeFragment.Children == nil {
@@ -3929,13 +3773,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NodeFragment.ID(childComplexity), true
 
-	case "NodeFragment.isPrivate":
-		if e.complexity.NodeFragment.IsPrivate == nil {
-			break
-		}
-
-		return e.complexity.NodeFragment.IsPrivate(childComplexity), true
-
 	case "NodeFragment.mandate":
 		if e.complexity.NodeFragment.Mandate == nil {
 			break
@@ -3947,6 +3784,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeFragment.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
+
+	case "NodeFragment.mode":
+		if e.complexity.NodeFragment.Mode == nil {
+			break
+		}
+
+		return e.complexity.NodeFragment.Mode(childComplexity), true
 
 	case "NodeFragment.name":
 		if e.complexity.NodeFragment.Name == nil {
@@ -3989,6 +3833,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeFragment.Type(childComplexity), true
+
+	case "NodeFragment.visibility":
+		if e.complexity.NodeFragment.Visibility == nil {
+			break
+		}
+
+		return e.complexity.NodeFragment.Visibility(childComplexity), true
 
 	case "NodeFragmentAggregateResult.aboutMax":
 		if e.complexity.NodeFragmentAggregateResult.AboutMax == nil {
@@ -4357,18 +4208,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateNode(childComplexity, args["filter"].(*model.NodeFilter)), true
 
-	case "Query.aggregateNodeCharac":
-		if e.complexity.Query.AggregateNodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_Query_aggregateNodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.AggregateNodeCharac(childComplexity, args["filter"].(*model.NodeCharacFilter)), true
-
 	case "Query.aggregateNodeFragment":
 		if e.complexity.Query.AggregateNodeFragment == nil {
 			break
@@ -4537,18 +4376,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetNode(childComplexity, args["id"].(*string), args["nameid"].(*string)), true
 
-	case "Query.getNodeCharac":
-		if e.complexity.Query.GetNodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getNodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetNodeCharac(childComplexity, args["id"].(string)), true
-
 	case "Query.getNodeFragment":
 		if e.complexity.Query.GetNodeFragment == nil {
 			break
@@ -4704,18 +4531,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryNode(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "Query.queryNodeCharac":
-		if e.complexity.Query.QueryNodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_Query_queryNodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.QueryNodeCharac(childComplexity, args["filter"].(*model.NodeCharacFilter), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryNodeFragment":
 		if e.complexity.Query.QueryNodeFragment == nil {
@@ -5365,25 +5180,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateMandatePayload.NumUids(childComplexity), true
-
-	case "UpdateNodeCharacPayload.nodeCharac":
-		if e.complexity.UpdateNodeCharacPayload.NodeCharac == nil {
-			break
-		}
-
-		args, err := ec.field_UpdateNodeCharacPayload_nodeCharac_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.UpdateNodeCharacPayload.NodeCharac(childComplexity, args["filter"].(*model.NodeCharacFilter), args["first"].(*int), args["offset"].(*int)), true
-
-	case "UpdateNodeCharacPayload.numUids":
-		if e.complexity.UpdateNodeCharacPayload.NumUids == nil {
-			break
-		}
-
-		return e.complexity.UpdateNodeCharacPayload.NumUids(childComplexity), true
 
 	case "UpdateNodeFragmentPayload.nodeFragment":
 		if e.complexity.UpdateNodeFragmentPayload.NodeFragment == nil {
@@ -6276,7 +6072,7 @@ directive @hook_deleteVote on FIELD_DEFINITION
 
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
-        queryNode(filter: {isPrivate: false}) { id }
+        queryNode(filter: {visibility: {eq: Public}}) { id }
     }"""
 },{ rule:"""query ($ROOTIDS: [String!]) {
         queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }
@@ -6299,13 +6095,14 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   mandate(filter: MandateFilter): Mandate
   docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   source(filter: BlobFilter): Blob
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  visibility: NodeVisibility! @search
+  mode: NodeMode! @search
+  rights: Int!
+  isArchived: Boolean! @search
   isRoot: Boolean! @search
   isPersonal: Boolean @search
-  isPrivate: Boolean! @search
-  isArchived: Boolean! @search
-  charac(filter: NodeCharacFilter): NodeCharac!
-  rights: Int!
-  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  userCanJoin: Boolean
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
@@ -6326,10 +6123,10 @@ type NodeFragment {
   name: String
   nameid: String
   type_: NodeType
-  isPrivate: Boolean
-  charac(filter: NodeCharacFilter): NodeCharac
   about: String
   mandate(filter: MandateFilter): Mandate
+  visibility: NodeVisibility
+  mode: NodeMode
   children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
   first_link: String
   second_link: String
@@ -6345,12 +6142,6 @@ type Mandate {
   responsabilities: String
   domains: String
   policies: String
-}
-
-type NodeCharac {
-  id: ID!
-  userCanJoin: Boolean! @search
-  mode: NodeMode! @search
 }
 
 type OrgaAgg {
@@ -6376,7 +6167,7 @@ type Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
         queryTension {
-          receiver(filter: {isPrivate: false}) { id }
+          receiver(filter: {visibility: {eq: Public}}) { id }
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String!]) {
@@ -6434,7 +6225,7 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
         queryLabel { 
-          nodes(filter: {isPrivate: false}) { id }
+          nodes(filter: {visibility: {eq: Public}}) { id }
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String!]) {
@@ -6506,7 +6297,7 @@ type EventFragment {
 type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query {
         queryContract {
-          tension { receiver(filter: {isPrivate: false}) { id } }
+          tension { receiver(filter: {visibility: {eq: Public}}) { id } }
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String!]) {
@@ -6616,6 +6407,15 @@ enum RoleType {
 
 }
 
+enum NodeVisibility {
+  Public
+
+  Private
+
+  Secret
+
+}
+
 enum NodeMode {
   Coordinated
 
@@ -6677,7 +6477,8 @@ enum TensionEvent {
   UserLeft
   MemberLinked
   MemberUnlinked
-  NodeAuth
+  Authority
+  Visibility
   Moved
 }
 
@@ -6717,35 +6518,35 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6855,24 +6656,14 @@ type AddMandatePayload {
   numUids: Int
 }
 
-input AddNodeCharacInput {
-  userCanJoin: Boolean!
-  mode: NodeMode!
-}
-
-type AddNodeCharacPayload {
-  nodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
-  numUids: Int
-}
-
 input AddNodeFragmentInput {
   name: String @alter_minLength(n:1)
   nameid: String @alter_toLower
   type_: NodeType
-  isPrivate: Boolean
-  charac: NodeCharacRef
   about: String @alter_maxLength(n:280)
   mandate: MandateRef
+  visibility: NodeVisibility
+  mode: NodeMode
   children: [NodeFragmentRef!]
   first_link: String
   second_link: String
@@ -6901,13 +6692,14 @@ input AddNodeInput {
   mandate: MandateRef
   docs: [BlobRef]
   source: BlobRef
+  labels: [LabelRef!]
+  visibility: NodeVisibility!
+  mode: NodeMode!
+  rights: Int! @alter_RO
+  isArchived: Boolean!
   isRoot: Boolean!
   isPersonal: Boolean
-  isPrivate: Boolean!
-  isArchived: Boolean!
-  charac: NodeCharacRef!
-  rights: Int! @alter_RO
-  labels: [LabelRef!]
+  userCanJoin: Boolean
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
@@ -7347,12 +7139,6 @@ type DeleteMandatePayload {
   numUids: Int
 }
 
-type DeleteNodeCharacPayload {
-  nodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
-  msg: String
-  numUids: Int
-}
-
 type DeleteNodeFragmentPayload {
   nodeFragment(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment]
   msg: String
@@ -7768,9 +7554,6 @@ type Mutation {
   addMandate(input: [AddMandateInput!]!): AddMandatePayload
   updateMandate(input: UpdateMandateInput!): UpdateMandatePayload
   deleteMandate(filter: MandateFilter!): DeleteMandatePayload
-  addNodeCharac(input: [AddNodeCharacInput!]!): AddNodeCharacPayload
-  updateNodeCharac(input: UpdateNodeCharacInput!): UpdateNodeCharacPayload
-  deleteNodeCharac(filter: NodeCharacFilter!): DeleteNodeCharacPayload
   addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
   updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
   deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
@@ -7833,36 +7616,6 @@ type NodeAggregateResult {
   rightsAvg: Float
 }
 
-type NodeCharacAggregateResult {
-  count: Int
-}
-
-input NodeCharacFilter {
-  id: [ID!]
-  userCanJoin: Boolean
-  mode: NodeMode_hash
-  has: [NodeCharacHasFilter]
-  and: [NodeCharacFilter]
-  or: [NodeCharacFilter]
-  not: NodeCharacFilter
-}
-
-enum NodeCharacHasFilter {
-  userCanJoin
-  mode
-}
-
-input NodeCharacPatch {
-  userCanJoin: Boolean
-  mode: NodeMode
-}
-
-input NodeCharacRef {
-  id: ID
-  userCanJoin: Boolean
-  mode: NodeMode
-}
-
 input NodeFilter {
   id: [ID!]
   createdAt: DateTimeFilter
@@ -7871,10 +7624,11 @@ input NodeFilter {
   rootnameid: StringHashFilter_StringRegExpFilter
   type_: NodeType_hash
   about: StringFullTextFilter
+  visibility: NodeVisibility_hash
+  mode: NodeMode_hash
+  isArchived: Boolean
   isRoot: Boolean
   isPersonal: Boolean
-  isPrivate: Boolean
-  isArchived: Boolean
   skills: StringTermFilter
   role_type: RoleType_hash
   has: [NodeHasFilter]
@@ -7909,10 +7663,10 @@ enum NodeFragmentHasFilter {
   name
   nameid
   type_
-  isPrivate
-  charac
   about
   mandate
+  visibility
+  mode
   children
   first_link
   second_link
@@ -7938,10 +7692,10 @@ input NodeFragmentPatch {
   name: String @alter_minLength(n:1)
   nameid: String @alter_toLower
   type_: NodeType
-  isPrivate: Boolean
-  charac: NodeCharacRef
   about: String @alter_maxLength(n:280)
   mandate: MandateRef
+  visibility: NodeVisibility
+  mode: NodeMode
   children: [NodeFragmentRef!]
   first_link: String
   second_link: String
@@ -7954,10 +7708,10 @@ input NodeFragmentRef {
   name: String
   nameid: String
   type_: NodeType
-  isPrivate: Boolean
-  charac: NodeCharacRef
   about: String
   mandate: MandateRef
+  visibility: NodeVisibility
+  mode: NodeMode
   children: [NodeFragmentRef!]
   first_link: String
   second_link: String
@@ -7981,13 +7735,14 @@ enum NodeHasFilter {
   mandate
   docs
   source
+  labels
+  visibility
+  mode
+  rights
+  isArchived
   isRoot
   isPersonal
-  isPrivate
-  isArchived
-  charac
-  rights
-  labels
+  userCanJoin
   first_link
   second_link
   skills
@@ -8032,13 +7787,14 @@ input NodePatch {
   mandate: MandateRef @patch_RO
   docs: [BlobRef] @patch_RO
   source: BlobRef @patch_RO
+  labels: [LabelRef!] @patch_RO
+  visibility: NodeVisibility @patch_RO
+  mode: NodeMode @patch_RO
+  rights: Int @alter_RO
+  isArchived: Boolean @patch_RO
   isRoot: Boolean @patch_RO
   isPersonal: Boolean @patch_RO
-  isPrivate: Boolean @patch_RO
-  isArchived: Boolean @patch_RO
-  charac: NodeCharacRef @patch_RO
-  rights: Int @alter_RO
-  labels: [LabelRef!] @patch_RO
+  userCanJoin: Boolean @patch_RO
   first_link: UserRef @patch_RO
   second_link: UserRef @patch_RO
   skills: [String!] @patch_RO
@@ -8064,13 +7820,14 @@ input NodeRef {
   mandate: MandateRef
   docs: [BlobRef]
   source: BlobRef
+  labels: [LabelRef!]
+  visibility: NodeVisibility
+  mode: NodeMode
+  rights: Int
+  isArchived: Boolean
   isRoot: Boolean
   isPersonal: Boolean
-  isPrivate: Boolean
-  isArchived: Boolean
-  charac: NodeCharacRef
-  rights: Int
-  labels: [LabelRef!]
+  userCanJoin: Boolean
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
@@ -8082,6 +7839,11 @@ input NodeRef {
 input NodeType_hash {
   eq: NodeType
   in: [NodeType]
+}
+
+input NodeVisibility_hash {
+  eq: NodeVisibility
+  in: [NodeVisibility]
 }
 
 type OrgaAggAggregateResult {
@@ -8227,9 +7989,6 @@ type Query {
   getMandate(id: ID!): Mandate
   queryMandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
   aggregateMandate(filter: MandateFilter): MandateAggregateResult
-  getNodeCharac(id: ID!): NodeCharac
-  queryNodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
-  aggregateNodeCharac(filter: NodeCharacFilter): NodeCharacAggregateResult
   queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
@@ -8539,17 +8298,6 @@ input UpdateMandateInput {
 
 type UpdateMandatePayload {
   mandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
-  numUids: Int
-}
-
-input UpdateNodeCharacInput {
-  filter: NodeCharacFilter!
-  set: NodeCharacPatch
-  remove: NodeCharacPatch
-}
-
-type UpdateNodeCharacPayload {
-  nodeCharac(filter: NodeCharacFilter, first: Int, offset: Int): [NodeCharac]
   numUids: Int
 }
 
@@ -9546,39 +9294,6 @@ func (ec *executionContext) field_AddMandatePayload_mandate_args(ctx context.Con
 	return args, nil
 }
 
-func (ec *executionContext) field_AddNodeCharacPayload_nodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg2
-	return args, nil
-}
-
 func (ec *executionContext) field_AddNodeFragmentPayload_nodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10443,39 +10158,6 @@ func (ec *executionContext) field_DeleteMandatePayload_mandate_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_DeleteNodeCharacPayload_nodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg2
-	return args, nil
-}
-
 func (ec *executionContext) field_DeleteNodeFragmentPayload_nodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11119,21 +10801,6 @@ func (ec *executionContext) field_Mutation_addMandate_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_addNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []*model.AddNodeCharacInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddNodeCharacInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_addNodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11463,21 +11130,6 @@ func (ec *executionContext) field_Mutation_deleteMandate_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNNodeCharacFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_deleteNodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11793,21 +11445,6 @@ func (ec *executionContext) field_Mutation_updateMandate_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.UpdateNodeCharacInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateNodeCharacInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeCharacInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updateNodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11973,21 +11610,6 @@ func (ec *executionContext) field_Mutation_updateVote_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_NodeFragment_charac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_NodeFragment_childrenAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12052,21 +11674,6 @@ func (ec *executionContext) field_NodeFragment_mandate_args(ctx context.Context,
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_charac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12657,21 +12264,6 @@ func (ec *executionContext) field_Query_aggregateMandate_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_aggregateNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_aggregateNodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12918,21 +12510,6 @@ func (ec *executionContext) field_Query_getLabel_args(ctx context.Context, rawAr
 }
 
 func (ec *executionContext) field_Query_getMandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -13443,39 +13020,6 @@ func (ec *executionContext) field_Query_queryMandate_args(ctx context.Context, r
 		}
 	}
 	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_queryNodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg2
 	return args, nil
 }
 
@@ -14541,39 +14085,6 @@ func (ec *executionContext) field_UpdateMandatePayload_mandate_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_UpdateNodeCharacPayload_nodeCharac_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeCharacFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg2
-	return args, nil
-}
-
 func (ec *executionContext) field_UpdateNodeFragmentPayload_nodeFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15537,7 +15048,7 @@ func (ec *executionContext) _AddContractPayload_contract(ctx context.Context, fi
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -15756,7 +15267,7 @@ func (ec *executionContext) _AddLabelPayload_label(ctx context.Context, field gr
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -15881,71 +15392,6 @@ func (ec *executionContext) _AddMandatePayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AddNodeCharacPayload_nodeCharac(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AddNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_AddNodeCharacPayload_nodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NodeCharac, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AddNodeCharacPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AddNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _AddNodeFragmentPayload_nodeFragment(ctx context.Context, field graphql.CollectedField, obj *model.AddNodeFragmentPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -16040,7 +15486,7 @@ func (ec *executionContext) _AddNodePayload_node(ctx context.Context, field grap
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -16194,7 +15640,7 @@ func (ec *executionContext) _AddTensionPayload_tension(ctx context.Context, fiel
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -16506,7 +15952,7 @@ func (ec *executionContext) _Blob_tension(ctx context.Context, field graphql.Col
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -17891,7 +17337,7 @@ func (ec *executionContext) _Contract_tension(ctx context.Context, field graphql
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -19236,7 +18682,7 @@ func (ec *executionContext) _DeleteContractPayload_contract(ctx context.Context,
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -19542,7 +18988,7 @@ func (ec *executionContext) _DeleteLabelPayload_label(ctx context.Context, field
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -19725,100 +19171,6 @@ func (ec *executionContext) _DeleteMandatePayload_numUids(ctx context.Context, f
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DeleteNodeCharacPayload_nodeCharac(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "DeleteNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_DeleteNodeCharacPayload_nodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NodeCharac, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _DeleteNodeCharacPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "DeleteNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Msg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _DeleteNodeCharacPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "DeleteNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _DeleteNodeFragmentPayload_nodeFragment(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNodeFragmentPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -19942,7 +19294,7 @@ func (ec *executionContext) _DeleteNodePayload_node(ctx context.Context, field g
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -20272,7 +19624,7 @@ func (ec *executionContext) _DeleteTensionPayload_tension(ctx context.Context, f
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -20700,7 +20052,7 @@ func (ec *executionContext) _Event_tension(ctx context.Context, field graphql.Co
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -21858,7 +21210,7 @@ func (ec *executionContext) _Label_tensions(ctx context.Context, field graphql.C
 			return obj.Tensions, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -21932,7 +21284,7 @@ func (ec *executionContext) _Label_nodes(ctx context.Context, field graphql.Coll
 			return obj.Nodes, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -23446,114 +22798,6 @@ func (ec *executionContext) _Mutation_deleteMandate(ctx context.Context, field g
 	res := resTmp.(*model.DeleteMandatePayload)
 	fc.Result = res
 	return ec.marshalODeleteMandatePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteMandatePayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_addNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addNodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddNodeCharac(rctx, args["input"].([]*model.AddNodeCharacInput))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.AddNodeCharacPayload)
-	fc.Result = res
-	return ec.marshalOAddNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_updateNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateNodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateNodeCharac(rctx, args["input"].(model.UpdateNodeCharacInput))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.UpdateNodeCharacPayload)
-	fc.Result = res
-	return ec.marshalOUpdateNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeCharacPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_deleteNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteNodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteNodeCharac(rctx, args["filter"].(model.NodeCharacFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.DeleteNodeCharacPayload)
-	fc.Result = res
-	return ec.marshalODeleteNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodeCharacPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -25471,7 +24715,7 @@ func (ec *executionContext) _Node_parent(ctx context.Context, field graphql.Coll
 			return obj.Parent, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -25531,7 +24775,7 @@ func (ec *executionContext) _Node_children(ctx context.Context, field graphql.Co
 			return obj.Children, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -25653,7 +24897,7 @@ func (ec *executionContext) _Node_tensions_out(ctx context.Context, field graphq
 			return obj.TensionsOut, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -25727,7 +24971,7 @@ func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql
 			return obj.TensionsIn, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -25933,6 +25177,254 @@ func (ec *executionContext) _Node_source(ctx context.Context, field graphql.Coll
 	return ec.marshalOBlob2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_labels(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_labels_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Labels, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Label); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Label`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Label)
+	fc.Result = res
+	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_visibility(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Visibility, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(model.NodeVisibility); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.NodeVisibility`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.NodeVisibility)
+	fc.Result = res
+	return ec.marshalNNodeVisibility2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_mode(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Mode, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(model.NodeMode); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.NodeMode`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.NodeMode)
+	fc.Result = res
+	return ec.marshalNNodeMode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_rights(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rights, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_isArchived(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.IsArchived, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -26034,150 +25526,7 @@ func (ec *executionContext) _Node_isPersonal(ctx context.Context, field graphql.
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Node_isPrivate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.IsPrivate, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_isArchived(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.IsArchived, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_charac(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_charac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Charac, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalNNodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_rights(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+func (ec *executionContext) _Node_userCanJoin(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -26195,78 +25544,15 @@ func (ec *executionContext) _Node_rights(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Rights, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_labels(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Node_labels_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Labels, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*model.Label); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Label`, tmp)
+		return obj.UserCanJoin, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Label)
+	res := resTmp.(*bool)
 	fc.Result = res
-	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Node_first_link(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
@@ -27286,171 +26572,6 @@ func (ec *executionContext) _NodeAggregateResult_rightsAvg(ctx context.Context, 
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeCharac_id(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeCharac",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeCharac_userCanJoin(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeCharac",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.UserCanJoin, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeCharac_mode(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharac) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeCharac",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.Mode, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Search == nil {
-				return nil, errors.New("directive search is not implemented")
-			}
-			return ec.directives.Search(ctx, obj, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(model.NodeMode); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.NodeMode`, tmp)
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model.NodeMode)
-	fc.Result = res
-	return ec.marshalNNodeMode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeCharacAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.NodeCharacAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeCharacAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _NodeFragment_id(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -27570,71 +26691,6 @@ func (ec *executionContext) _NodeFragment_type_(ctx context.Context, field graph
 	return ec.marshalONodeType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NodeFragment_isPrivate(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeFragment",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsPrivate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NodeFragment_charac(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "NodeFragment",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_NodeFragment_charac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Charac, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _NodeFragment_about(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -27698,6 +26754,64 @@ func (ec *executionContext) _NodeFragment_mandate(ctx context.Context, field gra
 	res := resTmp.(*model.Mandate)
 	fc.Result = res
 	return ec.marshalOMandate2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragment_visibility(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NodeFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Visibility, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeVisibility)
+	fc.Result = res
+	return ec.marshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragment_mode(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NodeFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mode, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeMode)
+	fc.Result = res
+	return ec.marshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeFragment_children(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
@@ -29091,7 +28205,7 @@ func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.Co
 			return ec.resolvers.Query().GetNode(rctx, args["id"].(*string), args["nameid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29151,7 +28265,7 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 			return ec.resolvers.Query().QueryNode(rctx, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29434,114 +28548,6 @@ func (ec *executionContext) _Query_aggregateMandate(ctx context.Context, field g
 	return ec.marshalOMandateAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateAggregateResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_getNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_getNodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetNodeCharac(rctx, args["id"].(string))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_queryNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_queryNodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryNodeCharac(rctx, args["filter"].(*model.NodeCharacFilter), args["first"].(*int), args["offset"].(*int))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_aggregateNodeCharac(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_aggregateNodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateNodeCharac(rctx, args["filter"].(*model.NodeCharacFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeCharacAggregateResult)
-	fc.Result = res
-	return ec.marshalONodeCharacAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacAggregateResult(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Query_queryOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -29799,7 +28805,7 @@ func (ec *executionContext) _Query_getTension(ctx context.Context, field graphql
 			return ec.resolvers.Query().GetTension(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29863,7 +28869,7 @@ func (ec *executionContext) _Query_queryTension(ctx context.Context, field graph
 			return ec.resolvers.Query().QueryTension(rctx, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29963,7 +28969,7 @@ func (ec *executionContext) _Query_getLabel(ctx context.Context, field graphql.C
 			return ec.resolvers.Query().GetLabel(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30023,7 +29029,7 @@ func (ec *executionContext) _Query_queryLabel(ctx context.Context, field graphql
 			return ec.resolvers.Query().QueryLabel(rctx, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30563,7 +29569,7 @@ func (ec *executionContext) _Query_getContract(ctx context.Context, field graphq
 			return ec.resolvers.Query().GetContract(rctx, args["id"].(*string), args["contractid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30623,7 +29629,7 @@ func (ec *executionContext) _Query_queryContract(ctx context.Context, field grap
 			return ec.resolvers.Query().QueryContract(rctx, args["filter"].(*model.ContractFilter), args["order"].(*model.ContractOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31176,7 +30182,7 @@ func (ec *executionContext) _Tension_emitter(ctx context.Context, field graphql.
 			return obj.Emitter, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31295,7 +30301,7 @@ func (ec *executionContext) _Tension_receiver(ctx context.Context, field graphql
 			return obj.Receiver, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31603,7 +30609,7 @@ func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.C
 			return obj.Labels, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31812,7 +30818,7 @@ func (ec *executionContext) _Tension_contracts(ctx context.Context, field graphq
 			return obj.Contracts, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -33245,7 +32251,7 @@ func (ec *executionContext) _UpdateContractPayload_contract(ctx context.Context,
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -33464,7 +32470,7 @@ func (ec *executionContext) _UpdateLabelPayload_label(ctx context.Context, field
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -33589,71 +32595,6 @@ func (ec *executionContext) _UpdateMandatePayload_numUids(ctx context.Context, f
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _UpdateNodeCharacPayload_nodeCharac(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UpdateNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_UpdateNodeCharacPayload_nodeCharac_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NodeCharac, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NodeCharac)
-	fc.Result = res
-	return ec.marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UpdateNodeCharacPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNodeCharacPayload) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UpdateNodeCharacPayload",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _UpdateNodeFragmentPayload_nodeFragment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNodeFragmentPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -33748,7 +32689,7 @@ func (ec *executionContext) _UpdateNodePayload_node(ctx context.Context, field g
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -33991,7 +32932,7 @@ func (ec *executionContext) _UpdateTensionPayload_tension(ctx context.Context, f
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -34734,7 +33675,7 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 			return obj.Roles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -34804,7 +33745,7 @@ func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphq
 			return obj.BackedRoles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -34874,7 +33815,7 @@ func (ec *executionContext) _User_tensions_created(ctx context.Context, field gr
 			return obj.TensionsCreated, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -34948,7 +33889,7 @@ func (ec *executionContext) _User_tensions_assigned(ctx context.Context, field g
 			return obj.TensionsAssigned, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {isPrivate: false}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35022,7 +33963,7 @@ func (ec *executionContext) _User_contracts(ctx context.Context, field graphql.C
 			return obj.Contracts, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36238,7 +35179,7 @@ func (ec *executionContext) _Vote_contract(ctx context.Context, field graphql.Co
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {isPrivate: false}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36301,7 +35242,7 @@ func (ec *executionContext) _Vote_node(ctx context.Context, field graphql.Collec
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {isPrivate: false}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -38414,34 +37355,6 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddNodeCharacInput(ctx context.Context, obj interface{}) (model.AddNodeCharacInput, error) {
-	var it model.AddNodeCharacInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "userCanJoin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
-			it.UserCanJoin, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "mode":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalNNodeMode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Context, obj interface{}) (model.AddNodeFragmentInput, error) {
 	var it model.AddNodeFragmentInput
 	var asMap = obj.(map[string]interface{})
@@ -38508,22 +37421,6 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("charac"))
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "about":
 			var err error
 
@@ -38557,6 +37454,22 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
 			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "visibility":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -38748,43 +37661,27 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "isRoot":
+		case "labels":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalNBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "isPersonal":
+		case "visibility":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
-			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			it.Visibility, err = ec.unmarshalNNodeVisibility2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
+		case "mode":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
-			it.IsPrivate, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isArchived":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			it.IsArchived, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("charac"))
-			it.Charac, err = ec.unmarshalNNodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			it.Mode, err = ec.unmarshalNNodeMode2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -38810,11 +37707,35 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "labels":
+		case "isArchived":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
+			it.IsArchived, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRoot":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
+			it.IsRoot, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPersonal":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
+			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userCanJoin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
+			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -42478,138 +41399,6 @@ func (ec *executionContext) unmarshalInputNearFilter(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNodeCharacFilter(ctx context.Context, obj interface{}) (model.NodeCharacFilter, error) {
-	var it model.NodeCharacFilter
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "userCanJoin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "mode":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeModeHash(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "has":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalONodeCharacHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "and":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalONodeCharacFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "or":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalONodeCharacFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "not":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNodeCharacPatch(ctx context.Context, obj interface{}) (model.NodeCharacPatch, error) {
-	var it model.NodeCharacPatch
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "userCanJoin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "mode":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNodeCharacRef(ctx context.Context, obj interface{}) (model.NodeCharacRef, error) {
-	var it model.NodeCharacRef
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "userCanJoin":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "mode":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj interface{}) (model.NodeFilter, error) {
 	var it model.NodeFilter
 	var asMap = obj.(map[string]interface{})
@@ -42672,6 +41461,30 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "visibility":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			it.Visibility, err = ec.unmarshalONodeVisibility_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibilityHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			it.Mode, err = ec.unmarshalONodeMode_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeModeHash(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isArchived":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
+			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isRoot":
 			var err error
 
@@ -42685,22 +41498,6 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
 			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isPrivate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isArchived":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -42912,22 +41709,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("charac"))
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "about":
 			var err error
 
@@ -42961,6 +41742,22 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
 			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "visibility":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -43048,22 +41845,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("charac"))
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "about":
 			var err error
 
@@ -43077,6 +41858,22 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
 			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "visibility":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -43550,6 +42347,132 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.BlobRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "labels":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.LabelRef); ok {
+				it.Labels = data
+			} else if tmp == nil {
+				it.Labels = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.LabelRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "visibility":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.NodeVisibility); ok {
+				it.Visibility = data
+			} else if tmp == nil {
+				it.Visibility = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeVisibility`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "mode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.NodeMode); ok {
+				it.Mode = data
+			} else if tmp == nil {
+				it.Mode = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeMode`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "rights":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_RO == nil {
+					return nil, errors.New("directive alter_RO is not implemented")
+				}
+				return ec.directives.Alter_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.Rights = data
+			} else if tmp == nil {
+				it.Rights = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "isArchived":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsArchived = data
+			} else if tmp == nil {
+				it.IsArchived = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "isRoot":
 			var err error
 
@@ -43598,10 +42521,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "isPrivate":
+		case "userCanJoin":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.Patch_RO == nil {
@@ -43615,111 +42538,11 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(*bool); ok {
-				it.IsPrivate = data
+				it.UserCanJoin = data
 			} else if tmp == nil {
-				it.IsPrivate = nil
+				it.UserCanJoin = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "isArchived":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*bool); ok {
-				it.IsArchived = data
-			} else if tmp == nil {
-				it.IsArchived = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "charac":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("charac"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.NodeCharacRef); ok {
-				it.Charac = data
-			} else if tmp == nil {
-				it.Charac = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.NodeCharacRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "rights":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Alter_RO == nil {
-					return nil, errors.New("directive alter_RO is not implemented")
-				}
-				return ec.directives.Alter_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.Rights = data
-			} else if tmp == nil {
-				it.Rights = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "labels":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.Patch_RO == nil {
-					return nil, errors.New("directive patch_RO is not implemented")
-				}
-				return ec.directives.Patch_RO(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.LabelRef); ok {
-				it.Labels = data
-			} else if tmp == nil {
-				it.Labels = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.LabelRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "first_link":
@@ -43980,6 +42803,46 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "labels":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "visibility":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
+			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+			it.Mode, err = ec.unmarshalONodeMode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rights":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
+			it.Rights, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isArchived":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
+			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isRoot":
 			var err error
 
@@ -43996,43 +42859,11 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "isPrivate":
+		case "userCanJoin":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPrivate"))
-			it.IsPrivate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isArchived":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "charac":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("charac"))
-			it.Charac, err = ec.unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "rights":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
-			it.Rights, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "labels":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
+			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -44109,6 +42940,34 @@ func (ec *executionContext) unmarshalInputNodeType_hash(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
 			it.In, err = ec.unmarshalONodeType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNodeVisibility_hash(ctx context.Context, obj interface{}) (model.NodeVisibilityHash, error) {
+	var it model.NodeVisibilityHash
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
+			it.In, err = ec.unmarshalONodeVisibility2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -45924,42 +44783,6 @@ func (ec *executionContext) unmarshalInputUpdateMandateInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateNodeCharacInput(ctx context.Context, obj interface{}) (model.UpdateNodeCharacInput, error) {
-	var it model.UpdateNodeCharacInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "filter":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNNodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "set":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalONodeCharacPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalONodeCharacPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputUpdateNodeFragmentInput(ctx context.Context, obj interface{}) (model.UpdateNodeFragmentInput, error) {
 	var it model.UpdateNodeFragmentInput
 	var asMap = obj.(map[string]interface{})
@@ -47526,32 +46349,6 @@ func (ec *executionContext) _AddMandatePayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var addNodeCharacPayloadImplementors = []string{"AddNodeCharacPayload"}
-
-func (ec *executionContext) _AddNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeCharacPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addNodeCharacPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddNodeCharacPayload")
-		case "nodeCharac":
-			out.Values[i] = ec._AddNodeCharacPayload_nodeCharac(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._AddNodeCharacPayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var addNodeFragmentPayloadImplementors = []string{"AddNodeFragmentPayload"}
 
 func (ec *executionContext) _AddNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeFragmentPayload) graphql.Marshaler {
@@ -48250,34 +47047,6 @@ func (ec *executionContext) _DeleteMandatePayload(ctx context.Context, sel ast.S
 	return out
 }
 
-var deleteNodeCharacPayloadImplementors = []string{"DeleteNodeCharacPayload"}
-
-func (ec *executionContext) _DeleteNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodeCharacPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNodeCharacPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteNodeCharacPayload")
-		case "nodeCharac":
-			out.Values[i] = ec._DeleteNodeCharacPayload_nodeCharac(ctx, field, obj)
-		case "msg":
-			out.Values[i] = ec._DeleteNodeCharacPayload_msg(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._DeleteNodeCharacPayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var deleteNodeFragmentPayloadImplementors = []string{"DeleteNodeFragmentPayload"}
 
 func (ec *executionContext) _DeleteNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodeFragmentPayload) graphql.Marshaler {
@@ -48911,12 +47680,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateMandate(ctx, field)
 		case "deleteMandate":
 			out.Values[i] = ec._Mutation_deleteMandate(ctx, field)
-		case "addNodeCharac":
-			out.Values[i] = ec._Mutation_addNodeCharac(ctx, field)
-		case "updateNodeCharac":
-			out.Values[i] = ec._Mutation_updateNodeCharac(ctx, field)
-		case "deleteNodeCharac":
-			out.Values[i] = ec._Mutation_deleteNodeCharac(ctx, field)
 		case "addOrgaAgg":
 			out.Values[i] = ec._Mutation_addOrgaAgg(ctx, field)
 		case "updateOrgaAgg":
@@ -49062,25 +47825,15 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_docs(ctx, field, obj)
 		case "source":
 			out.Values[i] = ec._Node_source(ctx, field, obj)
-		case "isRoot":
-			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
+		case "labels":
+			out.Values[i] = ec._Node_labels(ctx, field, obj)
+		case "visibility":
+			out.Values[i] = ec._Node_visibility(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "isPersonal":
-			out.Values[i] = ec._Node_isPersonal(ctx, field, obj)
-		case "isPrivate":
-			out.Values[i] = ec._Node_isPrivate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "isArchived":
-			out.Values[i] = ec._Node_isArchived(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "charac":
-			out.Values[i] = ec._Node_charac(ctx, field, obj)
+		case "mode":
+			out.Values[i] = ec._Node_mode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -49089,8 +47842,20 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "labels":
-			out.Values[i] = ec._Node_labels(ctx, field, obj)
+		case "isArchived":
+			out.Values[i] = ec._Node_isArchived(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isRoot":
+			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isPersonal":
+			out.Values[i] = ec._Node_isPersonal(ctx, field, obj)
+		case "userCanJoin":
+			out.Values[i] = ec._Node_userCanJoin(ctx, field, obj)
 		case "first_link":
 			out.Values[i] = ec._Node_first_link(ctx, field, obj)
 		case "second_link":
@@ -49182,67 +47947,6 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 	return out
 }
 
-var nodeCharacImplementors = []string{"NodeCharac"}
-
-func (ec *executionContext) _NodeCharac(ctx context.Context, sel ast.SelectionSet, obj *model.NodeCharac) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, nodeCharacImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("NodeCharac")
-		case "id":
-			out.Values[i] = ec._NodeCharac_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "userCanJoin":
-			out.Values[i] = ec._NodeCharac_userCanJoin(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "mode":
-			out.Values[i] = ec._NodeCharac_mode(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var nodeCharacAggregateResultImplementors = []string{"NodeCharacAggregateResult"}
-
-func (ec *executionContext) _NodeCharacAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NodeCharacAggregateResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, nodeCharacAggregateResultImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("NodeCharacAggregateResult")
-		case "count":
-			out.Values[i] = ec._NodeCharacAggregateResult_count(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var nodeFragmentImplementors = []string{"NodeFragment"}
 
 func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.SelectionSet, obj *model.NodeFragment) graphql.Marshaler {
@@ -49265,14 +47969,14 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._NodeFragment_nameid(ctx, field, obj)
 		case "type_":
 			out.Values[i] = ec._NodeFragment_type_(ctx, field, obj)
-		case "isPrivate":
-			out.Values[i] = ec._NodeFragment_isPrivate(ctx, field, obj)
-		case "charac":
-			out.Values[i] = ec._NodeFragment_charac(ctx, field, obj)
 		case "about":
 			out.Values[i] = ec._NodeFragment_about(ctx, field, obj)
 		case "mandate":
 			out.Values[i] = ec._NodeFragment_mandate(ctx, field, obj)
+		case "visibility":
+			out.Values[i] = ec._NodeFragment_visibility(ctx, field, obj)
+		case "mode":
+			out.Values[i] = ec._NodeFragment_mode(ctx, field, obj)
 		case "children":
 			out.Values[i] = ec._NodeFragment_children(ctx, field, obj)
 		case "first_link":
@@ -49681,39 +48385,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_aggregateMandate(ctx, field)
-				return res
-			})
-		case "getNodeCharac":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getNodeCharac(ctx, field)
-				return res
-			})
-		case "queryNodeCharac":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_queryNodeCharac(ctx, field)
-				return res
-			})
-		case "aggregateNodeCharac":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_aggregateNodeCharac(ctx, field)
 				return res
 			})
 		case "queryOrgaAgg":
@@ -50444,32 +49115,6 @@ func (ec *executionContext) _UpdateMandatePayload(ctx context.Context, sel ast.S
 			out.Values[i] = ec._UpdateMandatePayload_mandate(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdateMandatePayload_numUids(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var updateNodeCharacPayloadImplementors = []string{"UpdateNodeCharacPayload"}
-
-func (ec *executionContext) _UpdateNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNodeCharacPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, updateNodeCharacPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateNodeCharacPayload")
-		case "nodeCharac":
-			out.Values[i] = ec._UpdateNodeCharacPayload_nodeCharac(ctx, field, obj)
-		case "numUids":
-			out.Values[i] = ec._UpdateNodeCharacPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -51441,32 +50086,6 @@ func (ec *executionContext) unmarshalNAddMandateInput2ᚖzerogovᚋfractal6ᚗgo
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNAddNodeCharacInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeCharacInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.AddNodeCharacInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAddNodeCharacInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddNodeCharacInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacInput(ctx context.Context, v interface{}) (*model.AddNodeCharacInput, error) {
-	res, err := ec.unmarshalInputAddNodeCharacInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNAddNodeFragmentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeFragmentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeFragmentInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -52047,31 +50666,6 @@ func (ec *executionContext) marshalNNode2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmo
 	return ec._Node(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNNodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharac) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._NodeCharac(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNNodeCharacFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx context.Context, v interface{}) (model.NodeCharacFilter, error) {
-	res, err := ec.unmarshalInputNodeCharacFilter(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx context.Context, v interface{}) (*model.NodeCharacFilter, error) {
-	res, err := ec.unmarshalInputNodeCharacFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx context.Context, v interface{}) (*model.NodeCharacRef, error) {
-	res, err := ec.unmarshalInputNodeCharacRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNNodeFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx context.Context, v interface{}) (model.NodeFilter, error) {
 	res, err := ec.unmarshalInputNodeFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -52129,6 +50723,16 @@ func (ec *executionContext) unmarshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraph�
 }
 
 func (ec *executionContext) marshalNNodeType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx context.Context, sel ast.SelectionSet, v model.NodeType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNNodeVisibility2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx context.Context, v interface{}) (model.NodeVisibility, error) {
+	var res model.NodeVisibility
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNNodeVisibility2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx context.Context, sel ast.SelectionSet, v model.NodeVisibility) graphql.Marshaler {
 	return v
 }
 
@@ -52473,11 +51077,6 @@ func (ec *executionContext) unmarshalNUpdateLabelInput2zerogovᚋfractal6ᚗgo�
 
 func (ec *executionContext) unmarshalNUpdateMandateInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateMandateInput(ctx context.Context, v interface{}) (model.UpdateMandateInput, error) {
 	res, err := ec.unmarshalInputUpdateMandateInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUpdateNodeCharacInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeCharacInput(ctx context.Context, v interface{}) (model.UpdateNodeCharacInput, error) {
-	res, err := ec.unmarshalInputUpdateNodeCharacInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -52940,13 +51539,6 @@ func (ec *executionContext) marshalOAddMandatePayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._AddMandatePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOAddNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddNodeCharacPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._AddNodeCharacPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddNodeFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddNodeFragmentPayload) graphql.Marshaler {
@@ -54274,13 +52866,6 @@ func (ec *executionContext) marshalODeleteMandatePayload2ᚖzerogovᚋfractal6�
 		return graphql.Null
 	}
 	return ec._DeleteMandatePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalODeleteNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteNodeCharacPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._DeleteNodeCharacPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteNodeFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteNodeFragmentPayload) graphql.Marshaler {
@@ -55713,188 +54298,6 @@ func (ec *executionContext) marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗ
 	return ec._NodeAggregateResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalONodeCharac2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v []*model.NodeCharac) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalONodeCharac2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharac(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharac) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._NodeCharac(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalONodeCharacAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharacAggregateResult) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._NodeCharacAggregateResult(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalONodeCharacFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx context.Context, v interface{}) ([]*model.NodeCharacFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.NodeCharacFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalONodeCharacFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacFilter(ctx context.Context, v interface{}) (*model.NodeCharacFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeCharacFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalONodeCharacHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx context.Context, v interface{}) ([]*model.NodeCharacHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.NodeCharacHasFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalONodeCharacHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalONodeCharacHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.NodeCharacHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalONodeCharacHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalONodeCharacHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx context.Context, v interface{}) (*model.NodeCharacHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.NodeCharacHasFilter)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalONodeCharacHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.NodeCharacHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalONodeCharacPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacPatch(ctx context.Context, v interface{}) (*model.NodeCharacPatch, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeCharacPatch(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalONodeCharacRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeCharacRef(ctx context.Context, v interface{}) (*model.NodeCharacRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNodeCharacRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalONodeFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx context.Context, v interface{}) ([]*model.NodeFilter, error) {
 	if v == nil {
 		return nil, nil
@@ -56514,6 +54917,94 @@ func (ec *executionContext) unmarshalONodeType_hash2ᚖzerogovᚋfractal6ᚗgo�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputNodeType_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONodeVisibility2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx context.Context, v interface{}) ([]*model.NodeVisibility, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.NodeVisibility, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalONodeVisibility2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx context.Context, sel ast.SelectionSet, v []*model.NodeVisibility) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) unmarshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx context.Context, v interface{}) (*model.NodeVisibility, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.NodeVisibility)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalONodeVisibility2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx context.Context, sel ast.SelectionSet, v *model.NodeVisibility) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalONodeVisibility_hash2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibilityHash(ctx context.Context, v interface{}) (*model.NodeVisibilityHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNodeVisibility_hash(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -57766,13 +56257,6 @@ func (ec *executionContext) marshalOUpdateMandatePayload2ᚖzerogovᚋfractal6�
 		return graphql.Null
 	}
 	return ec._UpdateMandatePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOUpdateNodeCharacPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeCharacPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateNodeCharacPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._UpdateNodeCharacPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateNodeFragmentPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateNodeFragmentPayload) graphql.Marshaler {
