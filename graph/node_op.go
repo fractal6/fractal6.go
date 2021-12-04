@@ -39,6 +39,8 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     // Prevent Auth properties to be changed from blob pushes
     // as unentended update can occurs as Peer role can pushed blob.
     // It means, that each of the properties below should have their own events
+    node.Nameid = nil
+    node.Type = nil
     node.Visibility = nil
     node.Mode = nil
     node.FirstLink = nil

@@ -1,8 +1,6 @@
-
 [server]
 host = "localhost"
 port = "8888"
-
 
 [db]
 host = "localhost"
