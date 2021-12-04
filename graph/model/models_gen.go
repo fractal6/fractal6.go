@@ -164,6 +164,7 @@ type AddNodeInput struct {
 	SecondLink  *UserRef       `json:"second_link,omitempty"`
 	Skills      []string       `json:"skills,omitempty"`
 	RoleType    *RoleType      `json:"role_type,omitempty"`
+	RoleExt     *RoleExtRef    `json:"role_ext,omitempty"`
 	Contracts   []*VoteRef     `json:"contracts,omitempty"`
 	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
 }
@@ -180,6 +181,22 @@ type AddOrgaAggInput struct {
 
 type AddOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
+	NumUids *int       `json:"numUids"`
+}
+
+type AddRoleExtInput struct {
+	Rootnameid string      `json:"rootnameid,omitempty"`
+	Name       string      `json:"name,omitempty"`
+	About      *string     `json:"about,omitempty"`
+	RoleType   RoleType    `json:"role_type,omitempty"`
+	Color      *string     `json:"color,omitempty"`
+	Mandate    *MandateRef `json:"mandate,omitempty"`
+	Nodes      []*NodeRef  `json:"nodes,omitempty"`
+	NNodes     *int        `json:"n_nodes"`
+}
+
+type AddRoleExtPayload struct {
+	RoleExt []*RoleExt `json:"roleExt,omitempty"`
 	NumUids *int       `json:"numUids"`
 }
 
@@ -602,6 +619,12 @@ type DeletePostPayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
+type DeleteRoleExtPayload struct {
+	RoleExt []*RoleExt `json:"roleExt,omitempty"`
+	Msg     *string    `json:"msg,omitempty"`
+	NumUids *int       `json:"numUids"`
+}
+
 type DeleteTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
@@ -960,6 +983,7 @@ type Node struct {
 	SecondLink           *User                   `json:"second_link,omitempty"`
 	Skills               []string                `json:"skills,omitempty"`
 	RoleType             *RoleType               `json:"role_type,omitempty"`
+	RoleExt              *RoleExt                `json:"role_ext,omitempty"`
 	Contracts            []*Vote                 `json:"contracts,omitempty"`
 	OrgaAgg              *OrgaAgg                `json:"orga_agg,omitempty"`
 	ChildrenAggregate    *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
@@ -1125,6 +1149,7 @@ type NodePatch struct {
 	SecondLink  *UserRef        `json:"second_link,omitempty"`
 	Skills      []string        `json:"skills,omitempty"`
 	RoleType    *RoleType       `json:"role_type,omitempty"`
+	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
 	Contracts   []*VoteRef      `json:"contracts,omitempty"`
 	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
 }
@@ -1158,6 +1183,7 @@ type NodeRef struct {
 	SecondLink  *UserRef        `json:"second_link,omitempty"`
 	Skills      []string        `json:"skills,omitempty"`
 	RoleType    *RoleType       `json:"role_type,omitempty"`
+	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
 	Contracts   []*VoteRef      `json:"contracts,omitempty"`
 	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
 }
@@ -1293,6 +1319,74 @@ type PostPatch struct {
 
 type PostRef struct {
 	ID string `json:"id,omitempty"`
+}
+
+type RoleExt struct {
+	ID             string               `json:"id,omitempty"`
+	Rootnameid     string               `json:"rootnameid,omitempty"`
+	Name           string               `json:"name,omitempty"`
+	About          *string              `json:"about,omitempty"`
+	RoleType       RoleType             `json:"role_type,omitempty"`
+	Color          *string              `json:"color,omitempty"`
+	Mandate        *Mandate             `json:"mandate,omitempty"`
+	Nodes          []*Node              `json:"nodes,omitempty"`
+	NNodes         *int                 `json:"n_nodes"`
+	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
+}
+
+type RoleExtAggregateResult struct {
+	Count         *int     `json:"count"`
+	RootnameidMin *string  `json:"rootnameidMin,omitempty"`
+	RootnameidMax *string  `json:"rootnameidMax,omitempty"`
+	NameMin       *string  `json:"nameMin,omitempty"`
+	NameMax       *string  `json:"nameMax,omitempty"`
+	AboutMin      *string  `json:"aboutMin,omitempty"`
+	AboutMax      *string  `json:"aboutMax,omitempty"`
+	ColorMin      *string  `json:"colorMin,omitempty"`
+	ColorMax      *string  `json:"colorMax,omitempty"`
+	NNodesMin     *int     `json:"n_nodesMin"`
+	NNodesMax     *int     `json:"n_nodesMax"`
+	NNodesSum     *int     `json:"n_nodesSum"`
+	NNodesAvg     *float64 `json:"n_nodesAvg,omitempty"`
+}
+
+type RoleExtFilter struct {
+	ID         []string                          `json:"id,omitempty"`
+	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
+	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
+	Has        []*RoleExtHasFilter               `json:"has,omitempty"`
+	And        []*RoleExtFilter                  `json:"and,omitempty"`
+	Or         []*RoleExtFilter                  `json:"or,omitempty"`
+	Not        *RoleExtFilter                    `json:"not,omitempty"`
+}
+
+type RoleExtOrder struct {
+	Asc  *RoleExtOrderable `json:"asc,omitempty"`
+	Desc *RoleExtOrderable `json:"desc,omitempty"`
+	Then *RoleExtOrder     `json:"then,omitempty"`
+}
+
+type RoleExtPatch struct {
+	Rootnameid *string     `json:"rootnameid,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	About      *string     `json:"about,omitempty"`
+	RoleType   *RoleType   `json:"role_type,omitempty"`
+	Color      *string     `json:"color,omitempty"`
+	Mandate    *MandateRef `json:"mandate,omitempty"`
+	Nodes      []*NodeRef  `json:"nodes,omitempty"`
+	NNodes     *int        `json:"n_nodes"`
+}
+
+type RoleExtRef struct {
+	ID         *string     `json:"id,omitempty"`
+	Rootnameid *string     `json:"rootnameid,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	About      *string     `json:"about,omitempty"`
+	RoleType   *RoleType   `json:"role_type,omitempty"`
+	Color      *string     `json:"color,omitempty"`
+	Mandate    *MandateRef `json:"mandate,omitempty"`
+	Nodes      []*NodeRef  `json:"nodes,omitempty"`
+	NNodes     *int        `json:"n_nodes"`
 }
 
 type RoleTypeHash struct {
@@ -1609,6 +1703,17 @@ type UpdatePostInput struct {
 type UpdatePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	NumUids *int    `json:"numUids"`
+}
+
+type UpdateRoleExtInput struct {
+	Filter *RoleExtFilter `json:"filter,omitempty"`
+	Set    *RoleExtPatch  `json:"set,omitempty"`
+	Remove *RoleExtPatch  `json:"remove,omitempty"`
+}
+
+type UpdateRoleExtPayload struct {
+	RoleExt []*RoleExt `json:"roleExt,omitempty"`
+	NumUids *int       `json:"numUids"`
 }
 
 type UpdateTensionInput struct {
@@ -2977,6 +3082,7 @@ const (
 	NodeHasFilterSecondLink  NodeHasFilter = "second_link"
 	NodeHasFilterSkills      NodeHasFilter = "skills"
 	NodeHasFilterRoleType    NodeHasFilter = "role_type"
+	NodeHasFilterRoleExt     NodeHasFilter = "role_ext"
 	NodeHasFilterContracts   NodeHasFilter = "contracts"
 	NodeHasFilterOrgaAgg     NodeHasFilter = "orga_agg"
 )
@@ -3009,13 +3115,14 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterSecondLink,
 	NodeHasFilterSkills,
 	NodeHasFilterRoleType,
+	NodeHasFilterRoleExt,
 	NodeHasFilterContracts,
 	NodeHasFilterOrgaAgg,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterLabels, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterLabels, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterRoleExt, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
 		return true
 	}
 	return false
@@ -3385,6 +3492,106 @@ func (e *PostOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PostOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type RoleExtHasFilter string
+
+const (
+	RoleExtHasFilterRootnameid RoleExtHasFilter = "rootnameid"
+	RoleExtHasFilterName       RoleExtHasFilter = "name"
+	RoleExtHasFilterAbout      RoleExtHasFilter = "about"
+	RoleExtHasFilterRoleType   RoleExtHasFilter = "role_type"
+	RoleExtHasFilterColor      RoleExtHasFilter = "color"
+	RoleExtHasFilterMandate    RoleExtHasFilter = "mandate"
+	RoleExtHasFilterNodes      RoleExtHasFilter = "nodes"
+	RoleExtHasFilterNNodes     RoleExtHasFilter = "n_nodes"
+)
+
+var AllRoleExtHasFilter = []RoleExtHasFilter{
+	RoleExtHasFilterRootnameid,
+	RoleExtHasFilterName,
+	RoleExtHasFilterAbout,
+	RoleExtHasFilterRoleType,
+	RoleExtHasFilterColor,
+	RoleExtHasFilterMandate,
+	RoleExtHasFilterNodes,
+	RoleExtHasFilterNNodes,
+}
+
+func (e RoleExtHasFilter) IsValid() bool {
+	switch e {
+	case RoleExtHasFilterRootnameid, RoleExtHasFilterName, RoleExtHasFilterAbout, RoleExtHasFilterRoleType, RoleExtHasFilterColor, RoleExtHasFilterMandate, RoleExtHasFilterNodes, RoleExtHasFilterNNodes:
+		return true
+	}
+	return false
+}
+
+func (e RoleExtHasFilter) String() string {
+	return string(e)
+}
+
+func (e *RoleExtHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = RoleExtHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid RoleExtHasFilter", str)
+	}
+	return nil
+}
+
+func (e RoleExtHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type RoleExtOrderable string
+
+const (
+	RoleExtOrderableRootnameid RoleExtOrderable = "rootnameid"
+	RoleExtOrderableName       RoleExtOrderable = "name"
+	RoleExtOrderableAbout      RoleExtOrderable = "about"
+	RoleExtOrderableColor      RoleExtOrderable = "color"
+	RoleExtOrderableNNodes     RoleExtOrderable = "n_nodes"
+)
+
+var AllRoleExtOrderable = []RoleExtOrderable{
+	RoleExtOrderableRootnameid,
+	RoleExtOrderableName,
+	RoleExtOrderableAbout,
+	RoleExtOrderableColor,
+	RoleExtOrderableNNodes,
+}
+
+func (e RoleExtOrderable) IsValid() bool {
+	switch e {
+	case RoleExtOrderableRootnameid, RoleExtOrderableName, RoleExtOrderableAbout, RoleExtOrderableColor, RoleExtOrderableNNodes:
+		return true
+	}
+	return false
+}
+
+func (e RoleExtOrderable) String() string {
+	return string(e)
+}
+
+func (e *RoleExtOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = RoleExtOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid RoleExtOrderable", str)
+	}
+	return nil
+}
+
+func (e RoleExtOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

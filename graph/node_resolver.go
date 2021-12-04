@@ -18,17 +18,29 @@ import (
 // ras
 
 ////////////////////////////////////////////////
-// Label Resolver
+// Artefact Resolver (Label, RoleExt...)
 ////////////////////////////////////////////////
 
-// Add Label - Must be Coordo
-func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+type AddArtefactInput struct {
+	Nodes       []*model.NodeRef    `json:"nodes,omitempty"`
+}
+
+type UpdateArtefactInput struct {
+	Set    *AddArtefactInput  `json:"set,omitempty"`
+	Remove *AddArtefactInput  `json:"remove,omitempty"`
+}
+
+
+// Add "Artefeact" - Must be Coordo
+func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
-    inputs := graphql.GetResolverContext(ctx).Args["input"].([]*model.AddLabelInput)
+    var inputs []*AddArtefactInput
+    StructMap(graphql.GetResolverContext(ctx).Args["input"], inputs)
+
     // Authorization
     // Check that user satisfy strict condition (coordo roles on node linked)
     mode := model.NodeModeCoordinated
@@ -44,14 +56,16 @@ func addLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (
     return next(ctx)
 }
 
-// Update Label - Must be coordo
-func updateLabelHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+// Update "Artefact" - Must be coordo
+func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
-    input := graphql.GetResolverContext(ctx).Args["input"].(model.UpdateLabelInput)
+    var input UpdateArtefactInput
+    StructMap(graphql.GetResolverContext(ctx).Args["input"], input)
+
     var nodes []*model.NodeRef
     if input.Set != nil {
         if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }

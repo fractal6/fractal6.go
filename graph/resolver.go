@@ -98,15 +98,25 @@ func Init() gen.Config {
     c.Directives.Hook_addNode = nothing
     c.Directives.Hook_updateNode = nothing
     c.Directives.Hook_deleteNode = nothing
+    //RoleExt
+    c.Directives.Hook_getRoleExtInput = nothing
+    c.Directives.Hook_queryRoleExtInput = nothing
+    c.Directives.Hook_addRoleExtInput = nothing
+    c.Directives.Hook_updateRoleExtInput = setContextWithID // used by the unique directive
+    c.Directives.Hook_deleteRoleExtInput = nothing
+    // --
+    c.Directives.Hook_addRoleExt = addNodeArtefactHook
+    c.Directives.Hook_updateRoleExt = updateNodeArtefactHook
+    c.Directives.Hook_deleteRoleExt = nothing
     //Label
     c.Directives.Hook_getLabelInput = nothing
     c.Directives.Hook_queryLabelInput = nothing
     c.Directives.Hook_addLabelInput = nothing
-    c.Directives.Hook_updateLabelInput = setContextWithID
+    c.Directives.Hook_updateLabelInput = setContextWithID // used by the unique directive
     c.Directives.Hook_deleteLabelInput = nothing
     // --
-    c.Directives.Hook_addLabel = addLabelHook
-    c.Directives.Hook_updateLabel = updateLabelHook
+    c.Directives.Hook_addLabel = addNodeArtefactHook
+    c.Directives.Hook_updateLabel = updateNodeArtefactHook
     c.Directives.Hook_deleteLabel = nothing
     //Tension
     c.Directives.Hook_getTensionInput = nothing

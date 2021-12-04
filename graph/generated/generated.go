@@ -64,6 +64,8 @@ type DirectiveRoot struct {
 	Hook_addLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addNode             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addNodeInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addRoleExt          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTension          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addVote             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -76,6 +78,8 @@ type DirectiveRoot struct {
 	Hook_deleteLabelInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteNode          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteNodeInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteRoleExt       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteRoleExtInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteVote          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -84,12 +88,14 @@ type DirectiveRoot struct {
 	Hook_getContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getNodeInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getVoteInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryCommentInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryContractInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryLabelInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryNodeInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryRoleExtInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryTensionInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryVoteInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateComment       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -100,6 +106,8 @@ type DirectiveRoot struct {
 	Hook_updateLabelInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateNode          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateNodeInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateRoleExt       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateRoleExtInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVote          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -167,6 +175,11 @@ type ComplexityRoot struct {
 	AddOrgaAggPayload struct {
 		NumUids func(childComplexity int) int
 		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
+	}
+
+	AddRoleExtPayload struct {
+		NumUids func(childComplexity int) int
+		RoleExt func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 	}
 
 	AddTensionPayload struct {
@@ -340,6 +353,12 @@ type ComplexityRoot struct {
 		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
 	}
 
+	DeleteRoleExtPayload struct {
+		Msg     func(childComplexity int) int
+		NumUids func(childComplexity int) int
+		RoleExt func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
+	}
+
 	DeleteTensionPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
@@ -473,6 +492,7 @@ type ComplexityRoot struct {
 		AddNode             func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
 		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
 		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
+		AddRoleExt          func(childComplexity int, input []*model.AddRoleExtInput) int
 		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser             func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
 		AddUserRights       func(childComplexity int, input []*model.AddUserRightsInput) int
@@ -488,6 +508,7 @@ type ComplexityRoot struct {
 		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
 		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
 		DeletePost          func(childComplexity int, filter model.PostFilter) int
+		DeleteRoleExt       func(childComplexity int, filter model.RoleExtFilter) int
 		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
 		DeleteUser          func(childComplexity int, filter model.UserFilter) int
 		DeleteUserRights    func(childComplexity int, filter model.UserRightsFilter) int
@@ -503,6 +524,7 @@ type ComplexityRoot struct {
 		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
 		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
 		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
+		UpdateRoleExt       func(childComplexity int, input model.UpdateRoleExtInput) int
 		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
 		UpdateUser          func(childComplexity int, input model.UpdateUserInput) int
 		UpdateUserRights    func(childComplexity int, input model.UpdateUserRightsInput) int
@@ -533,6 +555,7 @@ type ComplexityRoot struct {
 		OrgaAgg              func(childComplexity int, filter *model.OrgaAggFilter) int
 		Parent               func(childComplexity int, filter *model.NodeFilter) int
 		Rights               func(childComplexity int) int
+		RoleExt              func(childComplexity int, filter *model.RoleExtFilter) int
 		RoleType             func(childComplexity int) int
 		Rootnameid           func(childComplexity int) int
 		SecondLink           func(childComplexity int, filter *model.UserFilter) int
@@ -659,6 +682,7 @@ type ComplexityRoot struct {
 		AggregateNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter) int
 		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
 		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
+		AggregateRoleExt       func(childComplexity int, filter *model.RoleExtFilter) int
 		AggregateTension       func(childComplexity int, filter *model.TensionFilter) int
 		AggregateUser          func(childComplexity int, filter *model.UserFilter) int
 		AggregateUserRights    func(childComplexity int, filter *model.UserRightsFilter) int
@@ -672,6 +696,7 @@ type ComplexityRoot struct {
 		GetNode                func(childComplexity int, id *string, nameid *string) int
 		GetNodeFragment        func(childComplexity int, id string) int
 		GetPost                func(childComplexity int, id string) int
+		GetRoleExt             func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
 		GetUser                func(childComplexity int, id *string, username *string) int
 		GetVote                func(childComplexity int, id *string, voteid *string) int
@@ -686,10 +711,40 @@ type ComplexityRoot struct {
 		QueryNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
 		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		QueryRoleExt           func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		QueryTension           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		QueryUser              func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		QueryUserRights        func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
 		QueryVote              func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+	}
+
+	RoleExt struct {
+		About          func(childComplexity int) int
+		Color          func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Mandate        func(childComplexity int, filter *model.MandateFilter) int
+		NNodes         func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Nodes          func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		NodesAggregate func(childComplexity int, filter *model.NodeFilter) int
+		RoleType       func(childComplexity int) int
+		Rootnameid     func(childComplexity int) int
+	}
+
+	RoleExtAggregateResult struct {
+		AboutMax      func(childComplexity int) int
+		AboutMin      func(childComplexity int) int
+		ColorMax      func(childComplexity int) int
+		ColorMin      func(childComplexity int) int
+		Count         func(childComplexity int) int
+		NNodesAvg     func(childComplexity int) int
+		NNodesMax     func(childComplexity int) int
+		NNodesMin     func(childComplexity int) int
+		NNodesSum     func(childComplexity int) int
+		NameMax       func(childComplexity int) int
+		NameMin       func(childComplexity int) int
+		RootnameidMax func(childComplexity int) int
+		RootnameidMin func(childComplexity int) int
 	}
 
 	Tension struct {
@@ -802,6 +857,11 @@ type ComplexityRoot struct {
 	UpdatePostPayload struct {
 		NumUids func(childComplexity int) int
 		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+	}
+
+	UpdateRoleExtPayload struct {
+		NumUids func(childComplexity int) int
+		RoleExt func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 	}
 
 	UpdateTensionPayload struct {
@@ -921,6 +981,12 @@ type MutationResolver interface {
 	AddMandate(ctx context.Context, input []*model.AddMandateInput) (*model.AddMandatePayload, error)
 	UpdateMandate(ctx context.Context, input model.UpdateMandateInput) (*model.UpdateMandatePayload, error)
 	DeleteMandate(ctx context.Context, filter model.MandateFilter) (*model.DeleteMandatePayload, error)
+	AddLabel(ctx context.Context, input []*model.AddLabelInput) (*model.AddLabelPayload, error)
+	UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (*model.UpdateLabelPayload, error)
+	DeleteLabel(ctx context.Context, filter model.LabelFilter) (*model.DeleteLabelPayload, error)
+	AddRoleExt(ctx context.Context, input []*model.AddRoleExtInput) (*model.AddRoleExtPayload, error)
+	UpdateRoleExt(ctx context.Context, input model.UpdateRoleExtInput) (*model.UpdateRoleExtPayload, error)
+	DeleteRoleExt(ctx context.Context, filter model.RoleExtFilter) (*model.DeleteRoleExtPayload, error)
 	AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (*model.AddOrgaAggPayload, error)
 	UpdateOrgaAgg(ctx context.Context, input model.UpdateOrgaAggInput) (*model.UpdateOrgaAggPayload, error)
 	DeleteOrgaAgg(ctx context.Context, filter model.OrgaAggFilter) (*model.DeleteOrgaAggPayload, error)
@@ -929,9 +995,6 @@ type MutationResolver interface {
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
 	UpdateTension(ctx context.Context, input model.UpdateTensionInput) (*model.UpdateTensionPayload, error)
 	DeleteTension(ctx context.Context, filter model.TensionFilter) (*model.DeleteTensionPayload, error)
-	AddLabel(ctx context.Context, input []*model.AddLabelInput) (*model.AddLabelPayload, error)
-	UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (*model.UpdateLabelPayload, error)
-	DeleteLabel(ctx context.Context, filter model.LabelFilter) (*model.DeleteLabelPayload, error)
 	AddComment(ctx context.Context, input []*model.AddCommentInput) (*model.AddCommentPayload, error)
 	UpdateComment(ctx context.Context, input model.UpdateCommentInput) (*model.UpdateCommentPayload, error)
 	DeleteComment(ctx context.Context, filter model.CommentFilter) (*model.DeleteCommentPayload, error)
@@ -967,6 +1030,12 @@ type QueryResolver interface {
 	GetMandate(ctx context.Context, id string) (*model.Mandate, error)
 	QueryMandate(ctx context.Context, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) ([]*model.Mandate, error)
 	AggregateMandate(ctx context.Context, filter *model.MandateFilter) (*model.MandateAggregateResult, error)
+	GetLabel(ctx context.Context, id string) (*model.Label, error)
+	QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) ([]*model.Label, error)
+	AggregateLabel(ctx context.Context, filter *model.LabelFilter) (*model.LabelAggregateResult, error)
+	GetRoleExt(ctx context.Context, id string) (*model.RoleExt, error)
+	QueryRoleExt(ctx context.Context, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) ([]*model.RoleExt, error)
+	AggregateRoleExt(ctx context.Context, filter *model.RoleExtFilter) (*model.RoleExtAggregateResult, error)
 	QueryOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) ([]*model.OrgaAgg, error)
 	AggregateOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter) (*model.OrgaAggAggregateResult, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
@@ -975,9 +1044,6 @@ type QueryResolver interface {
 	GetTension(ctx context.Context, id string) (*model.Tension, error)
 	QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) ([]*model.Tension, error)
 	AggregateTension(ctx context.Context, filter *model.TensionFilter) (*model.TensionAggregateResult, error)
-	GetLabel(ctx context.Context, id string) (*model.Label, error)
-	QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) ([]*model.Label, error)
-	AggregateLabel(ctx context.Context, filter *model.LabelFilter) (*model.LabelAggregateResult, error)
 	GetComment(ctx context.Context, id string) (*model.Comment, error)
 	QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) ([]*model.Comment, error)
 	AggregateComment(ctx context.Context, filter *model.CommentFilter) (*model.CommentAggregateResult, error)
@@ -1206,6 +1272,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddRoleExtPayload.numUids":
+		if e.complexity.AddRoleExtPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddRoleExtPayload.NumUids(childComplexity), true
+
+	case "AddRoleExtPayload.roleExt":
+		if e.complexity.AddRoleExtPayload.RoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_AddRoleExtPayload_roleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddRoleExtPayload.RoleExt(childComplexity, args["filter"].(*model.RoleExtFilter), args["order"].(*model.RoleExtOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddTensionPayload.numUids":
 		if e.complexity.AddTensionPayload.NumUids == nil {
@@ -2103,6 +2188,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeletePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "DeleteRoleExtPayload.msg":
+		if e.complexity.DeleteRoleExtPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteRoleExtPayload.Msg(childComplexity), true
+
+	case "DeleteRoleExtPayload.numUids":
+		if e.complexity.DeleteRoleExtPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteRoleExtPayload.NumUids(childComplexity), true
+
+	case "DeleteRoleExtPayload.roleExt":
+		if e.complexity.DeleteRoleExtPayload.RoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteRoleExtPayload_roleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteRoleExtPayload.RoleExt(childComplexity, args["filter"].(*model.RoleExtFilter), args["order"].(*model.RoleExtOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteTensionPayload.msg":
 		if e.complexity.DeleteTensionPayload.Msg == nil {
 			break
@@ -2854,6 +2965,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddOrgaAgg(childComplexity, args["input"].([]*model.AddOrgaAggInput)), true
 
+	case "Mutation.addRoleExt":
+		if e.complexity.Mutation.AddRoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addRoleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddRoleExt(childComplexity, args["input"].([]*model.AddRoleExtInput)), true
+
 	case "Mutation.addTension":
 		if e.complexity.Mutation.AddTension == nil {
 			break
@@ -3034,6 +3157,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeletePost(childComplexity, args["filter"].(model.PostFilter)), true
 
+	case "Mutation.deleteRoleExt":
+		if e.complexity.Mutation.DeleteRoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteRoleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteRoleExt(childComplexity, args["filter"].(model.RoleExtFilter)), true
+
 	case "Mutation.deleteTension":
 		if e.complexity.Mutation.DeleteTension == nil {
 			break
@@ -3213,6 +3348,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdatePost(childComplexity, args["input"].(model.UpdatePostInput)), true
+
+	case "Mutation.updateRoleExt":
+		if e.complexity.Mutation.UpdateRoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateRoleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateRoleExt(childComplexity, args["input"].(model.UpdateRoleExtInput)), true
 
 	case "Mutation.updateTension":
 		if e.complexity.Mutation.UpdateTension == nil {
@@ -3487,6 +3634,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Rights(childComplexity), true
+
+	case "Node.role_ext":
+		if e.complexity.Node.RoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Node_role_ext_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.RoleExt(childComplexity, args["filter"].(*model.RoleExtFilter)), true
 
 	case "Node.role_type":
 		if e.complexity.Node.RoleType == nil {
@@ -4244,6 +4403,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregatePost(childComplexity, args["filter"].(*model.PostFilter)), true
 
+	case "Query.aggregateRoleExt":
+		if e.complexity.Query.AggregateRoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateRoleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateRoleExt(childComplexity, args["filter"].(*model.RoleExtFilter)), true
+
 	case "Query.aggregateTension":
 		if e.complexity.Query.AggregateTension == nil {
 			break
@@ -4399,6 +4570,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetPost(childComplexity, args["id"].(string)), true
+
+	case "Query.getRoleExt":
+		if e.complexity.Query.GetRoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getRoleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetRoleExt(childComplexity, args["id"].(string)), true
 
 	case "Query.getTension":
 		if e.complexity.Query.GetTension == nil {
@@ -4568,6 +4751,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryPost(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Query.queryRoleExt":
+		if e.complexity.Query.QueryRoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryRoleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryRoleExt(childComplexity, args["filter"].(*model.RoleExtFilter), args["order"].(*model.RoleExtOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "Query.queryTension":
 		if e.complexity.Query.QueryTension == nil {
 			break
@@ -4615,6 +4810,182 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryVote(childComplexity, args["filter"].(*model.VoteFilter), args["order"].(*model.VoteOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "RoleExt.about":
+		if e.complexity.RoleExt.About == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.About(childComplexity), true
+
+	case "RoleExt.color":
+		if e.complexity.RoleExt.Color == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.Color(childComplexity), true
+
+	case "RoleExt.id":
+		if e.complexity.RoleExt.ID == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.ID(childComplexity), true
+
+	case "RoleExt.mandate":
+		if e.complexity.RoleExt.Mandate == nil {
+			break
+		}
+
+		args, err := ec.field_RoleExt_mandate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.RoleExt.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
+
+	case "RoleExt.n_nodes":
+		if e.complexity.RoleExt.NNodes == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.NNodes(childComplexity), true
+
+	case "RoleExt.name":
+		if e.complexity.RoleExt.Name == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.Name(childComplexity), true
+
+	case "RoleExt.nodes":
+		if e.complexity.RoleExt.Nodes == nil {
+			break
+		}
+
+		args, err := ec.field_RoleExt_nodes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.RoleExt.Nodes(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "RoleExt.nodesAggregate":
+		if e.complexity.RoleExt.NodesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_RoleExt_nodesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.RoleExt.NodesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "RoleExt.role_type":
+		if e.complexity.RoleExt.RoleType == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.RoleType(childComplexity), true
+
+	case "RoleExt.rootnameid":
+		if e.complexity.RoleExt.Rootnameid == nil {
+			break
+		}
+
+		return e.complexity.RoleExt.Rootnameid(childComplexity), true
+
+	case "RoleExtAggregateResult.aboutMax":
+		if e.complexity.RoleExtAggregateResult.AboutMax == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.AboutMax(childComplexity), true
+
+	case "RoleExtAggregateResult.aboutMin":
+		if e.complexity.RoleExtAggregateResult.AboutMin == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.AboutMin(childComplexity), true
+
+	case "RoleExtAggregateResult.colorMax":
+		if e.complexity.RoleExtAggregateResult.ColorMax == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.ColorMax(childComplexity), true
+
+	case "RoleExtAggregateResult.colorMin":
+		if e.complexity.RoleExtAggregateResult.ColorMin == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.ColorMin(childComplexity), true
+
+	case "RoleExtAggregateResult.count":
+		if e.complexity.RoleExtAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.Count(childComplexity), true
+
+	case "RoleExtAggregateResult.n_nodesAvg":
+		if e.complexity.RoleExtAggregateResult.NNodesAvg == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.NNodesAvg(childComplexity), true
+
+	case "RoleExtAggregateResult.n_nodesMax":
+		if e.complexity.RoleExtAggregateResult.NNodesMax == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.NNodesMax(childComplexity), true
+
+	case "RoleExtAggregateResult.n_nodesMin":
+		if e.complexity.RoleExtAggregateResult.NNodesMin == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.NNodesMin(childComplexity), true
+
+	case "RoleExtAggregateResult.n_nodesSum":
+		if e.complexity.RoleExtAggregateResult.NNodesSum == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.NNodesSum(childComplexity), true
+
+	case "RoleExtAggregateResult.nameMax":
+		if e.complexity.RoleExtAggregateResult.NameMax == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.NameMax(childComplexity), true
+
+	case "RoleExtAggregateResult.nameMin":
+		if e.complexity.RoleExtAggregateResult.NameMin == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.NameMin(childComplexity), true
+
+	case "RoleExtAggregateResult.rootnameidMax":
+		if e.complexity.RoleExtAggregateResult.RootnameidMax == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.RootnameidMax(childComplexity), true
+
+	case "RoleExtAggregateResult.rootnameidMin":
+		if e.complexity.RoleExtAggregateResult.RootnameidMin == nil {
+			break
+		}
+
+		return e.complexity.RoleExtAggregateResult.RootnameidMin(childComplexity), true
 
 	case "Tension.action":
 		if e.complexity.Tension.Action == nil {
@@ -5256,6 +5627,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdatePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateRoleExtPayload.numUids":
+		if e.complexity.UpdateRoleExtPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateRoleExtPayload.NumUids(childComplexity), true
+
+	case "UpdateRoleExtPayload.roleExt":
+		if e.complexity.UpdateRoleExtPayload.RoleExt == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateRoleExtPayload_roleExt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateRoleExtPayload.RoleExt(childComplexity, args["filter"].(*model.RoleExtFilter), args["order"].(*model.RoleExtOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "UpdateTensionPayload.numUids":
 		if e.complexity.UpdateTensionPayload.NumUids == nil {
@@ -5990,6 +6380,38 @@ directive @hook_updateNode on FIELD_DEFINITION
 
 directive @hook_deleteNode on FIELD_DEFINITION
 
+directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_addRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_updateRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_deleteRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_addRoleExt on FIELD_DEFINITION
+
+directive @hook_updateRoleExt on FIELD_DEFINITION
+
+directive @hook_deleteRoleExt on FIELD_DEFINITION
+
+directive @hook_getLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_queryLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_addLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_updateLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_addLabel on FIELD_DEFINITION
+
+directive @hook_updateLabel on FIELD_DEFINITION
+
+directive @hook_deleteLabel on FIELD_DEFINITION
+
 directive @hook_getTensionInput on ARGUMENT_DEFINITION
 
 directive @hook_queryTensionInput on ARGUMENT_DEFINITION
@@ -6021,22 +6443,6 @@ directive @hook_addComment on FIELD_DEFINITION
 directive @hook_updateComment on FIELD_DEFINITION
 
 directive @hook_deleteComment on FIELD_DEFINITION
-
-directive @hook_getLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_queryLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_addLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_updateLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_addLabel on FIELD_DEFINITION
-
-directive @hook_updateLabel on FIELD_DEFINITION
-
-directive @hook_deleteLabel on FIELD_DEFINITION
 
 directive @hook_getContractInput on ARGUMENT_DEFINITION
 
@@ -6107,6 +6513,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
   role_type: RoleType @search
+  role_ext(filter: RoleExtFilter): RoleExt
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
@@ -6142,6 +6549,55 @@ type Mandate {
   responsabilities: String
   domains: String
   policies: String
+}
+
+type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryLabel { 
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String!]) {
+        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by: [hash])
+  name: String! @search(by: [hash, term])
+  description: String
+  color: String
+  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
+  n_nodes: Int
+  n_tensions: Int
+
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
+}
+
+type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryRoleExt { 
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String!]) {
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by: [hash])
+  name: String! @search(by: [hash, term])
+  about: String
+  role_type: RoleType!
+  color: String
+  mandate(filter: MandateFilter): Mandate
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: role_ext)
+  n_nodes: Int
+
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type OrgaAgg {
@@ -6220,31 +6676,6 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   createdAt: DateTime! @search
   updatedAt: DateTime
   message: String @search(by: [fulltext])
-}
-
-type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
-        queryLabel { 
-          nodes(filter: {visibility: {eq: Public}}) { id }
-        }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
-        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
-    }"""
-}]
-}) {
-  id: ID!
-  rootnameid: String! @search(by: [hash])
-  name: String! @search(by: [hash, term])
-  description: String
-  color: String
-  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
-  n_nodes: Int
-  n_tensions: Int
-
-  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
-  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type Comment @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -6514,39 +6945,40 @@ enum ContractType {
 enum UserType {
   Regular
   Root
+
 }
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @cascade(fields: [String]) on FIELD
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @id on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
 directive @lambda on FIELD_DEFINITION
 
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6704,6 +7136,7 @@ input AddNodeInput {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
+  role_ext: RoleExtRef
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -6720,6 +7153,22 @@ input AddOrgaAggInput {
 
 type AddOrgaAggPayload {
   orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  numUids: Int
+}
+
+input AddRoleExtInput {
+  rootnameid: String!
+  name: String! @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
+  about: String @alter_maxLength(n:280)
+  role_type: RoleType!
+  color: String
+  mandate: MandateRef
+  nodes: [NodeRef!] @alter_oneByOne
+  n_nodes: Int
+}
+
+type AddRoleExtPayload {
+  roleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   numUids: Int
 }
 
@@ -7163,6 +7612,12 @@ type DeletePostPayload {
   numUids: Int
 }
 
+type DeleteRoleExtPayload {
+  roleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
+  msg: String
+  numUids: Int
+}
+
 type DeleteTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
   msg: String
@@ -7554,6 +8009,12 @@ type Mutation {
   addMandate(input: [AddMandateInput!]!): AddMandatePayload
   updateMandate(input: UpdateMandateInput!): UpdateMandatePayload
   deleteMandate(filter: MandateFilter!): DeleteMandatePayload
+  addLabel(input: [AddLabelInput!]! @hook_addLabelInput): AddLabelPayload @hook_addLabel
+  updateLabel(input: UpdateLabelInput! @hook_updateLabelInput): UpdateLabelPayload @hook_updateLabel
+  deleteLabel(filter: LabelFilter! @hook_deleteLabelInput): DeleteLabelPayload @hook_deleteLabel
+  addRoleExt(input: [AddRoleExtInput!]! @hook_addRoleExtInput): AddRoleExtPayload @hook_addRoleExt
+  updateRoleExt(input: UpdateRoleExtInput! @hook_updateRoleExtInput): UpdateRoleExtPayload @hook_updateRoleExt
+  deleteRoleExt(filter: RoleExtFilter! @hook_deleteRoleExtInput): DeleteRoleExtPayload @hook_deleteRoleExt
   addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
   updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
   deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
@@ -7562,9 +8023,6 @@ type Mutation {
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
   updateTension(input: UpdateTensionInput! @hook_updateTensionInput): UpdateTensionPayload @hook_updateTension
   deleteTension(filter: TensionFilter! @hook_deleteTensionInput): DeleteTensionPayload @hook_deleteTension
-  addLabel(input: [AddLabelInput!]! @hook_addLabelInput): AddLabelPayload @hook_addLabel
-  updateLabel(input: UpdateLabelInput! @hook_updateLabelInput): UpdateLabelPayload @hook_updateLabel
-  deleteLabel(filter: LabelFilter! @hook_deleteLabelInput): DeleteLabelPayload @hook_deleteLabel
   addComment(input: [AddCommentInput!]! @hook_addCommentInput): AddCommentPayload @hook_addComment
   updateComment(input: UpdateCommentInput! @hook_updateCommentInput): UpdateCommentPayload @hook_updateComment
   deleteComment(filter: CommentFilter! @hook_deleteCommentInput): DeleteCommentPayload @hook_deleteComment
@@ -7747,6 +8205,7 @@ enum NodeHasFilter {
   second_link
   skills
   role_type
+  role_ext
   contracts
   orga_agg
 }
@@ -7799,6 +8258,7 @@ input NodePatch {
   second_link: UserRef @patch_RO
   skills: [String!] @patch_RO
   role_type: RoleType @patch_RO
+  role_ext: RoleExtRef @patch_RO
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -7832,6 +8292,7 @@ input NodeRef {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
+  role_ext: RoleExtRef
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -7989,6 +8450,12 @@ type Query {
   getMandate(id: ID!): Mandate
   queryMandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
   aggregateMandate(filter: MandateFilter): MandateAggregateResult
+  getLabel(id: ID! @hook_getLabelInput): Label
+  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabelInput): [Label]
+  aggregateLabel(filter: LabelFilter): LabelAggregateResult
+  getRoleExt(id: ID! @hook_getRoleExtInput): RoleExt
+  queryRoleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int @hook_queryRoleExtInput): [RoleExt]
+  aggregateRoleExt(filter: RoleExtFilter): RoleExtAggregateResult
   queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
@@ -7997,9 +8464,6 @@ type Query {
   getTension(id: ID! @hook_getTensionInput): Tension
   queryTension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int @hook_queryTensionInput): [Tension]
   aggregateTension(filter: TensionFilter): TensionAggregateResult
-  getLabel(id: ID! @hook_getLabelInput): Label
-  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabelInput): [Label]
-  aggregateLabel(filter: LabelFilter): LabelAggregateResult
   getComment(id: ID! @hook_getCommentInput): Comment
   queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int @hook_queryCommentInput): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
@@ -8022,6 +8486,80 @@ type Query {
   aggregateUser(filter: UserFilter): UserAggregateResult
   queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
   aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
+}
+
+type RoleExtAggregateResult {
+  count: Int
+  rootnameidMin: String
+  rootnameidMax: String
+  nameMin: String
+  nameMax: String
+  aboutMin: String
+  aboutMax: String
+  colorMin: String
+  colorMax: String
+  n_nodesMin: Int
+  n_nodesMax: Int
+  n_nodesSum: Int
+  n_nodesAvg: Float
+}
+
+input RoleExtFilter {
+  id: [ID!]
+  rootnameid: StringHashFilter
+  name: StringHashFilter_StringTermFilter
+  has: [RoleExtHasFilter]
+  and: [RoleExtFilter]
+  or: [RoleExtFilter]
+  not: RoleExtFilter
+}
+
+enum RoleExtHasFilter {
+  rootnameid
+  name
+  about
+  role_type
+  color
+  mandate
+  nodes
+  n_nodes
+}
+
+input RoleExtOrder {
+  asc: RoleExtOrderable
+  desc: RoleExtOrderable
+  then: RoleExtOrder
+}
+
+enum RoleExtOrderable {
+  rootnameid
+  name
+  about
+  color
+  n_nodes
+}
+
+input RoleExtPatch {
+  rootnameid: String @patch_RO
+  name: String @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
+  about: String @alter_maxLength(n:280)
+  role_type: RoleType
+  color: String
+  mandate: MandateRef
+  nodes: [NodeRef!] @alter_oneByOne
+  n_nodes: Int
+}
+
+input RoleExtRef {
+  id: ID
+  rootnameid: String
+  name: String
+  about: String
+  role_type: RoleType
+  color: String
+  mandate: MandateRef
+  nodes: [NodeRef!]
+  n_nodes: Int
 }
 
 input RoleType_hash {
@@ -8342,6 +8880,17 @@ input UpdatePostInput {
 
 type UpdatePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
+  numUids: Int
+}
+
+input UpdateRoleExtInput {
+  filter: RoleExtFilter!
+  set: RoleExtPatch
+  remove: RoleExtPatch
+}
+
+type UpdateRoleExtPayload {
+  roleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   numUids: Int
 }
 
@@ -9420,6 +9969,48 @@ func (ec *executionContext) field_AddOrgaAggPayload_orgaAgg_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_AddRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.RoleExtOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalORoleExtOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddTensionPayload_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10326,6 +10917,48 @@ func (ec *executionContext) field_DeletePostPayload_post_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.RoleExtOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalORoleExtOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteTensionPayload_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10870,6 +11503,38 @@ func (ec *executionContext) field_Mutation_addOrgaAgg_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddRoleExtInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddRoleExtInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addRoleExtInput == nil {
+				return nil, errors.New("directive hook_addRoleExtInput is not implemented")
+			}
+			return ec.directives.Hook_addRoleExtInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddRoleExtInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.AddRoleExtInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11205,6 +11870,36 @@ func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNRoleExtFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteRoleExtInput == nil {
+				return nil, errors.New("directive hook_deleteRoleExtInput is not implemented")
+			}
+			return ec.directives.Hook_deleteRoleExtInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.RoleExtFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.RoleExtFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11514,6 +12209,36 @@ func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, 
 		arg0, err = ec.unmarshalNUpdatePostInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateRoleExtInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateRoleExtInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateRoleExtInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateRoleExtInput == nil {
+				return nil, errors.New("directive hook_updateRoleExtInput is not implemented")
+			}
+			return ec.directives.Hook_updateRoleExtInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateRoleExtInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateRoleExtInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -11985,6 +12710,21 @@ func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_role_ext_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_second_link_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12324,6 +13064,21 @@ func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12587,6 +13342,34 @@ func (ec *executionContext) field_Query_getPost_args(ctx context.Context, rawArg
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_getRoleExtInput == nil {
+				return nil, errors.New("directive hook_getRoleExtInput is not implemented")
+			}
+			return ec.directives.Hook_getRoleExtInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(string); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
 		}
 	}
 	args["id"] = arg0
@@ -13206,6 +13989,63 @@ func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.RoleExtOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalORoleExtOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryRoleExtInput == nil {
+				return nil, errors.New("directive hook_queryRoleExtInput is not implemented")
+			}
+			return ec.directives.Hook_queryRoleExtInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*int); ok {
+			arg3 = data
+		} else if tmp == nil {
+			arg3 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_queryTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13398,6 +14238,78 @@ func (ec *executionContext) field_Query_queryVote_args(ctx context.Context, rawA
 			arg3 = nil
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_RoleExt_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MandateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOMandateFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_RoleExt_nodesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_RoleExt_nodes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -14227,6 +15139,48 @@ func (ec *executionContext) field_UpdatePostPayload_post_args(ctx context.Contex
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOPostOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdateRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RoleExtFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.RoleExtOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalORoleExtOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -15591,6 +16545,95 @@ func (ec *executionContext) _AddOrgaAggPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AddOrgaAggPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddRoleExtPayload_roleExt(ctx context.Context, field graphql.CollectedField, obj *model.AddRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddRoleExtPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddRoleExtPayload_roleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.RoleExt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.RoleExt); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.RoleExt`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddRoleExtPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddRoleExtPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -19595,6 +20638,124 @@ func (ec *executionContext) _DeletePostPayload_numUids(ctx context.Context, fiel
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeleteRoleExtPayload_roleExt(ctx context.Context, field graphql.CollectedField, obj *model.DeleteRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteRoleExtPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteRoleExtPayload_roleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.RoleExt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.RoleExt); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.RoleExt`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteRoleExtPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteRoleExtPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteRoleExtPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteRoleExtPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeleteTensionPayload_tension(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTensionPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -22800,6 +23961,342 @@ func (ec *executionContext) _Mutation_deleteMandate(ctx context.Context, field g
 	return ec.marshalODeleteMandatePayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteMandatePayload(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addLabel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddLabel(rctx, args["input"].([]*model.AddLabelInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addLabel == nil {
+				return nil, errors.New("directive hook_addLabel is not implemented")
+			}
+			return ec.directives.Hook_addLabel(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddLabelPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddLabelPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddLabelPayload)
+	fc.Result = res
+	return ec.marshalOAddLabelPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddLabelPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateLabel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateLabel(rctx, args["input"].(model.UpdateLabelInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateLabel == nil {
+				return nil, errors.New("directive hook_updateLabel is not implemented")
+			}
+			return ec.directives.Hook_updateLabel(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateLabelPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateLabelPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateLabelPayload)
+	fc.Result = res
+	return ec.marshalOUpdateLabelPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateLabelPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteLabel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteLabel(rctx, args["filter"].(model.LabelFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteLabel == nil {
+				return nil, errors.New("directive hook_deleteLabel is not implemented")
+			}
+			return ec.directives.Hook_deleteLabel(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteLabelPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteLabelPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteLabelPayload)
+	fc.Result = res
+	return ec.marshalODeleteLabelPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteLabelPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addRoleExt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addRoleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddRoleExt(rctx, args["input"].([]*model.AddRoleExtInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addRoleExt == nil {
+				return nil, errors.New("directive hook_addRoleExt is not implemented")
+			}
+			return ec.directives.Hook_addRoleExt(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddRoleExtPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddRoleExtPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddRoleExtPayload)
+	fc.Result = res
+	return ec.marshalOAddRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateRoleExt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateRoleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateRoleExt(rctx, args["input"].(model.UpdateRoleExtInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateRoleExt == nil {
+				return nil, errors.New("directive hook_updateRoleExt is not implemented")
+			}
+			return ec.directives.Hook_updateRoleExt(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateRoleExtPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateRoleExtPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateRoleExtPayload)
+	fc.Result = res
+	return ec.marshalOUpdateRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateRoleExtPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteRoleExt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteRoleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteRoleExt(rctx, args["filter"].(model.RoleExtFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteRoleExt == nil {
+				return nil, errors.New("directive hook_deleteRoleExt is not implemented")
+			}
+			return ec.directives.Hook_deleteRoleExt(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteRoleExtPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteRoleExtPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteRoleExtPayload)
+	fc.Result = res
+	return ec.marshalODeleteRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteRoleExtPayload(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -23146,174 +24643,6 @@ func (ec *executionContext) _Mutation_deleteTension(ctx context.Context, field g
 	res := resTmp.(*model.DeleteTensionPayload)
 	fc.Result = res
 	return ec.marshalODeleteTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteTensionPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_addLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addLabel_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().AddLabel(rctx, args["input"].([]*model.AddLabelInput))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_addLabel == nil {
-				return nil, errors.New("directive hook_addLabel is not implemented")
-			}
-			return ec.directives.Hook_addLabel(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.AddLabelPayload); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddLabelPayload`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.AddLabelPayload)
-	fc.Result = res
-	return ec.marshalOAddLabelPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddLabelPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_updateLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateLabel_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateLabel(rctx, args["input"].(model.UpdateLabelInput))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_updateLabel == nil {
-				return nil, errors.New("directive hook_updateLabel is not implemented")
-			}
-			return ec.directives.Hook_updateLabel(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.UpdateLabelPayload); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateLabelPayload`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.UpdateLabelPayload)
-	fc.Result = res
-	return ec.marshalOUpdateLabelPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateLabelPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_deleteLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteLabel_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().DeleteLabel(rctx, args["filter"].(model.LabelFilter))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_deleteLabel == nil {
-				return nil, errors.New("directive hook_deleteLabel is not implemented")
-			}
-			return ec.directives.Hook_deleteLabel(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.DeleteLabelPayload); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteLabelPayload`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.DeleteLabelPayload)
-	fc.Result = res
-	return ec.marshalODeleteLabelPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteLabelPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -25727,6 +27056,66 @@ func (ec *executionContext) _Node_role_type(ctx context.Context, field graphql.C
 	res := resTmp.(*model.RoleType)
 	fc.Result = res
 	return ec.marshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_role_ext(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_role_ext_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.RoleExt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.RoleExt); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleExt`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Node_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
@@ -28548,6 +29937,318 @@ func (ec *executionContext) _Query_aggregateMandate(ctx context.Context, field g
 	return ec.marshalOMandateAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateAggregateResult(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getLabel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetLabel(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Label); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.Label`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Label)
+	fc.Result = res
+	return ec.marshalOLabel2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryLabel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().QueryLabel(rctx, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Label); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Label`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Label)
+	fc.Result = res
+	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregateLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregateLabel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateLabel(rctx, args["filter"].(*model.LabelFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LabelAggregateResult)
+	fc.Result = res
+	return ec.marshalOLabelAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getRoleExt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getRoleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetRoleExt(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.RoleExt); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleExt`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryRoleExt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryRoleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().QueryRoleExt(rctx, args["filter"].(*model.RoleExtFilter), args["order"].(*model.RoleExtOrder), args["first"].(*int), args["offset"].(*int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.RoleExt); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.RoleExt`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregateRoleExt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregateRoleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateRoleExt(rctx, args["filter"].(*model.RoleExtFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.RoleExtAggregateResult)
+	fc.Result = res
+	return ec.marshalORoleExtAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_queryOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -28938,162 +30639,6 @@ func (ec *executionContext) _Query_aggregateTension(ctx context.Context, field g
 	res := resTmp.(*model.TensionAggregateResult)
 	fc.Result = res
 	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_getLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_getLabel_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetLabel(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, nil, query, nil, nil, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.Label); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.Label`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Label)
-	fc.Result = res
-	return ec.marshalOLabel2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabel(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_queryLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_queryLabel_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().QueryLabel(rctx, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, nil, query, nil, nil, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*model.Label); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Label`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Label)
-	fc.Result = res
-	return ec.marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabel(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_aggregateLabel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_aggregateLabel_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateLabel(rctx, args["filter"].(*model.LabelFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.LabelAggregateResult)
-	fc.Result = res
-	return ec.marshalOLabelAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -30095,6 +31640,788 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_id(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_rootnameid(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Rootnameid, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_name(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Name, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			by, err := ec.unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx, []interface{}{"hash", "term"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Search == nil {
+				return nil, errors.New("directive search is not implemented")
+			}
+			return ec.directives.Search(ctx, obj, directive0, by)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_about(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.About, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_role_type(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoleType, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.RoleType)
+	fc.Result = res
+	return ec.marshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_color(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Color, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_mandate(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_RoleExt_mandate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mandate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Mandate)
+	fc.Result = res
+	return ec.marshalOMandate2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_nodes(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_RoleExt_nodes_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Nodes, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			field, err := ec.unmarshalNString2string(ctx, "role_ext")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasInverse == nil {
+				return nil, errors.New("directive hasInverse is not implemented")
+			}
+			return ec.directives.HasInverse(ctx, obj, directive1, field)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Node); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.Node`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_n_nodes(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NNodes, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExt_nodesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_RoleExt_nodesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NodesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_rootnameidMin(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RootnameidMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_rootnameidMax(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RootnameidMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_nameMin(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NameMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_nameMax(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NameMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_aboutMin(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AboutMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_aboutMax(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AboutMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_colorMin(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ColorMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_colorMax(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ColorMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_n_nodesMin(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NNodesMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_n_nodesMax(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NNodesMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_n_nodesSum(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NNodesSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _RoleExtAggregateResult_n_nodesAvg(ctx context.Context, field graphql.CollectedField, obj *model.RoleExtAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "RoleExtAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NNodesAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_emitterid(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -32883,6 +35210,95 @@ func (ec *executionContext) _UpdatePostPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "UpdatePostPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateRoleExtPayload_roleExt(ctx context.Context, field graphql.CollectedField, obj *model.UpdateRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateRoleExtPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdateRoleExtPayload_roleExt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.RoleExt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, obj, directive0, nil, query, nil, nil, nil)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.RoleExt); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.RoleExt`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateRoleExtPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateRoleExtPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateRoleExtPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -37771,6 +40187,14 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "role_ext":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
+			it.RoleExt, err = ec.unmarshalORoleExtRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "contracts":
 			var err error
 
@@ -37812,6 +40236,154 @@ func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
 			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, obj interface{}) (model.AddRoleExtInput, error) {
+	var it model.AddRoleExtInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "rootnameid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				on, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_unique == nil {
+					return nil, errors.New("directive alter_unique is not implemented")
+				}
+				return ec.directives.Alter_unique(ctx, obj, directive0, on)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive1)
+			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNInt2int(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_minLength == nil {
+					return nil, errors.New("directive alter_minLength is not implemented")
+				}
+				return ec.directives.Alter_minLength(ctx, obj, directive2, n)
+			}
+
+			tmp, err := directive3(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNInt2int(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_maxLength == nil {
+					return nil, errors.New("directive alter_maxLength is not implemented")
+				}
+				return ec.directives.Alter_maxLength(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.About = data
+			} else if tmp == nil {
+				it.About = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "role_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
+			it.RoleType, err = ec.unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mandate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nodes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_oneByOne == nil {
+					return nil, errors.New("directive alter_oneByOne is not implemented")
+				}
+				return ec.directives.Alter_oneByOne(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "n_nodes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_nodes"))
+			it.NNodes, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -42647,6 +45219,32 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleType`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "role_ext":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalORoleExtRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.RoleExtRef); ok {
+				it.RoleExt = data
+			} else if tmp == nil {
+				it.RoleExt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.RoleExtRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "contracts":
 			var err error
 
@@ -42896,6 +45494,14 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
 			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role_ext":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
+			it.RoleExt, err = ec.unmarshalORoleExtRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -43486,6 +46092,360 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj interface{}) (model.RoleExtFilter, error) {
+	var it model.RoleExtFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rootnameid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOStringHashFilter_StringTermFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalORoleExtHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalORoleExtFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalORoleExtFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRoleExtOrder(ctx context.Context, obj interface{}) (model.RoleExtOrder, error) {
+	var it model.RoleExtOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalORoleExtOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalORoleExtOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalORoleExtOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj interface{}) (model.RoleExtPatch, error) {
+	var it model.RoleExtPatch
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "rootnameid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Rootnameid = data
+			} else if tmp == nil {
+				it.Rootnameid = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				on, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_unique == nil {
+					return nil, errors.New("directive alter_unique is not implemented")
+				}
+				return ec.directives.Alter_unique(ctx, obj, directive0, on)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive1)
+			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNInt2int(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_minLength == nil {
+					return nil, errors.New("directive alter_minLength is not implemented")
+				}
+				return ec.directives.Alter_minLength(ctx, obj, directive2, n)
+			}
+
+			tmp, err := directive3(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Name = data
+			} else if tmp == nil {
+				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				n, err := ec.unmarshalNInt2int(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Alter_maxLength == nil {
+					return nil, errors.New("directive alter_maxLength is not implemented")
+				}
+				return ec.directives.Alter_maxLength(ctx, obj, directive0, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.About = data
+			} else if tmp == nil {
+				it.About = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "role_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
+			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mandate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nodes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_oneByOne == nil {
+					return nil, errors.New("directive alter_oneByOne is not implemented")
+				}
+				return ec.directives.Alter_oneByOne(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "n_nodes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_nodes"))
+			it.NNodes, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj interface{}) (model.RoleExtRef, error) {
+	var it model.RoleExtRef
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rootnameid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
+			it.RoleType, err = ec.unmarshalORoleType2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mandate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "nodes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			it.Nodes, err = ec.unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "n_nodes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_nodes"))
+			it.NNodes, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -44918,6 +47878,42 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
 			it.Remove, err = ec.unmarshalOPostPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateRoleExtInput(ctx context.Context, obj interface{}) (model.UpdateRoleExtInput, error) {
+	var it model.UpdateRoleExtInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNRoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalORoleExtPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalORoleExtPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -46427,6 +49423,32 @@ func (ec *executionContext) _AddOrgaAggPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var addRoleExtPayloadImplementors = []string{"AddRoleExtPayload"}
+
+func (ec *executionContext) _AddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRoleExtPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addRoleExtPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddRoleExtPayload")
+		case "roleExt":
+			out.Values[i] = ec._AddRoleExtPayload_roleExt(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddRoleExtPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var addTensionPayloadImplementors = []string{"AddTensionPayload"}
 
 func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddTensionPayload) graphql.Marshaler {
@@ -47159,6 +50181,34 @@ func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var deleteRoleExtPayloadImplementors = []string{"DeleteRoleExtPayload"}
+
+func (ec *executionContext) _DeleteRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteRoleExtPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteRoleExtPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteRoleExtPayload")
+		case "roleExt":
+			out.Values[i] = ec._DeleteRoleExtPayload_roleExt(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeleteRoleExtPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteRoleExtPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteTensionPayloadImplementors = []string{"DeleteTensionPayload"}
 
 func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteTensionPayload) graphql.Marshaler {
@@ -47680,6 +50730,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateMandate(ctx, field)
 		case "deleteMandate":
 			out.Values[i] = ec._Mutation_deleteMandate(ctx, field)
+		case "addLabel":
+			out.Values[i] = ec._Mutation_addLabel(ctx, field)
+		case "updateLabel":
+			out.Values[i] = ec._Mutation_updateLabel(ctx, field)
+		case "deleteLabel":
+			out.Values[i] = ec._Mutation_deleteLabel(ctx, field)
+		case "addRoleExt":
+			out.Values[i] = ec._Mutation_addRoleExt(ctx, field)
+		case "updateRoleExt":
+			out.Values[i] = ec._Mutation_updateRoleExt(ctx, field)
+		case "deleteRoleExt":
+			out.Values[i] = ec._Mutation_deleteRoleExt(ctx, field)
 		case "addOrgaAgg":
 			out.Values[i] = ec._Mutation_addOrgaAgg(ctx, field)
 		case "updateOrgaAgg":
@@ -47696,12 +50758,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateTension(ctx, field)
 		case "deleteTension":
 			out.Values[i] = ec._Mutation_deleteTension(ctx, field)
-		case "addLabel":
-			out.Values[i] = ec._Mutation_addLabel(ctx, field)
-		case "updateLabel":
-			out.Values[i] = ec._Mutation_updateLabel(ctx, field)
-		case "deleteLabel":
-			out.Values[i] = ec._Mutation_deleteLabel(ctx, field)
 		case "addComment":
 			out.Values[i] = ec._Mutation_addComment(ctx, field)
 		case "updateComment":
@@ -47864,6 +50920,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_skills(ctx, field, obj)
 		case "role_type":
 			out.Values[i] = ec._Node_role_type(ctx, field, obj)
+		case "role_ext":
+			out.Values[i] = ec._Node_role_ext(ctx, field, obj)
 		case "contracts":
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
 		case "orga_agg":
@@ -48387,6 +51445,72 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_aggregateMandate(ctx, field)
 				return res
 			})
+		case "getLabel":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getLabel(ctx, field)
+				return res
+			})
+		case "queryLabel":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryLabel(ctx, field)
+				return res
+			})
+		case "aggregateLabel":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateLabel(ctx, field)
+				return res
+			})
+		case "getRoleExt":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getRoleExt(ctx, field)
+				return res
+			})
+		case "queryRoleExt":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryRoleExt(ctx, field)
+				return res
+			})
+		case "aggregateRoleExt":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateRoleExt(ctx, field)
+				return res
+			})
 		case "queryOrgaAgg":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -48473,39 +51597,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_aggregateTension(ctx, field)
-				return res
-			})
-		case "getLabel":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getLabel(ctx, field)
-				return res
-			})
-		case "queryLabel":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_queryLabel(ctx, field)
-				return res
-			})
-		case "aggregateLabel":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_aggregateLabel(ctx, field)
 				return res
 			})
 		case "getComment":
@@ -48754,6 +51845,108 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var roleExtImplementors = []string{"RoleExt"}
+
+func (ec *executionContext) _RoleExt(ctx context.Context, sel ast.SelectionSet, obj *model.RoleExt) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, roleExtImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RoleExt")
+		case "id":
+			out.Values[i] = ec._RoleExt_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "rootnameid":
+			out.Values[i] = ec._RoleExt_rootnameid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._RoleExt_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "about":
+			out.Values[i] = ec._RoleExt_about(ctx, field, obj)
+		case "role_type":
+			out.Values[i] = ec._RoleExt_role_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "color":
+			out.Values[i] = ec._RoleExt_color(ctx, field, obj)
+		case "mandate":
+			out.Values[i] = ec._RoleExt_mandate(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._RoleExt_nodes(ctx, field, obj)
+		case "n_nodes":
+			out.Values[i] = ec._RoleExt_n_nodes(ctx, field, obj)
+		case "nodesAggregate":
+			out.Values[i] = ec._RoleExt_nodesAggregate(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var roleExtAggregateResultImplementors = []string{"RoleExtAggregateResult"}
+
+func (ec *executionContext) _RoleExtAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.RoleExtAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, roleExtAggregateResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RoleExtAggregateResult")
+		case "count":
+			out.Values[i] = ec._RoleExtAggregateResult_count(ctx, field, obj)
+		case "rootnameidMin":
+			out.Values[i] = ec._RoleExtAggregateResult_rootnameidMin(ctx, field, obj)
+		case "rootnameidMax":
+			out.Values[i] = ec._RoleExtAggregateResult_rootnameidMax(ctx, field, obj)
+		case "nameMin":
+			out.Values[i] = ec._RoleExtAggregateResult_nameMin(ctx, field, obj)
+		case "nameMax":
+			out.Values[i] = ec._RoleExtAggregateResult_nameMax(ctx, field, obj)
+		case "aboutMin":
+			out.Values[i] = ec._RoleExtAggregateResult_aboutMin(ctx, field, obj)
+		case "aboutMax":
+			out.Values[i] = ec._RoleExtAggregateResult_aboutMax(ctx, field, obj)
+		case "colorMin":
+			out.Values[i] = ec._RoleExtAggregateResult_colorMin(ctx, field, obj)
+		case "colorMax":
+			out.Values[i] = ec._RoleExtAggregateResult_colorMax(ctx, field, obj)
+		case "n_nodesMin":
+			out.Values[i] = ec._RoleExtAggregateResult_n_nodesMin(ctx, field, obj)
+		case "n_nodesMax":
+			out.Values[i] = ec._RoleExtAggregateResult_n_nodesMax(ctx, field, obj)
+		case "n_nodesSum":
+			out.Values[i] = ec._RoleExtAggregateResult_n_nodesSum(ctx, field, obj)
+		case "n_nodesAvg":
+			out.Values[i] = ec._RoleExtAggregateResult_n_nodesAvg(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49219,6 +52412,32 @@ func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._UpdatePostPayload_post(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdatePostPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateRoleExtPayloadImplementors = []string{"UpdateRoleExtPayload"}
+
+func (ec *executionContext) _UpdateRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateRoleExtPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateRoleExtPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateRoleExtPayload")
+		case "roleExt":
+			out.Values[i] = ec._UpdateRoleExtPayload_roleExt(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateRoleExtPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -50164,6 +53383,32 @@ func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚖzerogovᚋfractal6ᚗgo
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddRoleExtInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtInputᚄ(ctx context.Context, v interface{}) ([]*model.AddRoleExtInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AddRoleExtInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddRoleExtInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddRoleExtInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtInput(ctx context.Context, v interface{}) (*model.AddRoleExtInput, error) {
+	res, err := ec.unmarshalInputAddRoleExtInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx context.Context, v interface{}) ([]*model.AddTensionInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -50975,6 +54220,26 @@ func (ec *executionContext) unmarshalNPostFilter2ᚖzerogovᚋfractal6ᚗgoᚋgr
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNRoleExtFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx context.Context, v interface{}) (model.RoleExtFilter, error) {
+	res, err := ec.unmarshalInputRoleExtFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNRoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx context.Context, v interface{}) (*model.RoleExtFilter, error) {
+	res, err := ec.unmarshalInputRoleExtFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, v interface{}) (model.RoleType, error) {
+	var res model.RoleType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRoleType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, sel ast.SelectionSet, v model.RoleType) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -51097,6 +54362,11 @@ func (ec *executionContext) unmarshalNUpdateOrgaAggInput2zerogovᚋfractal6ᚗgo
 
 func (ec *executionContext) unmarshalNUpdatePostInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx context.Context, v interface{}) (model.UpdatePostInput, error) {
 	res, err := ec.unmarshalInputUpdatePostInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateRoleExtInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateRoleExtInput(ctx context.Context, v interface{}) (model.UpdateRoleExtInput, error) {
+	res, err := ec.unmarshalInputUpdateRoleExtInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -51560,6 +54830,13 @@ func (ec *executionContext) marshalOAddOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._AddOrgaAggPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddRoleExtPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddRoleExtPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddTensionPayload) graphql.Marshaler {
@@ -52894,6 +56171,13 @@ func (ec *executionContext) marshalODeletePostPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._DeletePostPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteRoleExtPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteRoleExtPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteTensionPayload) graphql.Marshaler {
@@ -55428,6 +58712,212 @@ func (ec *executionContext) unmarshalOPostPatch2ᚖzerogovᚋfractal6ᚗgoᚋgra
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalORoleExt2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx context.Context, sel ast.SelectionSet, v []*model.RoleExt) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalORoleExt2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalORoleExt2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx context.Context, sel ast.SelectionSet, v *model.RoleExt) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._RoleExt(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalORoleExtAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.RoleExtAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._RoleExtAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalORoleExtFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx context.Context, v interface{}) ([]*model.RoleExtFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.RoleExtFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalORoleExtFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx context.Context, v interface{}) (*model.RoleExtFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputRoleExtFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalORoleExtHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx context.Context, v interface{}) ([]*model.RoleExtHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.RoleExtHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalORoleExtHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalORoleExtHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.RoleExtHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalORoleExtHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) unmarshalORoleExtHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx context.Context, v interface{}) (*model.RoleExtHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.RoleExtHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalORoleExtHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.RoleExtHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalORoleExtOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx context.Context, v interface{}) (*model.RoleExtOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputRoleExtOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalORoleExtOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx context.Context, v interface{}) (*model.RoleExtOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.RoleExtOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalORoleExtOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx context.Context, sel ast.SelectionSet, v *model.RoleExtOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalORoleExtPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx context.Context, v interface{}) (*model.RoleExtPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputRoleExtPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalORoleExtRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx context.Context, v interface{}) (*model.RoleExtRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputRoleExtRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalORoleType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx context.Context, v interface{}) ([]*model.RoleType, error) {
 	if v == nil {
 		return nil, nil
@@ -56285,6 +59775,13 @@ func (ec *executionContext) marshalOUpdatePostPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._UpdatePostPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateRoleExtPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateRoleExtPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateTensionPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateTensionPayload) graphql.Marshaler {

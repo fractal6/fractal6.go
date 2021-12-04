@@ -50,6 +50,32 @@ func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.Manda
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
+}
+
+func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
+}
+
+func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddRoleExt(ctx context.Context, input []*model.AddRoleExtInput) (data *model.AddRoleExtPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateRoleExt(ctx context.Context, input model.UpdateRoleExtInput) (data *model.UpdateRoleExtPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteRoleExt(ctx context.Context, filter model.RoleExtFilter) (data *model.DeleteRoleExtPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (data *model.AddOrgaAggPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -81,20 +107,6 @@ func (r *mutationResolver) UpdateTension(ctx context.Context, input model.Update
 }
 
 func (r *mutationResolver) DeleteTension(ctx context.Context, filter model.TensionFilter) (data *model.DeleteTensionPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
-}
-
-func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
-}
-
-func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFilter) (data *model.DeleteLabelPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -236,6 +248,31 @@ func (r *queryResolver) AggregateMandate(ctx context.Context, filter *model.Mand
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) GetLabel(ctx context.Context, id string) (data *model.Label, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) (data []*model.Label, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
+}
+
+func (r *queryResolver) AggregateLabel(ctx context.Context, filter *model.LabelFilter) (data *model.LabelAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetRoleExt(ctx context.Context, id string) (data *model.RoleExt, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryRoleExt(ctx context.Context, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) (data []*model.RoleExt, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateRoleExt(ctx context.Context, filter *model.RoleExtFilter) (data *model.RoleExtAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) QueryOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) (data []*model.OrgaAgg, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -267,19 +304,6 @@ func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionF
 }
 
 func (r *queryResolver) AggregateTension(ctx context.Context, filter *model.TensionFilter) (data *model.TensionAggregateResult, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) GetLabel(ctx context.Context, id string) (data *model.Label, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) (data []*model.Label, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	return data, errors
-}
-
-func (r *queryResolver) AggregateLabel(ctx context.Context, filter *model.LabelFilter) (data *model.LabelAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

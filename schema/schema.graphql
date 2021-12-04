@@ -43,6 +43,38 @@ directive @hook_updateNode on FIELD_DEFINITION
 
 directive @hook_deleteNode on FIELD_DEFINITION
 
+directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_addRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_updateRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_deleteRoleExtInput on ARGUMENT_DEFINITION
+
+directive @hook_addRoleExt on FIELD_DEFINITION
+
+directive @hook_updateRoleExt on FIELD_DEFINITION
+
+directive @hook_deleteRoleExt on FIELD_DEFINITION
+
+directive @hook_getLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_queryLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_addLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_updateLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
+
+directive @hook_addLabel on FIELD_DEFINITION
+
+directive @hook_updateLabel on FIELD_DEFINITION
+
+directive @hook_deleteLabel on FIELD_DEFINITION
+
 directive @hook_getTensionInput on ARGUMENT_DEFINITION
 
 directive @hook_queryTensionInput on ARGUMENT_DEFINITION
@@ -74,22 +106,6 @@ directive @hook_addComment on FIELD_DEFINITION
 directive @hook_updateComment on FIELD_DEFINITION
 
 directive @hook_deleteComment on FIELD_DEFINITION
-
-directive @hook_getLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_queryLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_addLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_updateLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_addLabel on FIELD_DEFINITION
-
-directive @hook_updateLabel on FIELD_DEFINITION
-
-directive @hook_deleteLabel on FIELD_DEFINITION
 
 directive @hook_getContractInput on ARGUMENT_DEFINITION
 
@@ -160,6 +176,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   second_link(filter: UserFilter): User
   skills: [String!] @search(by: [term])
   role_type: RoleType @search
+  role_ext(filter: RoleExtFilter): RoleExt
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
@@ -195,6 +212,55 @@ type Mandate {
   responsabilities: String
   domains: String
   policies: String
+}
+
+type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryLabel { 
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String!]) {
+        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by: [hash])
+  name: String! @search(by: [hash, term])
+  description: String
+  color: String
+  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
+  n_nodes: Int
+  n_tensions: Int
+
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
+}
+
+type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryRoleExt { 
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String!]) {
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by: [hash])
+  name: String! @search(by: [hash, term])
+  about: String
+  role_type: RoleType!
+  color: String
+  mandate(filter: MandateFilter): Mandate
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: role_ext)
+  n_nodes: Int
+
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type OrgaAgg {
@@ -273,31 +339,6 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   createdAt: DateTime! @search
   updatedAt: DateTime
   message: String @search(by: [fulltext])
-}
-
-type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
-        queryLabel { 
-          nodes(filter: {visibility: {eq: Public}}) { id }
-        }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
-        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
-    }"""
-}]
-}) {
-  id: ID!
-  rootnameid: String! @search(by: [hash])
-  name: String! @search(by: [hash, term])
-  description: String
-  color: String
-  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
-  n_nodes: Int
-  n_tensions: Int
-
-  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
-  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type Comment @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -567,39 +608,40 @@ enum ContractType {
 enum UserType {
   Regular
   Root
+
 }
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @cascade(fields: [String]) on FIELD
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @id on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
 directive @lambda on FIELD_DEFINITION
 
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -757,6 +799,7 @@ input AddNodeInput {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
+  role_ext: RoleExtRef
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -773,6 +816,22 @@ input AddOrgaAggInput {
 
 type AddOrgaAggPayload {
   orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  numUids: Int
+}
+
+input AddRoleExtInput {
+  rootnameid: String!
+  name: String! @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
+  about: String @alter_maxLength(n:280)
+  role_type: RoleType!
+  color: String
+  mandate: MandateRef
+  nodes: [NodeRef!] @alter_oneByOne
+  n_nodes: Int
+}
+
+type AddRoleExtPayload {
+  roleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   numUids: Int
 }
 
@@ -1216,6 +1275,12 @@ type DeletePostPayload {
   numUids: Int
 }
 
+type DeleteRoleExtPayload {
+  roleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
+  msg: String
+  numUids: Int
+}
+
 type DeleteTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
   msg: String
@@ -1607,6 +1672,12 @@ type Mutation {
   addMandate(input: [AddMandateInput!]!): AddMandatePayload
   updateMandate(input: UpdateMandateInput!): UpdateMandatePayload
   deleteMandate(filter: MandateFilter!): DeleteMandatePayload
+  addLabel(input: [AddLabelInput!]! @hook_addLabelInput): AddLabelPayload @hook_addLabel
+  updateLabel(input: UpdateLabelInput! @hook_updateLabelInput): UpdateLabelPayload @hook_updateLabel
+  deleteLabel(filter: LabelFilter! @hook_deleteLabelInput): DeleteLabelPayload @hook_deleteLabel
+  addRoleExt(input: [AddRoleExtInput!]! @hook_addRoleExtInput): AddRoleExtPayload @hook_addRoleExt
+  updateRoleExt(input: UpdateRoleExtInput! @hook_updateRoleExtInput): UpdateRoleExtPayload @hook_updateRoleExt
+  deleteRoleExt(filter: RoleExtFilter! @hook_deleteRoleExtInput): DeleteRoleExtPayload @hook_deleteRoleExt
   addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
   updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
   deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
@@ -1615,9 +1686,6 @@ type Mutation {
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
   updateTension(input: UpdateTensionInput! @hook_updateTensionInput): UpdateTensionPayload @hook_updateTension
   deleteTension(filter: TensionFilter! @hook_deleteTensionInput): DeleteTensionPayload @hook_deleteTension
-  addLabel(input: [AddLabelInput!]! @hook_addLabelInput): AddLabelPayload @hook_addLabel
-  updateLabel(input: UpdateLabelInput! @hook_updateLabelInput): UpdateLabelPayload @hook_updateLabel
-  deleteLabel(filter: LabelFilter! @hook_deleteLabelInput): DeleteLabelPayload @hook_deleteLabel
   addComment(input: [AddCommentInput!]! @hook_addCommentInput): AddCommentPayload @hook_addComment
   updateComment(input: UpdateCommentInput! @hook_updateCommentInput): UpdateCommentPayload @hook_updateComment
   deleteComment(filter: CommentFilter! @hook_deleteCommentInput): DeleteCommentPayload @hook_deleteComment
@@ -1800,6 +1868,7 @@ enum NodeHasFilter {
   second_link
   skills
   role_type
+  role_ext
   contracts
   orga_agg
 }
@@ -1852,6 +1921,7 @@ input NodePatch {
   second_link: UserRef @patch_RO
   skills: [String!] @patch_RO
   role_type: RoleType @patch_RO
+  role_ext: RoleExtRef @patch_RO
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -1885,6 +1955,7 @@ input NodeRef {
   second_link: UserRef
   skills: [String!]
   role_type: RoleType
+  role_ext: RoleExtRef
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -2042,6 +2113,12 @@ type Query {
   getMandate(id: ID!): Mandate
   queryMandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
   aggregateMandate(filter: MandateFilter): MandateAggregateResult
+  getLabel(id: ID! @hook_getLabelInput): Label
+  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabelInput): [Label]
+  aggregateLabel(filter: LabelFilter): LabelAggregateResult
+  getRoleExt(id: ID! @hook_getRoleExtInput): RoleExt
+  queryRoleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int @hook_queryRoleExtInput): [RoleExt]
+  aggregateRoleExt(filter: RoleExtFilter): RoleExtAggregateResult
   queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
@@ -2050,9 +2127,6 @@ type Query {
   getTension(id: ID! @hook_getTensionInput): Tension
   queryTension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int @hook_queryTensionInput): [Tension]
   aggregateTension(filter: TensionFilter): TensionAggregateResult
-  getLabel(id: ID! @hook_getLabelInput): Label
-  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabelInput): [Label]
-  aggregateLabel(filter: LabelFilter): LabelAggregateResult
   getComment(id: ID! @hook_getCommentInput): Comment
   queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int @hook_queryCommentInput): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
@@ -2075,6 +2149,80 @@ type Query {
   aggregateUser(filter: UserFilter): UserAggregateResult
   queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
   aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
+}
+
+type RoleExtAggregateResult {
+  count: Int
+  rootnameidMin: String
+  rootnameidMax: String
+  nameMin: String
+  nameMax: String
+  aboutMin: String
+  aboutMax: String
+  colorMin: String
+  colorMax: String
+  n_nodesMin: Int
+  n_nodesMax: Int
+  n_nodesSum: Int
+  n_nodesAvg: Float
+}
+
+input RoleExtFilter {
+  id: [ID!]
+  rootnameid: StringHashFilter
+  name: StringHashFilter_StringTermFilter
+  has: [RoleExtHasFilter]
+  and: [RoleExtFilter]
+  or: [RoleExtFilter]
+  not: RoleExtFilter
+}
+
+enum RoleExtHasFilter {
+  rootnameid
+  name
+  about
+  role_type
+  color
+  mandate
+  nodes
+  n_nodes
+}
+
+input RoleExtOrder {
+  asc: RoleExtOrderable
+  desc: RoleExtOrderable
+  then: RoleExtOrder
+}
+
+enum RoleExtOrderable {
+  rootnameid
+  name
+  about
+  color
+  n_nodes
+}
+
+input RoleExtPatch {
+  rootnameid: String @patch_RO
+  name: String @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
+  about: String @alter_maxLength(n:280)
+  role_type: RoleType
+  color: String
+  mandate: MandateRef
+  nodes: [NodeRef!] @alter_oneByOne
+  n_nodes: Int
+}
+
+input RoleExtRef {
+  id: ID
+  rootnameid: String
+  name: String
+  about: String
+  role_type: RoleType
+  color: String
+  mandate: MandateRef
+  nodes: [NodeRef!]
+  n_nodes: Int
 }
 
 input RoleType_hash {
@@ -2395,6 +2543,17 @@ input UpdatePostInput {
 
 type UpdatePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
+  numUids: Int
+}
+
+input UpdateRoleExtInput {
+  filter: RoleExtFilter!
+  set: RoleExtPatch
+  remove: RoleExtPatch
+}
+
+type UpdateRoleExtPayload {
+  roleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   numUids: Int
 }
 

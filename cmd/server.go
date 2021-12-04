@@ -128,7 +128,7 @@ func RunServer() {
         r.Get("/ping", handle6.Ping)
 
         // Serve frontend static files
-        //web.FileServer(r, "/", "./public")
+        web.FileServer(r, "/", "./public")
 
         // Overwrite gql config
         gqlConfig["introspection"] = true
