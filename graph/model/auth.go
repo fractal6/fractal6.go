@@ -52,19 +52,9 @@ var UserCtxPayloadDg string = `{
     User.password
     User.rights {expand(_all_)}
     User.roles {
-        Node.rootnameid
         Node.nameid
         Node.name
         Node.role_type
-    }
-}`
-
-// NodeCharac Payload
-var NodeCharacNF string = "Node.charac"
-var NodeCharacPayloadDg string = `{
-    Node.charac {
-        NodeCharac.userCanJoin
-        NodeCharac.mode
     }
 }`
 

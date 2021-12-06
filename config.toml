@@ -10,5 +10,5 @@ api = "graphql"
 admin = "admin"
 
 [graphql]
-complexity_limit = 200 # 50
+complexity_limit = 200  # 50
 introspection = false

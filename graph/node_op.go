@@ -87,6 +87,7 @@ func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.Nod
     err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isArchived", strconv.FormatBool(true))
     return ok, err
 }
+
 func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
     parentid := tension.Receiver.Nameid
 
@@ -97,7 +98,7 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
     ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-    // Check that node has no parent archived
+    // Check that parent node is not archived
     parentIsArchived, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
     if err != nil { return ok, err }
     if parentIsArchived != nil && parentIsArchived.(bool) == true{
@@ -112,6 +113,50 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
     }
     // Toggle the node flag
     err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isArchived", strconv.FormatBool(false))
+    return ok, err
+}
+
+func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, value string) (bool, error) {
+    parentid := tension.Receiver.Nameid
+
+    // Get References
+    _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return false, err }
+
+    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    if err != nil || !ok { return ok, err }
+
+    DB := db.GetDB()
+
+    switch *node.Type {
+    case model.NodeTypeRole:
+        if !model.RoleType(value).IsValid() { return false, fmt.Errorf("Bad vaue for role_type.") }
+        err = DB.SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
+        if err != nil { return false, err }
+        err = DB.SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
+    case model.NodeTypeCircle:
+        if !model.NodeMode(value).IsValid() { return false, fmt.Errorf("Bad value for mode.") }
+        err = DB.SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
+    }
+
+    return ok, err
+}
+
+func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, value string) (bool, error) {
+    parentid := tension.Receiver.Nameid
+
+    // Get References
+    _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+    if err != nil { return false, err }
+
+    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    if err != nil || !ok { return ok, err }
+
+    DB := db.GetDB()
+
+    if !model.NodeVisibility(value).IsValid() { return false, fmt.Errorf("Bad value for visibility.") }
+    err = DB.SetFieldByEq("Node.nameid", nameid, "Node.visibility", value)
+
     return ok, err
 }
 

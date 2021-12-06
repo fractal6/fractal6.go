@@ -1,29 +1,33 @@
 package db
 
 import (
-    "fmt"
-    "log"
-    "os"
-    "time"
-    "bytes"
-    "strings"
-    "context"
-    "reflect"
-    "net/http"
-    "encoding/json"
-    "text/template"
-    "github.com/spf13/viper"
-    "github.com/mitchellh/mapstructure"
-    //"github.com/vektah/gqlparser/v2/gqlerror"
-    "github.com/dgraph-io/dgo/v200"
-    "github.com/dgraph-io/dgo/v200/protos/api"
-    "google.golang.org/grpc"
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"reflect"
+	"strings"
+	"text/template"
+	"time"
 
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/tools"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 
-    "zerogov/fractal6.go/web/middleware/jwtauth"
-    jwt "github.com/dgrijalva/jwt-go"
+	//"github.com/vektah/gqlparser/v2/gqlerror"
+	"github.com/dgraph-io/dgo/v200"
+	"github.com/dgraph-io/dgo/v200/protos/api"
+	"google.golang.org/grpc"
+
+	"zerogov/fractal6.go/graph/codec"
+	"zerogov/fractal6.go/graph/model"
+	"zerogov/fractal6.go/tools"
+
+	"zerogov/fractal6.go/web/middleware/jwtauth"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 var dgraphSecret string
@@ -140,8 +144,15 @@ func initDB() *Dgraph {
             "variables": {{.Variables}}
         }`,
         "query": `{
-            "query": "query {{.Args}} {{.QueryName}} {
-                {{.QueryName}} {
+            "query": "query {{.QueryName}} {
+                {{.QueryName}} ({{.Args}}) {
+                    {{.QueryGraph}}
+                }
+            }"
+        }`,
+        "get": `{
+            "query": "query {{.QueryName}} {
+                {{.QueryName}} ({{.key}}: \"{{.value}}\") {
                     {{.QueryGraph}}
                 }
             }"
@@ -265,11 +276,17 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
 }
 
 func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
-    // Build claims
+    // Get unique rootnameid
     var rootids []string
-    for _, r := range uctx.Roles {
-        rootids = append(rootids, r.Rootnameid)
+    check := make(map[string]bool)
+    for _, d := range uctx.Roles {
+        rid, _ := codec.Nid2pid(d.Nameid)
+        if _, v := check[rid]; !v {
+            check[rid] = true
+            rootids = append(rootids, rid)
+        }
     }
+    // Build claims
     dgClaims := DgraphClaims{
         Username: uctx.Username,
         Rootids: rootids,
@@ -479,13 +496,7 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
     //fmt.Println("request ->", string(q))
     err := dg.postql(uctx, []byte(q), res)
     //fmt.Println("response ->", res)
-    if err != nil {
-        return err
-    } else if res.Errors != nil {
-        err, _ := json.Marshal(res.Errors)
-        //return fmt.Errorf(string(err))
-        return &GraphQLError{string(err)}
-    }
+    if err != nil { return err }
 
     switch v := data.(type) {
     case model.JsonAtom:
@@ -515,14 +526,83 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
         decoder, err := mapstructure.NewDecoder(config)
         if err != nil { return err }
         err = decoder.Decode(res.Data[queryName])
+        if err != nil { return err }
     }
 
+    if res.Errors != nil {
+        err, _ := json.Marshal(res.Errors)
+        //return fmt.Errorf(string(err))
+        return &GraphQLError{string(err)}
+    }
     return err
+}
+
+func (dg Dgraph) QueryAuthFilter(uctx model.UserCtx, vertex string, k string, values []string) ([]string, error) {
+    Vertex := strings.Title(vertex)
+    queryName := "query" + Vertex
+    queryGraph := k
+
+    var i int
+    var n, args string
+    var res []map[string]string
+    final := []string{}
+
+    // Build query arguments
+    for i, n = range values {
+        if i == 0 {
+            args += fmt.Sprintf(`%s: {eq:"%s"},`, k, n)
+        } else {
+            args += fmt.Sprintf(`or: {%s: {eq: "%s"},`, k, n)
+        }
+    }
+    args += strings.Repeat("},", i)
+
+    // Build query
+    input := map[string]string{
+        "QueryName": queryName,
+        "QueryGraph": queryGraph,
+        "Args": tools.CleanString("filter: {"+args+"}", true),
+    }
+
+    // send query
+    err := dg.QueryGql(uctx, "query", input, &res)
+    if err != nil { return final, err }
+
+    for _, x := range res {
+        final = append(final, x[k])
+    }
+    return final, nil
 }
 
 //
 // Graphql requests
 //
+
+// Get a new vertex
+func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string) (string, error) {
+    Vertex := strings.Title(vertex)
+    queryName := "get" + Vertex
+    queryGraph := "id"
+
+    // Build the string request
+    reqInput := map[string]string{
+        "QueryName": queryName, // function name (e.g addUser)
+        "QueryGraph": tools.CleanString(queryGraph, true), // output data
+        "key": input["key"],
+        "value": input["value"],
+    }
+
+    // Send request
+    payload := make(model.JsonAtom, 1)
+    err := dg.QueryGql(uctx, "get", reqInput, payload)
+    if err != nil { return "", err }
+    // Extract id result
+    if payload[queryName] == nil {
+        return "", fmt.Errorf("Unauthorized request. Possibly, name already exists.")
+    }
+    res := payload[queryName].(model.JsonAtom)["id"]
+    return res.(string), err
+}
 
 // Add a new vertex
 func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (string, error) {

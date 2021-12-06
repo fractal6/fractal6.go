@@ -65,7 +65,7 @@ func Nid2rootid(nid string) (string, error) {
     var pid string
     parts := strings.Split(nid, "#")
     if !(len(parts) == 3 || len(parts) == 1 || len(parts) == 2) {
-        return pid, fmt.Errorf("bad nameid format for Nid2pid: " + nid)
+        return pid, fmt.Errorf("bad nameid format for Nid2rootid: " + nid)
     }
 
     return parts[0], nil

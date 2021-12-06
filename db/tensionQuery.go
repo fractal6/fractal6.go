@@ -21,6 +21,7 @@ type TensionQuery struct {
     Labels []string             `json:"labels"`
 }
 
+// Note: We assumes here all nameids have the same rootnameid.
 func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
     /* list format */
 
@@ -44,9 +45,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 
     // Rootnameid
     rootnameid, err := codec.Nid2rootid(q.Nameids[0])
-    if err != nil {
-        return nil, err
-    }
+    if err != nil { return nil, err }
 
     /* Tension filter */
     var tf []string

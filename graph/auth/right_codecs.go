@@ -20,7 +20,10 @@ func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
 
     var roles []*model.Node
     for _, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid  {
+        rid, err := codec.Nid2rootid(r.Nameid)
+        if err != nil { panic(err.Error()) }
+
+        if rid == rootnameid  {
             roles = append(roles, r)
         }
     }
@@ -47,7 +50,10 @@ func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid {
+        rid, err := codec.Nid2rootid(r.Nameid)
+        if err != nil { panic(err.Error()) }
+
+        if rid == rootnameid {
             return i
         }
     }
@@ -60,7 +66,10 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && *r.RoleType == model.RoleTypeGuest {
+        rid, err := codec.Nid2rootid(r.Nameid)
+        if err != nil { panic(err.Error()) }
+
+        if rid == rootnameid && *r.RoleType == model.RoleTypeGuest {
             return i
         }
     }
@@ -77,6 +86,7 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
     for i, r := range uctx.Roles {
         pid, err := codec.Nid2pid(r.Nameid)
         if err != nil { panic(err.Error()) }
+
         if pid == nameid && *r.RoleType != model.RoleTypeGuest {
             return i
         }
@@ -92,6 +102,7 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
     for i, r := range uctx.Roles {
         pid, err := codec.Nid2pid(r.Nameid)
         if err != nil { panic(err.Error()) }
+
         if pid == nameid && *r.RoleType == model.RoleTypeCoordinator {
             return i
         }
@@ -105,7 +116,10 @@ func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        if r.Rootnameid == rootnameid && *r.RoleType == model.RoleTypeOwner {
+        rid, err := codec.Nid2rootid(r.Nameid)
+        if err != nil { panic(err.Error()) }
+
+        if rid == rootnameid && *r.RoleType == model.RoleTypeOwner {
             return i
         }
     }

@@ -144,7 +144,14 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         queryNode(filter: {visibility: {eq: Public}}) { id }
     }"""
 },{ rule:"""query ($ROOTIDS: [String!]) {
-        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryNode(filter: {visibility: {eq: Secret} }) {
+          children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+        }
     }"""
 }]
 }) {
@@ -613,35 +620,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
+
 directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -1141,6 +1150,7 @@ input ContractPatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
+  contractid: String
   tension: TensionRef @patch_RO
   status: ContractStatus @patch_RO
   contract_type: ContractType @patch_RO
@@ -1303,6 +1313,10 @@ type DeleteVotePayload {
   vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   msg: String
   numUids: Int
+}
+
+input DgraphDefault {
+  value: String
 }
 
 enum DgraphIndex {
@@ -1899,6 +1913,7 @@ input NodePatch {
   createdAt: DateTime @patch_RO
   updatedAt: DateTime @alter_RO
   name: String @patch_RO
+  nameid: String @patch_RO
   rootnameid: String @patch_RO
   parent: NodeRef @patch_RO
   children: [NodeRef!] @patch_RO
@@ -2673,6 +2688,7 @@ enum UserOrderable {
 input UserPatch {
   createdAt: DateTime @alter_RO
   lastAck: DateTime @alter_RO
+  username: String @patch_RO @alter_toLower
   name: String @patch_isOwner
   password: String @patch_isOwner
   email: String @patch_isOwner
@@ -2806,6 +2822,7 @@ input VotePatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
+  voteid: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]

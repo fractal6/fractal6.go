@@ -487,6 +487,7 @@ type ContractPatch struct {
 	CreatedAt    *string           `json:"createdAt,omitempty"`
 	UpdatedAt    *string           `json:"updatedAt,omitempty"`
 	Message      *string           `json:"message,omitempty"`
+	Contractid   *string           `json:"contractid,omitempty"`
 	Tension      *TensionRef       `json:"tension,omitempty"`
 	Status       *ContractStatus   `json:"status,omitempty"`
 	ContractType *ContractType     `json:"contract_type,omitempty"`
@@ -647,6 +648,10 @@ type DeleteVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids"`
+}
+
+type DgraphDefault struct {
+	Value *string `json:"value,omitempty"`
 }
 
 type Event struct {
@@ -1127,6 +1132,7 @@ type NodePatch struct {
 	CreatedAt   *string         `json:"createdAt,omitempty"`
 	UpdatedAt   *string         `json:"updatedAt,omitempty"`
 	Name        *string         `json:"name,omitempty"`
+	Nameid      *string         `json:"nameid,omitempty"`
 	Rootnameid  *string         `json:"rootnameid,omitempty"`
 	Parent      *NodeRef        `json:"parent,omitempty"`
 	Children    []*NodeRef      `json:"children,omitempty"`
@@ -1826,6 +1832,7 @@ type UserOrder struct {
 type UserPatch struct {
 	CreatedAt        *string        `json:"createdAt,omitempty"`
 	LastAck          *string        `json:"lastAck,omitempty"`
+	Username         *string        `json:"username,omitempty"`
 	Name             *string        `json:"name,omitempty"`
 	Password         *string        `json:"password,omitempty"`
 	Email            *string        `json:"email,omitempty"`
@@ -1949,6 +1956,7 @@ type VotePatch struct {
 	CreatedAt *string      `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
+	Voteid    *string      `json:"voteid,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Node      *NodeRef     `json:"node,omitempty"`
 	Data      []int        `json:"data"`

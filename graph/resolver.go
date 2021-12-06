@@ -48,7 +48,7 @@ func Init() gen.Config {
 
     // Dgraph directives
     c := gen.Config{Resolvers: &r}
-    c.Directives.Id = nothing
+    c.Directives.Id = nothing1
     c.Directives.HasInverse = nothing2
     c.Directives.Search = nothing3
     c.Directives.Auth = nothing4
@@ -170,6 +170,10 @@ func Init() gen.Config {
 */
 
 func nothing(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    return next(ctx)
+}
+
+func nothing1(ctx context.Context, obj interface{}, next graphql.Resolver, key *bool) (interface{}, error) {
     return next(ctx)
 }
 

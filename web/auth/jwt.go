@@ -176,6 +176,15 @@ func GetUserContext(ctx context.Context) (*model.UserCtx, error) {
     return uctx, nil
 }
 
+func GetUserContextOrEmpty(ctx context.Context) model.UserCtx {
+    uctx := ctx.Value(tkMaster.tokenClaim).(*model.UserCtx)
+    userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
+    if userCtxErr != nil { return model.UserCtx{} }
+
+    uctx.Iat = ctx.Value("iat").(string)
+    return *uctx
+}
+
 // CheckUserCtxIat update the user token if the given
 // node has been updated after that the token's iat.
 func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {

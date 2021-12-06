@@ -210,7 +210,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.nameid
         }
     }`,
-    "getAllChildren": `{
+    "getSubNodes": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
             o as Node.children
         }
@@ -219,7 +219,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.{{.fieldid}}
         }
     }`,
-    "getAllMembers": `{
+    "getSubMembers": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
             o as Node.children
         }
@@ -228,7 +228,6 @@ var dqlQueries map[string]string = map[string]string{
             Node.createdAt
             Node.name
             Node.nameid
-            Node.rootnameid
             Node.role_type
             Node.first_link {
                 User.username
@@ -239,12 +238,30 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-    "getAllLabels": `{
+    "getTopLabels": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.parent @normalize
+        }
+
+        var(func: uid(o)) @filter(NOT eq(Node.isArchived, true) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            l as Node.labels
+        }
+
+        all(func: uid(l)){
+            uid
+            Label.name
+            Label.color
+            Label.description
+            n_nodes: count(Label.nodes)
+        }
+    }`,
+    "getSubLabels": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
             o as Node.children
         }
 
-        labels(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
+        var(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
             l as Node.labels
         }
 
@@ -748,7 +765,8 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
     }
     // Filter special roles
     for i := 0; i < len(user.Roles); i++ {
-        if *user.Roles[i].RoleType == model.RoleTypeRetired {
+        if *user.Roles[i].RoleType == model.RoleTypeRetired ||
+        *user.Roles[i].RoleType == model.RoleTypePending {
             user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
             i--
         }
@@ -894,14 +912,14 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
 }
 
 // Get all sub children
-func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.Node, error) {
+func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
         "objid": objid,
     }
     // Send request
-    res, err := dg.QueryDql("getAllChildren", maps)
+    res, err := dg.QueryDql("getSubNodes", maps)
     if err != nil { return nil, err }
 
     // Decode response
@@ -928,14 +946,14 @@ func (dg Dgraph) GetAllChildren(fieldid string, objid string) ([]model.Node, err
 }
 
 // Get all sub members
-func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.Node, error) {
+func (dg Dgraph) GetSubMembers(fieldid string, objid string) ([]model.Node, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
         "objid": objid,
     }
     // Send request
-    res, err := dg.QueryDql("getAllMembers", maps)
+    res, err := dg.QueryDql("getSubMembers", maps)
     if err != nil { return nil, err }
 
     // Decode response
@@ -961,15 +979,15 @@ func (dg Dgraph) GetAllMembers(fieldid string, objid string) ([]model.Node, erro
     return data, err
 }
 
-// Get all sub labels
-func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.Label, error) {
+// Get all top labels
+func (dg Dgraph) GetTopLabels(fieldid string, objid string) ([]model.Label, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
         "objid": objid,
     }
     // Send request
-    res, err := dg.QueryDql("getAllLabels", maps)
+    res, err := dg.QueryDql("getTopLabels", maps)
     if err != nil { return nil, err }
 
     // Decode response
@@ -977,9 +995,9 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.Label, erro
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    var data []model.Label
+    var data_dup []model.Label
     config := &mapstructure.DecoderConfig{
-        Result: &data,
+        Result: &data_dup,
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
@@ -992,6 +1010,58 @@ func (dg Dgraph) GetAllLabels(fieldid string, objid string) ([]model.Label, erro
     decoder, err := mapstructure.NewDecoder(config)
     if err != nil { return nil, err }
     err = decoder.Decode(r.All)
+    // Remove duplicate based on Label.name
+    data := []model.Label{}
+    check := make(map[string]bool)
+    for _, d := range data_dup {
+        if _, v := check[d.Name]; !v {
+            check[d.Name] = true
+            data = append(data, d)
+        }
+    }
+    return data, err
+}
+
+// Get all sub labels
+func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid": fieldid,
+        "objid": objid,
+    }
+    // Send request
+    res, err := dg.QueryDql("getSubLabels", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data_dup []model.Label
+    config := &mapstructure.DecoderConfig{
+        Result: &data_dup,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    // Remove duplicate based on Label.name
+    data := []model.Label{}
+    check := make(map[string]bool)
+    for _, d := range data_dup {
+        if _, v := check[d.Name]; !v {
+            check[d.Name] = true
+            data = append(data, d)
+        }
+    }
     return data, err
 }
 
@@ -1205,6 +1275,25 @@ func (dg Dgraph) SetFieldByEq(fieldid string, objid string, predicate string, va
     mu := fmt.Sprintf(`
         uid(node) <%s> "%s" .
     `, predicate, val)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryDql(query, mutation)
+    return err
+}
+//SetSubFieldByEq set a predicate for the given node in the DB
+func (dg Dgraph) SetSubFieldByEq(fieldid string, objid string, predicate1, predicate2 string, val string) error {
+    query := fmt.Sprintf(`query {
+        var(func: eq(%s, "%s")) {
+            x as %s
+        }
+    }`, fieldid, objid, predicate1)
+
+    mu := fmt.Sprintf(`
+        uid(x) <%s> "%s" .
+    `, predicate2, val)
 
     mutation := &api.Mutation{
         SetNquads: []byte(mu),

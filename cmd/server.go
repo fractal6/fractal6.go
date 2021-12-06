@@ -87,7 +87,7 @@ func RunServer() {
     // processing should be stopped.
     r.Use(middleware.Timeout(60 * time.Second))
 
-    // Auth handlers
+    // Auth API
     r.Group(func(r chi.Router) {
         //r.Use(middle6.EnsurePostMethod)
         r.Route("/auth", func(r chi.Router) {
@@ -108,14 +108,31 @@ func RunServer() {
     // Http/Rest API
     r.Group(func(r chi.Router) {
         r.Route("/q", func(r chi.Router) {
-            // query
-            r.Post("/sub_children", handle6.SubChildren)
-            r.Post("/sub_members", handle6.SubMembers)
-            r.Post("/sub_labels", handle6.SubLabels)
-            r.Post("/tensions_int", handle6.TensionsInt)
-            r.Post("/tensions_ext", handle6.TensionsExt)
-            r.Post("/tensions_all", handle6.TensionsAll)
-            r.Post("/tensions_count", handle6.TensionsCount)
+
+            // Special recursive query
+            r.Group(func(r chi.Router) {
+                // Those data are not secured by now, and anyone can
+                // query them recursively, but as there are not sensitive
+                // and set them public for now.
+                //r.Use(middle6.CheckRecursiveQueryRights)
+                r.Post("/sub_nodes", handle6.SubNodes)
+                r.Post("/sub_members", handle6.SubMembers)
+                r.Post("/top_labels", handle6.TopLabels)
+                r.Post("/sub_labels", handle6.SubLabels)
+                //r.Post("/top_roles", handle6.TopRoles)
+                //r.Post("/sub_roles", handle6.SubRoles)
+            })
+
+            // Special tension query (nested filters and counts)
+            r.Group(func(r chi.Router) {
+                // The filtering is done directly in the query resolver as
+                // doing it here required to rewrite the body, which seems difficult ?!
+                //r.Use(middle6.CheckTensionQueryRights)
+                r.Post("/tensions_int", handle6.TensionsInt)
+                r.Post("/tensions_ext", handle6.TensionsExt)
+                r.Post("/tensions_all", handle6.TensionsAll)
+                r.Post("/tensions_count", handle6.TensionsCount)
+            })
         })
     })
 

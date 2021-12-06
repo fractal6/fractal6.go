@@ -64,6 +64,14 @@ func init() {
             Auth: TargetCoordoHook | AssigneeHook,
             Action: UnarchiveBlob,
         },
+        model.TensionEventAuthority: EventMap{
+            Auth: TargetCoordoHook,
+            Action: ChangeAuhtority,
+        },
+        model.TensionEventVisibility: EventMap{
+            Auth: TargetCoordoHook,
+            Action: ChangeVisibility,
+        },
         model.TensionEventUserLeft: EventMap{
             // Authorisation is done in the method for now (to avoid dealing with Guest node two times).
             Auth: PassingHook,
@@ -301,6 +309,37 @@ func UnarchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
     if ok { // Update blob pushed flag
         err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
     }
+
+    return ok, err
+}
+
+func ChangeAuhtority(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    // ChangeAuthory
+    // * If Circle : change mode on pointed node
+    // * If Role : change role_type on the pointed node (on Node + Node.RoleExt)
+    // * Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
+    // --
+    var ok bool
+
+    blob := GetBlob(tension)
+    if blob == nil { return false, fmt.Errorf("blob not found.")}
+
+    ok, err := TryChangeAuthority(uctx, tension, blob.Node, *event.New)
+
+    return ok, err
+}
+
+func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    // ChangeVisibility
+    // * Change the visiblity of the node
+    // * Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
+    // --
+    var ok bool
+
+    blob := GetBlob(tension)
+    if blob == nil { return false, fmt.Errorf("blob not found.")}
+
+    ok, err := TryChangeVisibility(uctx, tension, blob.Node, *event.New)
 
     return ok, err
 }

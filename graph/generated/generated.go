@@ -52,6 +52,7 @@ type DirectiveRoot struct {
 	Cascade                  func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
 	Count                    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string) (res interface{}, err error)
 	Custom                   func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
+	Default                  func(ctx context.Context, obj interface{}, next graphql.Resolver, add *model.DgraphDefault, update *model.DgraphDefault) (res interface{}, err error)
 	Dgraph                   func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	Generate                 func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
 	HasInverse               func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
@@ -112,7 +113,7 @@ type DirectiveRoot struct {
 	Hook_updateTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVote          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVoteInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver, interfaceArg *bool) (res interface{}, err error)
 	IsContractValidator      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Lambda                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	LambdaOnMutate           func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
@@ -6481,7 +6482,14 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         queryNode(filter: {visibility: {eq: Public}}) { id }
     }"""
 },{ rule:"""query ($ROOTIDS: [String!]) {
-        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryNode(filter: {visibility: {eq: Secret} }) {
+          children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+        }
     }"""
 }]
 }) {
@@ -6950,35 +6958,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
+
 directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7478,6 +7488,7 @@ input ContractPatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
+  contractid: String
   tension: TensionRef @patch_RO
   status: ContractStatus @patch_RO
   contract_type: ContractType @patch_RO
@@ -7640,6 +7651,10 @@ type DeleteVotePayload {
   vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   msg: String
   numUids: Int
+}
+
+input DgraphDefault {
+  value: String
 }
 
 enum DgraphIndex {
@@ -8236,6 +8251,7 @@ input NodePatch {
   createdAt: DateTime @patch_RO
   updatedAt: DateTime @alter_RO
   name: String @patch_RO
+  nameid: String @patch_RO
   rootnameid: String @patch_RO
   parent: NodeRef @patch_RO
   children: [NodeRef!] @patch_RO
@@ -9010,6 +9026,7 @@ enum UserOrderable {
 input UserPatch {
   createdAt: DateTime @alter_RO
   lastAck: DateTime @alter_RO
+  username: String @patch_RO @alter_toLower
   name: String @patch_isOwner
   password: String @patch_isOwner
   email: String @patch_isOwner
@@ -9143,6 +9160,7 @@ input VotePatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
+  voteid: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]
@@ -9351,6 +9369,30 @@ func (ec *executionContext) dir_custom_args(ctx context.Context, rawArgs map[str
 	return args, nil
 }
 
+func (ec *executionContext) dir_default_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.DgraphDefault
+	if tmp, ok := rawArgs["add"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("add"))
+		arg0, err = ec.unmarshalODgraphDefault2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphDefault(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["add"] = arg0
+	var arg1 *model.DgraphDefault
+	if tmp, ok := rawArgs["update"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("update"))
+		arg1, err = ec.unmarshalODgraphDefault2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphDefault(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["update"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) dir_dgraph_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -9420,6 +9462,21 @@ func (ec *executionContext) dir_hasInverse_args(ctx context.Context, rawArgs map
 		}
 	}
 	args["field"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) dir_id_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *bool
+	if tmp, ok := rawArgs["interface"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interface"))
+		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["interface"] = arg0
 	return args, nil
 }
 
@@ -16440,7 +16497,7 @@ func (ec *executionContext) _AddNodePayload_node(ctx context.Context, field grap
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -18324,7 +18381,7 @@ func (ec *executionContext) _Contract_contractid(ctx context.Context, field grap
 			if ec.directives.Id == nil {
 				return nil, errors.New("directive id is not implemented")
 			}
-			return ec.directives.Id(ctx, obj, directive0)
+			return ec.directives.Id(ctx, obj, directive0, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -20337,7 +20394,7 @@ func (ec *executionContext) _DeleteNodePayload_node(ctx context.Context, field g
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -22445,7 +22502,7 @@ func (ec *executionContext) _Label_nodes(ctx context.Context, field graphql.Coll
 			return obj.Nodes, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -25932,7 +25989,7 @@ func (ec *executionContext) _Node_nameid(ctx context.Context, field graphql.Coll
 			if ec.directives.Id == nil {
 				return nil, errors.New("directive id is not implemented")
 			}
-			return ec.directives.Id(ctx, obj, directive1)
+			return ec.directives.Id(ctx, obj, directive1, nil)
 		}
 
 		tmp, err := directive2(rctx)
@@ -26044,7 +26101,7 @@ func (ec *executionContext) _Node_parent(ctx context.Context, field graphql.Coll
 			return obj.Parent, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -26104,7 +26161,7 @@ func (ec *executionContext) _Node_children(ctx context.Context, field graphql.Co
 			return obj.Children, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29594,7 +29651,7 @@ func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.Co
 			return ec.resolvers.Query().GetNode(rctx, args["id"].(*string), args["nameid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29654,7 +29711,7 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 			return ec.resolvers.Query().QueryNode(rctx, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31941,7 +31998,7 @@ func (ec *executionContext) _RoleExt_nodes(ctx context.Context, field graphql.Co
 			return obj.Nodes, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -32509,7 +32566,7 @@ func (ec *executionContext) _Tension_emitter(ctx context.Context, field graphql.
 			return obj.Emitter, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -32628,7 +32685,7 @@ func (ec *executionContext) _Tension_receiver(ctx context.Context, field graphql
 			return obj.Receiver, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35016,7 +35073,7 @@ func (ec *executionContext) _UpdateNodePayload_node(ctx context.Context, field g
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35752,7 +35809,7 @@ func (ec *executionContext) _User_username(ctx context.Context, field graphql.Co
 			if ec.directives.Id == nil {
 				return nil, errors.New("directive id is not implemented")
 			}
-			return ec.directives.Id(ctx, obj, directive0)
+			return ec.directives.Id(ctx, obj, directive0, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -36091,7 +36148,7 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 			return obj.Roles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36161,7 +36218,7 @@ func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphq
 			return obj.BackedRoles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -37539,7 +37596,7 @@ func (ec *executionContext) _Vote_voteid(ctx context.Context, field graphql.Coll
 			if ec.directives.Id == nil {
 				return nil, errors.New("directive id is not implemented")
 			}
-			return ec.directives.Id(ctx, obj, directive0)
+			return ec.directives.Id(ctx, obj, directive0, nil)
 		}
 
 		tmp, err := directive1(rctx)
@@ -37658,7 +37715,7 @@ func (ec *executionContext) _Vote_node(ctx context.Context, field graphql.Collec
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -38281,6 +38338,38 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 	res := resTmp.([]introspection.InputValue)
 	fc.Result = res
 	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "__Directive",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRepeatable, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
@@ -39151,7 +39240,10 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj interface{}) (model.AddBlobInput, error) {
 	var it model.AddBlobInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39275,7 +39367,10 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, obj interface{}) (model.AddCommentInput, error) {
 	var it model.AddCommentInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39327,7 +39422,10 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, obj interface{}) (model.AddContractInput, error) {
 	var it model.AddContractInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39451,7 +39549,10 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputAddEventFragmentInput(ctx context.Context, obj interface{}) (model.AddEventFragmentInput, error) {
 	var it model.AddEventFragmentInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39487,7 +39588,10 @@ func (ec *executionContext) unmarshalInputAddEventFragmentInput(ctx context.Cont
 
 func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj interface{}) (model.AddEventInput, error) {
 	var it model.AddEventInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39563,7 +39667,10 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj interface{}) (model.AddLabelInput, error) {
 	var it model.AddLabelInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39729,7 +39836,10 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, obj interface{}) (model.AddMandateInput, error) {
 	var it model.AddMandateInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39773,7 +39883,10 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Context, obj interface{}) (model.AddNodeFragmentInput, error) {
 	var it model.AddNodeFragmentInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -39937,7 +40050,10 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 
 func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj interface{}) (model.AddNodeInput, error) {
 	var it model.AddNodeInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -40219,7 +40335,10 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, obj interface{}) (model.AddOrgaAggInput, error) {
 	var it model.AddOrgaAggInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -40247,7 +40366,10 @@ func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, obj interface{}) (model.AddRoleExtInput, error) {
 	var it model.AddRoleExtInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -40395,7 +40517,10 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, obj interface{}) (model.AddTensionInput, error) {
 	var it model.AddTensionInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -40629,7 +40754,10 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj interface{}) (model.AddUserInput, error) {
 	var it model.AddUserInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -40949,7 +41077,10 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context, obj interface{}) (model.AddUserRightsInput, error) {
 	var it model.AddUserRightsInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -40993,7 +41124,10 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 
 func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj interface{}) (model.AddVoteInput, error) {
 	var it model.AddVoteInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41069,7 +41203,10 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputAuthRule(ctx context.Context, obj interface{}) (model.AuthRule, error) {
 	var it model.AuthRule
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41113,7 +41250,10 @@ func (ec *executionContext) unmarshalInputAuthRule(ctx context.Context, obj inte
 
 func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj interface{}) (model.BlobFilter, error) {
 	var it model.BlobFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41205,7 +41345,10 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputBlobOrder(ctx context.Context, obj interface{}) (model.BlobOrder, error) {
 	var it model.BlobOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41241,7 +41384,10 @@ func (ec *executionContext) unmarshalInputBlobOrder(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj interface{}) (model.BlobPatch, error) {
 	var it model.BlobPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41417,7 +41563,10 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj interface{}) (model.BlobRef, error) {
 	var it model.BlobRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41517,7 +41666,10 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 
 func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj interface{}) (model.BlobTypeHash, error) {
 	var it model.BlobTypeHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41545,7 +41697,10 @@ func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj interface{}) (model.CommentFilter, error) {
 	var it model.CommentFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41613,7 +41768,10 @@ func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputCommentOrder(ctx context.Context, obj interface{}) (model.CommentOrder, error) {
 	var it model.CommentOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41649,7 +41807,10 @@ func (ec *executionContext) unmarshalInputCommentOrder(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj interface{}) (model.CommentPatch, error) {
 	var it model.CommentPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41701,7 +41862,10 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj interface{}) (model.CommentRef, error) {
 	var it model.CommentRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41761,7 +41925,10 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputContainsFilter(ctx context.Context, obj interface{}) (model.ContainsFilter, error) {
 	var it model.ContainsFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41789,7 +41956,10 @@ func (ec *executionContext) unmarshalInputContainsFilter(ctx context.Context, ob
 
 func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, obj interface{}) (model.ContractFilter, error) {
 	var it model.ContractFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41889,7 +42059,10 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 
 func (ec *executionContext) unmarshalInputContractOrder(ctx context.Context, obj interface{}) (model.ContractOrder, error) {
 	var it model.ContractOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41925,7 +42098,10 @@ func (ec *executionContext) unmarshalInputContractOrder(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj interface{}) (model.ContractPatch, error) {
 	var it model.ContractPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -41958,6 +42134,14 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contractid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
+			it.Contractid, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -42165,7 +42349,10 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj interface{}) (model.ContractRef, error) {
 	var it model.ContractRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42297,7 +42484,10 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 func (ec *executionContext) unmarshalInputContractStatus_hash(ctx context.Context, obj interface{}) (model.ContractStatusHash, error) {
 	var it model.ContractStatusHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42325,7 +42515,10 @@ func (ec *executionContext) unmarshalInputContractStatus_hash(ctx context.Contex
 
 func (ec *executionContext) unmarshalInputContractType_hash(ctx context.Context, obj interface{}) (model.ContractTypeHash, error) {
 	var it model.ContractTypeHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42353,7 +42546,10 @@ func (ec *executionContext) unmarshalInputContractType_hash(ctx context.Context,
 
 func (ec *executionContext) unmarshalInputCustomHTTP(ctx context.Context, obj interface{}) (model.CustomHTTP, error) {
 	var it model.CustomHTTP
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42437,7 +42633,10 @@ func (ec *executionContext) unmarshalInputCustomHTTP(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputDateTimeFilter(ctx context.Context, obj interface{}) (model.DateTimeFilter, error) {
 	var it model.DateTimeFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42505,7 +42704,10 @@ func (ec *executionContext) unmarshalInputDateTimeFilter(ctx context.Context, ob
 
 func (ec *executionContext) unmarshalInputDateTimeRange(ctx context.Context, obj interface{}) (model.DateTimeRange, error) {
 	var it model.DateTimeRange
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42531,9 +42733,35 @@ func (ec *executionContext) unmarshalInputDateTimeRange(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDgraphDefault(ctx context.Context, obj interface{}) (model.DgraphDefault, error) {
+	var it model.DgraphDefault
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "value":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			it.Value, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEventFilter(ctx context.Context, obj interface{}) (model.EventFilter, error) {
 	var it model.EventFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42609,7 +42837,10 @@ func (ec *executionContext) unmarshalInputEventFilter(ctx context.Context, obj i
 
 func (ec *executionContext) unmarshalInputEventFragmentFilter(ctx context.Context, obj interface{}) (model.EventFragmentFilter, error) {
 	var it model.EventFragmentFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42661,7 +42892,10 @@ func (ec *executionContext) unmarshalInputEventFragmentFilter(ctx context.Contex
 
 func (ec *executionContext) unmarshalInputEventFragmentOrder(ctx context.Context, obj interface{}) (model.EventFragmentOrder, error) {
 	var it model.EventFragmentOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42697,7 +42931,10 @@ func (ec *executionContext) unmarshalInputEventFragmentOrder(ctx context.Context
 
 func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context, obj interface{}) (model.EventFragmentPatch, error) {
 	var it model.EventFragmentPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42733,7 +42970,10 @@ func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context
 
 func (ec *executionContext) unmarshalInputEventFragmentRef(ctx context.Context, obj interface{}) (model.EventFragmentRef, error) {
 	var it model.EventFragmentRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42769,7 +43009,10 @@ func (ec *executionContext) unmarshalInputEventFragmentRef(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputEventOrder(ctx context.Context, obj interface{}) (model.EventOrder, error) {
 	var it model.EventOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42805,7 +43048,10 @@ func (ec *executionContext) unmarshalInputEventOrder(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj interface{}) (model.EventPatch, error) {
 	var it model.EventPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42881,7 +43127,10 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj interface{}) (model.EventRef, error) {
 	var it model.EventRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -42965,7 +43214,10 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 
 func (ec *executionContext) unmarshalInputFloatFilter(ctx context.Context, obj interface{}) (model.FloatFilter, error) {
 	var it model.FloatFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43033,7 +43285,10 @@ func (ec *executionContext) unmarshalInputFloatFilter(ctx context.Context, obj i
 
 func (ec *executionContext) unmarshalInputFloatRange(ctx context.Context, obj interface{}) (model.FloatRange, error) {
 	var it model.FloatRange
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43061,7 +43316,10 @@ func (ec *executionContext) unmarshalInputFloatRange(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputGenerateMutationParams(ctx context.Context, obj interface{}) (model.GenerateMutationParams, error) {
 	var it model.GenerateMutationParams
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43097,7 +43355,10 @@ func (ec *executionContext) unmarshalInputGenerateMutationParams(ctx context.Con
 
 func (ec *executionContext) unmarshalInputGenerateQueryParams(ctx context.Context, obj interface{}) (model.GenerateQueryParams, error) {
 	var it model.GenerateQueryParams
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43141,7 +43402,10 @@ func (ec *executionContext) unmarshalInputGenerateQueryParams(ctx context.Contex
 
 func (ec *executionContext) unmarshalInputInt64Filter(ctx context.Context, obj interface{}) (model.Int64Filter, error) {
 	var it model.Int64Filter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43209,7 +43473,10 @@ func (ec *executionContext) unmarshalInputInt64Filter(ctx context.Context, obj i
 
 func (ec *executionContext) unmarshalInputInt64Range(ctx context.Context, obj interface{}) (model.Int64Range, error) {
 	var it model.Int64Range
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43237,7 +43504,10 @@ func (ec *executionContext) unmarshalInputInt64Range(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputIntFilter(ctx context.Context, obj interface{}) (model.IntFilter, error) {
 	var it model.IntFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43305,7 +43575,10 @@ func (ec *executionContext) unmarshalInputIntFilter(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputIntRange(ctx context.Context, obj interface{}) (model.IntRange, error) {
 	var it model.IntRange
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43333,7 +43606,10 @@ func (ec *executionContext) unmarshalInputIntRange(ctx context.Context, obj inte
 
 func (ec *executionContext) unmarshalInputIntersectsFilter(ctx context.Context, obj interface{}) (model.IntersectsFilter, error) {
 	var it model.IntersectsFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43361,7 +43637,10 @@ func (ec *executionContext) unmarshalInputIntersectsFilter(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputLabelFilter(ctx context.Context, obj interface{}) (model.LabelFilter, error) {
 	var it model.LabelFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43429,7 +43708,10 @@ func (ec *executionContext) unmarshalInputLabelFilter(ctx context.Context, obj i
 
 func (ec *executionContext) unmarshalInputLabelOrder(ctx context.Context, obj interface{}) (model.LabelOrder, error) {
 	var it model.LabelOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43465,7 +43747,10 @@ func (ec *executionContext) unmarshalInputLabelOrder(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj interface{}) (model.LabelPatch, error) {
 	var it model.LabelPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43649,7 +43934,10 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj interface{}) (model.LabelRef, error) {
 	var it model.LabelRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43733,7 +44021,10 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 
 func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj interface{}) (model.MandateFilter, error) {
 	var it model.MandateFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43793,7 +44084,10 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputMandateOrder(ctx context.Context, obj interface{}) (model.MandateOrder, error) {
 	var it model.MandateOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43829,7 +44123,10 @@ func (ec *executionContext) unmarshalInputMandateOrder(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj interface{}) (model.MandatePatch, error) {
 	var it model.MandatePatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43873,7 +44170,10 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj interface{}) (model.MandateRef, error) {
 	var it model.MandateRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43925,7 +44225,10 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputMultiPolygonRef(ctx context.Context, obj interface{}) (model.MultiPolygonRef, error) {
 	var it model.MultiPolygonRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43945,7 +44248,10 @@ func (ec *executionContext) unmarshalInputMultiPolygonRef(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputNearFilter(ctx context.Context, obj interface{}) (model.NearFilter, error) {
 	var it model.NearFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -43973,7 +44279,10 @@ func (ec *executionContext) unmarshalInputNearFilter(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj interface{}) (model.NodeFilter, error) {
 	var it model.NodeFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44129,7 +44438,10 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputNodeFragmentFilter(ctx context.Context, obj interface{}) (model.NodeFragmentFilter, error) {
 	var it model.NodeFragmentFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44181,7 +44493,10 @@ func (ec *executionContext) unmarshalInputNodeFragmentFilter(ctx context.Context
 
 func (ec *executionContext) unmarshalInputNodeFragmentOrder(ctx context.Context, obj interface{}) (model.NodeFragmentOrder, error) {
 	var it model.NodeFragmentOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44217,7 +44532,10 @@ func (ec *executionContext) unmarshalInputNodeFragmentOrder(ctx context.Context,
 
 func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context, obj interface{}) (model.NodeFragmentPatch, error) {
 	var it model.NodeFragmentPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44381,7 +44699,10 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 
 func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, obj interface{}) (model.NodeFragmentRef, error) {
 	var it model.NodeFragmentRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44497,7 +44818,10 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputNodeMode_hash(ctx context.Context, obj interface{}) (model.NodeModeHash, error) {
 	var it model.NodeModeHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44525,7 +44849,10 @@ func (ec *executionContext) unmarshalInputNodeMode_hash(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputNodeOrder(ctx context.Context, obj interface{}) (model.NodeOrder, error) {
 	var it model.NodeOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44561,7 +44888,10 @@ func (ec *executionContext) unmarshalInputNodeOrder(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj interface{}) (model.NodePatch, error) {
 	var it model.NodePatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -44659,6 +44989,30 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.Name = data
 			} else if tmp == nil {
 				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "nameid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Nameid = data
+			} else if tmp == nil {
+				it.Nameid = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -45269,7 +45623,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj interface{}) (model.NodeRef, error) {
 	var it model.NodeRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45529,7 +45886,10 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 func (ec *executionContext) unmarshalInputNodeType_hash(ctx context.Context, obj interface{}) (model.NodeTypeHash, error) {
 	var it model.NodeTypeHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45557,7 +45917,10 @@ func (ec *executionContext) unmarshalInputNodeType_hash(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputNodeVisibility_hash(ctx context.Context, obj interface{}) (model.NodeVisibilityHash, error) {
 	var it model.NodeVisibilityHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45585,7 +45948,10 @@ func (ec *executionContext) unmarshalInputNodeVisibility_hash(ctx context.Contex
 
 func (ec *executionContext) unmarshalInputOrgaAggFilter(ctx context.Context, obj interface{}) (model.OrgaAggFilter, error) {
 	var it model.OrgaAggFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45629,7 +45995,10 @@ func (ec *executionContext) unmarshalInputOrgaAggFilter(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputOrgaAggOrder(ctx context.Context, obj interface{}) (model.OrgaAggOrder, error) {
 	var it model.OrgaAggOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45665,7 +46034,10 @@ func (ec *executionContext) unmarshalInputOrgaAggOrder(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputOrgaAggPatch(ctx context.Context, obj interface{}) (model.OrgaAggPatch, error) {
 	var it model.OrgaAggPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45693,7 +46065,10 @@ func (ec *executionContext) unmarshalInputOrgaAggPatch(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputOrgaAggRef(ctx context.Context, obj interface{}) (model.OrgaAggRef, error) {
 	var it model.OrgaAggRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45721,7 +46096,10 @@ func (ec *executionContext) unmarshalInputOrgaAggRef(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputPointGeoFilter(ctx context.Context, obj interface{}) (model.PointGeoFilter, error) {
 	var it model.PointGeoFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45749,7 +46127,10 @@ func (ec *executionContext) unmarshalInputPointGeoFilter(ctx context.Context, ob
 
 func (ec *executionContext) unmarshalInputPointListRef(ctx context.Context, obj interface{}) (model.PointListRef, error) {
 	var it model.PointListRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45769,7 +46150,10 @@ func (ec *executionContext) unmarshalInputPointListRef(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputPointRef(ctx context.Context, obj interface{}) (model.PointRef, error) {
 	var it model.PointRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45797,7 +46181,10 @@ func (ec *executionContext) unmarshalInputPointRef(ctx context.Context, obj inte
 
 func (ec *executionContext) unmarshalInputPolygonGeoFilter(ctx context.Context, obj interface{}) (model.PolygonGeoFilter, error) {
 	var it model.PolygonGeoFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45841,7 +46228,10 @@ func (ec *executionContext) unmarshalInputPolygonGeoFilter(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputPolygonRef(ctx context.Context, obj interface{}) (model.PolygonRef, error) {
 	var it model.PolygonRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45861,7 +46251,10 @@ func (ec *executionContext) unmarshalInputPolygonRef(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj interface{}) (model.PostFilter, error) {
 	var it model.PostFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45929,7 +46322,10 @@ func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputPostOrder(ctx context.Context, obj interface{}) (model.PostOrder, error) {
 	var it model.PostOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -45965,7 +46361,10 @@ func (ec *executionContext) unmarshalInputPostOrder(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj interface{}) (model.PostPatch, error) {
 	var it model.PostPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46083,7 +46482,10 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj interface{}) (model.PostRef, error) {
 	var it model.PostRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46103,7 +46505,10 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 
 func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj interface{}) (model.RoleExtFilter, error) {
 	var it model.RoleExtFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46171,7 +46576,10 @@ func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputRoleExtOrder(ctx context.Context, obj interface{}) (model.RoleExtOrder, error) {
 	var it model.RoleExtOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46207,7 +46615,10 @@ func (ec *executionContext) unmarshalInputRoleExtOrder(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj interface{}) (model.RoleExtPatch, error) {
 	var it model.RoleExtPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46373,7 +46784,10 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj interface{}) (model.RoleExtRef, error) {
 	var it model.RoleExtRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46457,7 +46871,10 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputRoleType_hash(ctx context.Context, obj interface{}) (model.RoleTypeHash, error) {
 	var it model.RoleTypeHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46485,7 +46902,10 @@ func (ec *executionContext) unmarshalInputRoleType_hash(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputStringExactFilter(ctx context.Context, obj interface{}) (model.StringExactFilter, error) {
 	var it model.StringExactFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46553,7 +46973,10 @@ func (ec *executionContext) unmarshalInputStringExactFilter(ctx context.Context,
 
 func (ec *executionContext) unmarshalInputStringFullTextFilter(ctx context.Context, obj interface{}) (model.StringFullTextFilter, error) {
 	var it model.StringFullTextFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46581,7 +47004,10 @@ func (ec *executionContext) unmarshalInputStringFullTextFilter(ctx context.Conte
 
 func (ec *executionContext) unmarshalInputStringHashFilter(ctx context.Context, obj interface{}) (model.StringHashFilter, error) {
 	var it model.StringHashFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46609,7 +47035,10 @@ func (ec *executionContext) unmarshalInputStringHashFilter(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputStringHashFilter_StringRegExpFilter(ctx context.Context, obj interface{}) (model.StringHashFilterStringRegExpFilter, error) {
 	var it model.StringHashFilterStringRegExpFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46645,7 +47074,10 @@ func (ec *executionContext) unmarshalInputStringHashFilter_StringRegExpFilter(ct
 
 func (ec *executionContext) unmarshalInputStringHashFilter_StringTermFilter(ctx context.Context, obj interface{}) (model.StringHashFilterStringTermFilter, error) {
 	var it model.StringHashFilterStringTermFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46689,7 +47121,10 @@ func (ec *executionContext) unmarshalInputStringHashFilter_StringTermFilter(ctx 
 
 func (ec *executionContext) unmarshalInputStringRange(ctx context.Context, obj interface{}) (model.StringRange, error) {
 	var it model.StringRange
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46717,7 +47152,10 @@ func (ec *executionContext) unmarshalInputStringRange(ctx context.Context, obj i
 
 func (ec *executionContext) unmarshalInputStringRegExpFilter(ctx context.Context, obj interface{}) (model.StringRegExpFilter, error) {
 	var it model.StringRegExpFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46737,7 +47175,10 @@ func (ec *executionContext) unmarshalInputStringRegExpFilter(ctx context.Context
 
 func (ec *executionContext) unmarshalInputStringTermFilter(ctx context.Context, obj interface{}) (model.StringTermFilter, error) {
 	var it model.StringTermFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46765,7 +47206,10 @@ func (ec *executionContext) unmarshalInputStringTermFilter(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputTensionEvent_hash(ctx context.Context, obj interface{}) (model.TensionEventHash, error) {
 	var it model.TensionEventHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46793,7 +47237,10 @@ func (ec *executionContext) unmarshalInputTensionEvent_hash(ctx context.Context,
 
 func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj interface{}) (model.TensionFilter, error) {
 	var it model.TensionFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46909,7 +47356,10 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputTensionOrder(ctx context.Context, obj interface{}) (model.TensionOrder, error) {
 	var it model.TensionOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -46945,7 +47395,10 @@ func (ec *executionContext) unmarshalInputTensionOrder(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj interface{}) (model.TensionPatch, error) {
 	var it model.TensionPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47249,7 +47702,10 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 
 func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj interface{}) (model.TensionRef, error) {
 	var it model.TensionRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47437,7 +47893,10 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputTensionStatus_hash(ctx context.Context, obj interface{}) (model.TensionStatusHash, error) {
 	var it model.TensionStatusHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47465,7 +47924,10 @@ func (ec *executionContext) unmarshalInputTensionStatus_hash(ctx context.Context
 
 func (ec *executionContext) unmarshalInputTensionType_hash(ctx context.Context, obj interface{}) (model.TensionTypeHash, error) {
 	var it model.TensionTypeHash
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47493,7 +47955,10 @@ func (ec *executionContext) unmarshalInputTensionType_hash(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputUpdateBlobInput(ctx context.Context, obj interface{}) (model.UpdateBlobInput, error) {
 	var it model.UpdateBlobInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47529,7 +47994,10 @@ func (ec *executionContext) unmarshalInputUpdateBlobInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context, obj interface{}) (model.UpdateCommentInput, error) {
 	var it model.UpdateCommentInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47565,7 +48033,10 @@ func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context
 
 func (ec *executionContext) unmarshalInputUpdateContractInput(ctx context.Context, obj interface{}) (model.UpdateContractInput, error) {
 	var it model.UpdateContractInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47601,7 +48072,10 @@ func (ec *executionContext) unmarshalInputUpdateContractInput(ctx context.Contex
 
 func (ec *executionContext) unmarshalInputUpdateEventFragmentInput(ctx context.Context, obj interface{}) (model.UpdateEventFragmentInput, error) {
 	var it model.UpdateEventFragmentInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47637,7 +48111,10 @@ func (ec *executionContext) unmarshalInputUpdateEventFragmentInput(ctx context.C
 
 func (ec *executionContext) unmarshalInputUpdateEventInput(ctx context.Context, obj interface{}) (model.UpdateEventInput, error) {
 	var it model.UpdateEventInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47673,7 +48150,10 @@ func (ec *executionContext) unmarshalInputUpdateEventInput(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputUpdateLabelInput(ctx context.Context, obj interface{}) (model.UpdateLabelInput, error) {
 	var it model.UpdateLabelInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47709,7 +48189,10 @@ func (ec *executionContext) unmarshalInputUpdateLabelInput(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputUpdateMandateInput(ctx context.Context, obj interface{}) (model.UpdateMandateInput, error) {
 	var it model.UpdateMandateInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47745,7 +48228,10 @@ func (ec *executionContext) unmarshalInputUpdateMandateInput(ctx context.Context
 
 func (ec *executionContext) unmarshalInputUpdateNodeFragmentInput(ctx context.Context, obj interface{}) (model.UpdateNodeFragmentInput, error) {
 	var it model.UpdateNodeFragmentInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47781,7 +48267,10 @@ func (ec *executionContext) unmarshalInputUpdateNodeFragmentInput(ctx context.Co
 
 func (ec *executionContext) unmarshalInputUpdateNodeInput(ctx context.Context, obj interface{}) (model.UpdateNodeInput, error) {
 	var it model.UpdateNodeInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47817,7 +48306,10 @@ func (ec *executionContext) unmarshalInputUpdateNodeInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context, obj interface{}) (model.UpdateOrgaAggInput, error) {
 	var it model.UpdateOrgaAggInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47853,7 +48345,10 @@ func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context
 
 func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, obj interface{}) (model.UpdatePostInput, error) {
 	var it model.UpdatePostInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47889,7 +48384,10 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUpdateRoleExtInput(ctx context.Context, obj interface{}) (model.UpdateRoleExtInput, error) {
 	var it model.UpdateRoleExtInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47925,7 +48423,10 @@ func (ec *executionContext) unmarshalInputUpdateRoleExtInput(ctx context.Context
 
 func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context, obj interface{}) (model.UpdateTensionInput, error) {
 	var it model.UpdateTensionInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47961,7 +48462,10 @@ func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context
 
 func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (model.UpdateUserInput, error) {
 	var it model.UpdateUserInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -47997,7 +48501,10 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUpdateUserRightsInput(ctx context.Context, obj interface{}) (model.UpdateUserRightsInput, error) {
 	var it model.UpdateUserRightsInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48033,7 +48540,10 @@ func (ec *executionContext) unmarshalInputUpdateUserRightsInput(ctx context.Cont
 
 func (ec *executionContext) unmarshalInputUpdateVoteInput(ctx context.Context, obj interface{}) (model.UpdateVoteInput, error) {
 	var it model.UpdateVoteInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48069,7 +48579,10 @@ func (ec *executionContext) unmarshalInputUpdateVoteInput(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj interface{}) (model.UserFilter, error) {
 	var it model.UserFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48137,7 +48650,10 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputUserOrder(ctx context.Context, obj interface{}) (model.UserOrder, error) {
 	var it model.UserOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48173,7 +48689,10 @@ func (ec *executionContext) unmarshalInputUserOrder(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj interface{}) (model.UserPatch, error) {
 	var it model.UserPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48221,6 +48740,36 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				it.LastAck = data
 			} else if tmp == nil {
 				it.LastAck = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Patch_RO == nil {
+					return nil, errors.New("directive patch_RO is not implemented")
+				}
+				return ec.directives.Patch_RO(ctx, obj, directive0)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.Alter_toLower == nil {
+					return nil, errors.New("directive alter_toLower is not implemented")
+				}
+				return ec.directives.Alter_toLower(ctx, obj, directive1)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Username = data
+			} else if tmp == nil {
+				it.Username = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -48557,7 +49106,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj interface{}) (model.UserRef, error) {
 	var it model.UserRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48705,7 +49257,10 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 
 func (ec *executionContext) unmarshalInputUserRightsFilter(ctx context.Context, obj interface{}) (model.UserRightsFilter, error) {
 	var it model.UserRightsFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48749,7 +49304,10 @@ func (ec *executionContext) unmarshalInputUserRightsFilter(ctx context.Context, 
 
 func (ec *executionContext) unmarshalInputUserRightsOrder(ctx context.Context, obj interface{}) (model.UserRightsOrder, error) {
 	var it model.UserRightsOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48785,7 +49343,10 @@ func (ec *executionContext) unmarshalInputUserRightsOrder(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, obj interface{}) (model.UserRightsPatch, error) {
 	var it model.UserRightsPatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48829,7 +49390,10 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 
 func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj interface{}) (model.UserRightsRef, error) {
 	var it model.UserRightsRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48873,7 +49437,10 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 
 func (ec *executionContext) unmarshalInputVoteFilter(ctx context.Context, obj interface{}) (model.VoteFilter, error) {
 	var it model.VoteFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48949,7 +49516,10 @@ func (ec *executionContext) unmarshalInputVoteFilter(ctx context.Context, obj in
 
 func (ec *executionContext) unmarshalInputVoteOrder(ctx context.Context, obj interface{}) (model.VoteOrder, error) {
 	var it model.VoteOrder
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -48985,7 +49555,10 @@ func (ec *executionContext) unmarshalInputVoteOrder(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj interface{}) (model.VotePatch, error) {
 	var it model.VotePatch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -49021,6 +49594,14 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "voteid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
+			it.Voteid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "contract":
 			var err error
 
@@ -49053,7 +49634,10 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 
 func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj interface{}) (model.VoteRef, error) {
 	var it model.VoteRef
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -49137,7 +49721,10 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 
 func (ec *executionContext) unmarshalInputWithinFilter(ctx context.Context, obj interface{}) (model.WithinFilter, error) {
 	var it model.WithinFilter
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -52906,6 +53493,11 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "isRepeatable":
+			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53692,6 +54284,13 @@ func (ec *executionContext) marshalNEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -53846,6 +54445,12 @@ func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.S
 	ret := make(graphql.Array, len(v))
 	for i := range v {
 		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
 	}
 
 	return ret
@@ -54025,6 +54630,13 @@ func (ec *executionContext) marshalNPoint2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54072,6 +54684,13 @@ func (ec *executionContext) marshalNPointList2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54171,6 +54790,13 @@ func (ec *executionContext) marshalNPolygon2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54484,6 +55110,13 @@ func (ec *executionContext) marshalNVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54571,6 +55204,13 @@ func (ec *executionContext) marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgq
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54644,6 +55284,13 @@ func (ec *executionContext) marshalN__DirectiveLocation2ᚕstringᚄ(ctx context
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54693,6 +55340,13 @@ func (ec *executionContext) marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54734,6 +55388,13 @@ func (ec *executionContext) marshalN__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -54936,6 +55597,7 @@ func (ec *executionContext) marshalOBlob2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -54976,6 +55638,13 @@ func (ec *executionContext) marshalOBlob2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -55086,6 +55755,7 @@ func (ec *executionContext) marshalOBlobHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55254,6 +55924,7 @@ func (ec *executionContext) marshalOBlobType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55342,6 +56013,7 @@ func (ec *executionContext) marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55382,6 +56054,13 @@ func (ec *executionContext) marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -55492,6 +56171,7 @@ func (ec *executionContext) marshalOCommentHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55612,6 +56292,7 @@ func (ec *executionContext) marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55652,6 +56333,13 @@ func (ec *executionContext) marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -55762,6 +56450,7 @@ func (ec *executionContext) marshalOContractHasFilter2ᚕᚖzerogovᚋfractal6�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55906,6 +56595,7 @@ func (ec *executionContext) marshalOContractStatus2ᚕᚖzerogovᚋfractal6ᚗgo
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -55994,6 +56684,7 @@ func (ec *executionContext) marshalOContractType2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -56208,6 +56899,14 @@ func (ec *executionContext) marshalODeleteVotePayload2ᚖzerogovᚋfractal6ᚗgo
 	return ec._DeleteVotePayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalODgraphDefault2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphDefault(ctx context.Context, v interface{}) (*model.DgraphDefault, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputDgraphDefault(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx context.Context, v interface{}) ([]model.DgraphIndex, error) {
 	if v == nil {
 		return nil, nil
@@ -56269,6 +56968,13 @@ func (ec *executionContext) marshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -56309,6 +57015,7 @@ func (ec *executionContext) marshalOEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -56395,6 +57102,7 @@ func (ec *executionContext) marshalOEventFragment2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -56505,6 +57213,7 @@ func (ec *executionContext) marshalOEventFragmentHasFilter2ᚕᚖzerogovᚋfract
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -56625,6 +57334,7 @@ func (ec *executionContext) marshalOEventHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -56808,6 +57518,12 @@ func (ec *executionContext) marshalOID2ᚕstringᚄ(ctx context.Context, sel ast
 		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
 	}
 
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -56857,6 +57573,12 @@ func (ec *executionContext) marshalOInt2ᚕintᚄ(ctx context.Context, sel ast.S
 	ret := make(graphql.Array, len(v))
 	for i := range v {
 		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
 	}
 
 	return ret
@@ -57025,6 +57747,7 @@ func (ec *executionContext) marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57065,6 +57788,13 @@ func (ec *executionContext) marshalOLabel2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -57175,6 +57905,7 @@ func (ec *executionContext) marshalOLabelHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57287,6 +58018,7 @@ func (ec *executionContext) marshalOMandate2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57397,6 +58129,7 @@ func (ec *executionContext) marshalOMandateHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57525,6 +58258,7 @@ func (ec *executionContext) marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57565,6 +58299,13 @@ func (ec *executionContext) marshalONode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -57651,6 +58392,7 @@ func (ec *executionContext) marshalONodeFragment2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57691,6 +58433,13 @@ func (ec *executionContext) marshalONodeFragment2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -57801,6 +58550,7 @@ func (ec *executionContext) marshalONodeFragmentHasFilter2ᚕᚖzerogovᚋfracta
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -57945,6 +58695,7 @@ func (ec *executionContext) marshalONodeHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58025,6 +58776,7 @@ func (ec *executionContext) marshalONodeMode2ᚕᚖzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58177,6 +58929,7 @@ func (ec *executionContext) marshalONodeType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58265,6 +59018,7 @@ func (ec *executionContext) marshalONodeVisibility2ᚕᚖzerogovᚋfractal6ᚗgo
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58329,6 +59083,7 @@ func (ec *executionContext) marshalOOrgaAgg2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58439,6 +59194,7 @@ func (ec *executionContext) marshalOOrgaAggHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58551,6 +59307,7 @@ func (ec *executionContext) marshalOPost2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58661,6 +59418,7 @@ func (ec *executionContext) marshalOPostHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58749,6 +59507,7 @@ func (ec *executionContext) marshalORoleExt2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58859,6 +59618,7 @@ func (ec *executionContext) marshalORoleExtHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -58979,6 +59739,7 @@ func (ec *executionContext) marshalORoleType2ᚕᚖzerogovᚋfractal6ᚗgoᚋgra
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59046,6 +59807,12 @@ func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel
 	ret := make(graphql.Array, len(v))
 	for i := range v {
 		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
 	}
 
 	return ret
@@ -59187,6 +59954,7 @@ func (ec *executionContext) marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59227,6 +59995,13 @@ func (ec *executionContext) marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgrap
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -59321,6 +60096,7 @@ func (ec *executionContext) marshalOTensionEvent2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59441,6 +60217,7 @@ func (ec *executionContext) marshalOTensionHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59585,6 +60362,7 @@ func (ec *executionContext) marshalOTensionStatus2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59673,6 +60451,7 @@ func (ec *executionContext) marshalOTensionType2ᚕᚖzerogovᚋfractal6ᚗgoᚋ
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59849,6 +60628,7 @@ func (ec *executionContext) marshalOUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -59889,6 +60669,13 @@ func (ec *executionContext) marshalOUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -59999,6 +60786,7 @@ func (ec *executionContext) marshalOUserHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -60119,6 +60907,7 @@ func (ec *executionContext) marshalOUserRights2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -60229,6 +61018,7 @@ func (ec *executionContext) marshalOUserRightsHasFilter2ᚕᚖzerogovᚋfractal6
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -60341,6 +61131,7 @@ func (ec *executionContext) marshalOVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -60381,6 +61172,13 @@ func (ec *executionContext) marshalOVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -60491,6 +61289,7 @@ func (ec *executionContext) marshalOVoteHasFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 
 	}
 	wg.Wait()
+
 	return ret
 }
 
@@ -60611,6 +61410,13 @@ func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgq
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -60651,6 +61457,13 @@ func (ec *executionContext) marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgen
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -60691,6 +61504,13 @@ func (ec *executionContext) marshalO__InputValue2ᚕgithubᚗcomᚋ99designsᚋg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -60738,6 +61558,13 @@ func (ec *executionContext) marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 

@@ -3,8 +3,6 @@ package graph
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
 
@@ -42,7 +40,6 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     // rc.Field.Name
     queryName := rc.Path().String()
 
-
     // Build the graphql raw request
     gc := graphql.GetRequestContext(ctx)
     variables, _ := json.Marshal(gc.Variables)
@@ -56,45 +53,49 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { uctx = &model.UserCtx{} }
     err = db.QueryGql(*uctx, "rawQuery", reqInput, data)
-    if err != nil {
-        return err
+    if data != nil && err != nil {
+        // Gqlgen ignore the data if there is an error returned
+        // see https://github.com/99designs/gqlgen/issues/1191
+
+        // Nodes query can return nul field if Node are hidden
+        // bu children are not. The source ends up to be a tension where
+        // the receiver is the parent wich is hidden ;)
+        //graphql.AddErrorf(ctx, err.Error())
+        return nil
     }
-    return nil
+    return err
 }
 
-// @Debug: GetPreloads loose subfilter in payload(in QueryGraph)
-func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}, db *db.Dgraph) error {
-    mutCtx := ctx.Value("mutation_context").(MutationContext)
-
-    /* Rebuild the Graphql inputs request from this context */
-    rc := graphql.GetResolverContext(ctx)
-    queryName := rc.Field.Name
-
-    // Format inputs
-    inputs, _ := json.Marshal(ipts)
-    // If inputs needs to get modified, see tools.StructToMap() usage
-    // in order to to get the struct in the schema.resolver caller.
-
-    // Format collected fields
-    inputType := strings.Split(fmt.Sprintf("%T", rc.Args[mutCtx.argName]), ".")[1]
-    queryGraph := strings.Join(GetPreloads(ctx), " ")
-
-    // Build the graphql raw request
-    reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
-        "InputType": inputType, // input type name (e.g AddUserInput)
-        "QueryGraph": queryGraph, // output data
-        "InputPayload": string(inputs), // inputs data
-    }
-
-    op := string(mutCtx.type_)
-
-    // Send request
-    uctx, err := webauth.GetUserContext(ctx)
-    if err != nil { uctx = &model.UserCtx{} }
-    err = db.QueryGql(*uctx, op, reqInput, data)
-    if err != nil {
-        return err
-    }
-    return nil
-}
+//// @Debug: GetPreloads loose subfilter in payload(in QueryGraph)
+//func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}, db *db.Dgraph) error {
+//    mutCtx := ctx.Value("mutation_context").(MutationContext)
+//
+//    /* Rebuild the Graphql inputs request from this context */
+//    rc := graphql.GetResolverContext(ctx)
+//    queryName := rc.Field.Name
+//
+//    // Format inputs
+//    inputs, _ := json.Marshal(ipts)
+//    // If inputs needs to get modified, see tools.StructToMap() usage
+//    // in order to to get the struct in the schema.resolver caller.
+//
+//    // Format collected fields
+//    inputType := strings.Split(fmt.Sprintf("%T", rc.Args[mutCtx.argName]), ".")[1]
+//    queryGraph := strings.Join(GetPreloads(ctx), " ")
+//
+//    // Build the graphql raw request
+//    reqInput := map[string]string{
+//        "QueryName": queryName, // function name (e.g addUser)
+//        "InputType": inputType, // input type name (e.g AddUserInput)
+//        "QueryGraph": queryGraph, // output data
+//        "InputPayload": string(inputs), // inputs data
+//    }
+//
+//    op := string(mutCtx.type_)
+//
+//    // Send request
+//    uctx, err := webauth.GetUserContext(ctx)
+//    if err != nil { uctx = &model.UserCtx{} }
+//    err = db.QueryGql(*uctx, op, reqInput, data)
+//    return err
+//}
