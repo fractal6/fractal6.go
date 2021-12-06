@@ -140,17 +140,17 @@ directive @hook_updateVote on FIELD_DEFINITION
 directive @hook_deleteVote on FIELD_DEFINITION
 
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
-        queryNode(filter: {visibility: {eq: Public}}) { id }
+},{ rule:"""query ($OWNIDS: [String]) {
+        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
-        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
     }"""
 },{ rule:"""query ($USERNAME: String!) {
-        queryNode(filter: {visibility: {eq: Secret} }) {
+        queryNode(filter: {visibility: {eq: Secret}}) {
           children {
               first_link(filter: {username: {eq: $USERNAME}}) { username }
-            }
+          }
         }
     }"""
 }]
@@ -222,12 +222,12 @@ type Mandate {
 }
 
 type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryLabel { 
-          nodes(filter: {visibility: {eq: Public}}) { id }
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
 }]
@@ -247,12 +247,12 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }
 
 type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryRoleExt { 
-          nodes(filter: {visibility: {eq: Public}}) { id }
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
 }]
@@ -291,14 +291,23 @@ type Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }
 
 type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryTension {
-          receiver(filter: {visibility: {eq: Public}}) { id }
+          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryTension {
-          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryTension {
+          receiver(filter: {visibility: {eq: Secret}}) { 
+            children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
         }
     }"""
 }]
@@ -396,14 +405,25 @@ type EventFragment {
 }
 
 type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryContract {
-          tension { receiver(filter: {visibility: {eq: Public}}) { id } }
+          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryContract {
-          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }
+          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryContract {
+          tension { 
+            receiver(filter: {visibility: {eq: Secret}}) { 
+              children {
+                  first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
         }
     }"""
 }]
@@ -620,37 +640,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!

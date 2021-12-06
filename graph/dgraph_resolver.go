@@ -3,13 +3,11 @@ package graph
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/99designs/gqlgen/graphql"
 
 	"zerogov/fractal6.go/db"
-	"zerogov/fractal6.go/graph/model"
-    webauth "zerogov/fractal6.go/web/auth"
 	"zerogov/fractal6.go/tools"
+    webauth "zerogov/fractal6.go/web/auth"
 )
 
 
@@ -50,9 +48,8 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     }
 
     // Send request
-    uctx, err := webauth.GetUserContext(ctx)
-    if err != nil { uctx = &model.UserCtx{} }
-    err = db.QueryGql(*uctx, "rawQuery", reqInput, data)
+    uctx := webauth.GetUserContextOrEmpty(ctx)
+    err := db.QueryGql(uctx, "rawQuery", reqInput, data)
     if data != nil && err != nil {
         // Gqlgen ignore the data if there is an error returned
         // see https://github.com/99designs/gqlgen/issues/1191
@@ -94,8 +91,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
 //    op := string(mutCtx.type_)
 //
 //    // Send request
-//    uctx, err := webauth.GetUserContext(ctx)
-//    if err != nil { uctx = &model.UserCtx{} }
-//    err = db.QueryGql(*uctx, op, reqInput, data)
+//    uctx := webauth.GetUserContextOrEmpty(ctx)
+//    err = db.QueryGql(uctx, op, reqInput, data)
 //    return err
 //}

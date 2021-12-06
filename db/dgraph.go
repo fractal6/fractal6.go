@@ -44,9 +44,12 @@ type Dgraph struct {
 }
 
 type DgraphClaims struct {
-    Username string         `json:"USERNAME"`
-    UserType model.UserType `json:"USERTYPE"`
+    Username string          `json:"USERNAME"`
+    UserType model.UserType  `json:"USERTYPE"`
+    // Rootnameid Where user is Member
     Rootids []string        `json:"ROOTIDS"`
+    // Rootnameid Where user is Owner
+    Ownids []string         `json:"OWNIDS"`
 }
 
 //
@@ -278,19 +281,30 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
 func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
     // Get unique rootnameid
     var rootids []string
+    var ownids []string
     check := make(map[string]bool)
     for _, d := range uctx.Roles {
         rid, _ := codec.Nid2pid(d.Nameid)
+        if *d.RoleType == model.RoleTypeOwner {
+            ownids = append(ownids, rid)
+            continue
+        }
         if _, v := check[rid]; !v {
             check[rid] = true
             rootids = append(rootids, rid)
         }
     }
+    // Dgraph failed to run the @auth query if the variable is null
+    // see https://discuss.dgraph.io/t/auth-rule-with-or-condition-fail-if-an-empty-list-is-given-as-variable/16251
+    if len(rootids) == 0 { rootids = append(rootids, "") }
+    if len(ownids) == 0 { ownids = append(ownids, "") }
+
     // Build claims
     dgClaims := DgraphClaims{
         Username: uctx.Username,
-        Rootids: rootids,
         UserType: uctx.Rights.Type,
+        Rootids: rootids,
+        Ownids: ownids,
     }
     claims := jwt.MapClaims{
         "https://fractale.co/jwt/claims": dgClaims,

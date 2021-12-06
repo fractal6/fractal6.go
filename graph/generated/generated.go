@@ -6478,17 +6478,17 @@ directive @hook_updateVote on FIELD_DEFINITION
 directive @hook_deleteVote on FIELD_DEFINITION
 
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
-        queryNode(filter: {visibility: {eq: Public}}) { id }
+},{ rule:"""query ($OWNIDS: [String]) {
+        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
-        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
     }"""
 },{ rule:"""query ($USERNAME: String!) {
-        queryNode(filter: {visibility: {eq: Secret} }) {
+        queryNode(filter: {visibility: {eq: Secret}}) {
           children {
               first_link(filter: {username: {eq: $USERNAME}}) { username }
-            }
+          }
         }
     }"""
 }]
@@ -6560,12 +6560,12 @@ type Mandate {
 }
 
 type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryLabel { 
-          nodes(filter: {visibility: {eq: Public}}) { id }
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
 }]
@@ -6585,12 +6585,12 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }
 
 type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryRoleExt { 
-          nodes(filter: {visibility: {eq: Public}}) { id }
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
 }]
@@ -6629,14 +6629,23 @@ type Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }
 
 type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryTension {
-          receiver(filter: {visibility: {eq: Public}}) { id }
+          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryTension {
-          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryTension {
+          receiver(filter: {visibility: {eq: Secret}}) { 
+            children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
         }
     }"""
 }]
@@ -6734,14 +6743,25 @@ type EventFragment {
 }
 
 type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryContract {
-          tension { receiver(filter: {visibility: {eq: Public}}) { id } }
+          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }
         }
     }"""
-},{ rule:"""query ($ROOTIDS: [String!]) {
+},{ rule:"""query ($ROOTIDS: [String]) {
         queryContract {
-          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }
+          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryContract {
+          tension { 
+            receiver(filter: {visibility: {eq: Secret}}) { 
+              children {
+                  first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
         }
     }"""
 }]
@@ -6958,37 +6978,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -16059,7 +16079,7 @@ func (ec *executionContext) _AddContractPayload_contract(ctx context.Context, fi
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -16278,7 +16298,7 @@ func (ec *executionContext) _AddLabelPayload_label(ctx context.Context, field gr
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -16497,7 +16517,7 @@ func (ec *executionContext) _AddNodePayload_node(ctx context.Context, field grap
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -16651,7 +16671,7 @@ func (ec *executionContext) _AddRoleExtPayload_roleExt(ctx context.Context, fiel
 			return obj.RoleExt, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -16740,7 +16760,7 @@ func (ec *executionContext) _AddTensionPayload_tension(ctx context.Context, fiel
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -17052,7 +17072,7 @@ func (ec *executionContext) _Blob_tension(ctx context.Context, field graphql.Col
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -18437,7 +18457,7 @@ func (ec *executionContext) _Contract_tension(ctx context.Context, field graphql
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -19782,7 +19802,7 @@ func (ec *executionContext) _DeleteContractPayload_contract(ctx context.Context,
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -20088,7 +20108,7 @@ func (ec *executionContext) _DeleteLabelPayload_label(ctx context.Context, field
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -20394,7 +20414,7 @@ func (ec *executionContext) _DeleteNodePayload_node(ctx context.Context, field g
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -20724,7 +20744,7 @@ func (ec *executionContext) _DeleteRoleExtPayload_roleExt(ctx context.Context, f
 			return obj.RoleExt, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -20842,7 +20862,7 @@ func (ec *executionContext) _DeleteTensionPayload_tension(ctx context.Context, f
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -21270,7 +21290,7 @@ func (ec *executionContext) _Event_tension(ctx context.Context, field graphql.Co
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -22428,7 +22448,7 @@ func (ec *executionContext) _Label_tensions(ctx context.Context, field graphql.C
 			return obj.Tensions, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -22502,7 +22522,7 @@ func (ec *executionContext) _Label_nodes(ctx context.Context, field graphql.Coll
 			return obj.Nodes, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -26101,7 +26121,7 @@ func (ec *executionContext) _Node_parent(ctx context.Context, field graphql.Coll
 			return obj.Parent, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -26161,7 +26181,7 @@ func (ec *executionContext) _Node_children(ctx context.Context, field graphql.Co
 			return obj.Children, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -26283,7 +26303,7 @@ func (ec *executionContext) _Node_tensions_out(ctx context.Context, field graphq
 			return obj.TensionsOut, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -26357,7 +26377,7 @@ func (ec *executionContext) _Node_tensions_in(ctx context.Context, field graphql
 			return obj.TensionsIn, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -26592,7 +26612,7 @@ func (ec *executionContext) _Node_labels(ctx context.Context, field graphql.Coll
 			return obj.Labels, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -27144,7 +27164,7 @@ func (ec *executionContext) _Node_role_ext(ctx context.Context, field graphql.Co
 			return obj.RoleExt, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29651,7 +29671,7 @@ func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.Co
 			return ec.resolvers.Query().GetNode(rctx, args["id"].(*string), args["nameid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -29711,7 +29731,7 @@ func (ec *executionContext) _Query_queryNode(ctx context.Context, field graphql.
 			return ec.resolvers.Query().QueryNode(rctx, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30023,7 +30043,7 @@ func (ec *executionContext) _Query_getLabel(ctx context.Context, field graphql.C
 			return ec.resolvers.Query().GetLabel(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30083,7 +30103,7 @@ func (ec *executionContext) _Query_queryLabel(ctx context.Context, field graphql
 			return ec.resolvers.Query().QueryLabel(rctx, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30179,7 +30199,7 @@ func (ec *executionContext) _Query_getRoleExt(ctx context.Context, field graphql
 			return ec.resolvers.Query().GetRoleExt(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30239,7 +30259,7 @@ func (ec *executionContext) _Query_queryRoleExt(ctx context.Context, field graph
 			return ec.resolvers.Query().QueryRoleExt(rctx, args["filter"].(*model.RoleExtFilter), args["order"].(*model.RoleExtOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30563,7 +30583,7 @@ func (ec *executionContext) _Query_getTension(ctx context.Context, field graphql
 			return ec.resolvers.Query().GetTension(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -30627,7 +30647,7 @@ func (ec *executionContext) _Query_queryTension(ctx context.Context, field graph
 			return ec.resolvers.Query().QueryTension(rctx, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31171,7 +31191,7 @@ func (ec *executionContext) _Query_getContract(ctx context.Context, field graphq
 			return ec.resolvers.Query().GetContract(rctx, args["id"].(*string), args["contractid"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31231,7 +31251,7 @@ func (ec *executionContext) _Query_queryContract(ctx context.Context, field grap
 			return ec.resolvers.Query().QueryContract(rctx, args["filter"].(*model.ContractFilter), args["order"].(*model.ContractOrder), args["first"].(*int), args["offset"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -31998,7 +32018,7 @@ func (ec *executionContext) _RoleExt_nodes(ctx context.Context, field graphql.Co
 			return obj.Nodes, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -32566,7 +32586,7 @@ func (ec *executionContext) _Tension_emitter(ctx context.Context, field graphql.
 			return obj.Emitter, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -32685,7 +32705,7 @@ func (ec *executionContext) _Tension_receiver(ctx context.Context, field graphql
 			return obj.Receiver, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -32993,7 +33013,7 @@ func (ec *executionContext) _Tension_labels(ctx context.Context, field graphql.C
 			return obj.Labels, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -33202,7 +33222,7 @@ func (ec *executionContext) _Tension_contracts(ctx context.Context, field graphq
 			return obj.Contracts, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -34635,7 +34655,7 @@ func (ec *executionContext) _UpdateContractPayload_contract(ctx context.Context,
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -34854,7 +34874,7 @@ func (ec *executionContext) _UpdateLabelPayload_label(ctx context.Context, field
 			return obj.Label, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryLabel { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35073,7 +35093,7 @@ func (ec *executionContext) _UpdateNodePayload_node(ctx context.Context, field g
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35316,7 +35336,7 @@ func (ec *executionContext) _UpdateRoleExtPayload_roleExt(ctx context.Context, f
 			return obj.RoleExt, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryRoleExt { \n          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -35405,7 +35425,7 @@ func (ec *executionContext) _UpdateTensionPayload_tension(ctx context.Context, f
 			return obj.Tension, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36148,7 +36168,7 @@ func (ec *executionContext) _User_roles(ctx context.Context, field graphql.Colle
 			return obj.Roles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36218,7 +36238,7 @@ func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphq
 			return obj.BackedRoles, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36288,7 +36308,7 @@ func (ec *executionContext) _User_tensions_created(ctx context.Context, field gr
 			return obj.TensionsCreated, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36362,7 +36382,7 @@ func (ec *executionContext) _User_tensions_assigned(ctx context.Context, field g
 			return obj.TensionsAssigned, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryTension {\n          receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryTension {\n          receiver(filter: {visibility: {eq: Secret}}) { \n            children {\n                first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -36436,7 +36456,7 @@ func (ec *executionContext) _User_contracts(ctx context.Context, field graphql.C
 			return obj.Contracts, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -37652,7 +37672,7 @@ func (ec *executionContext) _Vote_contract(ctx context.Context, field graphql.Co
 			return obj.Contract, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryContract {\n          tension { receiver(filter: {rootnameid: {in: $ROOTIDS}}) { id } }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryContract {\n          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }\n        }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryContract {\n          tension { \n            receiver(filter: {visibility: {eq: Secret}}) { \n              children {\n                  first_link(filter: {username: {eq: $USERNAME}}) { username }\n              }\n            }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
@@ -37715,7 +37735,7 @@ func (ec *executionContext) _Vote_node(ctx context.Context, field graphql.Collec
 			return obj.Node, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query {\n        queryNode(filter: {visibility: {eq: Public}}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String!]) {\n        queryNode(filter: {rootnameid: {in: $ROOTIDS}, and: {visibility: {eq: Private}} }) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret} }) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n            }\n        }\n    }"}}})
+			query, err := ec.unmarshalOAuthRule2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, map[string]interface{}{"or": []interface{}{map[string]interface{}{"rule": "{ $USERTYPE: {eq: \"Root\"} }"}, map[string]interface{}{"rule": "query ($OWNIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($ROOTIDS: [String]) {\n        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }\n    }"}, map[string]interface{}{"rule": "query ($USERNAME: String!) {\n        queryNode(filter: {visibility: {eq: Secret}}) {\n          children {\n              first_link(filter: {username: {eq: $USERNAME}}) { username }\n          }\n        }\n    }"}}})
 			if err != nil {
 				return nil, err
 			}
