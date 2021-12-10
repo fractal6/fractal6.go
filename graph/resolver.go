@@ -9,31 +9,16 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
 	"github.com/99designs/gqlgen/graphql"
 
 	"zerogov/fractal6.go/db"
-	gen "zerogov/fractal6.go/graph/generated"
-	"zerogov/fractal6.go/graph/model"
 	. "zerogov/fractal6.go/tools"
-	webauth "zerogov/fractal6.go/web/auth"
+	gen "zerogov/fractal6.go/graph/generated"
 )
 
 //
 // Resolver initialisation
 //
-
-// Mutation type Enum
-type mutationType string
-const (
-    AddMut mutationType = "add"
-    UpdateMut mutationType = "update"
-    DelMut mutationType = "delete"
-)
-type MutationContext struct  {
-    type_ mutationType
-    argName string
-}
 
 type Resolver struct{
     // Pointer on Dgraph client
@@ -46,12 +31,7 @@ func Init() gen.Config {
         db:db.GetDB(),
     }
 
-    // Dgraph directives
     c := gen.Config{Resolvers: &r}
-    c.Directives.Id = nothing1
-    c.Directives.HasInverse = nothing2
-    c.Directives.Search = nothing3
-    c.Directives.Auth = nothing4
 
     //
     // Query / Payload fields
@@ -64,40 +44,27 @@ func Init() gen.Config {
     c.Directives.IsContractValidator = isContractValidator
 
     //
-    // Mutation / Input Fields
+    //  Input Fields directives
     //
 
-    // isOwner
-    c.Directives.Add_isOwner = isOwner
-    c.Directives.Patch_isOwner = isOwner
+    // Auth directive
+    c.Directives.X_set = FieldAuthorization
+    c.Directives.X_remove = FieldAuthorization
+    c.Directives.X_patch = FieldAuthorization
+    c.Directives.X_alter = FieldAuthorization
+    c.Directives.X_patch_ro = readOnly
+    c.Directives.X_ro = readOnly
 
-    // Read-Only
-    c.Directives.Alter_RO = readOnly
-    c.Directives.Patch_RO = readOnly
-
-    // Input validation
-    c.Directives.Alter_minLength = inputMinLength
-    c.Directives.Alter_maxLength = inputMaxLength
-    c.Directives.Alter_oneByOne = oneByOne
-    c.Directives.Alter_unique = unique
-
-    // Input transformation
-    c.Directives.Alter_toLower = toLower
+    // Transformation directives
+    c.Directives.W_set = FieldTransform
+    c.Directives.W_remove = FieldTransform
+    c.Directives.W_patch = FieldTransform
+    c.Directives.W_alter = FieldTransform
 
     //
     // Hook
     //
 
-    //Node
-    c.Directives.Hook_getNodeInput = nothing
-    c.Directives.Hook_queryNodeInput = nothing
-    c.Directives.Hook_addNodeInput = nothing
-    c.Directives.Hook_updateNodeInput = nothing
-    c.Directives.Hook_deleteNodeInput = nothing
-    // --
-    c.Directives.Hook_addNode = nothing
-    c.Directives.Hook_updateNode = nothing
-    c.Directives.Hook_deleteNode = nothing
     //RoleExt
     c.Directives.Hook_getRoleExtInput = nothing
     c.Directives.Hook_queryRoleExtInput = nothing
@@ -165,42 +132,20 @@ func Init() gen.Config {
 
 /*
 *
-* Business logic layer methods
+* Field Directives Logics
 *
 */
 
-func nothing(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    return next(ctx)
-}
-
-func nothing1(ctx context.Context, obj interface{}, next graphql.Resolver, key *bool) (interface{}, error) {
-    return next(ctx)
-}
-
-func nothing2(ctx context.Context, obj interface{}, next graphql.Resolver, key string) (interface{}, error) {
-    return next(ctx)
-}
-
-func nothing3(ctx context.Context, obj interface{}, next graphql.Resolver, idx []model.DgraphIndex) (interface{}, error) {
-    return next(ctx)
-}
-
-func nothing4(ctx context.Context, obj interface {}, next graphql.Resolver, idx *model.AuthRule, r1 *model.AuthRule, r2 *model.AuthRule, r3 *model.AuthRule, r4 *model.AuthRule) (interface{}, error) {
-    return next(ctx)
-}
-
-
-// To document. Api to access to input query:
+// Reminder: Api to access to input query:
 //  rc := graphql.GetResolverContext(ctx)
 //  rqc := graphql.GetRequestContext(ctx)
 //  cfc := graphql.CollectFieldsCtx(ctx, nil)
 //  fc := graphql.GetFieldContext(ctx)
 //  pc := graphql.GetPathContext(ctx) // .*.Field to get the field name
 
-
-//
-// Query Fields
-//
+func nothing(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    return next(ctx)
+}
 
 func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
@@ -264,141 +209,8 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 }
 
 //
-// Input Field
+// Input directives
 //
-
-// Check uniqueness (@DEBUG follow @unique dgraph field iplementation)
-func unique(ctx context.Context, obj interface{}, next graphql.Resolver, subfield *string) (interface{}, error) {
-    data, err := next(ctx)
-    var v string
-    switch d := data.(type) {
-    case *string:
-        v = *d
-    case string:
-        v = d
-    }
-
-    field := *graphql.GetPathContext(ctx).Field
-    if subfield != nil {
-        // Extract the fieldname and type of the object queried
-        qName :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
-        if len(qName) != 2 { return nil, LogErr("@unique", fmt.Errorf("Unknow query name")) }
-        t := qName[1]
-        fieldName := t + "." + field
-        filterName := t + "." + *subfield
-        s := obj.(model.JsonAtom)[*subfield]
-        if s != nil {
-            //pass
-        } else if ctx.Value("id") != nil {
-            s, err = db.GetDB().GetFieldById(ctx.Value("id").(string), filterName)
-            if err != nil || s == nil { return nil, LogErr("Internal error", err) }
-        } else {
-            return nil, LogErr("Value Error", fmt.Errorf("%s or id is required.", *subfield))
-        }
-        filterValue := s.(string)
-
-        // Check existence
-        ex, err :=  db.GetDB().Exists(fieldName, v, &filterName, &filterValue)
-        if err != nil { return nil, LogErr("Internal error", err) }
-        if !ex {
-            return data, err
-        }
-    } else {
-        return nil, fmt.Errorf("@unique alone not implemented.")
-    }
-
-    return data, LogErr("Duplicate error", fmt.Errorf("%s is already taken", field))
-}
-
-//oneByOne ensure that mutation on the given field should contains set least one element.
-func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    data, err := next(ctx)
-    if len(InterfaceSlice(data)) != 1 {
-        field := *graphql.GetPathContext(ctx).Field
-        return nil, LogErr("@oneByOne error", fmt.Errorf("Only one object allowed in slice %s", field))
-    }
-    return data, err
-}
-
-func toLower(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    data, err := next(ctx)
-    switch d := data.(type) {
-    case *string:
-        v := strings.ToLower(*d)
-        return &v, err
-    case string:
-        v := strings.ToLower(d)
-        return v, err
-    }
-    field := *graphql.GetPathContext(ctx).Field
-    return nil, fmt.Errorf("Type unknwown for field %s", field)
-}
-
-func inputMinLength(ctx context.Context, obj interface{}, next graphql.Resolver, min int) (interface{}, error) {
-    var l int
-    data, err := next(ctx)
-    switch d := data.(type) {
-    case *string:
-        l = len(*d)
-    case string:
-        l = len(d)
-    default:
-        field := *graphql.GetPathContext(ctx).Field
-        return nil, fmt.Errorf("Type unknwown for field %s", field)
-    }
-    if l < min {
-        field := *graphql.GetPathContext(ctx).Field
-        return nil, fmt.Errorf("`%s' to short. Minimum length is %d", field, min)
-    }
-    return data, err
-}
-
-func inputMaxLength(ctx context.Context, obj interface{}, next graphql.Resolver, max int) (interface{}, error) {
-    var l int
-    data, err := next(ctx)
-    switch d := data.(type) {
-    case *string:
-        l = len(*d)
-    case string:
-        l = len(d)
-    default:
-        field := *graphql.GetPathContext(ctx).Field
-        return nil, fmt.Errorf("Type unknwown for field %s", field)
-    }
-    if l > max {
-        field := *graphql.GetPathContext(ctx).Field
-        return nil, fmt.Errorf("`%s' to short. Maximum length is %d", field, max)
-    }
-    return data, err
-}
-
-//
-// Auth directives
-//
-
-// Only the onwer of the object can edit it.
-func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, userField *string) (interface{}, error) {
-    // Retrieve userCtx from token
-    uctx, err := webauth.GetUserContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
-
-    // Get attributes and check everything is ok
-    var userObj model.JsonAtom
-    var f string
-    if userField == nil {
-        f = "user"
-        userObj[f] = obj
-    } else {
-        f = *userField
-        userObj = obj.(model.JsonAtom)
-    }
-
-    ok, err := CheckUserOwnership(ctx, uctx, f, userObj)
-    if err != nil { return nil, LogErr("Access denied", err) }
-    if ok { return next(ctx) }
-
-    return nil, LogErr("Access Denied", fmt.Errorf("bad ownership."))
-}
 
 func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
@@ -406,3 +218,21 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
     return nil, LogErr("Forbiden", fmt.Errorf("Read only field on `%s'", fieldName))
 }
 
+func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, n *int ) (interface{}, error) {
+    // If the directives exists withtout a rule, it pass through.
+    if r == nil { return next(ctx) }
+
+    // @TODO: Seperate function for Set and Remove + test if the input comply with the directives
+
+    if fun := FieldAuthorizationFunc[*r]; fun != nil {
+        return fun(ctx, obj, next, f, n)
+    }
+    return nil, LogErr("directive error", fmt.Errorf("unknown rule `%s'", *r))
+}
+
+func FieldTransform(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (interface{}, error) {
+    if fun := FieldTransformFunc[a]; fun != nil {
+        return fun(ctx, next)
+    }
+    return nil, LogErr("directive error", fmt.Errorf("unknown function `%s'", a))
+}

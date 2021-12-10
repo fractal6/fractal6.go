@@ -36,17 +36,6 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     emitterid := tension.Emitter.Nameid
     parentid := tension.Receiver.Nameid
 
-    // Prevent Auth properties to be changed from blob pushes
-    // as unentended update can occurs as Peer role can pushed blob.
-    // It means, that each of the properties below should have their own events
-    node.Nameid = nil
-    node.Type = nil
-    node.Visibility = nil
-    node.Mode = nil
-    node.FirstLink = nil
-    node.SecondLink = nil
-    node.RoleType = nil
-
     // Get References
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
@@ -130,13 +119,17 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
 
     switch *node.Type {
     case model.NodeTypeRole:
-        if !model.RoleType(value).IsValid() { return false, fmt.Errorf("Bad vaue for role_type.") }
+        if !model.RoleType(value).IsValid() { return false, fmt.Errorf("Bad value for role_type.") }
         err = DB.SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
         if err != nil { return false, err }
         err = DB.SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
+        if err != nil { return false, err }
+        err = db.GetDB().SetFieldById(node.ID, "NodeFragment.role_type", value)
     case model.NodeTypeCircle:
         if !model.NodeMode(value).IsValid() { return false, fmt.Errorf("Bad value for mode.") }
         err = DB.SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
+        if err != nil { return false, err }
+        err = db.GetDB().SetFieldById(node.ID, "NodeFragment.mode", value)
     }
 
     return ok, err
@@ -156,6 +149,8 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
 
     if !model.NodeVisibility(value).IsValid() { return false, fmt.Errorf("Bad value for visibility.") }
     err = DB.SetFieldByEq("Node.nameid", nameid, "Node.visibility", value)
+    if err != nil { return false, err }
+    err = db.GetDB().SetFieldById(node.ID, "NodeFragment.visibility", value)
 
     return ok, err
 }

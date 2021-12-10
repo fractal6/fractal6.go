@@ -117,17 +117,17 @@ type AddMandatePayload struct {
 }
 
 type AddNodeFragmentInput struct {
-	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
-	Type       *NodeType          `json:"type_,omitempty"`
+	Name       *string            `json:"name,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Visibility *NodeVisibility    `json:"visibility,omitempty"`
 	Mode       *NodeMode          `json:"mode,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
+	Type       *NodeType          `json:"type_,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
-	Skills     []string           `json:"skills,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
 }
 
@@ -209,7 +209,6 @@ type AddTensionInput struct {
 	Emitter        *NodeRef       `json:"emitter,omitempty"`
 	Receiverid     string         `json:"receiverid,omitempty"`
 	Receiver       *NodeRef       `json:"receiver,omitempty"`
-	Nth            *string        `json:"nth,omitempty"`
 	Title          string         `json:"title,omitempty"`
 	Type           TensionType    `json:"type_,omitempty"`
 	Status         TensionStatus  `json:"status,omitempty"`
@@ -238,14 +237,14 @@ type AddUserInput struct {
 	Email            string         `json:"email,omitempty"`
 	EmailHash        *string        `json:"emailHash,omitempty"`
 	EmailValidated   bool           `json:"emailValidated"`
+	Bio              *string        `json:"bio,omitempty"`
+	Utc              *string        `json:"utc,omitempty"`
 	Rights           *UserRightsRef `json:"rights,omitempty"`
 	Roles            []*NodeRef     `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef `json:"contracts,omitempty"`
-	Bio              *string        `json:"bio,omitempty"`
-	Utc              *string        `json:"utc,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -438,14 +437,14 @@ type Contract struct {
 	Participants          []*Vote                 `json:"participants,omitempty"`
 	Comments              []*Comment              `json:"comments,omitempty"`
 	IsValidator           *bool                   `json:"isValidator"`
-	CandidatesAggregate   *UserAggregateResult    `json:"candidatesAggregate,omitempty"`
-	ParticipantsAggregate *VoteAggregateResult    `json:"participantsAggregate,omitempty"`
-	CommentsAggregate     *CommentAggregateResult `json:"commentsAggregate,omitempty"`
 	ID                    string                  `json:"id,omitempty"`
 	CreatedBy             *User                   `json:"createdBy,omitempty"`
 	CreatedAt             string                  `json:"createdAt,omitempty"`
 	UpdatedAt             *string                 `json:"updatedAt,omitempty"`
 	Message               *string                 `json:"message,omitempty"`
+	CandidatesAggregate   *UserAggregateResult    `json:"candidatesAggregate,omitempty"`
+	ParticipantsAggregate *VoteAggregateResult    `json:"participantsAggregate,omitempty"`
+	CommentsAggregate     *CommentAggregateResult `json:"commentsAggregate,omitempty"`
 }
 
 type ContractAggregateResult struct {
@@ -1042,27 +1041,27 @@ type NodeFilter struct {
 
 type NodeFragment struct {
 	ID                string                       `json:"id,omitempty"`
-	Name              *string                      `json:"name,omitempty"`
 	Nameid            *string                      `json:"nameid,omitempty"`
-	Type              *NodeType                    `json:"type_,omitempty"`
+	Name              *string                      `json:"name,omitempty"`
 	About             *string                      `json:"about,omitempty"`
 	Mandate           *Mandate                     `json:"mandate,omitempty"`
+	Skills            []string                     `json:"skills,omitempty"`
+	Children          []*NodeFragment              `json:"children,omitempty"`
 	Visibility        *NodeVisibility              `json:"visibility,omitempty"`
 	Mode              *NodeMode                    `json:"mode,omitempty"`
-	Children          []*NodeFragment              `json:"children,omitempty"`
+	Type              *NodeType                    `json:"type_,omitempty"`
 	FirstLink         *string                      `json:"first_link,omitempty"`
 	SecondLink        *string                      `json:"second_link,omitempty"`
-	Skills            []string                     `json:"skills,omitempty"`
 	RoleType          *RoleType                    `json:"role_type,omitempty"`
 	ChildrenAggregate *NodeFragmentAggregateResult `json:"childrenAggregate,omitempty"`
 }
 
 type NodeFragmentAggregateResult struct {
 	Count         *int    `json:"count"`
-	NameMin       *string `json:"nameMin,omitempty"`
-	NameMax       *string `json:"nameMax,omitempty"`
 	NameidMin     *string `json:"nameidMin,omitempty"`
 	NameidMax     *string `json:"nameidMax,omitempty"`
+	NameMin       *string `json:"nameMin,omitempty"`
+	NameMax       *string `json:"nameMax,omitempty"`
 	AboutMin      *string `json:"aboutMin,omitempty"`
 	AboutMax      *string `json:"aboutMax,omitempty"`
 	FirstLinkMin  *string `json:"first_linkMin,omitempty"`
@@ -1086,33 +1085,33 @@ type NodeFragmentOrder struct {
 }
 
 type NodeFragmentPatch struct {
-	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
-	Type       *NodeType          `json:"type_,omitempty"`
+	Name       *string            `json:"name,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Visibility *NodeVisibility    `json:"visibility,omitempty"`
 	Mode       *NodeMode          `json:"mode,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
+	Type       *NodeType          `json:"type_,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
-	Skills     []string           `json:"skills,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
 }
 
 type NodeFragmentRef struct {
 	ID         *string            `json:"id,omitempty"`
-	Name       *string            `json:"name,omitempty"`
 	Nameid     *string            `json:"nameid,omitempty"`
-	Type       *NodeType          `json:"type_,omitempty"`
+	Name       *string            `json:"name,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
 	Visibility *NodeVisibility    `json:"visibility,omitempty"`
 	Mode       *NodeMode          `json:"mode,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
+	Type       *NodeType          `json:"type_,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
-	Skills     []string           `json:"skills,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
 }
 
@@ -1452,7 +1451,6 @@ type Tension struct {
 	Emitter            *Node                    `json:"emitter,omitempty"`
 	Receiverid         string                   `json:"receiverid,omitempty"`
 	Receiver           *Node                    `json:"receiver,omitempty"`
-	Nth                *string                  `json:"nth,omitempty"`
 	Title              string                   `json:"title,omitempty"`
 	Type               TensionType              `json:"type_,omitempty"`
 	Status             TensionStatus            `json:"status,omitempty"`
@@ -1465,17 +1463,17 @@ type Tension struct {
 	History            []*Event                 `json:"history,omitempty"`
 	NComments          *int                     `json:"n_comments"`
 	NOpenContracts     *int                     `json:"n_open_contracts"`
+	ID                 string                   `json:"id,omitempty"`
+	CreatedBy          *User                    `json:"createdBy,omitempty"`
+	CreatedAt          string                   `json:"createdAt,omitempty"`
+	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
+	Message            *string                  `json:"message,omitempty"`
 	AssigneesAggregate *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
 	LabelsAggregate    *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
 	CommentsAggregate  *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
 	BlobsAggregate     *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
 	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 	HistoryAggregate   *EventAggregateResult    `json:"historyAggregate,omitempty"`
-	ID                 string                   `json:"id,omitempty"`
-	CreatedBy          *User                    `json:"createdBy,omitempty"`
-	CreatedAt          string                   `json:"createdAt,omitempty"`
-	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
-	Message            *string                  `json:"message,omitempty"`
 }
 
 type TensionAggregateResult struct {
@@ -1490,8 +1488,6 @@ type TensionAggregateResult struct {
 	EmitteridMax      *string  `json:"emitteridMax,omitempty"`
 	ReceiveridMin     *string  `json:"receiveridMin,omitempty"`
 	ReceiveridMax     *string  `json:"receiveridMax,omitempty"`
-	NthMin            *string  `json:"nthMin,omitempty"`
-	NthMax            *string  `json:"nthMax,omitempty"`
 	TitleMin          *string  `json:"titleMin,omitempty"`
 	TitleMax          *string  `json:"titleMax,omitempty"`
 	NCommentsMin      *int     `json:"n_commentsMin"`
@@ -1515,7 +1511,6 @@ type TensionFilter struct {
 	Message    *StringFullTextFilter               `json:"message,omitempty"`
 	Emitterid  *StringHashFilterStringRegExpFilter `json:"emitterid,omitempty"`
 	Receiverid *StringHashFilterStringRegExpFilter `json:"receiverid,omitempty"`
-	Nth        *StringTermFilter                   `json:"nth,omitempty"`
 	Title      *StringFullTextFilter               `json:"title,omitempty"`
 	Type       *TensionTypeHash                    `json:"type_,omitempty"`
 	Status     *TensionStatusHash                  `json:"status,omitempty"`
@@ -1540,7 +1535,6 @@ type TensionPatch struct {
 	Emitter        *NodeRef       `json:"emitter,omitempty"`
 	Receiverid     *string        `json:"receiverid,omitempty"`
 	Receiver       *NodeRef       `json:"receiver,omitempty"`
-	Nth            *string        `json:"nth,omitempty"`
 	Title          *string        `json:"title,omitempty"`
 	Type           *TensionType   `json:"type_,omitempty"`
 	Status         *TensionStatus `json:"status,omitempty"`
@@ -1565,7 +1559,6 @@ type TensionRef struct {
 	Emitter        *NodeRef       `json:"emitter,omitempty"`
 	Receiverid     *string        `json:"receiverid,omitempty"`
 	Receiver       *NodeRef       `json:"receiver,omitempty"`
-	Nth            *string        `json:"nth,omitempty"`
 	Title          *string        `json:"title,omitempty"`
 	Type           *TensionType   `json:"type_,omitempty"`
 	Status         *TensionStatus `json:"status,omitempty"`
@@ -1776,14 +1769,14 @@ type User struct {
 	Email                     string                   `json:"email,omitempty"`
 	EmailHash                 *string                  `json:"emailHash,omitempty"`
 	EmailValidated            bool                     `json:"emailValidated"`
+	Bio                       *string                  `json:"bio,omitempty"`
+	Utc                       *string                  `json:"utc,omitempty"`
 	Rights                    *UserRights              `json:"rights,omitempty"`
 	Roles                     []*Node                  `json:"roles,omitempty"`
 	BackedRoles               []*Node                  `json:"backed_roles,omitempty"`
 	TensionsCreated           []*Tension               `json:"tensions_created,omitempty"`
 	TensionsAssigned          []*Tension               `json:"tensions_assigned,omitempty"`
 	Contracts                 []*Contract              `json:"contracts,omitempty"`
-	Bio                       *string                  `json:"bio,omitempty"`
-	Utc                       *string                  `json:"utc,omitempty"`
 	RolesAggregate            *NodeAggregateResult     `json:"rolesAggregate,omitempty"`
 	BackedRolesAggregate      *NodeAggregateResult     `json:"backed_rolesAggregate,omitempty"`
 	TensionsCreatedAggregate  *TensionAggregateResult  `json:"tensions_createdAggregate,omitempty"`
@@ -1838,14 +1831,14 @@ type UserPatch struct {
 	Email            *string        `json:"email,omitempty"`
 	EmailHash        *string        `json:"emailHash,omitempty"`
 	EmailValidated   *bool          `json:"emailValidated"`
+	Bio              *string        `json:"bio,omitempty"`
+	Utc              *string        `json:"utc,omitempty"`
 	Rights           *UserRightsRef `json:"rights,omitempty"`
 	Roles            []*NodeRef     `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef `json:"contracts,omitempty"`
-	Bio              *string        `json:"bio,omitempty"`
-	Utc              *string        `json:"utc,omitempty"`
 }
 
 type UserRef struct {
@@ -1858,14 +1851,14 @@ type UserRef struct {
 	Email            *string        `json:"email,omitempty"`
 	EmailHash        *string        `json:"emailHash,omitempty"`
 	EmailValidated   *bool          `json:"emailValidated"`
+	Bio              *string        `json:"bio,omitempty"`
+	Utc              *string        `json:"utc,omitempty"`
 	Rights           *UserRightsRef `json:"rights,omitempty"`
 	Roles            []*NodeRef     `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef `json:"contracts,omitempty"`
-	Bio              *string        `json:"bio,omitempty"`
-	Utc              *string        `json:"utc,omitempty"`
 }
 
 type UserRights struct {
@@ -1911,11 +1904,11 @@ type UserRightsRef struct {
 }
 
 type Vote struct {
-	ID        string    `json:"id,omitempty"`
 	Voteid    string    `json:"voteid,omitempty"`
 	Contract  *Contract `json:"contract,omitempty"`
 	Node      *Node     `json:"node,omitempty"`
 	Data      []int     `json:"data"`
+	ID        string    `json:"id,omitempty"`
 	CreatedBy *User     `json:"createdBy,omitempty"`
 	CreatedAt string    `json:"createdAt,omitempty"`
 	UpdatedAt *string   `json:"updatedAt,omitempty"`
@@ -2955,38 +2948,38 @@ func (e Mode) MarshalGQL(w io.Writer) {
 type NodeFragmentHasFilter string
 
 const (
-	NodeFragmentHasFilterName       NodeFragmentHasFilter = "name"
 	NodeFragmentHasFilterNameid     NodeFragmentHasFilter = "nameid"
-	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
+	NodeFragmentHasFilterName       NodeFragmentHasFilter = "name"
 	NodeFragmentHasFilterAbout      NodeFragmentHasFilter = "about"
 	NodeFragmentHasFilterMandate    NodeFragmentHasFilter = "mandate"
+	NodeFragmentHasFilterSkills     NodeFragmentHasFilter = "skills"
+	NodeFragmentHasFilterChildren   NodeFragmentHasFilter = "children"
 	NodeFragmentHasFilterVisibility NodeFragmentHasFilter = "visibility"
 	NodeFragmentHasFilterMode       NodeFragmentHasFilter = "mode"
-	NodeFragmentHasFilterChildren   NodeFragmentHasFilter = "children"
+	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
 	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
 	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
-	NodeFragmentHasFilterSkills     NodeFragmentHasFilter = "skills"
 	NodeFragmentHasFilterRoleType   NodeFragmentHasFilter = "role_type"
 )
 
 var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
-	NodeFragmentHasFilterName,
 	NodeFragmentHasFilterNameid,
-	NodeFragmentHasFilterType,
+	NodeFragmentHasFilterName,
 	NodeFragmentHasFilterAbout,
 	NodeFragmentHasFilterMandate,
+	NodeFragmentHasFilterSkills,
+	NodeFragmentHasFilterChildren,
 	NodeFragmentHasFilterVisibility,
 	NodeFragmentHasFilterMode,
-	NodeFragmentHasFilterChildren,
+	NodeFragmentHasFilterType,
 	NodeFragmentHasFilterFirstLink,
 	NodeFragmentHasFilterSecondLink,
-	NodeFragmentHasFilterSkills,
 	NodeFragmentHasFilterRoleType,
 }
 
 func (e NodeFragmentHasFilter) IsValid() bool {
 	switch e {
-	case NodeFragmentHasFilterName, NodeFragmentHasFilterNameid, NodeFragmentHasFilterType, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterChildren, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterSkills, NodeFragmentHasFilterRoleType:
+	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterChildren, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleType:
 		return true
 	}
 	return false
@@ -3016,16 +3009,16 @@ func (e NodeFragmentHasFilter) MarshalGQL(w io.Writer) {
 type NodeFragmentOrderable string
 
 const (
-	NodeFragmentOrderableName       NodeFragmentOrderable = "name"
 	NodeFragmentOrderableNameid     NodeFragmentOrderable = "nameid"
+	NodeFragmentOrderableName       NodeFragmentOrderable = "name"
 	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
 	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
 	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
 )
 
 var AllNodeFragmentOrderable = []NodeFragmentOrderable{
-	NodeFragmentOrderableName,
 	NodeFragmentOrderableNameid,
+	NodeFragmentOrderableName,
 	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
 	NodeFragmentOrderableSecondLink,
@@ -3033,7 +3026,7 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableName, NodeFragmentOrderableNameid, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink:
+	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink:
 		return true
 	}
 	return false
@@ -3803,7 +3796,6 @@ const (
 	TensionHasFilterEmitter        TensionHasFilter = "emitter"
 	TensionHasFilterReceiverid     TensionHasFilter = "receiverid"
 	TensionHasFilterReceiver       TensionHasFilter = "receiver"
-	TensionHasFilterNth            TensionHasFilter = "nth"
 	TensionHasFilterTitle          TensionHasFilter = "title"
 	TensionHasFilterType           TensionHasFilter = "type_"
 	TensionHasFilterStatus         TensionHasFilter = "status"
@@ -3827,7 +3819,6 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterEmitter,
 	TensionHasFilterReceiverid,
 	TensionHasFilterReceiver,
-	TensionHasFilterNth,
 	TensionHasFilterTitle,
 	TensionHasFilterType,
 	TensionHasFilterStatus,
@@ -3844,7 +3835,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterNth, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false
@@ -3879,7 +3870,6 @@ const (
 	TensionOrderableMessage        TensionOrderable = "message"
 	TensionOrderableEmitterid      TensionOrderable = "emitterid"
 	TensionOrderableReceiverid     TensionOrderable = "receiverid"
-	TensionOrderableNth            TensionOrderable = "nth"
 	TensionOrderableTitle          TensionOrderable = "title"
 	TensionOrderableNComments      TensionOrderable = "n_comments"
 	TensionOrderableNOpenContracts TensionOrderable = "n_open_contracts"
@@ -3891,7 +3881,6 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableMessage,
 	TensionOrderableEmitterid,
 	TensionOrderableReceiverid,
-	TensionOrderableNth,
 	TensionOrderableTitle,
 	TensionOrderableNComments,
 	TensionOrderableNOpenContracts,
@@ -3899,7 +3888,7 @@ var AllTensionOrderable = []TensionOrderable{
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableNth, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNOpenContracts:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNOpenContracts:
 		return true
 	}
 	return false
@@ -4021,14 +4010,14 @@ const (
 	UserHasFilterEmail            UserHasFilter = "email"
 	UserHasFilterEmailHash        UserHasFilter = "emailHash"
 	UserHasFilterEmailValidated   UserHasFilter = "emailValidated"
+	UserHasFilterBio              UserHasFilter = "bio"
+	UserHasFilterUtc              UserHasFilter = "utc"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
 	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
 	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
-	UserHasFilterBio              UserHasFilter = "bio"
-	UserHasFilterUtc              UserHasFilter = "utc"
 )
 
 var AllUserHasFilter = []UserHasFilter{
@@ -4040,19 +4029,19 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterEmail,
 	UserHasFilterEmailHash,
 	UserHasFilterEmailValidated,
+	UserHasFilterBio,
+	UserHasFilterUtc,
 	UserHasFilterRights,
 	UserHasFilterRoles,
 	UserHasFilterBackedRoles,
 	UserHasFilterTensionsCreated,
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
-	UserHasFilterBio,
-	UserHasFilterUtc,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterBio, UserHasFilterUtc:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts:
 		return true
 	}
 	return false

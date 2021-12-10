@@ -1,6 +1,7 @@
 package graph
 
 import (
+    //"fmt"
 	"context"
 	"encoding/json"
 	"github.com/99designs/gqlgen/graphql"
@@ -53,15 +54,35 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     if data != nil && err != nil {
         // Gqlgen ignore the data if there is an error returned
         // see https://github.com/99designs/gqlgen/issues/1191
-
-        // Nodes query can return nul field if Node are hidden
-        // bu children are not. The source ends up to be a tension where
-        // the receiver is the parent wich is hidden ;)
         //graphql.AddErrorf(ctx, err.Error())
+
+        // Nodes query can return null field if Node are hidden
+        // but children are not. The source ends up to be a tension where
+        // the receiver is the parent wich is hidden ;)
+        //
+        d, _ := json.Marshal(data)
+        if (string(d) == "null") {
+            // If there is really no data, show the graphql error
+            // otherwise, fail silently.
+            return err
+        }
         return nil
     }
     return err
 }
+
+//// Mutation type Enum
+//type mutationType string
+//const (
+//    AddMut mutationType = "add"
+//    UpdateMut mutationType = "update"
+//    DelMut mutationType = "delete"
+//)
+//type MutationContext struct  {
+//    type_ mutationType
+//    argName string
+//}
+
 
 //// @Debug: GetPreloads loose subfilter in payload(in QueryGraph)
 //func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}, db *db.Dgraph) error {

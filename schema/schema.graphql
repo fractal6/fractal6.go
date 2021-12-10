@@ -1,4 +1,60 @@
 
+directive @hook_addNodeInput on ARGUMENT_DEFINITION
+directive @hook_addNode on FIELD_DEFINITION
+directive @hook_updateNodeInput on ARGUMENT_DEFINITION
+directive @hook_updateNode on FIELD_DEFINITION
+directive @hook_deleteNodeInput on ARGUMENT_DEFINITION
+directive @hook_deleteNode on FIELD_DEFINITION
+directive @hook_addLabelInput on ARGUMENT_DEFINITION
+directive @hook_addLabel on FIELD_DEFINITION
+directive @hook_updateLabelInput on ARGUMENT_DEFINITION
+directive @hook_updateLabel on FIELD_DEFINITION
+directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
+directive @hook_deleteLabel on FIELD_DEFINITION
+directive @hook_addRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_addRoleExt on FIELD_DEFINITION
+directive @hook_updateRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_updateRoleExt on FIELD_DEFINITION
+directive @hook_deleteRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_deleteRoleExt on FIELD_DEFINITION
+directive @hook_addTensionInput on ARGUMENT_DEFINITION
+directive @hook_addTension on FIELD_DEFINITION
+directive @hook_updateTensionInput on ARGUMENT_DEFINITION
+directive @hook_updateTension on FIELD_DEFINITION
+directive @hook_deleteTensionInput on ARGUMENT_DEFINITION
+directive @hook_deleteTension on FIELD_DEFINITION
+directive @hook_addCommentInput on ARGUMENT_DEFINITION
+directive @hook_addComment on FIELD_DEFINITION
+directive @hook_updateCommentInput on ARGUMENT_DEFINITION
+directive @hook_updateComment on FIELD_DEFINITION
+directive @hook_deleteCommentInput on ARGUMENT_DEFINITION
+directive @hook_deleteComment on FIELD_DEFINITION
+directive @hook_addContractInput on ARGUMENT_DEFINITION
+directive @hook_addContract on FIELD_DEFINITION
+directive @hook_updateContractInput on ARGUMENT_DEFINITION
+directive @hook_updateContract on FIELD_DEFINITION
+directive @hook_deleteContractInput on ARGUMENT_DEFINITION
+directive @hook_deleteContract on FIELD_DEFINITION
+directive @hook_addVoteInput on ARGUMENT_DEFINITION
+directive @hook_addVote on FIELD_DEFINITION
+directive @hook_updateVoteInput on ARGUMENT_DEFINITION
+directive @hook_updateVote on FIELD_DEFINITION
+directive @hook_deleteVoteInput on ARGUMENT_DEFINITION
+directive @hook_deleteVote on FIELD_DEFINITION
+directive @hook_getNodeInput on ARGUMENT_DEFINITION
+directive @hook_queryNodeInput on ARGUMENT_DEFINITION
+directive @hook_getLabelInput on ARGUMENT_DEFINITION
+directive @hook_queryLabelInput on ARGUMENT_DEFINITION
+directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_getTensionInput on ARGUMENT_DEFINITION
+directive @hook_queryTensionInput on ARGUMENT_DEFINITION
+directive @hook_getCommentInput on ARGUMENT_DEFINITION
+directive @hook_queryCommentInput on ARGUMENT_DEFINITION
+directive @hook_getContractInput on ARGUMENT_DEFINITION
+directive @hook_queryContractInput on ARGUMENT_DEFINITION
+directive @hook_getVoteInput on ARGUMENT_DEFINITION
+directive @hook_queryVoteInput on ARGUMENT_DEFINITION
 
 
 directive @hidden on FIELD_DEFINITION
@@ -9,182 +65,57 @@ directive @meta(f: String!, k: String!) on FIELD_DEFINITION
 
 directive @isContractValidator on FIELD_DEFINITION
 
-directive @alter_toLower on INPUT_FIELD_DEFINITION
+directive @w_set(a: String!) on INPUT_FIELD_DEFINITION
 
-directive @alter_minLength(n: Int!) on INPUT_FIELD_DEFINITION
+directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
 
-directive @alter_maxLength(n: Int!) on INPUT_FIELD_DEFINITION
+directive @w_remove(a: String!) on INPUT_FIELD_DEFINITION
 
-directive @alter_oneByOne on INPUT_FIELD_DEFINITION
+directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
 
-directive @alter_unique(on: String) on INPUT_FIELD_DEFINITION
+directive @x_set(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
-directive @add_isOwner(u: String) on INPUT_FIELD_DEFINITION
+directive @x_patch(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
-directive @patch_isOwner(u: String) on INPUT_FIELD_DEFINITION
+directive @x_remove(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
-directive @patch_RO on INPUT_FIELD_DEFINITION
+directive @x_alter(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
-directive @alter_RO on INPUT_FIELD_DEFINITION
+directive @x_patch_ro on INPUT_FIELD_DEFINITION
 
-directive @hook_getNodeInput on ARGUMENT_DEFINITION
+directive @x_ro on INPUT_FIELD_DEFINITION
 
-directive @hook_queryNodeInput on ARGUMENT_DEFINITION
-
-directive @hook_addNodeInput on ARGUMENT_DEFINITION
-
-directive @hook_updateNodeInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteNodeInput on ARGUMENT_DEFINITION
-
-directive @hook_addNode on FIELD_DEFINITION
-
-directive @hook_updateNode on FIELD_DEFINITION
-
-directive @hook_deleteNode on FIELD_DEFINITION
-
-directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
-
-directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
-
-directive @hook_addRoleExtInput on ARGUMENT_DEFINITION
-
-directive @hook_updateRoleExtInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteRoleExtInput on ARGUMENT_DEFINITION
-
-directive @hook_addRoleExt on FIELD_DEFINITION
-
-directive @hook_updateRoleExt on FIELD_DEFINITION
-
-directive @hook_deleteRoleExt on FIELD_DEFINITION
-
-directive @hook_getLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_queryLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_addLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_updateLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteLabelInput on ARGUMENT_DEFINITION
-
-directive @hook_addLabel on FIELD_DEFINITION
-
-directive @hook_updateLabel on FIELD_DEFINITION
-
-directive @hook_deleteLabel on FIELD_DEFINITION
-
-directive @hook_getTensionInput on ARGUMENT_DEFINITION
-
-directive @hook_queryTensionInput on ARGUMENT_DEFINITION
-
-directive @hook_addTensionInput on ARGUMENT_DEFINITION
-
-directive @hook_updateTensionInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteTensionInput on ARGUMENT_DEFINITION
-
-directive @hook_addTension on FIELD_DEFINITION
-
-directive @hook_updateTension on FIELD_DEFINITION
-
-directive @hook_deleteTension on FIELD_DEFINITION
-
-directive @hook_getCommentInput on ARGUMENT_DEFINITION
-
-directive @hook_queryCommentInput on ARGUMENT_DEFINITION
-
-directive @hook_addCommentInput on ARGUMENT_DEFINITION
-
-directive @hook_updateCommentInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteCommentInput on ARGUMENT_DEFINITION
-
-directive @hook_addComment on FIELD_DEFINITION
-
-directive @hook_updateComment on FIELD_DEFINITION
-
-directive @hook_deleteComment on FIELD_DEFINITION
-
-directive @hook_getContractInput on ARGUMENT_DEFINITION
-
-directive @hook_queryContractInput on ARGUMENT_DEFINITION
-
-directive @hook_addContractInput on ARGUMENT_DEFINITION
-
-directive @hook_updateContractInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteContractInput on ARGUMENT_DEFINITION
-
-directive @hook_addContract on FIELD_DEFINITION
-
-directive @hook_updateContract on FIELD_DEFINITION
-
-directive @hook_deleteContract on FIELD_DEFINITION
-
-directive @hook_getVoteInput on ARGUMENT_DEFINITION
-
-directive @hook_queryVoteInput on ARGUMENT_DEFINITION
-
-directive @hook_addVoteInput on ARGUMENT_DEFINITION
-
-directive @hook_updateVoteInput on ARGUMENT_DEFINITION
-
-directive @hook_deleteVoteInput on ARGUMENT_DEFINITION
-
-directive @hook_addVote on FIELD_DEFINITION
-
-directive @hook_updateVote on FIELD_DEFINITION
-
-directive @hook_deleteVote on FIELD_DEFINITION
-
-type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($OWNIDS: [String]) {
-        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String]) {
-        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
-    }"""
-},{ rule:"""query ($USERNAME: String!) {
-        queryNode(filter: {visibility: {eq: Secret}}) {
-          children {
-              first_link(filter: {username: {eq: $USERNAME}}) { username }
-          }
-        }
-    }"""
-}]
-}) {
+type Node {
   id: ID!
   createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   updatedAt: DateTime
-  name: String! @search(by: [term])
-  nameid: String! @search(by: [hash, regexp]) @id
-  rootnameid: String! @search(by: [hash, regexp])
+  name: String!
+  nameid: String!
+  rootnameid: String!
   parent(filter: NodeFilter): Node
-  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: parent)
-  type_: NodeType! @search
-  tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: emitter)
-  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: receiver)
-  about: String @search(by: [fulltext])
+  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  type_: NodeType!
+  tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  about: String
   mandate(filter: MandateFilter): Mandate
   docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   source(filter: BlobFilter): Blob
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
-  visibility: NodeVisibility! @search
-  mode: NodeMode! @search
+  visibility: NodeVisibility!
+  mode: NodeMode!
   rights: Int!
-  isArchived: Boolean! @search
-  isRoot: Boolean! @search
-  isPersonal: Boolean @search
+  isArchived: Boolean!
+  isRoot: Boolean!
+  isPersonal: Boolean
   userCanJoin: Boolean
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
-  skills: [String!] @search(by: [term])
-  role_type: RoleType @search
+  skills: [String!]
+  role_type: RoleType
   role_ext(filter: RoleExtFilter): RoleExt
-  contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!] @hasInverse(field: node)
+  contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
@@ -197,17 +128,17 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type NodeFragment {
   id: ID!
-  name: String
   nameid: String
-  type_: NodeType
+  name: String
   about: String
   mandate(filter: MandateFilter): Mandate
+  skills: [String!]
+  children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
   visibility: NodeVisibility
   mode: NodeMode
-  children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
+  type_: NodeType
   first_link: String
   second_link: String
-  skills: [String!]
   role_type: RoleType
 
   childrenAggregate(filter: NodeFragmentFilter): NodeFragmentAggregateResult
@@ -215,30 +146,20 @@ type NodeFragment {
 
 type Mandate {
   id: ID!
-  purpose: String! @search(by: [fulltext])
+  purpose: String!
   responsabilities: String
   domains: String
   policies: String
 }
 
-type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($OWNIDS: [String]) {
-        queryLabel { 
-          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
-        }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String]) {
-        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
-    }"""
-}]
-}) {
+type Label {
   id: ID!
-  rootnameid: String! @search(by: [hash])
-  name: String! @search(by: [hash, term])
+  rootnameid: String!
+  name: String!
   description: String
   color: String
-  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: labels)
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: labels)
+  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   n_nodes: Int
   n_tensions: Int
 
@@ -246,25 +167,15 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
-type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($OWNIDS: [String]) {
-        queryRoleExt { 
-          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
-        }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String]) {
-        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
-    }"""
-}]
-}) {
+type RoleExt {
   id: ID!
-  rootnameid: String! @search(by: [hash])
-  name: String! @search(by: [hash, term])
+  rootnameid: String!
+  name: String!
   about: String
   role_type: RoleType!
   color: String
   mandate(filter: MandateFilter): Mandate
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: role_ext)
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   n_nodes: Int
 
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -275,74 +186,36 @@ type OrgaAgg {
   n_guests: Int
 }
 
-type Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($USERNAME: String!) {
-      queryPost {
-        createdBy(filter: {username: {eq: $USERNAME}}) { username }
-      }
-    }"""
-}]
-}) {
+type Post {
   id: ID!
   createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   updatedAt: DateTime
-  message: String @search(by: [fulltext])
+  message: String
 }
 
-type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($OWNIDS: [String]) {
-        queryTension {
-          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
-        }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String]) {
-        queryTension {
-          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
-        }
-    }"""
-},{ rule:"""query ($USERNAME: String!) {
-        queryTension {
-          receiver(filter: {visibility: {eq: Secret}}) { 
-            children {
-                first_link(filter: {username: {eq: $USERNAME}}) { username }
-            }
-          }
-        }
-    }"""
-}]
-}, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($USERNAME: String!) {
-        queryTension {
-          emitter {
-            first_link(filter: {username: {eq: $USERNAME}}) { username }
-          }
-        }
-    }"""
-},{ rule:"""query {
-        queryTension {
-          emitter(filter: {role_type: {eq: Bot}}) { id }
-        }
-    }"""
-}]
-}) {
-  emitterid: String! @search(by: [hash, regexp])
+type Tension {
+  emitterid: String!
   emitter(filter: NodeFilter): Node!
-  receiverid: String! @search(by: [hash, regexp])
+  receiverid: String!
   receiver(filter: NodeFilter): Node!
-  nth: String @search
-  title: String! @search(by: [fulltext])
-  type_: TensionType! @search
-  status: TensionStatus! @search
+  title: String!
+  type_: TensionType!
+  status: TensionStatus!
   assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   action: TensionAction
-  blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!] @hasInverse(field: tension)
-  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: tension)
-  history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]! @hasInverse(field: tension)
+  blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
+  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
   n_comments: Int
   n_open_contracts: Int
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  message: String
 
   assigneesAggregate(filter: UserFilter): UserAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
@@ -350,142 +223,100 @@ type Tension @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
-  id: ID!
-  createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
-  updatedAt: DateTime
-  message: String @search(by: [fulltext])
 }
 
-type Comment @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($USERNAME: String!) {
-      queryComment {
-        createdBy(filter: {username: {eq: $USERNAME}}) { username }
-      }
-    }"""
-}]
-}) {
-  message: String! @search(by: [fulltext])
+type Comment {
+  message: String!
   id: ID!
   createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   updatedAt: DateTime
 }
 
 type Blob {
   tension(filter: TensionFilter): Tension!
-  blob_type: BlobType! @search
-  pushedFlag: DateTime @search
-  archivedFlag: DateTime @search
+  blob_type: BlobType!
+  pushedFlag: DateTime
+  archivedFlag: DateTime
   node(filter: NodeFragmentFilter): NodeFragment
   md: String
   id: ID!
   createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   updatedAt: DateTime
-  message: String @search(by: [fulltext])
+  message: String
 }
 
 type Event {
   tension(filter: TensionFilter): Tension!
-  event_type: TensionEvent! @search
+  event_type: TensionEvent!
   old: String
   new: String
   id: ID!
   createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   updatedAt: DateTime
-  message: String @search(by: [fulltext])
+  message: String
 }
 
 type EventFragment {
-  event_type: TensionEvent! @search
+  event_type: TensionEvent!
   old: String
   new: String
 }
 
-type Contract @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($OWNIDS: [String]) {
-        queryContract {
-          tension { receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id } }
-        }
-    }"""
-},{ rule:"""query ($ROOTIDS: [String]) {
-        queryContract {
-          tension { receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id } }
-        }
-    }"""
-},{ rule:"""query ($USERNAME: String!) {
-        queryContract {
-          tension { 
-            receiver(filter: {visibility: {eq: Secret}}) { 
-              children {
-                  first_link(filter: {username: {eq: $USERNAME}}) { username }
-              }
-            }
-          }
-        }
-    }"""
-}]
-}) {
-  contractid: String! @id
+type Contract {
+  contractid: String!
   tension(filter: TensionFilter): Tension!
-  status: ContractStatus! @search
-  contract_type: ContractType! @search
-  closedAt: DateTime @search
+  status: ContractStatus!
+  contract_type: ContractType!
+  closedAt: DateTime
   event(filter: EventFragmentFilter): EventFragment!
-  candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!] @hasInverse(field: contracts)
-  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]! @hasInverse(field: contract)
+  candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
+  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]!
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  message: String
 
   candidatesAggregate(filter: UserFilter): UserAggregateResult
   participantsAggregate(filter: VoteFilter): VoteAggregateResult
   commentsAggregate(filter: CommentFilter): CommentAggregateResult
-  id: ID!
-  createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
-  updatedAt: DateTime
-  message: String @search(by: [fulltext])
 }
 
-type Vote @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query ($USERNAME: String!) {
-      queryVote {
-        node { first_link(filter: {username: {eq: $USERNAME}}) { username } }
-      }
-    }"""
-}]
-}) {
-  id: ID!
-  voteid: String! @id
+type Vote {
+  voteid: String!
   contract(filter: ContractFilter): Contract!
   node(filter: NodeFilter): Node!
   data: [Int!]!
+  id: ID!
   createdBy(filter: UserFilter): User!
-  createdAt: DateTime! @search
+  createdAt: DateTime!
   updatedAt: DateTime
-  message: String @search(by: [fulltext])
+  message: String
 }
 
 type User {
   id: ID!
   createdAt: DateTime!
   lastAck: DateTime!
-  username: String! @id
+  username: String!
   name: String
   password: String! @hidden
-  email: String! @search(by: [hash]) @hidden
+  email: String! @hidden
   emailHash: String @hidden
   emailValidated: Boolean! @hidden
-  rights(filter: UserRightsFilter): UserRights!
-  roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: first_link)
-  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @hasInverse(field: second_link)
-  tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: createdBy)
-  tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @hasInverse(field: assignees)
-  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @hasInverse(field: candidates)
   bio: String
   utc: String
+  rights(filter: UserRightsFilter): UserRights!
+  roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
 
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
   backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -640,47 +471,47 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @lambda on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @lambda on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   tension: TensionRef!
   blob_type: BlobType!
-  pushedFlag: DateTime @alter_RO
-  archivedFlag: DateTime @alter_RO
+  pushedFlag: DateTime
+  archivedFlag: DateTime
   node: NodeFragmentRef
   md: String
 }
@@ -693,7 +524,7 @@ type AddBlobPayload {
 input AddCommentInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   _VOID: String
 }
@@ -706,7 +537,7 @@ type AddCommentPayload {
 input AddContractInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   contractid: String!
   tension: TensionRef!
@@ -716,7 +547,7 @@ input AddContractInput {
   event: EventFragmentRef!
   candidates: [UserRef!]
   participants: [VoteRef!]!
-  comments: [CommentRef!]
+  comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean
 }
 
@@ -739,7 +570,7 @@ type AddEventFragmentPayload {
 input AddEventInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   tension: TensionRef!
   event_type: TensionEvent!
@@ -754,11 +585,11 @@ type AddEventPayload {
 
 input AddLabelInput {
   rootnameid: String!
-  name: String! @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
-  description: String @alter_maxLength(n:280)
+  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
+  description: String @x_alter(r:"maxLength", n:280)
   color: String
-  tensions: [TensionRef!] @alter_RO
-  nodes: [NodeRef!] @alter_oneByOne
+  tensions: [TensionRef!]
+  nodes: [NodeRef!] @x_alter(r:"oneByOne")
   n_nodes: Int
   n_tensions: Int
 }
@@ -781,17 +612,17 @@ type AddMandatePayload {
 }
 
 input AddNodeFragmentInput {
-  name: String @alter_minLength(n:1)
-  nameid: String @alter_toLower
-  type_: NodeType
-  about: String @alter_maxLength(n:280)
+  nameid: String @w_alter(a:"lower")
+  name: String @x_alter(r:"minLength", n:1)
+  about: String @x_alter(r:"maxLength", n:280)
   mandate: MandateRef
+  skills: [String!]
+  children: [NodeFragmentRef!]
   visibility: NodeVisibility
   mode: NodeMode
-  children: [NodeFragmentRef!]
+  type_: NodeType
   first_link: String
   second_link: String
-  skills: [String!]
   role_type: RoleType
 }
 
@@ -803,7 +634,7 @@ type AddNodeFragmentPayload {
 input AddNodeInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @alter_RO
+  updatedAt: DateTime
   name: String!
   nameid: String!
   rootnameid: String!
@@ -819,7 +650,7 @@ input AddNodeInput {
   labels: [LabelRef!]
   visibility: NodeVisibility!
   mode: NodeMode!
-  rights: Int! @alter_RO
+  rights: Int!
   isArchived: Boolean!
   isRoot: Boolean!
   isPersonal: Boolean
@@ -850,12 +681,12 @@ type AddOrgaAggPayload {
 
 input AddRoleExtInput {
   rootnameid: String!
-  name: String! @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
-  about: String @alter_maxLength(n:280)
+  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
+  about: String @x_alter(r:"maxLength", n:280)
   role_type: RoleType!
   color: String
   mandate: MandateRef
-  nodes: [NodeRef!] @alter_oneByOne
+  nodes: [NodeRef!] @x_alter(r:"oneByOne")
   n_nodes: Int
 }
 
@@ -867,21 +698,20 @@ type AddRoleExtPayload {
 input AddTensionInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   emitterid: String!
   emitter: NodeRef!
   receiverid: String!
   receiver: NodeRef!
-  nth: String
-  title: String! @alter_minLength(n:1)
+  title: String! @x_alter(r:"minLength", n:1)
   type_: TensionType!
   status: TensionStatus!
   assignees: [UserRef!]
   labels: [LabelRef!]
-  comments: [CommentRef!] @alter_oneByOne
+  comments: [CommentRef!] @x_alter(r:"oneByOne")
   action: TensionAction
-  blobs: [BlobRef!] @alter_oneByOne
+  blobs: [BlobRef!] @x_alter(r:"oneByOne")
   contracts: [ContractRef!]
   history: [EventRef!]!
   n_comments: Int
@@ -894,22 +724,22 @@ type AddTensionPayload {
 }
 
 input AddUserInput {
-  createdAt: DateTime! @alter_RO
-  lastAck: DateTime! @alter_RO
-  username: String! @alter_toLower
+  createdAt: DateTime!
+  lastAck: DateTime!
+  username: String!
   name: String
   password: String!
   email: String!
-  emailHash: String @alter_RO
-  emailValidated: Boolean! @alter_RO
-  rights: UserRightsRef! @alter_RO
-  roles: [NodeRef!] @alter_RO
-  backed_roles: [NodeRef!] @alter_RO
-  tensions_created: [TensionRef!] @alter_RO
-  tensions_assigned: [TensionRef!] @alter_RO
-  contracts: [ContractRef!] @alter_RO
+  emailHash: String
+  emailValidated: Boolean!
   bio: String
   utc: String
+  rights: UserRightsRef!
+  roles: [NodeRef!]
+  backed_roles: [NodeRef!]
+  tensions_created: [TensionRef!]
+  tensions_assigned: [TensionRef!]
+  contracts: [ContractRef!]
 }
 
 type AddUserPayload {
@@ -932,7 +762,7 @@ type AddUserRightsPayload {
 input AddVoteInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   voteid: String!
   contract: ContractRef!
@@ -1010,16 +840,16 @@ enum BlobOrderable {
 }
 
 input BlobPatch {
-  createdBy: UserRef
-  createdAt: DateTime
-  updatedAt: DateTime
-  message: String
-  tension: TensionRef
-  blob_type: BlobType @patch_RO
-  pushedFlag: DateTime @alter_RO
-  archivedFlag: DateTime @alter_RO
-  node: NodeFragmentRef @patch_RO
-  md: String @patch_RO
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  tension: TensionRef @x_patch_ro
+  blob_type: BlobType @x_patch_ro
+  pushedFlag: DateTime @x_patch_ro
+  archivedFlag: DateTime @x_patch_ro
+  node: NodeFragmentRef @x_patch_ro
+  md: String @x_patch_ro
 }
 
 input BlobRef {
@@ -1085,10 +915,10 @@ enum CommentOrderable {
 }
 
 input CommentPatch {
-  createdBy: UserRef
-  createdAt: DateTime
-  updatedAt: DateTime
-  message: String
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_alter
   _VOID: String
 }
 
@@ -1166,20 +996,20 @@ enum ContractOrderable {
 }
 
 input ContractPatch {
-  createdBy: UserRef
-  createdAt: DateTime
-  updatedAt: DateTime
-  message: String
-  contractid: String
-  tension: TensionRef @patch_RO
-  status: ContractStatus @patch_RO
-  contract_type: ContractType @patch_RO
-  closedAt: DateTime @patch_RO
-  event: EventFragmentRef @patch_RO
-  candidates: [UserRef!] @patch_RO
-  participants: [VoteRef!] @patch_RO
-  comments: [CommentRef!]
-  isValidator: Boolean
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  contractid: String @x_patch_ro
+  tension: TensionRef @x_patch_ro
+  status: ContractStatus @x_patch_ro
+  contract_type: ContractType @x_patch_ro
+  closedAt: DateTime @x_patch_ro
+  event: EventFragmentRef @x_patch_ro
+  candidates: [UserRef!] @x_patch_ro
+  participants: [VoteRef!] @x_patch_ro
+  comments: [CommentRef!] @x_alter(r:"oneByOne")
+  isValidator: Boolean @x_patch_ro
 }
 
 input ContractRef {
@@ -1416,9 +1246,9 @@ enum EventFragmentOrderable {
 }
 
 input EventFragmentPatch {
-  event_type: TensionEvent
-  old: String
-  new: String
+  event_type: TensionEvent @x_patch_ro
+  old: String @x_patch_ro
+  new: String @x_patch_ro
 }
 
 input EventFragmentRef {
@@ -1453,14 +1283,14 @@ enum EventOrderable {
 }
 
 input EventPatch {
-  createdBy: UserRef
-  createdAt: DateTime
-  updatedAt: DateTime
-  message: String
-  tension: TensionRef
-  event_type: TensionEvent
-  old: String
-  new: String
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  tension: TensionRef @x_patch_ro
+  event_type: TensionEvent @x_patch_ro
+  old: String @x_patch_ro
+  new: String @x_patch_ro
 }
 
 input EventRef {
@@ -1605,14 +1435,14 @@ enum LabelOrderable {
 }
 
 input LabelPatch {
-  rootnameid: String @patch_RO
-  name: String @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
-  description: String @alter_maxLength(n:280)
-  color: String
-  tensions: [TensionRef!] @alter_RO
-  nodes: [NodeRef!] @alter_oneByOne
-  n_nodes: Int
-  n_tensions: Int
+  rootnameid: String @x_patch_ro
+  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
+  description: String @x_alter(r:"maxLength", n:280)
+  color: String @x_alter
+  tensions: [TensionRef!] @x_ro
+  nodes: [NodeRef!] @x_alter(r:"oneByOne")
+  n_nodes: Int @x_ro
+  n_tensions: Int @x_ro
 }
 
 input LabelRef {
@@ -1669,10 +1499,10 @@ enum MandateOrderable {
 }
 
 input MandatePatch {
-  purpose: String
-  responsabilities: String
-  domains: String
-  policies: String
+  purpose: String @x_alter
+  responsabilities: String @x_alter
+  domains: String @x_alter
+  policies: String @x_alter
 }
 
 input MandateRef {
@@ -1794,10 +1624,10 @@ input NodeFilter {
 
 type NodeFragmentAggregateResult {
   count: Int
-  nameMin: String
-  nameMax: String
   nameidMin: String
   nameidMax: String
+  nameMin: String
+  nameMax: String
   aboutMin: String
   aboutMax: String
   first_linkMin: String
@@ -1815,17 +1645,17 @@ input NodeFragmentFilter {
 }
 
 enum NodeFragmentHasFilter {
-  name
   nameid
-  type_
+  name
   about
   mandate
+  skills
+  children
   visibility
   mode
-  children
+  type_
   first_link
   second_link
-  skills
   role_type
 }
 
@@ -1836,41 +1666,41 @@ input NodeFragmentOrder {
 }
 
 enum NodeFragmentOrderable {
-  name
   nameid
+  name
   about
   first_link
   second_link
 }
 
 input NodeFragmentPatch {
-  name: String @alter_minLength(n:1)
-  nameid: String @alter_toLower
-  type_: NodeType
-  about: String @alter_maxLength(n:280)
-  mandate: MandateRef
-  visibility: NodeVisibility
-  mode: NodeMode
-  children: [NodeFragmentRef!]
-  first_link: String
-  second_link: String
-  skills: [String!]
-  role_type: RoleType
+  nameid: String @w_alter(a:"lower")
+  name: String @x_alter(r:"minLength", n:1)
+  about: String @x_alter(r:"maxLength", n:280)
+  mandate: MandateRef @x_alter
+  skills: [String!] @x_alter
+  children: [NodeFragmentRef!] @x_alter
+  visibility: NodeVisibility @x_patch_ro
+  mode: NodeMode @x_patch_ro
+  type_: NodeType @x_patch_ro
+  first_link: String @x_patch_ro
+  second_link: String @x_patch_ro
+  role_type: RoleType @x_patch_ro
 }
 
 input NodeFragmentRef {
   id: ID
-  name: String
   nameid: String
-  type_: NodeType
+  name: String
   about: String
   mandate: MandateRef
+  skills: [String!]
+  children: [NodeFragmentRef!]
   visibility: NodeVisibility
   mode: NodeMode
-  children: [NodeFragmentRef!]
+  type_: NodeType
   first_link: String
   second_link: String
-  skills: [String!]
   role_type: RoleType
 }
 
@@ -1929,36 +1759,36 @@ enum NodeOrderable {
 }
 
 input NodePatch {
-  createdBy: UserRef @patch_RO
-  createdAt: DateTime @patch_RO
-  updatedAt: DateTime @alter_RO
-  name: String @patch_RO
-  nameid: String @patch_RO
-  rootnameid: String @patch_RO
-  parent: NodeRef @patch_RO
-  children: [NodeRef!] @patch_RO
-  type_: NodeType @patch_RO
-  tensions_out: [TensionRef!] @patch_RO
-  tensions_in: [TensionRef!] @patch_RO
-  about: String @patch_RO
-  mandate: MandateRef @patch_RO
-  docs: [BlobRef] @patch_RO
-  source: BlobRef @patch_RO
-  labels: [LabelRef!] @patch_RO
-  visibility: NodeVisibility @patch_RO
-  mode: NodeMode @patch_RO
-  rights: Int @alter_RO
-  isArchived: Boolean @patch_RO
-  isRoot: Boolean @patch_RO
-  isPersonal: Boolean @patch_RO
-  userCanJoin: Boolean @patch_RO
-  first_link: UserRef @patch_RO
-  second_link: UserRef @patch_RO
-  skills: [String!] @patch_RO
-  role_type: RoleType @patch_RO
-  role_ext: RoleExtRef @patch_RO
-  contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_patch_ro
+  name: String @x_patch_ro
+  nameid: String @x_patch_ro
+  rootnameid: String @x_patch_ro
+  parent: NodeRef @x_patch_ro
+  children: [NodeRef!] @x_patch_ro
+  type_: NodeType @x_patch_ro
+  tensions_out: [TensionRef!] @x_patch_ro
+  tensions_in: [TensionRef!] @x_patch_ro
+  about: String @x_patch_ro
+  mandate: MandateRef @x_patch_ro
+  docs: [BlobRef] @x_patch_ro
+  source: BlobRef @x_patch_ro
+  labels: [LabelRef!] @x_patch_ro
+  visibility: NodeVisibility @x_patch_ro
+  mode: NodeMode @x_patch_ro
+  rights: Int @x_patch_ro
+  isArchived: Boolean @x_patch_ro
+  isRoot: Boolean @x_patch_ro
+  isPersonal: Boolean @x_patch_ro
+  userCanJoin: Boolean @x_patch_ro
+  first_link: UserRef @x_patch_ro
+  second_link: UserRef @x_patch_ro
+  skills: [String!] @x_patch_ro
+  role_type: RoleType @x_patch_ro
+  role_ext: RoleExtRef @x_patch_ro
+  contracts: [VoteRef!] @x_patch_ro
+  orga_agg: OrgaAggRef @x_patch_ro
 }
 
 input NodeRef {
@@ -2041,8 +1871,8 @@ enum OrgaAggOrderable {
 }
 
 input OrgaAggPatch {
-  n_members: Int
-  n_guests: Int
+  n_members: Int @x_patch_ro
+  n_guests: Int @x_patch_ro
 }
 
 input OrgaAggRef {
@@ -2128,10 +1958,10 @@ enum PostOrderable {
 }
 
 input PostPatch {
-  createdBy: UserRef @patch_RO
-  createdAt: DateTime @patch_RO
-  updatedAt: DateTime @patch_isOwner(u:"createdBy")
-  message: String @patch_isOwner(u:"createdBy")
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_alter(r:"isOwner", f:"createdBy")
 }
 
 input PostRef {
@@ -2238,14 +2068,14 @@ enum RoleExtOrderable {
 }
 
 input RoleExtPatch {
-  rootnameid: String @patch_RO
-  name: String @alter_unique(on:"rootnameid") @alter_toLower @alter_minLength(n:1)
-  about: String @alter_maxLength(n:280)
-  role_type: RoleType
-  color: String
-  mandate: MandateRef
-  nodes: [NodeRef!] @alter_oneByOne
-  n_nodes: Int
+  rootnameid: String @x_patch_ro
+  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
+  about: String @x_alter(r:"maxLength", n:280)
+  role_type: RoleType @x_alter
+  color: String @x_alter
+  mandate: MandateRef @x_alter
+  nodes: [NodeRef!] @x_alter(r:"oneByOne")
+  n_nodes: Int @x_ro
 }
 
 input RoleExtRef {
@@ -2324,8 +2154,6 @@ type TensionAggregateResult {
   emitteridMax: String
   receiveridMin: String
   receiveridMax: String
-  nthMin: String
-  nthMax: String
   titleMin: String
   titleMax: String
   n_commentsMin: Int
@@ -2349,7 +2177,6 @@ input TensionFilter {
   message: StringFullTextFilter
   emitterid: StringHashFilter_StringRegExpFilter
   receiverid: StringHashFilter_StringRegExpFilter
-  nth: StringTermFilter
   title: StringFullTextFilter
   type_: TensionType_hash
   status: TensionStatus_hash
@@ -2368,7 +2195,6 @@ enum TensionHasFilter {
   emitter
   receiverid
   receiver
-  nth
   title
   type_
   status
@@ -2395,34 +2221,32 @@ enum TensionOrderable {
   message
   emitterid
   receiverid
-  nth
   title
   n_comments
   n_open_contracts
 }
 
 input TensionPatch {
-  createdBy: UserRef
-  createdAt: DateTime
-  updatedAt: DateTime
-  message: String
-  emitterid: String @patch_RO
-  emitter: NodeRef @patch_RO
-  receiverid: String @patch_RO
-  receiver: NodeRef @patch_RO
-  nth: String
-  title: String @alter_minLength(n:1)
-  type_: TensionType
-  status: TensionStatus
-  assignees: [UserRef!]
-  labels: [LabelRef!]
-  comments: [CommentRef!] @alter_oneByOne
-  action: TensionAction
-  blobs: [BlobRef!] @alter_oneByOne
-  contracts: [ContractRef!]
-  history: [EventRef!]
-  n_comments: Int
-  n_open_contracts: Int
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  emitterid: String @x_patch_ro
+  emitter: NodeRef @x_patch_ro
+  receiverid: String @x_patch_ro
+  receiver: NodeRef @x_patch_ro
+  title: String @x_alter(r:"minLength", n:1)
+  type_: TensionType @x_patch_ro
+  status: TensionStatus @x_patch_ro
+  assignees: [UserRef!] @x_patch_ro
+  labels: [LabelRef!] @x_patch_ro
+  comments: [CommentRef!] @x_alter(r:"oneByOne")
+  action: TensionAction @x_patch_ro
+  blobs: [BlobRef!] @x_alter(r:"oneByOne")
+  contracts: [ContractRef!] @x_patch_ro
+  history: [EventRef!] @x_alter
+  n_comments: Int @x_patch_ro
+  n_open_contracts: Int @x_patch_ro
 }
 
 input TensionRef {
@@ -2435,7 +2259,6 @@ input TensionRef {
   emitter: NodeRef
   receiverid: String
   receiver: NodeRef
-  nth: String
   title: String
   type_: TensionType
   status: TensionStatus
@@ -2677,14 +2500,14 @@ enum UserHasFilter {
   email
   emailHash
   emailValidated
+  bio
+  utc
   rights
   roles
   backed_roles
   tensions_created
   tensions_assigned
   contracts
-  bio
-  utc
 }
 
 input UserOrder {
@@ -2706,22 +2529,22 @@ enum UserOrderable {
 }
 
 input UserPatch {
-  createdAt: DateTime @alter_RO
-  lastAck: DateTime @alter_RO
-  username: String @patch_RO @alter_toLower
-  name: String @patch_isOwner
-  password: String @patch_isOwner
-  email: String @patch_isOwner
-  emailHash: String @alter_RO
-  emailValidated: Boolean @alter_RO
-  rights: UserRightsRef @alter_RO
-  roles: [NodeRef!] @alter_RO
-  backed_roles: [NodeRef!] @alter_RO
-  tensions_created: [TensionRef!] @alter_RO
-  tensions_assigned: [TensionRef!] @alter_RO
-  contracts: [ContractRef!] @alter_RO
-  bio: String @patch_isOwner
-  utc: String @patch_isOwner
+  createdAt: DateTime @x_patch_ro
+  lastAck: DateTime @x_patch_ro
+  username: String @x_patch_ro
+  name: String @x_patch(r:"isOwner")
+  password: String @x_patch(r:"isOwner")
+  email: String @x_patch(r:"isOwner")
+  emailHash: String @x_patch_ro
+  emailValidated: Boolean @x_patch_ro
+  bio: String @x_patch(r:"isOwner")
+  utc: String @x_patch(r:"isOwner")
+  rights: UserRightsRef @x_patch_ro
+  roles: [NodeRef!] @x_patch_ro
+  backed_roles: [NodeRef!] @x_patch_ro
+  tensions_created: [TensionRef!] @x_patch_ro
+  tensions_assigned: [TensionRef!] @x_patch_ro
+  contracts: [ContractRef!] @x_patch_ro
 }
 
 input UserRef {
@@ -2734,14 +2557,14 @@ input UserRef {
   email: String
   emailHash: String
   emailValidated: Boolean
+  bio: String
+  utc: String
   rights: UserRightsRef
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
-  bio: String
-  utc: String
 }
 
 type UserRightsAggregateResult {
@@ -2777,10 +2600,10 @@ enum UserRightsOrderable {
 }
 
 input UserRightsPatch {
-  canLogin: Boolean
-  canCreateRoot: Boolean
-  maxPublicOrga: Int
-  type_: UserType
+  canLogin: Boolean @x_patch_ro
+  canCreateRoot: Boolean @x_patch_ro
+  maxPublicOrga: Int @x_patch_ro
+  type_: UserType @x_patch_ro
 }
 
 input UserRightsRef {
@@ -2838,14 +2661,14 @@ enum VoteOrderable {
 }
 
 input VotePatch {
-  createdBy: UserRef
-  createdAt: DateTime
-  updatedAt: DateTime
-  message: String
-  voteid: String
-  contract: ContractRef
-  node: NodeRef
-  data: [Int!]
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  voteid: String @x_patch_ro
+  contract: ContractRef @x_patch_ro
+  node: NodeRef @x_patch_ro
+  data: [Int!] @x_patch_ro
 }
 
 input VoteRef {

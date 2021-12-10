@@ -79,7 +79,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         (contract == nil && GetBlob(tension) == nil)) // Moving node, doc etc
 
     if tension == nil || event == nil {
-        return false, nil, fmt.Errorf("empty tension or event.")
+        return false, nil, fmt.Errorf("non existent tension or event not allowed")
     }
 
     // Exception Hook

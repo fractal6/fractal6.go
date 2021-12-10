@@ -54,9 +54,9 @@ func RunServer() {
 
     var allowedOrigins []string
     if buildMode == "PROD" {
-        allowedOrigins = append(allowedOrigins,  "https://fractale.co")
+        allowedOrigins = append(allowedOrigins, "https://fractale.co")
     } else {
-        allowedOrigins = append(allowedOrigins,  "http://localhost:8000")
+        allowedOrigins = append(allowedOrigins, "http://localhost:8000")
     }
 
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing

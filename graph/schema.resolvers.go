@@ -11,11 +11,7 @@ import (
 )
 
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (data *model.AddNodePayload, errors error) {
-	////ctx = context.WithValue(ctx, "mutation_context", MutationContext{type_: AddMut, argName: "input"})
-	////errors = r.Gqlgen2DgraphMutationResolver(ctx, input, &data)
-	//errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
-	//return data, errors
-	return nil, fmt.Errorf("not implemented: add node")
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateNode(ctx context.Context, input model.UpdateNodeInput) (data *model.UpdateNodePayload, errors error) {

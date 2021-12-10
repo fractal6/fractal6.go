@@ -6,6 +6,7 @@ import (
     "github.com/99designs/gqlgen/graphql"
 
     "zerogov/fractal6.go/graph/model"
+    "zerogov/fractal6.go/graph/codec"
     "zerogov/fractal6.go/graph/auth"
     webauth "zerogov/fractal6.go/web/auth"
     . "zerogov/fractal6.go/tools"
@@ -42,11 +43,14 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
     StructMap(graphql.GetResolverContext(ctx).Args["input"], inputs)
 
     // Authorization
-    // Check that user satisfy strict condition (coordo roles on node linked)
+    // - Check that user satisfy strict condition (coordo roles on node linked)
+    // - Check that rootnameid comply with Nodes
     mode := model.NodeModeCoordinated
     for _, input := range inputs {
         if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         node := input.Nodes[0]
+        rid, _ := codec.Nid2pid(*node.Nameid)
+        if rid != *node.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
         ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {

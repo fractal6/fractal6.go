@@ -1,17 +1,17 @@
 package db
 
 import (
+	"fmt"
+	"os"
+	"log"
+	"time"
 	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
-	"os"
 	"reflect"
 	"strings"
+	"encoding/json"
 	"text/template"
-	"time"
+	"net/http"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -35,8 +35,8 @@ var dgraphSecret string
 // Draph database clients
 type Dgraph struct {
     // HTTP/Graphql and GPRC/DQL client address
-    gqlUrl string
-    grpcUrl string
+    gqlAddr string
+    grpcAddr string
 
     // HTTP/Graphql and GPRC/DQL client template
     gqlTemplates map[string]*QueryString
@@ -129,14 +129,14 @@ func initDB() *Dgraph {
     PORTDB := viper.GetString("db.port_graphql")
     PORTGRPC := viper.GetString("db.port_grpc")
     APIDB := viper.GetString("db.api")
-    dgraphApiUrl := "http://"+HOSTDB+":"+PORTDB+"/"+APIDB
-    grpcUrl := HOSTDB+":"+PORTGRPC
+    dgraphApiAddr := "http://"+HOSTDB+":"+PORTDB+"/"+APIDB
+    grpcAddr := HOSTDB+":"+PORTGRPC
 
     if HOSTDB == "" {
         panic("Viper error: not host found")
     } else {
-        fmt.Println("Dgraph Graphql addr:", dgraphApiUrl)
-        fmt.Println("Dgraph Grpc addr:", grpcUrl)
+        fmt.Println("Dgraph Graphql addr:", dgraphApiAddr)
+        fmt.Println("Dgraph Grpc addr:", grpcAddr)
     }
 
     // HTTP/Graphql Request Template
@@ -208,8 +208,8 @@ func initDB() *Dgraph {
     }
 
     return &Dgraph{
-        gqlUrl: dgraphApiUrl,
-        grpcUrl: grpcUrl,
+        gqlAddr: dgraphApiAddr,
+        grpcAddr: grpcAddr,
         dqlTemplates: dqlT,
         gqlTemplates: gqlT,
     }
@@ -241,7 +241,7 @@ func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
 
 // Get the grpc Dgraph client.
 func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
-    conn, err := grpc.Dial(dg.grpcUrl, grpc.WithInsecure())
+    conn, err := grpc.Dial(dg.grpcAddr, grpc.WithInsecure())
     if err != nil {
         log.Fatal("While trying to dial gRPC")
     }
@@ -278,7 +278,7 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
     }
 }
 
-func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
+func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
     // Get unique rootnameid
     var rootids []string
     var ownids []string
@@ -310,7 +310,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
         "https://fractale.co/jwt/claims": dgClaims,
     }
     jwtauth.SetIssuedNow(claims)
-    jwtauth.SetExpiry(claims, time.Now().UTC().Add(time.Minute*10))
+    jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 
     // Create token
     tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
@@ -322,11 +322,11 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx) string {
 
 // Post send a post request to the Graphql client.
 func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res interface{}) error {
-    req, err := http.NewRequest("POST", dg.gqlUrl, bytes.NewBuffer(data))
+    req, err := http.NewRequest("POST", dg.gqlAddr, bytes.NewBuffer(data))
     req.Header.Set("Content-Type", "application/json")
 
     // Set dgraph token
-    gqlToken := dg.BuildGqlToken(uctx)
+    gqlToken := dg.BuildGqlToken(uctx, time.Minute*10)
     req.Header.Set("X-Frac6-Auth", gqlToken)
 
     client := &http.Client{}

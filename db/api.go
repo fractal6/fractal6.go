@@ -37,6 +37,7 @@ var tensionBlobHookPayload string = `
     Blob.blob_type
     Blob.md
     Blob.node {
+      uid
       NodeFragment.name
       NodeFragment.nameid
       NodeFragment.type_
@@ -868,6 +869,10 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
         err = decoder.Decode(r.All[0])
         if err != nil { return nil, err }
     }
+
+    // Assume that tension does not exists if receiver is empty
+    // This is becausae DQL returns an object with t uid even is non existent.
+    if obj.Receiver == nil { return nil, err }
     return &obj, err
 }
 

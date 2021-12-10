@@ -27,10 +27,8 @@ func init () {
     jwtSecret = os.Getenv("JWT_SECRET")
 
     // Get env mode
-    if buildMode == "" {
+    if buildMode != "PROD" {
         buildMode = "DEV"
-    } else {
-        buildMode = "PROD"
     }
 
     // Init token master
@@ -52,12 +50,17 @@ func (Jwt) New() *Jwt {
         tokenClaimErr: "user_ctx_err",
 		tokenAuth: jwtauth.New("HS256", []byte(jwtSecret), nil),
 	}
-    uctx := db.DB.GetRootUctx()
-    apiToken, _ := tk.issue(uctx, time.Hour*1)
-    dgraphToken := db.GetDB().BuildGqlToken(uctx)
 
-	fmt.Println("Api token:", Unpack64(apiToken))
-	fmt.Println("Dgraph token:", dgraphToken)
+    if buildMode == "DEV" {
+        uctx := db.DB.GetRootUctx()
+        o := model.RoleTypeOwner
+        uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
+        apiToken, _ := tk.issue(uctx, time.Hour*48)
+        dgraphToken := db.GetDB().BuildGqlToken(uctx, time.Hour*48)
+
+        fmt.Println("Api token:", Unpack64(apiToken))
+        fmt.Println("Dgraph token:", dgraphToken)
+    }
 
 	return tk
 }

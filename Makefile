@@ -10,7 +10,7 @@ LANGS := en fr
 # LDFLAGS see versioning, hash etc...
 
 .PHONY: build prod vendor schema
-default: build gen
+default: build
 
 #
 # Build commands

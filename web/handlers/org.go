@@ -34,10 +34,6 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     ok, err := auth.CanNewOrga(*uctx, form)
     if err != nil || !ok { http.Error(w, err.Error(), 400); return }
 
-    // @debug; temporary hack, see issue here: https://discuss.dgraph.io/t/create-child-nodes-with-addparent/11311/13
-    uid_, _ := db.GetDB().GetFieldByEq("User.username", uctx.Username, "uid")
-    uid := uid_.(string)
-
     // @TODO
     userCanJoin := true
     isPersonal := true
@@ -64,8 +60,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
         IsArchived: false,
         // Common
         CreatedAt: Now(),
-        CreatedBy: &model.UserRef{ID: &uid},
-        //CreatedBy: &model.UserRef{Username: &uctx.Username},
+        CreatedBy: &model.UserRef{Username: &uctx.Username},
     }
     // Set Owner
     var owner model.NodeRef
