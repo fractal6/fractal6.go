@@ -1,10 +1,4 @@
 
-directive @hook_addNodeInput on ARGUMENT_DEFINITION
-directive @hook_addNode on FIELD_DEFINITION
-directive @hook_updateNodeInput on ARGUMENT_DEFINITION
-directive @hook_updateNode on FIELD_DEFINITION
-directive @hook_deleteNodeInput on ARGUMENT_DEFINITION
-directive @hook_deleteNode on FIELD_DEFINITION
 directive @hook_addLabelInput on ARGUMENT_DEFINITION
 directive @hook_addLabel on FIELD_DEFINITION
 directive @hook_updateLabelInput on ARGUMENT_DEFINITION
@@ -41,8 +35,6 @@ directive @hook_updateVoteInput on ARGUMENT_DEFINITION
 directive @hook_updateVote on FIELD_DEFINITION
 directive @hook_deleteVoteInput on ARGUMENT_DEFINITION
 directive @hook_deleteVote on FIELD_DEFINITION
-directive @hook_getNodeInput on ARGUMENT_DEFINITION
-directive @hook_queryNodeInput on ARGUMENT_DEFINITION
 directive @hook_getLabelInput on ARGUMENT_DEFINITION
 directive @hook_queryLabelInput on ARGUMENT_DEFINITION
 directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
@@ -65,19 +57,21 @@ directive @meta(f: String!, k: String!) on FIELD_DEFINITION
 
 directive @isContractValidator on FIELD_DEFINITION
 
+directive @w_add(a: String!) on INPUT_FIELD_DEFINITION
+
 directive @w_set(a: String!) on INPUT_FIELD_DEFINITION
 
-directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
-
 directive @w_remove(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
 
 directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
 
 directive @x_set(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
-directive @x_patch(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
-
 directive @x_remove(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
+
+directive @x_patch(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
 directive @x_alter(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
 
@@ -471,17 +465,7 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
@@ -491,7 +475,9 @@ directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJ
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @lambda on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
@@ -503,10 +489,18 @@ directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: Auth
 
 directive @cascade(fields: [String]) on FIELD
 
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
 input AddBlobInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime
   message: String
   tension: TensionRef!
   blob_type: BlobType!
@@ -524,7 +518,7 @@ type AddBlobPayload {
 input AddCommentInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime
   message: String
   _VOID: String
 }
@@ -537,7 +531,7 @@ type AddCommentPayload {
 input AddContractInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime
   message: String
   contractid: String!
   tension: TensionRef!
@@ -570,7 +564,7 @@ type AddEventFragmentPayload {
 input AddEventInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime
   message: String
   tension: TensionRef!
   event_type: TensionEvent!
@@ -585,8 +579,8 @@ type AddEventPayload {
 
 input AddLabelInput {
   rootnameid: String!
-  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  description: String @x_alter(r:"maxLength", n:280)
+  name: String!
+  description: String
   color: String
   tensions: [TensionRef!]
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
@@ -612,9 +606,9 @@ type AddMandatePayload {
 }
 
 input AddNodeFragmentInput {
-  nameid: String @w_alter(a:"lower")
-  name: String @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
+  nameid: String @w_add(a:"lower")
+  name: String
+  about: String
   mandate: MandateRef
   skills: [String!]
   children: [NodeFragmentRef!]
@@ -681,8 +675,8 @@ type AddOrgaAggPayload {
 
 input AddRoleExtInput {
   rootnameid: String!
-  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
+  name: String!
+  about: String
   role_type: RoleType!
   color: String
   mandate: MandateRef
@@ -698,13 +692,13 @@ type AddRoleExtPayload {
 input AddTensionInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime
   message: String
   emitterid: String!
   emitter: NodeRef!
   receiverid: String!
   receiver: NodeRef!
-  title: String! @x_alter(r:"minLength", n:1)
+  title: String!
   type_: TensionType!
   status: TensionStatus!
   assignees: [UserRef!]
@@ -762,7 +756,7 @@ type AddUserRightsPayload {
 input AddVoteInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime
   message: String
   voteid: String!
   contract: ContractRef!
@@ -842,7 +836,7 @@ enum BlobOrderable {
 input BlobPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
   tension: TensionRef @x_patch_ro
   blob_type: BlobType @x_patch_ro
@@ -917,8 +911,8 @@ enum CommentOrderable {
 input CommentPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_alter
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
+  message: String @x_set
   _VOID: String
 }
 
@@ -998,7 +992,7 @@ enum ContractOrderable {
 input ContractPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
   contractid: String @x_patch_ro
   tension: TensionRef @x_patch_ro
@@ -1285,7 +1279,7 @@ enum EventOrderable {
 input EventPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
   tension: TensionRef @x_patch_ro
   event_type: TensionEvent @x_patch_ro
@@ -1436,9 +1430,9 @@ enum LabelOrderable {
 
 input LabelPatch {
   rootnameid: String @x_patch_ro
-  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  description: String @x_alter(r:"maxLength", n:280)
-  color: String @x_alter
+  name: String @w_set(a:"lower") @x_set(r:"unique", f:"rootnameid") @x_set(r:"minLength", n:1)
+  description: String @x_set(r:"maxLength", n:280)
+  color: String @x_set
   tensions: [TensionRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
   n_nodes: Int @x_ro
@@ -1499,10 +1493,10 @@ enum MandateOrderable {
 }
 
 input MandatePatch {
-  purpose: String @x_alter
-  responsabilities: String @x_alter
-  domains: String @x_alter
-  policies: String @x_alter
+  purpose: String @x_set
+  responsabilities: String @x_set
+  domains: String @x_set
+  policies: String @x_set
 }
 
 input MandateRef {
@@ -1527,9 +1521,9 @@ input MultiPolygonRef {
 }
 
 type Mutation {
-  addNode(input: [AddNodeInput!]!, upsert: Boolean @hook_addNodeInput): AddNodePayload @hook_addNode
-  updateNode(input: UpdateNodeInput! @hook_updateNodeInput): UpdateNodePayload @hook_updateNode
-  deleteNode(filter: NodeFilter! @hook_deleteNodeInput): DeleteNodePayload @hook_deleteNode
+  addNode(input: [AddNodeInput!]!, upsert: Boolean): AddNodePayload
+  updateNode(input: UpdateNodeInput!): UpdateNodePayload
+  deleteNode(filter: NodeFilter!): DeleteNodePayload
   addNodeFragment(input: [AddNodeFragmentInput!]!): AddNodeFragmentPayload
   updateNodeFragment(input: UpdateNodeFragmentInput!): UpdateNodeFragmentPayload
   deleteNodeFragment(filter: NodeFragmentFilter!): DeleteNodeFragmentPayload
@@ -1674,10 +1668,10 @@ enum NodeFragmentOrderable {
 }
 
 input NodeFragmentPatch {
-  nameid: String @w_alter(a:"lower")
-  name: String @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
-  mandate: MandateRef @x_alter
+  nameid: String @x_patch_ro
+  name: String @x_set(r:"minLength", n:1)
+  about: String @x_set(r:"maxLength", n:280)
+  mandate: MandateRef @x_set
   skills: [String!] @x_alter
   children: [NodeFragmentRef!] @x_alter
   visibility: NodeVisibility @x_patch_ro
@@ -1960,8 +1954,8 @@ enum PostOrderable {
 input PostPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
+  message: String @x_set(r:"isOwner", f:"createdBy")
 }
 
 input PostRef {
@@ -1969,8 +1963,8 @@ input PostRef {
 }
 
 type Query {
-  getNode(id: ID, nameid: String @hook_getNodeInput): Node
-  queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int @hook_queryNodeInput): [Node]
+  getNode(id: ID, nameid: String): Node
+  queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
   aggregateNode(filter: NodeFilter): NodeAggregateResult
   getNodeFragment(id: ID!): NodeFragment
   queryNodeFragment(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment]
@@ -2069,11 +2063,11 @@ enum RoleExtOrderable {
 
 input RoleExtPatch {
   rootnameid: String @x_patch_ro
-  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
-  role_type: RoleType @x_alter
-  color: String @x_alter
-  mandate: MandateRef @x_alter
+  name: String @w_set(a:"lower") @x_set(r:"unique", f:"rootnameid") @x_set(r:"minLength", n:1)
+  about: String @x_set(r:"maxLength", n:280)
+  role_type: RoleType @x_set
+  color: String @x_set
+  mandate: MandateRef @x_set
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
   n_nodes: Int @x_ro
 }
@@ -2229,13 +2223,13 @@ enum TensionOrderable {
 input TensionPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
   emitterid: String @x_patch_ro
   emitter: NodeRef @x_patch_ro
   receiverid: String @x_patch_ro
   receiver: NodeRef @x_patch_ro
-  title: String @x_alter(r:"minLength", n:1)
+  title: String @x_set(r:"minLength", n:1)
   type_: TensionType @x_patch_ro
   status: TensionStatus @x_patch_ro
   assignees: [UserRef!] @x_patch_ro
@@ -2663,7 +2657,7 @@ enum VoteOrderable {
 input VotePatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  updatedAt: DateTime @x_set(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
   voteid: String @x_patch_ro
   contract: ContractRef @x_patch_ro

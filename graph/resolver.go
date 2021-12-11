@@ -48,6 +48,7 @@ func Init() gen.Config {
     //
 
     // Auth directive
+    // : add fiels are allowed by default
     c.Directives.X_set = FieldAuthorization
     c.Directives.X_remove = FieldAuthorization
     c.Directives.X_patch = FieldAuthorization
@@ -56,6 +57,7 @@ func Init() gen.Config {
     c.Directives.X_ro = readOnly
 
     // Transformation directives
+    c.Directives.W_add = FieldTransform
     c.Directives.W_set = FieldTransform
     c.Directives.W_remove = FieldTransform
     c.Directives.W_patch = FieldTransform
@@ -214,8 +216,10 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 
 func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
-    fieldName := rc.Field.Name
-    return nil, LogErr("Forbiden", fmt.Errorf("Read only field on `%s'", fieldName))
+    pc := graphql.GetPathContext(ctx)
+    queryName := rc.Field.Name
+    fieldName := *pc.Field
+    return nil, LogErr("Forbiden", fmt.Errorf("Read only field on %s:%s", queryName, fieldName))
 }
 
 func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, n *int ) (interface{}, error) {

@@ -42,6 +42,20 @@ type OrgaForm struct {
 }
 
 //
+// Data Patch
+//
+
+// Prevent Auth properties to be changed from blob pushes
+// as unentended update can occurs as Peer role can pushed blob.
+// It means, that each of the properties below should have their own events
+type NodePatchFromFragment struct {
+	About      *string            `json:"about,omitempty"`
+	Mandate    *MandateRef        `json:"mandate,omitempty"`
+	Skills     []string           `json:"skills,omitempty"`
+	Children   []*NodeFragmentRef `json:"children,omitempty"`
+}
+
+//
 // Dgraph Payload for DQL query
 //
 

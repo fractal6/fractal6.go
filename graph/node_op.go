@@ -25,7 +25,7 @@ func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFra
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     err = PushNode(uctx, bid, node, emitterid, nameid, parentid)
@@ -40,10 +40,10 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-    err = UpdateNode(uctx, bid, node, emitterid, nameid, parentid)
+    err = UpdateNode(uctx, bid, node, emitterid, nameid)
     return ok, err
 }
 
@@ -54,7 +54,7 @@ func TryArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.Nod
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     // Check that circle has no children
@@ -84,7 +84,7 @@ func TryUnarchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.N
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     // Check that parent node is not archived
@@ -112,7 +112,7 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     DB := db.GetDB()
@@ -142,7 +142,7 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
     _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, parentid, tension.Action)
+    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
     DB := db.GetDB()
@@ -156,7 +156,7 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
 }
 
 // NodeCheck validate and type checks.
-func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid, parentid string, action *model.TensionAction) (bool, error) {
+func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, action *model.TensionAction) (bool, error) {
     var ok bool = false
     var err error
 
@@ -250,32 +250,32 @@ func PushNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitte
     return err
 }
 
-
 // updateNode update a node from the given fragment
-// @DEBUG: only set the field that have been modified in NodePatch
-func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
+func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid string) (error) {
     // Map NodeFragment to Node Patch Input
+    var nodePatchFilter model.NodePatchFromFragment
     var nodePatch model.NodePatch
     delMap := make(map[string]interface{}, 2)
-    StructMap(node, &nodePatch)
+    StructMap(node, &nodePatchFilter)
+    StructMap(nodePatchFilter, &nodePatch)
 
     // Blob reference update
     if bid != nil {
         nodePatch.Source = &model.BlobRef{ ID: bid }
     }
 
-    // Fix automatic fields
-    switch *node.Type {
-    case model.NodeTypeRole:
-        if node.FirstLink != nil {
-            nodePatch.FirstLink = &model.UserRef{ Username: node.FirstLink }
-        } else {
-            // if first_link is empty, remove it.
-            delMap["Node.first_link"] = nil
-        }
-    case model.NodeTypeCircle:
-        nodePatch.Children = nil
-    }
+    //// Fix automatic fields
+    //switch *node.Type {
+    //case model.NodeTypeRole:
+    //    if node.FirstLink != nil {
+    //        nodePatch.FirstLink = &model.UserRef{ Username: node.FirstLink }
+    //    } else {
+    //        // if first_link is empty, remove it.
+    //        delMap["Node.first_link"] = nil
+    //    }
+    //case model.NodeTypeCircle:
+    //    nodePatch.Children = nil
+    //}
 
     // Get the first link prior updating the node
     firstLink_, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")

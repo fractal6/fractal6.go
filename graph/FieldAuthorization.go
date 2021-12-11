@@ -18,7 +18,7 @@ func init() {
     FieldAuthorizationFunc = map[string]func(context.Context, interface{}, graphql.Resolver, *string, *int) (interface{}, error){
         "isOwner": isOwner,
         "unique": unique,
-        "oneByone": oneByOne,
+        "oneByOne": oneByOne,
         "minLength": minLength,
         "maxLength": maxLength,
     }
