@@ -49,6 +49,7 @@ type OrgaForm struct {
 // as unentended update can occurs as Peer role can pushed blob.
 // It means, that each of the properties below should have their own events
 type NodePatchFromFragment struct {
+	Name       *string            `json:"name,omitempty"`
 	About      *string            `json:"about,omitempty"`
 	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	Skills     []string           `json:"skills,omitempty"`

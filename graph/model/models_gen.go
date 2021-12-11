@@ -212,10 +212,10 @@ type AddTensionInput struct {
 	Title          string         `json:"title,omitempty"`
 	Type           TensionType    `json:"type_,omitempty"`
 	Status         TensionStatus  `json:"status,omitempty"`
+	Action         *TensionAction `json:"action,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
 	Comments       []*CommentRef  `json:"comments,omitempty"`
-	Action         *TensionAction `json:"action,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
@@ -1454,10 +1454,10 @@ type Tension struct {
 	Title              string                   `json:"title,omitempty"`
 	Type               TensionType              `json:"type_,omitempty"`
 	Status             TensionStatus            `json:"status,omitempty"`
+	Action             *TensionAction           `json:"action,omitempty"`
 	Assignees          []*User                  `json:"assignees,omitempty"`
 	Labels             []*Label                 `json:"labels,omitempty"`
 	Comments           []*Comment               `json:"comments,omitempty"`
-	Action             *TensionAction           `json:"action,omitempty"`
 	Blobs              []*Blob                  `json:"blobs,omitempty"`
 	Contracts          []*Contract              `json:"contracts,omitempty"`
 	History            []*Event                 `json:"history,omitempty"`
@@ -1538,10 +1538,10 @@ type TensionPatch struct {
 	Title          *string        `json:"title,omitempty"`
 	Type           *TensionType   `json:"type_,omitempty"`
 	Status         *TensionStatus `json:"status,omitempty"`
+	Action         *TensionAction `json:"action,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
 	Comments       []*CommentRef  `json:"comments,omitempty"`
-	Action         *TensionAction `json:"action,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
@@ -1562,10 +1562,10 @@ type TensionRef struct {
 	Title          *string        `json:"title,omitempty"`
 	Type           *TensionType   `json:"type_,omitempty"`
 	Status         *TensionStatus `json:"status,omitempty"`
+	Action         *TensionAction `json:"action,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
 	Comments       []*CommentRef  `json:"comments,omitempty"`
-	Action         *TensionAction `json:"action,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
@@ -3799,10 +3799,10 @@ const (
 	TensionHasFilterTitle          TensionHasFilter = "title"
 	TensionHasFilterType           TensionHasFilter = "type_"
 	TensionHasFilterStatus         TensionHasFilter = "status"
+	TensionHasFilterAction         TensionHasFilter = "action"
 	TensionHasFilterAssignees      TensionHasFilter = "assignees"
 	TensionHasFilterLabels         TensionHasFilter = "labels"
 	TensionHasFilterComments       TensionHasFilter = "comments"
-	TensionHasFilterAction         TensionHasFilter = "action"
 	TensionHasFilterBlobs          TensionHasFilter = "blobs"
 	TensionHasFilterContracts      TensionHasFilter = "contracts"
 	TensionHasFilterHistory        TensionHasFilter = "history"
@@ -3822,10 +3822,10 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterTitle,
 	TensionHasFilterType,
 	TensionHasFilterStatus,
+	TensionHasFilterAction,
 	TensionHasFilterAssignees,
 	TensionHasFilterLabels,
 	TensionHasFilterComments,
-	TensionHasFilterAction,
 	TensionHasFilterBlobs,
 	TensionHasFilterContracts,
 	TensionHasFilterHistory,
@@ -3835,7 +3835,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterAction, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitterid, TensionHasFilterEmitter, TensionHasFilterReceiverid, TensionHasFilterReceiver, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterContracts, TensionHasFilterHistory, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false

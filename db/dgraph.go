@@ -551,6 +551,7 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
     return err
 }
 
+//QueryAuthFilter Get only the authorized node
 func (dg Dgraph) QueryAuthFilter(uctx model.UserCtx, vertex string, k string, values []string) ([]string, error) {
     Vertex := strings.Title(vertex)
     queryName := "query" + Vertex
@@ -693,6 +694,35 @@ func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) er
     if payload[queryName] == nil && err == nil {
         return fmt.Errorf("Unauthorized request.")
     }
+    return err
+}
+
+//
+// DB utility
+//
+
+// No way to dynamically build the type ?
+func (dg Dgraph) UpdateOne(uctx model.UserCtx, vertex string, id, k, v string) error {
+    var input model.UpdateTensionInput
+    var filter model.TensionFilter
+    var set model.TensionPatch
+
+    switch vertex {
+    case "tension":
+        // pass
+
+    default:
+        return fmt.Errorf("unknown vertex '%s'", vertex)
+
+    }
+
+    f := fmt.Sprintf(`{"%s":"%s"}`, tools.ToGoNameFormat(k), v)
+    err := json.Unmarshal([]byte(f), &set)
+    if err != nil { return err }
+    input.Filter = &filter
+    input.Set = &set
+    filter.ID = []string{id}
+    err = dg.Update(uctx, vertex, input)
     return err
 }
 

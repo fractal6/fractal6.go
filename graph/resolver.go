@@ -39,7 +39,6 @@ func Init() gen.Config {
 
     // Fields directives
     c.Directives.Hidden = hidden
-    c.Directives.Count = count
     c.Directives.Meta = meta
     c.Directives.IsContractValidator = isContractValidator
 
@@ -153,26 +152,6 @@ func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interf
     rc := graphql.GetResolverContext(ctx)
     fieldName := rc.Field.Name
     return nil, fmt.Errorf("`%s' field is hidden", fieldName)
-}
-
-func count(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (interface{}, error) {
-    rc := graphql.GetResolverContext(ctx)
-    fieldName := rc.Field.Name
-    goFieldfDef := ToGoNameFormat(fieldName)
-
-    // Reflect to get obj data info
-    // DEBUG: use type switch instead ? (less modular but faster?)
-    id := reflect.ValueOf(obj).Elem().FieldByName("ID").String()
-    if id == "" {
-        err := fmt.Errorf("`id' field is needed to query `%s'", fieldName)
-        return nil, err
-    }
-    typeName := ToTypeName(reflect.TypeOf(obj).String())
-    v := db.GetDB().Count(id, typeName+"."+field)
-    if v >= 0 {
-        reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&v))
-    }
-    return next(ctx)
 }
 
 func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k string) (interface{}, error) {

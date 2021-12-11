@@ -124,12 +124,12 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
         if err != nil { return false, err }
         err = DB.SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
         if err != nil { return false, err }
-        err = db.GetDB().SetFieldById(node.ID, "NodeFragment.role_type", value)
+        err = DB.SetFieldById(node.ID, "NodeFragment.role_type", value)
     case model.NodeTypeCircle:
         if !model.NodeMode(value).IsValid() { return false, fmt.Errorf("Bad value for mode.") }
         err = DB.SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
         if err != nil { return false, err }
-        err = db.GetDB().SetFieldById(node.ID, "NodeFragment.mode", value)
+        err = DB.SetFieldById(node.ID, "NodeFragment.mode", value)
     }
 
     return ok, err
@@ -150,7 +150,7 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
     if !model.NodeVisibility(value).IsValid() { return false, fmt.Errorf("Bad value for visibility.") }
     err = DB.SetFieldByEq("Node.nameid", nameid, "Node.visibility", value)
     if err != nil { return false, err }
-    err = db.GetDB().SetFieldById(node.ID, "NodeFragment.visibility", value)
+    err = DB.SetFieldById(node.ID, "NodeFragment.visibility", value)
 
     return ok, err
 }

@@ -29,15 +29,19 @@ func init() {
         },
         model.TensionEventTitleUpdated: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+            Propagate: "title",
         },
         model.TensionEventTypeUpdated: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+            Propagate: "type_",
         },
         model.TensionEventReopened: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+            Propagate: "status",
         },
         model.TensionEventClosed: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,
+            Propagate: "status",
         },
         model.TensionEventLabelAdded: EventMap{
             Auth: TargetCoordoHook | AuthorHook | AssigneeHook,
@@ -144,9 +148,16 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
     act := contract == nil || contract.Status == model.ContractStatusClosed
 
     // Trigger Action
-    if act && doProcess && em.Action != nil {
-        ok, err = em.Action(uctx, tension, event, blob)
-        if !ok || err != nil { return ok, contract, err }
+    if act && doProcess {
+        if em.Propagate != "" {
+            err = db.GetDB().UpdateOne(*uctx, "tension", tension.ID, em.Propagate, *event.New)
+            if err != nil { return ok, contract, err }
+        }
+        if em.Action != nil {
+            ok, err = em.Action(uctx, tension, event, blob)
+            if !ok || err != nil { return ok, contract, err }
+        }
+
         // leave trace
         leaveTrace(tension)
     }

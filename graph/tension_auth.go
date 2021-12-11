@@ -56,6 +56,7 @@ const (
 type EventMap struct {
     Validation model.ContractType
     Auth AuthHookValue
+    Propagate string
     Action func(*model.UserCtx, *model.Tension, *model.EventRef, *model.BlobRef) (bool, error)
 }
 type EventsMap = map[model.TensionEvent]EventMap
