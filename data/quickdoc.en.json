@@ -4,7 +4,7 @@
     "tasks": [
       {
         "header": "definitions",
-        "content": "**Organisation** (fractal): group of humans sharing a common purpose (the root circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member user.  \n\n**Circle**: a set of roles and sub-circles (team, group etc).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: distance between where you are and where you want to be. A tension can be used for example to share and manage tasks, issues or ideas. A tension, like an email, has an emitter and a receiver (a role or a circle).\nThere is three main categories of tension:\n* Operational: A general category of tension which can be a task, an issue or whatever that need to be share in the organisation.\n* Governance: concerning the structure of the organisation its mandates etc.\n* Help: for help requests, questions or clarifications.\n"
+        "content": "**Organisation** (fractal): group of humans sharing a common purpose (the root circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member.\n\n**Circle**: a set of roles and sub-circles (team, group etc).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: distance between where you are and where you want to be. A tension can be used for example to share and manage tasks, issues or ideas. A tension, like an email, has an emitter and a receiver (a role or a circle).\nThere is three main categories of tension:\n* Operational: A general category of tension which can be a task, an issue or whatever that need to be share in the organisation.\n* Governance: concerning the structure of the organisation its mandates etc.\n* Help: for help requests, questions or clarifications.\n"
       },
       {
         "header": "create organisation",
@@ -37,7 +37,7 @@
       },
       {
         "header": "close/reopen tension",
-        "content": "Tensions can be closed or reopen at any time by user with **sufficient rights**, when they are considered solved. Closed tension won't appear in the Overview activities panel but can still be access in the Tension panel thanks to the searching filters.\n"
+        "content": "Tensions can be closed or reopen at any time by members with **sufficient rights**, when they are considered solved. Closed tension won't appear in the Overview activities panel but can still be access in the Tension panel thanks to the searching filters.\n"
       },
       {
         "header": "Add a comment",
