@@ -19,8 +19,8 @@ func init() {
         "isOwner": isOwner,
         "unique": unique,
         "oneByOne": oneByOne,
-        "minLength": minLength,
-        "maxLength": maxLength,
+        "minLen": minLength,
+        "maxLen": maxLength,
     }
 
 }

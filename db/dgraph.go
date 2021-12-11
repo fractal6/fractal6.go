@@ -709,6 +709,7 @@ func (dg Dgraph) UpdateOne(uctx model.UserCtx, vertex string, id, k, v string) e
 
     switch vertex {
     case "tension":
+        //field := tools.ToGoNameFormat(k)
         // pass
 
     default:
@@ -716,7 +717,7 @@ func (dg Dgraph) UpdateOne(uctx model.UserCtx, vertex string, id, k, v string) e
 
     }
 
-    f := fmt.Sprintf(`{"%s":"%s"}`, tools.ToGoNameFormat(k), v)
+    f := fmt.Sprintf(`{"%s":"%s"}`, k, v)
     err := json.Unmarshal([]byte(f), &set)
     if err != nil { return err }
     input.Filter = &filter

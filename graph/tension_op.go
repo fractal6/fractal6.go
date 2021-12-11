@@ -150,7 +150,9 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
     // Trigger Action
     if act && doProcess {
         if em.Propagate != "" {
-            err = db.GetDB().UpdateOne(*uctx, "tension", tension.ID, em.Propagate, *event.New)
+            v, err := CheckEvent(tension, event)
+            if err != nil { return ok, contract, err }
+            err = db.GetDB().UpdateOne(*uctx, "tension", tension.ID, em.Propagate, v)
             if err != nil { return ok, contract, err }
         }
         if em.Action != nil {
@@ -492,5 +494,32 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
     // update tension
     err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
     return true, err
+}
+
+//
+// Utilities
+//
+
+// Check event before propagation. Should be definde in directive, those are
+// transactionned from event.
+func CheckEvent(t *model.Tension, e *model.EventRef) (string, error) {
+    if e.New == nil || *e.New == "" {
+        return "", fmt.Errorf("Event new field must be given.")
+    }
+
+    b := GetBlob(t)
+    var v = *e.New
+    var err error
+
+    switch *e.EventType {
+    case model.TensionEventTypeUpdated:
+        if b != nil && b.Node != nil && *b.Node.Type == model.NodeTypeCircle {
+            err = fmt.Errorf("The type of tensions with circle role attached cannot be changed.")
+        }
+    default:
+        // pass
+    }
+
+    return v, err
 }
 
