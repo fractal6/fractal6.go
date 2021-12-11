@@ -6770,27 +6770,9 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambda on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
@@ -6798,9 +6780,27 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @lambda on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6884,8 +6884,8 @@ type AddEventPayload {
 
 input AddLabelInput {
   rootnameid: String!
-  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  description: String @x_alter(r:"maxLength", n:280)
+  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!]
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
@@ -6912,8 +6912,8 @@ type AddMandatePayload {
 
 input AddNodeFragmentInput {
   nameid: String @w_add(a:"lower")
-  name: String @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
+  name: String @x_alter(r:"minLen", n:1)
+  about: String @x_alter(r:"maxLen", n:280)
   mandate: MandateRef
   skills: [String!]
   children: [NodeFragmentRef!]
@@ -6980,8 +6980,8 @@ type AddOrgaAggPayload {
 
 input AddRoleExtInput {
   rootnameid: String!
-  name: String! @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
+  name: String! @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType!
   color: String
   mandate: MandateRef
@@ -7735,8 +7735,8 @@ enum LabelOrderable {
 
 input LabelPatch {
   rootnameid: String @x_patch_ro
-  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  description: String @x_alter(r:"maxLength", n:280)
+  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
   tensions: [TensionRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
@@ -7974,8 +7974,8 @@ enum NodeFragmentOrderable {
 
 input NodeFragmentPatch {
   nameid: String @x_patch_ro
-  name: String @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
+  name: String @x_alter(r:"minLen", n:1)
+  about: String @x_alter(r:"maxLen", n:280)
   mandate: MandateRef @x_alter
   skills: [String!] @x_alter
   children: [NodeFragmentRef!] @x_alter
@@ -8368,8 +8368,8 @@ enum RoleExtOrderable {
 
 input RoleExtPatch {
   rootnameid: String @x_patch_ro
-  name: String @w_set(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLength", n:1)
-  about: String @x_alter(r:"maxLength", n:280)
+  name: String @w_set(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType @x_alter
   color: String @x_alter
   mandate: MandateRef @x_alter
@@ -36573,7 +36573,7 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 				return ec.directives.X_alter(ctx, obj, directive1, r, f, nil)
 			}
 			directive3 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
 				}
@@ -36603,7 +36603,7 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
 				if err != nil {
 					return nil, err
 				}
@@ -36787,7 +36787,7 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
 				}
@@ -36819,7 +36819,7 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
 				if err != nil {
 					return nil, err
 				}
@@ -37246,7 +37246,7 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil)
 			}
 			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
 				}
@@ -37276,7 +37276,7 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
 				if err != nil {
 					return nil, err
 				}
@@ -41043,7 +41043,7 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				return ec.directives.X_alter(ctx, obj, directive1, r, f, nil)
 			}
 			directive3 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
 				}
@@ -41075,7 +41075,7 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
 				if err != nil {
 					return nil, err
 				}
@@ -41936,7 +41936,7 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
 				}
@@ -41968,7 +41968,7 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
 				if err != nil {
 					return nil, err
 				}
@@ -44283,7 +44283,7 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				return ec.directives.X_alter(ctx, obj, directive1, r, f, nil)
 			}
 			directive3 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
 				}
@@ -44315,7 +44315,7 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLength")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
 				if err != nil {
 					return nil, err
 				}
