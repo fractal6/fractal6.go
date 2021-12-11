@@ -79,7 +79,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
             s, err = db.GetDB().GetFieldById(ctx.Value("id").(string), filterName)
             if err != nil || s == nil { return nil, LogErr("Internal error", err) }
         } else {
-            return nil, LogErr("Value Error", fmt.Errorf("%s or id is required.", *f))
+            return nil, LogErr("Value Error", fmt.Errorf("'%s' or id is required.", *f))
         }
         filterValue := s.(string)
 
@@ -93,15 +93,15 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
         return nil, fmt.Errorf("@unique alone not implemented.")
     }
 
-    return data, LogErr("Duplicate error", fmt.Errorf("%s is already taken", field))
+    return data, LogErr("Duplicate error", fmt.Errorf("'%s' is already taken", field))
 }
 
 //oneByOne ensure that the mutation on the given field should contains at least one element.
 func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, n *int) (interface{}, error) {
     data, err := next(ctx)
-    if len(InterfaceSlice(data)) != 1 {
+    if len(InterfaceSlice(data)) > 1 {
         field := *graphql.GetPathContext(ctx).Field
-        return nil, LogErr("@oneByOne error", fmt.Errorf("Only one object allowed in slice %s", field))
+        return nil, LogErr("@oneByOne error", fmt.Errorf("Only one object allowed in slice '%s'", field))
     }
     return data, err
 }
@@ -117,11 +117,11 @@ func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *s
         l = len(d)
     default:
         field := *graphql.GetPathContext(ctx).Field
-        return nil, fmt.Errorf("Type unknwown for field %s", field)
+        return nil, fmt.Errorf("Type unknwown for field '%s'", field)
     }
     if l < *n {
         field := *graphql.GetPathContext(ctx).Field
-        return nil, fmt.Errorf("`%s' to short. Minimum length is %d", field, *n)
+        return nil, fmt.Errorf("`%s' to short. Minimum length is '%d'", field, *n)
     }
     return data, err
 }
