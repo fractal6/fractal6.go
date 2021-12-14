@@ -3,22 +3,24 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 
-	. "zerogov/fractal6.go/tools"
 	"zerogov/fractal6.go/db"
 	"zerogov/fractal6.go/graph/model"
+	. "zerogov/fractal6.go/tools"
 	webauth "zerogov/fractal6.go/web/auth"
 )
 
-var FieldAuthorizationFunc map[string]func(context.Context, interface{}, graphql.Resolver, *string, *int) (interface{}, error)
+var FieldAuthorizationFunc map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error)
 
 func init() {
 
-    FieldAuthorizationFunc = map[string]func(context.Context, interface{}, graphql.Resolver, *string, *int) (interface{}, error){
+    FieldAuthorizationFunc = map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error){
         "isOwner": isOwner,
         "unique": unique,
         "oneByOne": oneByOne,
+        "hasEvent": hasEvent,
         "minLen": minLength,
         "maxLen": maxLength,
     }
@@ -29,7 +31,7 @@ func init() {
 
 //isOwner Check that object is own by the user.
 // If user(u) field is empty, assume a user object, else field should match the user(u) credential.
-func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, n *int) (interface{}, error) {
+func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     // Retrieve userCtx from token
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
@@ -54,7 +56,7 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *str
 
 //unique Check uniqueness (@DEBUG follow @unique dgraph field iplementation)
 // Ensure the field value is unique. If a field is given, it check the uniqueness on a subset of the parent type.
-func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, n *int) (interface{}, error) {
+func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     data, err := next(ctx)
     var v string
     switch d := data.(type) {
@@ -74,6 +76,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
         filterName := t + "." + *f
         s := obj.(model.JsonAtom)[*f]
         if s != nil {
+            // *f is present in the inut
             //pass
         } else if ctx.Value("id") != nil {
             s, err = db.GetDB().GetFieldById(ctx.Value("id").(string), filterName)
@@ -97,7 +100,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
 }
 
 //oneByOne ensure that the mutation on the given field should contains at least one element.
-func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, n *int) (interface{}, error) {
+func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     data, err := next(ctx)
     if len(InterfaceSlice(data)) > 1 {
         field := *graphql.GetPathContext(ctx).Field
@@ -106,8 +109,40 @@ func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
     return data, err
 }
 
+//hasEvent ensure the given events are present in the `history` property.
+func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+    var events []interface{}
+    events_ := obj.(model.JsonAtom)["history"]
+    if events_ != nil {
+        events = events_.([]interface{})
+    }
+
+    for _, event := range e  {
+        for _, eventPresent := range events {
+            eventType := eventPresent.(model.JsonAtom)["event_type"].(string)
+            if model.TensionEvent(eventType) == event {
+                // ok
+                return next(ctx)
+            }
+        }
+    }
+
+    // Exception if we got Blob with just an ID. Use to identify the blob user are working on.
+    blobs_ := obj.(model.JsonAtom)["blobs"]
+    if len(InterfaceSlice(blobs_)) == 1 {
+        b := blobs_.([]interface{})[0].(model.JsonAtom)
+        if len(b) == 1 && b["id"] != nil {
+            // ok
+            return next(ctx)
+        }
+    }
+
+    field := *graphql.GetPathContext(ctx).Field
+    return nil, LogErr("Event error", fmt.Errorf("missing event for field '%s'", field))
+}
+
 //inputMinLength the that the size of the field is stricly lesser than the given value
-func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, n *int) (interface{}, error) {
+func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     var l int
     data, err := next(ctx)
     switch d := data.(type) {
@@ -127,7 +162,7 @@ func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *s
 }
 
 //inputMaxLength the that the size of the field is stricly greater than the given value
-func maxLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, n *int) (interface{}, error) {
+func maxLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     var l int
     data, err := next(ctx)
     switch d := data.(type) {

@@ -11,9 +11,10 @@ import (
 	"reflect"
 	"github.com/99designs/gqlgen/graphql"
 
-	"zerogov/fractal6.go/db"
-	. "zerogov/fractal6.go/tools"
 	gen "zerogov/fractal6.go/graph/generated"
+	"zerogov/fractal6.go/graph/model"
+	. "zerogov/fractal6.go/tools"
+	"zerogov/fractal6.go/db"
 )
 
 //
@@ -201,14 +202,14 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
     return nil, LogErr("Forbiden", fmt.Errorf("Read only field on %s:%s", queryName, fieldName))
 }
 
-func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, n *int ) (interface{}, error) {
+func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int ) (interface{}, error) {
     // If the directives exists withtout a rule, it pass through.
     if r == nil { return next(ctx) }
 
     // @TODO: Seperate function for Set and Remove + test if the input comply with the directives
 
     if fun := FieldAuthorizationFunc[*r]; fun != nil {
-        return fun(ctx, obj, next, f, n)
+        return fun(ctx, obj, next, f, e, n)
     }
     return nil, LogErr("directive error", fmt.Errorf("unknown rule `%s'", *r))
 }

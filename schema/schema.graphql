@@ -65,13 +65,13 @@ directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
 
 directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
 
-directive @x_set(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
+directive @x_set(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
-directive @x_remove(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
+directive @x_remove(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
-directive @x_patch(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
+directive @x_patch(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
-directive @x_alter(r: String, f: String, n: Int) on INPUT_FIELD_DEFINITION
+directive @x_alter(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
 directive @x_patch_ro on INPUT_FIELD_DEFINITION
 
@@ -187,20 +187,20 @@ type Post {
 }
 
 type Tension {
-  emitterid: String!
   emitter(filter: NodeFilter): Node!
-  receiverid: String!
+  emitterid: String!
   receiver(filter: NodeFilter): Node!
+  receiverid: String!
   title: String!
   type_: TensionType!
   status: TensionStatus!
   action: TensionAction
+  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
-  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
-  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
+  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   n_comments: Int
   n_open_contracts: Int
   id: ID!
@@ -209,12 +209,12 @@ type Tension {
   updatedAt: DateTime
   message: String
 
+  commentsAggregate(filter: CommentFilter): CommentAggregateResult
   assigneesAggregate(filter: UserFilter): UserAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
-  commentsAggregate(filter: CommentFilter): CommentAggregateResult
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
-  contractsAggregate(filter: ContractFilter): ContractAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
+  contractsAggregate(filter: ContractFilter): ContractAggregateResult
 }
 
 type Comment {
@@ -463,37 +463,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @lambda on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -692,20 +692,20 @@ input AddTensionInput {
   createdAt: DateTime!
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
-  emitterid: String!
   emitter: NodeRef!
-  receiverid: String!
+  emitterid: String!
   receiver: NodeRef!
+  receiverid: String!
   title: String!
   type_: TensionType!
   status: TensionStatus!
   action: TensionAction
-  assignees: [UserRef!] @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"oneByOne")
-  comments: [CommentRef!] @x_alter(r:"oneByOne")
-  blobs: [BlobRef!] @x_alter(r:"oneByOne")
-  contracts: [ContractRef!]
+  comments: [CommentRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [Created, CommentPushed])
+  assignees: [UserRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [AssigneeAdded, AssigneeRemoved])
+  labels: [LabelRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [LabelAdded, LabelRemoved])
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [BlobCreated, BlobCommitted])
   history: [EventRef!]!
+  contracts: [ContractRef!]
   n_comments: Int
   n_open_contracts: Int
 }
@@ -2183,20 +2183,20 @@ enum TensionHasFilter {
   createdAt
   updatedAt
   message
-  emitterid
   emitter
-  receiverid
+  emitterid
   receiver
+  receiverid
   title
   type_
   status
   action
+  comments
   assignees
   labels
-  comments
   blobs
-  contracts
   history
+  contracts
   n_comments
   n_open_contracts
 }
@@ -2223,20 +2223,20 @@ input TensionPatch {
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
-  emitterid: String @x_patch_ro
   emitter: NodeRef @x_patch_ro
-  receiverid: String @x_patch_ro
+  emitterid: String @x_patch_ro
   receiver: NodeRef @x_patch_ro
+  receiverid: String @x_patch_ro
   title: String @x_patch_ro
   type_: TensionType @x_patch_ro
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
-  assignees: [UserRef!] @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"oneByOne")
-  comments: [CommentRef!] @x_alter(r:"oneByOne")
-  blobs: [BlobRef!] @x_alter(r:"oneByOne")
-  contracts: [ContractRef!] @x_patch_ro
+  comments: [CommentRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [Created, CommentPushed])
+  assignees: [UserRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [AssigneeAdded, AssigneeRemoved])
+  labels: [LabelRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [LabelAdded, LabelRemoved])
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
+  contracts: [ContractRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
   n_open_contracts: Int @x_patch_ro
 }
@@ -2247,20 +2247,20 @@ input TensionRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  emitterid: String
   emitter: NodeRef
-  receiverid: String
+  emitterid: String
   receiver: NodeRef
+  receiverid: String
   title: String
   type_: TensionType
   status: TensionStatus
   action: TensionAction
+  comments: [CommentRef!]
   assignees: [UserRef!]
   labels: [LabelRef!]
-  comments: [CommentRef!]
   blobs: [BlobRef!]
-  contracts: [ContractRef!]
   history: [EventRef!]
+  contracts: [ContractRef!]
   n_comments: Int
   n_open_contracts: Int
 }
@@ -2475,7 +2475,8 @@ type UserAggregateResult {
 
 input UserFilter {
   id: [ID!]
-  username: StringHashFilter
+  username: StringHashFilter_StringRegExpFilter
+  name: StringRegExpFilter
   email: StringHashFilter
   has: [UserHasFilter]
   and: [UserFilter]

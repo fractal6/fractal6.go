@@ -734,7 +734,7 @@ func (dg Dgraph) UpdateOne(uctx model.UserCtx, vertex string, id, k, v string) e
 // AddUserRole add a role to the user roles list
 func (dg Dgraph) AddUserRole(username, nameid string) error {
     userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
+        Filter: &model.UserFilter{ Username: &model.StringHashFilterStringRegExpFilter{ Eq: &username } },
         Set: &model.UserPatch{
             Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
         },
@@ -746,7 +746,7 @@ func (dg Dgraph) AddUserRole(username, nameid string) error {
 // RemoveUserRole remove a  role to the user roles list
 func (dg Dgraph) RemoveUserRole(username, nameid string) error {
     userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilter{ Eq: &username } },
+        Filter: &model.UserFilter{ Username: &model.StringHashFilterStringRegExpFilter{ Eq: &username } },
         Remove: &model.UserPatch{
             Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
         },
