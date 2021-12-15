@@ -32,13 +32,13 @@ func MemberIdCodec(rootnameid, username string) (string) {
     return nameid
 }
 
-func ContractIdCodec(receiverid string, event_type model.TensionEvent, old, new_ string) (string) {
-    nameid := strings.Join([]string{receiverid, string(event_type),old, new_}, "#")
+func ContractIdCodec(tid string, event_type model.TensionEvent, old, new_ string) (string) {
+    nameid := strings.Join([]string{tid, string(event_type), old, new_}, "#")
     return nameid
 }
 
-func VoteIdCodec(contractid string, nid string) (string) {
-    nameid := strings.Join([]string{contractid, nid}, "#")
+func VoteIdCodec(contractid string, rootnameid, username string) (string) {
+    nameid := strings.Join([]string{contractid, MemberIdCodec(rootnameid, username)}, "#")
     return nameid
 }
 

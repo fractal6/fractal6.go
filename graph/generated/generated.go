@@ -171,6 +171,11 @@ type ComplexityRoot struct {
 		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 	}
 
+	AddPendingUserPayload struct {
+		NumUids     func(childComplexity int) int
+		PendingUser func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
+	}
+
 	AddRoleExtPayload struct {
 		NumUids func(childComplexity int) int
 		RoleExt func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
@@ -247,24 +252,26 @@ type ComplexityRoot struct {
 	}
 
 	Contract struct {
-		Candidates            func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		CandidatesAggregate   func(childComplexity int, filter *model.UserFilter) int
-		ClosedAt              func(childComplexity int) int
-		Comments              func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		CommentsAggregate     func(childComplexity int, filter *model.CommentFilter) int
-		ContractType          func(childComplexity int) int
-		Contractid            func(childComplexity int) int
-		CreatedAt             func(childComplexity int) int
-		CreatedBy             func(childComplexity int, filter *model.UserFilter) int
-		Event                 func(childComplexity int, filter *model.EventFragmentFilter) int
-		ID                    func(childComplexity int) int
-		IsValidator           func(childComplexity int) int
-		Message               func(childComplexity int) int
-		Participants          func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
-		ParticipantsAggregate func(childComplexity int, filter *model.VoteFilter) int
-		Status                func(childComplexity int) int
-		Tension               func(childComplexity int, filter *model.TensionFilter) int
-		UpdatedAt             func(childComplexity int) int
+		Candidates                 func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		CandidatesAggregate        func(childComplexity int, filter *model.UserFilter) int
+		ClosedAt                   func(childComplexity int) int
+		Comments                   func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CommentsAggregate          func(childComplexity int, filter *model.CommentFilter) int
+		ContractType               func(childComplexity int) int
+		Contractid                 func(childComplexity int) int
+		CreatedAt                  func(childComplexity int) int
+		CreatedBy                  func(childComplexity int, filter *model.UserFilter) int
+		Event                      func(childComplexity int, filter *model.EventFragmentFilter) int
+		ID                         func(childComplexity int) int
+		IsValidator                func(childComplexity int) int
+		Message                    func(childComplexity int) int
+		Participants               func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+		ParticipantsAggregate      func(childComplexity int, filter *model.VoteFilter) int
+		PendingCandidates          func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
+		PendingCandidatesAggregate func(childComplexity int, filter *model.PendingUserFilter) int
+		Status                     func(childComplexity int) int
+		Tension                    func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt                  func(childComplexity int) int
 	}
 
 	ContractAggregateResult struct {
@@ -339,6 +346,12 @@ type ComplexityRoot struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
+	}
+
+	DeletePendingUserPayload struct {
+		Msg         func(childComplexity int) int
+		NumUids     func(childComplexity int) int
+		PendingUser func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
 	}
 
 	DeletePostPayload struct {
@@ -486,6 +499,7 @@ type ComplexityRoot struct {
 		AddNode             func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
 		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
 		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
+		AddPendingUser      func(childComplexity int, input []*model.AddPendingUserInput) int
 		AddRoleExt          func(childComplexity int, input []*model.AddRoleExtInput) int
 		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser             func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
@@ -501,6 +515,7 @@ type ComplexityRoot struct {
 		DeleteNode          func(childComplexity int, filter model.NodeFilter) int
 		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
 		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
+		DeletePendingUser   func(childComplexity int, filter model.PendingUserFilter) int
 		DeletePost          func(childComplexity int, filter model.PostFilter) int
 		DeleteRoleExt       func(childComplexity int, filter model.RoleExtFilter) int
 		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
@@ -517,6 +532,7 @@ type ComplexityRoot struct {
 		UpdateNode          func(childComplexity int, input model.UpdateNodeInput) int
 		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
 		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
+		UpdatePendingUser   func(childComplexity int, input model.UpdatePendingUserInput) int
 		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
 		UpdateRoleExt       func(childComplexity int, input model.UpdateRoleExtInput) int
 		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
@@ -633,6 +649,16 @@ type ComplexityRoot struct {
 		NMembersSum func(childComplexity int) int
 	}
 
+	PendingUser struct {
+		Email func(childComplexity int) int
+	}
+
+	PendingUserAggregateResult struct {
+		Count    func(childComplexity int) int
+		EmailMax func(childComplexity int) int
+		EmailMin func(childComplexity int) int
+	}
+
 	Point struct {
 		Latitude  func(childComplexity int) int
 		Longitude func(childComplexity int) int
@@ -675,6 +701,7 @@ type ComplexityRoot struct {
 		AggregateNode          func(childComplexity int, filter *model.NodeFilter) int
 		AggregateNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter) int
 		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
+		AggregatePendingUser   func(childComplexity int, filter *model.PendingUserFilter) int
 		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
 		AggregateRoleExt       func(childComplexity int, filter *model.RoleExtFilter) int
 		AggregateTension       func(childComplexity int, filter *model.TensionFilter) int
@@ -704,6 +731,7 @@ type ComplexityRoot struct {
 		QueryNode              func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		QueryNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
 		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
+		QueryPendingUser       func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
 		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
 		QueryRoleExt           func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		QueryTension           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -843,6 +871,11 @@ type ComplexityRoot struct {
 	UpdateOrgaAggPayload struct {
 		NumUids func(childComplexity int) int
 		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
+	}
+
+	UpdatePendingUserPayload struct {
+		NumUids     func(childComplexity int) int
+		PendingUser func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
 	}
 
 	UpdatePostPayload struct {
@@ -1001,6 +1034,9 @@ type MutationResolver interface {
 	AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (*model.AddContractPayload, error)
 	UpdateContract(ctx context.Context, input model.UpdateContractInput) (*model.UpdateContractPayload, error)
 	DeleteContract(ctx context.Context, filter model.ContractFilter) (*model.DeleteContractPayload, error)
+	AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput) (*model.AddPendingUserPayload, error)
+	UpdatePendingUser(ctx context.Context, input model.UpdatePendingUserInput) (*model.UpdatePendingUserPayload, error)
+	DeletePendingUser(ctx context.Context, filter model.PendingUserFilter) (*model.DeletePendingUserPayload, error)
 	AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (*model.AddVotePayload, error)
 	UpdateVote(ctx context.Context, input model.UpdateVoteInput) (*model.UpdateVotePayload, error)
 	DeleteVote(ctx context.Context, filter model.VoteFilter) (*model.DeleteVotePayload, error)
@@ -1049,6 +1085,8 @@ type QueryResolver interface {
 	GetContract(ctx context.Context, id *string, contractid *string) (*model.Contract, error)
 	QueryContract(ctx context.Context, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) ([]*model.Contract, error)
 	AggregateContract(ctx context.Context, filter *model.ContractFilter) (*model.ContractAggregateResult, error)
+	QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) ([]*model.PendingUser, error)
+	AggregatePendingUser(ctx context.Context, filter *model.PendingUserFilter) (*model.PendingUserAggregateResult, error)
 	GetVote(ctx context.Context, id *string, voteid *string) (*model.Vote, error)
 	QueryVote(ctx context.Context, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) ([]*model.Vote, error)
 	AggregateVote(ctx context.Context, filter *model.VoteFilter) (*model.VoteAggregateResult, error)
@@ -1263,6 +1301,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddPendingUserPayload.numUids":
+		if e.complexity.AddPendingUserPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddPendingUserPayload.NumUids(childComplexity), true
+
+	case "AddPendingUserPayload.pendingUser":
+		if e.complexity.AddPendingUserPayload.PendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_AddPendingUserPayload_pendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddPendingUserPayload.PendingUser(childComplexity, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddRoleExtPayload.numUids":
 		if e.complexity.AddRoleExtPayload.NumUids == nil {
@@ -1790,6 +1847,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Contract.ParticipantsAggregate(childComplexity, args["filter"].(*model.VoteFilter)), true
 
+	case "Contract.pending_candidates":
+		if e.complexity.Contract.PendingCandidates == nil {
+			break
+		}
+
+		args, err := ec.field_Contract_pending_candidates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Contract.PendingCandidates(childComplexity, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Contract.pending_candidatesAggregate":
+		if e.complexity.Contract.PendingCandidatesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Contract_pending_candidatesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Contract.PendingCandidatesAggregate(childComplexity, args["filter"].(*model.PendingUserFilter)), true
+
 	case "Contract.status":
 		if e.complexity.Contract.Status == nil {
 			break
@@ -2152,6 +2233,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeletePendingUserPayload.msg":
+		if e.complexity.DeletePendingUserPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeletePendingUserPayload.Msg(childComplexity), true
+
+	case "DeletePendingUserPayload.numUids":
+		if e.complexity.DeletePendingUserPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeletePendingUserPayload.NumUids(childComplexity), true
+
+	case "DeletePendingUserPayload.pendingUser":
+		if e.complexity.DeletePendingUserPayload.PendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_DeletePendingUserPayload_pendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeletePendingUserPayload.PendingUser(childComplexity, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeletePostPayload.msg":
 		if e.complexity.DeletePostPayload.Msg == nil {
@@ -2956,6 +3063,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddOrgaAgg(childComplexity, args["input"].([]*model.AddOrgaAggInput)), true
 
+	case "Mutation.addPendingUser":
+		if e.complexity.Mutation.AddPendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addPendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddPendingUser(childComplexity, args["input"].([]*model.AddPendingUserInput)), true
+
 	case "Mutation.addRoleExt":
 		if e.complexity.Mutation.AddRoleExt == nil {
 			break
@@ -3135,6 +3254,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteOrgaAgg(childComplexity, args["filter"].(model.OrgaAggFilter)), true
+
+	case "Mutation.deletePendingUser":
+		if e.complexity.Mutation.DeletePendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deletePendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeletePendingUser(childComplexity, args["filter"].(model.PendingUserFilter)), true
 
 	case "Mutation.deletePost":
 		if e.complexity.Mutation.DeletePost == nil {
@@ -3327,6 +3458,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateOrgaAgg(childComplexity, args["input"].(model.UpdateOrgaAggInput)), true
+
+	case "Mutation.updatePendingUser":
+		if e.complexity.Mutation.UpdatePendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePendingUser(childComplexity, args["input"].(model.UpdatePendingUserInput)), true
 
 	case "Mutation.updatePost":
 		if e.complexity.Mutation.UpdatePost == nil {
@@ -4145,6 +4288,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OrgaAggAggregateResult.NMembersSum(childComplexity), true
 
+	case "PendingUser.email":
+		if e.complexity.PendingUser.Email == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.Email(childComplexity), true
+
+	case "PendingUserAggregateResult.count":
+		if e.complexity.PendingUserAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.Count(childComplexity), true
+
+	case "PendingUserAggregateResult.emailMax":
+		if e.complexity.PendingUserAggregateResult.EmailMax == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.EmailMax(childComplexity), true
+
+	case "PendingUserAggregateResult.emailMin":
+		if e.complexity.PendingUserAggregateResult.EmailMin == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.EmailMin(childComplexity), true
+
 	case "Point.latitude":
 		if e.complexity.Point.Latitude == nil {
 			break
@@ -4381,6 +4552,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AggregateOrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter)), true
+
+	case "Query.aggregatePendingUser":
+		if e.complexity.Query.AggregatePendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregatePendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregatePendingUser(childComplexity, args["filter"].(*model.PendingUserFilter)), true
 
 	case "Query.aggregatePost":
 		if e.complexity.Query.AggregatePost == nil {
@@ -4729,6 +4912,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryOrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryPendingUser":
+		if e.complexity.Query.QueryPendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryPendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryPendingUser(childComplexity, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryPost":
 		if e.complexity.Query.QueryPost == nil {
@@ -5578,6 +5773,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateOrgaAggPayload.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter), args["order"].(*model.OrgaAggOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdatePendingUserPayload.numUids":
+		if e.complexity.UpdatePendingUserPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdatePendingUserPayload.NumUids(childComplexity), true
+
+	case "UpdatePendingUserPayload.pendingUser":
+		if e.complexity.UpdatePendingUserPayload.PendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_UpdatePendingUserPayload_pendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdatePendingUserPayload.PendingUser(childComplexity, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "UpdatePostPayload.numUids":
 		if e.complexity.UpdatePostPayload.NumUids == nil {
@@ -6572,6 +6786,7 @@ type Contract {
   closedAt: DateTime
   event(filter: EventFragmentFilter): EventFragment!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
+  pending_candidates(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser!]
   participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]!
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
@@ -6582,8 +6797,13 @@ type Contract {
   message: String
 
   candidatesAggregate(filter: UserFilter): UserAggregateResult
+  pending_candidatesAggregate(filter: PendingUserFilter): PendingUserAggregateResult
   participantsAggregate(filter: VoteFilter): VoteAggregateResult
   commentsAggregate(filter: CommentFilter): CommentAggregateResult
+}
+
+type PendingUser {
+  email: String
 }
 
 type Vote {
@@ -6770,37 +6990,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
+directive @lambda on FIELD_DEFINITION
+
 directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -6845,6 +7065,7 @@ input AddContractInput {
   closedAt: DateTime
   event: EventFragmentRef!
   candidates: [UserRef!]
+  pending_candidates: [PendingUserRef!]
   participants: [VoteRef!]!
   comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean
@@ -6975,6 +7196,15 @@ input AddOrgaAggInput {
 
 type AddOrgaAggPayload {
   orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  numUids: Int
+}
+
+input AddPendingUserInput {
+  email: String
+}
+
+type AddPendingUserPayload {
+  pendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   numUids: Int
 }
 
@@ -7275,6 +7505,7 @@ enum ContractHasFilter {
   closedAt
   event
   candidates
+  pending_candidates
   participants
   comments
   isValidator
@@ -7306,6 +7537,7 @@ input ContractPatch {
   closedAt: DateTime @x_patch_ro
   event: EventFragmentRef @x_patch_ro
   candidates: [UserRef!] @x_patch_ro
+  pending_candidates: [PendingUserRef!] @x_patch_ro
   participants: [VoteRef!] @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean @x_patch_ro
@@ -7324,6 +7556,7 @@ input ContractRef {
   closedAt: DateTime
   event: EventFragmentRef
   candidates: [UserRef!]
+  pending_candidates: [PendingUserRef!]
   participants: [VoteRef!]
   comments: [CommentRef!]
   isValidator: Boolean
@@ -7424,6 +7657,12 @@ type DeleteNodePayload {
 
 type DeleteOrgaAggPayload {
   orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  msg: String
+  numUids: Int
+}
+
+type DeletePendingUserPayload {
+  pendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   msg: String
   numUids: Int
 }
@@ -7864,6 +8103,9 @@ type Mutation {
   addContract(input: [AddContractInput!]!, upsert: Boolean @hook_addContractInput): AddContractPayload @hook_addContract
   updateContract(input: UpdateContractInput! @hook_updateContractInput): UpdateContractPayload @hook_updateContract
   deleteContract(filter: ContractFilter! @hook_deleteContractInput): DeleteContractPayload @hook_deleteContract
+  addPendingUser(input: [AddPendingUserInput!]!): AddPendingUserPayload
+  updatePendingUser(input: UpdatePendingUserInput!): UpdatePendingUserPayload
+  deletePendingUser(filter: PendingUserFilter!): DeletePendingUserPayload
   addVote(input: [AddVoteInput!]!, upsert: Boolean @hook_addVoteInput): AddVotePayload @hook_addVote
   updateVote(input: UpdateVoteInput! @hook_updateVoteInput): UpdateVotePayload @hook_updateVote
   deleteVote(filter: VoteFilter! @hook_deleteVoteInput): DeleteVotePayload @hook_deleteVote
@@ -8179,6 +8421,41 @@ input OrgaAggRef {
   n_guests: Int
 }
 
+type PendingUserAggregateResult {
+  count: Int
+  emailMin: String
+  emailMax: String
+}
+
+input PendingUserFilter {
+  has: [PendingUserHasFilter]
+  and: [PendingUserFilter]
+  or: [PendingUserFilter]
+  not: PendingUserFilter
+}
+
+enum PendingUserHasFilter {
+  email
+}
+
+input PendingUserOrder {
+  asc: PendingUserOrderable
+  desc: PendingUserOrderable
+  then: PendingUserOrder
+}
+
+enum PendingUserOrderable {
+  email
+}
+
+input PendingUserPatch {
+  email: String @x_patch_ro
+}
+
+input PendingUserRef {
+  email: String
+}
+
 type Point {
   longitude: Float!
   latitude: Float!
@@ -8305,6 +8582,8 @@ type Query {
   getContract(id: ID, contractid: String @hook_getContractInput): Contract
   queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContractInput): [Contract]
   aggregateContract(filter: ContractFilter): ContractAggregateResult
+  queryPendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
+  aggregatePendingUser(filter: PendingUserFilter): PendingUserAggregateResult
   getVote(id: ID, voteid: String @hook_getVoteInput): Vote
   queryVote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int @hook_queryVoteInput): [Vote]
   aggregateVote(filter: VoteFilter): VoteAggregateResult
@@ -8689,6 +8968,17 @@ input UpdateOrgaAggInput {
 
 type UpdateOrgaAggPayload {
   orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
+  numUids: Int
+}
+
+input UpdatePendingUserInput {
+  filter: PendingUserFilter!
+  set: PendingUserPatch
+  remove: PendingUserPatch
+}
+
+type UpdatePendingUserPayload {
+  pendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   numUids: Int
 }
 
@@ -9984,6 +10274,48 @@ func (ec *executionContext) field_AddOrgaAggPayload_orgaAgg_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_AddPendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PendingUserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10455,6 +10787,63 @@ func (ec *executionContext) field_Contract_participants_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Contract_pending_candidatesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Contract_pending_candidates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PendingUserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Contract_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10864,6 +11253,48 @@ func (ec *executionContext) field_DeleteOrgaAggPayload_orgaAgg_args(ctx context.
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeletePendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PendingUserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -11503,6 +11934,21 @@ func (ec *executionContext) field_Mutation_addOrgaAgg_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addPendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddPendingUserInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddPendingUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11840,6 +12286,21 @@ func (ec *executionContext) field_Mutation_deleteOrgaAgg_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deletePendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNPendingUserFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12162,6 +12623,21 @@ func (ec *executionContext) field_Mutation_updateOrgaAgg_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdateOrgaAggInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdatePendingUserInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdatePendingUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePendingUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -13019,6 +13495,21 @@ func (ec *executionContext) field_Query_aggregateOrgaAgg_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregatePendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13861,6 +14352,48 @@ func (ec *executionContext) field_Query_queryOrgaAgg_args(ctx context.Context, r
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryPendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PendingUserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -15037,6 +15570,48 @@ func (ec *executionContext) field_UpdateOrgaAggPayload_orgaAgg_args(ctx context.
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdatePendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PendingUserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PendingUserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -16389,6 +16964,71 @@ func (ec *executionContext) _AddOrgaAggPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AddOrgaAggPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddPendingUserPayload_pendingUser(ctx context.Context, field graphql.CollectedField, obj *model.AddPendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddPendingUserPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddPendingUserPayload_pendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingUser, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PendingUser)
+	fc.Result = res
+	return ec.marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddPendingUserPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddPendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddPendingUserPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -18130,6 +18770,42 @@ func (ec *executionContext) _Contract_candidates(ctx context.Context, field grap
 	return ec.marshalOUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Contract_pending_candidates(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_pending_candidates_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingCandidates, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PendingUser)
+	fc.Result = res
+	return ec.marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Contract_participants(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18449,6 +19125,42 @@ func (ec *executionContext) _Contract_candidatesAggregate(ctx context.Context, f
 	res := resTmp.(*model.UserAggregateResult)
 	fc.Result = res
 	return ec.marshalOUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_pending_candidatesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_pending_candidatesAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingCandidatesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.PendingUserAggregateResult)
+	fc.Result = res
+	return ec.marshalOPendingUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_participantsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -19762,6 +20474,100 @@ func (ec *executionContext) _DeleteOrgaAggPayload_numUids(ctx context.Context, f
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "DeleteOrgaAggPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeletePendingUserPayload_pendingUser(ctx context.Context, field graphql.CollectedField, obj *model.DeletePendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeletePendingUserPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeletePendingUserPayload_pendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingUser, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PendingUser)
+	fc.Result = res
+	return ec.marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeletePendingUserPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeletePendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeletePendingUserPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeletePendingUserPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeletePendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeletePendingUserPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -24151,6 +24957,114 @@ func (ec *executionContext) _Mutation_deleteContract(ctx context.Context, field 
 	return ec.marshalODeleteContractPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteContractPayload(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addPendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addPendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddPendingUser(rctx, args["input"].([]*model.AddPendingUserInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddPendingUserPayload)
+	fc.Result = res
+	return ec.marshalOAddPendingUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updatePendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updatePendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePendingUser(rctx, args["input"].(model.UpdatePendingUserInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdatePendingUserPayload)
+	fc.Result = res
+	return ec.marshalOUpdatePendingUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePendingUserPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deletePendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deletePendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeletePendingUser(rctx, args["filter"].(model.PendingUserFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeletePendingUserPayload)
+	fc.Result = res
+	return ec.marshalODeletePendingUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeletePendingUserPayload(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addVote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -27373,6 +28287,122 @@ func (ec *executionContext) _OrgaAggAggregateResult_n_guestsAvg(ctx context.Cont
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PendingUser_email(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_emailMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_emailMax(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Point_longitude(ctx context.Context, field graphql.CollectedField, obj *model.Point) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -29195,6 +30225,78 @@ func (ec *executionContext) _Query_aggregateContract(ctx context.Context, field 
 	res := resTmp.(*model.ContractAggregateResult)
 	fc.Result = res
 	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryPendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryPendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryPendingUser(rctx, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PendingUser)
+	fc.Result = res
+	return ec.marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregatePendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregatePendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregatePendingUser(rctx, args["filter"].(*model.PendingUserFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.PendingUserAggregateResult)
+	fc.Result = res
+	return ec.marshalOPendingUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getVote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -32410,6 +33512,71 @@ func (ec *executionContext) _UpdateOrgaAggPayload_numUids(ctx context.Context, f
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "UpdateOrgaAggPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdatePendingUserPayload_pendingUser(ctx context.Context, field graphql.CollectedField, obj *model.UpdatePendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdatePendingUserPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdatePendingUserPayload_pendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingUser, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PendingUser)
+	fc.Result = res
+	return ec.marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdatePendingUserPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdatePendingUserPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdatePendingUserPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -36369,6 +37536,14 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "pending_candidates":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
+			it.PendingCandidates, err = ec.unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "participants":
 			var err error
 
@@ -37237,6 +38412,29 @@ func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
 			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Context, obj interface{}) (model.AddPendingUserInput, error) {
+	var it model.AddPendingUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -39397,6 +40595,32 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "pending_candidates":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.PendingUserRef); ok {
+				it.PendingCandidates = data
+			} else if tmp == nil {
+				it.PendingCandidates = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.PendingUserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "participants":
 			var err error
 
@@ -39585,6 +40809,14 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
 			it.Candidates, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pending_candidates":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
+			it.PendingCandidates, err = ec.unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -43786,6 +45018,154 @@ func (ec *executionContext) unmarshalInputOrgaAggRef(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context, obj interface{}) (model.PendingUserFilter, error) {
+	var it model.PendingUserFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOPendingUserHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOPendingUserFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOPendingUserFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPendingUserOrder(ctx context.Context, obj interface{}) (model.PendingUserOrder, error) {
+	var it model.PendingUserOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOPendingUserOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOPendingUserOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, obj interface{}) (model.PendingUserPatch, error) {
+	var it model.PendingUserPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Email = data
+			} else if tmp == nil {
+				it.Email = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, obj interface{}) (model.PendingUserRef, error) {
+	var it model.PendingUserRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputPointGeoFilter(ctx context.Context, obj interface{}) (model.PointGeoFilter, error) {
 	var it model.PointGeoFilter
 	asMap := map[string]interface{}{}
@@ -46407,6 +47787,45 @@ func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdatePendingUserInput(ctx context.Context, obj interface{}) (model.UpdatePendingUserInput, error) {
+	var it model.UpdatePendingUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOPendingUserPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOPendingUserPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, obj interface{}) (model.UpdatePostInput, error) {
 	var it model.UpdatePostInput
 	asMap := map[string]interface{}{}
@@ -48304,6 +49723,32 @@ func (ec *executionContext) _AddOrgaAggPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var addPendingUserPayloadImplementors = []string{"AddPendingUserPayload"}
+
+func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddPendingUserPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addPendingUserPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddPendingUserPayload")
+		case "pendingUser":
+			out.Values[i] = ec._AddPendingUserPayload_pendingUser(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddPendingUserPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var addRoleExtPayloadImplementors = []string{"AddRoleExtPayload"}
 
 func (ec *executionContext) _AddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRoleExtPayload) graphql.Marshaler {
@@ -48665,6 +50110,8 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "candidates":
 			out.Values[i] = ec._Contract_candidates(ctx, field, obj)
+		case "pending_candidates":
+			out.Values[i] = ec._Contract_pending_candidates(ctx, field, obj)
 		case "participants":
 			out.Values[i] = ec._Contract_participants(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -48695,6 +50142,8 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Contract_message(ctx, field, obj)
 		case "candidatesAggregate":
 			out.Values[i] = ec._Contract_candidatesAggregate(ctx, field, obj)
+		case "pending_candidatesAggregate":
+			out.Values[i] = ec._Contract_pending_candidatesAggregate(ctx, field, obj)
 		case "participantsAggregate":
 			out.Values[i] = ec._Contract_participantsAggregate(ctx, field, obj)
 		case "commentsAggregate":
@@ -49023,6 +50472,34 @@ func (ec *executionContext) _DeleteOrgaAggPayload(ctx context.Context, sel ast.S
 			out.Values[i] = ec._DeleteOrgaAggPayload_msg(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._DeleteOrgaAggPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deletePendingUserPayloadImplementors = []string{"DeletePendingUserPayload"}
+
+func (ec *executionContext) _DeletePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePendingUserPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deletePendingUserPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeletePendingUserPayload")
+		case "pendingUser":
+			out.Values[i] = ec._DeletePendingUserPayload_pendingUser(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeletePendingUserPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeletePendingUserPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49669,6 +51146,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateContract(ctx, field)
 		case "deleteContract":
 			out.Values[i] = ec._Mutation_deleteContract(ctx, field)
+		case "addPendingUser":
+			out.Values[i] = ec._Mutation_addPendingUser(ctx, field)
+		case "updatePendingUser":
+			out.Values[i] = ec._Mutation_updatePendingUser(ctx, field)
+		case "deletePendingUser":
+			out.Values[i] = ec._Mutation_deletePendingUser(ctx, field)
 		case "addVote":
 			out.Values[i] = ec._Mutation_addVote(ctx, field)
 		case "updateVote":
@@ -50038,6 +51521,58 @@ func (ec *executionContext) _OrgaAggAggregateResult(ctx context.Context, sel ast
 			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsSum(ctx, field, obj)
 		case "n_guestsAvg":
 			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsAvg(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var pendingUserImplementors = []string{"PendingUser"}
+
+func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionSet, obj *model.PendingUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pendingUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PendingUser")
+		case "email":
+			out.Values[i] = ec._PendingUser_email(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var pendingUserAggregateResultImplementors = []string{"PendingUserAggregateResult"}
+
+func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.PendingUserAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pendingUserAggregateResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PendingUserAggregateResult")
+		case "count":
+			out.Values[i] = ec._PendingUserAggregateResult_count(ctx, field, obj)
+		case "emailMin":
+			out.Values[i] = ec._PendingUserAggregateResult_emailMin(ctx, field, obj)
+		case "emailMax":
+			out.Values[i] = ec._PendingUserAggregateResult_emailMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -50632,6 +52167,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_aggregateContract(ctx, field)
+				return res
+			})
+		case "queryPendingUser":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryPendingUser(ctx, field)
+				return res
+			})
+		case "aggregatePendingUser":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregatePendingUser(ctx, field)
 				return res
 			})
 		case "getVote":
@@ -51261,6 +52818,32 @@ func (ec *executionContext) _UpdateOrgaAggPayload(ctx context.Context, sel ast.S
 			out.Values[i] = ec._UpdateOrgaAggPayload_orgaAgg(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdateOrgaAggPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updatePendingUserPayloadImplementors = []string{"UpdatePendingUserPayload"}
+
+func (ec *executionContext) _UpdatePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdatePendingUserPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updatePendingUserPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdatePendingUserPayload")
+		case "pendingUser":
+			out.Values[i] = ec._UpdatePendingUserPayload_pendingUser(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdatePendingUserPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52263,6 +53846,32 @@ func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚖzerogovᚋfractal6ᚗgo
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddPendingUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInputᚄ(ctx context.Context, v interface{}) ([]*model.AddPendingUserInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AddPendingUserInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddPendingUserInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddPendingUserInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInput(ctx context.Context, v interface{}) (*model.AddPendingUserInput, error) {
+	res, err := ec.unmarshalInputAddPendingUserInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddRoleExtInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtInputᚄ(ctx context.Context, v interface{}) ([]*model.AddRoleExtInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -52884,6 +54493,31 @@ func (ec *executionContext) unmarshalNOrgaAggFilter2ᚖzerogovᚋfractal6ᚗgo�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNPendingUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx context.Context, sel ast.SelectionSet, v *model.PendingUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PendingUser(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPendingUserFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx context.Context, v interface{}) (model.PendingUserFilter, error) {
+	res, err := ec.unmarshalInputPendingUserFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx context.Context, v interface{}) (*model.PendingUserFilter, error) {
+	res, err := ec.unmarshalInputPendingUserFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPendingUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRef(ctx context.Context, v interface{}) (*model.PendingUserRef, error) {
+	res, err := ec.unmarshalInputPendingUserRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNPoint2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Point) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -53271,6 +54905,11 @@ func (ec *executionContext) unmarshalNUpdateNodeInput2zerogovᚋfractal6ᚗgoᚋ
 
 func (ec *executionContext) unmarshalNUpdateOrgaAggInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggInput(ctx context.Context, v interface{}) (model.UpdateOrgaAggInput, error) {
 	res, err := ec.unmarshalInputUpdateOrgaAggInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdatePendingUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePendingUserInput(ctx context.Context, v interface{}) (model.UpdatePendingUserInput, error) {
+	res, err := ec.unmarshalInputUpdatePendingUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -53779,6 +55418,13 @@ func (ec *executionContext) marshalOAddOrgaAggPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._AddOrgaAggPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddPendingUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddPendingUserPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddPendingUserPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddRoleExtPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddRoleExtPayload) graphql.Marshaler {
@@ -55143,6 +56789,13 @@ func (ec *executionContext) marshalODeleteOrgaAggPayload2ᚖzerogovᚋfractal6�
 		return graphql.Null
 	}
 	return ec._DeleteOrgaAggPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeletePendingUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeletePendingUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeletePendingUserPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeletePendingUserPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeletePostPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeletePostPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeletePostPayload) graphql.Marshaler {
@@ -57542,6 +59195,277 @@ func (ec *executionContext) unmarshalOOrgaAggRef2ᚖzerogovᚋfractal6ᚗgoᚋgr
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx context.Context, sel ast.SelectionSet, v []*model.PendingUser) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOPendingUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PendingUser) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPendingUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOPendingUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx context.Context, sel ast.SelectionSet, v *model.PendingUser) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PendingUser(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOPendingUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.PendingUserAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PendingUserAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOPendingUserFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx context.Context, v interface{}) ([]*model.PendingUserFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.PendingUserFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOPendingUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx context.Context, v interface{}) (*model.PendingUserFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPendingUserFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPendingUserHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx context.Context, v interface{}) ([]*model.PendingUserHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.PendingUserHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOPendingUserHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOPendingUserHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.PendingUserHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOPendingUserHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOPendingUserHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx context.Context, v interface{}) (*model.PendingUserHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.PendingUserHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPendingUserHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.PendingUserHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOPendingUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx context.Context, v interface{}) (*model.PendingUserOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPendingUserOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPendingUserOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx context.Context, v interface{}) (*model.PendingUserOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.PendingUserOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPendingUserOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx context.Context, sel ast.SelectionSet, v *model.PendingUserOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOPendingUserPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx context.Context, v interface{}) (*model.PendingUserPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPendingUserPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx context.Context, v interface{}) ([]*model.PendingUserRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.PendingUserRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPendingUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalOPointRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRef(ctx context.Context, v interface{}) (*model.PointRef, error) {
 	if v == nil {
 		return nil, nil
@@ -58914,6 +60838,13 @@ func (ec *executionContext) marshalOUpdateOrgaAggPayload2ᚖzerogovᚋfractal6�
 		return graphql.Null
 	}
 	return ec._UpdateOrgaAggPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdatePendingUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePendingUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdatePendingUserPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdatePendingUserPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdatePostPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdatePostPayload) graphql.Marshaler {

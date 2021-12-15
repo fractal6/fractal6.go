@@ -169,6 +169,18 @@ func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.Cont
 	return data, errors
 }
 
+func (r *mutationResolver) AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput) (data *model.AddPendingUserPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdatePendingUser(ctx context.Context, input model.UpdatePendingUserInput) (data *model.UpdatePendingUserPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeletePendingUser(ctx context.Context, filter model.PendingUserFilter) (data *model.DeletePendingUserPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (data *model.AddVotePayload, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
@@ -357,6 +369,14 @@ func (r *queryResolver) QueryContract(ctx context.Context, filter *model.Contrac
 }
 
 func (r *queryResolver) AggregateContract(ctx context.Context, filter *model.ContractFilter) (data *model.ContractAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) (data []*model.PendingUser, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregatePendingUser(ctx context.Context, filter *model.PendingUserFilter) (data *model.PendingUserAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

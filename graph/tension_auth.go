@@ -47,7 +47,7 @@ const (
 )
 
 // If an event has a Validation (function) attached, the tension need to satisfy the authorization in
-// both direction. Specific constraint must be implemented in the cooresponding function. Ie, to invite a user
+// both directions. Specific constraint must be implemented in the cooresponding function. Ie, to invite a user
 // a AnyParticipate validation method is created, and the constraint is that at a candidate and a coordo must validate.
 // Validation function return a triplet:
 // ok bool -> ok means the contract has been validated and can be closed.
@@ -249,7 +249,7 @@ func (em EventMap) AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, ev
         } else if ok2 {
             rid, _ = codec.Nid2rootid(nameidNew)
         }
-        contractid := codec.ContractIdCodec(tension.Receiver.Nameid, *event.EventType, *event.Old, *event.New)
+        contractid := codec.ContractIdCodec(tension.ID, *event.EventType, *event.Old, *event.New)
         contract := &model.Contract{
             Contractid: contractid,
             CreatedAt: Now(),
@@ -259,7 +259,7 @@ func (em EventMap) AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, ev
             Status: model.ContractStatusOpen,
             ContractType: model.ContractTypeAnyCoordoDual,
             Participants: []*model.Vote{&model.Vote{
-                Voteid: codec.VoteIdCodec(contractid, codec.MemberIdCodec(rid, uctx.Username)),
+                Voteid: codec.VoteIdCodec(contractid, rid, uctx.Username),
                 Node: &model.Node{Nameid: codec.MemberIdCodec(rid, uctx.Username)},
                 Data: []int{1},
             }, },

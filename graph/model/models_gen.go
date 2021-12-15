@@ -40,20 +40,21 @@ type AddCommentPayload struct {
 }
 
 type AddContractInput struct {
-	CreatedBy    *UserRef          `json:"createdBy,omitempty"`
-	CreatedAt    string            `json:"createdAt,omitempty"`
-	UpdatedAt    *string           `json:"updatedAt,omitempty"`
-	Message      *string           `json:"message,omitempty"`
-	Contractid   string            `json:"contractid,omitempty"`
-	Tension      *TensionRef       `json:"tension,omitempty"`
-	Status       ContractStatus    `json:"status,omitempty"`
-	ContractType ContractType      `json:"contract_type,omitempty"`
-	ClosedAt     *string           `json:"closedAt,omitempty"`
-	Event        *EventFragmentRef `json:"event,omitempty"`
-	Candidates   []*UserRef        `json:"candidates,omitempty"`
-	Participants []*VoteRef        `json:"participants,omitempty"`
-	Comments     []*CommentRef     `json:"comments,omitempty"`
-	IsValidator  *bool             `json:"isValidator"`
+	CreatedBy         *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt         string            `json:"createdAt,omitempty"`
+	UpdatedAt         *string           `json:"updatedAt,omitempty"`
+	Message           *string           `json:"message,omitempty"`
+	Contractid        string            `json:"contractid,omitempty"`
+	Tension           *TensionRef       `json:"tension,omitempty"`
+	Status            ContractStatus    `json:"status,omitempty"`
+	ContractType      ContractType      `json:"contract_type,omitempty"`
+	ClosedAt          *string           `json:"closedAt,omitempty"`
+	Event             *EventFragmentRef `json:"event,omitempty"`
+	Candidates        []*UserRef        `json:"candidates,omitempty"`
+	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
+	Participants      []*VoteRef        `json:"participants,omitempty"`
+	Comments          []*CommentRef     `json:"comments,omitempty"`
+	IsValidator       *bool             `json:"isValidator"`
 }
 
 type AddContractPayload struct {
@@ -182,6 +183,15 @@ type AddOrgaAggInput struct {
 type AddOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
 	NumUids *int       `json:"numUids"`
+}
+
+type AddPendingUserInput struct {
+	Email *string `json:"email,omitempty"`
+}
+
+type AddPendingUserPayload struct {
+	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
+	NumUids     *int           `json:"numUids"`
 }
 
 type AddRoleExtInput struct {
@@ -427,24 +437,26 @@ type ContainsFilter struct {
 }
 
 type Contract struct {
-	Contractid            string                  `json:"contractid,omitempty"`
-	Tension               *Tension                `json:"tension,omitempty"`
-	Status                ContractStatus          `json:"status,omitempty"`
-	ContractType          ContractType            `json:"contract_type,omitempty"`
-	ClosedAt              *string                 `json:"closedAt,omitempty"`
-	Event                 *EventFragment          `json:"event,omitempty"`
-	Candidates            []*User                 `json:"candidates,omitempty"`
-	Participants          []*Vote                 `json:"participants,omitempty"`
-	Comments              []*Comment              `json:"comments,omitempty"`
-	IsValidator           *bool                   `json:"isValidator"`
-	ID                    string                  `json:"id,omitempty"`
-	CreatedBy             *User                   `json:"createdBy,omitempty"`
-	CreatedAt             string                  `json:"createdAt,omitempty"`
-	UpdatedAt             *string                 `json:"updatedAt,omitempty"`
-	Message               *string                 `json:"message,omitempty"`
-	CandidatesAggregate   *UserAggregateResult    `json:"candidatesAggregate,omitempty"`
-	ParticipantsAggregate *VoteAggregateResult    `json:"participantsAggregate,omitempty"`
-	CommentsAggregate     *CommentAggregateResult `json:"commentsAggregate,omitempty"`
+	Contractid                 string                      `json:"contractid,omitempty"`
+	Tension                    *Tension                    `json:"tension,omitempty"`
+	Status                     ContractStatus              `json:"status,omitempty"`
+	ContractType               ContractType                `json:"contract_type,omitempty"`
+	ClosedAt                   *string                     `json:"closedAt,omitempty"`
+	Event                      *EventFragment              `json:"event,omitempty"`
+	Candidates                 []*User                     `json:"candidates,omitempty"`
+	PendingCandidates          []*PendingUser              `json:"pending_candidates,omitempty"`
+	Participants               []*Vote                     `json:"participants,omitempty"`
+	Comments                   []*Comment                  `json:"comments,omitempty"`
+	IsValidator                *bool                       `json:"isValidator"`
+	ID                         string                      `json:"id,omitempty"`
+	CreatedBy                  *User                       `json:"createdBy,omitempty"`
+	CreatedAt                  string                      `json:"createdAt,omitempty"`
+	UpdatedAt                  *string                     `json:"updatedAt,omitempty"`
+	Message                    *string                     `json:"message,omitempty"`
+	CandidatesAggregate        *UserAggregateResult        `json:"candidatesAggregate,omitempty"`
+	PendingCandidatesAggregate *PendingUserAggregateResult `json:"pending_candidatesAggregate,omitempty"`
+	ParticipantsAggregate      *VoteAggregateResult        `json:"participantsAggregate,omitempty"`
+	CommentsAggregate          *CommentAggregateResult     `json:"commentsAggregate,omitempty"`
 }
 
 type ContractAggregateResult struct {
@@ -482,38 +494,40 @@ type ContractOrder struct {
 }
 
 type ContractPatch struct {
-	CreatedBy    *UserRef          `json:"createdBy,omitempty"`
-	CreatedAt    *string           `json:"createdAt,omitempty"`
-	UpdatedAt    *string           `json:"updatedAt,omitempty"`
-	Message      *string           `json:"message,omitempty"`
-	Contractid   *string           `json:"contractid,omitempty"`
-	Tension      *TensionRef       `json:"tension,omitempty"`
-	Status       *ContractStatus   `json:"status,omitempty"`
-	ContractType *ContractType     `json:"contract_type,omitempty"`
-	ClosedAt     *string           `json:"closedAt,omitempty"`
-	Event        *EventFragmentRef `json:"event,omitempty"`
-	Candidates   []*UserRef        `json:"candidates,omitempty"`
-	Participants []*VoteRef        `json:"participants,omitempty"`
-	Comments     []*CommentRef     `json:"comments,omitempty"`
-	IsValidator  *bool             `json:"isValidator"`
+	CreatedBy         *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt         *string           `json:"createdAt,omitempty"`
+	UpdatedAt         *string           `json:"updatedAt,omitempty"`
+	Message           *string           `json:"message,omitempty"`
+	Contractid        *string           `json:"contractid,omitempty"`
+	Tension           *TensionRef       `json:"tension,omitempty"`
+	Status            *ContractStatus   `json:"status,omitempty"`
+	ContractType      *ContractType     `json:"contract_type,omitempty"`
+	ClosedAt          *string           `json:"closedAt,omitempty"`
+	Event             *EventFragmentRef `json:"event,omitempty"`
+	Candidates        []*UserRef        `json:"candidates,omitempty"`
+	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
+	Participants      []*VoteRef        `json:"participants,omitempty"`
+	Comments          []*CommentRef     `json:"comments,omitempty"`
+	IsValidator       *bool             `json:"isValidator"`
 }
 
 type ContractRef struct {
-	ID           *string           `json:"id,omitempty"`
-	CreatedBy    *UserRef          `json:"createdBy,omitempty"`
-	CreatedAt    *string           `json:"createdAt,omitempty"`
-	UpdatedAt    *string           `json:"updatedAt,omitempty"`
-	Message      *string           `json:"message,omitempty"`
-	Contractid   *string           `json:"contractid,omitempty"`
-	Tension      *TensionRef       `json:"tension,omitempty"`
-	Status       *ContractStatus   `json:"status,omitempty"`
-	ContractType *ContractType     `json:"contract_type,omitempty"`
-	ClosedAt     *string           `json:"closedAt,omitempty"`
-	Event        *EventFragmentRef `json:"event,omitempty"`
-	Candidates   []*UserRef        `json:"candidates,omitempty"`
-	Participants []*VoteRef        `json:"participants,omitempty"`
-	Comments     []*CommentRef     `json:"comments,omitempty"`
-	IsValidator  *bool             `json:"isValidator"`
+	ID                *string           `json:"id,omitempty"`
+	CreatedBy         *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt         *string           `json:"createdAt,omitempty"`
+	UpdatedAt         *string           `json:"updatedAt,omitempty"`
+	Message           *string           `json:"message,omitempty"`
+	Contractid        *string           `json:"contractid,omitempty"`
+	Tension           *TensionRef       `json:"tension,omitempty"`
+	Status            *ContractStatus   `json:"status,omitempty"`
+	ContractType      *ContractType     `json:"contract_type,omitempty"`
+	ClosedAt          *string           `json:"closedAt,omitempty"`
+	Event             *EventFragmentRef `json:"event,omitempty"`
+	Candidates        []*UserRef        `json:"candidates,omitempty"`
+	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
+	Participants      []*VoteRef        `json:"participants,omitempty"`
+	Comments          []*CommentRef     `json:"comments,omitempty"`
+	IsValidator       *bool             `json:"isValidator"`
 }
 
 type ContractStatusHash struct {
@@ -611,6 +625,12 @@ type DeleteOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
 	NumUids *int       `json:"numUids"`
+}
+
+type DeletePendingUserPayload struct {
+	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
+	Msg         *string        `json:"msg,omitempty"`
+	NumUids     *int           `json:"numUids"`
 }
 
 type DeletePostPayload struct {
@@ -1243,6 +1263,37 @@ type OrgaAggRef struct {
 	NGuests  *int `json:"n_guests"`
 }
 
+type PendingUser struct {
+	Email *string `json:"email,omitempty"`
+}
+
+type PendingUserAggregateResult struct {
+	Count    *int    `json:"count"`
+	EmailMin *string `json:"emailMin,omitempty"`
+	EmailMax *string `json:"emailMax,omitempty"`
+}
+
+type PendingUserFilter struct {
+	Has []*PendingUserHasFilter `json:"has,omitempty"`
+	And []*PendingUserFilter    `json:"and,omitempty"`
+	Or  []*PendingUserFilter    `json:"or,omitempty"`
+	Not *PendingUserFilter      `json:"not,omitempty"`
+}
+
+type PendingUserOrder struct {
+	Asc  *PendingUserOrderable `json:"asc,omitempty"`
+	Desc *PendingUserOrderable `json:"desc,omitempty"`
+	Then *PendingUserOrder     `json:"then,omitempty"`
+}
+
+type PendingUserPatch struct {
+	Email *string `json:"email,omitempty"`
+}
+
+type PendingUserRef struct {
+	Email *string `json:"email,omitempty"`
+}
+
 type Point struct {
 	Longitude float64 `json:"longitude,omitempty"`
 	Latitude  float64 `json:"latitude,omitempty"`
@@ -1691,6 +1742,17 @@ type UpdateOrgaAggInput struct {
 type UpdateOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
 	NumUids *int       `json:"numUids"`
+}
+
+type UpdatePendingUserInput struct {
+	Filter *PendingUserFilter `json:"filter,omitempty"`
+	Set    *PendingUserPatch  `json:"set,omitempty"`
+	Remove *PendingUserPatch  `json:"remove,omitempty"`
+}
+
+type UpdatePendingUserPayload struct {
+	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
+	NumUids     *int           `json:"numUids"`
 }
 
 type UpdatePostInput struct {
@@ -2218,20 +2280,21 @@ func (e CommentOrderable) MarshalGQL(w io.Writer) {
 type ContractHasFilter string
 
 const (
-	ContractHasFilterCreatedBy    ContractHasFilter = "createdBy"
-	ContractHasFilterCreatedAt    ContractHasFilter = "createdAt"
-	ContractHasFilterUpdatedAt    ContractHasFilter = "updatedAt"
-	ContractHasFilterMessage      ContractHasFilter = "message"
-	ContractHasFilterContractid   ContractHasFilter = "contractid"
-	ContractHasFilterTension      ContractHasFilter = "tension"
-	ContractHasFilterStatus       ContractHasFilter = "status"
-	ContractHasFilterContractType ContractHasFilter = "contract_type"
-	ContractHasFilterClosedAt     ContractHasFilter = "closedAt"
-	ContractHasFilterEvent        ContractHasFilter = "event"
-	ContractHasFilterCandidates   ContractHasFilter = "candidates"
-	ContractHasFilterParticipants ContractHasFilter = "participants"
-	ContractHasFilterComments     ContractHasFilter = "comments"
-	ContractHasFilterIsValidator  ContractHasFilter = "isValidator"
+	ContractHasFilterCreatedBy         ContractHasFilter = "createdBy"
+	ContractHasFilterCreatedAt         ContractHasFilter = "createdAt"
+	ContractHasFilterUpdatedAt         ContractHasFilter = "updatedAt"
+	ContractHasFilterMessage           ContractHasFilter = "message"
+	ContractHasFilterContractid        ContractHasFilter = "contractid"
+	ContractHasFilterTension           ContractHasFilter = "tension"
+	ContractHasFilterStatus            ContractHasFilter = "status"
+	ContractHasFilterContractType      ContractHasFilter = "contract_type"
+	ContractHasFilterClosedAt          ContractHasFilter = "closedAt"
+	ContractHasFilterEvent             ContractHasFilter = "event"
+	ContractHasFilterCandidates        ContractHasFilter = "candidates"
+	ContractHasFilterPendingCandidates ContractHasFilter = "pending_candidates"
+	ContractHasFilterParticipants      ContractHasFilter = "participants"
+	ContractHasFilterComments          ContractHasFilter = "comments"
+	ContractHasFilterIsValidator       ContractHasFilter = "isValidator"
 )
 
 var AllContractHasFilter = []ContractHasFilter{
@@ -2246,6 +2309,7 @@ var AllContractHasFilter = []ContractHasFilter{
 	ContractHasFilterClosedAt,
 	ContractHasFilterEvent,
 	ContractHasFilterCandidates,
+	ContractHasFilterPendingCandidates,
 	ContractHasFilterParticipants,
 	ContractHasFilterComments,
 	ContractHasFilterIsValidator,
@@ -2253,7 +2317,7 @@ var AllContractHasFilter = []ContractHasFilter{
 
 func (e ContractHasFilter) IsValid() bool {
 	switch e {
-	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterContractid, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterParticipants, ContractHasFilterComments, ContractHasFilterIsValidator:
+	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterContractid, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterPendingCandidates, ContractHasFilterParticipants, ContractHasFilterComments, ContractHasFilterIsValidator:
 		return true
 	}
 	return false
@@ -3406,6 +3470,84 @@ func (e *OrgaAggOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e OrgaAggOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PendingUserHasFilter string
+
+const (
+	PendingUserHasFilterEmail PendingUserHasFilter = "email"
+)
+
+var AllPendingUserHasFilter = []PendingUserHasFilter{
+	PendingUserHasFilterEmail,
+}
+
+func (e PendingUserHasFilter) IsValid() bool {
+	switch e {
+	case PendingUserHasFilterEmail:
+		return true
+	}
+	return false
+}
+
+func (e PendingUserHasFilter) String() string {
+	return string(e)
+}
+
+func (e *PendingUserHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PendingUserHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PendingUserHasFilter", str)
+	}
+	return nil
+}
+
+func (e PendingUserHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PendingUserOrderable string
+
+const (
+	PendingUserOrderableEmail PendingUserOrderable = "email"
+)
+
+var AllPendingUserOrderable = []PendingUserOrderable{
+	PendingUserOrderableEmail,
+}
+
+func (e PendingUserOrderable) IsValid() bool {
+	switch e {
+	case PendingUserOrderableEmail:
+		return true
+	}
+	return false
+}
+
+func (e PendingUserOrderable) String() string {
+	return string(e)
+}
+
+func (e *PendingUserOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PendingUserOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PendingUserOrderable", str)
+	}
+	return nil
+}
+
+func (e PendingUserOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
