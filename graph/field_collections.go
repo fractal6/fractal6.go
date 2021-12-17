@@ -64,6 +64,14 @@ func setContextWithNameid(ctx context.Context, obj interface{}, next graphql.Res
     return next(ctx)
 }
 
+func setUpdateContextInfo(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    hasSet := obj.(model.JsonAtom)["set"] != nil
+    hasRemove := obj.(model.JsonAtom)["remove"] != nil
+    ctx = context.WithValue(ctx, "hasSet", hasSet)
+    ctx = context.WithValue(ctx, "hasRemove", hasRemove)
+    return next(ctx)
+}
+
 func getNestedObj(obj interface{}, field string) interface{} {
     var source model.JsonAtom
     var target interface{}

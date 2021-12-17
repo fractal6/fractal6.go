@@ -91,7 +91,7 @@ func Init() gen.Config {
     c.Directives.Hook_getTensionInput = nothing
     c.Directives.Hook_queryTensionInput = nothing
     c.Directives.Hook_addTensionInput = nothing
-    c.Directives.Hook_updateTensionInput = nothing
+    c.Directives.Hook_updateTensionInput = setUpdateContextInfo
     c.Directives.Hook_deleteTensionInput = nothing
     // --
     c.Directives.Hook_addTension = addTensionHook
@@ -220,3 +220,5 @@ func FieldTransform(ctx context.Context, obj interface{}, next graphql.Resolver,
     }
     return nil, LogErr("directive error", fmt.Errorf("unknown function `%s'", a))
 }
+
+

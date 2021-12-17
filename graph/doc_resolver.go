@@ -12,10 +12,7 @@ func TryUpdateDoc(uctx *model.UserCtx, tension *model.Tension, md *string) (bool
     return false, nil
 }
 
-func TryArchiveDoc(uctx *model.UserCtx, tension *model.Tension, md *string) (bool, error) {
+func TryChangeArchiveDoc(uctx *model.UserCtx, tension *model.Tension, md *string, event model.TensionEvent) (bool, error) {
     return false, nil
 }
 
-func TryUnarchiveDoc(uctx *model.UserCtx, tension *model.Tension, md *string) (bool, error) {
-    return false, nil
-}

@@ -11,6 +11,63 @@ import (
     . "zerogov/fractal6.go/tools"
 )
 
+
+// EventMap structure contains all the information needed to process a given event.
+//
+// If an event has a Validation value, the tension need to satisfy the authorization in a bidirectional way.
+// The rules in both directions must be implemented in the coresponding functions.
+//     I.e. To invite an user, a AnyCandidates validation method should be set,
+//     and the action will be the processed once any the candidate (or any candidates)
+//     has been validated by any participants (the one that satisfy the given authorization).
+//
+type EventMap struct {
+    // Validation defined how the tension should be validated. Typically, what kind of contract
+    // is used to validated the tension. If Validation is nil, no contract are create and the tension
+    // and we just check if the Authorization hook. Else the validations are defined in the function mapped
+    // to it. see the validationMap map.
+    Validation model.ContractType
+    // Auth defined a set of authorization hooks that can be satisfied by a user to process the event.
+    Auth AuthHookValue
+    // Defined a propertie/variable the should be updated by the event (taking value from the event old/new attributes)
+    Propagate string
+    // Action definfed the fonction that should be executed if the user has been authorized.
+    Action func(*model.UserCtx, *model.Tension, *model.EventRef, *model.BlobRef) (bool, error)
+}
+type EventsMap = map[model.TensionEvent]EventMap
+
+// Validation ~ Contract
+// Validation function return a triplet:
+// ok bool -> ok means the contract has been validated and can be closed.
+// contract -> returns the updated contract if is has been altered else nil
+// err -> is something got wrong
+var validationMap map[model.ContractType]func(EventMap, *model.UserCtx, *model.Tension, *model.EventRef, *model.Contract) (bool, *model.Contract, error)
+
+
+/*
+*
+* @FUTURE: Those the following structure should be defined automatically or in the schema ?
+*
+*/
+
+
+// Authorization **Hook** Enum.
+// Each event have a set of hook activated to allow users to trigger an event.
+type AuthHookValue int
+const (
+    PassingHook AuthHookValue      = 1 // for public event
+    // Graph Role based
+    OwnerHook AuthHookValue        = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
+    MemberHook AuthHookValue       = 1 << 2
+    MemberActiveHook AuthHookValue = 1 << 3
+    SourceCoordoHook AuthHookValue = 1 << 4
+    TargetCoordoHook AuthHookValue = 1 << 5
+    // Granted based
+    AuthorHook AuthHookValue       = 1 << 6
+    AssigneeHook AuthHookValue     = 1 << 7
+    // Contract based
+    CandidateHook AuthHookValue    = 1 << 8
+)
+
 // Node Action **Rights** Enum.
 // Each node has a rights value (literal) which represents a set of activated rights.
 // Those rights are encoded as a XOR between the different possible actions.
@@ -28,46 +85,22 @@ const (
 )
 var authEventsLut map[model.TensionEvent]AuthValue
 
-// Authorization **Hook** Enum.
-// Each event have a set of hook activated to allow users to trigger an event.
-type AuthHookValue int
-const (
-    PassingHook AuthHookValue      = 1 // for public event
-    // Graph Role based
-    OwnerHook AuthHookValue        = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
-    MemberHook AuthHookValue       = 1 << 2
-    MemberActiveHook AuthHookValue = 1 << 3
-    SourceCoordoHook AuthHookValue = 1 << 4
-    TargetCoordoHook AuthHookValue = 1 << 5
-    // Granted based
-    AuthorHook AuthHookValue       = 1 << 6
-    AssigneeHook AuthHookValue     = 1 << 7
-    // Other
-    CandidateHook AuthHookValue    = 1 << 8
-)
-
-// If an event has a Validation (function) attached, the tension need to satisfy the authorization in
-// both directions. Specific constraint must be implemented in the cooresponding function. Ie, to invite a user
-// a AnyParticipate validation method is created, and the constraint is that at a candidate and a coordo must validate.
-// Validation function return a triplet:
-// ok bool -> ok means the contract has been validated and can be closed.
-// contract -> returns the updated contract if is has been altered else nil
-// err -> is something got wrong
-type EventMap struct {
-    Validation model.ContractType
-    Auth AuthHookValue
-    Propagate string
-    Action func(*model.UserCtx, *model.Tension, *model.EventRef, *model.BlobRef) (bool, error)
-}
-type EventsMap = map[model.TensionEvent]EventMap
 
 func init() {
+
+    validationMap = map[model.ContractType]func(EventMap, *model.UserCtx, *model.Tension, *model.EventRef, *model.Contract) (bool, *model.Contract, error){
+        model.ContractTypeAnyCandidates   : AnyCandidates,
+        model.ContractTypeAnyCoordoDual   : AnyCoordoDual,
+        model.ContractTypeAnyCoordoSource : AnyCoordoSource,
+        model.ContractTypeAnyCoordoTarget : AnyCoordoTarget,
+    }
+
     authEventsLut = map[model.TensionEvent]AuthValue{
         model.TensionEventCreated       : Creating,
         model.TensionEventReopened      : Reopening,
         model.TensionEventClosed        : Closing,
         model.TensionEventTitleUpdated  : TitleUpdating,
-        model.TensionEventTypeUpdated  : TypeUpdating,
+        model.TensionEventTypeUpdated   : TypeUpdating,
         model.TensionEventCommentPushed : CommentPushing,
     }
 }
@@ -83,7 +116,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         return false, nil, fmt.Errorf("non existent tension or event not allowed")
     }
 
-    // Exception Hook
+    // Exception Hook Authorization
     // --
     if hookEnabled {
         ok, err = em.checkTensionAuth(uctx, tension, event, contract)
@@ -97,26 +130,20 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         }
     }
 
-    // Check the contract authorization
+    // Contract Authorization
     // --
-    var f func(*model.UserCtx, *model.Tension, *model.EventRef, *model.Contract) (bool, *model.Contract, error)
-    switch em.Validation {
-    case model.ContractTypeAnyCandidates:
-        f = em.AnyCandidates
-    case model.ContractTypeAnyCoordoDual:
-        f = em.AnyCoordoDual
-    case model.ContractTypeAnyCoordoSource:
-        f = em.AnyCoordoSource
-    case model.ContractTypeAnyCoordoTarget:
-        f = em.AnyCoordoTarget
-    case "": // Empty, blocking
-        return false, nil, err
-    default:
-        return false, nil, fmt.Errorf("not implemented contract type.")
-    }
-
-    return f(uctx, tension, event, contract)
+    f := validationMap[em.Validation]
+    if f == nil { return false, nil, fmt.Errorf("not implemented contract type.") }
+    return f(em, uctx, tension, event, contract)
 }
+
+
+/*
+ *
+ * Tension Event Authorization implementation
+ *
+ */
+
 
 func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, error) {
     var err error
@@ -180,7 +207,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     if CandidateHook & em.Auth > 0 && contract != nil {
         // Check if uctx is a contract candidate
         for _, c := range contract.Candidates {
-            if c.Username == uctx.Username {
+            if c.Username == uctx.Username && len(contract.Candidates) == 1 {
                 return true, err
             }
         }
@@ -189,22 +216,43 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     return false, err
 }
 
-func (em EventMap) AnyCandidates(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+
+/*
+ *
+ * Contract validation implementations
+ *
+ */
+
+
+func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     ok, err := em.checkTensionAuth(uctx, tension, event, contract)
     if err != nil { return false, nil, err }
-
     if !ok {
         return false, contract, err
     }
 
-    // Check Vote
-    v := 0
-    for _, p := range contract.Participants {
-        // @Debug don't allow more than two vote....
-        v += p.Data[0]
+    if len(contract.Candidates) !=1 {
+        return false, nil, fmt.Errorf("Contract with no candidate.")
     }
-    // if two vote (coordo + other(coordo) -> ok
-    if v >= 2 {
+
+    // Check Vote
+    // @Debug don't allow more than two vote....
+    v1 := false
+    v2 := false
+    for _, p := range contract.Participants {
+        if (p.Node.FirstLink == nil) { continue }
+
+        if p.Node.FirstLink.Username == contract.Candidates[0].Username {
+            // Candidate
+            v1 = p.Data[0] == 1
+        } else {
+            // Coordinator
+            v2 = p.Data[0] == 1 || v2
+        }
+    }
+
+    // if two vote (coordo + candidate) -> ok
+    if v1 && v2 {
         contract.Status = model.ContractStatusClosed
         return true, contract, err
     } else {
@@ -213,9 +261,9 @@ func (em EventMap) AnyCandidates(uctx *model.UserCtx, tension *model.Tension, ev
     }
 }
 
-func (em EventMap) AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     if event.Old == nil || event.New == nil { return false, nil, fmt.Errorf("old and new event data must be defined.") }
-    // @debug manege event.old values in general ?
+    // @debug manage event.old values in general ?
     if *event.Old != tension.Receiver.Nameid {
         return false, nil, fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid)
     }
@@ -266,13 +314,14 @@ func (em EventMap) AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, ev
         }
         return false, contract, err
     } else if ok1 || ok2 {
-        // Check Vote
+        // Check Votes
+        // @Debug don't allow more than two vote....
         v := 0
         for _, p := range contract.Participants {
-            // @Debug don't allow more than two vote....
             v += p.Data[0]
         }
-        // if two vote (coordo + other(coordo) -> ok
+
+        // if two votes (source-coordo + target-coordo) -> ok
         if v >= 2 {
             contract.Status = model.ContractStatusClosed
             return true, contract, err
@@ -285,17 +334,17 @@ func (em EventMap) AnyCoordoDual(uctx *model.UserCtx, tension *model.Tension, ev
     }
 }
 
-func (em EventMap) AnyCoordoSource(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+func AnyCoordoSource(em EventMap, uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     panic("not implemented.")
 }
 
-func (em EventMap) AnyCoordoTarget(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+func AnyCoordoTarget(em EventMap, uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     panic("not implemented.")
 }
 
 
 ////////////////////////////////////////////////
-// With Ctx method (used in graph/resolver.go)
+// With Ctx method (used in graph/resolver.go) -- (could be done in Dgraph Lamba)
 ////////////////////////////////////////////////
 
 // Check if an user owns the given object

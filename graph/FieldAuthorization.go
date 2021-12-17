@@ -129,7 +129,7 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
 
     // Exception if we got Blob with just an ID. Use to identify the blob user are working on.
     blobs_ := obj.(model.JsonAtom)["blobs"]
-    if len(InterfaceSlice(blobs_)) == 1 {
+    if blobs_ != nil && len(InterfaceSlice(blobs_)) == 1 {
         b := blobs_.([]interface{})[0].(model.JsonAtom)
         if len(b) == 1 && b["id"] != nil {
             // ok
@@ -138,6 +138,11 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
     }
 
     field := *graphql.GetPathContext(ctx).Field
+    if ctx.Value("hasSet") != nil && ctx.Value("hasRemove") != nil && (field == "labels" || field == "assignees") {
+        // @DEBUG: detect events when remove is used in in updates
+        // when removing labels or assigness...
+        return next(ctx)
+    }
     return nil, LogErr("Event error", fmt.Errorf("missing event for field '%s'", field))
 }
 

@@ -81,7 +81,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Add the root control tension
-    tensionInput := graph.MakeNewRootTension(uctx, nameid, nodeInput)
+    tensionInput := graph.MakeNewRootTension(nameid, nodeInput)
     tid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "tension", tensionInput)
     if err != nil { http.Error(w, err.Error(), 400); return }
 

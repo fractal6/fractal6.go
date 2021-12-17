@@ -11,25 +11,47 @@ import (
 // contractEventHook is applied for addContract query directives.
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload).
 // All events in History must pass.
-func contractEventHook(uctx *model.UserCtx, tid string, event *model.EventRef, bid *string) (bool, error) {
+func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventRef, bid *string) (bool, error) {
     var ok bool = true
     var err error
     var tension *model.Tension
-    var contract *model.Contract
     if event == nil {
         return false, fmt.Errorf("No event given.")
     }
-
     if tension == nil {
         // Fetch Tension, target Node and blob charac (last if bid undefined)
-        tension, err = db.GetDB().GetTensionHook(tid, false, nil)
+        // @DEBUG: blob is not always needed (Moving non node tension, Invite, etc)
+        tension, err = db.GetDB().GetTensionHook(tid, true, nil)
         if err != nil { return false, err }
     }
 
+    // Fetch the contract
+    contract, err := db.GetDB().GetContractHook(cid)
+    if err != nil { return false, err }
+    if contract == nil { return false, fmt.Errorf("contract not found.") }
+
     // Process event
-    ok, contract, err = processEvent(uctx, tension, event, nil, nil, true, true, true)
+    ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true, true)
     ok = ok || contract != nil
 
+    fmt.Println(1)
+    if contract != nil && err != nil {
+        // Pre-contract action
+        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+            for _, c := range contract.Candidates {
+                // Add pending Nodes
+                fmt.Println(c.Username)
+                err = AddPendingNode(c.Username, tension)
+                if err != nil { return false, err }
+
+                // Send email invitation.
+                // @todo
+
+            }
+        }
+    }
+
+    fmt.Println(ok)
     return ok, err
 }
 
@@ -42,7 +64,7 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     if contract == nil { return  ok, contract, fmt.Errorf("contract not found.") }
 
     // Fetch linked tension
-    // @DEBUG: blob is not always needed (for move tension...)
+    // @DEBUG: blob is not always needed (Moving non node tension, Invite, etc)
     tension, err := db.GetDB().GetTensionHook(contract.Tension.ID, true, nil)
     if err != nil { return false,  nil, err }
 

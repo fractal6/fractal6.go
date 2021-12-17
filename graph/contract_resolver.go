@@ -43,11 +43,12 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
     }
     id := data.(*model.AddContractPayload).Contract[0].ID
     tid := *input.Tension.ID
+    cid := *&input.Contractid
 
     // Validate and process Blob Event
     var event model.EventRef
     StructMap(*input.Event, &event)
-    ok, err := contractEventHook(uctx, tid, &event, nil)
+    ok, err := contractEventHook(uctx, cid, tid, &event, nil)
     if !ok || err != nil {
         // Delete the tension just added
         e := db.GetDB().DeepDelete("contract", id)

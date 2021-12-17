@@ -12,21 +12,21 @@ import (
     //. "zerogov/fractal6.go/tools"
 )
 
-func LinkUser(rootnameid, nameid, firstLink string) error {
-    err := db.GetDB().AddUserRole(firstLink, nameid)
+func LinkUser(rootnameid, nameid, username string) error {
+    err := db.GetDB().AddUserRole(username, nameid)
     if err != nil { return err }
 
-    err = maybeUpdateMembership(rootnameid, firstLink, model.RoleTypeMember)
+    err = maybeUpdateMembership(rootnameid, username, model.RoleTypeMember)
     if err != nil { return  err }
 
     return err
 }
 
-func UnlinkUser(rootnameid, nameid, firstLink string) error {
-    err := db.GetDB().RemoveUserRole(firstLink, nameid)
+func UnlinkUser(rootnameid, nameid, username string) error {
+    err := db.GetDB().RemoveUserRole(username, nameid)
     if err != nil { return err }
 
-    err = maybeUpdateMembership(rootnameid, firstLink, model.RoleTypeGuest)
+    err = maybeUpdateMembership(rootnameid, username, model.RoleTypeGuest)
     if err != nil { return err }
 
     return err

@@ -71,7 +71,7 @@ var contractHookPayload string = `{
     EventFragment.new
   }
   Contract.candidates { User.username }
-  Contract.participants { Vote.data Vote.Node { Node.nameid } }
+  Contract.participants { Vote.data Vote.node { Node.nameid Node.first_link {User.username} } }
 }`
 
 // GPRC/DQL Request Template

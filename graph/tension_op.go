@@ -62,11 +62,11 @@ func init() {
         },
         model.TensionEventBlobArchived: EventMap{
             Auth: TargetCoordoHook | AssigneeHook,
-            Action: ArchiveBlob,
+            Action: ChangeArchiveBlob,
         },
         model.TensionEventBlobUnarchived: EventMap{
             Auth: TargetCoordoHook | AssigneeHook,
-            Action: UnarchiveBlob,
+            Action: ChangeArchiveBlob,
         },
         model.TensionEventAuthority: EventMap{
             Auth: TargetCoordoHook,
@@ -76,21 +76,30 @@ func init() {
             Auth: TargetCoordoHook,
             Action: ChangeVisibility,
         },
-        model.TensionEventUserLeft: EventMap{
-            // Authorisation is done in the method for now (to avoid dealing with Guest node two times).
-            Auth: PassingHook,
-            Action: UserLeave,
-        },
-        model.TensionEventUserJoined: EventMap{
-            // @FIXFEAT: Either Check Receiver NodeCharac or contract value to check that user has been invited !
-            Validation: model.ContractTypeAnyCandidates,
-            Auth: TargetCoordoHook | CandidateHook,
-            Action: UserJoin,
-        },
         model.TensionEventMoved: EventMap{
             Validation: model.ContractTypeAnyCoordoDual,
             Auth: AuthorHook | SourceCoordoHook | TargetCoordoHook | AssigneeHook,
             Action: MoveTension,
+        },
+        model.TensionEventMemberLinked: EventMap{
+            Validation: model.ContractTypeAnyCandidates,
+            Auth: TargetCoordoHook | AssigneeHook | CandidateHook,
+            Action: ChangeFirstLink,
+        },
+        model.TensionEventMemberUnlinked: EventMap{
+            Auth: TargetCoordoHook | AssigneeHook,
+            Action: ChangeFirstLink,
+        },
+        model.TensionEventUserJoined: EventMap{
+            // @FIXFEAT: Either Check Receiver NodeCharac or contract value to check that user has been invited !
+            Validation: model.ContractTypeAnyCandidates,
+            Auth: TargetCoordoHook |  AssigneeHook | CandidateHook,
+            Action: UserJoin,
+        },
+        model.TensionEventUserLeft: EventMap{
+            // Authorisation is done in the method for now (to avoid dealing with Guest node two times).
+            Auth: PassingHook,
+            Action: UserLeave,
         },
     }
 }
@@ -266,8 +275,8 @@ func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     return ok, err
 }
 
-func ArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-    // Archived Node
+func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    // Archived/Unarchive Node
     // * link or unlink role
     // * set archive event and flag
     // --
@@ -282,45 +291,21 @@ func ArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 
     switch tensionCharac.DocType {
     case codec.NodeDoc:
-        ok, err = TryArchiveNode(uctx, tension, blob.Node)
+        ok, err = TryChangeArchiveNode(uctx, tension, blob.Node, *event.EventType)
     case codec.MdDoc:
         md := blob.Md
-        ok, err = TryArchiveDoc(uctx, tension, md)
+        ok, err = TryChangeArchiveDoc(uctx, tension, md, *event.EventType)
     }
 
     if err != nil { return ok, err }
     if ok { // Update blob archived flag
-        err = db.GetDB().SetArchivedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.ArchiveAction(blob.Node.Type))
-    }
-
-    return ok, err
-}
-
-func UnarchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-    // Unarchived Node
-    // * link or unlink role
-    // * set archive event and flag
-    // --
-    var ok bool
-
-    blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
-
-    // Extract tension blob characteristic
-    tensionCharac, err := codec.TensionCharac{}.New(*tension.Action)
-    if err != nil { return false, fmt.Errorf("tensionCharac unknown.") }
-
-    switch tensionCharac.DocType {
-    case codec.NodeDoc:
-        ok, err = TryUnarchiveNode(uctx, tension, blob.Node)
-    case codec.MdDoc:
-        md := blob.Md
-        ok, err = TryUnarchiveDoc(uctx, tension, md)
-    }
-
-    if err != nil { return ok, err }
-    if ok { // Update blob pushed flag
-        err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
+        if *event.EventType == model.TensionEventBlobArchived {
+            err = db.GetDB().SetArchivedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.ArchiveAction(blob.Node.Type))
+        } else if *event.EventType == model.TensionEventBlobUnarchived {
+            err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
+        } else {
+            err = fmt.Errorf("bad tension event '%s'.", string(*event.EventType))
+        }
     }
 
     return ok, err
@@ -357,74 +342,16 @@ func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.
     return ok, err
 }
 
-func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-    // Remove user reference
-    // * remove User role
-    // * unlink Orga role (Guest/Member) if role_type is Guest|Member
-    // * upgrade user membership
-    // --
+func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    // ChangeFirstLink
+    // * ensure first_link is free on link
+    // * Link/unlink user
     var ok bool
 
     blob := GetBlob(tension)
     if blob == nil { return false, fmt.Errorf("blob not found.")}
-    node := blob.Node
 
-    if model.RoleType(*event.Old) == model.RoleTypeGuest {
-        rootid, e := codec.Nid2rootid(*event.New)
-        if e != nil { return ok, e }
-        i := auth.UserIsGuest(uctx, rootid)
-        if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")) }
-        var nf model.NodeFragment
-        t := model.NodeTypeRole
-        StructMap(uctx.Roles[i], &nf)
-        nf.FirstLink = &uctx.Username
-        nf.Type = &t
-        node = &nf
-    }
-
-    ok, err := LeaveRole(uctx, tension, node)
-    return ok, err
-}
-
-
-func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-    var ok bool
-    // Only root node can be join
-    // --
-
-    rootid, err := codec.Nid2rootid(*event.New)
-    if err != nil { return ok, err }
-    if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")) }
-    i := auth.UserIsMember(uctx, rootid)
-    if i>=0 {return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation.")) }
-
-    // Validate
-    // --
-    // check the invitation if a hash is given
-    // * orga invtation ? <> user invitation hash ?
-    // * else check if User Can Join Organisation
-    if *tension.Receiver.UserCanJoin  {
-        guestid := codec.MemberIdCodec(rootid, uctx.Username)
-        ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
-        if err != nil { return ok, err }
-        if ex {
-            // Ensure a correct state for this Guest node.
-            err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)
-        } else {
-            rt := model.RoleTypeGuest
-            t := model.NodeTypeRole
-            name := "Guest"
-            n := &model.NodeFragment{
-                Name: &name,
-                RoleType: &rt,
-                Type: &t,
-                FirstLink: &uctx.Username,
-            }
-            auth.InheritNodeCharacDefault(n, tension.Receiver)
-            err = PushNode(uctx, nil, n, "", guestid, rootid)
-        }
-        ok = true
-    }
+    ok, err := TryUpdateLink(uctx, tension, blob.Node, event)
 
     return ok, err
 }
@@ -495,6 +422,78 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
     err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
     return true, err
 }
+
+func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    var ok bool
+
+    // Only root node can be joined
+    // --
+    rootid, err := codec.Nid2rootid(*event.New)
+    if err != nil { return ok, err }
+    if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")) }
+    i := auth.UserIsMember(uctx, rootid)
+    if i>=0 {return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation.")) }
+
+    // Validate
+    // --
+    // check the invitation if a hash is given
+    // * orga invtation ? <> user invitation hash ?
+    // * else check if User Can Join Organisation
+    if *tension.Receiver.UserCanJoin  {
+        guestid := codec.MemberIdCodec(rootid, uctx.Username)
+        ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
+        if err != nil { return ok, err }
+        if ex {
+            // Ensure a correct state for this Guest node.
+            err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)
+        } else {
+            rt := model.RoleTypeGuest
+            t := model.NodeTypeRole
+            name := "Guest"
+            n := &model.NodeFragment{
+                Name: &name,
+                RoleType: &rt,
+                Type: &t,
+                FirstLink: &uctx.Username,
+            }
+            auth.InheritNodeCharacDefault(n, tension.Receiver)
+            err = PushNode(uctx.Username, nil, n, "", guestid, rootid)
+        }
+        ok = true
+    }
+
+    return ok, err
+}
+
+func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    // Remove user reference
+    // * remove User role
+    // * unlink Orga role (Guest/Member) if role_type is Guest|Member
+    // * upgrade user membership
+    // --
+    var ok bool
+
+    blob := GetBlob(tension)
+    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    node := blob.Node
+
+    if model.RoleType(*event.Old) == model.RoleTypeGuest {
+        rootid, e := codec.Nid2rootid(*event.New)
+        if e != nil { return ok, e }
+        i := auth.UserIsGuest(uctx, rootid)
+        if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")) }
+        var nf model.NodeFragment
+        t := model.NodeTypeRole
+        StructMap(uctx.Roles[i], &nf)
+        nf.FirstLink = &uctx.Username
+        nf.Type = &t
+        node = &nf
+    }
+
+    ok, err := LeaveRole(uctx, tension, node)
+    return ok, err
+}
+
 
 //
 // Utilities
