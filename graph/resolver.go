@@ -101,7 +101,7 @@ func Init() gen.Config {
     c.Directives.Hook_getCommentInput = nothing
     c.Directives.Hook_queryCommentInput = nothing
     c.Directives.Hook_addCommentInput = nothing
-    c.Directives.Hook_updateCommentInput = nothing
+    c.Directives.Hook_updateCommentInput = setContextWithID // used by isOwner auth rule
     c.Directives.Hook_deleteCommentInput = nothing
     // --
     c.Directives.Hook_addComment = nothing
@@ -192,6 +192,33 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 
 //
 // Input directives
+//
+
+func setContextWithID(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil { return nil, err }
+    return next(ctx)
+}
+
+func setContextWithNameid(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, _, err := setContextWith(ctx, obj, "nameid")
+    if err != nil { return nil, err }
+    return next(ctx)
+}
+
+func setUpdateContextInfo(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    hasSet := obj.(model.JsonAtom)["set"] != nil
+    hasRemove := obj.(model.JsonAtom)["remove"] != nil
+    ctx = context.WithValue(ctx, "hasSet", hasSet)
+    ctx = context.WithValue(ctx, "hasRemove", hasRemove)
+    ctx, _, err := setContextWith(ctx, obj, "id")
+    if err != nil { return nil, err }
+    return next(ctx)
+}
+
+
+//
+// Input Field directives
 //
 
 func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {

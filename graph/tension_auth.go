@@ -354,10 +354,10 @@ func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField stri
     var err error
     user := userObj.(model.JsonAtom)[userField]
     if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        // Tension here
+        // Non user type here (userField/createdBy mùust be present
         id := ctx.Value("id")
         if id == nil || id .(string) == "" {
-            return false, fmt.Errorf("node target unknown(id), need a database request here...")
+            return false, fmt.Errorf("object target unknown(id), see setContextWithID...")
         }
         // Request the database to get the field
         // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())

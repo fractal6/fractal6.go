@@ -28,6 +28,8 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
     } else if obj.(model.JsonAtom)["filter"] != nil {
         // Delete mutation
         filter = obj.(model.JsonAtom)["filter"].(model.JsonAtom)
+    } else {
+        return ctx, val, err
     }
 
     if filter[n] == nil {
@@ -50,26 +52,6 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
 
     ctx = context.WithValue(ctx, n, val)
     return ctx, val, err
-}
-
-func setContextWithID(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil { return nil, err }
-    return next(ctx)
-}
-
-func setContextWithNameid(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "nameid")
-    if err != nil { return nil, err }
-    return next(ctx)
-}
-
-func setUpdateContextInfo(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    hasSet := obj.(model.JsonAtom)["set"] != nil
-    hasRemove := obj.(model.JsonAtom)["remove"] != nil
-    ctx = context.WithValue(ctx, "hasSet", hasSet)
-    ctx = context.WithValue(ctx, "hasRemove", hasRemove)
-    return next(ctx)
 }
 
 func getNestedObj(obj interface{}, field string) interface{} {

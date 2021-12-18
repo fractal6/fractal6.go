@@ -264,9 +264,9 @@ type Contract {
   contract_type: ContractType!
   closedAt: DateTime
   event(filter: EventFragmentFilter): EventFragment!
+  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   pending_candidates(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser!]
-  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]!
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
   id: ID!
@@ -275,9 +275,9 @@ type Contract {
   updatedAt: DateTime
   message: String
 
+  participantsAggregate(filter: VoteFilter): VoteAggregateResult
   candidatesAggregate(filter: UserFilter): UserAggregateResult
   pending_candidatesAggregate(filter: PendingUserFilter): PendingUserAggregateResult
-  participantsAggregate(filter: VoteFilter): VoteAggregateResult
   commentsAggregate(filter: CommentFilter): CommentAggregateResult
 }
 
@@ -469,37 +469,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -543,9 +543,9 @@ input AddContractInput {
   contract_type: ContractType!
   closedAt: DateTime
   event: EventFragmentRef!
+  participants: [VoteRef!]!
   candidates: [UserRef!]
   pending_candidates: [PendingUserRef!]
-  participants: [VoteRef!]!
   comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean
 }
@@ -716,10 +716,10 @@ input AddTensionInput {
   type_: TensionType!
   status: TensionStatus!
   action: TensionAction
-  comments: [CommentRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [Created, CommentPushed])
-  assignees: [UserRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [AssigneeAdded, AssigneeRemoved])
-  labels: [LabelRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [LabelAdded, LabelRemoved])
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [BlobCreated, BlobCommitted])
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!]!
   contracts: [ContractRef!]
   n_comments: Int
@@ -983,9 +983,9 @@ enum ContractHasFilter {
   contract_type
   closedAt
   event
+  participants
   candidates
   pending_candidates
-  participants
   comments
   isValidator
 }
@@ -1015,9 +1015,9 @@ input ContractPatch {
   contract_type: ContractType @x_patch_ro
   closedAt: DateTime @x_patch_ro
   event: EventFragmentRef @x_patch_ro
+  participants: [VoteRef!] @x_patch_ro
   candidates: [UserRef!] @x_patch_ro
   pending_candidates: [PendingUserRef!] @x_patch_ro
-  participants: [VoteRef!] @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean @x_patch_ro
 }
@@ -1034,9 +1034,9 @@ input ContractRef {
   contract_type: ContractType
   closedAt: DateTime
   event: EventFragmentRef
+  participants: [VoteRef!]
   candidates: [UserRef!]
   pending_candidates: [PendingUserRef!]
-  participants: [VoteRef!]
   comments: [CommentRef!]
   isValidator: Boolean
 }
@@ -2296,10 +2296,10 @@ input TensionPatch {
   type_: TensionType @x_patch_ro
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
-  comments: [CommentRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [Created, CommentPushed])
-  assignees: [UserRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [AssigneeAdded, AssigneeRemoved])
-  labels: [LabelRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [LabelAdded, LabelRemoved])
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [BlobCreated, BlobCommitted])
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
   n_comments: Int @x_patch_ro

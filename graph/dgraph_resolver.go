@@ -44,7 +44,8 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     variables, _ := json.Marshal(gc.Variables)
     reqInput := map[string]string{
         "QueryName": queryName,
-        "RawQuery": tools.QuoteString(gc.RawQuery),
+        "RawQuery": tools.CleanString(gc.RawQuery, true),
+        //"RawQuery": tools.QuoteString(gc.RawQuery),
         "Variables": string(variables),
     }
 

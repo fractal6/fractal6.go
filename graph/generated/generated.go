@@ -6785,9 +6785,9 @@ type Contract {
   contract_type: ContractType!
   closedAt: DateTime
   event(filter: EventFragmentFilter): EventFragment!
+  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]!
   candidates(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   pending_candidates(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser!]
-  participants(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]!
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   isValidator: Boolean @isContractValidator
   id: ID!
@@ -6796,9 +6796,9 @@ type Contract {
   updatedAt: DateTime
   message: String
 
+  participantsAggregate(filter: VoteFilter): VoteAggregateResult
   candidatesAggregate(filter: UserFilter): UserAggregateResult
   pending_candidatesAggregate(filter: PendingUserFilter): PendingUserAggregateResult
-  participantsAggregate(filter: VoteFilter): VoteAggregateResult
   commentsAggregate(filter: CommentFilter): CommentAggregateResult
 }
 
@@ -6990,37 +6990,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7064,9 +7064,9 @@ input AddContractInput {
   contract_type: ContractType!
   closedAt: DateTime
   event: EventFragmentRef!
+  participants: [VoteRef!]!
   candidates: [UserRef!]
   pending_candidates: [PendingUserRef!]
-  participants: [VoteRef!]!
   comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean
 }
@@ -7237,10 +7237,10 @@ input AddTensionInput {
   type_: TensionType!
   status: TensionStatus!
   action: TensionAction
-  comments: [CommentRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [Created, CommentPushed])
-  assignees: [UserRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [AssigneeAdded, AssigneeRemoved])
-  labels: [LabelRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [LabelAdded, LabelRemoved])
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [BlobCreated, BlobCommitted])
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!]!
   contracts: [ContractRef!]
   n_comments: Int
@@ -7504,9 +7504,9 @@ enum ContractHasFilter {
   contract_type
   closedAt
   event
+  participants
   candidates
   pending_candidates
-  participants
   comments
   isValidator
 }
@@ -7536,9 +7536,9 @@ input ContractPatch {
   contract_type: ContractType @x_patch_ro
   closedAt: DateTime @x_patch_ro
   event: EventFragmentRef @x_patch_ro
+  participants: [VoteRef!] @x_patch_ro
   candidates: [UserRef!] @x_patch_ro
   pending_candidates: [PendingUserRef!] @x_patch_ro
-  participants: [VoteRef!] @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean @x_patch_ro
 }
@@ -7555,9 +7555,9 @@ input ContractRef {
   contract_type: ContractType
   closedAt: DateTime
   event: EventFragmentRef
+  participants: [VoteRef!]
   candidates: [UserRef!]
   pending_candidates: [PendingUserRef!]
-  participants: [VoteRef!]
   comments: [CommentRef!]
   isValidator: Boolean
 }
@@ -8817,10 +8817,10 @@ input TensionPatch {
   type_: TensionType @x_patch_ro
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
-  comments: [CommentRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [Created, CommentPushed])
-  assignees: [UserRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [AssigneeAdded, AssigneeRemoved])
-  labels: [LabelRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [LabelAdded, LabelRemoved])
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e: [BlobCreated, BlobCommitted])
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
@@ -18734,6 +18734,45 @@ func (ec *executionContext) _Contract_event(ctx context.Context, field graphql.C
 	return ec.marshalNEventFragment2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragment(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Contract_participants(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_participants_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Participants, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Vote)
+	fc.Result = res
+	return ec.marshalNVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Contract_candidates(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18804,45 +18843,6 @@ func (ec *executionContext) _Contract_pending_candidates(ctx context.Context, fi
 	res := resTmp.([]*model.PendingUser)
 	fc.Result = res
 	return ec.marshalOPendingUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Contract_participants(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Contract",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Contract_participants_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Participants, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Vote)
-	fc.Result = res
-	return ec.marshalNVote2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_comments(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -19091,6 +19091,42 @@ func (ec *executionContext) _Contract_message(ctx context.Context, field graphql
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Contract_participantsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Contract",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Contract_participantsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ParticipantsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.VoteAggregateResult)
+	fc.Result = res
+	return ec.marshalOVoteAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Contract_candidatesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -19161,42 +19197,6 @@ func (ec *executionContext) _Contract_pending_candidatesAggregate(ctx context.Co
 	res := resTmp.(*model.PendingUserAggregateResult)
 	fc.Result = res
 	return ec.marshalOPendingUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Contract_participantsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Contract",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Contract_participantsAggregate_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ParticipantsAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.VoteAggregateResult)
-	fc.Result = res
-	return ec.marshalOVoteAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_commentsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
@@ -37528,6 +37528,14 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "participants":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
+			it.Participants, err = ec.unmarshalNVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "candidates":
 			var err error
 
@@ -37541,14 +37549,6 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
 			it.PendingCandidates, err = ec.unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "participants":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			it.Participants, err = ec.unmarshalNVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -38742,16 +38742,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -38763,7 +38753,17 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -38786,16 +38786,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -38807,7 +38797,17 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -38830,16 +38830,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -38851,10 +38841,10 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -40569,6 +40559,32 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.EventFragmentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "participants":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.VoteRef); ok {
+				it.Participants = data
+			} else if tmp == nil {
+				it.Participants = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.VoteRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "candidates":
 			var err error
 
@@ -40619,32 +40635,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				it.PendingCandidates = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.PendingUserRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "participants":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.VoteRef); ok {
-				it.Participants = data
-			} else if tmp == nil {
-				it.Participants = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.VoteRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comments":
@@ -40804,6 +40794,14 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
+		case "participants":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
+			it.Participants, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "candidates":
 			var err error
 
@@ -40817,14 +40815,6 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
 			it.PendingCandidates, err = ec.unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "participants":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			it.Participants, err = ec.unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -46878,16 +46868,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -46899,7 +46879,17 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -46922,16 +46912,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -46943,7 +46923,17 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -46966,16 +46956,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -46987,10 +46967,10 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -50108,15 +50088,15 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "candidates":
-			out.Values[i] = ec._Contract_candidates(ctx, field, obj)
-		case "pending_candidates":
-			out.Values[i] = ec._Contract_pending_candidates(ctx, field, obj)
 		case "participants":
 			out.Values[i] = ec._Contract_participants(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "candidates":
+			out.Values[i] = ec._Contract_candidates(ctx, field, obj)
+		case "pending_candidates":
+			out.Values[i] = ec._Contract_pending_candidates(ctx, field, obj)
 		case "comments":
 			out.Values[i] = ec._Contract_comments(ctx, field, obj)
 		case "isValidator":
@@ -50140,12 +50120,12 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Contract_updatedAt(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._Contract_message(ctx, field, obj)
+		case "participantsAggregate":
+			out.Values[i] = ec._Contract_participantsAggregate(ctx, field, obj)
 		case "candidatesAggregate":
 			out.Values[i] = ec._Contract_candidatesAggregate(ctx, field, obj)
 		case "pending_candidatesAggregate":
 			out.Values[i] = ec._Contract_pending_candidatesAggregate(ctx, field, obj)
-		case "participantsAggregate":
-			out.Values[i] = ec._Contract_participantsAggregate(ctx, field, obj)
 		case "commentsAggregate":
 			out.Values[i] = ec._Contract_commentsAggregate(ctx, field, obj)
 		default:

@@ -287,7 +287,8 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
         rid, _ := codec.Nid2pid(d.Nameid)
         if *d.RoleType == model.RoleTypeOwner {
             ownids = append(ownids, rid)
-            continue
+            // Owner is also a member !
+            //continue
         }
         if _, v := check[rid]; !v {
             check[rid] = true

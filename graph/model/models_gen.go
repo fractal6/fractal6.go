@@ -50,9 +50,9 @@ type AddContractInput struct {
 	ContractType      ContractType      `json:"contract_type,omitempty"`
 	ClosedAt          *string           `json:"closedAt,omitempty"`
 	Event             *EventFragmentRef `json:"event,omitempty"`
+	Participants      []*VoteRef        `json:"participants,omitempty"`
 	Candidates        []*UserRef        `json:"candidates,omitempty"`
 	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
-	Participants      []*VoteRef        `json:"participants,omitempty"`
 	Comments          []*CommentRef     `json:"comments,omitempty"`
 	IsValidator       *bool             `json:"isValidator"`
 }
@@ -443,9 +443,9 @@ type Contract struct {
 	ContractType               ContractType                `json:"contract_type,omitempty"`
 	ClosedAt                   *string                     `json:"closedAt,omitempty"`
 	Event                      *EventFragment              `json:"event,omitempty"`
+	Participants               []*Vote                     `json:"participants,omitempty"`
 	Candidates                 []*User                     `json:"candidates,omitempty"`
 	PendingCandidates          []*PendingUser              `json:"pending_candidates,omitempty"`
-	Participants               []*Vote                     `json:"participants,omitempty"`
 	Comments                   []*Comment                  `json:"comments,omitempty"`
 	IsValidator                *bool                       `json:"isValidator"`
 	ID                         string                      `json:"id,omitempty"`
@@ -453,9 +453,9 @@ type Contract struct {
 	CreatedAt                  string                      `json:"createdAt,omitempty"`
 	UpdatedAt                  *string                     `json:"updatedAt,omitempty"`
 	Message                    *string                     `json:"message,omitempty"`
+	ParticipantsAggregate      *VoteAggregateResult        `json:"participantsAggregate,omitempty"`
 	CandidatesAggregate        *UserAggregateResult        `json:"candidatesAggregate,omitempty"`
 	PendingCandidatesAggregate *PendingUserAggregateResult `json:"pending_candidatesAggregate,omitempty"`
-	ParticipantsAggregate      *VoteAggregateResult        `json:"participantsAggregate,omitempty"`
 	CommentsAggregate          *CommentAggregateResult     `json:"commentsAggregate,omitempty"`
 }
 
@@ -504,9 +504,9 @@ type ContractPatch struct {
 	ContractType      *ContractType     `json:"contract_type,omitempty"`
 	ClosedAt          *string           `json:"closedAt,omitempty"`
 	Event             *EventFragmentRef `json:"event,omitempty"`
+	Participants      []*VoteRef        `json:"participants,omitempty"`
 	Candidates        []*UserRef        `json:"candidates,omitempty"`
 	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
-	Participants      []*VoteRef        `json:"participants,omitempty"`
 	Comments          []*CommentRef     `json:"comments,omitempty"`
 	IsValidator       *bool             `json:"isValidator"`
 }
@@ -523,9 +523,9 @@ type ContractRef struct {
 	ContractType      *ContractType     `json:"contract_type,omitempty"`
 	ClosedAt          *string           `json:"closedAt,omitempty"`
 	Event             *EventFragmentRef `json:"event,omitempty"`
+	Participants      []*VoteRef        `json:"participants,omitempty"`
 	Candidates        []*UserRef        `json:"candidates,omitempty"`
 	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
-	Participants      []*VoteRef        `json:"participants,omitempty"`
 	Comments          []*CommentRef     `json:"comments,omitempty"`
 	IsValidator       *bool             `json:"isValidator"`
 }
@@ -2290,9 +2290,9 @@ const (
 	ContractHasFilterContractType      ContractHasFilter = "contract_type"
 	ContractHasFilterClosedAt          ContractHasFilter = "closedAt"
 	ContractHasFilterEvent             ContractHasFilter = "event"
+	ContractHasFilterParticipants      ContractHasFilter = "participants"
 	ContractHasFilterCandidates        ContractHasFilter = "candidates"
 	ContractHasFilterPendingCandidates ContractHasFilter = "pending_candidates"
-	ContractHasFilterParticipants      ContractHasFilter = "participants"
 	ContractHasFilterComments          ContractHasFilter = "comments"
 	ContractHasFilterIsValidator       ContractHasFilter = "isValidator"
 )
@@ -2308,16 +2308,16 @@ var AllContractHasFilter = []ContractHasFilter{
 	ContractHasFilterContractType,
 	ContractHasFilterClosedAt,
 	ContractHasFilterEvent,
+	ContractHasFilterParticipants,
 	ContractHasFilterCandidates,
 	ContractHasFilterPendingCandidates,
-	ContractHasFilterParticipants,
 	ContractHasFilterComments,
 	ContractHasFilterIsValidator,
 }
 
 func (e ContractHasFilter) IsValid() bool {
 	switch e {
-	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterContractid, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterCandidates, ContractHasFilterPendingCandidates, ContractHasFilterParticipants, ContractHasFilterComments, ContractHasFilterIsValidator:
+	case ContractHasFilterCreatedBy, ContractHasFilterCreatedAt, ContractHasFilterUpdatedAt, ContractHasFilterMessage, ContractHasFilterContractid, ContractHasFilterTension, ContractHasFilterStatus, ContractHasFilterContractType, ContractHasFilterClosedAt, ContractHasFilterEvent, ContractHasFilterParticipants, ContractHasFilterCandidates, ContractHasFilterPendingCandidates, ContractHasFilterComments, ContractHasFilterIsValidator:
 		return true
 	}
 	return false

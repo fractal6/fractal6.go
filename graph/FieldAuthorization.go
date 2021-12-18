@@ -140,6 +140,7 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
     field := *graphql.GetPathContext(ctx).Field
     if ctx.Value("hasSet") != nil && ctx.Value("hasRemove") != nil && (field == "labels" || field == "assignees") {
         // @DEBUG: detect events when remove is used in in updates
+        // @DEBUG: detect that the number of event is equal to the current field len
         // when removing labels or assigness...
         return next(ctx)
     }
