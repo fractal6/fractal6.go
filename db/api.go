@@ -71,6 +71,7 @@ var contractHookPayload string = `{
     EventFragment.new
   }
   Contract.candidates { User.username }
+  Contract.pending_candidates { PendingUser.email }
   Contract.participants { Vote.data Vote.node { Node.nameid Node.first_link {User.username} } }
 }`
 
@@ -277,7 +278,6 @@ var dqlQueries map[string]string = map[string]string{
     "getTensionInt": `{
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
             tensions as Node.tensions_in {{.tensionFilter}} @cascade {
-                Tension.emitter @filter({{.nameids}})
                 {{.authorsFilter}}
                 {{.labelsFilter}}
             }
@@ -332,14 +332,9 @@ var dqlQueries map[string]string = map[string]string{
                 {{.authorsFilter}}
                 {{.labelsFilter}}
             }
-            tensions_out as Node.tensions_out {{.tensionFilter}} @cascade {
-                uid
-                {{.authorsFilter}}
-                {{.labelsFilter}}
-            }
         }
 
-        all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+        all(func: uid(tensions_in), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
             uid
             Post.createdAt
             Post.createdBy { User.username }
@@ -360,17 +355,12 @@ var dqlQueries map[string]string = map[string]string{
                 {{.authorsFilter}}
                 {{.labelsFilter}}
             }
-            tensions_out as Node.tensions_out {{.tensionFilter}} @cascade {
-                uid
-                {{.authorsFilter}}
-                {{.labelsFilter}}
-            }
         }
 
-        all(func: uid(tensions_in, tensions_out)) @filter(eq(Tension.status, "Open")) {
+        all(func: uid(tensions_in)) @filter(eq(Tension.status, "Open")) {
             count: count(uid)
         }
-        all2(func: uid(tensions_in, tensions_out)) @filter(eq(Tension.status, "Closed")) {
+        all2(func: uid(tensions_in)) @filter(eq(Tension.status, "Closed")) {
             count: count(uid)
         }
     }`,
