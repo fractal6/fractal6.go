@@ -2,6 +2,7 @@ package graph
 
 import (
     //"fmt"
+    "regexp"
 	"context"
 	"encoding/json"
 	"github.com/99designs/gqlgen/graphql"
@@ -42,10 +43,21 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     // Build the graphql raw request
     gc := graphql.GetRequestContext(ctx)
     variables, _ := json.Marshal(gc.Variables)
+
+    // Remove some input
+    rawQuery := gc.RawQuery
+    if ctx.Value("cut_history") != nil {
+        // Go along PushHistory...
+        reg := regexp.MustCompile(`,?\s*history\s*:\s*\[[^\]]*\]`)
+        // If we remove completely history, it cause some "no data" box error on the frontend.
+        rawQuery = reg.ReplaceAllString(rawQuery, "history:[]")
+    }
+
     reqInput := map[string]string{
         "QueryName": queryName,
-        "RawQuery": tools.CleanString(gc.RawQuery, true),
-        //"RawQuery": tools.QuoteString(gc.RawQuery),
+        // Warning: CleanString will lose format for text and mardown text data.
+        //"RawQuery": tools.CleanString(gc.RawQuery, true),
+        "RawQuery": tools.QuoteString(rawQuery),
         "Variables": string(variables),
     }
 

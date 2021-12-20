@@ -199,8 +199,9 @@ type Tension {
   assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
-  history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
+  history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  suscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   n_comments: Int
   n_open_contracts: Int
   id: ID!
@@ -215,6 +216,7 @@ type Tension {
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  suscribersAggregate(filter: UserFilter): UserAggregateResult
 }
 
 type Comment {
@@ -309,19 +311,34 @@ type User {
   emailValidated: Boolean! @hidden
   bio: String
   utc: String
+  notifyByEmail: Boolean
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
 
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
   backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
+  eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
 }
+
+type UserEvent {
+  id: ID!
+  createdAt: DateTime!
+  isRead: Boolean!
+  user(filter: UserFilter): User!
+  event(filter: EventKindFilter, first: Int, offset: Int): [EventKind!]
+}
+
+union EventKind= Event| Contract
 
 type UserRights {
   canLogin: Boolean!
@@ -469,37 +486,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -720,14 +737,27 @@ input AddTensionInput {
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
-  history: [EventRef!]!
+  history: [EventRef!]
   contracts: [ContractRef!]
+  suscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
 }
 
 type AddTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  numUids: Int
+}
+
+input AddUserEventInput {
+  createdAt: DateTime!
+  isRead: Boolean!
+  user: UserRef!
+  event: [EventKindRef!]
+}
+
+type AddUserEventPayload {
+  userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   numUids: Int
 }
 
@@ -742,12 +772,15 @@ input AddUserInput {
   emailValidated: Boolean!
   bio: String
   utc: String
+  notifyByEmail: Boolean
   rights: UserRightsRef!
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  subscriptions: [TensionRef!]
+  events: [UserEventRef!]
 }
 
 type AddUserPayload {
@@ -1164,6 +1197,12 @@ type DeleteTensionPayload {
   numUids: Int
 }
 
+type DeleteUserEventPayload {
+  userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
+  msg: String
+  numUids: Int
+}
+
 type DeleteUserPayload {
   user(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   msg: String
@@ -1283,6 +1322,22 @@ enum EventHasFilter {
   event_type
   old
   new
+}
+
+input EventKindFilter {
+  memberTypes: [EventKindType!]
+  eventFilter: EventFilter
+  contractFilter: ContractFilter
+}
+
+input EventKindRef {
+  eventRef: EventRef
+  contractRef: ContractRef
+}
+
+enum EventKindType {
+  Event
+  Contract
 }
 
 input EventOrder {
@@ -1591,6 +1646,9 @@ type Mutation {
   addUser(input: [AddUserInput!]!, upsert: Boolean): AddUserPayload
   updateUser(input: UpdateUserInput!): UpdateUserPayload
   deleteUser(filter: UserFilter!): DeleteUserPayload
+  addUserEvent(input: [AddUserEventInput!]!): AddUserEventPayload
+  updateUserEvent(input: UpdateUserEventInput!): UpdateUserEventPayload
+  deleteUserEvent(filter: UserEventFilter!): DeleteUserEventPayload
   addUserRights(input: [AddUserRightsInput!]!): AddUserRightsPayload
   updateUserRights(input: UpdateUserRightsInput!): UpdateUserRightsPayload
   deleteUserRights(filter: UserRightsFilter!): DeleteUserRightsPayload
@@ -2069,6 +2127,9 @@ type Query {
   getUser(id: ID, username: String): User
   queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   aggregateUser(filter: UserFilter): UserAggregateResult
+  getUserEvent(id: ID!): UserEvent
+  queryUserEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
+  aggregateUserEvent(filter: UserEventFilter): UserEventAggregateResult
   queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
   aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
 }
@@ -2262,6 +2323,7 @@ enum TensionHasFilter {
   blobs
   history
   contracts
+  suscribers
   n_comments
   n_open_contracts
 }
@@ -2302,6 +2364,7 @@ input TensionPatch {
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
+  suscribers: [UserRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
   n_open_contracts: Int @x_patch_ro
 }
@@ -2326,6 +2389,7 @@ input TensionRef {
   blobs: [BlobRef!]
   history: [EventRef!]
   contracts: [ContractRef!]
+  suscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
 }
@@ -2494,6 +2558,17 @@ type UpdateTensionPayload {
   numUids: Int
 }
 
+input UpdateUserEventInput {
+  filter: UserEventFilter!
+  set: UserEventPatch
+  remove: UserEventPatch
+}
+
+type UpdateUserEventPayload {
+  userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
+  numUids: Int
+}
+
 input UpdateUserInput {
   filter: UserFilter!
   set: UserPatch
@@ -2549,6 +2624,54 @@ type UserAggregateResult {
   utcMax: String
 }
 
+type UserEventAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+}
+
+input UserEventFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  isRead: Boolean
+  has: [UserEventHasFilter]
+  and: [UserEventFilter]
+  or: [UserEventFilter]
+  not: UserEventFilter
+}
+
+enum UserEventHasFilter {
+  createdAt
+  isRead
+  user
+  event
+}
+
+input UserEventOrder {
+  asc: UserEventOrderable
+  desc: UserEventOrderable
+  then: UserEventOrder
+}
+
+enum UserEventOrderable {
+  createdAt
+}
+
+input UserEventPatch {
+  createdAt: DateTime @x_patch_ro
+  isRead: Boolean @x_patch_ro
+  user: UserRef @x_patch_ro
+  event: [EventKindRef!] @x_patch_ro
+}
+
+input UserEventRef {
+  id: ID
+  createdAt: DateTime
+  isRead: Boolean
+  user: UserRef
+  event: [EventKindRef!]
+}
+
 input UserFilter {
   id: [ID!]
   username: StringHashFilter_StringRegExpFilter
@@ -2571,12 +2694,15 @@ enum UserHasFilter {
   emailValidated
   bio
   utc
+  notifyByEmail
   rights
   roles
   backed_roles
   tensions_created
   tensions_assigned
   contracts
+  subscriptions
+  events
 }
 
 input UserOrder {
@@ -2608,12 +2734,15 @@ input UserPatch {
   emailValidated: Boolean @x_patch_ro
   bio: String @x_patch(r:"isOwner")
   utc: String @x_patch(r:"isOwner")
+  notifyByEmail: Boolean @x_patch(r:"isOwner")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
   backed_roles: [NodeRef!] @x_patch_ro
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
+  subscriptions: [TensionRef!] @x_patch_ro
+  events: [UserEventRef!] @x_patch_ro
 }
 
 input UserRef {
@@ -2628,12 +2757,15 @@ input UserRef {
   emailValidated: Boolean
   bio: String
   utc: String
+  notifyByEmail: Boolean
   rights: UserRightsRef
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  subscriptions: [TensionRef!]
+  events: [UserEventRef!]
 }
 
 type UserRightsAggregateResult {

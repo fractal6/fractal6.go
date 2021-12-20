@@ -232,7 +232,10 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
     }
 
     if len(contract.Candidates) !=1 {
-        return false, nil, fmt.Errorf("Contract with no candidate.")
+        // Only one candidate supported for now.
+        if len(contract.PendingCandidates) !=1 {
+            return false, nil, fmt.Errorf("Contract with no candidate.")
+        }
     }
 
     // Check Vote
@@ -242,7 +245,7 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
     for _, p := range contract.Participants {
         if (p.Node.FirstLink == nil) { continue }
 
-        if p.Node.FirstLink.Username == contract.Candidates[0].Username {
+        if len(contract.Candidates) == 1 && p.Node.FirstLink.Username == contract.Candidates[0].Username {
             // Candidate
             v1 = p.Data[0] == 1
         } else {

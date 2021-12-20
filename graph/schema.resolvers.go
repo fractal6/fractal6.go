@@ -206,6 +206,18 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddUserEvent(ctx context.Context, input []*model.AddUserEventInput) (data *model.AddUserEventPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (data *model.UpdateUserEventPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (data *model.DeleteUserEventPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (data *model.AddUserRightsPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -403,6 +415,18 @@ func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter,
 }
 
 func (r *queryResolver) AggregateUser(ctx context.Context, filter *model.UserFilter) (data *model.UserAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetUserEvent(ctx context.Context, id string) (data *model.UserEvent, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryUserEvent(ctx context.Context, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) (data []*model.UserEvent, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateUserEvent(ctx context.Context, filter *model.UserEventFilter) (data *model.UserEventAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

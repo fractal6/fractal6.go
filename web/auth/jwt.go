@@ -130,7 +130,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
     return &httpCookie, nil
 }
 
-func ContextWithUserCtx(ctx context.Context) context.Context {
+func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
     token, claims, err := jwtauth.FromContext(ctx)
     if err != nil {
         //errMsg := fmt.Errorf("%v", err)
@@ -156,18 +156,18 @@ func ContextWithUserCtx(ctx context.Context) context.Context {
 
     // Set the user token
     userCtx := model.UserCtx{}
-    uRaw, err := json.Marshal(claims[tkMaster.tokenClaim])
-    if err != nil { panic(err) }
+    uRaw, e := json.Marshal(claims[tkMaster.tokenClaim])
+    if e != nil { panic(e) }
     json.Unmarshal(uRaw, &userCtx)
     ctx = context.WithValue(ctx, tkMaster.tokenClaim, &userCtx)
 
     // Set the Iat
     if claims["iat"] != nil {
         var iat int64 = int64(claims["iat"].(float64))
-        return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339))
+        return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339)), err
     }
     //LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
-    return ctx
+    return ctx, err
 }
 
 func GetUserContext(ctx context.Context) (*model.UserCtx, error) {

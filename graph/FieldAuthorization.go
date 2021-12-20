@@ -102,7 +102,12 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
 //oneByOne ensure that the mutation on the given field should contains at least one element.
 func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     data, err := next(ctx)
-    if len(InterfaceSlice(data)) > 1 {
+    slice, ok := InterfaceSlice(data)
+    if !ok {
+        field := *graphql.GetPathContext(ctx).Field
+        return nil, fmt.Errorf("Data must be an array '%s'", field)
+    }
+    if len(slice) > 1 {
         field := *graphql.GetPathContext(ctx).Field
         return nil, LogErr("@oneByOne error", fmt.Errorf("Only one object allowed in slice '%s'", field))
     }
@@ -129,9 +134,15 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
 
     // Exception if we got Blob with just an ID. Use to identify the blob user are working on.
     blobs_ := obj.(model.JsonAtom)["blobs"]
-    if blobs_ != nil && len(InterfaceSlice(blobs_)) == 1 {
-        b := blobs_.([]interface{})[0].(model.JsonAtom)
+    blobs, ok := InterfaceSlice(blobs_)
+    if !ok {
+        field := *graphql.GetPathContext(ctx).Field
+        return nil, fmt.Errorf("Blobs must be an array '%s'", field)
+    }
+    if len(blobs) == 1 {
+        b := blobs[0].(model.JsonAtom)
         if len(b) == 1 && b["id"] != nil {
+            // Allows just reference to a blob (@DEBUG: add a 'cut_blob' to remove it as we do for history to prevent blob hack.
             // ok
             return next(ctx)
         }

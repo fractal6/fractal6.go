@@ -9,6 +9,7 @@ import (
     "encoding/json"
     "github.com/spf13/viper"
     "github.com/mitchellh/mapstructure"
+	"zerogov/fractal6.go/graph/model"
 )
 
 //Now returns the current time formated with RFC3339
@@ -112,6 +113,47 @@ func CleanNilMap(m map[string]interface{}) map[string]interface{} {
     return out
 }
 
+//InterfaceSlice tries to convert an interface to a Slice of interface.
+// see stackoverflow.com/a/12754757/4223749
+// and https://ahmet.im/blog/golang-take-slices-of-any-type-as-input-parameter/
+func InterfaceSlice(arg interface{}) (out []interface{}, ok bool) {
+    // Keep the distinction between nil and empty slice input
+    if arg == nil { return out, true }
+    slice, success := takeArg(arg, reflect.Slice)
+    //if slice.IsNil() { return out, true }
+    if !success { // Non slice type
+		return
+    }
+    c := slice.Len()
+    out = make([]interface{}, c)
+    for i := 0; i < c; i++ {
+        out[i] = slice.Index(i).Interface()
+    }
+    return out, true
+}
+
+func takeArg(arg interface{}, kind reflect.Kind) (val reflect.Value, ok bool) {
+    val = reflect.ValueOf(arg)
+    if val.Kind() == kind {
+        ok = true
+    }
+    return
+}
+
+
+func InterfaceToStringSlice(in interface{}) []string {
+    if in == nil {
+        return []string{}
+    }
+    temp := in.([]interface{})
+    var out []string
+    for _, x := range temp {
+        out = append(out, x.(string))
+    }
+    return out
+}
+
+
 // CleanAliasedMap copy the input map by renaming all the keys
 // recursively by removing trailing integers.
 // @DEBUG: how to better handle aliasing (check gqlgen)
@@ -130,6 +172,11 @@ func CleanAliasedMap(m map[string]interface{}) map[string]interface{} {
         switch t := v.(type) {
         case map[string]interface{}:
             nv = CleanAliasedMap(t)
+        case []interface{}:
+            for i, x := range t {
+                t[i] = CleanAliasedMap(x.(model.JsonAtom))
+            }
+            nv = t
         default:
             nv = t
         }
@@ -164,24 +211,49 @@ func CleanCompositeName(m map[string]interface{}) map[string]interface{} {
     return out
 }
 
-//InterfaceSlice tries to convert an interface to a Slice of interface.
-// see stackoverflow.com/a/12754757/4223749
-func InterfaceSlice(slice interface{}) []interface{} {
-    s := reflect.ValueOf(slice)
-    if s.Kind() != reflect.Slice {
-        panic("InterfaceSlice() given a non-slice type")
+// @TODO: migrate CleanCompositeNameHook (db/dql.go) here...
+
+func CleanAliasedMapHook() mapstructure.DecodeHookFunc {
+    return func(from, to reflect.Kind, data interface{}) (interface{}, error) {
+        if to == reflect.Struct {
+            return CleanAliasedMap(data.(map[string]interface{})), nil
+        }
+        return data, nil
     }
+}
 
-    // Keep the distinction between nil and empty slice input
-    if s.IsNil() {
-        return nil
-    }
+func ToUnionHookFunc() mapstructure.DecodeHookFunc {
+    // see  https://github.com/mitchellh/mapstructure/issues/159
+    // and alsoe https://github.com/99designs/gqlgen/issues/1055
+	return func(f, t reflect.Type, data interface{}) (interface{}, error) {
+        var ek model.EventKind // because EventKind is an interface...else TypeOf(MyStrct) works.
+		if t != reflect.TypeOf(&ek).Elem() {
+			return data, nil
+		}
 
-    ret := make([]interface{}, s.Len())
+		switch f.Kind() {
+		case reflect.Map:
+            var d interface{}
+            b, _ := json.Marshal(data)
+            switch data.(model.JsonAtom)["__typename"] {
+                case "Event":
+                    var partial model.Event
+                    if err := json.Unmarshal(b, &partial); err != nil {
+                        return data, err
+                    }
+                    d = &partial
+                case "Contract":
+                    var partial model.Contract
+                    if err := json.Unmarshal(b, &partial); err != nil {
+                        return data, err
+                    }
+                    d = &partial
+                // Ad other unions here...
+                }
 
-    for i:=0; i<s.Len(); i++ {
-        ret[i] = s.Index(i).Interface()
-    }
-
-    return ret
+			return d, nil
+		default:
+			return data, nil
+		}
+	}
 }

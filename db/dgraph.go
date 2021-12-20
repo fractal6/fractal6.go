@@ -7,8 +7,6 @@ import (
 	"time"
 	"bytes"
 	"context"
-	"reflect"
-	"strings"
 	"encoding/json"
 	"text/template"
 	"net/http"
@@ -20,14 +18,13 @@ import (
 	"github.com/dgraph-io/dgo/v200"
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"google.golang.org/grpc"
+	jwt "github.com/dgrijalva/jwt-go"
 
 	"zerogov/fractal6.go/graph/codec"
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/tools"
-
 	"zerogov/fractal6.go/web/middleware/jwtauth"
+	. "zerogov/fractal6.go/tools"
 
-	jwt "github.com/dgrijalva/jwt-go"
 )
 
 var dgraphSecret string
@@ -94,7 +91,7 @@ type QueryString struct {
 // Init clean the query to be compatible in application/json format.
 func (q *QueryString) Init() {
     d := q.Q
-    q.Q = tools.CleanString(d, false)
+    q.Q = CleanString(d, false)
     // Load the template @DEBUG: Do we need a template name ?
     q.Template = template.Must(template.New("graphql").Parse(q.Q))
 }
@@ -124,7 +121,7 @@ func GetDB() *Dgraph {
 }
 
 func initDB() *Dgraph {
-    tools.InitViper()
+    InitViper()
     HOSTDB := viper.GetString("db.host")
     PORTDB := viper.GetString("db.port_graphql")
     PORTGRPC := viper.GetString("db.port_grpc")
@@ -137,61 +134,6 @@ func initDB() *Dgraph {
     } else {
         fmt.Println("Dgraph Graphql addr:", dgraphApiAddr)
         fmt.Println("Dgraph Grpc addr:", grpcAddr)
-    }
-
-    // HTTP/Graphql Request Template
-    gqlQueries := map[string]string{
-        // QUERIES
-        "rawQuery": `{
-            "query": "{{.RawQuery}}",
-            "variables": {{.Variables}}
-        }`,
-        "query": `{
-            "query": "query {{.QueryName}} {
-                {{.QueryName}} ({{.Args}}) {
-                    {{.QueryGraph}}
-                }
-            }"
-        }`,
-        "get": `{
-            "query": "query {{.QueryName}} {
-                {{.QueryName}} ({{.key}}: \"{{.value}}\") {
-                    {{.QueryGraph}}
-                }
-            }"
-        }`,
-
-        // MUTATIONS
-        "add": `{
-            "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) {
-                {{.QueryName}}(input: $input) {
-                    {{.QueryGraph}}
-                }
-            }",
-            "variables": {
-                "input": {{.InputPayload}}
-            }
-        }`,
-        "update": `{
-            "query": "mutation {{.QueryName}}($input:{{.InputType}}!) {
-                {{.QueryName}}(input: $input) {
-                    {{.QueryGraph}}
-                }
-            }",
-            "variables": {
-                "input": {{.InputPayload}}
-            }
-        }`,
-        "delete": `{
-            "query": "mutation {{.QueryName}}($input:{{.InputType}}!) {
-                {{.QueryName}}(filter: $input) {
-                    {{.QueryGraph}}
-                }
-            }",
-            "variables": {
-                "input": {{.InputPayload}}
-            }
-        }`,
     }
 
     dqlT := map[string]*QueryString{}
@@ -447,7 +389,7 @@ func (dg Dgraph) Push_(object map[string]interface{}, dtype string) (string, err
 
 //ClearNodes remove nodes from theirs uid and their edges in dgraph.
 // refers to https://dgraph.io/docs/mutations/json-mutation-format/#deleting-edges
-func (dg Dgraph) ClearNodes(uids ...string) (error) {
+func (dg Dgraph) ClearNodes_(uids ...string) (error) {
     // init client
     dgc, cancel := dg.getDgraphClient()
     defer cancel()
@@ -470,7 +412,7 @@ func (dg Dgraph) ClearNodes(uids ...string) (error) {
 }
 
 //ClearEdges remove edges from their uid
-func (dg Dgraph) ClearEdges(key string, value string, delMap map[string]interface{}) (error) {
+func (dg Dgraph) ClearEdges_(key string, value string, delMap map[string]interface{}) (error) {
     // init client
     dgc, cancel := dg.getDgraphClient()
     defer cancel()
@@ -526,13 +468,10 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
             config = &mapstructure.DecoderConfig{
                 Result: data,
                 TagName: "json",
-                DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
-                    if to == reflect.Struct {
-                        nv := tools.CleanAliasedMap(v.(map[string]interface{}))
-                        return nv, nil
-                    }
-                    return v, nil
-                },
+                DecodeHook: mapstructure.ComposeDecodeHookFunc(
+                    CleanAliasedMapHook(),
+                    ToUnionHookFunc(),
+                ),
             }
         } else {
             config = &mapstructure.DecoderConfig{TagName: "json", Result: data}
@@ -552,206 +491,3 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
     return err
 }
 
-//QueryAuthFilter Get only the authorized node
-func (dg Dgraph) QueryAuthFilter(uctx model.UserCtx, vertex string, k string, values []string) ([]string, error) {
-    Vertex := strings.Title(vertex)
-    queryName := "query" + Vertex
-    queryGraph := k
-
-    var i int
-    var n, args string
-    var res []map[string]string
-    final := []string{}
-
-    // Build query arguments
-    for i, n = range values {
-        if i == 0 {
-            args += fmt.Sprintf(`%s: {eq:"%s"},`, k, n)
-        } else {
-            args += fmt.Sprintf(`or: {%s: {eq: "%s"},`, k, n)
-        }
-    }
-    args += strings.Repeat("},", i)
-
-    // Build query
-    input := map[string]string{
-        "QueryName": queryName,
-        "QueryGraph": queryGraph,
-        "Args": tools.CleanString("filter: {"+args+"}", true),
-    }
-
-    // send query
-    err := dg.QueryGql(uctx, "query", input, &res)
-    if err != nil { return final, err }
-
-    for _, x := range res {
-        final = append(final, x[k])
-    }
-    return final, nil
-}
-
-//
-// Graphql requests
-//
-
-// Get a new vertex
-func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string) (string, error) {
-    Vertex := strings.Title(vertex)
-    queryName := "get" + Vertex
-    queryGraph := "id"
-
-    // Build the string request
-    reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
-        "QueryGraph": tools.CleanString(queryGraph, true), // output data
-        "key": input["key"],
-        "value": input["value"],
-    }
-
-    // Send request
-    payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql(uctx, "get", reqInput, payload)
-    if err != nil { return "", err }
-    // Extract id result
-    if payload[queryName] == nil {
-        return "", fmt.Errorf("Unauthorized request. Possibly, name already exists.")
-    }
-    res := payload[queryName].(model.JsonAtom)["id"]
-    return res.(string), err
-}
-
-// Add a new vertex
-func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (string, error) {
-    Vertex := strings.Title(vertex)
-    queryName := "add" + Vertex
-    inputType := "Add" + Vertex + "Input"
-    queryGraph := vertex + ` { id }`
-
-    // Build the string request
-    inputs, _ := tools.MarshalWithoutNil(input)
-    reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
-        "InputType": inputType, // input type name (e.g AddUserInput)
-        "QueryGraph": tools.CleanString(queryGraph, true), // output data
-        "InputPayload": "["+string(inputs)+"]", // inputs data -- Just one node
-    }
-
-    // Send request
-    payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql(uctx, "add", reqInput, payload)
-    if err != nil { return "", err }
-    // Extract id result
-    if payload[queryName] == nil {
-        return "", fmt.Errorf("Unauthorized request. Possibly, name already exists.")
-    }
-    res := payload[queryName].(model.JsonAtom)[vertex].([]interface{})[0].(model.JsonAtom)["id"]
-    return res.(string), err
-}
-
-// Update a vertex
-func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input interface{}) error {
-    Vertex := strings.Title(vertex)
-    queryName := "update" + Vertex
-    inputType := "Update" + Vertex + "Input"
-    queryGraph := vertex + ` { id }`
-
-    // Build the string request
-    inputs, _ := tools.MarshalWithoutNil(input)
-    reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
-        "InputType": inputType, // input type name (e.g AddUserInput)
-        "QueryGraph": tools.CleanString(queryGraph, true), // output data
-        "InputPayload": string(inputs), // inputs data
-    }
-
-    // Send request
-    payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql(uctx, "update", reqInput, payload)
-    if payload[queryName] == nil && err == nil {
-        return fmt.Errorf("Unauthorized request. Possibly, name already exists.")
-    }
-    return err
-}
-
-// Delete a vertex
-func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) error {
-    Vertex := strings.Title(vertex)
-    queryName := "delete" + Vertex
-    inputType :=  Vertex + "Filter"
-    queryGraph := vertex + ` { id }`
-
-    // Build the string request
-    inputs, _ := tools.MarshalWithoutNil(input)
-    reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
-        "InputType": inputType, // input type name (e.g AddUserInput)
-        "QueryGraph": tools.CleanString(queryGraph, true), // output data
-        "InputPayload": string(inputs), // inputs data
-    }
-
-    // Send request
-    payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql(uctx, "delete", reqInput, payload)
-    if payload[queryName] == nil && err == nil {
-        return fmt.Errorf("Unauthorized request.")
-    }
-    return err
-}
-
-//
-// DB utility
-//
-
-// No way to dynamically build the type ?
-func (dg Dgraph) UpdateOne(uctx model.UserCtx, vertex string, id, k, v string) error {
-    var input model.UpdateTensionInput
-    var filter model.TensionFilter
-    var set model.TensionPatch
-
-    switch vertex {
-    case "tension":
-        //field := tools.ToGoNameFormat(k)
-        // pass
-
-    default:
-        return fmt.Errorf("unknown vertex '%s'", vertex)
-
-    }
-
-    f := fmt.Sprintf(`{"%s":"%s"}`, k, v)
-    err := json.Unmarshal([]byte(f), &set)
-    if err != nil { return err }
-    input.Filter = &filter
-    input.Set = &set
-    filter.ID = []string{id}
-    err = dg.Update(uctx, vertex, input)
-    return err
-}
-
-//
-// Private User methods
-//
-
-// AddUserRole add a role to the user roles list
-func (dg Dgraph) AddUserRole(username, nameid string) error {
-    userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilterStringRegExpFilter{ Eq: &username } },
-        Set: &model.UserPatch{
-            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-        },
-    }
-    err := dg.Update(dg.GetRootUctx(), "user", userInput)
-    return err
-}
-
-// RemoveUserRole remove a  role to the user roles list
-func (dg Dgraph) RemoveUserRole(username, nameid string) error {
-    userInput := model.UpdateUserInput{
-        Filter: &model.UserFilter{ Username: &model.StringHashFilterStringRegExpFilter{ Eq: &username } },
-        Remove: &model.UserPatch{
-            Roles: []*model.NodeRef{ &model.NodeRef{ Nameid: &nameid }},
-        },
-    }
-    err := dg.Update(dg.GetRootUctx(), "user", userInput)
-    return err
-}

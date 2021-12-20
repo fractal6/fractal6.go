@@ -33,13 +33,19 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     }
     input := inputs[0]
 
+    // History and notification Logics --
+    // In order to notify user on the given event, we need to know their ids to pass and link them
+    // to the notification (UserEvent edge) function. To do so we first cut the history from the original
+    // input, and push then the history (see the PushHistory function).
+    ctx = context.WithValue(ctx, "cut_history", true)
     // Execute query
     data, err := next(ctx)
-    if err != nil { return nil, err }
+    if err != nil { return data, err }
     if data.(*model.AddTensionPayload) == nil {
         return nil, LogErr("add tension", fmt.Errorf("no tension added."))
     }
-    id := data.(*model.AddTensionPayload).Tension[0].ID
+    tension := data.(*model.AddTensionPayload).Tension[0]
+    id := tension.ID
 
     // Validate and process Blob Event
     ok, _,  err := tensionEventHook(uctx, id, input.History, nil)
@@ -49,6 +55,8 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
         if e != nil { panic(e) }
     }
     if ok || err != nil {
+        err = PushHistory(uctx, id, input.History)
+        PushEventNotifications(id, input.History)
         return data, err
     }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -78,7 +86,17 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
         ok, contract, err = tensionEventHook(uctx, ids[0], input.Set.History, blob)
         if err != nil  { return nil, err }
         if ok {
-            return next(ctx)
+            // History and notification Logics --
+            // In order to notify user on the given event, we need to know their ids to pass and link them
+            // to the notification (UserEvent edge) function. To do so we first cut the history from the original
+            // input, and push then the history (see the PushHistory function).
+            ctx = context.WithValue(ctx, "cut_history", true)
+            // Execute query
+            data, err := next(ctx)
+            if err != nil { return data, err }
+            err = PushHistory(uctx, ids[0], input.Set.History)
+            PushEventNotifications(ids[0], input.Set.History)
+            return data, err
         } else if contract != nil {
             var t model.UpdateTensionPayload
             t.Tension = []*model.Tension{&model.Tension{

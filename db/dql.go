@@ -11,7 +11,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/tools"
+	. "zerogov/fractal6.go/tools"
 )
 
 
@@ -743,7 +743,7 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
             TagName: "json",
             DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
                 if to == reflect.Struct {
-                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    nv := CleanCompositeName(v.(map[string]interface{}))
                     return nv, nil
                 }
                 return v, nil
@@ -796,7 +796,7 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}))
                 return nv, nil
             }
             return v, nil
@@ -848,7 +848,7 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
             TagName: "json",
             DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
                 if to == reflect.Struct {
-                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    nv := CleanCompositeName(v.(map[string]interface{}))
                     return nv, nil
                 }
                 return v, nil
@@ -892,7 +892,7 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
             TagName: "json",
             DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
                 if to == reflect.Struct {
-                    nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                    nv := CleanCompositeName(v.(map[string]interface{}))
                     return nv, nil
                 }
                 return v, nil
@@ -928,7 +928,7 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error)
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}))
                 return nv, nil
             }
             return v, nil
@@ -962,7 +962,7 @@ func (dg Dgraph) GetSubMembers(fieldid string, objid string) ([]model.Node, erro
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}))
                 return nv, nil
             }
             return v, nil
@@ -996,7 +996,7 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string) ([]model.Label, erro
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}))
                 return nv, nil
             }
             return v, nil
@@ -1039,7 +1039,7 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, erro
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}))
                 return nv, nil
             }
             return v, nil
@@ -1089,7 +1089,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := tools.CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}))
                 return nv, nil
             }
             return v, nil

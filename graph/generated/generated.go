@@ -186,6 +186,11 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	AddUserEventPayload struct {
+		NumUids   func(childComplexity int) int
+		UserEvent func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
+	}
+
 	AddUserPayload struct {
 		NumUids func(childComplexity int) int
 		User    func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
@@ -372,6 +377,12 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	DeleteUserEventPayload struct {
+		Msg       func(childComplexity int) int
+		NumUids   func(childComplexity int) int
+		UserEvent func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
+	}
+
 	DeleteUserPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
@@ -503,6 +514,7 @@ type ComplexityRoot struct {
 		AddRoleExt          func(childComplexity int, input []*model.AddRoleExtInput) int
 		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser             func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
+		AddUserEvent        func(childComplexity int, input []*model.AddUserEventInput) int
 		AddUserRights       func(childComplexity int, input []*model.AddUserRightsInput) int
 		AddVote             func(childComplexity int, input []*model.AddVoteInput, upsert *bool) int
 		DeleteBlob          func(childComplexity int, filter model.BlobFilter) int
@@ -520,6 +532,7 @@ type ComplexityRoot struct {
 		DeleteRoleExt       func(childComplexity int, filter model.RoleExtFilter) int
 		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
 		DeleteUser          func(childComplexity int, filter model.UserFilter) int
+		DeleteUserEvent     func(childComplexity int, filter model.UserEventFilter) int
 		DeleteUserRights    func(childComplexity int, filter model.UserRightsFilter) int
 		DeleteVote          func(childComplexity int, filter model.VoteFilter) int
 		UpdateBlob          func(childComplexity int, input model.UpdateBlobInput) int
@@ -537,6 +550,7 @@ type ComplexityRoot struct {
 		UpdateRoleExt       func(childComplexity int, input model.UpdateRoleExtInput) int
 		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
 		UpdateUser          func(childComplexity int, input model.UpdateUserInput) int
+		UpdateUserEvent     func(childComplexity int, input model.UpdateUserEventInput) int
 		UpdateUserRights    func(childComplexity int, input model.UpdateUserRightsInput) int
 		UpdateVote          func(childComplexity int, input model.UpdateVoteInput) int
 	}
@@ -706,6 +720,7 @@ type ComplexityRoot struct {
 		AggregateRoleExt       func(childComplexity int, filter *model.RoleExtFilter) int
 		AggregateTension       func(childComplexity int, filter *model.TensionFilter) int
 		AggregateUser          func(childComplexity int, filter *model.UserFilter) int
+		AggregateUserEvent     func(childComplexity int, filter *model.UserEventFilter) int
 		AggregateUserRights    func(childComplexity int, filter *model.UserRightsFilter) int
 		AggregateVote          func(childComplexity int, filter *model.VoteFilter) int
 		GetBlob                func(childComplexity int, id string) int
@@ -720,6 +735,7 @@ type ComplexityRoot struct {
 		GetRoleExt             func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
 		GetUser                func(childComplexity int, id *string, username *string) int
+		GetUserEvent           func(childComplexity int, id string) int
 		GetVote                func(childComplexity int, id *string, voteid *string) int
 		QueryBlob              func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
 		QueryComment           func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
@@ -736,6 +752,7 @@ type ComplexityRoot struct {
 		QueryRoleExt           func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		QueryTension           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		QueryUser              func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		QueryUserEvent         func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		QueryUserRights        func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
 		QueryVote              func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
 	}
@@ -770,33 +787,35 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Action             func(childComplexity int) int
-		Assignees          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		AssigneesAggregate func(childComplexity int, filter *model.UserFilter) int
-		Blobs              func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		BlobsAggregate     func(childComplexity int, filter *model.BlobFilter) int
-		Comments           func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		CommentsAggregate  func(childComplexity int, filter *model.CommentFilter) int
-		Contracts          func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
-		ContractsAggregate func(childComplexity int, filter *model.ContractFilter) int
-		CreatedAt          func(childComplexity int) int
-		CreatedBy          func(childComplexity int, filter *model.UserFilter) int
-		Emitter            func(childComplexity int, filter *model.NodeFilter) int
-		Emitterid          func(childComplexity int) int
-		History            func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
-		HistoryAggregate   func(childComplexity int, filter *model.EventFilter) int
-		ID                 func(childComplexity int) int
-		Labels             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		LabelsAggregate    func(childComplexity int, filter *model.LabelFilter) int
-		Message            func(childComplexity int) int
-		NComments          func(childComplexity int) int
-		NOpenContracts     func(childComplexity int) int
-		Receiver           func(childComplexity int, filter *model.NodeFilter) int
-		Receiverid         func(childComplexity int) int
-		Status             func(childComplexity int) int
-		Title              func(childComplexity int) int
-		Type               func(childComplexity int) int
-		UpdatedAt          func(childComplexity int) int
+		Action              func(childComplexity int) int
+		Assignees           func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		AssigneesAggregate  func(childComplexity int, filter *model.UserFilter) int
+		Blobs               func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		BlobsAggregate      func(childComplexity int, filter *model.BlobFilter) int
+		Comments            func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CommentsAggregate   func(childComplexity int, filter *model.CommentFilter) int
+		Contracts           func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
+		ContractsAggregate  func(childComplexity int, filter *model.ContractFilter) int
+		CreatedAt           func(childComplexity int) int
+		CreatedBy           func(childComplexity int, filter *model.UserFilter) int
+		Emitter             func(childComplexity int, filter *model.NodeFilter) int
+		Emitterid           func(childComplexity int) int
+		History             func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		HistoryAggregate    func(childComplexity int, filter *model.EventFilter) int
+		ID                  func(childComplexity int) int
+		Labels              func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate     func(childComplexity int, filter *model.LabelFilter) int
+		Message             func(childComplexity int) int
+		NComments           func(childComplexity int) int
+		NOpenContracts      func(childComplexity int) int
+		Receiver            func(childComplexity int, filter *model.NodeFilter) int
+		Receiverid          func(childComplexity int) int
+		Status              func(childComplexity int) int
+		Suscribers          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		SuscribersAggregate func(childComplexity int, filter *model.UserFilter) int
+		Title               func(childComplexity int) int
+		Type                func(childComplexity int) int
+		UpdatedAt           func(childComplexity int) int
 	}
 
 	TensionAggregateResult struct {
@@ -893,6 +912,11 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	UpdateUserEventPayload struct {
+		NumUids   func(childComplexity int) int
+		UserEvent func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
+	}
+
 	UpdateUserPayload struct {
 		NumUids func(childComplexity int) int
 		User    func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
@@ -918,13 +942,18 @@ type ComplexityRoot struct {
 		Email                     func(childComplexity int) int
 		EmailHash                 func(childComplexity int) int
 		EmailValidated            func(childComplexity int) int
+		Events                    func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
+		EventsAggregate           func(childComplexity int, filter *model.UserEventFilter) int
 		ID                        func(childComplexity int) int
 		LastAck                   func(childComplexity int) int
 		Name                      func(childComplexity int) int
+		NotifyByEmail             func(childComplexity int) int
 		Password                  func(childComplexity int) int
 		Rights                    func(childComplexity int, filter *model.UserRightsFilter) int
 		Roles                     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		RolesAggregate            func(childComplexity int, filter *model.NodeFilter) int
+		Subscriptions             func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		SubscriptionsAggregate    func(childComplexity int, filter *model.TensionFilter) int
 		TensionsAssigned          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		TensionsAssignedAggregate func(childComplexity int, filter *model.TensionFilter) int
 		TensionsCreated           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -953,6 +982,20 @@ type ComplexityRoot struct {
 		UsernameMin  func(childComplexity int) int
 		UtcMax       func(childComplexity int) int
 		UtcMin       func(childComplexity int) int
+	}
+
+	UserEvent struct {
+		CreatedAt func(childComplexity int) int
+		Event     func(childComplexity int, filter *model.EventKindFilter, first *int, offset *int) int
+		ID        func(childComplexity int) int
+		IsRead    func(childComplexity int) int
+		User      func(childComplexity int, filter *model.UserFilter) int
+	}
+
+	UserEventAggregateResult struct {
+		Count        func(childComplexity int) int
+		CreatedAtMax func(childComplexity int) int
+		CreatedAtMin func(childComplexity int) int
 	}
 
 	UserRights struct {
@@ -1043,6 +1086,9 @@ type MutationResolver interface {
 	AddUser(ctx context.Context, input []*model.AddUserInput, upsert *bool) (*model.AddUserPayload, error)
 	UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.UpdateUserPayload, error)
 	DeleteUser(ctx context.Context, filter model.UserFilter) (*model.DeleteUserPayload, error)
+	AddUserEvent(ctx context.Context, input []*model.AddUserEventInput) (*model.AddUserEventPayload, error)
+	UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (*model.UpdateUserEventPayload, error)
+	DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (*model.DeleteUserEventPayload, error)
 	AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (*model.AddUserRightsPayload, error)
 	UpdateUserRights(ctx context.Context, input model.UpdateUserRightsInput) (*model.UpdateUserRightsPayload, error)
 	DeleteUserRights(ctx context.Context, filter model.UserRightsFilter) (*model.DeleteUserRightsPayload, error)
@@ -1093,6 +1139,9 @@ type QueryResolver interface {
 	GetUser(ctx context.Context, id *string, username *string) (*model.User, error)
 	QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) ([]*model.User, error)
 	AggregateUser(ctx context.Context, filter *model.UserFilter) (*model.UserAggregateResult, error)
+	GetUserEvent(ctx context.Context, id string) (*model.UserEvent, error)
+	QueryUserEvent(ctx context.Context, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) ([]*model.UserEvent, error)
+	AggregateUserEvent(ctx context.Context, filter *model.UserEventFilter) (*model.UserEventAggregateResult, error)
 	QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) ([]*model.UserRights, error)
 	AggregateUserRights(ctx context.Context, filter *model.UserRightsFilter) (*model.UserRightsAggregateResult, error)
 }
@@ -1358,6 +1407,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddUserEventPayload.numUids":
+		if e.complexity.AddUserEventPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddUserEventPayload.NumUids(childComplexity), true
+
+	case "AddUserEventPayload.userEvent":
+		if e.complexity.AddUserEventPayload.UserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_AddUserEventPayload_userEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddUserEventPayload.UserEvent(childComplexity, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddUserPayload.numUids":
 		if e.complexity.AddUserPayload.NumUids == nil {
@@ -2338,6 +2406,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "DeleteUserEventPayload.msg":
+		if e.complexity.DeleteUserEventPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteUserEventPayload.Msg(childComplexity), true
+
+	case "DeleteUserEventPayload.numUids":
+		if e.complexity.DeleteUserEventPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteUserEventPayload.NumUids(childComplexity), true
+
+	case "DeleteUserEventPayload.userEvent":
+		if e.complexity.DeleteUserEventPayload.UserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteUserEventPayload_userEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteUserEventPayload.UserEvent(childComplexity, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteUserPayload.msg":
 		if e.complexity.DeleteUserPayload.Msg == nil {
 			break
@@ -3111,6 +3205,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddUser(childComplexity, args["input"].([]*model.AddUserInput), args["upsert"].(*bool)), true
 
+	case "Mutation.addUserEvent":
+		if e.complexity.Mutation.AddUserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addUserEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddUserEvent(childComplexity, args["input"].([]*model.AddUserEventInput)), true
+
 	case "Mutation.addUserRights":
 		if e.complexity.Mutation.AddUserRights == nil {
 			break
@@ -3315,6 +3421,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteUser(childComplexity, args["filter"].(model.UserFilter)), true
 
+	case "Mutation.deleteUserEvent":
+		if e.complexity.Mutation.DeleteUserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteUserEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteUserEvent(childComplexity, args["filter"].(model.UserEventFilter)), true
+
 	case "Mutation.deleteUserRights":
 		if e.complexity.Mutation.DeleteUserRights == nil {
 			break
@@ -3518,6 +3636,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(model.UpdateUserInput)), true
+
+	case "Mutation.updateUserEvent":
+		if e.complexity.Mutation.UpdateUserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserEvent(childComplexity, args["input"].(model.UpdateUserEventInput)), true
 
 	case "Mutation.updateUserRights":
 		if e.complexity.Mutation.UpdateUserRights == nil {
@@ -4613,6 +4743,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateUser(childComplexity, args["filter"].(*model.UserFilter)), true
 
+	case "Query.aggregateUserEvent":
+		if e.complexity.Query.AggregateUserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateUserEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateUserEvent(childComplexity, args["filter"].(*model.UserEventFilter)), true
+
 	case "Query.aggregateUserRights":
 		if e.complexity.Query.AggregateUserRights == nil {
 			break
@@ -4780,6 +4922,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetUser(childComplexity, args["id"].(*string), args["username"].(*string)), true
+
+	case "Query.getUserEvent":
+		if e.complexity.Query.GetUserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserEvent(childComplexity, args["id"].(string)), true
 
 	case "Query.getVote":
 		if e.complexity.Query.GetVote == nil {
@@ -4972,6 +5126,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryUser(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryUserEvent":
+		if e.complexity.Query.QueryUserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryUserEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryUserEvent(childComplexity, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryUserRights":
 		if e.complexity.Query.QueryUserRights == nil {
@@ -5416,6 +5582,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Status(childComplexity), true
 
+	case "Tension.suscribers":
+		if e.complexity.Tension.Suscribers == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_suscribers_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.Suscribers(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Tension.suscribersAggregate":
+		if e.complexity.Tension.SuscribersAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_suscribersAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.SuscribersAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
+
 	case "Tension.title":
 		if e.complexity.Tension.Title == nil {
 			break
@@ -5850,6 +6040,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "UpdateUserEventPayload.numUids":
+		if e.complexity.UpdateUserEventPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateUserEventPayload.NumUids(childComplexity), true
+
+	case "UpdateUserEventPayload.userEvent":
+		if e.complexity.UpdateUserEventPayload.UserEvent == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateUserEventPayload_userEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateUserEventPayload.UserEvent(childComplexity, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "UpdateUserPayload.numUids":
 		if e.complexity.UpdateUserPayload.NumUids == nil {
 			break
@@ -5990,6 +6199,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.EmailValidated(childComplexity), true
 
+	case "User.events":
+		if e.complexity.User.Events == nil {
+			break
+		}
+
+		args, err := ec.field_User_events_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Events(childComplexity, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.eventsAggregate":
+		if e.complexity.User.EventsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_eventsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.EventsAggregate(childComplexity, args["filter"].(*model.UserEventFilter)), true
+
 	case "User.id":
 		if e.complexity.User.ID == nil {
 			break
@@ -6010,6 +6243,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Name(childComplexity), true
+
+	case "User.notifyByEmail":
+		if e.complexity.User.NotifyByEmail == nil {
+			break
+		}
+
+		return e.complexity.User.NotifyByEmail(childComplexity), true
 
 	case "User.password":
 		if e.complexity.User.Password == nil {
@@ -6053,6 +6293,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.RolesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "User.subscriptions":
+		if e.complexity.User.Subscriptions == nil {
+			break
+		}
+
+		args, err := ec.field_User_subscriptions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Subscriptions(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.subscriptionsAggregate":
+		if e.complexity.User.SubscriptionsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_subscriptionsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.SubscriptionsAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "User.tensions_assigned":
 		if e.complexity.User.TensionsAssigned == nil {
@@ -6248,6 +6512,72 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserAggregateResult.UtcMin(childComplexity), true
+
+	case "UserEvent.createdAt":
+		if e.complexity.UserEvent.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserEvent.CreatedAt(childComplexity), true
+
+	case "UserEvent.event":
+		if e.complexity.UserEvent.Event == nil {
+			break
+		}
+
+		args, err := ec.field_UserEvent_event_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UserEvent.Event(childComplexity, args["filter"].(*model.EventKindFilter), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UserEvent.id":
+		if e.complexity.UserEvent.ID == nil {
+			break
+		}
+
+		return e.complexity.UserEvent.ID(childComplexity), true
+
+	case "UserEvent.isRead":
+		if e.complexity.UserEvent.IsRead == nil {
+			break
+		}
+
+		return e.complexity.UserEvent.IsRead(childComplexity), true
+
+	case "UserEvent.user":
+		if e.complexity.UserEvent.User == nil {
+			break
+		}
+
+		args, err := ec.field_UserEvent_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UserEvent.User(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "UserEventAggregateResult.count":
+		if e.complexity.UserEventAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.UserEventAggregateResult.Count(childComplexity), true
+
+	case "UserEventAggregateResult.createdAtMax":
+		if e.complexity.UserEventAggregateResult.CreatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.UserEventAggregateResult.CreatedAtMax(childComplexity), true
+
+	case "UserEventAggregateResult.createdAtMin":
+		if e.complexity.UserEventAggregateResult.CreatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.UserEventAggregateResult.CreatedAtMin(childComplexity), true
 
 	case "UserRights.canCreateRoot":
 		if e.complexity.UserRights.CanCreateRoot == nil {
@@ -6720,8 +7050,9 @@ type Tension {
   assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
-  history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]!
+  history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  suscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   n_comments: Int
   n_open_contracts: Int
   id: ID!
@@ -6736,6 +7067,7 @@ type Tension {
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  suscribersAggregate(filter: UserFilter): UserAggregateResult
 }
 
 type Comment {
@@ -6830,19 +7162,34 @@ type User {
   emailValidated: Boolean! @hidden
   bio: String
   utc: String
+  notifyByEmail: Boolean
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
 
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
   backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
+  eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
 }
+
+type UserEvent {
+  id: ID!
+  createdAt: DateTime!
+  isRead: Boolean!
+  user(filter: UserFilter): User!
+  event(filter: EventKindFilter, first: Int, offset: Int): [EventKind!]
+}
+
+union EventKind= Event| Contract
 
 type UserRights {
   canLogin: Boolean!
@@ -6990,37 +7337,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7241,14 +7588,27 @@ input AddTensionInput {
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
-  history: [EventRef!]!
+  history: [EventRef!]
   contracts: [ContractRef!]
+  suscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
 }
 
 type AddTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  numUids: Int
+}
+
+input AddUserEventInput {
+  createdAt: DateTime!
+  isRead: Boolean!
+  user: UserRef!
+  event: [EventKindRef!]
+}
+
+type AddUserEventPayload {
+  userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   numUids: Int
 }
 
@@ -7263,12 +7623,15 @@ input AddUserInput {
   emailValidated: Boolean!
   bio: String
   utc: String
+  notifyByEmail: Boolean
   rights: UserRightsRef!
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  subscriptions: [TensionRef!]
+  events: [UserEventRef!]
 }
 
 type AddUserPayload {
@@ -7685,6 +8048,12 @@ type DeleteTensionPayload {
   numUids: Int
 }
 
+type DeleteUserEventPayload {
+  userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
+  msg: String
+  numUids: Int
+}
+
 type DeleteUserPayload {
   user(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   msg: String
@@ -7804,6 +8173,22 @@ enum EventHasFilter {
   event_type
   old
   new
+}
+
+input EventKindFilter {
+  memberTypes: [EventKindType!]
+  eventFilter: EventFilter
+  contractFilter: ContractFilter
+}
+
+input EventKindRef {
+  eventRef: EventRef
+  contractRef: ContractRef
+}
+
+enum EventKindType {
+  Event
+  Contract
 }
 
 input EventOrder {
@@ -8112,6 +8497,9 @@ type Mutation {
   addUser(input: [AddUserInput!]!, upsert: Boolean): AddUserPayload
   updateUser(input: UpdateUserInput!): UpdateUserPayload
   deleteUser(filter: UserFilter!): DeleteUserPayload
+  addUserEvent(input: [AddUserEventInput!]!): AddUserEventPayload
+  updateUserEvent(input: UpdateUserEventInput!): UpdateUserEventPayload
+  deleteUserEvent(filter: UserEventFilter!): DeleteUserEventPayload
   addUserRights(input: [AddUserRightsInput!]!): AddUserRightsPayload
   updateUserRights(input: UpdateUserRightsInput!): UpdateUserRightsPayload
   deleteUserRights(filter: UserRightsFilter!): DeleteUserRightsPayload
@@ -8590,6 +8978,9 @@ type Query {
   getUser(id: ID, username: String): User
   queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
   aggregateUser(filter: UserFilter): UserAggregateResult
+  getUserEvent(id: ID!): UserEvent
+  queryUserEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
+  aggregateUserEvent(filter: UserEventFilter): UserEventAggregateResult
   queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
   aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
 }
@@ -8783,6 +9174,7 @@ enum TensionHasFilter {
   blobs
   history
   contracts
+  suscribers
   n_comments
   n_open_contracts
 }
@@ -8823,6 +9215,7 @@ input TensionPatch {
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
+  suscribers: [UserRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
   n_open_contracts: Int @x_patch_ro
 }
@@ -8847,6 +9240,7 @@ input TensionRef {
   blobs: [BlobRef!]
   history: [EventRef!]
   contracts: [ContractRef!]
+  suscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
 }
@@ -9015,6 +9409,17 @@ type UpdateTensionPayload {
   numUids: Int
 }
 
+input UpdateUserEventInput {
+  filter: UserEventFilter!
+  set: UserEventPatch
+  remove: UserEventPatch
+}
+
+type UpdateUserEventPayload {
+  userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
+  numUids: Int
+}
+
 input UpdateUserInput {
   filter: UserFilter!
   set: UserPatch
@@ -9070,6 +9475,54 @@ type UserAggregateResult {
   utcMax: String
 }
 
+type UserEventAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+}
+
+input UserEventFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  isRead: Boolean
+  has: [UserEventHasFilter]
+  and: [UserEventFilter]
+  or: [UserEventFilter]
+  not: UserEventFilter
+}
+
+enum UserEventHasFilter {
+  createdAt
+  isRead
+  user
+  event
+}
+
+input UserEventOrder {
+  asc: UserEventOrderable
+  desc: UserEventOrderable
+  then: UserEventOrder
+}
+
+enum UserEventOrderable {
+  createdAt
+}
+
+input UserEventPatch {
+  createdAt: DateTime @x_patch_ro
+  isRead: Boolean @x_patch_ro
+  user: UserRef @x_patch_ro
+  event: [EventKindRef!] @x_patch_ro
+}
+
+input UserEventRef {
+  id: ID
+  createdAt: DateTime
+  isRead: Boolean
+  user: UserRef
+  event: [EventKindRef!]
+}
+
 input UserFilter {
   id: [ID!]
   username: StringHashFilter_StringRegExpFilter
@@ -9092,12 +9545,15 @@ enum UserHasFilter {
   emailValidated
   bio
   utc
+  notifyByEmail
   rights
   roles
   backed_roles
   tensions_created
   tensions_assigned
   contracts
+  subscriptions
+  events
 }
 
 input UserOrder {
@@ -9129,12 +9585,15 @@ input UserPatch {
   emailValidated: Boolean @x_patch_ro
   bio: String @x_patch(r:"isOwner")
   utc: String @x_patch(r:"isOwner")
+  notifyByEmail: Boolean @x_patch(r:"isOwner")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
   backed_roles: [NodeRef!] @x_patch_ro
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
+  subscriptions: [TensionRef!] @x_patch_ro
+  events: [UserEventRef!] @x_patch_ro
 }
 
 input UserRef {
@@ -9149,12 +9608,15 @@ input UserRef {
   emailValidated: Boolean
   bio: String
   utc: String
+  notifyByEmail: Boolean
   rights: UserRightsRef
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  subscriptions: [TensionRef!]
+  events: [UserEventRef!]
 }
 
 type UserRightsAggregateResult {
@@ -10400,6 +10862,48 @@ func (ec *executionContext) field_AddTensionPayload_tension_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_AddUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddUserPayload_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11447,6 +11951,48 @@ func (ec *executionContext) field_DeleteTensionPayload_tension_args(ctx context.
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteUserPayload_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12013,6 +12559,21 @@ func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddUserEventInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddUserEventInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addUserRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12376,6 +12937,21 @@ func (ec *executionContext) field_Mutation_deleteTension_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNUserEventFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteUserRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12715,6 +13291,21 @@ func (ec *executionContext) field_Mutation_updateTension_args(ctx context.Contex
 			arg0 = data
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateTensionInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateUserEventInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateUserEventInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventInput(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["input"] = arg0
@@ -13555,6 +14146,21 @@ func (ec *executionContext) field_Query_aggregateTension_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateUserRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13844,6 +14450,21 @@ func (ec *executionContext) field_Query_getTension_args(ctx context.Context, raw
 			arg0 = data
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["id"] = arg0
@@ -14576,6 +15197,48 @@ func (ec *executionContext) field_Query_queryTension_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_queryUserRights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15176,6 +15839,63 @@ func (ec *executionContext) field_Tension_receiver_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Tension_suscribersAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_suscribers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateBlobPayload_blob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15764,6 +16484,48 @@ func (ec *executionContext) field_UpdateTensionPayload_tension_args(ctx context.
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateUserPayload_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15890,6 +16652,54 @@ func (ec *executionContext) field_UpdateVotePayload_vote_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_UserEvent_event_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventKindFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventKindFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_UserEvent_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_User_backed_rolesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -16004,6 +16814,63 @@ func (ec *executionContext) field_User_contracts_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_User_eventsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_User_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_User_rights_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -16050,6 +16917,63 @@ func (ec *executionContext) field_User_roles_args(ctx context.Context, rawArgs m
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalONodeOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_User_subscriptionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_User_subscriptions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -17159,6 +18083,71 @@ func (ec *executionContext) _AddTensionPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AddTensionPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddUserEventPayload_userEvent(ctx context.Context, field graphql.CollectedField, obj *model.AddUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddUserEventPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddUserEventPayload_userEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserEvent, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEvent)
+	fc.Result = res
+	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddUserEventPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddUserEventPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -20850,6 +21839,100 @@ func (ec *executionContext) _DeleteTensionPayload_numUids(ctx context.Context, f
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "DeleteTensionPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserEventPayload_userEvent(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteUserEventPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteUserEventPayload_userEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserEvent, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEvent)
+	fc.Result = res
+	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserEventPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteUserEventPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserEventPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteUserEventPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -25339,6 +26422,114 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	res := resTmp.(*model.DeleteUserPayload)
 	fc.Result = res
 	return ec.marshalODeleteUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addUserEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddUserEvent(rctx, args["input"].([]*model.AddUserEventInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddUserEventPayload)
+	fc.Result = res
+	return ec.marshalOAddUserEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateUserEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUserEvent(rctx, args["input"].(model.UpdateUserEventInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateUserEventPayload)
+	fc.Result = res
+	return ec.marshalOUpdateUserEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteUserEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteUserEvent(rctx, args["filter"].(model.UserEventFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteUserEventPayload)
+	fc.Result = res
+	return ec.marshalODeleteUserEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -30515,6 +31706,114 @@ func (ec *executionContext) _Query_aggregateUser(ctx context.Context, field grap
 	return ec.marshalOUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getUserEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserEvent(rctx, args["id"].(string))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserEvent)
+	fc.Result = res
+	return ec.marshalOUserEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryUserEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryUserEvent(rctx, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEvent)
+	fc.Result = res
+	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregateUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregateUserEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateUserEvent(rctx, args["filter"].(*model.UserEventFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserEventAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserEventAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_queryUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -31792,14 +33091,11 @@ func (ec *executionContext) _Tension_history(ctx context.Context, field graphql.
 	})
 
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.Event)
 	fc.Result = res
-	return ec.marshalNEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
+	return ec.marshalOEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -31836,6 +33132,42 @@ func (ec *executionContext) _Tension_contracts(ctx context.Context, field graphq
 	res := resTmp.([]*model.Contract)
 	fc.Result = res
 	return ec.marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_suscribers(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_suscribers_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Suscribers, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
@@ -32271,6 +33603,42 @@ func (ec *executionContext) _Tension_contractsAggregate(ctx context.Context, fie
 	res := resTmp.(*model.ContractAggregateResult)
 	fc.Result = res
 	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tension_suscribersAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Tension_suscribersAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SuscribersAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TensionAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
@@ -33792,6 +35160,71 @@ func (ec *executionContext) _UpdateTensionPayload_numUids(ctx context.Context, f
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UpdateUserEventPayload_userEvent(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateUserEventPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdateUserEventPayload_userEvent_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserEvent, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEvent)
+	fc.Result = res
+	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateUserEventPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserEventPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateUserEventPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UpdateUserPayload_user(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -34407,6 +35840,35 @@ func (ec *executionContext) _User_utc(ctx context.Context, field graphql.Collect
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_notifyByEmail(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NotifyByEmail, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_rights(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -34626,6 +36088,78 @@ func (ec *executionContext) _User_contracts(ctx context.Context, field graphql.C
 	return ec.marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_subscriptions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_subscriptions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subscriptions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_events(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_events_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Events, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEvent)
+	fc.Result = res
+	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -34804,6 +36338,78 @@ func (ec *executionContext) _User_contractsAggregate(ctx context.Context, field 
 	res := resTmp.(*model.ContractAggregateResult)
 	fc.Result = res
 	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_subscriptionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_subscriptionsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubscriptionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_eventsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_eventsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserEventAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserEventAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
@@ -35355,6 +36961,264 @@ func (ec *executionContext) _UserAggregateResult_utcMax(ctx context.Context, fie
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEvent_id(ctx context.Context, field graphql.CollectedField, obj *model.UserEvent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEvent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEvent_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.UserEvent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEvent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEvent_isRead(ctx context.Context, field graphql.CollectedField, obj *model.UserEvent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEvent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRead, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEvent_user(ctx context.Context, field graphql.CollectedField, obj *model.UserEvent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEvent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UserEvent_user_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEvent_event(ctx context.Context, field graphql.CollectedField, obj *model.UserEvent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEvent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UserEvent_event_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Event, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.EventKind)
+	fc.Result = res
+	return ec.marshalOEventKind2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.UserEventAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField, obj *model.UserEventAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField, obj *model.UserEventAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserRights_canLogin(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
@@ -38904,7 +40768,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			it.History, err = ec.unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			it.History, err = ec.unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -38913,6 +40777,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "suscribers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("suscribers"))
+			it.Suscribers, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -38929,6 +40801,53 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
 			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddUserEventInput(ctx context.Context, obj interface{}) (model.AddUserEventInput, error) {
+	var it model.AddUserEventInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			it.IsRead, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "user":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			it.User, err = ec.unmarshalNUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			it.Event, err = ec.unmarshalOEventKindRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -39027,6 +40946,14 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "notifyByEmail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
+			it.NotifyByEmail, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "rights":
 			var err error
 
@@ -39072,6 +40999,22 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subscriptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
+			it.Subscriptions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
+			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -41406,6 +43349,76 @@ func (ec *executionContext) unmarshalInputEventFragmentRef(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
 			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventKindFilter(ctx context.Context, obj interface{}) (model.EventKindFilter, error) {
+	var it model.EventKindFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "memberTypes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberTypes"))
+			it.MemberTypes, err = ec.unmarshalOEventKindType2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "eventFilter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eventFilter"))
+			it.EventFilter, err = ec.unmarshalOEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contractFilter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractFilter"))
+			it.ContractFilter, err = ec.unmarshalOContractFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventKindRef(ctx context.Context, obj interface{}) (model.EventKindRef, error) {
+	var it model.EventKindRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "eventRef":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eventRef"))
+			it.EventRef, err = ec.unmarshalOEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contractRef":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractRef"))
+			it.ContractRef, err = ec.unmarshalOContractRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47078,6 +49091,32 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "suscribers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("suscribers"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserRef); ok {
+				it.Suscribers = data
+			} else if tmp == nil {
+				it.Suscribers = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "n_comments":
 			var err error
 
@@ -47290,6 +49329,14 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "suscribers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("suscribers"))
+			it.Suscribers, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47923,6 +49970,45 @@ func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserEventInput(ctx context.Context, obj interface{}) (model.UpdateUserEventInput, error) {
+	var it model.UpdateUserEventInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOUserEventPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOUserEventPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (model.UpdateUserInput, error) {
 	var it model.UpdateUserInput
 	asMap := map[string]interface{}{}
@@ -48031,6 +50117,286 @@ func (ec *executionContext) unmarshalInputUpdateVoteInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
 			it.Remove, err = ec.unmarshalOVotePatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVotePatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventFilter(ctx context.Context, obj interface{}) (model.UserEventFilter, error) {
+	var it model.UserEventFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOUserEventHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOUserEventFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOUserEventFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventOrder(ctx context.Context, obj interface{}) (model.UserEventOrder, error) {
+	var it model.UserEventOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOUserEventOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOUserEventOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, obj interface{}) (model.UserEventPatch, error) {
+	var it model.UserEventPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsRead = data
+			} else if tmp == nil {
+				it.IsRead = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "user":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.User = data
+			} else if tmp == nil {
+				it.User = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventKindRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.EventKindRef); ok {
+				it.Event = data
+			} else if tmp == nil {
+				it.Event = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.EventKindRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventRef(ctx context.Context, obj interface{}) (model.UserEventRef, error) {
+	var it model.UserEventRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "user":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			it.User, err = ec.unmarshalOUserRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			it.Event, err = ec.unmarshalOEventKindRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -48427,6 +50793,34 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "notifyByEmail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.NotifyByEmail = data
+			} else if tmp == nil {
+				it.NotifyByEmail = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "rights":
 			var err error
 
@@ -48583,6 +50977,58 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "subscriptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.Subscriptions = data
+			} else if tmp == nil {
+				it.Subscriptions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserEventRef); ok {
+				it.Events = data
+			} else if tmp == nil {
+				it.Events = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.UserEventRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -48686,6 +51132,14 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "notifyByEmail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
+			it.NotifyByEmail, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "rights":
 			var err error
 
@@ -48731,6 +51185,22 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subscriptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
+			it.Subscriptions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
+			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -49439,6 +51909,29 @@ func (ec *executionContext) unmarshalInputWithinFilter(ctx context.Context, obj 
 
 // region    ************************** interface.gotpl ***************************
 
+func (ec *executionContext) _EventKind(ctx context.Context, sel ast.SelectionSet, obj model.EventKind) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case model.Event:
+		return ec._Event(ctx, sel, &obj)
+	case *model.Event:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Event(ctx, sel, obj)
+	case model.Contract:
+		return ec._Contract(ctx, sel, &obj)
+	case *model.Contract:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Contract(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -49781,6 +52274,32 @@ func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var addUserEventPayloadImplementors = []string{"AddUserEventPayload"}
+
+func (ec *executionContext) _AddUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserEventPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addUserEventPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddUserEventPayload")
+		case "userEvent":
+			out.Values[i] = ec._AddUserEventPayload_userEvent(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddUserEventPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var addUserPayloadImplementors = []string{"AddUserPayload"}
 
 func (ec *executionContext) _AddUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserPayload) graphql.Marshaler {
@@ -50050,7 +52569,7 @@ func (ec *executionContext) _CommentAggregateResult(ctx context.Context, sel ast
 	return out
 }
 
-var contractImplementors = []string{"Contract"}
+var contractImplementors = []string{"Contract", "EventKind"}
 
 func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet, obj *model.Contract) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, contractImplementors)
@@ -50575,6 +53094,34 @@ func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.S
 	return out
 }
 
+var deleteUserEventPayloadImplementors = []string{"DeleteUserEventPayload"}
+
+func (ec *executionContext) _DeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserEventPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserEventPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteUserEventPayload")
+		case "userEvent":
+			out.Values[i] = ec._DeleteUserEventPayload_userEvent(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeleteUserEventPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteUserEventPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteUserPayloadImplementors = []string{"DeleteUserPayload"}
 
 func (ec *executionContext) _DeleteUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserPayload) graphql.Marshaler {
@@ -50659,7 +53206,7 @@ func (ec *executionContext) _DeleteVotePayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var eventImplementors = []string{"Event"}
+var eventImplementors = []string{"Event", "EventKind"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *model.Event) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventImplementors)
@@ -51144,6 +53691,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateUser(ctx, field)
 		case "deleteUser":
 			out.Values[i] = ec._Mutation_deleteUser(ctx, field)
+		case "addUserEvent":
+			out.Values[i] = ec._Mutation_addUserEvent(ctx, field)
+		case "updateUserEvent":
+			out.Values[i] = ec._Mutation_updateUserEvent(ctx, field)
+		case "deleteUserEvent":
+			out.Values[i] = ec._Mutation_deleteUserEvent(ctx, field)
 		case "addUserRights":
 			out.Values[i] = ec._Mutation_addUserRights(ctx, field)
 		case "updateUserRights":
@@ -52237,6 +54790,39 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_aggregateUser(ctx, field)
 				return res
 			})
+		case "getUserEvent":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserEvent(ctx, field)
+				return res
+			})
+		case "queryUserEvent":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryUserEvent(ctx, field)
+				return res
+			})
+		case "aggregateUserEvent":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateUserEvent(ctx, field)
+				return res
+			})
 		case "queryUserRights":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -52434,11 +55020,10 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_blobs(ctx, field, obj)
 		case "history":
 			out.Values[i] = ec._Tension_history(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "contracts":
 			out.Values[i] = ec._Tension_contracts(ctx, field, obj)
+		case "suscribers":
+			out.Values[i] = ec._Tension_suscribers(ctx, field, obj)
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
 		case "n_open_contracts":
@@ -52474,6 +55059,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_historyAggregate(ctx, field, obj)
 		case "contractsAggregate":
 			out.Values[i] = ec._Tension_contractsAggregate(ctx, field, obj)
+		case "suscribersAggregate":
+			out.Values[i] = ec._Tension_suscribersAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52913,6 +55500,32 @@ func (ec *executionContext) _UpdateTensionPayload(ctx context.Context, sel ast.S
 	return out
 }
 
+var updateUserEventPayloadImplementors = []string{"UpdateUserEventPayload"}
+
+func (ec *executionContext) _UpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserEventPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserEventPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateUserEventPayload")
+		case "userEvent":
+			out.Values[i] = ec._UpdateUserEventPayload_userEvent(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateUserEventPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var updateUserPayloadImplementors = []string{"UpdateUserPayload"}
 
 func (ec *executionContext) _UpdateUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserPayload) graphql.Marshaler {
@@ -53045,6 +55658,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_bio(ctx, field, obj)
 		case "utc":
 			out.Values[i] = ec._User_utc(ctx, field, obj)
+		case "notifyByEmail":
+			out.Values[i] = ec._User_notifyByEmail(ctx, field, obj)
 		case "rights":
 			out.Values[i] = ec._User_rights(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -53060,6 +55675,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_tensions_assigned(ctx, field, obj)
 		case "contracts":
 			out.Values[i] = ec._User_contracts(ctx, field, obj)
+		case "subscriptions":
+			out.Values[i] = ec._User_subscriptions(ctx, field, obj)
+		case "events":
+			out.Values[i] = ec._User_events(ctx, field, obj)
 		case "rolesAggregate":
 			out.Values[i] = ec._User_rolesAggregate(ctx, field, obj)
 		case "backed_rolesAggregate":
@@ -53070,6 +55689,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_tensions_assignedAggregate(ctx, field, obj)
 		case "contractsAggregate":
 			out.Values[i] = ec._User_contractsAggregate(ctx, field, obj)
+		case "subscriptionsAggregate":
+			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
+		case "eventsAggregate":
+			out.Values[i] = ec._User_eventsAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53130,6 +55753,78 @@ func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._UserAggregateResult_utcMin(ctx, field, obj)
 		case "utcMax":
 			out.Values[i] = ec._UserAggregateResult_utcMax(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userEventImplementors = []string{"UserEvent"}
+
+func (ec *executionContext) _UserEvent(ctx context.Context, sel ast.SelectionSet, obj *model.UserEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userEventImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserEvent")
+		case "id":
+			out.Values[i] = ec._UserEvent_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._UserEvent_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isRead":
+			out.Values[i] = ec._UserEvent_isRead(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "user":
+			out.Values[i] = ec._UserEvent_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "event":
+			out.Values[i] = ec._UserEvent_event(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userEventAggregateResultImplementors = []string{"UserEventAggregateResult"}
+
+func (ec *executionContext) _UserEventAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserEventAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userEventAggregateResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserEventAggregateResult")
+		case "count":
+			out.Values[i] = ec._UserEventAggregateResult_count(ctx, field, obj)
+		case "createdAtMin":
+			out.Values[i] = ec._UserEventAggregateResult_createdAtMin(ctx, field, obj)
+		case "createdAtMax":
+			out.Values[i] = ec._UserEventAggregateResult_createdAtMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53904,6 +56599,32 @@ func (ec *executionContext) unmarshalNAddTensionInput2ᚖzerogovᚋfractal6ᚗgo
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddUserEventInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserEventInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AddUserEventInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddUserEventInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddUserEventInput2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInput(ctx context.Context, v interface{}) (*model.AddUserEventInput, error) {
+	res, err := ec.unmarshalInputAddUserEventInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -54127,50 +56848,6 @@ func (ec *executionContext) marshalNDgraphIndex2zerogovᚋfractal6ᚗgoᚋgraph�
 	return v
 }
 
-func (ec *executionContext) marshalNEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Event) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEvent(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v *model.Event) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -54216,25 +56893,29 @@ func (ec *executionContext) unmarshalNEventFragmentRef2ᚖzerogovᚋfractal6ᚗg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx context.Context, v interface{}) ([]*model.EventRef, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
+func (ec *executionContext) marshalNEventKind2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKind(ctx context.Context, sel ast.SelectionSet, v model.EventKind) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
 		}
+		return graphql.Null
 	}
-	var err error
-	res := make([]*model.EventRef, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
+	return ec._EventKind(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNEventKindRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRef(ctx context.Context, v interface{}) (*model.EventKindRef, error) {
+	res, err := ec.unmarshalInputEventKindRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEventKindType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindType(ctx context.Context, v interface{}) (model.EventKindType, error) {
+	var res model.EventKindType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEventKindType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindType(ctx context.Context, sel ast.SelectionSet, v model.EventKindType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx context.Context, v interface{}) (*model.EventRef, error) {
@@ -54908,6 +57589,11 @@ func (ec *executionContext) unmarshalNUpdateTensionInput2zerogovᚋfractal6ᚗgo
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateUserEventInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventInput(ctx context.Context, v interface{}) (model.UpdateUserEventInput, error) {
+	res, err := ec.unmarshalInputUpdateUserEventInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
 	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -54931,6 +57617,31 @@ func (ec *executionContext) marshalNUser2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmo
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx context.Context, sel ast.SelectionSet, v *model.UserEvent) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserEvent(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUserEventFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx context.Context, v interface{}) (model.UserEventFilter, error) {
+	res, err := ec.unmarshalInputUserEventFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx context.Context, v interface{}) (*model.UserEventFilter, error) {
+	res, err := ec.unmarshalInputUserEventFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUserEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRef(ctx context.Context, v interface{}) (*model.UserEventRef, error) {
+	res, err := ec.unmarshalInputUserEventRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNUserFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx context.Context, v interface{}) (model.UserFilter, error) {
@@ -55419,6 +58130,13 @@ func (ec *executionContext) marshalOAddTensionPayload2ᚖzerogovᚋfractal6ᚗgo
 		return graphql.Null
 	}
 	return ec._AddTensionPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddUserEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddUserEventPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddUserEventPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddUserPayload) graphql.Marshaler {
@@ -56799,6 +59517,13 @@ func (ec *executionContext) marshalODeleteTensionPayload2ᚖzerogovᚋfractal6�
 	return ec._DeleteTensionPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalODeleteUserEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteUserEventPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteUserEventPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalODeleteUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteUserPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -56936,6 +59661,53 @@ func (ec *executionContext) marshalOEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraph�
 
 	}
 	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Event) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEvent(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
 
 	return ret
 }
@@ -57275,6 +60047,156 @@ func (ec *executionContext) marshalOEventHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋ
 	return v
 }
 
+func (ec *executionContext) marshalOEventKind2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindᚄ(ctx context.Context, sel ast.SelectionSet, v []model.EventKind) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEventKind2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKind(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOEventKindFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindFilter(ctx context.Context, v interface{}) (*model.EventKindFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventKindFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventKindRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx context.Context, v interface{}) ([]*model.EventKindRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.EventKindRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNEventKindRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOEventKindType2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindTypeᚄ(ctx context.Context, v interface{}) ([]model.EventKindType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]model.EventKindType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNEventKindType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOEventKindType2ᚕzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []model.EventKindType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEventKindType2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalOEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx context.Context, v interface{}) (*model.EventOrder, error) {
 	if v == nil {
 		return nil, nil
@@ -57329,6 +60251,14 @@ func (ec *executionContext) unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx context.Context, v interface{}) (*model.EventRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚕᚖfloat64(ctx context.Context, v interface{}) ([]*float64, error) {
@@ -60848,6 +63778,13 @@ func (ec *executionContext) marshalOUpdateTensionPayload2ᚖzerogovᚋfractal6�
 	return ec._UpdateTensionPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOUpdateUserEventPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateUserEventPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateUserEventPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOUpdateUserPayload2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateUserPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -60969,6 +63906,277 @@ func (ec *executionContext) marshalOUserAggregateResult2ᚖzerogovᚋfractal6ᚗ
 		return graphql.Null
 	}
 	return ec._UserAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx context.Context, sel ast.SelectionSet, v []*model.UserEvent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUserEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserEvent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUserEvent2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEvent(ctx context.Context, sel ast.SelectionSet, v *model.UserEvent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UserEvent(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUserEventAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.UserEventAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UserEventAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUserEventFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx context.Context, v interface{}) ([]*model.UserEventFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.UserEventFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUserEventFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx context.Context, v interface{}) (*model.UserEventFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserEventFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserEventHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx context.Context, v interface{}) ([]*model.UserEventHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.UserEventHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOUserEventHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOUserEventHasFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.UserEventHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUserEventHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOUserEventHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx context.Context, v interface{}) (*model.UserEventHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.UserEventHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUserEventHasFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.UserEventHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOUserEventOrder2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx context.Context, v interface{}) (*model.UserEventOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserEventOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserEventOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx context.Context, v interface{}) (*model.UserEventOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.UserEventOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUserEventOrderable2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx context.Context, sel ast.SelectionSet, v *model.UserEventOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOUserEventPatch2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx context.Context, v interface{}) (*model.UserEventPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserEventPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx context.Context, v interface{}) ([]*model.UserEventRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.UserEventRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNUserEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOUserFilter2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx context.Context, v interface{}) ([]*model.UserFilter, error) {

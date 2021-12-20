@@ -12,6 +12,7 @@ import (
 
 
 var EMAP EventsMap
+var SuscribingEvents map[model.TensionEvent]bool
 
 func init() {
     EMAP = EventsMap{
@@ -102,6 +103,13 @@ func init() {
             Action: UserLeave,
         },
     }
+
+    SuscribingEvents = map[model.TensionEvent]bool{
+        model.TensionEventCreated: true,
+        model.TensionEventCommentPushed: true,
+        model.TensionEventReopened: true,
+        model.TensionEventClosed: true,
+    }
 }
 
 // tensionEventHook is applied for addTension and updateTension query directives.
@@ -109,6 +117,7 @@ func init() {
 // All events in History must pass.
 func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, blob *model.BlobRef) (bool, *model.Contract, error) {
     var ok bool = true
+    var addSuscriber bool
     var err error
     var tension *model.Tension
     var contract *model.Contract
@@ -126,16 +135,28 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         }
 
         // Process event
-        ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true, true)
+        ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true)
         if !ok || err != nil { break }
 
+        // Check if event make a new suscriber
+        addSuscriber = addSuscriber || SuscribingEvents[*event.EventType]
+
+    }
+
+    // Add suscriber
+    // @performance: @defer this with Redis
+    if ok && addSuscriber {
+		err = db.GetDB().Update(*uctx, "tension", &model.UpdateTensionInput{
+			Filter: &model.TensionFilter{ID: []string{tension.ID}},
+			Set: &model.TensionPatch{Suscribers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}}},
+		})
     }
 
     return ok, contract, err
 }
 
 func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, blob *model.BlobRef, contract *model.Contract,
-                    doCheck, doProcess, doNotify bool) (bool, *model.Contract, error) {
+                    doCheck, doProcess bool) (bool, *model.Contract, error) {
     var ok bool
     var err error
 
@@ -154,6 +175,7 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
         if !ok || err != nil { return ok, contract, err }
     }
 
+    // act is false if contract is cancelled for example !
     act := contract == nil || contract.Status == model.ContractStatusClosed
 
     // Trigger Action
@@ -161,7 +183,7 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
         if em.Propagate != "" {
             v, err := CheckEvent(tension, event)
             if err != nil { return ok, contract, err }
-            err = db.GetDB().UpdateOne(*uctx, "tension", tension.ID, em.Propagate, v)
+            err = db.GetDB().UpdateValue(*uctx, "tension", tension.ID, em.Propagate, v)
             if err != nil { return ok, contract, err }
         }
         if em.Action != nil {
@@ -181,20 +203,6 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
         // Assumes contract is either closed or cancelled.
         err = db.GetDB().SetFieldById(contract.ID, "Contract.contractid", contract.ID)
         if err != nil { return false, contract, err }
-    }
-
-    // Notify users
-    if doNotify {
-        // push notification (somewhere ?!)
-        //if act {
-            // * participants
-            // * candidates
-            // * assigness
-            // * coordo
-            // * suscriber
-        //} else {
-            //notify only the participants and candidates
-            // inform what has beend voted...
     }
 
     return ok, contract, err

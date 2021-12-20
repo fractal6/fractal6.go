@@ -8,6 +8,10 @@ import (
 	"strconv"
 )
 
+type EventKind interface {
+	IsEventKind()
+}
+
 type AddBlobInput struct {
 	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
 	CreatedAt    string           `json:"createdAt,omitempty"`
@@ -229,6 +233,7 @@ type AddTensionInput struct {
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
+	Suscribers     []*UserRef     `json:"suscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
 	NOpenContracts *int           `json:"n_open_contracts"`
 }
@@ -238,23 +243,38 @@ type AddTensionPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
+type AddUserEventInput struct {
+	CreatedAt string          `json:"createdAt,omitempty"`
+	IsRead    bool            `json:"isRead"`
+	User      *UserRef        `json:"user,omitempty"`
+	Event     []*EventKindRef `json:"event,omitempty"`
+}
+
+type AddUserEventPayload struct {
+	UserEvent []*UserEvent `json:"userEvent,omitempty"`
+	NumUids   *int         `json:"numUids"`
+}
+
 type AddUserInput struct {
-	CreatedAt        string         `json:"createdAt,omitempty"`
-	LastAck          string         `json:"lastAck,omitempty"`
-	Username         string         `json:"username,omitempty"`
-	Name             *string        `json:"name,omitempty"`
-	Password         string         `json:"password,omitempty"`
-	Email            string         `json:"email,omitempty"`
-	EmailHash        *string        `json:"emailHash,omitempty"`
-	EmailValidated   bool           `json:"emailValidated"`
-	Bio              *string        `json:"bio,omitempty"`
-	Utc              *string        `json:"utc,omitempty"`
-	Rights           *UserRightsRef `json:"rights,omitempty"`
-	Roles            []*NodeRef     `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
-	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
-	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
-	Contracts        []*ContractRef `json:"contracts,omitempty"`
+	CreatedAt        string          `json:"createdAt,omitempty"`
+	LastAck          string          `json:"lastAck,omitempty"`
+	Username         string          `json:"username,omitempty"`
+	Name             *string         `json:"name,omitempty"`
+	Password         string          `json:"password,omitempty"`
+	Email            string          `json:"email,omitempty"`
+	EmailHash        *string         `json:"emailHash,omitempty"`
+	EmailValidated   bool            `json:"emailValidated"`
+	Bio              *string         `json:"bio,omitempty"`
+	Utc              *string         `json:"utc,omitempty"`
+	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Rights           *UserRightsRef  `json:"rights,omitempty"`
+	Roles            []*NodeRef      `json:"roles,omitempty"`
+	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
+	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
+	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
+	Contracts        []*ContractRef  `json:"contracts,omitempty"`
+	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
+	Events           []*UserEventRef `json:"events,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -459,6 +479,8 @@ type Contract struct {
 	CommentsAggregate          *CommentAggregateResult     `json:"commentsAggregate,omitempty"`
 }
 
+func (Contract) IsEventKind() {}
+
 type ContractAggregateResult struct {
 	Count         *int    `json:"count"`
 	CreatedAtMin  *string `json:"createdAtMin,omitempty"`
@@ -651,6 +673,12 @@ type DeleteTensionPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
+type DeleteUserEventPayload struct {
+	UserEvent []*UserEvent `json:"userEvent,omitempty"`
+	Msg       *string      `json:"msg,omitempty"`
+	NumUids   *int         `json:"numUids"`
+}
+
 type DeleteUserPayload struct {
 	User    []*User `json:"user,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
@@ -684,6 +712,8 @@ type Event struct {
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 }
+
+func (Event) IsEventKind() {}
 
 type EventAggregateResult struct {
 	Count        *int    `json:"count"`
@@ -748,6 +778,17 @@ type EventFragmentRef struct {
 	EventType *TensionEvent `json:"event_type,omitempty"`
 	Old       *string       `json:"old,omitempty"`
 	New       *string       `json:"new,omitempty"`
+}
+
+type EventKindFilter struct {
+	MemberTypes    []EventKindType `json:"memberTypes,omitempty"`
+	EventFilter    *EventFilter    `json:"eventFilter,omitempty"`
+	ContractFilter *ContractFilter `json:"contractFilter,omitempty"`
+}
+
+type EventKindRef struct {
+	EventRef    *EventRef    `json:"eventRef,omitempty"`
+	ContractRef *ContractRef `json:"contractRef,omitempty"`
 }
 
 type EventOrder struct {
@@ -1498,33 +1539,35 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Emitter            *Node                    `json:"emitter,omitempty"`
-	Emitterid          string                   `json:"emitterid,omitempty"`
-	Receiver           *Node                    `json:"receiver,omitempty"`
-	Receiverid         string                   `json:"receiverid,omitempty"`
-	Title              string                   `json:"title,omitempty"`
-	Type               TensionType              `json:"type_,omitempty"`
-	Status             TensionStatus            `json:"status,omitempty"`
-	Action             *TensionAction           `json:"action,omitempty"`
-	Comments           []*Comment               `json:"comments,omitempty"`
-	Assignees          []*User                  `json:"assignees,omitempty"`
-	Labels             []*Label                 `json:"labels,omitempty"`
-	Blobs              []*Blob                  `json:"blobs,omitempty"`
-	History            []*Event                 `json:"history,omitempty"`
-	Contracts          []*Contract              `json:"contracts,omitempty"`
-	NComments          *int                     `json:"n_comments"`
-	NOpenContracts     *int                     `json:"n_open_contracts"`
-	ID                 string                   `json:"id,omitempty"`
-	CreatedBy          *User                    `json:"createdBy,omitempty"`
-	CreatedAt          string                   `json:"createdAt,omitempty"`
-	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
-	Message            *string                  `json:"message,omitempty"`
-	CommentsAggregate  *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
-	AssigneesAggregate *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
-	LabelsAggregate    *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
-	BlobsAggregate     *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
-	HistoryAggregate   *EventAggregateResult    `json:"historyAggregate,omitempty"`
-	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
+	Emitter             *Node                    `json:"emitter,omitempty"`
+	Emitterid           string                   `json:"emitterid,omitempty"`
+	Receiver            *Node                    `json:"receiver,omitempty"`
+	Receiverid          string                   `json:"receiverid,omitempty"`
+	Title               string                   `json:"title,omitempty"`
+	Type                TensionType              `json:"type_,omitempty"`
+	Status              TensionStatus            `json:"status,omitempty"`
+	Action              *TensionAction           `json:"action,omitempty"`
+	Comments            []*Comment               `json:"comments,omitempty"`
+	Assignees           []*User                  `json:"assignees,omitempty"`
+	Labels              []*Label                 `json:"labels,omitempty"`
+	Blobs               []*Blob                  `json:"blobs,omitempty"`
+	History             []*Event                 `json:"history,omitempty"`
+	Contracts           []*Contract              `json:"contracts,omitempty"`
+	Suscribers          []*User                  `json:"suscribers,omitempty"`
+	NComments           *int                     `json:"n_comments"`
+	NOpenContracts      *int                     `json:"n_open_contracts"`
+	ID                  string                   `json:"id,omitempty"`
+	CreatedBy           *User                    `json:"createdBy,omitempty"`
+	CreatedAt           string                   `json:"createdAt,omitempty"`
+	UpdatedAt           *string                  `json:"updatedAt,omitempty"`
+	Message             *string                  `json:"message,omitempty"`
+	CommentsAggregate   *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
+	AssigneesAggregate  *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
+	LabelsAggregate     *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
+	BlobsAggregate      *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
+	HistoryAggregate    *EventAggregateResult    `json:"historyAggregate,omitempty"`
+	ContractsAggregate  *ContractAggregateResult `json:"contractsAggregate,omitempty"`
+	SuscribersAggregate *UserAggregateResult     `json:"suscribersAggregate,omitempty"`
 }
 
 type TensionAggregateResult struct {
@@ -1596,6 +1639,7 @@ type TensionPatch struct {
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
+	Suscribers     []*UserRef     `json:"suscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
 	NOpenContracts *int           `json:"n_open_contracts"`
 }
@@ -1620,6 +1664,7 @@ type TensionRef struct {
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
+	Suscribers     []*UserRef     `json:"suscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
 	NOpenContracts *int           `json:"n_open_contracts"`
 }
@@ -1788,6 +1833,17 @@ type UpdateTensionPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
+type UpdateUserEventInput struct {
+	Filter *UserEventFilter `json:"filter,omitempty"`
+	Set    *UserEventPatch  `json:"set,omitempty"`
+	Remove *UserEventPatch  `json:"remove,omitempty"`
+}
+
+type UpdateUserEventPayload struct {
+	UserEvent []*UserEvent `json:"userEvent,omitempty"`
+	NumUids   *int         `json:"numUids"`
+}
+
 type UpdateUserInput struct {
 	Filter *UserFilter `json:"filter,omitempty"`
 	Set    *UserPatch  `json:"set,omitempty"`
@@ -1822,28 +1878,33 @@ type UpdateVotePayload struct {
 }
 
 type User struct {
-	ID                        string                   `json:"id,omitempty"`
-	CreatedAt                 string                   `json:"createdAt,omitempty"`
-	LastAck                   string                   `json:"lastAck,omitempty"`
-	Username                  string                   `json:"username,omitempty"`
-	Name                      *string                  `json:"name,omitempty"`
-	Password                  string                   `json:"password,omitempty"`
-	Email                     string                   `json:"email,omitempty"`
-	EmailHash                 *string                  `json:"emailHash,omitempty"`
-	EmailValidated            bool                     `json:"emailValidated"`
-	Bio                       *string                  `json:"bio,omitempty"`
-	Utc                       *string                  `json:"utc,omitempty"`
-	Rights                    *UserRights              `json:"rights,omitempty"`
-	Roles                     []*Node                  `json:"roles,omitempty"`
-	BackedRoles               []*Node                  `json:"backed_roles,omitempty"`
-	TensionsCreated           []*Tension               `json:"tensions_created,omitempty"`
-	TensionsAssigned          []*Tension               `json:"tensions_assigned,omitempty"`
-	Contracts                 []*Contract              `json:"contracts,omitempty"`
-	RolesAggregate            *NodeAggregateResult     `json:"rolesAggregate,omitempty"`
-	BackedRolesAggregate      *NodeAggregateResult     `json:"backed_rolesAggregate,omitempty"`
-	TensionsCreatedAggregate  *TensionAggregateResult  `json:"tensions_createdAggregate,omitempty"`
-	TensionsAssignedAggregate *TensionAggregateResult  `json:"tensions_assignedAggregate,omitempty"`
-	ContractsAggregate        *ContractAggregateResult `json:"contractsAggregate,omitempty"`
+	ID                        string                    `json:"id,omitempty"`
+	CreatedAt                 string                    `json:"createdAt,omitempty"`
+	LastAck                   string                    `json:"lastAck,omitempty"`
+	Username                  string                    `json:"username,omitempty"`
+	Name                      *string                   `json:"name,omitempty"`
+	Password                  string                    `json:"password,omitempty"`
+	Email                     string                    `json:"email,omitempty"`
+	EmailHash                 *string                   `json:"emailHash,omitempty"`
+	EmailValidated            bool                      `json:"emailValidated"`
+	Bio                       *string                   `json:"bio,omitempty"`
+	Utc                       *string                   `json:"utc,omitempty"`
+	NotifyByEmail             *bool                     `json:"notifyByEmail"`
+	Rights                    *UserRights               `json:"rights,omitempty"`
+	Roles                     []*Node                   `json:"roles,omitempty"`
+	BackedRoles               []*Node                   `json:"backed_roles,omitempty"`
+	TensionsCreated           []*Tension                `json:"tensions_created,omitempty"`
+	TensionsAssigned          []*Tension                `json:"tensions_assigned,omitempty"`
+	Contracts                 []*Contract               `json:"contracts,omitempty"`
+	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
+	Events                    []*UserEvent              `json:"events,omitempty"`
+	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
+	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
+	TensionsCreatedAggregate  *TensionAggregateResult   `json:"tensions_createdAggregate,omitempty"`
+	TensionsAssignedAggregate *TensionAggregateResult   `json:"tensions_assignedAggregate,omitempty"`
+	ContractsAggregate        *ContractAggregateResult  `json:"contractsAggregate,omitempty"`
+	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
+	EventsAggregate           *UserEventAggregateResult `json:"eventsAggregate,omitempty"`
 }
 
 type UserAggregateResult struct {
@@ -1868,6 +1929,51 @@ type UserAggregateResult struct {
 	UtcMax       *string `json:"utcMax,omitempty"`
 }
 
+type UserEvent struct {
+	ID        string      `json:"id,omitempty"`
+	CreatedAt string      `json:"createdAt,omitempty"`
+	IsRead    bool        `json:"isRead"`
+	User      *User       `json:"user,omitempty"`
+	Event     []EventKind `json:"event,omitempty"`
+}
+
+type UserEventAggregateResult struct {
+	Count        *int    `json:"count"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+}
+
+type UserEventFilter struct {
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	IsRead    *bool                 `json:"isRead"`
+	Has       []*UserEventHasFilter `json:"has,omitempty"`
+	And       []*UserEventFilter    `json:"and,omitempty"`
+	Or        []*UserEventFilter    `json:"or,omitempty"`
+	Not       *UserEventFilter      `json:"not,omitempty"`
+}
+
+type UserEventOrder struct {
+	Asc  *UserEventOrderable `json:"asc,omitempty"`
+	Desc *UserEventOrderable `json:"desc,omitempty"`
+	Then *UserEventOrder     `json:"then,omitempty"`
+}
+
+type UserEventPatch struct {
+	CreatedAt *string         `json:"createdAt,omitempty"`
+	IsRead    *bool           `json:"isRead"`
+	User      *UserRef        `json:"user,omitempty"`
+	Event     []*EventKindRef `json:"event,omitempty"`
+}
+
+type UserEventRef struct {
+	ID        *string         `json:"id,omitempty"`
+	CreatedAt *string         `json:"createdAt,omitempty"`
+	IsRead    *bool           `json:"isRead"`
+	User      *UserRef        `json:"user,omitempty"`
+	Event     []*EventKindRef `json:"event,omitempty"`
+}
+
 type UserFilter struct {
 	ID       []string                            `json:"id,omitempty"`
 	Username *StringHashFilterStringRegExpFilter `json:"username,omitempty"`
@@ -1886,42 +1992,48 @@ type UserOrder struct {
 }
 
 type UserPatch struct {
-	CreatedAt        *string        `json:"createdAt,omitempty"`
-	LastAck          *string        `json:"lastAck,omitempty"`
-	Username         *string        `json:"username,omitempty"`
-	Name             *string        `json:"name,omitempty"`
-	Password         *string        `json:"password,omitempty"`
-	Email            *string        `json:"email,omitempty"`
-	EmailHash        *string        `json:"emailHash,omitempty"`
-	EmailValidated   *bool          `json:"emailValidated"`
-	Bio              *string        `json:"bio,omitempty"`
-	Utc              *string        `json:"utc,omitempty"`
-	Rights           *UserRightsRef `json:"rights,omitempty"`
-	Roles            []*NodeRef     `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
-	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
-	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
-	Contracts        []*ContractRef `json:"contracts,omitempty"`
+	CreatedAt        *string         `json:"createdAt,omitempty"`
+	LastAck          *string         `json:"lastAck,omitempty"`
+	Username         *string         `json:"username,omitempty"`
+	Name             *string         `json:"name,omitempty"`
+	Password         *string         `json:"password,omitempty"`
+	Email            *string         `json:"email,omitempty"`
+	EmailHash        *string         `json:"emailHash,omitempty"`
+	EmailValidated   *bool           `json:"emailValidated"`
+	Bio              *string         `json:"bio,omitempty"`
+	Utc              *string         `json:"utc,omitempty"`
+	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Rights           *UserRightsRef  `json:"rights,omitempty"`
+	Roles            []*NodeRef      `json:"roles,omitempty"`
+	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
+	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
+	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
+	Contracts        []*ContractRef  `json:"contracts,omitempty"`
+	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
+	Events           []*UserEventRef `json:"events,omitempty"`
 }
 
 type UserRef struct {
-	ID               *string        `json:"id,omitempty"`
-	CreatedAt        *string        `json:"createdAt,omitempty"`
-	LastAck          *string        `json:"lastAck,omitempty"`
-	Username         *string        `json:"username,omitempty"`
-	Name             *string        `json:"name,omitempty"`
-	Password         *string        `json:"password,omitempty"`
-	Email            *string        `json:"email,omitempty"`
-	EmailHash        *string        `json:"emailHash,omitempty"`
-	EmailValidated   *bool          `json:"emailValidated"`
-	Bio              *string        `json:"bio,omitempty"`
-	Utc              *string        `json:"utc,omitempty"`
-	Rights           *UserRightsRef `json:"rights,omitempty"`
-	Roles            []*NodeRef     `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef     `json:"backed_roles,omitempty"`
-	TensionsCreated  []*TensionRef  `json:"tensions_created,omitempty"`
-	TensionsAssigned []*TensionRef  `json:"tensions_assigned,omitempty"`
-	Contracts        []*ContractRef `json:"contracts,omitempty"`
+	ID               *string         `json:"id,omitempty"`
+	CreatedAt        *string         `json:"createdAt,omitempty"`
+	LastAck          *string         `json:"lastAck,omitempty"`
+	Username         *string         `json:"username,omitempty"`
+	Name             *string         `json:"name,omitempty"`
+	Password         *string         `json:"password,omitempty"`
+	Email            *string         `json:"email,omitempty"`
+	EmailHash        *string         `json:"emailHash,omitempty"`
+	EmailValidated   *bool           `json:"emailValidated"`
+	Bio              *string         `json:"bio,omitempty"`
+	Utc              *string         `json:"utc,omitempty"`
+	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Rights           *UserRightsRef  `json:"rights,omitempty"`
+	Roles            []*NodeRef      `json:"roles,omitempty"`
+	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
+	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
+	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
+	Contracts        []*ContractRef  `json:"contracts,omitempty"`
+	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
+	Events           []*UserEventRef `json:"events,omitempty"`
 }
 
 type UserRights struct {
@@ -2680,6 +2792,47 @@ func (e *EventHasFilter) UnmarshalGQL(v interface{}) error {
 }
 
 func (e EventHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventKindType string
+
+const (
+	EventKindTypeEvent    EventKindType = "Event"
+	EventKindTypeContract EventKindType = "Contract"
+)
+
+var AllEventKindType = []EventKindType{
+	EventKindTypeEvent,
+	EventKindTypeContract,
+}
+
+func (e EventKindType) IsValid() bool {
+	switch e {
+	case EventKindTypeEvent, EventKindTypeContract:
+		return true
+	}
+	return false
+}
+
+func (e EventKindType) String() string {
+	return string(e)
+}
+
+func (e *EventKindType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventKindType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventKindType", str)
+	}
+	return nil
+}
+
+func (e EventKindType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -3949,6 +4102,7 @@ const (
 	TensionHasFilterBlobs          TensionHasFilter = "blobs"
 	TensionHasFilterHistory        TensionHasFilter = "history"
 	TensionHasFilterContracts      TensionHasFilter = "contracts"
+	TensionHasFilterSuscribers     TensionHasFilter = "suscribers"
 	TensionHasFilterNComments      TensionHasFilter = "n_comments"
 	TensionHasFilterNOpenContracts TensionHasFilter = "n_open_contracts"
 )
@@ -3972,13 +4126,14 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterBlobs,
 	TensionHasFilterHistory,
 	TensionHasFilterContracts,
+	TensionHasFilterSuscribers,
 	TensionHasFilterNComments,
 	TensionHasFilterNOpenContracts,
 }
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterContracts, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterContracts, TensionHasFilterSuscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false
@@ -4142,6 +4297,90 @@ func (e TensionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type UserEventHasFilter string
+
+const (
+	UserEventHasFilterCreatedAt UserEventHasFilter = "createdAt"
+	UserEventHasFilterIsRead    UserEventHasFilter = "isRead"
+	UserEventHasFilterUser      UserEventHasFilter = "user"
+	UserEventHasFilterEvent     UserEventHasFilter = "event"
+)
+
+var AllUserEventHasFilter = []UserEventHasFilter{
+	UserEventHasFilterCreatedAt,
+	UserEventHasFilterIsRead,
+	UserEventHasFilterUser,
+	UserEventHasFilterEvent,
+}
+
+func (e UserEventHasFilter) IsValid() bool {
+	switch e {
+	case UserEventHasFilterCreatedAt, UserEventHasFilterIsRead, UserEventHasFilterUser, UserEventHasFilterEvent:
+		return true
+	}
+	return false
+}
+
+func (e UserEventHasFilter) String() string {
+	return string(e)
+}
+
+func (e *UserEventHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserEventHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserEventHasFilter", str)
+	}
+	return nil
+}
+
+func (e UserEventHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserEventOrderable string
+
+const (
+	UserEventOrderableCreatedAt UserEventOrderable = "createdAt"
+)
+
+var AllUserEventOrderable = []UserEventOrderable{
+	UserEventOrderableCreatedAt,
+}
+
+func (e UserEventOrderable) IsValid() bool {
+	switch e {
+	case UserEventOrderableCreatedAt:
+		return true
+	}
+	return false
+}
+
+func (e UserEventOrderable) String() string {
+	return string(e)
+}
+
+func (e *UserEventOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserEventOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserEventOrderable", str)
+	}
+	return nil
+}
+
+func (e UserEventOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type UserHasFilter string
 
 const (
@@ -4155,12 +4394,15 @@ const (
 	UserHasFilterEmailValidated   UserHasFilter = "emailValidated"
 	UserHasFilterBio              UserHasFilter = "bio"
 	UserHasFilterUtc              UserHasFilter = "utc"
+	UserHasFilterNotifyByEmail    UserHasFilter = "notifyByEmail"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
 	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
 	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
+	UserHasFilterSubscriptions    UserHasFilter = "subscriptions"
+	UserHasFilterEvents           UserHasFilter = "events"
 )
 
 var AllUserHasFilter = []UserHasFilter{
@@ -4174,17 +4416,20 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterEmailValidated,
 	UserHasFilterBio,
 	UserHasFilterUtc,
+	UserHasFilterNotifyByEmail,
 	UserHasFilterRights,
 	UserHasFilterRoles,
 	UserHasFilterBackedRoles,
 	UserHasFilterTensionsCreated,
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
+	UserHasFilterSubscriptions,
+	UserHasFilterEvents,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterSubscriptions, UserHasFilterEvents:
 		return true
 	}
 	return false

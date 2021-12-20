@@ -31,27 +31,28 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     if contract == nil { return false, fmt.Errorf("contract not found.") }
 
     // Process event
-    ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true, true)
+    ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true)
     ok = ok || contract != nil
 
-    fmt.Println(1)
     if contract != nil && err != nil {
-        // Pre-contract action
+        // Post-contract action
         if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+            // Add pending Nodes
             for _, c := range contract.Candidates {
-                // Add pending Nodes
-                fmt.Println(c.Username)
                 err = AddPendingNode(c.Username, tension)
                 if err != nil { return false, err }
-
-                // Send email invitation.
-                // @todo
-
             }
         }
+
+        // @TODO here:
+        // PushContractNotification and dend email (watch special case for pendingCandidates).
+        // * notify only the participants and authorized participants (coordo)
+        //for _, c := range contract.PendingCandidates {
+        //    // @todo
+        //    fmt.Println(c.Email)
+        //}
     }
 
-    fmt.Println(ok)
     return ok, err
 }
 
@@ -71,8 +72,16 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     // Process event
     var event model.EventRef
     StructMap(contract.Event, &event)
-    ok, contract, err = processEvent(uctx, tension, &event, nil, contract, true, true, true)
+    ok, contract, err = processEvent(uctx, tension, &event, nil, contract, true, true)
     if err != nil { return false, contract, err }
+
+    if ok {
+        // @TODO here:
+        // 1. push the event
+        //err = PushHistory(uctx, tension.ID, [contract.event])
+        // 2. do pushEventNotification, with that event !
+        //PushEventNotifications(tension.ID, [contract.event])
+    }
 
     return ok, contract, err
 }
@@ -91,7 +100,7 @@ func hasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, erro
     tension, err := db.GetDB().GetTensionHook(contract.Tension.ID, false, nil)
     if err != nil { return false, err }
 
-    ok, c, err := processEvent(uctx, tension, &event, nil, nil, true, false, false)
+    ok, c, err := processEvent(uctx, tension, &event, nil, nil, true, false)
     return ok||c!=nil, err
 }
 
