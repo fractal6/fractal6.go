@@ -12,7 +12,7 @@ import (
 
 
 var EMAP EventsMap
-var SuscribingEvents map[model.TensionEvent]bool
+var SubscribingEvents map[model.TensionEvent]bool
 
 func init() {
     EMAP = EventsMap{
@@ -104,7 +104,7 @@ func init() {
         },
     }
 
-    SuscribingEvents = map[model.TensionEvent]bool{
+    SubscribingEvents = map[model.TensionEvent]bool{
         model.TensionEventCreated: true,
         model.TensionEventCommentPushed: true,
         model.TensionEventReopened: true,
@@ -117,7 +117,7 @@ func init() {
 // All events in History must pass.
 func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, blob *model.BlobRef) (bool, *model.Contract, error) {
     var ok bool = true
-    var addSuscriber bool
+    var addSubscriber bool
     var err error
     var tension *model.Tension
     var contract *model.Contract
@@ -138,17 +138,17 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true)
         if !ok || err != nil { break }
 
-        // Check if event make a new suscriber
-        addSuscriber = addSuscriber || SuscribingEvents[*event.EventType]
+        // Check if event make a new subscriber
+        addSubscriber = addSubscriber || SubscribingEvents[*event.EventType]
 
     }
 
-    // Add suscriber
+    // Add subscriber
     // @performance: @defer this with Redis
-    if ok && addSuscriber {
+    if ok && addSubscriber {
 		err = db.GetDB().Update(*uctx, "tension", &model.UpdateTensionInput{
 			Filter: &model.TensionFilter{ID: []string{tension.ID}},
-			Set: &model.TensionPatch{Suscribers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}}},
+			Set: &model.TensionPatch{Subscribers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}}},
 		})
     }
 

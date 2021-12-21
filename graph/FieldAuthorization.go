@@ -37,7 +37,7 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *str
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get attributes and check everything is ok
-    var userObj model.JsonAtom
+    userObj := make(model.JsonAtom)
     var userField string
     if f == nil {
         userField = "user"

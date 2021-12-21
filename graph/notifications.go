@@ -56,16 +56,16 @@ func PushEventNotifications(tid string, evts []*model.EventRef) error {
     assignees := InterfaceToStringSlice(res)
     // Get Coordos
     // * (will see later)
-    // Get Suscriber
-    res, err = db.GetDB().GetSubFieldById(tid, "Tension.suscribers", "User.username")
+    // Get Subscriber
+    res, err = db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username")
     if err != nil { return err }
-    suscribers := InterfaceToStringSlice(res)
+    subscribers := InterfaceToStringSlice(res)
     // Append without duplicate
     for _, u := range assignees {
         if users[u] { continue }
         users[u] = true
     }
-    for _, u := range suscribers {
+    for _, u := range subscribers {
         //@TODO or u == uctx.Username
         if users[u] { continue }
         users[u] = true

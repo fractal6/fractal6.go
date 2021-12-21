@@ -787,35 +787,35 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Action              func(childComplexity int) int
-		Assignees           func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		AssigneesAggregate  func(childComplexity int, filter *model.UserFilter) int
-		Blobs               func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		BlobsAggregate      func(childComplexity int, filter *model.BlobFilter) int
-		Comments            func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		CommentsAggregate   func(childComplexity int, filter *model.CommentFilter) int
-		Contracts           func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
-		ContractsAggregate  func(childComplexity int, filter *model.ContractFilter) int
-		CreatedAt           func(childComplexity int) int
-		CreatedBy           func(childComplexity int, filter *model.UserFilter) int
-		Emitter             func(childComplexity int, filter *model.NodeFilter) int
-		Emitterid           func(childComplexity int) int
-		History             func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
-		HistoryAggregate    func(childComplexity int, filter *model.EventFilter) int
-		ID                  func(childComplexity int) int
-		Labels              func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		LabelsAggregate     func(childComplexity int, filter *model.LabelFilter) int
-		Message             func(childComplexity int) int
-		NComments           func(childComplexity int) int
-		NOpenContracts      func(childComplexity int) int
-		Receiver            func(childComplexity int, filter *model.NodeFilter) int
-		Receiverid          func(childComplexity int) int
-		Status              func(childComplexity int) int
-		Suscribers          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		SuscribersAggregate func(childComplexity int, filter *model.UserFilter) int
-		Title               func(childComplexity int) int
-		Type                func(childComplexity int) int
-		UpdatedAt           func(childComplexity int) int
+		Action               func(childComplexity int) int
+		Assignees            func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		AssigneesAggregate   func(childComplexity int, filter *model.UserFilter) int
+		Blobs                func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		BlobsAggregate       func(childComplexity int, filter *model.BlobFilter) int
+		Comments             func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		CommentsAggregate    func(childComplexity int, filter *model.CommentFilter) int
+		Contracts            func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
+		ContractsAggregate   func(childComplexity int, filter *model.ContractFilter) int
+		CreatedAt            func(childComplexity int) int
+		CreatedBy            func(childComplexity int, filter *model.UserFilter) int
+		Emitter              func(childComplexity int, filter *model.NodeFilter) int
+		Emitterid            func(childComplexity int) int
+		History              func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		HistoryAggregate     func(childComplexity int, filter *model.EventFilter) int
+		ID                   func(childComplexity int) int
+		Labels               func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate      func(childComplexity int, filter *model.LabelFilter) int
+		Message              func(childComplexity int) int
+		NComments            func(childComplexity int) int
+		NOpenContracts       func(childComplexity int) int
+		Receiver             func(childComplexity int, filter *model.NodeFilter) int
+		Receiverid           func(childComplexity int) int
+		Status               func(childComplexity int) int
+		Subscribers          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		SubscribersAggregate func(childComplexity int, filter *model.UserFilter) int
+		Title                func(childComplexity int) int
+		Type                 func(childComplexity int) int
+		UpdatedAt            func(childComplexity int) int
 	}
 
 	TensionAggregateResult struct {
@@ -5582,29 +5582,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Status(childComplexity), true
 
-	case "Tension.suscribers":
-		if e.complexity.Tension.Suscribers == nil {
+	case "Tension.subscribers":
+		if e.complexity.Tension.Subscribers == nil {
 			break
 		}
 
-		args, err := ec.field_Tension_suscribers_args(context.TODO(), rawArgs)
+		args, err := ec.field_Tension_subscribers_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Tension.Suscribers(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Tension.Subscribers(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
 
-	case "Tension.suscribersAggregate":
-		if e.complexity.Tension.SuscribersAggregate == nil {
+	case "Tension.subscribersAggregate":
+		if e.complexity.Tension.SubscribersAggregate == nil {
 			break
 		}
 
-		args, err := ec.field_Tension_suscribersAggregate_args(context.TODO(), rawArgs)
+		args, err := ec.field_Tension_subscribersAggregate_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Tension.SuscribersAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
+		return e.complexity.Tension.SubscribersAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "Tension.title":
 		if e.complexity.Tension.Title == nil {
@@ -7052,7 +7052,7 @@ type Tension {
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
-  suscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
+  subscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   n_comments: Int
   n_open_contracts: Int
   id: ID!
@@ -7067,7 +7067,7 @@ type Tension {
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
-  suscribersAggregate(filter: UserFilter): UserAggregateResult
+  subscribersAggregate(filter: UserFilter): UserAggregateResult
 }
 
 type Comment {
@@ -7163,21 +7163,21 @@ type User {
   bio: String
   utc: String
   notifyByEmail: Boolean
+  subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
-  subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
 
+  subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
   backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
-  subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
 }
 
@@ -7337,37 +7337,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @cascade(fields: [String]) on FIELD
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7590,7 +7590,7 @@ input AddTensionInput {
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!]
   contracts: [ContractRef!]
-  suscribers: [UserRef!]
+  subscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
 }
@@ -7624,13 +7624,13 @@ input AddUserInput {
   bio: String
   utc: String
   notifyByEmail: Boolean
+  subscriptions: [TensionRef!]
   rights: UserRightsRef!
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
-  subscriptions: [TensionRef!]
   events: [UserEventRef!]
 }
 
@@ -9174,7 +9174,7 @@ enum TensionHasFilter {
   blobs
   history
   contracts
-  suscribers
+  subscribers
   n_comments
   n_open_contracts
 }
@@ -9215,7 +9215,7 @@ input TensionPatch {
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
-  suscribers: [UserRef!] @x_patch_ro
+  subscribers: [UserRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
   n_open_contracts: Int @x_patch_ro
 }
@@ -9240,7 +9240,7 @@ input TensionRef {
   blobs: [BlobRef!]
   history: [EventRef!]
   contracts: [ContractRef!]
-  suscribers: [UserRef!]
+  subscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
 }
@@ -9546,13 +9546,13 @@ enum UserHasFilter {
   bio
   utc
   notifyByEmail
+  subscriptions
   rights
   roles
   backed_roles
   tensions_created
   tensions_assigned
   contracts
-  subscriptions
   events
 }
 
@@ -9578,21 +9578,21 @@ input UserPatch {
   createdAt: DateTime @x_patch_ro
   lastAck: DateTime @x_patch_ro
   username: String @x_patch_ro
-  name: String @x_patch(r:"isOwner")
-  password: String @x_patch(r:"isOwner")
-  email: String @x_patch(r:"isOwner")
+  name: String @x_patch
+  password: String @x_patch_ro
+  email: String @x_patch
   emailHash: String @x_patch_ro
   emailValidated: Boolean @x_patch_ro
-  bio: String @x_patch(r:"isOwner")
-  utc: String @x_patch(r:"isOwner")
-  notifyByEmail: Boolean @x_patch(r:"isOwner")
+  bio: String @x_patch
+  utc: String @x_patch
+  notifyByEmail: Boolean @x_patch
+  subscriptions: [TensionRef!] @x_patch
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
   backed_roles: [NodeRef!] @x_patch_ro
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
-  subscriptions: [TensionRef!] @x_patch_ro
   events: [UserEventRef!] @x_patch_ro
 }
 
@@ -9609,13 +9609,13 @@ input UserRef {
   bio: String
   utc: String
   notifyByEmail: Boolean
+  subscriptions: [TensionRef!]
   rights: UserRightsRef
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
-  subscriptions: [TensionRef!]
   events: [UserEventRef!]
 }
 
@@ -15839,7 +15839,7 @@ func (ec *executionContext) field_Tension_receiver_args(ctx context.Context, raw
 	return args, nil
 }
 
-func (ec *executionContext) field_Tension_suscribersAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Tension_subscribersAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.UserFilter
@@ -15854,7 +15854,7 @@ func (ec *executionContext) field_Tension_suscribersAggregate_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Tension_suscribers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Tension_subscribers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.UserFilter
@@ -33134,7 +33134,7 @@ func (ec *executionContext) _Tension_contracts(ctx context.Context, field graphq
 	return ec.marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_suscribers(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tension_subscribers(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -33151,7 +33151,7 @@ func (ec *executionContext) _Tension_suscribers(ctx context.Context, field graph
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Tension_suscribers_args(ctx, rawArgs)
+	args, err := ec.field_Tension_subscribers_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -33159,7 +33159,7 @@ func (ec *executionContext) _Tension_suscribers(ctx context.Context, field graph
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Suscribers, nil
+		return obj.Subscribers, nil
 	})
 
 	if resTmp == nil {
@@ -33605,7 +33605,7 @@ func (ec *executionContext) _Tension_contractsAggregate(ctx context.Context, fie
 	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tension_suscribersAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tension_subscribersAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -33622,7 +33622,7 @@ func (ec *executionContext) _Tension_suscribersAggregate(ctx context.Context, fi
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Tension_suscribersAggregate_args(ctx, rawArgs)
+	args, err := ec.field_Tension_subscribersAggregate_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -33630,7 +33630,7 @@ func (ec *executionContext) _Tension_suscribersAggregate(ctx context.Context, fi
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.SuscribersAggregate, nil
+		return obj.SubscribersAggregate, nil
 	})
 
 	if resTmp == nil {
@@ -35869,6 +35869,42 @@ func (ec *executionContext) _User_notifyByEmail(ctx context.Context, field graph
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_subscriptions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_subscriptions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subscriptions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_rights(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -36088,42 +36124,6 @@ func (ec *executionContext) _User_contracts(ctx context.Context, field graphql.C
 	return ec.marshalOContract2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_subscriptions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_User_subscriptions_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Subscriptions, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Tension)
-	fc.Result = res
-	return ec.marshalOTension2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _User_events(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -36158,6 +36158,42 @@ func (ec *executionContext) _User_events(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*model.UserEvent)
 	fc.Result = res
 	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_subscriptionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_subscriptionsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubscriptionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -36338,42 +36374,6 @@ func (ec *executionContext) _User_contractsAggregate(ctx context.Context, field 
 	res := resTmp.(*model.ContractAggregateResult)
 	fc.Result = res
 	return ec.marshalOContractAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _User_subscriptionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_User_subscriptionsAggregate_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SubscriptionsAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.TensionAggregateResult)
-	fc.Result = res
-	return ec.marshalOTensionAggregateResult2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_eventsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -40780,11 +40780,11 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "suscribers":
+		case "subscribers":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("suscribers"))
-			it.Suscribers, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribers"))
+			it.Subscribers, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -40954,6 +40954,14 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "subscriptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
+			it.Subscriptions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "rights":
 			var err error
 
@@ -40999,14 +41007,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "subscriptions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
-			it.Subscriptions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -49091,10 +49091,10 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "suscribers":
+		case "subscribers":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("suscribers"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			}
@@ -49110,9 +49110,9 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.([]*model.UserRef); ok {
-				it.Suscribers = data
+				it.Subscribers = data
 			} else if tmp == nil {
-				it.Suscribers = nil
+				it.Subscribers = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -49332,11 +49332,11 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "suscribers":
+		case "subscribers":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("suscribers"))
-			it.Suscribers, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribers"))
+			it.Subscribers, err = ec.unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -50611,14 +50611,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
-				if err != nil {
-					return nil, err
-				}
 				if ec.directives.X_patch == nil {
 					return nil, errors.New("directive x_patch is not implemented")
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -50639,14 +50635,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
-				if err != nil {
-					return nil, err
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
 				}
-				if ec.directives.X_patch == nil {
-					return nil, errors.New("directive x_patch is not implemented")
-				}
-				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
 			}
 
 			tmp, err := directive1(ctx)
@@ -50667,14 +50659,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
-				if err != nil {
-					return nil, err
-				}
 				if ec.directives.X_patch == nil {
 					return nil, errors.New("directive x_patch is not implemented")
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -50743,14 +50731,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bio"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
-				if err != nil {
-					return nil, err
-				}
 				if ec.directives.X_patch == nil {
 					return nil, errors.New("directive x_patch is not implemented")
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -50771,14 +50755,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("utc"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
-				if err != nil {
-					return nil, err
-				}
 				if ec.directives.X_patch == nil {
 					return nil, errors.New("directive x_patch is not implemented")
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -50799,14 +50779,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
-				if err != nil {
-					return nil, err
-				}
 				if ec.directives.X_patch == nil {
 					return nil, errors.New("directive x_patch is not implemented")
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, r, nil, nil, nil)
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -50819,6 +50795,32 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				it.NotifyByEmail = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "subscriptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.Subscriptions = data
+			} else if tmp == nil {
+				it.Subscriptions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
@@ -50977,32 +50979,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "subscriptions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.TensionRef); ok {
-				it.Subscriptions = data
-			} else if tmp == nil {
-				it.Subscriptions = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.TensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "events":
 			var err error
 
@@ -51140,6 +51116,14 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "subscriptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
+			it.Subscriptions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "rights":
 			var err error
 
@@ -51185,14 +51169,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "subscriptions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
-			it.Subscriptions, err = ec.unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -55022,8 +54998,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_history(ctx, field, obj)
 		case "contracts":
 			out.Values[i] = ec._Tension_contracts(ctx, field, obj)
-		case "suscribers":
-			out.Values[i] = ec._Tension_suscribers(ctx, field, obj)
+		case "subscribers":
+			out.Values[i] = ec._Tension_subscribers(ctx, field, obj)
 		case "n_comments":
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
 		case "n_open_contracts":
@@ -55059,8 +55035,8 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Tension_historyAggregate(ctx, field, obj)
 		case "contractsAggregate":
 			out.Values[i] = ec._Tension_contractsAggregate(ctx, field, obj)
-		case "suscribersAggregate":
-			out.Values[i] = ec._Tension_suscribersAggregate(ctx, field, obj)
+		case "subscribersAggregate":
+			out.Values[i] = ec._Tension_subscribersAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55660,6 +55636,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_utc(ctx, field, obj)
 		case "notifyByEmail":
 			out.Values[i] = ec._User_notifyByEmail(ctx, field, obj)
+		case "subscriptions":
+			out.Values[i] = ec._User_subscriptions(ctx, field, obj)
 		case "rights":
 			out.Values[i] = ec._User_rights(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -55675,10 +55653,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_tensions_assigned(ctx, field, obj)
 		case "contracts":
 			out.Values[i] = ec._User_contracts(ctx, field, obj)
-		case "subscriptions":
-			out.Values[i] = ec._User_subscriptions(ctx, field, obj)
 		case "events":
 			out.Values[i] = ec._User_events(ctx, field, obj)
+		case "subscriptionsAggregate":
+			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
 		case "rolesAggregate":
 			out.Values[i] = ec._User_rolesAggregate(ctx, field, obj)
 		case "backed_rolesAggregate":
@@ -55689,8 +55667,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_tensions_assignedAggregate(ctx, field, obj)
 		case "contractsAggregate":
 			out.Values[i] = ec._User_contractsAggregate(ctx, field, obj)
-		case "subscriptionsAggregate":
-			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
 		case "eventsAggregate":
 			out.Values[i] = ec._User_eventsAggregate(ctx, field, obj)
 		default:

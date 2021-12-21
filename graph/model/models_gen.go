@@ -233,7 +233,7 @@ type AddTensionInput struct {
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
-	Suscribers     []*UserRef     `json:"suscribers,omitempty"`
+	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
 	NOpenContracts *int           `json:"n_open_contracts"`
 }
@@ -267,13 +267,13 @@ type AddUserInput struct {
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
-	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 }
 
@@ -1539,35 +1539,35 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Emitter             *Node                    `json:"emitter,omitempty"`
-	Emitterid           string                   `json:"emitterid,omitempty"`
-	Receiver            *Node                    `json:"receiver,omitempty"`
-	Receiverid          string                   `json:"receiverid,omitempty"`
-	Title               string                   `json:"title,omitempty"`
-	Type                TensionType              `json:"type_,omitempty"`
-	Status              TensionStatus            `json:"status,omitempty"`
-	Action              *TensionAction           `json:"action,omitempty"`
-	Comments            []*Comment               `json:"comments,omitempty"`
-	Assignees           []*User                  `json:"assignees,omitempty"`
-	Labels              []*Label                 `json:"labels,omitempty"`
-	Blobs               []*Blob                  `json:"blobs,omitempty"`
-	History             []*Event                 `json:"history,omitempty"`
-	Contracts           []*Contract              `json:"contracts,omitempty"`
-	Suscribers          []*User                  `json:"suscribers,omitempty"`
-	NComments           *int                     `json:"n_comments"`
-	NOpenContracts      *int                     `json:"n_open_contracts"`
-	ID                  string                   `json:"id,omitempty"`
-	CreatedBy           *User                    `json:"createdBy,omitempty"`
-	CreatedAt           string                   `json:"createdAt,omitempty"`
-	UpdatedAt           *string                  `json:"updatedAt,omitempty"`
-	Message             *string                  `json:"message,omitempty"`
-	CommentsAggregate   *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
-	AssigneesAggregate  *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
-	LabelsAggregate     *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
-	BlobsAggregate      *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
-	HistoryAggregate    *EventAggregateResult    `json:"historyAggregate,omitempty"`
-	ContractsAggregate  *ContractAggregateResult `json:"contractsAggregate,omitempty"`
-	SuscribersAggregate *UserAggregateResult     `json:"suscribersAggregate,omitempty"`
+	Emitter              *Node                    `json:"emitter,omitempty"`
+	Emitterid            string                   `json:"emitterid,omitempty"`
+	Receiver             *Node                    `json:"receiver,omitempty"`
+	Receiverid           string                   `json:"receiverid,omitempty"`
+	Title                string                   `json:"title,omitempty"`
+	Type                 TensionType              `json:"type_,omitempty"`
+	Status               TensionStatus            `json:"status,omitempty"`
+	Action               *TensionAction           `json:"action,omitempty"`
+	Comments             []*Comment               `json:"comments,omitempty"`
+	Assignees            []*User                  `json:"assignees,omitempty"`
+	Labels               []*Label                 `json:"labels,omitempty"`
+	Blobs                []*Blob                  `json:"blobs,omitempty"`
+	History              []*Event                 `json:"history,omitempty"`
+	Contracts            []*Contract              `json:"contracts,omitempty"`
+	Subscribers          []*User                  `json:"subscribers,omitempty"`
+	NComments            *int                     `json:"n_comments"`
+	NOpenContracts       *int                     `json:"n_open_contracts"`
+	ID                   string                   `json:"id,omitempty"`
+	CreatedBy            *User                    `json:"createdBy,omitempty"`
+	CreatedAt            string                   `json:"createdAt,omitempty"`
+	UpdatedAt            *string                  `json:"updatedAt,omitempty"`
+	Message              *string                  `json:"message,omitempty"`
+	CommentsAggregate    *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
+	AssigneesAggregate   *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
+	LabelsAggregate      *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
+	BlobsAggregate       *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
+	HistoryAggregate     *EventAggregateResult    `json:"historyAggregate,omitempty"`
+	ContractsAggregate   *ContractAggregateResult `json:"contractsAggregate,omitempty"`
+	SubscribersAggregate *UserAggregateResult     `json:"subscribersAggregate,omitempty"`
 }
 
 type TensionAggregateResult struct {
@@ -1639,7 +1639,7 @@ type TensionPatch struct {
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
-	Suscribers     []*UserRef     `json:"suscribers,omitempty"`
+	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
 	NOpenContracts *int           `json:"n_open_contracts"`
 }
@@ -1664,7 +1664,7 @@ type TensionRef struct {
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
-	Suscribers     []*UserRef     `json:"suscribers,omitempty"`
+	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
 	NOpenContracts *int           `json:"n_open_contracts"`
 }
@@ -1890,20 +1890,20 @@ type User struct {
 	Bio                       *string                   `json:"bio,omitempty"`
 	Utc                       *string                   `json:"utc,omitempty"`
 	NotifyByEmail             *bool                     `json:"notifyByEmail"`
+	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
 	Rights                    *UserRights               `json:"rights,omitempty"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
 	BackedRoles               []*Node                   `json:"backed_roles,omitempty"`
 	TensionsCreated           []*Tension                `json:"tensions_created,omitempty"`
 	TensionsAssigned          []*Tension                `json:"tensions_assigned,omitempty"`
 	Contracts                 []*Contract               `json:"contracts,omitempty"`
-	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
 	Events                    []*UserEvent              `json:"events,omitempty"`
+	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
 	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
 	TensionsCreatedAggregate  *TensionAggregateResult   `json:"tensions_createdAggregate,omitempty"`
 	TensionsAssignedAggregate *TensionAggregateResult   `json:"tensions_assignedAggregate,omitempty"`
 	ContractsAggregate        *ContractAggregateResult  `json:"contractsAggregate,omitempty"`
-	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	EventsAggregate           *UserEventAggregateResult `json:"eventsAggregate,omitempty"`
 }
 
@@ -2003,13 +2003,13 @@ type UserPatch struct {
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
-	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 }
 
@@ -2026,13 +2026,13 @@ type UserRef struct {
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
-	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 }
 
@@ -4102,7 +4102,7 @@ const (
 	TensionHasFilterBlobs          TensionHasFilter = "blobs"
 	TensionHasFilterHistory        TensionHasFilter = "history"
 	TensionHasFilterContracts      TensionHasFilter = "contracts"
-	TensionHasFilterSuscribers     TensionHasFilter = "suscribers"
+	TensionHasFilterSubscribers    TensionHasFilter = "subscribers"
 	TensionHasFilterNComments      TensionHasFilter = "n_comments"
 	TensionHasFilterNOpenContracts TensionHasFilter = "n_open_contracts"
 )
@@ -4126,14 +4126,14 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterBlobs,
 	TensionHasFilterHistory,
 	TensionHasFilterContracts,
-	TensionHasFilterSuscribers,
+	TensionHasFilterSubscribers,
 	TensionHasFilterNComments,
 	TensionHasFilterNOpenContracts,
 }
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterContracts, TensionHasFilterSuscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false
@@ -4395,13 +4395,13 @@ const (
 	UserHasFilterBio              UserHasFilter = "bio"
 	UserHasFilterUtc              UserHasFilter = "utc"
 	UserHasFilterNotifyByEmail    UserHasFilter = "notifyByEmail"
+	UserHasFilterSubscriptions    UserHasFilter = "subscriptions"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
 	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
 	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
-	UserHasFilterSubscriptions    UserHasFilter = "subscriptions"
 	UserHasFilterEvents           UserHasFilter = "events"
 )
 
@@ -4417,19 +4417,19 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterBio,
 	UserHasFilterUtc,
 	UserHasFilterNotifyByEmail,
+	UserHasFilterSubscriptions,
 	UserHasFilterRights,
 	UserHasFilterRoles,
 	UserHasFilterBackedRoles,
 	UserHasFilterTensionsCreated,
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
-	UserHasFilterSubscriptions,
 	UserHasFilterEvents,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterSubscriptions, UserHasFilterEvents:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents:
 		return true
 	}
 	return false
