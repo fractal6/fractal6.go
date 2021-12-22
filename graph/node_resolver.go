@@ -1,15 +1,16 @@
 package graph
 
 import (
-    "fmt"
-    "context"
-    "github.com/99designs/gqlgen/graphql"
+	"fmt"
+	"context"
 
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/graph/codec"
-    "zerogov/fractal6.go/graph/auth"
-    webauth "zerogov/fractal6.go/web/auth"
-    . "zerogov/fractal6.go/tools"
+	"github.com/99designs/gqlgen/graphql"
+
+	"zerogov/fractal6.go/graph/auth"
+	"zerogov/fractal6.go/graph/codec"
+	"zerogov/fractal6.go/graph/model"
+	. "zerogov/fractal6.go/tools"
+	webauth "zerogov/fractal6.go/web/auth"
 )
 
 ////////////////////////////////////////////////
@@ -23,6 +24,7 @@ import (
 ////////////////////////////////////////////////
 
 type AddArtefactInput struct {
+	Rootnameid  string              `json:"rootnameid,omitempty"`
 	Nodes       []*model.NodeRef    `json:"nodes,omitempty"`
 }
 
@@ -34,13 +36,19 @@ type UpdateArtefactInput struct {
 
 // Add "Artefeact" - Must be Coordo
 func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    var ok bool =  false
     // Get User context
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
     var inputs []*AddArtefactInput
-    StructMap(graphql.GetResolverContext(ctx).Args["input"], inputs)
+    inputs_, _ := InterfaceSlice(graphql.GetResolverContext(ctx).Args["input"])
+    for _, s:= range inputs_ {
+        temp := AddArtefactInput{}
+        StructMap(s, &temp)
+        inputs = append(inputs, &temp)
+    }
 
     // Authorization
     // - Check that user satisfy strict condition (coordo roles on node linked)
@@ -50,25 +58,27 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
         if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         node := input.Nodes[0]
         rid, _ := codec.Nid2pid(*node.Nameid)
-        if rid != *node.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
-        ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &mode)
+        if rid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
+        ok, err = auth.HasCoordoRole(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }
     }
-    return next(ctx)
+    if ok { return next(ctx) }
+    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
 // Update "Artefact" - Must be coordo
 func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    var ok bool =  false
     // Get User context
     uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
     var input UpdateArtefactInput
-    StructMap(graphql.GetResolverContext(ctx).Args["input"], input)
+    StructMap(graphql.GetResolverContext(ctx).Args["input"], &input)
 
     var nodes []*model.NodeRef
     if input.Set != nil {
@@ -84,12 +94,13 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
     // Check that user satisfy strict condition (coordo roles on node linked)
     mode := model.NodeModeCoordinated
     for _, node := range nodes {
-        ok, err := auth.HasCoordoRole(uctx, *node.Nameid, &mode)
+        ok, err = auth.HasCoordoRole(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }
     }
-    return next(ctx)
+    if ok { return next(ctx) }
+    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
