@@ -101,7 +101,7 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     // Get the total number of roles and circle recursively
     //    var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
-    //        c as Node.children @filter(NOT eq(Node.isArchived, true))
+    //        c as Node.children @filter(eq(Node.isArchived, false))
     //    }
     //    var(func: uid(c)) @filter(eq(Node.type_, "Circle")) {
     //        circle as count(uid)
@@ -201,9 +201,14 @@ var dqlQueries map[string]string = map[string]string{
     // Get multiple objects
     "getChildren": `{
         all(func: eq(Node.nameid, "{{.nameid}}"))  {
-            Node.children @filter(NOT eq(Node.isArchived, true)) {
+            Node.children @filter(eq(Node.isArchived, false)) {
                 Node.nameid
             }
+        }
+    }`,
+    "getCoordos": `{
+        all(func: eq(Node.nameid, "{{.nameid}}")) {
+            Node.children @filter(eq(Node.role_type, "Coordinator") AND eq(Node.isArchived, false)) { uid }
         }
     }`,
     "getParents": `{
@@ -217,7 +222,7 @@ var dqlQueries map[string]string = map[string]string{
             o as Node.children
         }
 
-        all(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
+        all(func: uid(o)) @filter(eq(Node.isArchived, false)) {
             Node.{{.fieldid}}
         }
     }`,
@@ -226,7 +231,7 @@ var dqlQueries map[string]string = map[string]string{
             o as Node.children
         }
 
-        all(func: uid(o)) @filter(has(Node.role_type) AND NOT eq(Node.isArchived, true)) {
+        all(func: uid(o)) @filter(has(Node.role_type) AND eq(Node.isArchived, false)) {
             Node.createdAt
             Node.name
             Node.nameid
@@ -246,7 +251,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(NOT eq(Node.isArchived, true) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
             l as Node.labels
         }
 
@@ -263,7 +268,7 @@ var dqlQueries map[string]string = map[string]string{
             o as Node.children
         }
 
-        var(func: uid(o)) @filter(NOT eq(Node.isArchived, true)) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false)) {
             l as Node.labels
         }
 
@@ -362,11 +367,6 @@ var dqlQueries map[string]string = map[string]string{
         }
         all2(func: uid(tensions_in)) @filter(eq(Tension.status, "Closed")) {
             count: count(uid)
-        }
-    }`,
-    "getCoordos": `{
-        all(func: eq(Node.nameid, "{{.nameid}}")) {
-            Node.children @filter(eq(Node.role_type, "Coordinator") AND NOT eq(Node.isArchived, true)) { uid }
         }
     }`,
     // Mutations
@@ -1298,45 +1298,6 @@ func (dg Dgraph) SetSubFieldByEq(fieldid string, objid string, predicate1, predi
     return err
 }
 
-// UpdateRoleType update the role of a node given the nameid using upsert block.
-func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
-    query := fmt.Sprintf(`query {
-        node as var(func: eq(Node.nameid, "%s"))
-    }`, nameid)
-
-    mu := fmt.Sprintf(`
-        uid(node) <Node.role_type> "%s" .
-        uid(node) <Node.name> "%s" .
-    `, roleType, roleType)
-
-    mutation := &api.Mutation{
-        SetNquads: []byte(mu),
-    }
-
-    err := dg.MutateWithQueryDql(query, mutation)
-    return err
-}
-
-// Remove the user link in the last blob if user match
-func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
-    query := fmt.Sprintf(`query {
-        var(func: uid(%s)) {
-          Tension.blobs (orderdesc: Post.createdAt, first: 1) {
-            n as Blob.node @filter(eq(NodeFragment.first_link, "%s"))
-          }
-        }
-    }`, tid, username)
-
-    muDel := `uid(n) <NodeFragment.first_link> * .`
-
-    mutation := &api.Mutation{
-        DelNquads: []byte(muDel),
-    }
-
-    err := dg.MutateWithQueryDql(query, mutation)
-    return err
-}
-
 // Set the blob pushedFlag and the tension action
 func (dg Dgraph) SetPushedFlagBlob(bid string, flag string, tid string, action model.TensionAction) error {
     query := fmt.Sprintf(`query {
@@ -1394,6 +1355,25 @@ func (dg Dgraph) SetNodeSource(nameid string, bid string) error {
     return err
 }
 
+func (dg Dgraph) SetChildrenRoleVisibility(nameid string, value string) error {
+    query := fmt.Sprintf(`query {
+        var(func: eq(Node.nameid, "%s")) {
+            c as Node.children @filter(eq(Node.type_, "Role"))
+        }
+    }`, nameid)
+
+    mu := fmt.Sprintf(`
+        uid(c) <Node.visibility> "%s" .
+    `, value)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryDql(query, mutation)
+    return err
+}
+// PatchNameid is used to update a node nameid
 func (dg Dgraph) PatchNameid(nameid_old string, nameid_new string) error {
     query := fmt.Sprintf(`query {
         node as var(func: eq(Node.nameid, "%s")) {
@@ -1410,6 +1390,45 @@ func (dg Dgraph) PatchNameid(nameid_old string, nameid_new string) error {
 
     mutation := &api.Mutation{
         SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryDql(query, mutation)
+    return err
+}
+
+// UpdateRoleType update the role of a node given the nameid using upsert block.
+func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
+    query := fmt.Sprintf(`query {
+        node as var(func: eq(Node.nameid, "%s"))
+    }`, nameid)
+
+    mu := fmt.Sprintf(`
+        uid(node) <Node.role_type> "%s" .
+        uid(node) <Node.name> "%s" .
+    `, roleType, roleType)
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
+    }
+
+    err := dg.MutateWithQueryDql(query, mutation)
+    return err
+}
+
+// Remove the user link in the last blob if user match
+func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
+    query := fmt.Sprintf(`query {
+        var(func: uid(%s)) {
+          Tension.blobs (orderdesc: Post.createdAt, first: 1) {
+            n as Blob.node @filter(eq(NodeFragment.first_link, "%s"))
+          }
+        }
+    }`, tid, username)
+
+    muDel := `uid(n) <NodeFragment.first_link> * .`
+
+    mutation := &api.Mutation{
+        DelNquads: []byte(muDel),
     }
 
     err := dg.MutateWithQueryDql(query, mutation)

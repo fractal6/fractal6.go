@@ -226,12 +226,12 @@ func leaveTrace(tension *model.Tension) {
             _, nameid, err = codec.NodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
         }
 
-        // Set the Update time into the target node
+        // Set the Update time into the affected node.
         err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
-        pid, _ := codec.Nid2pid(nameid) // @debug: real parent needed here (ie event for circle)
-        if pid != nameid && err == nil {
-            err = db.GetDB().SetFieldByEq("Node.nameid", pid, "Node.updatedAt", Now())
-        }
+        if err != nil { panic(err) }
+        // Set the Update of its parent node (tension.receiver)
+        err = db.GetDB().SetFieldByEq("Node.nameid", tension.Receiver.Nameid, "Node.updatedAt", Now())
+        if err != nil { panic(err) }
     }
 }
 

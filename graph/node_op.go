@@ -138,6 +138,10 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
     if err != nil { return false, err }
     // Update NodeFragmet
     err = DB.SetFieldById(node.ID, "NodeFragment.visibility", value)
+    if err != nil { return false, err }
+
+    // Change all role direct children
+    err = db.GetDB().SetChildrenRoleVisibility(nameid, value)
 
     return ok, err
 }
