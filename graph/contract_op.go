@@ -83,7 +83,6 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
 
         // Push Event History and Notifications
         err = PushHistory(uctx, tension.ID, []*model.EventRef{&event})
-        fmt.Println(err)
         PushEventNotifications(tension.ID, []*model.EventRef{&event})
     }
 
@@ -94,11 +93,6 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
 func hasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, error) {
     var event model.EventRef
     StructMap(contract.Event, &event)
-
-    // Exit if contract is not open
-    if contract.Status != "" && contract.Status != model.ContractStatusOpen {
-        return false, fmt.Errorf("Contract status is closed or missing.")
-    }
 
     // Get linked tension
     tension, err := db.GetDB().GetTensionHook(contract.Tension.ID, false, nil)

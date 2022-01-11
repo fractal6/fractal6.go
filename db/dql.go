@@ -881,10 +881,10 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
 
     // Send request
     var q string
-    if cid[0:2] == "0x" {
-        q = "getContractHook"
-    } else {
+    if strings.Contains(cid, "#") {
         q = "getContractHook2"
+    } else {
+        q = "getContractHook"
     }
     res, err := dg.QueryDql(q, maps)
     if err != nil { return nil, err }

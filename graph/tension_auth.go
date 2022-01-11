@@ -257,7 +257,6 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
         if (p.Node.FirstLink == nil) { continue }
 
         if len(contract.Candidates) == 1 && p.Node.FirstLink.Username == contract.Candidates[0].Username {
-            fmt.Println("candidate", p.Data)
             // Candidate
             if p.Data[0] == 1 {
                 candidateVote = 1
@@ -265,7 +264,6 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
                 candidateVote = -1
             }
         } else {
-            fmt.Println("coordo", p.Data)
             // Coordinator
             if p.Data[0] == 1 {
                 upVote += 1
