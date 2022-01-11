@@ -63,34 +63,43 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 // Update Contract hook
 func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    //uctx, err := webauth.GetUserContext(ctx)
-    //if err != nil { return nil, LogErr("Access denied", err) }
+    uctx, err := webauth.GetUserContext(ctx)
+    if err != nil { return nil, LogErr("Access denied", err) }
 
-    // Validate input
+    // Validate Input
     input := graphql.GetResolverContext(ctx).Args["input"].(model.UpdateContractInput)
     ids := input.Filter.ID
     if len(ids) != 1 {
-        return nil, LogErr("update contract", fmt.Errorf("One and only one contract allowed."))
+        return nil, LogErr("update tension", fmt.Errorf("One and only one tension allowed."))
     }
 
-    // Validate Event prior the mutation
-    // <!> Only used to post comment <!>
-    if input.Remove != nil || input.Set == nil || len(input.Set.Comments) != 1 {
-        return nil, LogErr("update contract", fmt.Errorf("comment missing"))
+    // Validate and process Blob Event
+    var ok bool
+    if input.Set != nil {
+        // getContractHook
+        contract, err := db.GetDB().GetContractHook(ids[0])
+        if err != nil  { return nil, err }
+        // Check if user has admin right
+        ok, err = hasContractRight(uctx, contract)
+        if err != nil  { return nil, err }
+        if !ok {
+            // Check if user is candidate
+            for _, c := range contract.Candidates {
+                if c.Username == uctx.Username  {
+                    ok = true
+                    break
+                }
+            }
+        }
+        if ok { // Execute query
+            // @todo: notify users by email
+            return next(ctx)
+        } else {
+            return nil, LogErr("Access denied", fmt.Errorf("You're not authorized to access this ressource."))
+        }
     }
 
-    //c := input.Set.Comments[0]
-    // @obsolete ??
-    // use only add/upsert insead.
-
-    data, err := next(ctx)
-    if err != nil { return nil, err }
-    if data.(*model.UpdateContractPayload) == nil {
-        return nil, LogErr("update contract", fmt.Errorf("no contract updated."))
-    }
-
-    // notify participants and candidates
-    return data, err
+    return nil, LogErr("Access denied", fmt.Errorf("Input remove not implemented."))
 }
 
 // Delete Contract hook
@@ -198,7 +207,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     // Ensure that user own the vote
     rid, _ := codec.Nid2rootid(nameid)
     if nameid != codec.MemberIdCodec(rid, uctx.Username) {
-        return nil, LogErr("add vote", fmt.Errorf("You should own yout vote."))
+        return nil, LogErr("add vote", fmt.Errorf("You should own your vote."))
     }
 
     // Try to add vote

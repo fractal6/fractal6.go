@@ -67,6 +67,16 @@ func Init() gen.Config {
     // Hook
     //
 
+    //User
+    c.Directives.Hook_getUserInput = nothing
+    c.Directives.Hook_queryUserInput = nothing
+    c.Directives.Hook_addUserInput = nothing
+    c.Directives.Hook_updateUserInput = nothing
+    c.Directives.Hook_deleteUserInput = nothing
+    // --
+    c.Directives.Hook_addUser = nothing
+    c.Directives.Hook_updateUser = updateUserHook
+    c.Directives.Hook_deleteUser = nothing
     //RoleExt
     c.Directives.Hook_getRoleExtInput = nothing
     c.Directives.Hook_queryRoleExtInput = nothing
@@ -91,7 +101,7 @@ func Init() gen.Config {
     c.Directives.Hook_getTensionInput = nothing
     c.Directives.Hook_queryTensionInput = nothing
     c.Directives.Hook_addTensionInput = nothing
-    c.Directives.Hook_updateTensionInput = setUpdateContextInfo
+    c.Directives.Hook_updateTensionInput = setUpdateContextInfo // for hasEvent+isOwner field auth
     c.Directives.Hook_deleteTensionInput = nothing
     // --
     c.Directives.Hook_addTension = addTensionHook
@@ -111,7 +121,7 @@ func Init() gen.Config {
     c.Directives.Hook_getContractInput = nothing
     c.Directives.Hook_queryContractInput = nothing
     c.Directives.Hook_addContractInput = nothing
-    c.Directives.Hook_updateContractInput = nothing
+    c.Directives.Hook_updateContractInput = setContextWithID // used by isOwner auth rule
     c.Directives.Hook_deleteContractInput = nothing
     // --
     c.Directives.Hook_addContract = addContractHook

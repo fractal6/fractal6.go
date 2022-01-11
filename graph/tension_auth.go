@@ -113,7 +113,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         (contract == nil && GetBlob(tension) == nil)) // Moving node, doc etc
 
     if tension == nil || event == nil {
-        return false, nil, fmt.Errorf("non existent tension or event not allowed")
+        return false, nil, fmt.Errorf("non existing tension or event not allowed")
     }
 
     // Exception Hook Authorization
@@ -231,6 +231,16 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
         return false, contract, err
     }
 
+    if contract == nil {
+        // If user is participant return true whitout a contract
+        if uctx.Username == *event.New {
+            return true, nil, nil
+        } else {
+            // Futur: return the contract instead of using addContract ?
+            return false, nil, fmt.Errorf("User addContract query instead.")
+        }
+    }
+
     if len(contract.Candidates) !=1 {
         // Only one candidate supported for now.
         if len(contract.PendingCandidates) !=1 {
@@ -240,26 +250,39 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
 
     // Check Vote
     // @Debug don't allow more than two vote....
-    v1 := false
-    v2 := false
+    upVote := 0
+    downVote := 0
+    candidateVote := 0
     for _, p := range contract.Participants {
         if (p.Node.FirstLink == nil) { continue }
 
         if len(contract.Candidates) == 1 && p.Node.FirstLink.Username == contract.Candidates[0].Username {
+            fmt.Println("candidate", p.Data)
             // Candidate
-            v1 = p.Data[0] == 1
+            if p.Data[0] == 1 {
+                candidateVote = 1
+            } else {
+                candidateVote = -1
+            }
         } else {
+            fmt.Println("coordo", p.Data)
             // Coordinator
-            v2 = p.Data[0] == 1 || v2
+            if p.Data[0] == 1 {
+                upVote += 1
+            } else {
+                downVote += 1
+            }
         }
     }
 
     // if two vote (coordo + candidate) -> ok
-    if v1 && v2 {
+    if candidateVote > 0 && upVote > 0 {
         contract.Status = model.ContractStatusClosed
         return true, contract, err
-    } else {
+    } else if candidateVote < 0 || downVote > 0 {
         contract.Status = model.ContractStatusCanceled
+        return true, contract, err
+    } else {
         return false, contract, err
     }
 }
@@ -302,7 +325,7 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
         }
         contractid := codec.ContractIdCodec(tension.ID, *event.EventType, *event.Old, *event.New)
         contract := &model.Contract{
-            Contractid: contractid,
+            //Contractid: contractid, // Build in the frontend.
             CreatedAt: Now(),
             CreatedBy: &model.User{Username: uctx.Username},
             Event: &ev,
@@ -319,18 +342,25 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
     } else if ok1 || ok2 {
         // Check Votes
         // @Debug don't allow more than two vote....
-        v := 0
+        upVote := 0
+        downVote := 0
         for _, p := range contract.Participants {
-            v += p.Data[0]
+            if p.Data[0] == 1 {
+                upVote += 1
+            } else {
+                downVote += 1
+            }
         }
 
         // if two votes (source-coordo + target-coordo) -> ok
-        if v >= 2 {
+        if upVote >= 2 {
             contract.Status = model.ContractStatusClosed
             return true, contract, err
-        } else {
+        } else if downVote >= upVote {
             contract.Status = model.ContractStatusCanceled
             return true, contract, err
+        } else {
+            return false, contract, err
         }
     } else {
         return false, contract, err
@@ -357,7 +387,7 @@ func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField stri
     var err error
     user := userObj.(model.JsonAtom)[userField]
     if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        // Non user type here (userField/createdBy mùust be present
+        // Non user type here (userField/createdBy must be present)
         id := ctx.Value("id")
         if id == nil || id .(string) == "" {
             return false, fmt.Errorf("object target unknown(id), see setContextWithID...")

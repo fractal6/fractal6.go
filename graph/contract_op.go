@@ -32,23 +32,23 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
 
     // Process event
     ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true)
+    if err != nil { return false, err }
     ok = ok || contract != nil
 
-    if contract != nil && err != nil {
-        // Post-contract action
+    // Post-contract action
+    if contract != nil {
+        // Add pending Nodes
         if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
-            // Add pending Nodes
             for _, c := range contract.Candidates {
                 err = AddPendingNode(c.Username, tension)
                 if err != nil { return false, err }
             }
         }
-
-        // @TODO here:
-        // PushContractNotification and dend email (watch special case for pendingCandidates).
-        // * notify only the participants and authorized participants (coordo)
+        // Push Notifications
+        err = PushContractNotifications(tid, contract)
+        if err != nil { panic(err) }
         //for _, c := range contract.PendingCandidates {
-        //    // @todo
+        //    // @todo: send signup+contract invitation
         //    fmt.Println(c.Email)
         //}
     }
@@ -74,13 +74,17 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     StructMap(contract.Event, &event)
     ok, contract, err = processEvent(uctx, tension, &event, nil, contract, true, true)
     if err != nil { return false, contract, err }
+    ok = ok || contract != nil
 
-    if ok {
-        // @TODO here:
-        // 1. push the event
-        //err = PushHistory(uctx, tension.ID, [contract.event])
-        // 2. do pushEventNotification, with that event !
-        //PushEventNotifications(tension.ID, [contract.event])
+    if contract != nil && contract.Status == model.ContractStatusClosed {
+        now := Now()
+        event.CreatedAt = &now
+        event.CreatedBy = &model.UserRef{Username: &uctx.Username}
+
+        // Push Event History and Notifications
+        err = PushHistory(uctx, tension.ID, []*model.EventRef{&event})
+        fmt.Println(err)
+        PushEventNotifications(tension.ID, []*model.EventRef{&event})
     }
 
     return ok, contract, err
@@ -101,7 +105,8 @@ func hasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, erro
     if err != nil { return false, err }
 
     ok, c, err := processEvent(uctx, tension, &event, nil, nil, true, false)
-    return ok||c!=nil, err
+    ok = ok || c != nil
+    return ok, err
 }
 
 

@@ -16,8 +16,8 @@ var letterReg *re.Regexp
 func init() {
     //special := "@!#<>{}`'\"" + `%\\`
     //reservedURI := "&=+'/[]" + `\s`
-    special := `\@\!\#\<\>\{\}\%\'\"\\` + "`"
-    specialSoft := `\!\#\<\>\{\}\%\'\"\\` + "`"
+    special :=   `\@\!\#\<\>\{\}\%\'\"\\` + "`" + `\*\^\%\;\~¨:,$£§` // username
+    specialSoft := `\!\#\<\>\{\}\%\'\"\\` + "`" + `\*\^\%\;¨`        // nameid
     reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
     numReg = re.MustCompile(`[0-9]`)
     letterReg = re.MustCompile(`[a-zA-Z]`)
@@ -65,13 +65,18 @@ func ValidateUsername(u string) error {
     // * do not contains space at begining or end.
     // * unsafe character.
     // * avoid URI special character and spaces.
-    if hasStrip(u) {
+    if hasStrip(u)  {
         return ErrBadUsernameFormat
     }
     if hasSpecial(u) {
         return ErrBadUsernameFormat
     }
     if hasReservedURI(u) {
+        return ErrBadUsernameFormat
+    }
+
+    l := u[len(u) -1]
+    if l == '.' || l == '-' {
         return ErrBadUsernameFormat
     }
     return nil

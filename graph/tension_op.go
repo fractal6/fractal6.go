@@ -196,12 +196,13 @@ func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
     }
 
     // Set contract status if any
-    if contract != nil {
+    if contract != nil && doProcess {
         err = db.GetDB().SetFieldById(contract.ID, "Contract.status", string(contract.Status))
         if err != nil { return false, contract, err }
 
         // Assumes contract is either closed or cancelled.
-        err = db.GetDB().SetFieldById(contract.ID, "Contract.contractid", contract.ID)
+        // @DEBUG: wouldn't it be a bettter way to work with voteid & contractid ?
+        err = db.GetDB().RewriteContractId(contract.ID)
         if err != nil { return false, contract, err }
     }
 

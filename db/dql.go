@@ -62,6 +62,7 @@ var tensionBlobHookPayload string = `
 
 var contractHookPayload string = `{
   uid
+  Post.createdAt
   Contract.tension { uid }
   Contract.status
   Contract.contract_type
@@ -184,6 +185,10 @@ var dqlQueries map[string]string = map[string]string{
         {{.payload}}
     }`,
     "getContractHook": `{
+        all(func: uid("{{.id}}"))
+        {{.payload}}
+    }`,
+    "getContractHook2": `{
         all(func: eq(Contract.contractid, "{{.id}}"))
         {{.payload}}
     }`,
@@ -875,7 +880,13 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
     }
 
     // Send request
-    res, err := dg.QueryDql("getContractHook", maps)
+    var q string
+    if cid[0:2] == "0x" {
+        q = "getContractHook"
+    } else {
+        q = "getContractHook2"
+    }
+    res, err := dg.QueryDql(q, maps)
     if err != nil { return nil, err }
 
     // Decode response
@@ -1429,6 +1440,30 @@ func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
 
     mutation := &api.Mutation{
         DelNquads: []byte(muDel),
+    }
+
+    err := dg.MutateWithQueryDql(query, mutation)
+    return err
+}
+
+// Rewrite Contractid and voteid as theyr are use to upsert contracts and votes.
+func (dg Dgraph) RewriteContractId(cid string) error {
+    query := fmt.Sprintf(`query {
+        var(func: uid(%s)) {
+            cuid as uid
+            Contract.participants {
+                vuid as uid
+            }
+        }
+    }`, cid)
+
+    mu := `
+        uid(cuid) <Contract.contractid> "" .
+        uid(vuid) <Vote.voteid> "" .
+    `
+
+    mutation := &api.Mutation{
+        SetNquads: []byte(mu),
     }
 
     err := dg.MutateWithQueryDql(query, mutation)

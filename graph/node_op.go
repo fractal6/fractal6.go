@@ -408,7 +408,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
 }
 
 func AddPendingNode(username string, tension *model.Tension) error {
-    rootid, err := codec.Nid2rootid(tension.Receiverid)
+    rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
     if err != nil { return err }
     nid := codec.MemberIdCodec(rootid, username)
     ex, err :=  db.GetDB().Exists("Node.nameid", nid, nil, nil)

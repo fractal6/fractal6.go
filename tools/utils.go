@@ -17,7 +17,11 @@ func Now() string {
     return time.Now().UTC().Format(time.RFC3339)
 }
 
-//IsOlder returns trus if d2 is older than d1.
+func ZeroTime() string {
+    return time.Time{}.UTC().Format(time.RFC3339)
+}
+
+//IsOlder returns true if d1 is older than d2.
 func IsOlder(d1, d2 string) bool {
     date1, _ := time.Parse(time.RFC3339, d1)
     date2, _ := time.Parse(time.RFC3339, d2)
@@ -174,7 +178,9 @@ func CleanAliasedMap(m map[string]interface{}) map[string]interface{} {
             nv = CleanAliasedMap(t)
         case []interface{}:
             for i, x := range t {
-                t[i] = CleanAliasedMap(x.(model.JsonAtom))
+                if m, ok := x.(model.JsonAtom); ok {
+                    t[i] = CleanAliasedMap(m)
+                }
             }
             nv = t
         default:

@@ -56,7 +56,8 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     }
     if ok || err != nil {
         err = PushHistory(uctx, id, input.History)
-        PushEventNotifications(id, input.History)
+        e := PushEventNotifications(id, input.History)
+        if e != nil { panic(err) }
         return data, err
     }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -95,7 +96,8 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
             data, err := next(ctx)
             if err != nil { return data, err }
             err = PushHistory(uctx, ids[0], input.Set.History)
-            PushEventNotifications(ids[0], input.Set.History)
+            e := PushEventNotifications(ids[0], input.Set.History)
+            if e != nil { panic(err) }
             return data, err
         } else if contract != nil {
             var t model.UpdateTensionPayload

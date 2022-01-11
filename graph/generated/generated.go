@@ -59,6 +59,8 @@ type DirectiveRoot struct {
 	Hook_addRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTension          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addUser             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addUserInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addVote             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addVoteInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteComment       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -71,6 +73,8 @@ type DirectiveRoot struct {
 	Hook_deleteRoleExtInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteUser          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteUserInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteVote          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteVoteInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getCommentInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -78,12 +82,14 @@ type DirectiveRoot struct {
 	Hook_getLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getUserInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getVoteInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryCommentInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryContractInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryLabelInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryRoleExtInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryTensionInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryUserInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryVoteInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateComment       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateCommentInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -95,6 +101,8 @@ type DirectiveRoot struct {
 	Hook_updateRoleExtInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTensionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateUser          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateUserInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVote          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVoteInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver, interfaceArg *bool) (res interface{}, err error)
@@ -6886,6 +6894,12 @@ directive @hook_updateVoteInput on ARGUMENT_DEFINITION
 directive @hook_updateVote on FIELD_DEFINITION
 directive @hook_deleteVoteInput on ARGUMENT_DEFINITION
 directive @hook_deleteVote on FIELD_DEFINITION
+directive @hook_addUserInput on ARGUMENT_DEFINITION
+directive @hook_addUser on FIELD_DEFINITION
+directive @hook_updateUserInput on ARGUMENT_DEFINITION
+directive @hook_updateUser on FIELD_DEFINITION
+directive @hook_deleteUserInput on ARGUMENT_DEFINITION
+directive @hook_deleteUser on FIELD_DEFINITION
 directive @hook_getLabelInput on ARGUMENT_DEFINITION
 directive @hook_queryLabelInput on ARGUMENT_DEFINITION
 directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
@@ -6898,6 +6912,8 @@ directive @hook_getContractInput on ARGUMENT_DEFINITION
 directive @hook_queryContractInput on ARGUMENT_DEFINITION
 directive @hook_getVoteInput on ARGUMENT_DEFINITION
 directive @hook_queryVoteInput on ARGUMENT_DEFINITION
+directive @hook_getUserInput on ARGUMENT_DEFINITION
+directive @hook_queryUserInput on ARGUMENT_DEFINITION
 
 
 directive @hidden on FIELD_DEFINITION
@@ -7337,37 +7353,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8494,9 +8510,9 @@ type Mutation {
   addVote(input: [AddVoteInput!]!, upsert: Boolean @hook_addVoteInput): AddVotePayload @hook_addVote
   updateVote(input: UpdateVoteInput! @hook_updateVoteInput): UpdateVotePayload @hook_updateVote
   deleteVote(filter: VoteFilter! @hook_deleteVoteInput): DeleteVotePayload @hook_deleteVote
-  addUser(input: [AddUserInput!]!, upsert: Boolean): AddUserPayload
-  updateUser(input: UpdateUserInput!): UpdateUserPayload
-  deleteUser(filter: UserFilter!): DeleteUserPayload
+  addUser(input: [AddUserInput!]!, upsert: Boolean @hook_addUserInput): AddUserPayload @hook_addUser
+  updateUser(input: UpdateUserInput! @hook_updateUserInput): UpdateUserPayload @hook_updateUser
+  deleteUser(filter: UserFilter! @hook_deleteUserInput): DeleteUserPayload @hook_deleteUser
   addUserEvent(input: [AddUserEventInput!]!): AddUserEventPayload
   updateUserEvent(input: UpdateUserEventInput!): UpdateUserEventPayload
   deleteUserEvent(filter: UserEventFilter!): DeleteUserEventPayload
@@ -8975,8 +8991,8 @@ type Query {
   getVote(id: ID, voteid: String @hook_getVoteInput): Vote
   queryVote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int @hook_queryVoteInput): [Vote]
   aggregateVote(filter: VoteFilter): VoteAggregateResult
-  getUser(id: ID, username: String): User
-  queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User]
+  getUser(id: ID, username: String @hook_getUserInput): User
+  queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int @hook_queryUserInput): [User]
   aggregateUser(filter: UserFilter): UserAggregateResult
   getUserEvent(id: ID!): UserEvent
   queryUserEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
@@ -12604,9 +12620,24 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 	var arg1 *bool
 	if tmp, ok := rawArgs["upsert"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
-		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addUserInput == nil {
+				return nil, errors.New("directive hook_addUserInput is not implemented")
+			}
+			return ec.directives.Hook_addUserInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*bool); ok {
+			arg1 = data
+		} else if tmp == nil {
+			arg1 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp))
 		}
 	}
 	args["upsert"] = arg1
@@ -12973,9 +13004,24 @@ func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, 
 	var arg0 model.UserFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNUserFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUserFilter2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteUserInput == nil {
+				return nil, errors.New("directive hook_deleteUserInput is not implemented")
+			}
+			return ec.directives.Hook_deleteUserInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UserFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UserFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -13333,9 +13379,24 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 	var arg0 model.UpdateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateUserInput2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateUserInput == nil {
+				return nil, errors.New("directive hook_updateUserInput is not implemented")
+			}
+			return ec.directives.Hook_updateUserInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateUserInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be zerogov/fractal6.go/graph/model.UpdateUserInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -14486,9 +14547,24 @@ func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArg
 	var arg1 *string
 	if tmp, ok := rawArgs["username"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_getUserInput == nil {
+				return nil, errors.New("directive hook_getUserInput is not implemented")
+			}
+			return ec.directives.Hook_getUserInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*string); ok {
+			arg1 = data
+		} else if tmp == nil {
+			arg1 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp))
 		}
 	}
 	args["username"] = arg1
@@ -15314,9 +15390,24 @@ func (ec *executionContext) field_Query_queryUser_args(ctx context.Context, rawA
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryUserInput == nil {
+				return nil, errors.New("directive hook_queryUserInput is not implemented")
+			}
+			return ec.directives.Hook_queryUserInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*int); ok {
+			arg3 = data
+		} else if tmp == nil {
+			arg3 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
 		}
 	}
 	args["offset"] = arg3
@@ -26340,8 +26431,28 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddUser(rctx, args["input"].([]*model.AddUserInput), args["upsert"].(*bool))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddUser(rctx, args["input"].([]*model.AddUserInput), args["upsert"].(*bool))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addUser == nil {
+				return nil, errors.New("directive hook_addUser is not implemented")
+			}
+			return ec.directives.Hook_addUser(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddUserPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.AddUserPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -26376,8 +26487,28 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUser(rctx, args["input"].(model.UpdateUserInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateUser(rctx, args["input"].(model.UpdateUserInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateUser == nil {
+				return nil, errors.New("directive hook_updateUser is not implemented")
+			}
+			return ec.directives.Hook_updateUser(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateUserPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.UpdateUserPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -26412,8 +26543,28 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteUser(rctx, args["filter"].(model.UserFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteUser(rctx, args["filter"].(model.UserFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteUser == nil {
+				return nil, errors.New("directive hook_deleteUser is not implemented")
+			}
+			return ec.directives.Hook_deleteUser(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteUserPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *zerogov/fractal6.go/graph/model.DeleteUserPayload`, tmp)
 	})
 
 	if resTmp == nil {

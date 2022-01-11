@@ -161,7 +161,8 @@ func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddCo
 }
 
 func (r *mutationResolver) UpdateContract(ctx context.Context, input model.UpdateContractInput) (data *model.UpdateContractPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.ContractFilter) (data *model.DeleteContractPayload, errors error) {
