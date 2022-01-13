@@ -1,8 +1,9 @@
 package graph
 
 import (
-	"context"
 	"fmt"
+	"context"
+    "strings"
 
 	"github.com/99designs/gqlgen/graphql"
 
@@ -70,8 +71,8 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
     if f != nil {
         // Extract the fieldname and type of the object queried
         qName :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
-        if len(qName) != 2 { return nil, LogErr("@unique", fmt.Errorf("Unknow query name")) }
-        t := qName[1]
+        if len(qName) < 2 { return nil, LogErr("@unique", fmt.Errorf("Unknow query name")) }
+        t := strings.Join(qName[1:], "")
         fieldName := t + "." + field
         filterName := t + "." + *f
         s := obj.(model.JsonAtom)[*f]

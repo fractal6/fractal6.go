@@ -122,6 +122,60 @@ func SubLabels(w http.ResponseWriter, r *http.Request) {
     w.Write(jsonData)
 }
 
+func TopRoles(w http.ResponseWriter, r *http.Request) {
+	var q string
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get top labels
+    data, err := db.GetDB().GetTopRoles("nameid", q)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}
+
+func SubRoles(w http.ResponseWriter, r *http.Request) {
+	var q string
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Get sub labels
+    data, err := db.GetDB().GetSubRoles("nameid", q)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    // Return the user context
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    w.Write(jsonData)
+}
+
 //
 // Query Tensions
 //

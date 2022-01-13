@@ -100,8 +100,6 @@ type AddLabelInput struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
-	NNodes      *int          `json:"n_nodes"`
-	NTensions   *int          `json:"n_tensions"`
 }
 
 type AddLabelPayload struct {
@@ -149,15 +147,12 @@ type AddNodeInput struct {
 	Nameid      string         `json:"nameid,omitempty"`
 	Rootnameid  string         `json:"rootnameid,omitempty"`
 	Parent      *NodeRef       `json:"parent,omitempty"`
-	Children    []*NodeRef     `json:"children,omitempty"`
 	Type        NodeType       `json:"type_,omitempty"`
 	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
 	About       *string        `json:"about,omitempty"`
 	Mandate     *MandateRef    `json:"mandate,omitempty"`
-	Docs        []*BlobRef     `json:"docs,omitempty"`
 	Source      *BlobRef       `json:"source,omitempty"`
-	Labels      []*LabelRef    `json:"labels,omitempty"`
 	Visibility  NodeVisibility `json:"visibility,omitempty"`
 	Mode        NodeMode       `json:"mode,omitempty"`
 	Rights      int            `json:"rights"`
@@ -165,6 +160,10 @@ type AddNodeInput struct {
 	IsRoot      bool           `json:"isRoot"`
 	IsPersonal  *bool          `json:"isPersonal"`
 	UserCanJoin *bool          `json:"userCanJoin"`
+	Children    []*NodeRef     `json:"children,omitempty"`
+	Docs        []*BlobRef     `json:"docs,omitempty"`
+	Labels      []*LabelRef    `json:"labels,omitempty"`
+	Roles       []*RoleExtRef  `json:"roles,omitempty"`
 	FirstLink   *UserRef       `json:"first_link,omitempty"`
 	SecondLink  *UserRef       `json:"second_link,omitempty"`
 	Skills      []string       `json:"skills,omitempty"`
@@ -206,7 +205,7 @@ type AddRoleExtInput struct {
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
 	Nodes      []*NodeRef  `json:"nodes,omitempty"`
-	NNodes     *int        `json:"n_nodes"`
+	Roles      []*NodeRef  `json:"roles,omitempty"`
 }
 
 type AddRoleExtPayload struct {
@@ -891,30 +890,20 @@ type Label struct {
 	Color             *string                 `json:"color,omitempty"`
 	Tensions          []*Tension              `json:"tensions,omitempty"`
 	Nodes             []*Node                 `json:"nodes,omitempty"`
-	NNodes            *int                    `json:"n_nodes"`
-	NTensions         *int                    `json:"n_tensions"`
 	TensionsAggregate *TensionAggregateResult `json:"tensionsAggregate,omitempty"`
 	NodesAggregate    *NodeAggregateResult    `json:"nodesAggregate,omitempty"`
 }
 
 type LabelAggregateResult struct {
-	Count          *int     `json:"count"`
-	RootnameidMin  *string  `json:"rootnameidMin,omitempty"`
-	RootnameidMax  *string  `json:"rootnameidMax,omitempty"`
-	NameMin        *string  `json:"nameMin,omitempty"`
-	NameMax        *string  `json:"nameMax,omitempty"`
-	DescriptionMin *string  `json:"descriptionMin,omitempty"`
-	DescriptionMax *string  `json:"descriptionMax,omitempty"`
-	ColorMin       *string  `json:"colorMin,omitempty"`
-	ColorMax       *string  `json:"colorMax,omitempty"`
-	NNodesMin      *int     `json:"n_nodesMin"`
-	NNodesMax      *int     `json:"n_nodesMax"`
-	NNodesSum      *int     `json:"n_nodesSum"`
-	NNodesAvg      *float64 `json:"n_nodesAvg,omitempty"`
-	NTensionsMin   *int     `json:"n_tensionsMin"`
-	NTensionsMax   *int     `json:"n_tensionsMax"`
-	NTensionsSum   *int     `json:"n_tensionsSum"`
-	NTensionsAvg   *float64 `json:"n_tensionsAvg,omitempty"`
+	Count          *int    `json:"count"`
+	RootnameidMin  *string `json:"rootnameidMin,omitempty"`
+	RootnameidMax  *string `json:"rootnameidMax,omitempty"`
+	NameMin        *string `json:"nameMin,omitempty"`
+	NameMax        *string `json:"nameMax,omitempty"`
+	DescriptionMin *string `json:"descriptionMin,omitempty"`
+	DescriptionMax *string `json:"descriptionMax,omitempty"`
+	ColorMin       *string `json:"colorMin,omitempty"`
+	ColorMax       *string `json:"colorMax,omitempty"`
 }
 
 type LabelFilter struct {
@@ -940,8 +929,6 @@ type LabelPatch struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
-	NNodes      *int          `json:"n_nodes"`
-	NTensions   *int          `json:"n_tensions"`
 }
 
 type LabelRef struct {
@@ -952,8 +939,6 @@ type LabelRef struct {
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
 	Nodes       []*NodeRef    `json:"nodes,omitempty"`
-	NNodes      *int          `json:"n_nodes"`
-	NTensions   *int          `json:"n_tensions"`
 }
 
 type Mandate struct {
@@ -1028,15 +1013,12 @@ type Node struct {
 	Nameid               string                  `json:"nameid,omitempty"`
 	Rootnameid           string                  `json:"rootnameid,omitempty"`
 	Parent               *Node                   `json:"parent,omitempty"`
-	Children             []*Node                 `json:"children,omitempty"`
 	Type                 NodeType                `json:"type_,omitempty"`
 	TensionsOut          []*Tension              `json:"tensions_out,omitempty"`
 	TensionsIn           []*Tension              `json:"tensions_in,omitempty"`
 	About                *string                 `json:"about,omitempty"`
 	Mandate              *Mandate                `json:"mandate,omitempty"`
-	Docs                 []*Blob                 `json:"docs,omitempty"`
 	Source               *Blob                   `json:"source,omitempty"`
-	Labels               []*Label                `json:"labels,omitempty"`
 	Visibility           NodeVisibility          `json:"visibility,omitempty"`
 	Mode                 NodeMode                `json:"mode,omitempty"`
 	Rights               int                     `json:"rights"`
@@ -1044,6 +1026,10 @@ type Node struct {
 	IsRoot               bool                    `json:"isRoot"`
 	IsPersonal           *bool                   `json:"isPersonal"`
 	UserCanJoin          *bool                   `json:"userCanJoin"`
+	Children             []*Node                 `json:"children,omitempty"`
+	Docs                 []*Blob                 `json:"docs,omitempty"`
+	Labels               []*Label                `json:"labels,omitempty"`
+	Roles                []*RoleExt              `json:"roles,omitempty"`
 	FirstLink            *User                   `json:"first_link,omitempty"`
 	SecondLink           *User                   `json:"second_link,omitempty"`
 	Skills               []string                `json:"skills,omitempty"`
@@ -1051,11 +1037,12 @@ type Node struct {
 	RoleExt              *RoleExt                `json:"role_ext,omitempty"`
 	Contracts            []*Vote                 `json:"contracts,omitempty"`
 	OrgaAgg              *OrgaAgg                `json:"orga_agg,omitempty"`
-	ChildrenAggregate    *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
 	TensionsOutAggregate *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate  *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
+	ChildrenAggregate    *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
 	DocsAggregate        *BlobAggregateResult    `json:"docsAggregate,omitempty"`
 	LabelsAggregate      *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
+	RolesAggregate       *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
 	ContractsAggregate   *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
 }
 
@@ -1195,15 +1182,12 @@ type NodePatch struct {
 	Nameid      *string         `json:"nameid,omitempty"`
 	Rootnameid  *string         `json:"rootnameid,omitempty"`
 	Parent      *NodeRef        `json:"parent,omitempty"`
-	Children    []*NodeRef      `json:"children,omitempty"`
 	Type        *NodeType       `json:"type_,omitempty"`
 	TensionsOut []*TensionRef   `json:"tensions_out,omitempty"`
 	TensionsIn  []*TensionRef   `json:"tensions_in,omitempty"`
 	About       *string         `json:"about,omitempty"`
 	Mandate     *MandateRef     `json:"mandate,omitempty"`
-	Docs        []*BlobRef      `json:"docs,omitempty"`
 	Source      *BlobRef        `json:"source,omitempty"`
-	Labels      []*LabelRef     `json:"labels,omitempty"`
 	Visibility  *NodeVisibility `json:"visibility,omitempty"`
 	Mode        *NodeMode       `json:"mode,omitempty"`
 	Rights      *int            `json:"rights"`
@@ -1211,6 +1195,10 @@ type NodePatch struct {
 	IsRoot      *bool           `json:"isRoot"`
 	IsPersonal  *bool           `json:"isPersonal"`
 	UserCanJoin *bool           `json:"userCanJoin"`
+	Children    []*NodeRef      `json:"children,omitempty"`
+	Docs        []*BlobRef      `json:"docs,omitempty"`
+	Labels      []*LabelRef     `json:"labels,omitempty"`
+	Roles       []*RoleExtRef   `json:"roles,omitempty"`
 	FirstLink   *UserRef        `json:"first_link,omitempty"`
 	SecondLink  *UserRef        `json:"second_link,omitempty"`
 	Skills      []string        `json:"skills,omitempty"`
@@ -1229,15 +1217,12 @@ type NodeRef struct {
 	Nameid      *string         `json:"nameid,omitempty"`
 	Rootnameid  *string         `json:"rootnameid,omitempty"`
 	Parent      *NodeRef        `json:"parent,omitempty"`
-	Children    []*NodeRef      `json:"children,omitempty"`
 	Type        *NodeType       `json:"type_,omitempty"`
 	TensionsOut []*TensionRef   `json:"tensions_out,omitempty"`
 	TensionsIn  []*TensionRef   `json:"tensions_in,omitempty"`
 	About       *string         `json:"about,omitempty"`
 	Mandate     *MandateRef     `json:"mandate,omitempty"`
-	Docs        []*BlobRef      `json:"docs,omitempty"`
 	Source      *BlobRef        `json:"source,omitempty"`
-	Labels      []*LabelRef     `json:"labels,omitempty"`
 	Visibility  *NodeVisibility `json:"visibility,omitempty"`
 	Mode        *NodeMode       `json:"mode,omitempty"`
 	Rights      *int            `json:"rights"`
@@ -1245,6 +1230,10 @@ type NodeRef struct {
 	IsRoot      *bool           `json:"isRoot"`
 	IsPersonal  *bool           `json:"isPersonal"`
 	UserCanJoin *bool           `json:"userCanJoin"`
+	Children    []*NodeRef      `json:"children,omitempty"`
+	Docs        []*BlobRef      `json:"docs,omitempty"`
+	Labels      []*LabelRef     `json:"labels,omitempty"`
+	Roles       []*RoleExtRef   `json:"roles,omitempty"`
 	FirstLink   *UserRef        `json:"first_link,omitempty"`
 	SecondLink  *UserRef        `json:"second_link,omitempty"`
 	Skills      []string        `json:"skills,omitempty"`
@@ -1427,24 +1416,21 @@ type RoleExt struct {
 	Color          *string              `json:"color,omitempty"`
 	Mandate        *Mandate             `json:"mandate,omitempty"`
 	Nodes          []*Node              `json:"nodes,omitempty"`
-	NNodes         *int                 `json:"n_nodes"`
+	Roles          []*Node              `json:"roles,omitempty"`
 	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
+	RolesAggregate *NodeAggregateResult `json:"rolesAggregate,omitempty"`
 }
 
 type RoleExtAggregateResult struct {
-	Count         *int     `json:"count"`
-	RootnameidMin *string  `json:"rootnameidMin,omitempty"`
-	RootnameidMax *string  `json:"rootnameidMax,omitempty"`
-	NameMin       *string  `json:"nameMin,omitempty"`
-	NameMax       *string  `json:"nameMax,omitempty"`
-	AboutMin      *string  `json:"aboutMin,omitempty"`
-	AboutMax      *string  `json:"aboutMax,omitempty"`
-	ColorMin      *string  `json:"colorMin,omitempty"`
-	ColorMax      *string  `json:"colorMax,omitempty"`
-	NNodesMin     *int     `json:"n_nodesMin"`
-	NNodesMax     *int     `json:"n_nodesMax"`
-	NNodesSum     *int     `json:"n_nodesSum"`
-	NNodesAvg     *float64 `json:"n_nodesAvg,omitempty"`
+	Count         *int    `json:"count"`
+	RootnameidMin *string `json:"rootnameidMin,omitempty"`
+	RootnameidMax *string `json:"rootnameidMax,omitempty"`
+	NameMin       *string `json:"nameMin,omitempty"`
+	NameMax       *string `json:"nameMax,omitempty"`
+	AboutMin      *string `json:"aboutMin,omitempty"`
+	AboutMax      *string `json:"aboutMax,omitempty"`
+	ColorMin      *string `json:"colorMin,omitempty"`
+	ColorMax      *string `json:"colorMax,omitempty"`
 }
 
 type RoleExtFilter struct {
@@ -1471,7 +1457,7 @@ type RoleExtPatch struct {
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
 	Nodes      []*NodeRef  `json:"nodes,omitempty"`
-	NNodes     *int        `json:"n_nodes"`
+	Roles      []*NodeRef  `json:"roles,omitempty"`
 }
 
 type RoleExtRef struct {
@@ -1483,7 +1469,7 @@ type RoleExtRef struct {
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
 	Nodes      []*NodeRef  `json:"nodes,omitempty"`
-	NNodes     *int        `json:"n_nodes"`
+	Roles      []*NodeRef  `json:"roles,omitempty"`
 }
 
 type RoleTypeHash struct {
@@ -2939,8 +2925,6 @@ const (
 	LabelHasFilterColor       LabelHasFilter = "color"
 	LabelHasFilterTensions    LabelHasFilter = "tensions"
 	LabelHasFilterNodes       LabelHasFilter = "nodes"
-	LabelHasFilterNNodes      LabelHasFilter = "n_nodes"
-	LabelHasFilterNTensions   LabelHasFilter = "n_tensions"
 )
 
 var AllLabelHasFilter = []LabelHasFilter{
@@ -2950,13 +2934,11 @@ var AllLabelHasFilter = []LabelHasFilter{
 	LabelHasFilterColor,
 	LabelHasFilterTensions,
 	LabelHasFilterNodes,
-	LabelHasFilterNNodes,
-	LabelHasFilterNTensions,
 }
 
 func (e LabelHasFilter) IsValid() bool {
 	switch e {
-	case LabelHasFilterRootnameid, LabelHasFilterName, LabelHasFilterDescription, LabelHasFilterColor, LabelHasFilterTensions, LabelHasFilterNodes, LabelHasFilterNNodes, LabelHasFilterNTensions:
+	case LabelHasFilterRootnameid, LabelHasFilterName, LabelHasFilterDescription, LabelHasFilterColor, LabelHasFilterTensions, LabelHasFilterNodes:
 		return true
 	}
 	return false
@@ -2990,8 +2972,6 @@ const (
 	LabelOrderableName        LabelOrderable = "name"
 	LabelOrderableDescription LabelOrderable = "description"
 	LabelOrderableColor       LabelOrderable = "color"
-	LabelOrderableNNodes      LabelOrderable = "n_nodes"
-	LabelOrderableNTensions   LabelOrderable = "n_tensions"
 )
 
 var AllLabelOrderable = []LabelOrderable{
@@ -2999,13 +2979,11 @@ var AllLabelOrderable = []LabelOrderable{
 	LabelOrderableName,
 	LabelOrderableDescription,
 	LabelOrderableColor,
-	LabelOrderableNNodes,
-	LabelOrderableNTensions,
 }
 
 func (e LabelOrderable) IsValid() bool {
 	switch e {
-	case LabelOrderableRootnameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor, LabelOrderableNNodes, LabelOrderableNTensions:
+	case LabelOrderableRootnameid, LabelOrderableName, LabelOrderableDescription, LabelOrderableColor:
 		return true
 	}
 	return false
@@ -3281,15 +3259,12 @@ const (
 	NodeHasFilterNameid      NodeHasFilter = "nameid"
 	NodeHasFilterRootnameid  NodeHasFilter = "rootnameid"
 	NodeHasFilterParent      NodeHasFilter = "parent"
-	NodeHasFilterChildren    NodeHasFilter = "children"
 	NodeHasFilterType        NodeHasFilter = "type_"
 	NodeHasFilterTensionsOut NodeHasFilter = "tensions_out"
 	NodeHasFilterTensionsIn  NodeHasFilter = "tensions_in"
 	NodeHasFilterAbout       NodeHasFilter = "about"
 	NodeHasFilterMandate     NodeHasFilter = "mandate"
-	NodeHasFilterDocs        NodeHasFilter = "docs"
 	NodeHasFilterSource      NodeHasFilter = "source"
-	NodeHasFilterLabels      NodeHasFilter = "labels"
 	NodeHasFilterVisibility  NodeHasFilter = "visibility"
 	NodeHasFilterMode        NodeHasFilter = "mode"
 	NodeHasFilterRights      NodeHasFilter = "rights"
@@ -3297,6 +3272,10 @@ const (
 	NodeHasFilterIsRoot      NodeHasFilter = "isRoot"
 	NodeHasFilterIsPersonal  NodeHasFilter = "isPersonal"
 	NodeHasFilterUserCanJoin NodeHasFilter = "userCanJoin"
+	NodeHasFilterChildren    NodeHasFilter = "children"
+	NodeHasFilterDocs        NodeHasFilter = "docs"
+	NodeHasFilterLabels      NodeHasFilter = "labels"
+	NodeHasFilterRoles       NodeHasFilter = "roles"
 	NodeHasFilterFirstLink   NodeHasFilter = "first_link"
 	NodeHasFilterSecondLink  NodeHasFilter = "second_link"
 	NodeHasFilterSkills      NodeHasFilter = "skills"
@@ -3314,15 +3293,12 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterNameid,
 	NodeHasFilterRootnameid,
 	NodeHasFilterParent,
-	NodeHasFilterChildren,
 	NodeHasFilterType,
 	NodeHasFilterTensionsOut,
 	NodeHasFilterTensionsIn,
 	NodeHasFilterAbout,
 	NodeHasFilterMandate,
-	NodeHasFilterDocs,
 	NodeHasFilterSource,
-	NodeHasFilterLabels,
 	NodeHasFilterVisibility,
 	NodeHasFilterMode,
 	NodeHasFilterRights,
@@ -3330,6 +3306,10 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterIsRoot,
 	NodeHasFilterIsPersonal,
 	NodeHasFilterUserCanJoin,
+	NodeHasFilterChildren,
+	NodeHasFilterDocs,
+	NodeHasFilterLabels,
+	NodeHasFilterRoles,
 	NodeHasFilterFirstLink,
 	NodeHasFilterSecondLink,
 	NodeHasFilterSkills,
@@ -3341,7 +3321,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterChildren, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterDocs, NodeHasFilterSource, NodeHasFilterLabels, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterRoleExt, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterRoleExt, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
 		return true
 	}
 	return false
@@ -3802,7 +3782,7 @@ const (
 	RoleExtHasFilterColor      RoleExtHasFilter = "color"
 	RoleExtHasFilterMandate    RoleExtHasFilter = "mandate"
 	RoleExtHasFilterNodes      RoleExtHasFilter = "nodes"
-	RoleExtHasFilterNNodes     RoleExtHasFilter = "n_nodes"
+	RoleExtHasFilterRoles      RoleExtHasFilter = "roles"
 )
 
 var AllRoleExtHasFilter = []RoleExtHasFilter{
@@ -3813,12 +3793,12 @@ var AllRoleExtHasFilter = []RoleExtHasFilter{
 	RoleExtHasFilterColor,
 	RoleExtHasFilterMandate,
 	RoleExtHasFilterNodes,
-	RoleExtHasFilterNNodes,
+	RoleExtHasFilterRoles,
 }
 
 func (e RoleExtHasFilter) IsValid() bool {
 	switch e {
-	case RoleExtHasFilterRootnameid, RoleExtHasFilterName, RoleExtHasFilterAbout, RoleExtHasFilterRoleType, RoleExtHasFilterColor, RoleExtHasFilterMandate, RoleExtHasFilterNodes, RoleExtHasFilterNNodes:
+	case RoleExtHasFilterRootnameid, RoleExtHasFilterName, RoleExtHasFilterAbout, RoleExtHasFilterRoleType, RoleExtHasFilterColor, RoleExtHasFilterMandate, RoleExtHasFilterNodes, RoleExtHasFilterRoles:
 		return true
 	}
 	return false
@@ -3852,7 +3832,6 @@ const (
 	RoleExtOrderableName       RoleExtOrderable = "name"
 	RoleExtOrderableAbout      RoleExtOrderable = "about"
 	RoleExtOrderableColor      RoleExtOrderable = "color"
-	RoleExtOrderableNNodes     RoleExtOrderable = "n_nodes"
 )
 
 var AllRoleExtOrderable = []RoleExtOrderable{
@@ -3860,12 +3839,11 @@ var AllRoleExtOrderable = []RoleExtOrderable{
 	RoleExtOrderableName,
 	RoleExtOrderableAbout,
 	RoleExtOrderableColor,
-	RoleExtOrderableNNodes,
 }
 
 func (e RoleExtOrderable) IsValid() bool {
 	switch e {
-	case RoleExtOrderableRootnameid, RoleExtOrderableName, RoleExtOrderableAbout, RoleExtOrderableColor, RoleExtOrderableNNodes:
+	case RoleExtOrderableRootnameid, RoleExtOrderableName, RoleExtOrderableAbout, RoleExtOrderableColor:
 		return true
 	}
 	return false

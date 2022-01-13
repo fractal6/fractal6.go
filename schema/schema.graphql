@@ -94,15 +94,12 @@ type Node {
   nameid: String!
   rootnameid: String!
   parent(filter: NodeFilter): Node
-  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   type_: NodeType!
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   about: String
   mandate(filter: MandateFilter): Mandate
-  docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   source(filter: BlobFilter): Blob
-  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   visibility: NodeVisibility!
   mode: NodeMode!
   rights: Int!
@@ -110,6 +107,10 @@ type Node {
   isRoot: Boolean!
   isPersonal: Boolean
   userCanJoin: Boolean
+  children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   skills: [String!]
@@ -118,11 +119,12 @@ type Node {
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
-  childrenAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
+  childrenAggregate(filter: NodeFilter): NodeAggregateResult
   docsAggregate(filter: BlobFilter): BlobAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
 }
 
@@ -160,8 +162,6 @@ type Label {
   color: String
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  n_nodes: Int
-  n_tensions: Int
 
   tensionsAggregate(filter: TensionFilter): TensionAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -176,9 +176,10 @@ type RoleExt {
   color: String
   mandate(filter: MandateFilter): Mandate
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  n_nodes: Int
+  roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  rolesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type OrgaAgg {
@@ -496,35 +497,35 @@ enum UserType {
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -614,8 +615,6 @@ input AddLabelInput {
   color: String
   tensions: [TensionRef!]
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
-  n_nodes: Int
-  n_tensions: Int
 }
 
 type AddLabelPayload {
@@ -663,15 +662,12 @@ input AddNodeInput {
   nameid: String!
   rootnameid: String!
   parent: NodeRef
-  children: [NodeRef!]
   type_: NodeType!
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
   about: String
   mandate: MandateRef
-  docs: [BlobRef]
   source: BlobRef
-  labels: [LabelRef!]
   visibility: NodeVisibility!
   mode: NodeMode!
   rights: Int!
@@ -679,6 +675,10 @@ input AddNodeInput {
   isRoot: Boolean!
   isPersonal: Boolean
   userCanJoin: Boolean
+  children: [NodeRef!]
+  docs: [BlobRef]
+  labels: [LabelRef!]
+  roles: [RoleExtRef!]
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
@@ -714,13 +714,13 @@ type AddPendingUserPayload {
 
 input AddRoleExtInput {
   rootnameid: String!
-  name: String! @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType!
   color: String
   mandate: MandateRef
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
-  n_nodes: Int
+  roles: [NodeRef!]
 }
 
 type AddRoleExtPayload {
@@ -1468,14 +1468,6 @@ type LabelAggregateResult {
   descriptionMax: String
   colorMin: String
   colorMax: String
-  n_nodesMin: Int
-  n_nodesMax: Int
-  n_nodesSum: Int
-  n_nodesAvg: Float
-  n_tensionsMin: Int
-  n_tensionsMax: Int
-  n_tensionsSum: Int
-  n_tensionsAvg: Float
 }
 
 input LabelFilter {
@@ -1495,8 +1487,6 @@ enum LabelHasFilter {
   color
   tensions
   nodes
-  n_nodes
-  n_tensions
 }
 
 input LabelOrder {
@@ -1510,8 +1500,6 @@ enum LabelOrderable {
   name
   description
   color
-  n_nodes
-  n_tensions
 }
 
 input LabelPatch {
@@ -1521,8 +1509,6 @@ input LabelPatch {
   color: String @x_alter
   tensions: [TensionRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
-  n_nodes: Int @x_ro
-  n_tensions: Int @x_ro
 }
 
 input LabelRef {
@@ -1533,8 +1519,6 @@ input LabelRef {
   color: String
   tensions: [TensionRef!]
   nodes: [NodeRef!]
-  n_nodes: Int
-  n_tensions: Int
 }
 
 type MandateAggregateResult {
@@ -1798,15 +1782,12 @@ enum NodeHasFilter {
   nameid
   rootnameid
   parent
-  children
   type_
   tensions_out
   tensions_in
   about
   mandate
-  docs
   source
-  labels
   visibility
   mode
   rights
@@ -1814,6 +1795,10 @@ enum NodeHasFilter {
   isRoot
   isPersonal
   userCanJoin
+  children
+  docs
+  labels
+  roles
   first_link
   second_link
   skills
@@ -1852,15 +1837,12 @@ input NodePatch {
   nameid: String @x_patch_ro
   rootnameid: String @x_patch_ro
   parent: NodeRef @x_patch_ro
-  children: [NodeRef!] @x_patch_ro
   type_: NodeType @x_patch_ro
   tensions_out: [TensionRef!] @x_patch_ro
   tensions_in: [TensionRef!] @x_patch_ro
   about: String @x_patch_ro
   mandate: MandateRef @x_patch_ro
-  docs: [BlobRef] @x_patch_ro
   source: BlobRef @x_patch_ro
-  labels: [LabelRef!] @x_patch_ro
   visibility: NodeVisibility @x_patch_ro
   mode: NodeMode @x_patch_ro
   rights: Int @x_patch_ro
@@ -1868,6 +1850,10 @@ input NodePatch {
   isRoot: Boolean @x_patch_ro
   isPersonal: Boolean @x_patch_ro
   userCanJoin: Boolean @x_patch_ro
+  children: [NodeRef!] @x_patch_ro
+  docs: [BlobRef] @x_patch_ro
+  labels: [LabelRef!] @x_patch_ro
+  roles: [RoleExtRef!] @x_patch_ro
   first_link: UserRef @x_patch_ro
   second_link: UserRef @x_patch_ro
   skills: [String!] @x_patch_ro
@@ -1886,15 +1872,12 @@ input NodeRef {
   nameid: String
   rootnameid: String
   parent: NodeRef
-  children: [NodeRef!]
   type_: NodeType
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
   about: String
   mandate: MandateRef
-  docs: [BlobRef]
   source: BlobRef
-  labels: [LabelRef!]
   visibility: NodeVisibility
   mode: NodeMode
   rights: Int
@@ -1902,6 +1885,10 @@ input NodeRef {
   isRoot: Boolean
   isPersonal: Boolean
   userCanJoin: Boolean
+  children: [NodeRef!]
+  docs: [BlobRef]
+  labels: [LabelRef!]
+  roles: [RoleExtRef!]
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
@@ -2152,10 +2139,6 @@ type RoleExtAggregateResult {
   aboutMax: String
   colorMin: String
   colorMax: String
-  n_nodesMin: Int
-  n_nodesMax: Int
-  n_nodesSum: Int
-  n_nodesAvg: Float
 }
 
 input RoleExtFilter {
@@ -2176,7 +2159,7 @@ enum RoleExtHasFilter {
   color
   mandate
   nodes
-  n_nodes
+  roles
 }
 
 input RoleExtOrder {
@@ -2190,18 +2173,17 @@ enum RoleExtOrderable {
   name
   about
   color
-  n_nodes
 }
 
 input RoleExtPatch {
   rootnameid: String @x_patch_ro
-  name: String @w_set(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType @x_alter
   color: String @x_alter
   mandate: MandateRef @x_alter
   nodes: [NodeRef!] @x_alter(r:"oneByOne")
-  n_nodes: Int @x_ro
+  roles: [NodeRef!] @x_patch_ro
 }
 
 input RoleExtRef {
@@ -2213,7 +2195,7 @@ input RoleExtRef {
   color: String
   mandate: MandateRef
   nodes: [NodeRef!]
-  n_nodes: Int
+  roles: [NodeRef!]
 }
 
 input RoleType_hash {

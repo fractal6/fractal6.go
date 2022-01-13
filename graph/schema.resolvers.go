@@ -61,11 +61,13 @@ func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFi
 }
 
 func (r *mutationResolver) AddRoleExt(ctx context.Context, input []*model.AddRoleExtInput) (data *model.AddRoleExtPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) UpdateRoleExt(ctx context.Context, input model.UpdateRoleExtInput) (data *model.UpdateRoleExtPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteRoleExt(ctx context.Context, filter model.RoleExtFilter) (data *model.DeleteRoleExtPayload, errors error) {

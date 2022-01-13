@@ -264,8 +264,6 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Label.name
             Label.color
-            Label.description
-            n_nodes: count(Label.nodes)
         }
     }`,
     "getSubLabels": `{
@@ -281,8 +279,39 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Label.name
             Label.color
-            Label.description
-            n_nodes: count(Label.nodes)
+        }
+    }`,
+    "getTopRoles": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.parent @normalize
+        }
+
+        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            l as Node.roles
+        }
+
+        all(func: uid(l)){
+            uid
+            RoleExt.name
+            RoleExt.color
+            RoleExt.role_type
+        }
+    }`,
+    "getSubRoles": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as Node.children
+        }
+
+        var(func: uid(o)) @filter(eq(Node.isArchived, false)) {
+            l as Node.roles
+        }
+
+        all(func: uid(l)){
+            uid
+            RoleExt.name
+            RoleExt.color
+            RoleExt.role_type
         }
     }`,
     "getTensionInt": `{
@@ -1061,6 +1090,92 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, erro
     err = decoder.Decode(r.All)
     // Remove duplicate based on Label.name
     data := []model.Label{}
+    check := make(map[string]bool)
+    for _, d := range data_dup {
+        if _, v := check[d.Name]; !v {
+            check[d.Name] = true
+            data = append(data, d)
+        }
+    }
+    return data, err
+}
+
+// Get all top roles
+func (dg Dgraph) GetTopRoles(fieldid string, objid string) ([]model.RoleExt, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid": fieldid,
+        "objid": objid,
+    }
+    // Send request
+    res, err := dg.QueryDql("getTopRoles", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data_dup []model.RoleExt
+    config := &mapstructure.DecoderConfig{
+        Result: &data_dup,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    // Remove duplicate based on Label.name
+    data := []model.RoleExt{}
+    check := make(map[string]bool)
+    for _, d := range data_dup {
+        if _, v := check[d.Name]; !v {
+            check[d.Name] = true
+            data = append(data, d)
+        }
+    }
+    return data, err
+}
+
+// Get all sub labels
+func (dg Dgraph) GetSubRoles(fieldid string, objid string) ([]model.RoleExt, error) {
+    // Format Query
+    maps := map[string]string{
+        "fieldid": fieldid,
+        "objid": objid,
+    }
+    // Send request
+    res, err := dg.QueryDql("getSubRoles", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data_dup []model.RoleExt
+    config := &mapstructure.DecoderConfig{
+        Result: &data_dup,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    // Remove duplicate based on Label.name
+    data := []model.RoleExt{}
     check := make(map[string]bool)
     for _, d := range data_dup {
         if _, v := check[d.Name]; !v {

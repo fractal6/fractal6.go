@@ -119,8 +119,8 @@ func RunServer() {
                 r.Post("/sub_members", handle6.SubMembers)
                 r.Post("/top_labels", handle6.TopLabels)
                 r.Post("/sub_labels", handle6.SubLabels)
-                //r.Post("/top_roles", handle6.TopRoles)
-                //r.Post("/sub_roles", handle6.SubRoles)
+                r.Post("/top_roles", handle6.TopRoles)
+                r.Post("/sub_roles", handle6.SubRoles)
             })
 
             // Special tension query (nested filters and counts)

@@ -57,7 +57,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
     for _, input := range inputs {
         if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         node := input.Nodes[0]
-        rid, _ := codec.Nid2pid(*node.Nameid)
+        rid, _ := codec.Nid2rootid(*node.Nameid)
         if rid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
         ok, err = auth.HasCoordoRole(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
