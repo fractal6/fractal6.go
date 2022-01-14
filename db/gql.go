@@ -69,10 +69,10 @@ var gqlQueries map[string]string = map[string]string{
 //
 
 // Get a new vertex
-func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string) (string, error) {
+func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string, graph string) (interface{}, error) {
     Vertex := strings.Title(vertex)
     queryName := "get" + Vertex
-    queryGraph := "id"
+    queryGraph := graph
 
     // Build the string request
     reqInput := map[string]string{
@@ -90,8 +90,8 @@ func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string)
     if payload[queryName] == nil {
         return "", fmt.Errorf("Unauthorized request. Possibly, name already exists.")
     }
-    res := payload[queryName].(model.JsonAtom)["id"]
-    return res.(string), err
+    res := payload[queryName]
+    return res, err
 }
 
 // Add a new vertex

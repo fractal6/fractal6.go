@@ -84,6 +84,11 @@ var dqlQueries map[string]string = map[string]string{
             count({{.fieldName}})
         }
     }`,
+    "count2": `{
+        all(func: eq({{.f1}}, {{.v1}})) @filter(eq({{.f2}}, {{.v2}})) {
+            count({{.fieldName}})
+        }
+    }`,
     "getOrgaAgg": `{
         var(func: eq(Node.nameid, "{{.nameid}}"))  {
             Node.children @filter(eq(Node.role_type, "Guest")) {
@@ -448,6 +453,34 @@ func (dg Dgraph) Count(id string, fieldName string) int {
     }
     // Send request
     res, err := dg.QueryDql("count", maps)
+    if err != nil { panic(err) }
+
+    // Decode response
+    var r DqlRespCount
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { panic(err) }
+
+    // Extract result
+    if len(r.All) == 0 { return -1 }
+
+    values := make([]int, 0, len(r.All[0]))
+    for _, v := range r.All[0] {
+        values = append(values, v)
+    }
+
+    return values[0]
+}
+func (dg Dgraph) Count2(f1, v1, f2, v2, fieldName string) int {
+    // Format Query
+    maps := map[string]string{
+        "f1": f1,
+        "v1": v1,
+        "f2": f2,
+        "v2": v2,
+        "fieldName": fieldName,
+    }
+    // Send request
+    res, err := dg.QueryDql("count2", maps)
     if err != nil { panic(err) }
 
     // Decode response

@@ -72,9 +72,9 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
         // Extract the fieldname and type of the object queried
         qName :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
         if len(qName) < 2 { return nil, LogErr("@unique", fmt.Errorf("Unknow query name")) }
-        t := strings.Join(qName[1:], "")
-        fieldName := t + "." + field
-        filterName := t + "." + *f
+        typeName := strings.Join(qName[1:], "")
+        fieldName := typeName + "." + field
+        filterName := typeName + "." + *f
         s := obj.(model.JsonAtom)[*f]
         if s != nil {
             // *f is present in the inut

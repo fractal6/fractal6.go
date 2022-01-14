@@ -1,11 +1,14 @@
 package graph
 
 import (
-	"fmt"
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
 
+	//"zerogov/fractal6.go/db"
+	"zerogov/fractal6.go/db"
 	"zerogov/fractal6.go/graph/auth"
 	"zerogov/fractal6.go/graph/codec"
 	"zerogov/fractal6.go/graph/model"
@@ -28,9 +31,16 @@ type AddArtefactInput struct {
 	Nodes       []*model.NodeRef    `json:"nodes,omitempty"`
 }
 
+type FilterArtefactInput struct {
+	ID         []string                                `json:"id,omitempty"`
+	Rootnameid *model.StringHashFilter                       `json:"rootnameid,omitempty"`
+	Name       *model.StringHashFilterStringTermFilter `json:"name,omitempty"`
+}
+
 type UpdateArtefactInput struct {
-	Set    *AddArtefactInput  `json:"set,omitempty"`
-	Remove *AddArtefactInput  `json:"remove,omitempty"`
+	Filter *FilterArtefactInput `json:"filter,omitempty"`
+	Set    *AddArtefactInput    `json:"set,omitempty"`
+	Remove *AddArtefactInput    `json:"remove,omitempty"`
 }
 
 
@@ -82,10 +92,27 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 
     var nodes []*model.NodeRef
     if input.Set != nil {
+        // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
+        n_nodes := 0
+        qName :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
+        if len(qName) < 2 { return nil, LogErr("updateNodeArtefact", fmt.Errorf("Unknow query name")) }
+        typeName := strings.Join(qName[1:], "")
+        if len(input.Filter.ID) > 0 {
+            n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")
+        } else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
+            n_nodes = db.GetDB().Count2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes")
+        } else {
+            return nil, LogErr("Access denied", fmt.Errorf("invalid filter to query node artefact."))
+        }
+        if n_nodes > 1 {
+            return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is possible only if one node defines this object."))
+        }
+
         if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         nodes = append(nodes, input.Set.Nodes[0])
     }
     if input.Remove != nil {
+        // @DEBUG: only allow nodes to be removed...
         if len(input.Remove.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         nodes = append(nodes, input.Remove.Nodes[0])
     }
@@ -100,7 +127,9 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }
     }
-    if ok { return next(ctx) }
+    if ok {
+        return next(ctx)
+    }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
