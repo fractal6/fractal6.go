@@ -111,11 +111,12 @@ type Node {
   docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
+  role_ext(filter: RoleExtFilter): RoleExt
+  role_type: RoleType
+  color: String
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   skills: [String!]
-  role_type: RoleType
-  role_ext(filter: RoleExtFilter): RoleExt
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
 
@@ -142,6 +143,7 @@ type NodeFragment {
   first_link: String
   second_link: String
   role_type: RoleType
+  color: String
 
   childrenAggregate(filter: NodeFragmentFilter): NodeFragmentAggregateResult
 }
@@ -495,25 +497,7 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambda on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
 directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
@@ -521,11 +505,29 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
+
+directive @lambda on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -647,6 +649,7 @@ input AddNodeFragmentInput {
   first_link: String
   second_link: String
   role_type: RoleType
+  color: String
 }
 
 type AddNodeFragmentPayload {
@@ -679,11 +682,12 @@ input AddNodeInput {
   docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  role_ext: RoleExtRef
+  role_type: RoleType
+  color: String
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
-  role_type: RoleType
-  role_ext: RoleExtRef
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }
@@ -1669,6 +1673,8 @@ type NodeAggregateResult {
   rightsMax: Int
   rightsSum: Int
   rightsAvg: Float
+  colorMin: String
+  colorMax: String
 }
 
 input NodeFilter {
@@ -1684,8 +1690,8 @@ input NodeFilter {
   isArchived: Boolean
   isRoot: Boolean
   isPersonal: Boolean
-  skills: StringTermFilter
   role_type: RoleType_hash
+  skills: StringTermFilter
   has: [NodeHasFilter]
   and: [NodeFilter]
   or: [NodeFilter]
@@ -1704,6 +1710,8 @@ type NodeFragmentAggregateResult {
   first_linkMax: String
   second_linkMin: String
   second_linkMax: String
+  colorMin: String
+  colorMax: String
 }
 
 input NodeFragmentFilter {
@@ -1727,6 +1735,7 @@ enum NodeFragmentHasFilter {
   first_link
   second_link
   role_type
+  color
 }
 
 input NodeFragmentOrder {
@@ -1741,6 +1750,7 @@ enum NodeFragmentOrderable {
   about
   first_link
   second_link
+  color
 }
 
 input NodeFragmentPatch {
@@ -1756,6 +1766,7 @@ input NodeFragmentPatch {
   first_link: String @x_patch_ro
   second_link: String @x_patch_ro
   role_type: RoleType @x_patch_ro
+  color: String @x_patch_ro
 }
 
 input NodeFragmentRef {
@@ -1772,6 +1783,7 @@ input NodeFragmentRef {
   first_link: String
   second_link: String
   role_type: RoleType
+  color: String
 }
 
 enum NodeHasFilter {
@@ -1799,11 +1811,12 @@ enum NodeHasFilter {
   docs
   labels
   roles
+  role_ext
+  role_type
+  color
   first_link
   second_link
   skills
-  role_type
-  role_ext
   contracts
   orga_agg
 }
@@ -1827,6 +1840,7 @@ enum NodeOrderable {
   rootnameid
   about
   rights
+  color
 }
 
 input NodePatch {
@@ -1854,11 +1868,12 @@ input NodePatch {
   docs: [BlobRef] @x_patch_ro
   labels: [LabelRef!] @x_patch_ro
   roles: [RoleExtRef!] @x_patch_ro
+  role_ext: RoleExtRef @x_patch_ro
+  role_type: RoleType @x_patch_ro
+  color: String @x_patch_ro
   first_link: UserRef @x_patch_ro
   second_link: UserRef @x_patch_ro
   skills: [String!] @x_patch_ro
-  role_type: RoleType @x_patch_ro
-  role_ext: RoleExtRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
   orga_agg: OrgaAggRef @x_patch_ro
 }
@@ -1889,11 +1904,12 @@ input NodeRef {
   docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  role_ext: RoleExtRef
+  role_type: RoleType
+  color: String
   first_link: UserRef
   second_link: UserRef
   skills: [String!]
-  role_type: RoleType
-  role_ext: RoleExtRef
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
 }

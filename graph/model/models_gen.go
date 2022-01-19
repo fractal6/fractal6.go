@@ -132,6 +132,7 @@ type AddNodeFragmentInput struct {
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
+	Color      *string            `json:"color,omitempty"`
 }
 
 type AddNodeFragmentPayload struct {
@@ -164,11 +165,12 @@ type AddNodeInput struct {
 	Docs        []*BlobRef     `json:"docs,omitempty"`
 	Labels      []*LabelRef    `json:"labels,omitempty"`
 	Roles       []*RoleExtRef  `json:"roles,omitempty"`
+	RoleExt     *RoleExtRef    `json:"role_ext,omitempty"`
+	RoleType    *RoleType      `json:"role_type,omitempty"`
+	Color       *string        `json:"color,omitempty"`
 	FirstLink   *UserRef       `json:"first_link,omitempty"`
 	SecondLink  *UserRef       `json:"second_link,omitempty"`
 	Skills      []string       `json:"skills,omitempty"`
-	RoleType    *RoleType      `json:"role_type,omitempty"`
-	RoleExt     *RoleExtRef    `json:"role_ext,omitempty"`
 	Contracts   []*VoteRef     `json:"contracts,omitempty"`
 	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
 }
@@ -1030,11 +1032,12 @@ type Node struct {
 	Docs                 []*Blob                 `json:"docs,omitempty"`
 	Labels               []*Label                `json:"labels,omitempty"`
 	Roles                []*RoleExt              `json:"roles,omitempty"`
+	RoleExt              *RoleExt                `json:"role_ext,omitempty"`
+	RoleType             *RoleType               `json:"role_type,omitempty"`
+	Color                *string                 `json:"color,omitempty"`
 	FirstLink            *User                   `json:"first_link,omitempty"`
 	SecondLink           *User                   `json:"second_link,omitempty"`
 	Skills               []string                `json:"skills,omitempty"`
-	RoleType             *RoleType               `json:"role_type,omitempty"`
-	RoleExt              *RoleExt                `json:"role_ext,omitempty"`
 	Contracts            []*Vote                 `json:"contracts,omitempty"`
 	OrgaAgg              *OrgaAgg                `json:"orga_agg,omitempty"`
 	TensionsOutAggregate *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
@@ -1064,6 +1067,8 @@ type NodeAggregateResult struct {
 	RightsMax     *int     `json:"rightsMax"`
 	RightsSum     *int     `json:"rightsSum"`
 	RightsAvg     *float64 `json:"rightsAvg,omitempty"`
+	ColorMin      *string  `json:"colorMin,omitempty"`
+	ColorMax      *string  `json:"colorMax,omitempty"`
 }
 
 type NodeFilter struct {
@@ -1079,8 +1084,8 @@ type NodeFilter struct {
 	IsArchived *bool                               `json:"isArchived"`
 	IsRoot     *bool                               `json:"isRoot"`
 	IsPersonal *bool                               `json:"isPersonal"`
-	Skills     *StringTermFilter                   `json:"skills,omitempty"`
 	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
+	Skills     *StringTermFilter                   `json:"skills,omitempty"`
 	Has        []*NodeHasFilter                    `json:"has,omitempty"`
 	And        []*NodeFilter                       `json:"and,omitempty"`
 	Or         []*NodeFilter                       `json:"or,omitempty"`
@@ -1101,6 +1106,7 @@ type NodeFragment struct {
 	FirstLink         *string                      `json:"first_link,omitempty"`
 	SecondLink        *string                      `json:"second_link,omitempty"`
 	RoleType          *RoleType                    `json:"role_type,omitempty"`
+	Color             *string                      `json:"color,omitempty"`
 	ChildrenAggregate *NodeFragmentAggregateResult `json:"childrenAggregate,omitempty"`
 }
 
@@ -1116,6 +1122,8 @@ type NodeFragmentAggregateResult struct {
 	FirstLinkMax  *string `json:"first_linkMax,omitempty"`
 	SecondLinkMin *string `json:"second_linkMin,omitempty"`
 	SecondLinkMax *string `json:"second_linkMax,omitempty"`
+	ColorMin      *string `json:"colorMin,omitempty"`
+	ColorMax      *string `json:"colorMax,omitempty"`
 }
 
 type NodeFragmentFilter struct {
@@ -1145,6 +1153,7 @@ type NodeFragmentPatch struct {
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
+	Color      *string            `json:"color,omitempty"`
 }
 
 type NodeFragmentRef struct {
@@ -1161,6 +1170,7 @@ type NodeFragmentRef struct {
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
+	Color      *string            `json:"color,omitempty"`
 }
 
 type NodeModeHash struct {
@@ -1199,11 +1209,12 @@ type NodePatch struct {
 	Docs        []*BlobRef      `json:"docs,omitempty"`
 	Labels      []*LabelRef     `json:"labels,omitempty"`
 	Roles       []*RoleExtRef   `json:"roles,omitempty"`
+	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
+	RoleType    *RoleType       `json:"role_type,omitempty"`
+	Color       *string         `json:"color,omitempty"`
 	FirstLink   *UserRef        `json:"first_link,omitempty"`
 	SecondLink  *UserRef        `json:"second_link,omitempty"`
 	Skills      []string        `json:"skills,omitempty"`
-	RoleType    *RoleType       `json:"role_type,omitempty"`
-	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
 	Contracts   []*VoteRef      `json:"contracts,omitempty"`
 	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
 }
@@ -1234,11 +1245,12 @@ type NodeRef struct {
 	Docs        []*BlobRef      `json:"docs,omitempty"`
 	Labels      []*LabelRef     `json:"labels,omitempty"`
 	Roles       []*RoleExtRef   `json:"roles,omitempty"`
+	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
+	RoleType    *RoleType       `json:"role_type,omitempty"`
+	Color       *string         `json:"color,omitempty"`
 	FirstLink   *UserRef        `json:"first_link,omitempty"`
 	SecondLink  *UserRef        `json:"second_link,omitempty"`
 	Skills      []string        `json:"skills,omitempty"`
-	RoleType    *RoleType       `json:"role_type,omitempty"`
-	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
 	Contracts   []*VoteRef      `json:"contracts,omitempty"`
 	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
 }
@@ -3156,6 +3168,7 @@ const (
 	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
 	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
 	NodeFragmentHasFilterRoleType   NodeFragmentHasFilter = "role_type"
+	NodeFragmentHasFilterColor      NodeFragmentHasFilter = "color"
 )
 
 var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
@@ -3171,11 +3184,12 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 	NodeFragmentHasFilterFirstLink,
 	NodeFragmentHasFilterSecondLink,
 	NodeFragmentHasFilterRoleType,
+	NodeFragmentHasFilterColor,
 }
 
 func (e NodeFragmentHasFilter) IsValid() bool {
 	switch e {
-	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterChildren, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleType:
+	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterChildren, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
 		return true
 	}
 	return false
@@ -3210,6 +3224,7 @@ const (
 	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
 	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
 	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
+	NodeFragmentOrderableColor      NodeFragmentOrderable = "color"
 )
 
 var AllNodeFragmentOrderable = []NodeFragmentOrderable{
@@ -3218,11 +3233,12 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
 	NodeFragmentOrderableSecondLink,
+	NodeFragmentOrderableColor,
 }
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink:
+	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableColor:
 		return true
 	}
 	return false
@@ -3276,11 +3292,12 @@ const (
 	NodeHasFilterDocs        NodeHasFilter = "docs"
 	NodeHasFilterLabels      NodeHasFilter = "labels"
 	NodeHasFilterRoles       NodeHasFilter = "roles"
+	NodeHasFilterRoleExt     NodeHasFilter = "role_ext"
+	NodeHasFilterRoleType    NodeHasFilter = "role_type"
+	NodeHasFilterColor       NodeHasFilter = "color"
 	NodeHasFilterFirstLink   NodeHasFilter = "first_link"
 	NodeHasFilterSecondLink  NodeHasFilter = "second_link"
 	NodeHasFilterSkills      NodeHasFilter = "skills"
-	NodeHasFilterRoleType    NodeHasFilter = "role_type"
-	NodeHasFilterRoleExt     NodeHasFilter = "role_ext"
 	NodeHasFilterContracts   NodeHasFilter = "contracts"
 	NodeHasFilterOrgaAgg     NodeHasFilter = "orga_agg"
 )
@@ -3310,18 +3327,19 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterDocs,
 	NodeHasFilterLabels,
 	NodeHasFilterRoles,
+	NodeHasFilterRoleExt,
+	NodeHasFilterRoleType,
+	NodeHasFilterColor,
 	NodeHasFilterFirstLink,
 	NodeHasFilterSecondLink,
 	NodeHasFilterSkills,
-	NodeHasFilterRoleType,
-	NodeHasFilterRoleExt,
 	NodeHasFilterContracts,
 	NodeHasFilterOrgaAgg,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterRoleType, NodeHasFilterRoleExt, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
 		return true
 	}
 	return false
@@ -3399,6 +3417,7 @@ const (
 	NodeOrderableRootnameid NodeOrderable = "rootnameid"
 	NodeOrderableAbout      NodeOrderable = "about"
 	NodeOrderableRights     NodeOrderable = "rights"
+	NodeOrderableColor      NodeOrderable = "color"
 )
 
 var AllNodeOrderable = []NodeOrderable{
@@ -3409,11 +3428,12 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableRootnameid,
 	NodeOrderableAbout,
 	NodeOrderableRights,
+	NodeOrderableColor,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableRights:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableName, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableAbout, NodeOrderableRights, NodeOrderableColor:
 		return true
 	}
 	return false

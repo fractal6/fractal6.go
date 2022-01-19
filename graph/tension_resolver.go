@@ -54,10 +54,13 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
         e := db.GetDB().DeepDelete("tension", id)
         if e != nil { panic(e) }
     }
-    if ok || err != nil {
+    if err != nil {
+        return data, err
+    }
+    if ok {
         err = PushHistory(uctx, id, input.History)
         e := PushEventNotifications(id, input.History)
-        if e != nil { panic(err) }
+        if e != nil { panic(e) }
         return data, err
     }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))

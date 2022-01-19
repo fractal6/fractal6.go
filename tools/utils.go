@@ -47,6 +47,7 @@ func StructMap(in interface{}, out interface{}) {
 
 //StructToMap convert a struct to a map[string]interface{} based on your JSON tag in your structs.
 // Use mapstructure instead ?
+// @deprectad: show omitempty tag, and values seems to be nil ?
 func StructToMap(item interface{}) map[string]interface{} {
     res := map[string]interface{}{}
     if item == nil {

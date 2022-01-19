@@ -50,6 +50,9 @@ var tensionBlobHookPayload string = `
       NodeFragment.second_link
       NodeFragment.skills
       NodeFragment.role_type
+      NodeFragment.color
+      NodeFragment.visibility
+      NodeFragment.mode
 
       NodeFragment.children {
         NodeFragment.first_link
