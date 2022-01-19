@@ -145,7 +145,7 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 
     // Add subscriber
     // @performance: @defer this with Redis
-    if ok && addSubscriber {
+    if addSubscriber && ok && err == nil {
 		err = db.GetDB().Update(*uctx, "tension", &model.UpdateTensionInput{
 			Filter: &model.TensionFilter{ID: []string{tension.ID}},
 			Set: &model.TensionPatch{Subscribers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}}},

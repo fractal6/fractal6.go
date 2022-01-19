@@ -228,6 +228,9 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
     nodeInput.IsRoot = false
     nodeInput.IsArchived = false
     nodeInput.Rights = 0
+    if node.RoleExt != nil {
+        nodeInput.RoleExt = &model.RoleExtRef{ID: node.RoleExt}
+    }
     if bid != nil {
         nodeInput.Source = &model.BlobRef{ ID: bid }
     }

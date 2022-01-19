@@ -629,6 +629,7 @@ type ComplexityRoot struct {
 		Mode              func(childComplexity int) int
 		Name              func(childComplexity int) int
 		Nameid            func(childComplexity int) int
+		RoleExt           func(childComplexity int) int
 		RoleType          func(childComplexity int) int
 		SecondLink        func(childComplexity int) int
 		Skills            func(childComplexity int) int
@@ -648,6 +649,8 @@ type ComplexityRoot struct {
 		NameMin       func(childComplexity int) int
 		NameidMax     func(childComplexity int) int
 		NameidMin     func(childComplexity int) int
+		RoleExtMax    func(childComplexity int) int
+		RoleExtMin    func(childComplexity int) int
 		SecondLinkMax func(childComplexity int) int
 		SecondLinkMin func(childComplexity int) int
 	}
@@ -4214,6 +4217,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NodeFragment.Nameid(childComplexity), true
 
+	case "NodeFragment.role_ext":
+		if e.complexity.NodeFragment.RoleExt == nil {
+			break
+		}
+
+		return e.complexity.NodeFragment.RoleExt(childComplexity), true
+
 	case "NodeFragment.role_type":
 		if e.complexity.NodeFragment.RoleType == nil {
 			break
@@ -4325,6 +4335,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeFragmentAggregateResult.NameidMin(childComplexity), true
+
+	case "NodeFragmentAggregateResult.role_extMax":
+		if e.complexity.NodeFragmentAggregateResult.RoleExtMax == nil {
+			break
+		}
+
+		return e.complexity.NodeFragmentAggregateResult.RoleExtMax(childComplexity), true
+
+	case "NodeFragmentAggregateResult.role_extMin":
+		if e.complexity.NodeFragmentAggregateResult.RoleExtMin == nil {
+			break
+		}
+
+		return e.complexity.NodeFragmentAggregateResult.RoleExtMin(childComplexity), true
 
 	case "NodeFragmentAggregateResult.second_linkMax":
 		if e.complexity.NodeFragmentAggregateResult.SecondLinkMax == nil {
@@ -6981,6 +7005,7 @@ type NodeFragment {
   type_: NodeType
   first_link: String
   second_link: String
+  role_ext: String
   role_type: RoleType
   color: String
 
@@ -7338,35 +7363,35 @@ enum UserType {
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7487,6 +7512,7 @@ input AddNodeFragmentInput {
   type_: NodeType
   first_link: String
   second_link: String
+  role_ext: String
   role_type: RoleType
   color: String
 }
@@ -8549,6 +8575,8 @@ type NodeFragmentAggregateResult {
   first_linkMax: String
   second_linkMin: String
   second_linkMax: String
+  role_extMin: String
+  role_extMax: String
   colorMin: String
   colorMax: String
 }
@@ -8573,6 +8601,7 @@ enum NodeFragmentHasFilter {
   type_
   first_link
   second_link
+  role_ext
   role_type
   color
 }
@@ -8589,6 +8618,7 @@ enum NodeFragmentOrderable {
   about
   first_link
   second_link
+  role_ext
   color
 }
 
@@ -8604,6 +8634,7 @@ input NodeFragmentPatch {
   type_: NodeType @x_patch_ro
   first_link: String @x_patch_ro
   second_link: String @x_patch_ro
+  role_ext: String @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
 }
@@ -8621,6 +8652,7 @@ input NodeFragmentRef {
   type_: NodeType
   first_link: String
   second_link: String
+  role_ext: String
   role_type: RoleType
   color: String
 }
@@ -28887,6 +28919,35 @@ func (ec *executionContext) _NodeFragment_second_link(ctx context.Context, field
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _NodeFragment_role_ext(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NodeFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoleExt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NodeFragment_role_type(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -29290,6 +29351,64 @@ func (ec *executionContext) _NodeFragmentAggregateResult_second_linkMax(ctx cont
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SecondLinkMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragmentAggregateResult_role_extMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragmentAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NodeFragmentAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoleExtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NodeFragmentAggregateResult_role_extMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragmentAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NodeFragmentAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoleExtMax, nil
 	})
 
 	if resTmp == nil {
@@ -40095,6 +40214,14 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
+		case "role_ext":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
+			it.RoleExt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "role_type":
 			var err error
 
@@ -45604,6 +45731,30 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "role_ext":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.RoleExt = data
+			} else if tmp == nil {
+				it.RoleExt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "role_type":
 			var err error
 
@@ -45762,6 +45913,14 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
 			it.SecondLink, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role_ext":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
+			it.RoleExt, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -54086,6 +54245,8 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._NodeFragment_first_link(ctx, field, obj)
 		case "second_link":
 			out.Values[i] = ec._NodeFragment_second_link(ctx, field, obj)
+		case "role_ext":
+			out.Values[i] = ec._NodeFragment_role_ext(ctx, field, obj)
 		case "role_type":
 			out.Values[i] = ec._NodeFragment_role_type(ctx, field, obj)
 		case "color":
@@ -54136,6 +54297,10 @@ func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, se
 			out.Values[i] = ec._NodeFragmentAggregateResult_second_linkMin(ctx, field, obj)
 		case "second_linkMax":
 			out.Values[i] = ec._NodeFragmentAggregateResult_second_linkMax(ctx, field, obj)
+		case "role_extMin":
+			out.Values[i] = ec._NodeFragmentAggregateResult_role_extMin(ctx, field, obj)
+		case "role_extMax":
+			out.Values[i] = ec._NodeFragmentAggregateResult_role_extMax(ctx, field, obj)
 		case "colorMin":
 			out.Values[i] = ec._NodeFragmentAggregateResult_colorMin(ctx, field, obj)
 		case "colorMax":

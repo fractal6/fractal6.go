@@ -131,6 +131,7 @@ type AddNodeFragmentInput struct {
 	Type       *NodeType          `json:"type_,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
+	RoleExt    *string            `json:"role_ext,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
 	Color      *string            `json:"color,omitempty"`
 }
@@ -1105,6 +1106,7 @@ type NodeFragment struct {
 	Type              *NodeType                    `json:"type_,omitempty"`
 	FirstLink         *string                      `json:"first_link,omitempty"`
 	SecondLink        *string                      `json:"second_link,omitempty"`
+	RoleExt           *string                      `json:"role_ext,omitempty"`
 	RoleType          *RoleType                    `json:"role_type,omitempty"`
 	Color             *string                      `json:"color,omitempty"`
 	ChildrenAggregate *NodeFragmentAggregateResult `json:"childrenAggregate,omitempty"`
@@ -1122,6 +1124,8 @@ type NodeFragmentAggregateResult struct {
 	FirstLinkMax  *string `json:"first_linkMax,omitempty"`
 	SecondLinkMin *string `json:"second_linkMin,omitempty"`
 	SecondLinkMax *string `json:"second_linkMax,omitempty"`
+	RoleExtMin    *string `json:"role_extMin,omitempty"`
+	RoleExtMax    *string `json:"role_extMax,omitempty"`
 	ColorMin      *string `json:"colorMin,omitempty"`
 	ColorMax      *string `json:"colorMax,omitempty"`
 }
@@ -1152,6 +1156,7 @@ type NodeFragmentPatch struct {
 	Type       *NodeType          `json:"type_,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
+	RoleExt    *string            `json:"role_ext,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
 	Color      *string            `json:"color,omitempty"`
 }
@@ -1169,6 +1174,7 @@ type NodeFragmentRef struct {
 	Type       *NodeType          `json:"type_,omitempty"`
 	FirstLink  *string            `json:"first_link,omitempty"`
 	SecondLink *string            `json:"second_link,omitempty"`
+	RoleExt    *string            `json:"role_ext,omitempty"`
 	RoleType   *RoleType          `json:"role_type,omitempty"`
 	Color      *string            `json:"color,omitempty"`
 }
@@ -3167,6 +3173,7 @@ const (
 	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
 	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
 	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
+	NodeFragmentHasFilterRoleExt    NodeFragmentHasFilter = "role_ext"
 	NodeFragmentHasFilterRoleType   NodeFragmentHasFilter = "role_type"
 	NodeFragmentHasFilterColor      NodeFragmentHasFilter = "color"
 )
@@ -3183,13 +3190,14 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 	NodeFragmentHasFilterType,
 	NodeFragmentHasFilterFirstLink,
 	NodeFragmentHasFilterSecondLink,
+	NodeFragmentHasFilterRoleExt,
 	NodeFragmentHasFilterRoleType,
 	NodeFragmentHasFilterColor,
 }
 
 func (e NodeFragmentHasFilter) IsValid() bool {
 	switch e {
-	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterChildren, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
+	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterChildren, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleExt, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
 		return true
 	}
 	return false
@@ -3224,6 +3232,7 @@ const (
 	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
 	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
 	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
+	NodeFragmentOrderableRoleExt    NodeFragmentOrderable = "role_ext"
 	NodeFragmentOrderableColor      NodeFragmentOrderable = "color"
 )
 
@@ -3233,12 +3242,13 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
 	NodeFragmentOrderableSecondLink,
+	NodeFragmentOrderableRoleExt,
 	NodeFragmentOrderableColor,
 }
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableColor:
+	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableRoleExt, NodeFragmentOrderableColor:
 		return true
 	}
 	return false
