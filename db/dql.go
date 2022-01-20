@@ -46,19 +46,12 @@ var tensionBlobHookPayload string = `
         expand(_all_)
       }
 
-      NodeFragment.first_link
-      NodeFragment.second_link
       NodeFragment.skills
       NodeFragment.role_type
       NodeFragment.role_ext
       NodeFragment.color
       NodeFragment.visibility
       NodeFragment.mode
-
-      NodeFragment.children {
-        NodeFragment.first_link
-        NodeFragment.role_type
-      }
     }
 
   }

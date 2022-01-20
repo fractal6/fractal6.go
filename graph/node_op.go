@@ -235,20 +235,22 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
         nodeInput.Source = &model.BlobRef{ ID: bid }
     }
     var children []model.NodeFragment
-    switch *node.Type {
-    case model.NodeTypeRole:
-        if node.FirstLink != nil {
-            nodeInput.FirstLink = &model.UserRef{Username: node.FirstLink}
-        }
-    case model.NodeTypeCircle:
-        nodeInput.Children = nil
-        for i, c := range(node.Children) {
-            if c.FirstLink != nil {
-                child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node)
-                children = append(children, child)
-            }
-        }
-    }
+
+    // @DEBUG: for the moment, first_link and children are linked separetly, see contracts....
+    //switch *node.Type {
+    //case model.NodeTypeRole:
+    //    if node.FirstLink != nil {
+    //        nodeInput.FirstLink = &model.UserRef{Username: node.FirstLink}
+    //    }
+    //case model.NodeTypeCircle:
+    //    nodeInput.Children = nil
+    //    for i, c := range(node.Children) {
+    //        if c.FirstLink != nil {
+    //            child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node)
+    //            children = append(children, child)
+    //        }
+    //    }
+    //}
 
     // Push the nodes into the database
     _, err := db.GetDB().Add(db.DB.GetRootUctx(), "node", nodeInput)
