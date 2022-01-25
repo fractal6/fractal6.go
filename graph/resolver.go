@@ -12,6 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 
 	gen "zerogov/fractal6.go/graph/generated"
+    webauth "zerogov/fractal6.go/web/auth"
 	"zerogov/fractal6.go/graph/model"
 	. "zerogov/fractal6.go/tools"
 	"zerogov/fractal6.go/db"
@@ -48,7 +49,7 @@ func Init() gen.Config {
     //
 
     // Auth directive
-    // : add fiels are allowed by default
+    // - add fields are allowed by default
     c.Directives.X_set = FieldAuthorization
     c.Directives.X_remove = FieldAuthorization
     c.Directives.X_patch = FieldAuthorization
@@ -62,6 +63,7 @@ func Init() gen.Config {
     c.Directives.W_remove = FieldTransform
     c.Directives.W_patch = FieldTransform
     c.Directives.W_alter = FieldTransform
+    c.Directives.W_meta_patch = meta_patch
 
     //
     // Hook
@@ -71,11 +73,11 @@ func Init() gen.Config {
     c.Directives.Hook_getUserInput = nothing
     c.Directives.Hook_queryUserInput = nothing
     c.Directives.Hook_addUserInput = nothing
-    c.Directives.Hook_updateUserInput = nothing
+    c.Directives.Hook_updateUserInput = setContextWithID // used by meta_patch
     c.Directives.Hook_deleteUserInput = nothing
     // --
     c.Directives.Hook_addUser = nothing
-    c.Directives.Hook_updateUser = updateUserHook
+    c.Directives.Hook_updateUser = nothing
     c.Directives.Hook_deleteUser = nothing
     //RoleExt
     c.Directives.Hook_getRoleExtInput = nothing
@@ -165,39 +167,66 @@ func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interf
     return nil, fmt.Errorf("`%s' field is hidden", fieldName)
 }
 
-func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k string) (interface{}, error) {
+func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
     data, err:= next(ctx)
     if err != nil { return nil, err }
 
-    // @debug: obj cast Doesnt work here why ?!
-    //v := obj.(model.JsonAtom)[k]
-    // Using reflexion
-    v := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(k)).String()
-    if v == "" {
-        rc := graphql.GetResolverContext(ctx)
-        fieldName := rc.Field.Name
-        err := fmt.Errorf("`%s' field is needed to query `%s'", k, fieldName)
-        return nil, err
+    var ok bool
+    var v string
+    if k != nil { // On Queries
+        if v, ok = ctx.Value(*k).(string); !ok {
+            v = reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k)).String()
+        }
+        if v == "" {
+            rc := graphql.GetResolverContext(ctx)
+            fieldName := rc.Field.Name
+            err := fmt.Errorf("`%s' field is needed to query `%s'", *k, fieldName)
+            return nil, err
+        }
+    } else {
+        // get uid ?
+        panic("not implemented")
     }
-    res := db.GetDB().Meta(k, v, f)
+
+    res := db.GetDB().Meta(f, v, k)
     if err != nil { return nil, err }
     err = Map2Struct(res, &data)
     return data, err
+}
 
-    // Rewrite graph result with reflection
-    //n_guest := stats["n_guest"]
-    //n_member := stats["n_member"]
-    //stats_ := model.NodeStats{
-    //    NGuest: &n_guest,
-    //    NMember: &n_member,
-    //}
-    //reflect.ValueOf(obj).Elem().FieldByName("Stats").Set(reflect.ValueOf(&stats_))
-    //
-    //for k, v := range stats {
-    //    goFieldfDef := ToGoNameFormat(k)
-    //    reflect.ValueOf(obj).Elem().FieldByName(goFieldfDef).Set(reflect.ValueOf(&stats))
-    //}
-    //return next(ctx)
+func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
+    uctx := webauth.GetUserContextOrEmpty(ctx)
+    // @FIX this hack ! Redis push ?
+    var ok bool
+    var v string
+    // Set function
+    key := uctx.Username + "meta_patch_f"
+    _, err := cache.Do("SETEX", key, "5", f)
+    if err != nil { return nil, err }
+    // Set attribute name
+    if k != nil {
+        if v, ok = ctx.Value(*k).(string); !ok {
+            v = reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k)).String()
+        }
+        if v == "" {
+            rc := graphql.GetResolverContext(ctx)
+            fieldName := rc.Field.Name
+            err := fmt.Errorf("`%s' field is needed to query `%s'", *k, fieldName)
+            return nil, err
+        }
+
+        key = uctx.Username + "meta_patch_k"
+        _, err = cache.Do("SETEX", key, "5", *k)
+        if err != nil { return nil, err }
+    } else {
+        // get uid ?
+        panic("not implemented")
+    }
+    // Set attribute value
+    key = uctx.Username + "meta_patch_v"
+    _, err = cache.Do("SETEX", key, "5", v)
+    if err != nil { return nil, err }
+    return next(ctx)
 }
 
 //
@@ -205,8 +234,11 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 //
 
 func setContextWithID(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, _, err := setContextWith(ctx, obj, "id")
-    if err != nil { return nil, err }
+    var err error
+    for _, n := range []string{"id", "nameid", "rootnameid", "username"} {
+        ctx, _, err = setContextWith(ctx, obj, n)
+        if err != nil { return nil, err }
+    }
     return next(ctx)
 }
 
@@ -225,7 +257,6 @@ func setUpdateContextInfo(ctx context.Context, obj interface{}, next graphql.Res
     if err != nil { return nil, err }
     return next(ctx)
 }
-
 
 //
 // Input Field directives

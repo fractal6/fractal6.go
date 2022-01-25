@@ -73,6 +73,11 @@ var contractHookPayload string = `{
   Contract.participants { Vote.data Vote.node { Node.nameid Node.first_link {User.username} } }
 }`
 
+type QueryMut struct {
+    Q string
+    M string
+}
+
 // GPRC/DQL Request Template
 var dqlQueries map[string]string = map[string]string{
     // Count objects
@@ -405,7 +410,7 @@ var dqlQueries map[string]string = map[string]string{
             count: count(uid)
         }
     }`,
-    // Mutations
+    // Deletion
     "deleteTension": `{
         id as var(func: uid({{.id}})) {
           rid_emitter as Tension.emitter
@@ -435,6 +440,20 @@ var dqlQueries map[string]string = map[string]string{
             all_ids as uid
         }
     }`,
+}
+
+var dqlMutations map[string]QueryMut = map[string]QueryMut{
+    "markAllAsRead": QueryMut{
+        Q: `query {
+            var(func: eq(User.username, "{{.username}}")) {
+                uids as User.events @filter(eq(UserEvent.isRead, "false")) @cascade {
+                    UserEvent.event @filter(type(Event))
+                }
+            }
+        }
+        `,
+        M: `uid(uids) <UserEvent.isRead> "true" .`,
+    },
 }
 
 //
@@ -496,12 +515,28 @@ func (dg Dgraph) Count2(f1, v1, f2, v2, fieldName string) int {
     return values[0]
 }
 
-func (dg Dgraph) Meta(k, v, f string) map[string]interface{} {
-    // Format Query
-    maps := map[string]string{k: v}
-    // Send request
-    res, err := dg.QueryDql(f, maps)
-    if err != nil { panic(err) }
+func (dg Dgraph) Meta(f, v string, k *string) map[string]interface{} {
+    var res *api.Response
+    var err error
+    var maps  map[string]string
+    if k != nil {
+        maps = map[string]string{*k: v}
+    } else {
+        maps = map[string]string{"id": v}
+    }
+
+    if _, ok := dqlQueries[f]; ok { // Query Case
+        // Send request
+        res, err = dg.QueryDql(f, maps)
+        if err != nil { panic(err) }
+    } else { // Mutation Case
+        // Send request
+        //err := dg.MutateWithQueryDql(query, mutation)
+        // @codefactor: unify api...
+        res, err = dg.MutateWithQueryDql2(f, maps)
+        if err != nil { panic(err) }
+        return nil
+    }
 
     // Decode response
     var r DqlResp
@@ -510,7 +545,7 @@ func (dg Dgraph) Meta(k, v, f string) map[string]interface{} {
 
     // Extract result
     if len(r.All) == 0 {
-        panic("no result for: "+ k)
+        panic("no result for: "+ f)
     }
     agg := make(map[string]interface{}, len(r.All))
     for _, s := range r.All {
@@ -1614,7 +1649,6 @@ func (dg Dgraph) RewriteContractId(cid string) error {
     err := dg.MutateWithQueryDql(query, mutation)
     return err
 }
-
 
 // Deletions
 

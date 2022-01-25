@@ -277,6 +277,7 @@ type AddUserInput struct {
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
+	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -1902,6 +1903,7 @@ type User struct {
 	TensionsAssigned          []*Tension                `json:"tensions_assigned,omitempty"`
 	Contracts                 []*Contract               `json:"contracts,omitempty"`
 	Events                    []*UserEvent              `json:"events,omitempty"`
+	MarkAllAsRead             *string                   `json:"markAllAsRead,omitempty"`
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
 	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
@@ -1912,25 +1914,27 @@ type User struct {
 }
 
 type UserAggregateResult struct {
-	Count        *int    `json:"count"`
-	CreatedAtMin *string `json:"createdAtMin,omitempty"`
-	CreatedAtMax *string `json:"createdAtMax,omitempty"`
-	LastAckMin   *string `json:"lastAckMin,omitempty"`
-	LastAckMax   *string `json:"lastAckMax,omitempty"`
-	UsernameMin  *string `json:"usernameMin,omitempty"`
-	UsernameMax  *string `json:"usernameMax,omitempty"`
-	NameMin      *string `json:"nameMin,omitempty"`
-	NameMax      *string `json:"nameMax,omitempty"`
-	PasswordMin  *string `json:"passwordMin,omitempty"`
-	PasswordMax  *string `json:"passwordMax,omitempty"`
-	EmailMin     *string `json:"emailMin,omitempty"`
-	EmailMax     *string `json:"emailMax,omitempty"`
-	EmailHashMin *string `json:"emailHashMin,omitempty"`
-	EmailHashMax *string `json:"emailHashMax,omitempty"`
-	BioMin       *string `json:"bioMin,omitempty"`
-	BioMax       *string `json:"bioMax,omitempty"`
-	UtcMin       *string `json:"utcMin,omitempty"`
-	UtcMax       *string `json:"utcMax,omitempty"`
+	Count            *int    `json:"count"`
+	CreatedAtMin     *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax     *string `json:"createdAtMax,omitempty"`
+	LastAckMin       *string `json:"lastAckMin,omitempty"`
+	LastAckMax       *string `json:"lastAckMax,omitempty"`
+	UsernameMin      *string `json:"usernameMin,omitempty"`
+	UsernameMax      *string `json:"usernameMax,omitempty"`
+	NameMin          *string `json:"nameMin,omitempty"`
+	NameMax          *string `json:"nameMax,omitempty"`
+	PasswordMin      *string `json:"passwordMin,omitempty"`
+	PasswordMax      *string `json:"passwordMax,omitempty"`
+	EmailMin         *string `json:"emailMin,omitempty"`
+	EmailMax         *string `json:"emailMax,omitempty"`
+	EmailHashMin     *string `json:"emailHashMin,omitempty"`
+	EmailHashMax     *string `json:"emailHashMax,omitempty"`
+	BioMin           *string `json:"bioMin,omitempty"`
+	BioMax           *string `json:"bioMax,omitempty"`
+	UtcMin           *string `json:"utcMin,omitempty"`
+	UtcMax           *string `json:"utcMax,omitempty"`
+	MarkAllAsReadMin *string `json:"markAllAsReadMin,omitempty"`
+	MarkAllAsReadMax *string `json:"markAllAsReadMax,omitempty"`
 }
 
 type UserEvent struct {
@@ -2015,6 +2019,7 @@ type UserPatch struct {
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
+	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 }
 
 type UserRef struct {
@@ -2038,6 +2043,7 @@ type UserRef struct {
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
+	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 }
 
 type UserRights struct {
@@ -4411,6 +4417,7 @@ const (
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
 	UserHasFilterEvents           UserHasFilter = "events"
+	UserHasFilterMarkAllAsRead    UserHasFilter = "markAllAsRead"
 )
 
 var AllUserHasFilter = []UserHasFilter{
@@ -4433,11 +4440,12 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
 	UserHasFilterEvents,
+	UserHasFilterMarkAllAsRead,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
 		return true
 	}
 	return false
@@ -4467,15 +4475,16 @@ func (e UserHasFilter) MarshalGQL(w io.Writer) {
 type UserOrderable string
 
 const (
-	UserOrderableCreatedAt UserOrderable = "createdAt"
-	UserOrderableLastAck   UserOrderable = "lastAck"
-	UserOrderableUsername  UserOrderable = "username"
-	UserOrderableName      UserOrderable = "name"
-	UserOrderablePassword  UserOrderable = "password"
-	UserOrderableEmail     UserOrderable = "email"
-	UserOrderableEmailHash UserOrderable = "emailHash"
-	UserOrderableBio       UserOrderable = "bio"
-	UserOrderableUtc       UserOrderable = "utc"
+	UserOrderableCreatedAt     UserOrderable = "createdAt"
+	UserOrderableLastAck       UserOrderable = "lastAck"
+	UserOrderableUsername      UserOrderable = "username"
+	UserOrderableName          UserOrderable = "name"
+	UserOrderablePassword      UserOrderable = "password"
+	UserOrderableEmail         UserOrderable = "email"
+	UserOrderableEmailHash     UserOrderable = "emailHash"
+	UserOrderableBio           UserOrderable = "bio"
+	UserOrderableUtc           UserOrderable = "utc"
+	UserOrderableMarkAllAsRead UserOrderable = "markAllAsRead"
 )
 
 var AllUserOrderable = []UserOrderable{
@@ -4488,11 +4497,12 @@ var AllUserOrderable = []UserOrderable{
 	UserOrderableEmailHash,
 	UserOrderableBio,
 	UserOrderableUtc,
+	UserOrderableMarkAllAsRead,
 }
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableEmailHash, UserOrderableBio, UserOrderableUtc:
+	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableEmailHash, UserOrderableBio, UserOrderableUtc, UserOrderableMarkAllAsRead:
 		return true
 	}
 	return false

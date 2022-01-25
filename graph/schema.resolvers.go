@@ -215,7 +215,8 @@ func (r *mutationResolver) AddUserEvent(ctx context.Context, input []*model.AddU
 }
 
 func (r *mutationResolver) UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (data *model.UpdateUserEventPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 func (r *mutationResolver) DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (data *model.DeleteUserEventPayload, errors error) {

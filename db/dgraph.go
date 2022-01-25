@@ -143,9 +143,12 @@ func initDB() *Dgraph {
         dqlT[op] = &QueryString{Q:q}
         dqlT[op].Init()
     }
+    for op, q := range(dqlMutations) {
+        dqlT[op] = &QueryString{Q:q.Q}
+        dqlT[op].Init()
+    }
     for op, q := range(gqlQueries) {
         gqlT[op] = &QueryString{Q:q}
-
         gqlT[op].Init()
     }
 
@@ -321,6 +324,33 @@ func (dg Dgraph) MutateWithQueryDql(query string, mu *api.Mutation) (error) {
 
     _, err := txn.Do(ctx, req)
     return err
+}
+
+//MutateWithQueryDql2 runs an upsert block mutation by first querying query
+//and then mutate based on the result.
+func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Response, error) {
+    // init client
+    dgc, cancel := dg.getDgraphClient()
+    defer cancel()
+    ctx := context.Background()
+    txn := dgc.NewTxn()
+    defer txn.Discard(ctx)
+
+    query := dg.getDqlQuery(op, maps)
+    muSet := dqlMutations[op].M
+
+    req := &api.Request{
+        Query: query,
+        Mutations: []*api.Mutation{
+            &api.Mutation{
+                SetNquads: []byte(muSet),
+            },
+        },
+        CommitNow: true,
+    }
+
+    res, err := txn.Do(ctx, req)
+    return res, err
 }
 
 //MutateUpsertDql adds a new object in the database if it doesn't exist

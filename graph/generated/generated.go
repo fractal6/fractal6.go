@@ -109,13 +109,14 @@ type DirectiveRoot struct {
 	IsContractValidator      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Lambda                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	LambdaOnMutate           func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
-	Meta                     func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k string) (res interface{}, err error)
+	Meta                     func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
 	Remote                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	RemoteResponse           func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
 	Search                   func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
 	Secret                   func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
 	W_add                    func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
 	W_alter                  func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_meta_patch             func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
 	W_patch                  func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
 	W_remove                 func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
 	W_set                    func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
@@ -952,6 +953,7 @@ type ComplexityRoot struct {
 		EventsAggregate           func(childComplexity int, filter *model.UserEventFilter) int
 		ID                        func(childComplexity int) int
 		LastAck                   func(childComplexity int) int
+		MarkAllAsRead             func(childComplexity int) int
 		Name                      func(childComplexity int) int
 		NotifyByEmail             func(childComplexity int) int
 		Password                  func(childComplexity int) int
@@ -969,25 +971,27 @@ type ComplexityRoot struct {
 	}
 
 	UserAggregateResult struct {
-		BioMax       func(childComplexity int) int
-		BioMin       func(childComplexity int) int
-		Count        func(childComplexity int) int
-		CreatedAtMax func(childComplexity int) int
-		CreatedAtMin func(childComplexity int) int
-		EmailHashMax func(childComplexity int) int
-		EmailHashMin func(childComplexity int) int
-		EmailMax     func(childComplexity int) int
-		EmailMin     func(childComplexity int) int
-		LastAckMax   func(childComplexity int) int
-		LastAckMin   func(childComplexity int) int
-		NameMax      func(childComplexity int) int
-		NameMin      func(childComplexity int) int
-		PasswordMax  func(childComplexity int) int
-		PasswordMin  func(childComplexity int) int
-		UsernameMax  func(childComplexity int) int
-		UsernameMin  func(childComplexity int) int
-		UtcMax       func(childComplexity int) int
-		UtcMin       func(childComplexity int) int
+		BioMax           func(childComplexity int) int
+		BioMin           func(childComplexity int) int
+		Count            func(childComplexity int) int
+		CreatedAtMax     func(childComplexity int) int
+		CreatedAtMin     func(childComplexity int) int
+		EmailHashMax     func(childComplexity int) int
+		EmailHashMin     func(childComplexity int) int
+		EmailMax         func(childComplexity int) int
+		EmailMin         func(childComplexity int) int
+		LastAckMax       func(childComplexity int) int
+		LastAckMin       func(childComplexity int) int
+		MarkAllAsReadMax func(childComplexity int) int
+		MarkAllAsReadMin func(childComplexity int) int
+		NameMax          func(childComplexity int) int
+		NameMin          func(childComplexity int) int
+		PasswordMax      func(childComplexity int) int
+		PasswordMin      func(childComplexity int) int
+		UsernameMax      func(childComplexity int) int
+		UsernameMin      func(childComplexity int) int
+		UtcMax           func(childComplexity int) int
+		UtcMin           func(childComplexity int) int
 	}
 
 	UserEvent struct {
@@ -6249,6 +6253,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.LastAck(childComplexity), true
 
+	case "User.markAllAsRead":
+		if e.complexity.User.MarkAllAsRead == nil {
+			break
+		}
+
+		return e.complexity.User.MarkAllAsRead(childComplexity), true
+
 	case "User.name":
 		if e.complexity.User.Name == nil {
 			break
@@ -6468,6 +6479,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserAggregateResult.LastAckMin(childComplexity), true
+
+	case "UserAggregateResult.markAllAsReadMax":
+		if e.complexity.UserAggregateResult.MarkAllAsReadMax == nil {
+			break
+		}
+
+		return e.complexity.UserAggregateResult.MarkAllAsReadMax(childComplexity), true
+
+	case "UserAggregateResult.markAllAsReadMin":
+		if e.complexity.UserAggregateResult.MarkAllAsReadMin == nil {
+			break
+		}
+
+		return e.complexity.UserAggregateResult.MarkAllAsReadMin(childComplexity), true
 
 	case "UserAggregateResult.nameMax":
 		if e.complexity.UserAggregateResult.NameMax == nil {
@@ -6922,7 +6947,7 @@ directive @hook_queryUserInput on ARGUMENT_DEFINITION
 
 directive @hidden on FIELD_DEFINITION
 
-directive @meta(f: String!, k: String!) on FIELD_DEFINITION
+directive @meta(f: String!, k: String) on FIELD_DEFINITION
 
 directive @isContractValidator on FIELD_DEFINITION
 
@@ -6935,6 +6960,8 @@ directive @w_remove(a: String!) on INPUT_FIELD_DEFINITION
 directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
 
 directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_meta_patch(f: String!, k: String) on INPUT_FIELD_DEFINITION
 
 directive @x_set(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
@@ -7195,6 +7222,7 @@ type User {
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
+  markAllAsRead: String
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -7361,37 +7389,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7658,6 +7686,7 @@ input AddUserInput {
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
   events: [UserEventRef!]
+  markAllAsRead: String
 }
 
 type AddUserPayload {
@@ -9499,6 +9528,8 @@ type UserAggregateResult {
   bioMax: String
   utcMin: String
   utcMax: String
+  markAllAsReadMin: String
+  markAllAsReadMax: String
 }
 
 type UserEventAggregateResult {
@@ -9536,7 +9567,7 @@ enum UserEventOrderable {
 
 input UserEventPatch {
   createdAt: DateTime @x_patch_ro
-  isRead: Boolean @x_patch_ro
+  isRead: Boolean @x_alter
   user: UserRef @x_patch_ro
   event: [EventKindRef!] @x_patch_ro
 }
@@ -9580,6 +9611,7 @@ enum UserHasFilter {
   tensions_assigned
   contracts
   events
+  markAllAsRead
 }
 
 input UserOrder {
@@ -9598,6 +9630,7 @@ enum UserOrderable {
   emailHash
   bio
   utc
+  markAllAsRead
 }
 
 input UserPatch {
@@ -9619,7 +9652,8 @@ input UserPatch {
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
-  events: [UserEventRef!] @x_patch_ro
+  events: [UserEventRef!] @x_alter
+  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
 }
 
 input UserRef {
@@ -9643,6 +9677,7 @@ input UserRef {
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
   events: [UserEventRef!]
+  markAllAsRead: String
 }
 
 type UserRightsAggregateResult {
@@ -10033,10 +10068,10 @@ func (ec *executionContext) dir_meta_args(ctx context.Context, rawArgs map[strin
 		}
 	}
 	args["f"] = arg0
-	var arg1 string
+	var arg1 *string
 	if tmp, ok := rawArgs["k"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("k"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -10126,6 +10161,30 @@ func (ec *executionContext) dir_w_alter_args(ctx context.Context, rawArgs map[st
 		}
 	}
 	args["a"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) dir_w_meta_patch_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["f"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("f"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["f"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["k"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("k"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["k"] = arg1
 	return args, nil
 }
 
@@ -27720,7 +27779,7 @@ func (ec *executionContext) _Node_orga_agg(ctx context.Context, field graphql.Co
 			if err != nil {
 				return nil, err
 			}
-			k, err := ec.unmarshalNString2string(ctx, "nameid")
+			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
 			if err != nil {
 				return nil, err
 			}
@@ -36405,6 +36464,35 @@ func (ec *executionContext) _User_events(ctx context.Context, field graphql.Coll
 	return ec.marshalOUserEvent2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_markAllAsRead(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MarkAllAsRead, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_subscriptionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -37198,6 +37286,64 @@ func (ec *executionContext) _UserAggregateResult_utcMax(ctx context.Context, fie
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.UtcMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserAggregateResult_markAllAsReadMin(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MarkAllAsReadMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserAggregateResult_markAllAsReadMax(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MarkAllAsReadMax, nil
 	})
 
 	if resTmp == nil {
@@ -41286,6 +41432,14 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
 			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "markAllAsRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
+			it.MarkAllAsRead, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -50614,10 +50768,10 @@ func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, ob
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -51326,10 +51480,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return ec.unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -51342,6 +51496,44 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				it.Events = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*zerogov/fractal6.go/graph/model.UserEventRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "markAllAsRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				f, err := ec.unmarshalNString2string(ctx, "markAllAsRead")
+				if err != nil {
+					return nil, err
+				}
+				k, err := ec.unmarshalOString2ᚖstring(ctx, "username")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_meta_patch == nil {
+					return nil, errors.New("directive w_meta_patch is not implemented")
+				}
+				return ec.directives.W_meta_patch(ctx, obj, directive0, f, k)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.MarkAllAsRead = data
+			} else if tmp == nil {
+				it.MarkAllAsRead = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		}
@@ -51516,6 +51708,14 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
 			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "markAllAsRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
+			it.MarkAllAsRead, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -55990,6 +56190,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_contracts(ctx, field, obj)
 		case "events":
 			out.Values[i] = ec._User_events(ctx, field, obj)
+		case "markAllAsRead":
+			out.Values[i] = ec._User_markAllAsRead(ctx, field, obj)
 		case "subscriptionsAggregate":
 			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
 		case "rolesAggregate":
@@ -56064,6 +56266,10 @@ func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._UserAggregateResult_utcMin(ctx, field, obj)
 		case "utcMax":
 			out.Values[i] = ec._UserAggregateResult_utcMax(ctx, field, obj)
+		case "markAllAsReadMin":
+			out.Values[i] = ec._UserAggregateResult_markAllAsReadMin(ctx, field, obj)
+		case "markAllAsReadMax":
+			out.Values[i] = ec._UserAggregateResult_markAllAsReadMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

@@ -1,16 +1,24 @@
 package graph
 
 import (
-    //"fmt"
-    "regexp"
+    "fmt"
 	"context"
+    "regexp"
+    "strings"
 	"encoding/json"
 	"github.com/99designs/gqlgen/graphql"
 
 	"zerogov/fractal6.go/db"
 	"zerogov/fractal6.go/tools"
+	"zerogov/fractal6.go/web/sessions"
     webauth "zerogov/fractal6.go/web/auth"
 )
+
+var cache sessions.Session
+
+func init() {
+    cache = sessions.GetCache()
+}
 
 
 func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
@@ -39,10 +47,14 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     rc := graphql.GetResolverContext(ctx)
     // rc.Field.Name
     queryName := rc.Path().String()
-
-    // Build the graphql raw request
     gc := graphql.GetRequestContext(ctx)
     variables, _ := json.Marshal(gc.Variables)
+
+    // Return error if jwt token error (particurly when has expired)
+    if strings.HasPrefix(queryName, "update") || strings.HasPrefix(queryName, "delete") {
+        _, err := webauth.GetUserContext(ctx)
+        if err != nil { return tools.LogErr("Access denied", err) }
+    }
 
     // Remove some input
     rawQuery := gc.RawQuery
@@ -80,7 +92,18 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
             return err
         }
         return nil
+    } else if err != nil || data == nil {
+        return err
     }
+
+    // Post processing (@meta_patch)
+    if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
+        k, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_k")
+        v, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_v")
+        kk := fmt.Sprintf("%s", k)
+        db.Meta(fmt.Sprintf("%s", f), fmt.Sprintf("%s", v), &kk)
+    }
+
     return err
 }
 

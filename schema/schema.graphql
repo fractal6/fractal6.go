@@ -59,7 +59,7 @@ directive @hook_queryUserInput on ARGUMENT_DEFINITION
 
 directive @hidden on FIELD_DEFINITION
 
-directive @meta(f: String!, k: String!) on FIELD_DEFINITION
+directive @meta(f: String!, k: String) on FIELD_DEFINITION
 
 directive @isContractValidator on FIELD_DEFINITION
 
@@ -72,6 +72,8 @@ directive @w_remove(a: String!) on INPUT_FIELD_DEFINITION
 directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
 
 directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_meta_patch(f: String!, k: String) on INPUT_FIELD_DEFINITION
 
 directive @x_set(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
@@ -332,6 +334,7 @@ type User {
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
+  markAllAsRead: String
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -498,37 +501,37 @@ enum UserType {
 
 # Dgraph.Authorization {"VerificationKey":"checkJwkToken_or_pubkey","Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"HS256"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -795,6 +798,7 @@ input AddUserInput {
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
   events: [UserEventRef!]
+  markAllAsRead: String
 }
 
 type AddUserPayload {
@@ -2636,6 +2640,8 @@ type UserAggregateResult {
   bioMax: String
   utcMin: String
   utcMax: String
+  markAllAsReadMin: String
+  markAllAsReadMax: String
 }
 
 type UserEventAggregateResult {
@@ -2673,7 +2679,7 @@ enum UserEventOrderable {
 
 input UserEventPatch {
   createdAt: DateTime @x_patch_ro
-  isRead: Boolean @x_patch_ro
+  isRead: Boolean @x_alter
   user: UserRef @x_patch_ro
   event: [EventKindRef!] @x_patch_ro
 }
@@ -2717,6 +2723,7 @@ enum UserHasFilter {
   tensions_assigned
   contracts
   events
+  markAllAsRead
 }
 
 input UserOrder {
@@ -2735,6 +2742,7 @@ enum UserOrderable {
   emailHash
   bio
   utc
+  markAllAsRead
 }
 
 input UserPatch {
@@ -2756,7 +2764,8 @@ input UserPatch {
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
-  events: [UserEventRef!] @x_patch_ro
+  events: [UserEventRef!] @x_alter
+  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
 }
 
 input UserRef {
@@ -2780,6 +2789,7 @@ input UserRef {
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
   events: [UserEventRef!]
+  markAllAsRead: String
 }
 
 type UserRightsAggregateResult {

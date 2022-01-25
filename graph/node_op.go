@@ -100,21 +100,19 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-    DB := db.GetDB()
-
     switch *node.Type {
     case model.NodeTypeRole:
         if !model.RoleType(value).IsValid() { return false, fmt.Errorf("Bad value for role_type.") }
-        err = DB.SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
+        err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
         if err != nil { return false, err }
-        err = DB.SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
+        err = db.DB.SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
         if err != nil { return false, err }
-        err = DB.SetFieldById(node.ID, "NodeFragment.role_type", value)
+        err = db.DB.SetFieldById(node.ID, "NodeFragment.role_type", value)
     case model.NodeTypeCircle:
         if !model.NodeMode(value).IsValid() { return false, fmt.Errorf("Bad value for mode.") }
-        err = DB.SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
+        err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
         if err != nil { return false, err }
-        err = DB.SetFieldById(node.ID, "NodeFragment.mode", value)
+        err = db.DB.SetFieldById(node.ID, "NodeFragment.mode", value)
     }
 
     return ok, err
@@ -130,18 +128,16 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-    DB := db.GetDB()
-
     if !model.NodeVisibility(value).IsValid() { return false, fmt.Errorf("Bad value for visibility.") }
     // Update Node
-    err = DB.SetFieldByEq("Node.nameid", nameid, "Node.visibility", value)
+    err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.visibility", value)
     if err != nil { return false, err }
     // Update NodeFragmet
-    err = DB.SetFieldById(node.ID, "NodeFragment.visibility", value)
+    err = db.DB.SetFieldById(node.ID, "NodeFragment.visibility", value)
     if err != nil { return false, err }
 
     // Change all role direct children
-    err = db.GetDB().SetChildrenRoleVisibility(nameid, value)
+    err = db.DB.SetChildrenRoleVisibility(nameid, value)
 
     return ok, err
 }
@@ -156,7 +152,6 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-    DB := db.GetDB()
 
     if *event.EventType == model.TensionEventMemberLinked {
         // Link user
@@ -173,7 +168,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
         if err != nil { return false, err }
     }
     // Update NodeFragmet
-    err = DB.SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
+    err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
 
     return ok, err
 }
