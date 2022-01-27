@@ -8,10 +8,10 @@ import (
 	"encoding/json"
 	"github.com/99designs/gqlgen/graphql"
 
-	"zerogov/fractal6.go/db"
-	"zerogov/fractal6.go/tools"
-	"zerogov/fractal6.go/web/sessions"
-    webauth "zerogov/fractal6.go/web/auth"
+	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/sessions"
+    webauth "fractale/fractal6.go/web/auth"
 )
 
 var cache sessions.Session

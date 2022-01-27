@@ -5,8 +5,8 @@ import (
     "net/http"
     "encoding/json"
 
-    "zerogov/fractal6.go/db"
-    webauth "zerogov/fractal6.go/web/auth"
+    "fractale/fractal6.go/db"
+    webauth "fractale/fractal6.go/web/auth"
 )
 
 //

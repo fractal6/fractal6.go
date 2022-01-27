@@ -1,7 +1,7 @@
 package graph
 
 import (
-    "zerogov/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/model"
 )
 
 func TryAddDoc(uctx *model.UserCtx, tension *model.Tension, md *string) (bool, error) {

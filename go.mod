@@ -1,4 +1,4 @@
-module zerogov/fractal6.go
+module fractale/fractal6.go
 
 go 1.17
 

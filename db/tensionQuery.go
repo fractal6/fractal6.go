@@ -5,8 +5,8 @@ import (
     "strings"
     "strconv"
 
-    "zerogov/fractal6.go/graph/codec"
-    "zerogov/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/codec"
+    "fractale/fractal6.go/graph/model"
 
 )
 

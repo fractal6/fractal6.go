@@ -10,10 +10,10 @@ import (
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    "zerogov/fractal6.go/web"
-    "zerogov/fractal6.go/web/auth"
-    handle6 "zerogov/fractal6.go/web/handlers"
-    middle6 "zerogov/fractal6.go/web/middleware"
+    "fractale/fractal6.go/web"
+    "fractale/fractal6.go/web/auth"
+    handle6 "fractale/fractal6.go/web/handlers"
+    middle6 "fractale/fractal6.go/web/middleware"
 )
 
 var tkMaster *auth.Jwt

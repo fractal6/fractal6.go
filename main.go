@@ -1,7 +1,7 @@
 package main
 
 import (
-	"zerogov/fractal6.go/cmd"
+	"fractale/fractal6.go/cmd"
 )
 
 func main() {

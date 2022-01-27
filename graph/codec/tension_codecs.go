@@ -3,7 +3,7 @@ package codec
 import (
     "fmt"
 
-    "zerogov/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/model"
 )
 
 // Action Type enum

@@ -7,7 +7,7 @@ import (
     "reflect"
     "github.com/99designs/gqlgen/graphql"
 
-    "zerogov/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/model"
 )
 
 //

@@ -3,8 +3,8 @@ package middleware
 import (
     "net/http"
     "github.com/go-chi/jwtauth/v5"
-    "zerogov/fractal6.go/web/auth"
-    "zerogov/fractal6.go/tools"
+    "fractale/fractal6.go/web/auth"
+    "fractale/fractal6.go/tools"
 )
 
 

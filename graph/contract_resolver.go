@@ -5,12 +5,12 @@ import (
     "context"
     "github.com/99designs/gqlgen/graphql"
 
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/graph/codec"
-    "zerogov/fractal6.go/db"
-    "zerogov/fractal6.go/graph/auth"
-    webauth"zerogov/fractal6.go/web/auth"
-    . "zerogov/fractal6.go/tools"
+    "fractale/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/codec"
+    "fractale/fractal6.go/db"
+    "fractale/fractal6.go/graph/auth"
+    webauth"fractale/fractal6.go/web/auth"
+    . "fractale/fractal6.go/tools"
 )
 
 

@@ -4,8 +4,8 @@ import (
     "net/http"
 	"github.com/99designs/gqlgen/handler"
 
-	gen "zerogov/fractal6.go/graph/generated"
-	"zerogov/fractal6.go/graph"
+	gen "fractale/fractal6.go/graph/generated"
+	"fractale/fractal6.go/graph"
 )
 
 

@@ -3,7 +3,7 @@ GOFLAGS ?= $(GOFLAGS:) -v
 GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
-MOD := "zerogov/fractal6.go"
+MOD := "fractale/fractal6.go"
 LANGS := en fr
 
 # TODO: versioning

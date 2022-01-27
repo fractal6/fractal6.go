@@ -3,10 +3,10 @@ package auth
 import (
     //"fmt"
 
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/graph/codec"
-    "zerogov/fractal6.go/db"
-    . "zerogov/fractal6.go/tools"
+    "fractale/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/codec"
+    "fractale/fractal6.go/db"
+    . "fractale/fractal6.go/tools"
 )
 
 // Inherits node properties

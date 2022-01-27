@@ -2,9 +2,9 @@ package auth
 
 import (
     //"fmt"
-    "zerogov/fractal6.go/graph/model"
-    "zerogov/fractal6.go/graph/codec"
-    webauth "zerogov/fractal6.go/web/auth"
+    "fractale/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/codec"
+    webauth "fractale/fractal6.go/web/auth"
 )
 
 

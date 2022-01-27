@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"zerogov/fractal6.go/tools"
+	"fractale/fractal6.go/tools"
 )
 
 var (

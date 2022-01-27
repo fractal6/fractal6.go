@@ -6,8 +6,8 @@ package graph
 import (
 	"context"
 	"fmt"
-	"zerogov/fractal6.go/graph/generated"
-	"zerogov/fractal6.go/graph/model"
+	"fractale/fractal6.go/graph/generated"
+	"fractale/fractal6.go/graph/model"
 )
 
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (data *model.AddNodePayload, errors error) {

@@ -6,9 +6,9 @@ import (
     "strings"
     //"strconv"
 
-    "zerogov/fractal6.go/db"
-    "zerogov/fractal6.go/tools"
-    "zerogov/fractal6.go/graph/model"
+    "fractale/fractal6.go/db"
+    "fractale/fractal6.go/tools"
+    "fractale/fractal6.go/graph/model"
 )
 
 // Library errors

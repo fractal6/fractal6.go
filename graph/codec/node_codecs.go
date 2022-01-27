@@ -4,7 +4,7 @@ import (
     "fmt"
     "strings"
 
-    "zerogov/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/model"
 )
 
 // Format the nameid id from its parts

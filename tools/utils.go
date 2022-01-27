@@ -9,7 +9,7 @@ import (
     "encoding/json"
     "github.com/spf13/viper"
     "github.com/mitchellh/mapstructure"
-	"zerogov/fractal6.go/graph/model"
+	"fractale/fractal6.go/graph/model"
 )
 
 //Now returns the current time formated with RFC3339
