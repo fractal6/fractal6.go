@@ -7389,27 +7389,13 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0EPd3/ym98kmPFp/HtDw\nVEehAvBzl3nJjEUw4jJNBVIjiRgKI3Q7SGVE/W5Q4S/PI8mGl9aA5qY3LcvbtUPc\nvzpql1JLn/wYPeA/ttVeVps2Dtqqn7arrxpWxZmKcAGEKi0RlUrhwlC2tzfBwx0x\nXPoinb4Zyvq0BcQ+l0jx7e+Q+Qt6Rt01oYwEoXw5eKwWgI3IA2ZN1ChF0Pkoucwp\nWVRg7cOJL8nsMz59AQUFyM16+u4zHHKD+Rq5a2RT6ChZL+RS2QkNcvDSb7MTQKei\nQo8OVPLUiMVMAZ6gIjBRQBQo61rf7lv/3FDeEMXDDM0hH+vnu2D9W1yXrUGJW0TT\n4wIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
@@ -7417,9 +7403,23 @@ directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: Auth
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @lambda on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -17430,6 +17430,21 @@ func (ec *executionContext) field_Vote_node_args(ctx context.Context, rawArgs ma
 		}
 	}
 	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field___Field_args_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *bool
+	if tmp, ok := rawArgs["includeDeprecated"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
+		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["includeDeprecated"] = arg0
 	return args, nil
 }
 
@@ -38805,6 +38820,13 @@ func (ec *executionContext) ___Field_args(ctx context.Context, field graphql.Col
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field___Field_args_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Args, nil
@@ -52455,7 +52477,6 @@ var addBlobPayloadImplementors = []string{"AddBlobPayload"}
 
 func (ec *executionContext) _AddBlobPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddBlobPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addBlobPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52463,9 +52484,19 @@ func (ec *executionContext) _AddBlobPayload(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddBlobPayload")
 		case "blob":
-			out.Values[i] = ec._AddBlobPayload_blob(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddBlobPayload_blob(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddBlobPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddBlobPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52481,7 +52512,6 @@ var addCommentPayloadImplementors = []string{"AddCommentPayload"}
 
 func (ec *executionContext) _AddCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddCommentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addCommentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52489,9 +52519,19 @@ func (ec *executionContext) _AddCommentPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddCommentPayload")
 		case "comment":
-			out.Values[i] = ec._AddCommentPayload_comment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddCommentPayload_comment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddCommentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddCommentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52507,7 +52547,6 @@ var addContractPayloadImplementors = []string{"AddContractPayload"}
 
 func (ec *executionContext) _AddContractPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddContractPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addContractPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52515,9 +52554,19 @@ func (ec *executionContext) _AddContractPayload(ctx context.Context, sel ast.Sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddContractPayload")
 		case "contract":
-			out.Values[i] = ec._AddContractPayload_contract(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddContractPayload_contract(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddContractPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddContractPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52533,7 +52582,6 @@ var addEventFragmentPayloadImplementors = []string{"AddEventFragmentPayload"}
 
 func (ec *executionContext) _AddEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addEventFragmentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52541,9 +52589,19 @@ func (ec *executionContext) _AddEventFragmentPayload(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddEventFragmentPayload")
 		case "eventFragment":
-			out.Values[i] = ec._AddEventFragmentPayload_eventFragment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddEventFragmentPayload_eventFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddEventFragmentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddEventFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52559,7 +52617,6 @@ var addEventPayloadImplementors = []string{"AddEventPayload"}
 
 func (ec *executionContext) _AddEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addEventPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52567,9 +52624,19 @@ func (ec *executionContext) _AddEventPayload(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddEventPayload")
 		case "event":
-			out.Values[i] = ec._AddEventPayload_event(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddEventPayload_event(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddEventPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddEventPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52585,7 +52652,6 @@ var addLabelPayloadImplementors = []string{"AddLabelPayload"}
 
 func (ec *executionContext) _AddLabelPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddLabelPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addLabelPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52593,9 +52659,19 @@ func (ec *executionContext) _AddLabelPayload(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddLabelPayload")
 		case "label":
-			out.Values[i] = ec._AddLabelPayload_label(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddLabelPayload_label(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddLabelPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddLabelPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52611,7 +52687,6 @@ var addMandatePayloadImplementors = []string{"AddMandatePayload"}
 
 func (ec *executionContext) _AddMandatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddMandatePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addMandatePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52619,9 +52694,19 @@ func (ec *executionContext) _AddMandatePayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddMandatePayload")
 		case "mandate":
-			out.Values[i] = ec._AddMandatePayload_mandate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddMandatePayload_mandate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddMandatePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddMandatePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52637,7 +52722,6 @@ var addNodeFragmentPayloadImplementors = []string{"AddNodeFragmentPayload"}
 
 func (ec *executionContext) _AddNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addNodeFragmentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52645,9 +52729,19 @@ func (ec *executionContext) _AddNodeFragmentPayload(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddNodeFragmentPayload")
 		case "nodeFragment":
-			out.Values[i] = ec._AddNodeFragmentPayload_nodeFragment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddNodeFragmentPayload_nodeFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddNodeFragmentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddNodeFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52663,7 +52757,6 @@ var addNodePayloadImplementors = []string{"AddNodePayload"}
 
 func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addNodePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52671,9 +52764,19 @@ func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddNodePayload")
 		case "node":
-			out.Values[i] = ec._AddNodePayload_node(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddNodePayload_node(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddNodePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddNodePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52689,7 +52792,6 @@ var addOrgaAggPayloadImplementors = []string{"AddOrgaAggPayload"}
 
 func (ec *executionContext) _AddOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddOrgaAggPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addOrgaAggPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52697,9 +52799,19 @@ func (ec *executionContext) _AddOrgaAggPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddOrgaAggPayload")
 		case "orgaAgg":
-			out.Values[i] = ec._AddOrgaAggPayload_orgaAgg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddOrgaAggPayload_orgaAgg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddOrgaAggPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddOrgaAggPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52715,7 +52827,6 @@ var addPendingUserPayloadImplementors = []string{"AddPendingUserPayload"}
 
 func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddPendingUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addPendingUserPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52723,9 +52834,19 @@ func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddPendingUserPayload")
 		case "pendingUser":
-			out.Values[i] = ec._AddPendingUserPayload_pendingUser(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddPendingUserPayload_pendingUser(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddPendingUserPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddPendingUserPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52741,7 +52862,6 @@ var addRoleExtPayloadImplementors = []string{"AddRoleExtPayload"}
 
 func (ec *executionContext) _AddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRoleExtPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addRoleExtPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52749,9 +52869,19 @@ func (ec *executionContext) _AddRoleExtPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddRoleExtPayload")
 		case "roleExt":
-			out.Values[i] = ec._AddRoleExtPayload_roleExt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddRoleExtPayload_roleExt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddRoleExtPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddRoleExtPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52767,7 +52897,6 @@ var addTensionPayloadImplementors = []string{"AddTensionPayload"}
 
 func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddTensionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addTensionPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52775,9 +52904,19 @@ func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddTensionPayload")
 		case "tension":
-			out.Values[i] = ec._AddTensionPayload_tension(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddTensionPayload_tension(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddTensionPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddTensionPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52793,7 +52932,6 @@ var addUserEventPayloadImplementors = []string{"AddUserEventPayload"}
 
 func (ec *executionContext) _AddUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addUserEventPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52801,9 +52939,19 @@ func (ec *executionContext) _AddUserEventPayload(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddUserEventPayload")
 		case "userEvent":
-			out.Values[i] = ec._AddUserEventPayload_userEvent(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserEventPayload_userEvent(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddUserEventPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserEventPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52819,7 +52967,6 @@ var addUserPayloadImplementors = []string{"AddUserPayload"}
 
 func (ec *executionContext) _AddUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addUserPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52827,9 +52974,19 @@ func (ec *executionContext) _AddUserPayload(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddUserPayload")
 		case "user":
-			out.Values[i] = ec._AddUserPayload_user(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserPayload_user(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddUserPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52845,7 +53002,6 @@ var addUserRightsPayloadImplementors = []string{"AddUserRightsPayload"}
 
 func (ec *executionContext) _AddUserRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserRightsPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addUserRightsPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52853,9 +53009,19 @@ func (ec *executionContext) _AddUserRightsPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddUserRightsPayload")
 		case "userRights":
-			out.Values[i] = ec._AddUserRightsPayload_userRights(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserRightsPayload_userRights(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddUserRightsPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserRightsPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52871,7 +53037,6 @@ var addVotePayloadImplementors = []string{"AddVotePayload"}
 
 func (ec *executionContext) _AddVotePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddVotePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addVotePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52879,9 +53044,19 @@ func (ec *executionContext) _AddVotePayload(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddVotePayload")
 		case "vote":
-			out.Values[i] = ec._AddVotePayload_vote(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddVotePayload_vote(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._AddVotePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddVotePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52897,7 +53072,6 @@ var blobImplementors = []string{"Blob"}
 
 func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj *model.Blob) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, blobImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52905,42 +53079,97 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Blob")
 		case "tension":
-			out.Values[i] = ec._Blob_tension(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_tension(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "blob_type":
-			out.Values[i] = ec._Blob_blob_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_blob_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "pushedFlag":
-			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_pushedFlag(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "archivedFlag":
-			out.Values[i] = ec._Blob_archivedFlag(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_archivedFlag(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "node":
-			out.Values[i] = ec._Blob_node(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_node(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "md":
-			out.Values[i] = ec._Blob_md(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_md(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "id":
-			out.Values[i] = ec._Blob_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Blob_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Blob_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Blob_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Blob_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Blob_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -52956,7 +53185,6 @@ var blobAggregateResultImplementors = []string{"BlobAggregateResult"}
 
 func (ec *executionContext) _BlobAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.BlobAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, blobAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -52964,31 +53192,96 @@ func (ec *executionContext) _BlobAggregateResult(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("BlobAggregateResult")
 		case "count":
-			out.Values[i] = ec._BlobAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._BlobAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._BlobAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._BlobAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._BlobAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._BlobAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._BlobAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "pushedFlagMin":
-			out.Values[i] = ec._BlobAggregateResult_pushedFlagMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_pushedFlagMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "pushedFlagMax":
-			out.Values[i] = ec._BlobAggregateResult_pushedFlagMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_pushedFlagMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "archivedFlagMin":
-			out.Values[i] = ec._BlobAggregateResult_archivedFlagMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_archivedFlagMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "archivedFlagMax":
-			out.Values[i] = ec._BlobAggregateResult_archivedFlagMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_archivedFlagMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "mdMin":
-			out.Values[i] = ec._BlobAggregateResult_mdMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_mdMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "mdMax":
-			out.Values[i] = ec._BlobAggregateResult_mdMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._BlobAggregateResult_mdMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53004,7 +53297,6 @@ var commentImplementors = []string{"Comment"}
 
 func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commentImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53012,27 +53304,52 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Comment")
 		case "message":
-			out.Values[i] = ec._Comment_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Comment_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "id":
-			out.Values[i] = ec._Comment_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Comment_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Comment_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Comment_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Comment_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Comment_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Comment_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53048,7 +53365,6 @@ var commentAggregateResultImplementors = []string{"CommentAggregateResult"}
 
 func (ec *executionContext) _CommentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.CommentAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commentAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53056,23 +53372,68 @@ func (ec *executionContext) _CommentAggregateResult(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CommentAggregateResult")
 		case "count":
-			out.Values[i] = ec._CommentAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._CommentAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._CommentAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._CommentAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._CommentAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._CommentAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._CommentAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "_VOIDMin":
-			out.Values[i] = ec._CommentAggregateResult__VOIDMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult__VOIDMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "_VOIDMax":
-			out.Values[i] = ec._CommentAggregateResult__VOIDMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CommentAggregateResult__VOIDMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53088,7 +53449,6 @@ var contractImplementors = []string{"Contract", "EventKind"}
 
 func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet, obj *model.Contract) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, contractImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53096,72 +53456,172 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Contract")
 		case "contractid":
-			out.Values[i] = ec._Contract_contractid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_contractid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "tension":
-			out.Values[i] = ec._Contract_tension(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_tension(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "status":
-			out.Values[i] = ec._Contract_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "contract_type":
-			out.Values[i] = ec._Contract_contract_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_contract_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "closedAt":
-			out.Values[i] = ec._Contract_closedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_closedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "event":
-			out.Values[i] = ec._Contract_event(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_event(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "participants":
-			out.Values[i] = ec._Contract_participants(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_participants(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "candidates":
-			out.Values[i] = ec._Contract_candidates(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_candidates(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "pending_candidates":
-			out.Values[i] = ec._Contract_pending_candidates(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_pending_candidates(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "comments":
-			out.Values[i] = ec._Contract_comments(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_comments(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "isValidator":
-			out.Values[i] = ec._Contract_isValidator(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_isValidator(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "id":
-			out.Values[i] = ec._Contract_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Contract_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Contract_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Contract_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Contract_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "participantsAggregate":
-			out.Values[i] = ec._Contract_participantsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_participantsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "candidatesAggregate":
-			out.Values[i] = ec._Contract_candidatesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_candidatesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "pending_candidatesAggregate":
-			out.Values[i] = ec._Contract_pending_candidatesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_pending_candidatesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "commentsAggregate":
-			out.Values[i] = ec._Contract_commentsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Contract_commentsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53177,7 +53637,6 @@ var contractAggregateResultImplementors = []string{"ContractAggregateResult"}
 
 func (ec *executionContext) _ContractAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ContractAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, contractAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53185,27 +53644,82 @@ func (ec *executionContext) _ContractAggregateResult(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ContractAggregateResult")
 		case "count":
-			out.Values[i] = ec._ContractAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._ContractAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._ContractAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._ContractAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._ContractAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._ContractAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._ContractAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contractidMin":
-			out.Values[i] = ec._ContractAggregateResult_contractidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_contractidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contractidMax":
-			out.Values[i] = ec._ContractAggregateResult_contractidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_contractidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "closedAtMin":
-			out.Values[i] = ec._ContractAggregateResult_closedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_closedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "closedAtMax":
-			out.Values[i] = ec._ContractAggregateResult_closedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContractAggregateResult_closedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53221,7 +53735,6 @@ var deleteBlobPayloadImplementors = []string{"DeleteBlobPayload"}
 
 func (ec *executionContext) _DeleteBlobPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteBlobPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteBlobPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53229,11 +53742,26 @@ func (ec *executionContext) _DeleteBlobPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteBlobPayload")
 		case "blob":
-			out.Values[i] = ec._DeleteBlobPayload_blob(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteBlobPayload_blob(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteBlobPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteBlobPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteBlobPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteBlobPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53249,7 +53777,6 @@ var deleteCommentPayloadImplementors = []string{"DeleteCommentPayload"}
 
 func (ec *executionContext) _DeleteCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteCommentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteCommentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53257,11 +53784,26 @@ func (ec *executionContext) _DeleteCommentPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteCommentPayload")
 		case "comment":
-			out.Values[i] = ec._DeleteCommentPayload_comment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteCommentPayload_comment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteCommentPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteCommentPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteCommentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteCommentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53277,7 +53819,6 @@ var deleteContractPayloadImplementors = []string{"DeleteContractPayload"}
 
 func (ec *executionContext) _DeleteContractPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteContractPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteContractPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53285,11 +53826,26 @@ func (ec *executionContext) _DeleteContractPayload(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteContractPayload")
 		case "contract":
-			out.Values[i] = ec._DeleteContractPayload_contract(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteContractPayload_contract(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteContractPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteContractPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteContractPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteContractPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53305,7 +53861,6 @@ var deleteEventFragmentPayloadImplementors = []string{"DeleteEventFragmentPayloa
 
 func (ec *executionContext) _DeleteEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventFragmentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53313,11 +53868,26 @@ func (ec *executionContext) _DeleteEventFragmentPayload(ctx context.Context, sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteEventFragmentPayload")
 		case "eventFragment":
-			out.Values[i] = ec._DeleteEventFragmentPayload_eventFragment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteEventFragmentPayload_eventFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteEventFragmentPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteEventFragmentPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteEventFragmentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteEventFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53333,7 +53903,6 @@ var deleteEventPayloadImplementors = []string{"DeleteEventPayload"}
 
 func (ec *executionContext) _DeleteEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53341,11 +53910,26 @@ func (ec *executionContext) _DeleteEventPayload(ctx context.Context, sel ast.Sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteEventPayload")
 		case "event":
-			out.Values[i] = ec._DeleteEventPayload_event(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteEventPayload_event(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteEventPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteEventPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteEventPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteEventPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53361,7 +53945,6 @@ var deleteLabelPayloadImplementors = []string{"DeleteLabelPayload"}
 
 func (ec *executionContext) _DeleteLabelPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteLabelPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteLabelPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53369,11 +53952,26 @@ func (ec *executionContext) _DeleteLabelPayload(ctx context.Context, sel ast.Sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteLabelPayload")
 		case "label":
-			out.Values[i] = ec._DeleteLabelPayload_label(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteLabelPayload_label(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteLabelPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteLabelPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteLabelPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteLabelPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53389,7 +53987,6 @@ var deleteMandatePayloadImplementors = []string{"DeleteMandatePayload"}
 
 func (ec *executionContext) _DeleteMandatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteMandatePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteMandatePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53397,11 +53994,26 @@ func (ec *executionContext) _DeleteMandatePayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteMandatePayload")
 		case "mandate":
-			out.Values[i] = ec._DeleteMandatePayload_mandate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteMandatePayload_mandate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteMandatePayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteMandatePayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteMandatePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteMandatePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53417,7 +54029,6 @@ var deleteNodeFragmentPayloadImplementors = []string{"DeleteNodeFragmentPayload"
 
 func (ec *executionContext) _DeleteNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodeFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNodeFragmentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53425,11 +54036,26 @@ func (ec *executionContext) _DeleteNodeFragmentPayload(ctx context.Context, sel 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodeFragmentPayload")
 		case "nodeFragment":
-			out.Values[i] = ec._DeleteNodeFragmentPayload_nodeFragment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNodeFragmentPayload_nodeFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteNodeFragmentPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNodeFragmentPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteNodeFragmentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNodeFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53445,7 +54071,6 @@ var deleteNodePayloadImplementors = []string{"DeleteNodePayload"}
 
 func (ec *executionContext) _DeleteNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNodePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53453,11 +54078,26 @@ func (ec *executionContext) _DeleteNodePayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodePayload")
 		case "node":
-			out.Values[i] = ec._DeleteNodePayload_node(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNodePayload_node(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteNodePayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNodePayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteNodePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNodePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53473,7 +54113,6 @@ var deleteOrgaAggPayloadImplementors = []string{"DeleteOrgaAggPayload"}
 
 func (ec *executionContext) _DeleteOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteOrgaAggPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteOrgaAggPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53481,11 +54120,26 @@ func (ec *executionContext) _DeleteOrgaAggPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteOrgaAggPayload")
 		case "orgaAgg":
-			out.Values[i] = ec._DeleteOrgaAggPayload_orgaAgg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteOrgaAggPayload_orgaAgg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteOrgaAggPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteOrgaAggPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteOrgaAggPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteOrgaAggPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53501,7 +54155,6 @@ var deletePendingUserPayloadImplementors = []string{"DeletePendingUserPayload"}
 
 func (ec *executionContext) _DeletePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePendingUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deletePendingUserPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53509,11 +54162,26 @@ func (ec *executionContext) _DeletePendingUserPayload(ctx context.Context, sel a
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeletePendingUserPayload")
 		case "pendingUser":
-			out.Values[i] = ec._DeletePendingUserPayload_pendingUser(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeletePendingUserPayload_pendingUser(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeletePendingUserPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeletePendingUserPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeletePendingUserPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeletePendingUserPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53529,7 +54197,6 @@ var deletePostPayloadImplementors = []string{"DeletePostPayload"}
 
 func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePostPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deletePostPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53537,11 +54204,26 @@ func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeletePostPayload")
 		case "post":
-			out.Values[i] = ec._DeletePostPayload_post(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeletePostPayload_post(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeletePostPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeletePostPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeletePostPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeletePostPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53557,7 +54239,6 @@ var deleteRoleExtPayloadImplementors = []string{"DeleteRoleExtPayload"}
 
 func (ec *executionContext) _DeleteRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteRoleExtPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteRoleExtPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53565,11 +54246,26 @@ func (ec *executionContext) _DeleteRoleExtPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteRoleExtPayload")
 		case "roleExt":
-			out.Values[i] = ec._DeleteRoleExtPayload_roleExt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteRoleExtPayload_roleExt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteRoleExtPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteRoleExtPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteRoleExtPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteRoleExtPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53585,7 +54281,6 @@ var deleteTensionPayloadImplementors = []string{"DeleteTensionPayload"}
 
 func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteTensionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteTensionPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53593,11 +54288,26 @@ func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteTensionPayload")
 		case "tension":
-			out.Values[i] = ec._DeleteTensionPayload_tension(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteTensionPayload_tension(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteTensionPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteTensionPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteTensionPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteTensionPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53613,7 +54323,6 @@ var deleteUserEventPayloadImplementors = []string{"DeleteUserEventPayload"}
 
 func (ec *executionContext) _DeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserEventPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53621,11 +54330,26 @@ func (ec *executionContext) _DeleteUserEventPayload(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserEventPayload")
 		case "userEvent":
-			out.Values[i] = ec._DeleteUserEventPayload_userEvent(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserEventPayload_userEvent(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteUserEventPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserEventPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteUserEventPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserEventPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53641,7 +54365,6 @@ var deleteUserPayloadImplementors = []string{"DeleteUserPayload"}
 
 func (ec *executionContext) _DeleteUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53649,11 +54372,26 @@ func (ec *executionContext) _DeleteUserPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserPayload")
 		case "user":
-			out.Values[i] = ec._DeleteUserPayload_user(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserPayload_user(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteUserPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteUserPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53669,7 +54407,6 @@ var deleteUserRightsPayloadImplementors = []string{"DeleteUserRightsPayload"}
 
 func (ec *executionContext) _DeleteUserRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserRightsPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserRightsPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53677,11 +54414,26 @@ func (ec *executionContext) _DeleteUserRightsPayload(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserRightsPayload")
 		case "userRights":
-			out.Values[i] = ec._DeleteUserRightsPayload_userRights(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserRightsPayload_userRights(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteUserRightsPayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserRightsPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteUserRightsPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserRightsPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53697,7 +54449,6 @@ var deleteVotePayloadImplementors = []string{"DeleteVotePayload"}
 
 func (ec *executionContext) _DeleteVotePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteVotePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteVotePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53705,11 +54456,26 @@ func (ec *executionContext) _DeleteVotePayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteVotePayload")
 		case "vote":
-			out.Values[i] = ec._DeleteVotePayload_vote(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteVotePayload_vote(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "msg":
-			out.Values[i] = ec._DeleteVotePayload_msg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteVotePayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._DeleteVotePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteVotePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53725,7 +54491,6 @@ var eventImplementors = []string{"Event", "EventKind"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *model.Event) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53733,38 +54498,83 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Event")
 		case "tension":
-			out.Values[i] = ec._Event_tension(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_tension(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "event_type":
-			out.Values[i] = ec._Event_event_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_event_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "old":
-			out.Values[i] = ec._Event_old(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_old(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "new":
-			out.Values[i] = ec._Event_new(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_new(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "id":
-			out.Values[i] = ec._Event_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Event_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Event_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Event_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Event_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53780,7 +54590,6 @@ var eventAggregateResultImplementors = []string{"EventAggregateResult"}
 
 func (ec *executionContext) _EventAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.EventAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53788,27 +54597,82 @@ func (ec *executionContext) _EventAggregateResult(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventAggregateResult")
 		case "count":
-			out.Values[i] = ec._EventAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._EventAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._EventAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._EventAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._EventAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._EventAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._EventAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "oldMin":
-			out.Values[i] = ec._EventAggregateResult_oldMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_oldMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "oldMax":
-			out.Values[i] = ec._EventAggregateResult_oldMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_oldMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "newMin":
-			out.Values[i] = ec._EventAggregateResult_newMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_newMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "newMax":
-			out.Values[i] = ec._EventAggregateResult_newMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventAggregateResult_newMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53824,7 +54688,6 @@ var eventFragmentImplementors = []string{"EventFragment"}
 
 func (ec *executionContext) _EventFragment(ctx context.Context, sel ast.SelectionSet, obj *model.EventFragment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventFragmentImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53832,14 +54695,29 @@ func (ec *executionContext) _EventFragment(ctx context.Context, sel ast.Selectio
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventFragment")
 		case "event_type":
-			out.Values[i] = ec._EventFragment_event_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragment_event_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "old":
-			out.Values[i] = ec._EventFragment_old(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragment_old(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "new":
-			out.Values[i] = ec._EventFragment_new(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragment_new(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53855,7 +54733,6 @@ var eventFragmentAggregateResultImplementors = []string{"EventFragmentAggregateR
 
 func (ec *executionContext) _EventFragmentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.EventFragmentAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventFragmentAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53863,15 +54740,40 @@ func (ec *executionContext) _EventFragmentAggregateResult(ctx context.Context, s
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventFragmentAggregateResult")
 		case "count":
-			out.Values[i] = ec._EventFragmentAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragmentAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "oldMin":
-			out.Values[i] = ec._EventFragmentAggregateResult_oldMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragmentAggregateResult_oldMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "oldMax":
-			out.Values[i] = ec._EventFragmentAggregateResult_oldMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragmentAggregateResult_oldMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "newMin":
-			out.Values[i] = ec._EventFragmentAggregateResult_newMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragmentAggregateResult_newMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "newMax":
-			out.Values[i] = ec._EventFragmentAggregateResult_newMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventFragmentAggregateResult_newMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53887,7 +54789,6 @@ var labelImplementors = []string{"Label"}
 
 func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, obj *model.Label) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, labelImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53895,32 +54796,77 @@ func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Label")
 		case "id":
-			out.Values[i] = ec._Label_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "rootnameid":
-			out.Values[i] = ec._Label_rootnameid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_rootnameid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._Label_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec._Label_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "color":
-			out.Values[i] = ec._Label_color(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_color(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions":
-			out.Values[i] = ec._Label_tensions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_tensions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nodes":
-			out.Values[i] = ec._Label_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensionsAggregate":
-			out.Values[i] = ec._Label_tensionsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_tensionsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nodesAggregate":
-			out.Values[i] = ec._Label_nodesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Label_nodesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53936,7 +54882,6 @@ var labelAggregateResultImplementors = []string{"LabelAggregateResult"}
 
 func (ec *executionContext) _LabelAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.LabelAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, labelAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53944,23 +54889,68 @@ func (ec *executionContext) _LabelAggregateResult(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("LabelAggregateResult")
 		case "count":
-			out.Values[i] = ec._LabelAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rootnameidMin":
-			out.Values[i] = ec._LabelAggregateResult_rootnameidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_rootnameidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rootnameidMax":
-			out.Values[i] = ec._LabelAggregateResult_rootnameidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_rootnameidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMin":
-			out.Values[i] = ec._LabelAggregateResult_nameMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_nameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMax":
-			out.Values[i] = ec._LabelAggregateResult_nameMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_nameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "descriptionMin":
-			out.Values[i] = ec._LabelAggregateResult_descriptionMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_descriptionMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "descriptionMax":
-			out.Values[i] = ec._LabelAggregateResult_descriptionMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_descriptionMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMin":
-			out.Values[i] = ec._LabelAggregateResult_colorMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_colorMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMax":
-			out.Values[i] = ec._LabelAggregateResult_colorMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelAggregateResult_colorMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -53976,7 +54966,6 @@ var mandateImplementors = []string{"Mandate"}
 
 func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, obj *model.Mandate) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mandateImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -53984,21 +54973,46 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mandate")
 		case "id":
-			out.Values[i] = ec._Mandate_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mandate_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "purpose":
-			out.Values[i] = ec._Mandate_purpose(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mandate_purpose(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "responsabilities":
-			out.Values[i] = ec._Mandate_responsabilities(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mandate_responsabilities(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "domains":
-			out.Values[i] = ec._Mandate_domains(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mandate_domains(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "policies":
-			out.Values[i] = ec._Mandate_policies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mandate_policies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54014,7 +55028,6 @@ var mandateAggregateResultImplementors = []string{"MandateAggregateResult"}
 
 func (ec *executionContext) _MandateAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.MandateAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mandateAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54022,23 +55035,68 @@ func (ec *executionContext) _MandateAggregateResult(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MandateAggregateResult")
 		case "count":
-			out.Values[i] = ec._MandateAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "purposeMin":
-			out.Values[i] = ec._MandateAggregateResult_purposeMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_purposeMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "purposeMax":
-			out.Values[i] = ec._MandateAggregateResult_purposeMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_purposeMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "responsabilitiesMin":
-			out.Values[i] = ec._MandateAggregateResult_responsabilitiesMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_responsabilitiesMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "responsabilitiesMax":
-			out.Values[i] = ec._MandateAggregateResult_responsabilitiesMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_responsabilitiesMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "domainsMin":
-			out.Values[i] = ec._MandateAggregateResult_domainsMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_domainsMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "domainsMax":
-			out.Values[i] = ec._MandateAggregateResult_domainsMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_domainsMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "policiesMin":
-			out.Values[i] = ec._MandateAggregateResult_policiesMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_policiesMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "policiesMax":
-			out.Values[i] = ec._MandateAggregateResult_policiesMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MandateAggregateResult_policiesMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54054,7 +55112,6 @@ var multiPolygonImplementors = []string{"MultiPolygon"}
 
 func (ec *executionContext) _MultiPolygon(ctx context.Context, sel ast.SelectionSet, obj *model.MultiPolygon) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, multiPolygonImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54062,7 +55119,12 @@ func (ec *executionContext) _MultiPolygon(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MultiPolygon")
 		case "polygons":
-			out.Values[i] = ec._MultiPolygon_polygons(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._MultiPolygon_polygons(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -54081,7 +55143,6 @@ var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
-
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
 		Object: "Mutation",
 	})
@@ -54089,115 +55150,385 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "addNode":
-			out.Values[i] = ec._Mutation_addNode(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addNode(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateNode":
-			out.Values[i] = ec._Mutation_updateNode(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateNode(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteNode":
-			out.Values[i] = ec._Mutation_deleteNode(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteNode(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addNodeFragment":
-			out.Values[i] = ec._Mutation_addNodeFragment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addNodeFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateNodeFragment":
-			out.Values[i] = ec._Mutation_updateNodeFragment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateNodeFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteNodeFragment":
-			out.Values[i] = ec._Mutation_deleteNodeFragment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteNodeFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addMandate":
-			out.Values[i] = ec._Mutation_addMandate(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addMandate(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateMandate":
-			out.Values[i] = ec._Mutation_updateMandate(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateMandate(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteMandate":
-			out.Values[i] = ec._Mutation_deleteMandate(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMandate(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addLabel":
-			out.Values[i] = ec._Mutation_addLabel(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addLabel(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateLabel":
-			out.Values[i] = ec._Mutation_updateLabel(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLabel(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteLabel":
-			out.Values[i] = ec._Mutation_deleteLabel(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteLabel(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addRoleExt":
-			out.Values[i] = ec._Mutation_addRoleExt(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addRoleExt(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateRoleExt":
-			out.Values[i] = ec._Mutation_updateRoleExt(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateRoleExt(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteRoleExt":
-			out.Values[i] = ec._Mutation_deleteRoleExt(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteRoleExt(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addOrgaAgg":
-			out.Values[i] = ec._Mutation_addOrgaAgg(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addOrgaAgg(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateOrgaAgg":
-			out.Values[i] = ec._Mutation_updateOrgaAgg(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateOrgaAgg(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteOrgaAgg":
-			out.Values[i] = ec._Mutation_deleteOrgaAgg(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteOrgaAgg(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updatePost":
-			out.Values[i] = ec._Mutation_updatePost(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePost(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deletePost":
-			out.Values[i] = ec._Mutation_deletePost(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePost(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addTension":
-			out.Values[i] = ec._Mutation_addTension(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addTension(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateTension":
-			out.Values[i] = ec._Mutation_updateTension(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTension(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteTension":
-			out.Values[i] = ec._Mutation_deleteTension(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTension(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addComment":
-			out.Values[i] = ec._Mutation_addComment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addComment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateComment":
-			out.Values[i] = ec._Mutation_updateComment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateComment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteComment":
-			out.Values[i] = ec._Mutation_deleteComment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteComment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addBlob":
-			out.Values[i] = ec._Mutation_addBlob(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addBlob(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateBlob":
-			out.Values[i] = ec._Mutation_updateBlob(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateBlob(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteBlob":
-			out.Values[i] = ec._Mutation_deleteBlob(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteBlob(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addEvent":
-			out.Values[i] = ec._Mutation_addEvent(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addEvent(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateEvent":
-			out.Values[i] = ec._Mutation_updateEvent(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateEvent(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteEvent":
-			out.Values[i] = ec._Mutation_deleteEvent(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteEvent(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addEventFragment":
-			out.Values[i] = ec._Mutation_addEventFragment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addEventFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateEventFragment":
-			out.Values[i] = ec._Mutation_updateEventFragment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateEventFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteEventFragment":
-			out.Values[i] = ec._Mutation_deleteEventFragment(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteEventFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addContract":
-			out.Values[i] = ec._Mutation_addContract(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addContract(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateContract":
-			out.Values[i] = ec._Mutation_updateContract(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateContract(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteContract":
-			out.Values[i] = ec._Mutation_deleteContract(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteContract(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addPendingUser":
-			out.Values[i] = ec._Mutation_addPendingUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addPendingUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updatePendingUser":
-			out.Values[i] = ec._Mutation_updatePendingUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePendingUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deletePendingUser":
-			out.Values[i] = ec._Mutation_deletePendingUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deletePendingUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addVote":
-			out.Values[i] = ec._Mutation_addVote(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addVote(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateVote":
-			out.Values[i] = ec._Mutation_updateVote(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateVote(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteVote":
-			out.Values[i] = ec._Mutation_deleteVote(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteVote(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addUser":
-			out.Values[i] = ec._Mutation_addUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateUser":
-			out.Values[i] = ec._Mutation_updateUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteUser":
-			out.Values[i] = ec._Mutation_deleteUser(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteUser(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addUserEvent":
-			out.Values[i] = ec._Mutation_addUserEvent(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUserEvent(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateUserEvent":
-			out.Values[i] = ec._Mutation_updateUserEvent(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserEvent(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteUserEvent":
-			out.Values[i] = ec._Mutation_deleteUserEvent(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteUserEvent(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addUserRights":
-			out.Values[i] = ec._Mutation_addUserRights(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUserRights(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "updateUserRights":
-			out.Values[i] = ec._Mutation_updateUserRights(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserRights(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "deleteUserRights":
-			out.Values[i] = ec._Mutation_deleteUserRights(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteUserRights(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54213,7 +55544,6 @@ var nodeImplementors = []string{"Node"}
 
 func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj *model.Node) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54221,121 +55551,321 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Node")
 		case "id":
-			out.Values[i] = ec._Node_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Node_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Node_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Node_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "name":
-			out.Values[i] = ec._Node_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "nameid":
-			out.Values[i] = ec._Node_nameid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_nameid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "rootnameid":
-			out.Values[i] = ec._Node_rootnameid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_rootnameid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "parent":
-			out.Values[i] = ec._Node_parent(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_parent(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "type_":
-			out.Values[i] = ec._Node_type_(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_type_(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "tensions_out":
-			out.Values[i] = ec._Node_tensions_out(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_tensions_out(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_in":
-			out.Values[i] = ec._Node_tensions_in(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_tensions_in(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "about":
-			out.Values[i] = ec._Node_about(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_about(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "mandate":
-			out.Values[i] = ec._Node_mandate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_mandate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "source":
-			out.Values[i] = ec._Node_source(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_source(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "visibility":
-			out.Values[i] = ec._Node_visibility(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_visibility(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "mode":
-			out.Values[i] = ec._Node_mode(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_mode(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "rights":
-			out.Values[i] = ec._Node_rights(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_rights(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isArchived":
-			out.Values[i] = ec._Node_isArchived(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_isArchived(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isRoot":
-			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_isRoot(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isPersonal":
-			out.Values[i] = ec._Node_isPersonal(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_isPersonal(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "userCanJoin":
-			out.Values[i] = ec._Node_userCanJoin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_userCanJoin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "children":
-			out.Values[i] = ec._Node_children(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_children(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "docs":
-			out.Values[i] = ec._Node_docs(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_docs(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "labels":
-			out.Values[i] = ec._Node_labels(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_labels(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "roles":
-			out.Values[i] = ec._Node_roles(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_roles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_ext":
-			out.Values[i] = ec._Node_role_ext(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_role_ext(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_type":
-			out.Values[i] = ec._Node_role_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_role_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "color":
-			out.Values[i] = ec._Node_color(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_color(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "first_link":
-			out.Values[i] = ec._Node_first_link(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_first_link(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "second_link":
-			out.Values[i] = ec._Node_second_link(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_second_link(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "skills":
-			out.Values[i] = ec._Node_skills(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_skills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contracts":
-			out.Values[i] = ec._Node_contracts(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_contracts(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "orga_agg":
-			out.Values[i] = ec._Node_orga_agg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_orga_agg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_outAggregate":
-			out.Values[i] = ec._Node_tensions_outAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_tensions_outAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_inAggregate":
-			out.Values[i] = ec._Node_tensions_inAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_tensions_inAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "childrenAggregate":
-			out.Values[i] = ec._Node_childrenAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_childrenAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "docsAggregate":
-			out.Values[i] = ec._Node_docsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_docsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "labelsAggregate":
-			out.Values[i] = ec._Node_labelsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_labelsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rolesAggregate":
-			out.Values[i] = ec._Node_rolesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_rolesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contractsAggregate":
-			out.Values[i] = ec._Node_contractsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_contractsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54351,7 +55881,6 @@ var nodeAggregateResultImplementors = []string{"NodeAggregateResult"}
 
 func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NodeAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54359,43 +55888,138 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NodeAggregateResult")
 		case "count":
-			out.Values[i] = ec._NodeAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._NodeAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._NodeAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._NodeAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._NodeAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMin":
-			out.Values[i] = ec._NodeAggregateResult_nameMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_nameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMax":
-			out.Values[i] = ec._NodeAggregateResult_nameMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_nameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameidMin":
-			out.Values[i] = ec._NodeAggregateResult_nameidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_nameidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameidMax":
-			out.Values[i] = ec._NodeAggregateResult_nameidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_nameidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rootnameidMin":
-			out.Values[i] = ec._NodeAggregateResult_rootnameidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_rootnameidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rootnameidMax":
-			out.Values[i] = ec._NodeAggregateResult_rootnameidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_rootnameidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "aboutMin":
-			out.Values[i] = ec._NodeAggregateResult_aboutMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_aboutMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "aboutMax":
-			out.Values[i] = ec._NodeAggregateResult_aboutMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_aboutMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rightsMin":
-			out.Values[i] = ec._NodeAggregateResult_rightsMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_rightsMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rightsMax":
-			out.Values[i] = ec._NodeAggregateResult_rightsMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_rightsMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rightsSum":
-			out.Values[i] = ec._NodeAggregateResult_rightsSum(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_rightsSum(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rightsAvg":
-			out.Values[i] = ec._NodeAggregateResult_rightsAvg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_rightsAvg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMin":
-			out.Values[i] = ec._NodeAggregateResult_colorMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_colorMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMax":
-			out.Values[i] = ec._NodeAggregateResult_colorMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeAggregateResult_colorMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54411,7 +56035,6 @@ var nodeFragmentImplementors = []string{"NodeFragment"}
 
 func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.SelectionSet, obj *model.NodeFragment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeFragmentImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54419,40 +56042,120 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NodeFragment")
 		case "id":
-			out.Values[i] = ec._NodeFragment_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "nameid":
-			out.Values[i] = ec._NodeFragment_nameid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_nameid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "name":
-			out.Values[i] = ec._NodeFragment_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "about":
-			out.Values[i] = ec._NodeFragment_about(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_about(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "mandate":
-			out.Values[i] = ec._NodeFragment_mandate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_mandate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "skills":
-			out.Values[i] = ec._NodeFragment_skills(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_skills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "children":
-			out.Values[i] = ec._NodeFragment_children(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_children(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "visibility":
-			out.Values[i] = ec._NodeFragment_visibility(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_visibility(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "mode":
-			out.Values[i] = ec._NodeFragment_mode(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_mode(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "type_":
-			out.Values[i] = ec._NodeFragment_type_(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_type_(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "first_link":
-			out.Values[i] = ec._NodeFragment_first_link(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_first_link(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "second_link":
-			out.Values[i] = ec._NodeFragment_second_link(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_second_link(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_ext":
-			out.Values[i] = ec._NodeFragment_role_ext(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_role_ext(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_type":
-			out.Values[i] = ec._NodeFragment_role_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_role_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "color":
-			out.Values[i] = ec._NodeFragment_color(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_color(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "childrenAggregate":
-			out.Values[i] = ec._NodeFragment_childrenAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragment_childrenAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54468,7 +56171,6 @@ var nodeFragmentAggregateResultImplementors = []string{"NodeFragmentAggregateRes
 
 func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NodeFragmentAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeFragmentAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54476,35 +56178,110 @@ func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NodeFragmentAggregateResult")
 		case "count":
-			out.Values[i] = ec._NodeFragmentAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameidMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_nameidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_nameidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameidMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_nameidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_nameidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_nameMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_nameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_nameMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_nameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "aboutMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_aboutMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_aboutMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "aboutMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_aboutMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_aboutMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "first_linkMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_first_linkMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_first_linkMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "first_linkMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_first_linkMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_first_linkMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "second_linkMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_second_linkMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_second_linkMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "second_linkMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_second_linkMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_second_linkMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_extMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_role_extMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_role_extMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_extMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_role_extMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_role_extMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMin":
-			out.Values[i] = ec._NodeFragmentAggregateResult_colorMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_colorMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMax":
-			out.Values[i] = ec._NodeFragmentAggregateResult_colorMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NodeFragmentAggregateResult_colorMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54520,7 +56297,6 @@ var orgaAggImplementors = []string{"OrgaAgg"}
 
 func (ec *executionContext) _OrgaAgg(ctx context.Context, sel ast.SelectionSet, obj *model.OrgaAgg) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, orgaAggImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54528,9 +56304,19 @@ func (ec *executionContext) _OrgaAgg(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OrgaAgg")
 		case "n_members":
-			out.Values[i] = ec._OrgaAgg_n_members(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAgg_n_members(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_guests":
-			out.Values[i] = ec._OrgaAgg_n_guests(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAgg_n_guests(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54546,7 +56332,6 @@ var orgaAggAggregateResultImplementors = []string{"OrgaAggAggregateResult"}
 
 func (ec *executionContext) _OrgaAggAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.OrgaAggAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, orgaAggAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54554,23 +56339,68 @@ func (ec *executionContext) _OrgaAggAggregateResult(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OrgaAggAggregateResult")
 		case "count":
-			out.Values[i] = ec._OrgaAggAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_membersMin":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_membersMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_membersMax":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_membersMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_membersSum":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersSum(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_membersSum(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_membersAvg":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersAvg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_membersAvg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_guestsMin":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_guestsMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_guestsMax":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_guestsMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_guestsSum":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsSum(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_guestsSum(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_guestsAvg":
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsAvg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OrgaAggAggregateResult_n_guestsAvg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54586,7 +56416,6 @@ var pendingUserImplementors = []string{"PendingUser"}
 
 func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionSet, obj *model.PendingUser) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pendingUserImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54594,7 +56423,12 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PendingUser")
 		case "email":
-			out.Values[i] = ec._PendingUser_email(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_email(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54610,7 +56444,6 @@ var pendingUserAggregateResultImplementors = []string{"PendingUserAggregateResul
 
 func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.PendingUserAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pendingUserAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54618,11 +56451,26 @@ func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PendingUserAggregateResult")
 		case "count":
-			out.Values[i] = ec._PendingUserAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailMin":
-			out.Values[i] = ec._PendingUserAggregateResult_emailMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_emailMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailMax":
-			out.Values[i] = ec._PendingUserAggregateResult_emailMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_emailMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54638,7 +56486,6 @@ var pointImplementors = []string{"Point"}
 
 func (ec *executionContext) _Point(ctx context.Context, sel ast.SelectionSet, obj *model.Point) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pointImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54646,12 +56493,22 @@ func (ec *executionContext) _Point(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Point")
 		case "longitude":
-			out.Values[i] = ec._Point_longitude(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Point_longitude(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "latitude":
-			out.Values[i] = ec._Point_latitude(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Point_latitude(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -54670,7 +56527,6 @@ var pointListImplementors = []string{"PointList"}
 
 func (ec *executionContext) _PointList(ctx context.Context, sel ast.SelectionSet, obj *model.PointList) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pointListImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54678,7 +56534,12 @@ func (ec *executionContext) _PointList(ctx context.Context, sel ast.SelectionSet
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PointList")
 		case "points":
-			out.Values[i] = ec._PointList_points(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PointList_points(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -54697,7 +56558,6 @@ var polygonImplementors = []string{"Polygon"}
 
 func (ec *executionContext) _Polygon(ctx context.Context, sel ast.SelectionSet, obj *model.Polygon) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, polygonImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54705,7 +56565,12 @@ func (ec *executionContext) _Polygon(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Polygon")
 		case "coordinates":
-			out.Values[i] = ec._Polygon_coordinates(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Polygon_coordinates(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -54724,7 +56589,6 @@ var postImplementors = []string{"Post"}
 
 func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *model.Post) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, postImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54732,24 +56596,49 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Post")
 		case "id":
-			out.Values[i] = ec._Post_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Post_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Post_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Post_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Post_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Post_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Post_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Post_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Post_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Post_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54765,7 +56654,6 @@ var postAggregateResultImplementors = []string{"PostAggregateResult"}
 
 func (ec *executionContext) _PostAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.PostAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, postAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -54773,19 +56661,54 @@ func (ec *executionContext) _PostAggregateResult(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PostAggregateResult")
 		case "count":
-			out.Values[i] = ec._PostAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._PostAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._PostAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._PostAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._PostAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._PostAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._PostAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PostAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -54801,7 +56724,6 @@ var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, queryImplementors)
-
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
 		Object: "Query",
 	})
@@ -54809,12 +56731,18 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
 		case "getNode":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54822,10 +56750,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getNode(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryNode":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54833,10 +56770,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryNode(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateNode":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54844,10 +56790,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateNode(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getNodeFragment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54855,10 +56810,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getNodeFragment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryNodeFragment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54866,10 +56830,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryNodeFragment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateNodeFragment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54877,10 +56850,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateNodeFragment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getMandate":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54888,10 +56870,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getMandate(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryMandate":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54899,10 +56890,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryMandate(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateMandate":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54910,10 +56910,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateMandate(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getLabel":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54921,10 +56930,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getLabel(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryLabel":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54932,10 +56950,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryLabel(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateLabel":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54943,10 +56970,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateLabel(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getRoleExt":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54954,10 +56990,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getRoleExt(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryRoleExt":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54965,10 +57010,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryRoleExt(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateRoleExt":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54976,10 +57030,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateRoleExt(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryOrgaAgg":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54987,10 +57050,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryOrgaAgg(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateOrgaAgg":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -54998,10 +57070,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateOrgaAgg(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getPost":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55009,10 +57090,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getPost(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryPost":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55020,10 +57110,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryPost(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregatePost":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55031,10 +57130,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregatePost(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getTension":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55042,10 +57150,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getTension(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryTension":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55053,10 +57170,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryTension(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateTension":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55064,10 +57190,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateTension(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getComment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55075,10 +57210,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getComment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryComment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55086,10 +57230,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryComment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateComment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55097,10 +57250,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateComment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getBlob":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55108,10 +57270,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getBlob(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryBlob":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55119,10 +57290,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryBlob(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateBlob":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55130,10 +57310,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateBlob(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getEvent":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55141,10 +57330,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getEvent(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryEvent":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55152,10 +57350,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryEvent(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateEvent":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55163,10 +57370,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateEvent(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryEventFragment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55174,10 +57390,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryEventFragment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateEventFragment":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55185,10 +57410,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateEventFragment(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getContract":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55196,10 +57430,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getContract(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryContract":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55207,10 +57450,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryContract(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateContract":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55218,10 +57470,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateContract(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryPendingUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55229,10 +57490,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryPendingUser(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregatePendingUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55240,10 +57510,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregatePendingUser(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getVote":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55251,10 +57530,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getVote(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryVote":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55262,10 +57550,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryVote(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateVote":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55273,10 +57570,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateVote(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55284,10 +57590,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getUser(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55295,10 +57610,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryUser(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateUser":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55306,10 +57630,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateUser(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "getUserEvent":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55317,10 +57650,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_getUserEvent(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryUserEvent":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55328,10 +57670,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryUserEvent(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateUserEvent":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55339,10 +57690,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateUserEvent(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "queryUserRights":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55350,10 +57710,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_queryUserRights(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "aggregateUserRights":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -55361,11 +57730,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_aggregateUserRights(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "__type":
-			out.Values[i] = ec._Query___type(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Query___type(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "__schema":
-			out.Values[i] = ec._Query___schema(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Query___schema(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55381,7 +57768,6 @@ var roleExtImplementors = []string{"RoleExt"}
 
 func (ec *executionContext) _RoleExt(ctx context.Context, sel ast.SelectionSet, obj *model.RoleExt) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, roleExtImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55389,39 +57775,94 @@ func (ec *executionContext) _RoleExt(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("RoleExt")
 		case "id":
-			out.Values[i] = ec._RoleExt_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "rootnameid":
-			out.Values[i] = ec._RoleExt_rootnameid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_rootnameid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._RoleExt_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "about":
-			out.Values[i] = ec._RoleExt_about(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_about(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "role_type":
-			out.Values[i] = ec._RoleExt_role_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_role_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "color":
-			out.Values[i] = ec._RoleExt_color(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_color(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "mandate":
-			out.Values[i] = ec._RoleExt_mandate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_mandate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nodes":
-			out.Values[i] = ec._RoleExt_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "roles":
-			out.Values[i] = ec._RoleExt_roles(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_roles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nodesAggregate":
-			out.Values[i] = ec._RoleExt_nodesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_nodesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rolesAggregate":
-			out.Values[i] = ec._RoleExt_rolesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExt_rolesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55437,7 +57878,6 @@ var roleExtAggregateResultImplementors = []string{"RoleExtAggregateResult"}
 
 func (ec *executionContext) _RoleExtAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.RoleExtAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, roleExtAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55445,23 +57885,68 @@ func (ec *executionContext) _RoleExtAggregateResult(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("RoleExtAggregateResult")
 		case "count":
-			out.Values[i] = ec._RoleExtAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rootnameidMin":
-			out.Values[i] = ec._RoleExtAggregateResult_rootnameidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_rootnameidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rootnameidMax":
-			out.Values[i] = ec._RoleExtAggregateResult_rootnameidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_rootnameidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMin":
-			out.Values[i] = ec._RoleExtAggregateResult_nameMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_nameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMax":
-			out.Values[i] = ec._RoleExtAggregateResult_nameMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_nameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "aboutMin":
-			out.Values[i] = ec._RoleExtAggregateResult_aboutMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_aboutMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "aboutMax":
-			out.Values[i] = ec._RoleExtAggregateResult_aboutMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_aboutMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMin":
-			out.Values[i] = ec._RoleExtAggregateResult_colorMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_colorMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "colorMax":
-			out.Values[i] = ec._RoleExtAggregateResult_colorMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._RoleExtAggregateResult_colorMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55477,7 +57962,6 @@ var tensionImplementors = []string{"Tension"}
 
 func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, obj *model.Tension) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tensionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55485,93 +57969,238 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Tension")
 		case "emitter":
-			out.Values[i] = ec._Tension_emitter(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_emitter(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "emitterid":
-			out.Values[i] = ec._Tension_emitterid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_emitterid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "receiver":
-			out.Values[i] = ec._Tension_receiver(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_receiver(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "receiverid":
-			out.Values[i] = ec._Tension_receiverid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_receiverid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "title":
-			out.Values[i] = ec._Tension_title(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_title(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "type_":
-			out.Values[i] = ec._Tension_type_(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_type_(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "status":
-			out.Values[i] = ec._Tension_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "action":
-			out.Values[i] = ec._Tension_action(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_action(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "comments":
-			out.Values[i] = ec._Tension_comments(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_comments(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "assignees":
-			out.Values[i] = ec._Tension_assignees(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_assignees(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "labels":
-			out.Values[i] = ec._Tension_labels(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_labels(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "blobs":
-			out.Values[i] = ec._Tension_blobs(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_blobs(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "history":
-			out.Values[i] = ec._Tension_history(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_history(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contracts":
-			out.Values[i] = ec._Tension_contracts(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_contracts(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscribers":
-			out.Values[i] = ec._Tension_subscribers(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_subscribers(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_comments":
-			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_n_comments(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_open_contracts":
-			out.Values[i] = ec._Tension_n_open_contracts(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_n_open_contracts(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "id":
-			out.Values[i] = ec._Tension_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Tension_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Tension_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Tension_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Tension_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "commentsAggregate":
-			out.Values[i] = ec._Tension_commentsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_commentsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "assigneesAggregate":
-			out.Values[i] = ec._Tension_assigneesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_assigneesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "labelsAggregate":
-			out.Values[i] = ec._Tension_labelsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_labelsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "blobsAggregate":
-			out.Values[i] = ec._Tension_blobsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_blobsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "historyAggregate":
-			out.Values[i] = ec._Tension_historyAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_historyAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contractsAggregate":
-			out.Values[i] = ec._Tension_contractsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_contractsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscribersAggregate":
-			out.Values[i] = ec._Tension_subscribersAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Tension_subscribersAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55587,7 +58216,6 @@ var tensionAggregateResultImplementors = []string{"TensionAggregateResult"}
 
 func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.TensionAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tensionAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55595,47 +58223,152 @@ func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TensionAggregateResult")
 		case "count":
-			out.Values[i] = ec._TensionAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._TensionAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._TensionAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._TensionAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._TensionAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._TensionAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._TensionAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emitteridMin":
-			out.Values[i] = ec._TensionAggregateResult_emitteridMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_emitteridMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emitteridMax":
-			out.Values[i] = ec._TensionAggregateResult_emitteridMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_emitteridMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "receiveridMin":
-			out.Values[i] = ec._TensionAggregateResult_receiveridMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_receiveridMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "receiveridMax":
-			out.Values[i] = ec._TensionAggregateResult_receiveridMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_receiveridMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "titleMin":
-			out.Values[i] = ec._TensionAggregateResult_titleMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_titleMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "titleMax":
-			out.Values[i] = ec._TensionAggregateResult_titleMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_titleMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_commentsMin":
-			out.Values[i] = ec._TensionAggregateResult_n_commentsMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_commentsMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_commentsMax":
-			out.Values[i] = ec._TensionAggregateResult_n_commentsMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_commentsMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_commentsSum":
-			out.Values[i] = ec._TensionAggregateResult_n_commentsSum(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_commentsSum(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_commentsAvg":
-			out.Values[i] = ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_open_contractsMin":
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_open_contractsMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_open_contractsMax":
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_open_contractsMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_open_contractsSum":
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsSum(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_open_contractsSum(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "n_open_contractsAvg":
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsAvg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TensionAggregateResult_n_open_contractsAvg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55651,7 +58384,6 @@ var updateBlobPayloadImplementors = []string{"UpdateBlobPayload"}
 
 func (ec *executionContext) _UpdateBlobPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateBlobPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateBlobPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55659,9 +58391,19 @@ func (ec *executionContext) _UpdateBlobPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateBlobPayload")
 		case "blob":
-			out.Values[i] = ec._UpdateBlobPayload_blob(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateBlobPayload_blob(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateBlobPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateBlobPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55677,7 +58419,6 @@ var updateCommentPayloadImplementors = []string{"UpdateCommentPayload"}
 
 func (ec *executionContext) _UpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateCommentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateCommentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55685,9 +58426,19 @@ func (ec *executionContext) _UpdateCommentPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateCommentPayload")
 		case "comment":
-			out.Values[i] = ec._UpdateCommentPayload_comment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateCommentPayload_comment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateCommentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateCommentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55703,7 +58454,6 @@ var updateContractPayloadImplementors = []string{"UpdateContractPayload"}
 
 func (ec *executionContext) _UpdateContractPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateContractPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateContractPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55711,9 +58461,19 @@ func (ec *executionContext) _UpdateContractPayload(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateContractPayload")
 		case "contract":
-			out.Values[i] = ec._UpdateContractPayload_contract(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateContractPayload_contract(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateContractPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateContractPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55729,7 +58489,6 @@ var updateEventFragmentPayloadImplementors = []string{"UpdateEventFragmentPayloa
 
 func (ec *executionContext) _UpdateEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventFragmentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55737,9 +58496,19 @@ func (ec *executionContext) _UpdateEventFragmentPayload(ctx context.Context, sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateEventFragmentPayload")
 		case "eventFragment":
-			out.Values[i] = ec._UpdateEventFragmentPayload_eventFragment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateEventFragmentPayload_eventFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateEventFragmentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateEventFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55755,7 +58524,6 @@ var updateEventPayloadImplementors = []string{"UpdateEventPayload"}
 
 func (ec *executionContext) _UpdateEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55763,9 +58531,19 @@ func (ec *executionContext) _UpdateEventPayload(ctx context.Context, sel ast.Sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateEventPayload")
 		case "event":
-			out.Values[i] = ec._UpdateEventPayload_event(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateEventPayload_event(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateEventPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateEventPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55781,7 +58559,6 @@ var updateLabelPayloadImplementors = []string{"UpdateLabelPayload"}
 
 func (ec *executionContext) _UpdateLabelPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateLabelPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateLabelPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55789,9 +58566,19 @@ func (ec *executionContext) _UpdateLabelPayload(ctx context.Context, sel ast.Sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateLabelPayload")
 		case "label":
-			out.Values[i] = ec._UpdateLabelPayload_label(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateLabelPayload_label(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateLabelPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateLabelPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55807,7 +58594,6 @@ var updateMandatePayloadImplementors = []string{"UpdateMandatePayload"}
 
 func (ec *executionContext) _UpdateMandatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateMandatePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateMandatePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55815,9 +58601,19 @@ func (ec *executionContext) _UpdateMandatePayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateMandatePayload")
 		case "mandate":
-			out.Values[i] = ec._UpdateMandatePayload_mandate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateMandatePayload_mandate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateMandatePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateMandatePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55833,7 +58629,6 @@ var updateNodeFragmentPayloadImplementors = []string{"UpdateNodeFragmentPayload"
 
 func (ec *executionContext) _UpdateNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNodeFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateNodeFragmentPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55841,9 +58636,19 @@ func (ec *executionContext) _UpdateNodeFragmentPayload(ctx context.Context, sel 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateNodeFragmentPayload")
 		case "nodeFragment":
-			out.Values[i] = ec._UpdateNodeFragmentPayload_nodeFragment(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateNodeFragmentPayload_nodeFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateNodeFragmentPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateNodeFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55859,7 +58664,6 @@ var updateNodePayloadImplementors = []string{"UpdateNodePayload"}
 
 func (ec *executionContext) _UpdateNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNodePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateNodePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55867,9 +58671,19 @@ func (ec *executionContext) _UpdateNodePayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateNodePayload")
 		case "node":
-			out.Values[i] = ec._UpdateNodePayload_node(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateNodePayload_node(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateNodePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateNodePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55885,7 +58699,6 @@ var updateOrgaAggPayloadImplementors = []string{"UpdateOrgaAggPayload"}
 
 func (ec *executionContext) _UpdateOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateOrgaAggPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateOrgaAggPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55893,9 +58706,19 @@ func (ec *executionContext) _UpdateOrgaAggPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateOrgaAggPayload")
 		case "orgaAgg":
-			out.Values[i] = ec._UpdateOrgaAggPayload_orgaAgg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateOrgaAggPayload_orgaAgg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateOrgaAggPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateOrgaAggPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55911,7 +58734,6 @@ var updatePendingUserPayloadImplementors = []string{"UpdatePendingUserPayload"}
 
 func (ec *executionContext) _UpdatePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdatePendingUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updatePendingUserPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55919,9 +58741,19 @@ func (ec *executionContext) _UpdatePendingUserPayload(ctx context.Context, sel a
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdatePendingUserPayload")
 		case "pendingUser":
-			out.Values[i] = ec._UpdatePendingUserPayload_pendingUser(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdatePendingUserPayload_pendingUser(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdatePendingUserPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdatePendingUserPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55937,7 +58769,6 @@ var updatePostPayloadImplementors = []string{"UpdatePostPayload"}
 
 func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdatePostPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updatePostPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55945,9 +58776,19 @@ func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdatePostPayload")
 		case "post":
-			out.Values[i] = ec._UpdatePostPayload_post(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdatePostPayload_post(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdatePostPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdatePostPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55963,7 +58804,6 @@ var updateRoleExtPayloadImplementors = []string{"UpdateRoleExtPayload"}
 
 func (ec *executionContext) _UpdateRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateRoleExtPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateRoleExtPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55971,9 +58811,19 @@ func (ec *executionContext) _UpdateRoleExtPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateRoleExtPayload")
 		case "roleExt":
-			out.Values[i] = ec._UpdateRoleExtPayload_roleExt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateRoleExtPayload_roleExt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateRoleExtPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateRoleExtPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -55989,7 +58839,6 @@ var updateTensionPayloadImplementors = []string{"UpdateTensionPayload"}
 
 func (ec *executionContext) _UpdateTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateTensionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateTensionPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -55997,9 +58846,19 @@ func (ec *executionContext) _UpdateTensionPayload(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateTensionPayload")
 		case "tension":
-			out.Values[i] = ec._UpdateTensionPayload_tension(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateTensionPayload_tension(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateTensionPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateTensionPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56015,7 +58874,6 @@ var updateUserEventPayloadImplementors = []string{"UpdateUserEventPayload"}
 
 func (ec *executionContext) _UpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserEventPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56023,9 +58881,19 @@ func (ec *executionContext) _UpdateUserEventPayload(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateUserEventPayload")
 		case "userEvent":
-			out.Values[i] = ec._UpdateUserEventPayload_userEvent(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserEventPayload_userEvent(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateUserEventPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserEventPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56041,7 +58909,6 @@ var updateUserPayloadImplementors = []string{"UpdateUserPayload"}
 
 func (ec *executionContext) _UpdateUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56049,9 +58916,19 @@ func (ec *executionContext) _UpdateUserPayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateUserPayload")
 		case "user":
-			out.Values[i] = ec._UpdateUserPayload_user(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserPayload_user(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateUserPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56067,7 +58944,6 @@ var updateUserRightsPayloadImplementors = []string{"UpdateUserRightsPayload"}
 
 func (ec *executionContext) _UpdateUserRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserRightsPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserRightsPayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56075,9 +58951,19 @@ func (ec *executionContext) _UpdateUserRightsPayload(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateUserRightsPayload")
 		case "userRights":
-			out.Values[i] = ec._UpdateUserRightsPayload_userRights(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserRightsPayload_userRights(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateUserRightsPayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserRightsPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56093,7 +58979,6 @@ var updateVotePayloadImplementors = []string{"UpdateVotePayload"}
 
 func (ec *executionContext) _UpdateVotePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateVotePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateVotePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56101,9 +58986,19 @@ func (ec *executionContext) _UpdateVotePayload(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateVotePayload")
 		case "vote":
-			out.Values[i] = ec._UpdateVotePayload_vote(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateVotePayload_vote(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "numUids":
-			out.Values[i] = ec._UpdateVotePayload_numUids(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateVotePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56119,7 +59014,6 @@ var userImplementors = []string{"User"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56127,85 +59021,225 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
 		case "id":
-			out.Values[i] = ec._User_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._User_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "lastAck":
-			out.Values[i] = ec._User_lastAck(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_lastAck(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "username":
-			out.Values[i] = ec._User_username(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_username(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec._User_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "password":
-			out.Values[i] = ec._User_password(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_password(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "email":
-			out.Values[i] = ec._User_email(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_email(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "emailHash":
-			out.Values[i] = ec._User_emailHash(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_emailHash(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailValidated":
-			out.Values[i] = ec._User_emailValidated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_emailValidated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "bio":
-			out.Values[i] = ec._User_bio(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_bio(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "utc":
-			out.Values[i] = ec._User_utc(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_utc(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "notifyByEmail":
-			out.Values[i] = ec._User_notifyByEmail(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_notifyByEmail(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscriptions":
-			out.Values[i] = ec._User_subscriptions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_subscriptions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rights":
-			out.Values[i] = ec._User_rights(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_rights(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "roles":
-			out.Values[i] = ec._User_roles(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_roles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "backed_roles":
-			out.Values[i] = ec._User_backed_roles(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_backed_roles(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_created":
-			out.Values[i] = ec._User_tensions_created(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_tensions_created(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_assigned":
-			out.Values[i] = ec._User_tensions_assigned(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_tensions_assigned(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contracts":
-			out.Values[i] = ec._User_contracts(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_contracts(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "events":
-			out.Values[i] = ec._User_events(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_events(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "markAllAsRead":
-			out.Values[i] = ec._User_markAllAsRead(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_markAllAsRead(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscriptionsAggregate":
-			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_subscriptionsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "rolesAggregate":
-			out.Values[i] = ec._User_rolesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_rolesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "backed_rolesAggregate":
-			out.Values[i] = ec._User_backed_rolesAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_backed_rolesAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_createdAggregate":
-			out.Values[i] = ec._User_tensions_createdAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_tensions_createdAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_assignedAggregate":
-			out.Values[i] = ec._User_tensions_assignedAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_tensions_assignedAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "contractsAggregate":
-			out.Values[i] = ec._User_contractsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_contractsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "eventsAggregate":
-			out.Values[i] = ec._User_eventsAggregate(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_eventsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56221,7 +59255,6 @@ var userAggregateResultImplementors = []string{"UserAggregateResult"}
 
 func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56229,47 +59262,152 @@ func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserAggregateResult")
 		case "count":
-			out.Values[i] = ec._UserAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._UserAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._UserAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "lastAckMin":
-			out.Values[i] = ec._UserAggregateResult_lastAckMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_lastAckMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "lastAckMax":
-			out.Values[i] = ec._UserAggregateResult_lastAckMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_lastAckMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "usernameMin":
-			out.Values[i] = ec._UserAggregateResult_usernameMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_usernameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "usernameMax":
-			out.Values[i] = ec._UserAggregateResult_usernameMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_usernameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMin":
-			out.Values[i] = ec._UserAggregateResult_nameMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_nameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nameMax":
-			out.Values[i] = ec._UserAggregateResult_nameMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_nameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "passwordMin":
-			out.Values[i] = ec._UserAggregateResult_passwordMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_passwordMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "passwordMax":
-			out.Values[i] = ec._UserAggregateResult_passwordMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_passwordMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailMin":
-			out.Values[i] = ec._UserAggregateResult_emailMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_emailMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailMax":
-			out.Values[i] = ec._UserAggregateResult_emailMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_emailMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailHashMin":
-			out.Values[i] = ec._UserAggregateResult_emailHashMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_emailHashMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailHashMax":
-			out.Values[i] = ec._UserAggregateResult_emailHashMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_emailHashMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "bioMin":
-			out.Values[i] = ec._UserAggregateResult_bioMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_bioMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "bioMax":
-			out.Values[i] = ec._UserAggregateResult_bioMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_bioMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "utcMin":
-			out.Values[i] = ec._UserAggregateResult_utcMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_utcMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "utcMax":
-			out.Values[i] = ec._UserAggregateResult_utcMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_utcMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "markAllAsReadMin":
-			out.Values[i] = ec._UserAggregateResult_markAllAsReadMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_markAllAsReadMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "markAllAsReadMax":
-			out.Values[i] = ec._UserAggregateResult_markAllAsReadMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_markAllAsReadMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56285,7 +59423,6 @@ var userEventImplementors = []string{"UserEvent"}
 
 func (ec *executionContext) _UserEvent(ctx context.Context, sel ast.SelectionSet, obj *model.UserEvent) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userEventImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56293,27 +59430,52 @@ func (ec *executionContext) _UserEvent(ctx context.Context, sel ast.SelectionSet
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserEvent")
 		case "id":
-			out.Values[i] = ec._UserEvent_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEvent_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._UserEvent_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEvent_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isRead":
-			out.Values[i] = ec._UserEvent_isRead(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEvent_isRead(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "user":
-			out.Values[i] = ec._UserEvent_user(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEvent_user(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "event":
-			out.Values[i] = ec._UserEvent_event(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEvent_event(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56329,7 +59491,6 @@ var userEventAggregateResultImplementors = []string{"UserEventAggregateResult"}
 
 func (ec *executionContext) _UserEventAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserEventAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userEventAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56337,11 +59498,26 @@ func (ec *executionContext) _UserEventAggregateResult(ctx context.Context, sel a
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserEventAggregateResult")
 		case "count":
-			out.Values[i] = ec._UserEventAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._UserEventAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._UserEventAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56357,7 +59533,6 @@ var userRightsImplementors = []string{"UserRights"}
 
 func (ec *executionContext) _UserRights(ctx context.Context, sel ast.SelectionSet, obj *model.UserRights) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userRightsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56365,22 +59540,42 @@ func (ec *executionContext) _UserRights(ctx context.Context, sel ast.SelectionSe
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserRights")
 		case "canLogin":
-			out.Values[i] = ec._UserRights_canLogin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRights_canLogin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "canCreateRoot":
-			out.Values[i] = ec._UserRights_canCreateRoot(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRights_canCreateRoot(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "maxPublicOrga":
-			out.Values[i] = ec._UserRights_maxPublicOrga(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRights_maxPublicOrga(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "type_":
-			out.Values[i] = ec._UserRights_type_(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRights_type_(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -56399,7 +59594,6 @@ var userRightsAggregateResultImplementors = []string{"UserRightsAggregateResult"
 
 func (ec *executionContext) _UserRightsAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserRightsAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userRightsAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56407,15 +59601,40 @@ func (ec *executionContext) _UserRightsAggregateResult(ctx context.Context, sel 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserRightsAggregateResult")
 		case "count":
-			out.Values[i] = ec._UserRightsAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRightsAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "maxPublicOrgaMin":
-			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRightsAggregateResult_maxPublicOrgaMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "maxPublicOrgaMax":
-			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRightsAggregateResult_maxPublicOrgaMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "maxPublicOrgaSum":
-			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaSum(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRightsAggregateResult_maxPublicOrgaSum(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "maxPublicOrgaAvg":
-			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaAvg(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRightsAggregateResult_maxPublicOrgaAvg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56431,7 +59650,6 @@ var voteImplementors = []string{"Vote"}
 
 func (ec *executionContext) _Vote(ctx context.Context, sel ast.SelectionSet, obj *model.Vote) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, voteImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56439,44 +59657,89 @@ func (ec *executionContext) _Vote(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Vote")
 		case "voteid":
-			out.Values[i] = ec._Vote_voteid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_voteid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "contract":
-			out.Values[i] = ec._Vote_contract(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_contract(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "node":
-			out.Values[i] = ec._Vote_node(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_node(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "data":
-			out.Values[i] = ec._Vote_data(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_data(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "id":
-			out.Values[i] = ec._Vote_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdBy":
-			out.Values[i] = ec._Vote_createdBy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "createdAt":
-			out.Values[i] = ec._Vote_createdAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updatedAt":
-			out.Values[i] = ec._Vote_updatedAt(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Vote_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Vote_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56492,7 +59755,6 @@ var voteAggregateResultImplementors = []string{"VoteAggregateResult"}
 
 func (ec *executionContext) _VoteAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.VoteAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, voteAggregateResultImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56500,23 +59762,68 @@ func (ec *executionContext) _VoteAggregateResult(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("VoteAggregateResult")
 		case "count":
-			out.Values[i] = ec._VoteAggregateResult_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMin":
-			out.Values[i] = ec._VoteAggregateResult_createdAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "createdAtMax":
-			out.Values[i] = ec._VoteAggregateResult_createdAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMin":
-			out.Values[i] = ec._VoteAggregateResult_updatedAtMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "updatedAtMax":
-			out.Values[i] = ec._VoteAggregateResult_updatedAtMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMin":
-			out.Values[i] = ec._VoteAggregateResult_messageMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "messageMax":
-			out.Values[i] = ec._VoteAggregateResult_messageMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_messageMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "voteidMin":
-			out.Values[i] = ec._VoteAggregateResult_voteidMin(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_voteidMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "voteidMax":
-			out.Values[i] = ec._VoteAggregateResult_voteidMax(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._VoteAggregateResult_voteidMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56532,7 +59839,6 @@ var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __DirectiveImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56540,24 +59846,49 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Directive")
 		case "name":
-			out.Values[i] = ec.___Directive_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___Directive_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "locations":
-			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_locations(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "args":
-			out.Values[i] = ec.___Directive_args(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_args(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isRepeatable":
-			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_isRepeatable(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -56576,7 +59907,6 @@ var __EnumValueImplementors = []string{"__EnumValue"}
 
 func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.EnumValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __EnumValueImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56584,19 +59914,39 @@ func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__EnumValue")
 		case "name":
-			out.Values[i] = ec.___EnumValue_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___EnumValue_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "isDeprecated":
-			out.Values[i] = ec.___EnumValue_isDeprecated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_isDeprecated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deprecationReason":
-			out.Values[i] = ec.___EnumValue_deprecationReason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_deprecationReason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56612,7 +59962,6 @@ var __FieldImplementors = []string{"__Field"}
 
 func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, obj *introspection.Field) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __FieldImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56620,29 +59969,59 @@ func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Field")
 		case "name":
-			out.Values[i] = ec.___Field_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___Field_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "args":
-			out.Values[i] = ec.___Field_args(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_args(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "type":
-			out.Values[i] = ec.___Field_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isDeprecated":
-			out.Values[i] = ec.___Field_isDeprecated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_isDeprecated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deprecationReason":
-			out.Values[i] = ec.___Field_deprecationReason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_deprecationReason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56658,7 +60037,6 @@ var __InputValueImplementors = []string{"__InputValue"}
 
 func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.InputValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __InputValueImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56666,19 +60044,39 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__InputValue")
 		case "name":
-			out.Values[i] = ec.___InputValue_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___InputValue_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "type":
-			out.Values[i] = ec.___InputValue_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "defaultValue":
-			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_defaultValue(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56694,7 +60092,6 @@ var __SchemaImplementors = []string{"__Schema"}
 
 func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet, obj *introspection.Schema) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __SchemaImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56702,21 +60099,46 @@ func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Schema")
 		case "types":
-			out.Values[i] = ec.___Schema_types(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_types(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "queryType":
-			out.Values[i] = ec.___Schema_queryType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_queryType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "mutationType":
-			out.Values[i] = ec.___Schema_mutationType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_mutationType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscriptionType":
-			out.Values[i] = ec.___Schema_subscriptionType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_subscriptionType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "directives":
-			out.Values[i] = ec.___Schema_directives(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_directives(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -56735,7 +60157,6 @@ var __TypeImplementors = []string{"__Type"}
 
 func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, obj *introspection.Type) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __TypeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -56743,26 +60164,71 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Type")
 		case "kind":
-			out.Values[i] = ec.___Type_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec.___Type_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "description":
-			out.Values[i] = ec.___Type_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "fields":
-			out.Values[i] = ec.___Type_fields(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_fields(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "interfaces":
-			out.Values[i] = ec.___Type_interfaces(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_interfaces(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "possibleTypes":
-			out.Values[i] = ec.___Type_possibleTypes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_possibleTypes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "enumValues":
-			out.Values[i] = ec.___Type_enumValues(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_enumValues(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "inputFields":
-			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_inputFields(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "ofType":
-			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_ofType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -56781,11 +60247,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 func (ec *executionContext) unmarshalNAddBlobInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBlobInputᚄ(ctx context.Context, v interface{}) ([]*model.AddBlobInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddBlobInput, len(vSlice))
@@ -56807,11 +60269,7 @@ func (ec *executionContext) unmarshalNAddBlobInput2ᚖzerogovᚋfractal6ᚗgoᚋ
 func (ec *executionContext) unmarshalNAddCommentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddCommentInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddCommentInput, len(vSlice))
@@ -56833,11 +60291,7 @@ func (ec *executionContext) unmarshalNAddCommentInput2ᚖzerogovᚋfractal6ᚗgo
 func (ec *executionContext) unmarshalNAddContractInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInputᚄ(ctx context.Context, v interface{}) ([]*model.AddContractInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddContractInput, len(vSlice))
@@ -56859,11 +60313,7 @@ func (ec *executionContext) unmarshalNAddContractInput2ᚖzerogovᚋfractal6ᚗg
 func (ec *executionContext) unmarshalNAddEventFragmentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddEventFragmentInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddEventFragmentInput, len(vSlice))
@@ -56885,11 +60335,7 @@ func (ec *executionContext) unmarshalNAddEventFragmentInput2ᚖzerogovᚋfractal
 func (ec *executionContext) unmarshalNAddEventInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventInputᚄ(ctx context.Context, v interface{}) ([]*model.AddEventInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddEventInput, len(vSlice))
@@ -56911,11 +60357,7 @@ func (ec *executionContext) unmarshalNAddEventInput2ᚖzerogovᚋfractal6ᚗgo�
 func (ec *executionContext) unmarshalNAddLabelInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddLabelInputᚄ(ctx context.Context, v interface{}) ([]*model.AddLabelInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddLabelInput, len(vSlice))
@@ -56937,11 +60379,7 @@ func (ec *executionContext) unmarshalNAddLabelInput2ᚖzerogovᚋfractal6ᚗgo�
 func (ec *executionContext) unmarshalNAddMandateInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddMandateInputᚄ(ctx context.Context, v interface{}) ([]*model.AddMandateInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddMandateInput, len(vSlice))
@@ -56963,11 +60401,7 @@ func (ec *executionContext) unmarshalNAddMandateInput2ᚖzerogovᚋfractal6ᚗgo
 func (ec *executionContext) unmarshalNAddNodeFragmentInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeFragmentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeFragmentInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddNodeFragmentInput, len(vSlice))
@@ -56989,11 +60423,7 @@ func (ec *executionContext) unmarshalNAddNodeFragmentInput2ᚖzerogovᚋfractal6
 func (ec *executionContext) unmarshalNAddNodeInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNodeInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNodeInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddNodeInput, len(vSlice))
@@ -57015,11 +60445,7 @@ func (ec *executionContext) unmarshalNAddNodeInput2ᚖzerogovᚋfractal6ᚗgoᚋ
 func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInputᚄ(ctx context.Context, v interface{}) ([]*model.AddOrgaAggInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddOrgaAggInput, len(vSlice))
@@ -57041,11 +60467,7 @@ func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚖzerogovᚋfractal6ᚗgo
 func (ec *executionContext) unmarshalNAddPendingUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInputᚄ(ctx context.Context, v interface{}) ([]*model.AddPendingUserInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddPendingUserInput, len(vSlice))
@@ -57067,11 +60489,7 @@ func (ec *executionContext) unmarshalNAddPendingUserInput2ᚖzerogovᚋfractal6�
 func (ec *executionContext) unmarshalNAddRoleExtInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtInputᚄ(ctx context.Context, v interface{}) ([]*model.AddRoleExtInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddRoleExtInput, len(vSlice))
@@ -57093,11 +60511,7 @@ func (ec *executionContext) unmarshalNAddRoleExtInput2ᚖzerogovᚋfractal6ᚗgo
 func (ec *executionContext) unmarshalNAddTensionInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionInputᚄ(ctx context.Context, v interface{}) ([]*model.AddTensionInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddTensionInput, len(vSlice))
@@ -57119,11 +60533,7 @@ func (ec *executionContext) unmarshalNAddTensionInput2ᚖzerogovᚋfractal6ᚗgo
 func (ec *executionContext) unmarshalNAddUserEventInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserEventInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddUserEventInput, len(vSlice))
@@ -57145,11 +60555,7 @@ func (ec *executionContext) unmarshalNAddUserEventInput2ᚖzerogovᚋfractal6ᚗ
 func (ec *executionContext) unmarshalNAddUserInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddUserInput, len(vSlice))
@@ -57171,11 +60577,7 @@ func (ec *executionContext) unmarshalNAddUserInput2ᚖzerogovᚋfractal6ᚗgoᚋ
 func (ec *executionContext) unmarshalNAddUserRightsInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserRightsInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserRightsInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddUserRightsInput, len(vSlice))
@@ -57197,11 +60599,7 @@ func (ec *executionContext) unmarshalNAddUserRightsInput2ᚖzerogovᚋfractal6�
 func (ec *executionContext) unmarshalNAddVoteInput2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddVoteInputᚄ(ctx context.Context, v interface{}) ([]*model.AddVoteInput, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AddVoteInput, len(vSlice))
@@ -57441,18 +60839,18 @@ func (ec *executionContext) unmarshalNEventRef2ᚖzerogovᚋfractal6ᚗgoᚋgrap
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
-	res, err := graphql.UnmarshalFloat(v)
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
-	res := graphql.MarshalFloat(v)
+	res := graphql.MarshalFloatContext(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 	}
-	return res
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalNHTTPMethod2zerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐHTTPMethod(ctx context.Context, v interface{}) (model.HTTPMethod, error) {
@@ -57498,11 +60896,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]int, len(vSlice))
@@ -57807,11 +61201,7 @@ func (ec *executionContext) marshalNPointList2ᚖzerogovᚋfractal6ᚗgoᚋgraph
 func (ec *executionContext) unmarshalNPointListRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointListRefᚄ(ctx context.Context, v interface{}) ([]*model.PointListRef, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PointListRef, len(vSlice))
@@ -57833,11 +61223,7 @@ func (ec *executionContext) unmarshalNPointListRef2ᚖzerogovᚋfractal6ᚗgoᚋ
 func (ec *executionContext) unmarshalNPointRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRefᚄ(ctx context.Context, v interface{}) ([]*model.PointRef, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PointRef, len(vSlice))
@@ -57913,11 +61299,7 @@ func (ec *executionContext) marshalNPolygon2ᚖzerogovᚋfractal6ᚗgoᚋgraph�
 func (ec *executionContext) unmarshalNPolygonRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRefᚄ(ctx context.Context, v interface{}) ([]*model.PolygonRef, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PolygonRef, len(vSlice))
@@ -58293,11 +61675,7 @@ func (ec *executionContext) unmarshalNVoteFilter2ᚖzerogovᚋfractal6ᚗgoᚋgr
 func (ec *executionContext) unmarshalNVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx context.Context, v interface{}) ([]*model.VoteRef, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.VoteRef, len(vSlice))
@@ -58382,11 +61760,7 @@ func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Conte
 func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]string, len(vSlice))
@@ -58698,11 +62072,7 @@ func (ec *executionContext) unmarshalOAuthRule2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.AuthRule, len(vSlice))
@@ -58832,11 +62202,7 @@ func (ec *executionContext) unmarshalOBlobFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.BlobFilter, len(vSlice))
@@ -58864,11 +62230,7 @@ func (ec *executionContext) unmarshalOBlobHasFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.BlobHasFilter, len(vSlice))
@@ -58977,11 +62339,7 @@ func (ec *executionContext) unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.BlobRef, len(vSlice))
@@ -59001,11 +62359,7 @@ func (ec *executionContext) unmarshalOBlobRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.BlobRef, len(vSlice))
@@ -59033,11 +62387,7 @@ func (ec *executionContext) unmarshalOBlobType2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.BlobType, len(vSlice))
@@ -59122,7 +62472,8 @@ func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interf
 }
 
 func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
-	return graphql.MarshalBoolean(v)
+	res := graphql.MarshalBoolean(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v interface{}) (*bool, error) {
@@ -59137,7 +62488,8 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalBoolean(*v)
+	res := graphql.MarshalBoolean(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOComment2ᚕᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
@@ -59248,11 +62600,7 @@ func (ec *executionContext) unmarshalOCommentFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.CommentFilter, len(vSlice))
@@ -59280,11 +62628,7 @@ func (ec *executionContext) unmarshalOCommentHasFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.CommentHasFilter, len(vSlice))
@@ -59393,11 +62737,7 @@ func (ec *executionContext) unmarshalOCommentRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.CommentRef, len(vSlice))
@@ -59527,11 +62867,7 @@ func (ec *executionContext) unmarshalOContractFilter2ᚕᚖzerogovᚋfractal6ᚗ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.ContractFilter, len(vSlice))
@@ -59559,11 +62895,7 @@ func (ec *executionContext) unmarshalOContractHasFilter2ᚕᚖzerogovᚋfractal6
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.ContractHasFilter, len(vSlice))
@@ -59672,11 +63004,7 @@ func (ec *executionContext) unmarshalOContractRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.ContractRef, len(vSlice))
@@ -59704,11 +63032,7 @@ func (ec *executionContext) unmarshalOContractStatus2ᚕᚖzerogovᚋfractal6ᚗ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.ContractStatus, len(vSlice))
@@ -59793,11 +63117,7 @@ func (ec *executionContext) unmarshalOContractType2ᚕᚖzerogovᚋfractal6ᚗgo
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.ContractType, len(vSlice))
@@ -59890,11 +63210,7 @@ func (ec *executionContext) unmarshalODateTime2ᚕᚖstring(ctx context.Context,
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*string, len(vSlice))
@@ -59932,7 +63248,8 @@ func (ec *executionContext) marshalODateTime2ᚖstring(ctx context.Context, sel 
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalODateTimeFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx context.Context, v interface{}) (*model.DateTimeFilter, error) {
@@ -60091,11 +63408,7 @@ func (ec *executionContext) unmarshalODgraphIndex2ᚕzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]model.DgraphIndex, len(vSlice))
@@ -60264,11 +63577,7 @@ func (ec *executionContext) unmarshalOEventFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.EventFilter, len(vSlice))
@@ -60351,11 +63660,7 @@ func (ec *executionContext) unmarshalOEventFragmentFilter2ᚕᚖzerogovᚋfracta
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.EventFragmentFilter, len(vSlice))
@@ -60383,11 +63688,7 @@ func (ec *executionContext) unmarshalOEventFragmentHasFilter2ᚕᚖzerogovᚋfra
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.EventFragmentHasFilter, len(vSlice))
@@ -60504,11 +63805,7 @@ func (ec *executionContext) unmarshalOEventHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.EventHasFilter, len(vSlice))
@@ -60640,11 +63937,7 @@ func (ec *executionContext) unmarshalOEventKindRef2ᚕᚖzerogovᚋfractal6ᚗgo
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.EventKindRef, len(vSlice))
@@ -60664,11 +63957,7 @@ func (ec *executionContext) unmarshalOEventKindType2ᚕzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]model.EventKindType, len(vSlice))
@@ -60767,11 +64056,7 @@ func (ec *executionContext) unmarshalOEventRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.EventRef, len(vSlice))
@@ -60799,11 +64084,7 @@ func (ec *executionContext) unmarshalOFloat2ᚕᚖfloat64(ctx context.Context, v
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*float64, len(vSlice))
@@ -60833,7 +64114,7 @@ func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v in
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalFloat(v)
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -60841,7 +64122,8 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalFloat(*v)
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalOFloatRange2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐFloatRange(ctx context.Context, v interface{}) (*model.FloatRange, error) {
@@ -60874,11 +64156,7 @@ func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v int
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]string, len(vSlice))
@@ -60922,7 +64200,8 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalID(*v)
+	res := graphql.MarshalID(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
@@ -60931,11 +64210,7 @@ func (ec *executionContext) unmarshalOInt2ᚕintᚄ(ctx context.Context, v inter
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]int, len(vSlice))
@@ -60973,11 +64248,7 @@ func (ec *executionContext) unmarshalOInt2ᚕᚖint(ctx context.Context, v inter
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*int, len(vSlice))
@@ -61015,7 +64286,8 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalInt(*v)
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOInt642ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
@@ -61024,11 +64296,7 @@ func (ec *executionContext) unmarshalOInt642ᚕᚖstring(ctx context.Context, v 
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*string, len(vSlice))
@@ -61066,7 +64334,8 @@ func (ec *executionContext) marshalOInt642ᚖstring(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOInt64Range2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐInt64Range(ctx context.Context, v interface{}) (*model.Int64Range, error) {
@@ -61201,11 +64470,7 @@ func (ec *executionContext) unmarshalOLabelFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.LabelFilter, len(vSlice))
@@ -61233,11 +64498,7 @@ func (ec *executionContext) unmarshalOLabelHasFilter2ᚕᚖzerogovᚋfractal6ᚗ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.LabelHasFilter, len(vSlice))
@@ -61346,11 +64607,7 @@ func (ec *executionContext) unmarshalOLabelRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.LabelRef, len(vSlice))
@@ -61425,11 +64682,7 @@ func (ec *executionContext) unmarshalOMandateFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.MandateFilter, len(vSlice))
@@ -61457,11 +64710,7 @@ func (ec *executionContext) unmarshalOMandateHasFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.MandateHasFilter, len(vSlice))
@@ -61712,11 +64961,7 @@ func (ec *executionContext) unmarshalONodeFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeFilter, len(vSlice))
@@ -61846,11 +65091,7 @@ func (ec *executionContext) unmarshalONodeFragmentFilter2ᚕᚖzerogovᚋfractal
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeFragmentFilter, len(vSlice))
@@ -61878,11 +65119,7 @@ func (ec *executionContext) unmarshalONodeFragmentHasFilter2ᚕᚖzerogovᚋfrac
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeFragmentHasFilter, len(vSlice))
@@ -61991,11 +65228,7 @@ func (ec *executionContext) unmarshalONodeFragmentRef2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeFragmentRef, len(vSlice))
@@ -62023,11 +65256,7 @@ func (ec *executionContext) unmarshalONodeHasFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeHasFilter, len(vSlice))
@@ -62104,11 +65333,7 @@ func (ec *executionContext) unmarshalONodeMode2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeMode, len(vSlice))
@@ -62225,11 +65450,7 @@ func (ec *executionContext) unmarshalONodeRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeRef, len(vSlice))
@@ -62257,11 +65478,7 @@ func (ec *executionContext) unmarshalONodeType2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeType, len(vSlice))
@@ -62346,11 +65563,7 @@ func (ec *executionContext) unmarshalONodeVisibility2ᚕᚖzerogovᚋfractal6ᚗ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.NodeVisibility, len(vSlice))
@@ -62490,11 +65703,7 @@ func (ec *executionContext) unmarshalOOrgaAggFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.OrgaAggFilter, len(vSlice))
@@ -62522,11 +65731,7 @@ func (ec *executionContext) unmarshalOOrgaAggHasFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.OrgaAggHasFilter, len(vSlice))
@@ -62745,11 +65950,7 @@ func (ec *executionContext) unmarshalOPendingUserFilter2ᚕᚖzerogovᚋfractal6
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PendingUserFilter, len(vSlice))
@@ -62777,11 +65978,7 @@ func (ec *executionContext) unmarshalOPendingUserHasFilter2ᚕᚖzerogovᚋfract
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PendingUserHasFilter, len(vSlice))
@@ -62890,11 +66087,7 @@ func (ec *executionContext) unmarshalOPendingUserRef2ᚕᚖzerogovᚋfractal6ᚗ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PendingUserRef, len(vSlice))
@@ -62985,11 +66178,7 @@ func (ec *executionContext) unmarshalOPostFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PostFilter, len(vSlice))
@@ -63017,11 +66206,7 @@ func (ec *executionContext) unmarshalOPostHasFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.PostHasFilter, len(vSlice))
@@ -63232,11 +66417,7 @@ func (ec *executionContext) unmarshalORoleExtFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.RoleExtFilter, len(vSlice))
@@ -63264,11 +66445,7 @@ func (ec *executionContext) unmarshalORoleExtHasFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.RoleExtHasFilter, len(vSlice))
@@ -63377,11 +66554,7 @@ func (ec *executionContext) unmarshalORoleExtRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.RoleExtRef, len(vSlice))
@@ -63409,11 +66582,7 @@ func (ec *executionContext) unmarshalORoleType2ᚕᚖzerogovᚋfractal6ᚗgoᚋg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.RoleType, len(vSlice))
@@ -63498,7 +66667,8 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 }
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalString(v)
+	res := graphql.MarshalString(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
@@ -63507,11 +66677,7 @@ func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]string, len(vSlice))
@@ -63549,11 +66715,7 @@ func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*string, len(vSlice))
@@ -63591,7 +66753,8 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOStringFullTextFilter2ᚖzerogovᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx context.Context, v interface{}) (*model.StringFullTextFilter, error) {
@@ -63774,11 +66937,7 @@ func (ec *executionContext) unmarshalOTensionEvent2ᚕzerogovᚋfractal6ᚗgoᚋ
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]model.TensionEvent, len(vSlice))
@@ -63845,11 +67004,7 @@ func (ec *executionContext) unmarshalOTensionEvent2ᚕᚖzerogovᚋfractal6ᚗgo
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.TensionEvent, len(vSlice))
@@ -63934,11 +67089,7 @@ func (ec *executionContext) unmarshalOTensionFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.TensionFilter, len(vSlice))
@@ -63966,11 +67117,7 @@ func (ec *executionContext) unmarshalOTensionHasFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.TensionHasFilter, len(vSlice))
@@ -64079,11 +67226,7 @@ func (ec *executionContext) unmarshalOTensionRef2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.TensionRef, len(vSlice))
@@ -64111,11 +67254,7 @@ func (ec *executionContext) unmarshalOTensionStatus2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.TensionStatus, len(vSlice))
@@ -64200,11 +67339,7 @@ func (ec *executionContext) unmarshalOTensionType2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.TensionType, len(vSlice))
@@ -64619,11 +67754,7 @@ func (ec *executionContext) unmarshalOUserEventFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserEventFilter, len(vSlice))
@@ -64651,11 +67782,7 @@ func (ec *executionContext) unmarshalOUserEventHasFilter2ᚕᚖzerogovᚋfractal
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserEventHasFilter, len(vSlice))
@@ -64764,11 +67891,7 @@ func (ec *executionContext) unmarshalOUserEventRef2ᚕᚖzerogovᚋfractal6ᚗgo
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserEventRef, len(vSlice))
@@ -64788,11 +67911,7 @@ func (ec *executionContext) unmarshalOUserFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserFilter, len(vSlice))
@@ -64820,11 +67939,7 @@ func (ec *executionContext) unmarshalOUserHasFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserHasFilter, len(vSlice))
@@ -64933,11 +68048,7 @@ func (ec *executionContext) unmarshalOUserRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserRef, len(vSlice))
@@ -65020,11 +68131,7 @@ func (ec *executionContext) unmarshalOUserRightsFilter2ᚕᚖzerogovᚋfractal6�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserRightsFilter, len(vSlice))
@@ -65052,11 +68159,7 @@ func (ec *executionContext) unmarshalOUserRightsHasFilter2ᚕᚖzerogovᚋfracta
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.UserRightsHasFilter, len(vSlice))
@@ -65291,11 +68394,7 @@ func (ec *executionContext) unmarshalOVoteFilter2ᚕᚖzerogovᚋfractal6ᚗgo�
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.VoteFilter, len(vSlice))
@@ -65323,11 +68422,7 @@ func (ec *executionContext) unmarshalOVoteHasFilter2ᚕᚖzerogovᚋfractal6ᚗg
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.VoteHasFilter, len(vSlice))
@@ -65436,11 +68531,7 @@ func (ec *executionContext) unmarshalOVoteRef2ᚕᚖzerogovᚋfractal6ᚗgoᚋgr
 	}
 	var vSlice []interface{}
 	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
+		vSlice = graphql.CoerceList(v)
 	}
 	var err error
 	res := make([]*model.VoteRef, len(vSlice))

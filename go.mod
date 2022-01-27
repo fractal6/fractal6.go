@@ -3,7 +3,7 @@ module zerogov/fractal6.go
 go 1.17
 
 require (
-	github.com/99designs/gqlgen v0.14.0
+	github.com/99designs/gqlgen v0.16.0
 	github.com/dgraph-io/dgo/v200 v200.0.0-20200502013902-3336867fe8a1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/jwtauth/v5 v5.0.2
@@ -11,11 +11,11 @@ require (
 	github.com/gomodule/redigo v1.8.5
 	github.com/lestrrat-go/jwx v1.2.18
 	github.com/mitchellh/mapstructure v1.4.3
-	github.com/rs/cors v1.7.0
+	github.com/rs/cors v1.8.2
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
 	github.com/steambap/captcha v1.4.1
-	github.com/vektah/gqlparser/v2 v2.2.0
+	github.com/vektah/gqlparser/v2 v2.3.1
 	golang.org/x/crypto v0.0.0-20220126173729-e04a8579fee6
 	google.golang.org/grpc v1.29.1
 )
@@ -50,9 +50,9 @@ require (
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
-	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.8 // indirect
+	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55 // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
