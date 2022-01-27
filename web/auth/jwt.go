@@ -8,14 +8,14 @@ import (
     "context"
     "encoding/json"
     "net/http"
+    "github.com/go-chi/jwtauth/v5"
+    "github.com/lestrrat-go/jwx/jwt"
     //"github.com/mitchellh/mapstructure"
 
     . "zerogov/fractal6.go/tools"
 	"zerogov/fractal6.go/graph/model"
 	"zerogov/fractal6.go/db"
 
-    "zerogov/fractal6.go/web/middleware/jwtauth"
-    jwt "github.com/dgrijalva/jwt-go"
 )
 
 var tkMaster *Jwt
@@ -52,12 +52,16 @@ func (Jwt) New() *Jwt {
 	}
 
     if buildMode == "DEV" {
+        // Api debug token
         uctx := db.DB.GetRootUctx()
         o := model.RoleTypeOwner
         uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
         apiToken, _ := tk.issue(uctx, time.Hour*48)
+
+        // Dgraph token
         dgraphToken := db.GetDB().BuildGqlToken(uctx, time.Hour*48)
 
+        // Log
         fmt.Println("Api token:", Unpack64(apiToken))
         fmt.Println("Dgraph token:", dgraphToken)
     }
@@ -71,7 +75,7 @@ func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
 
 // Issue generate and encode a new token
 func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
-    claims := jwt.MapClaims{ tk.tokenClaim: d }
+    claims := map[string]interface{}{ tk.tokenClaim: d }
     jwtauth.SetIssuedNow(claims)
     jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 	_, token, err := tk.tokenAuth.Encode(claims)
@@ -93,8 +97,8 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
     if buildMode == "PROD" {
         token, err = tkMaster.issue(userCtx, time.Hour*24*30)
     } else {
-        token, err = tkMaster.issue(userCtx, time.Hour*12)
-        //token, err = tkMaster.issue(userCtx, time.Second*30)
+        //token, err = tkMaster.issue(userCtx, time.Hour*12)
+        token, err = tkMaster.issue(userCtx, time.Second*60)
     }
     return token, err
 }
@@ -144,7 +148,7 @@ func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
         }
         //http.Error(w, http.StatusText(401), 401)
         //return
-    } else if token == nil || !token.Valid {
+    } else if token == nil || jwt.Validate(token) != nil {
         err = errors.New("jwtauth: token is invalid")
     } else if claims[tkMaster.tokenClaim] == nil {
         err = errors.New("auth: user claim is invalid")
@@ -163,8 +167,10 @@ func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
 
     // Set the Iat
     if claims["iat"] != nil {
-        var iat int64 = int64(claims["iat"].(float64))
-        return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339)), err
+        //iat := claims["iat"].(int64)
+        //return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339)), err
+        iat := claims["iat"].(time.Time)
+        return context.WithValue(ctx, "iat", iat.Format(time.RFC3339)), err
     }
     //LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
     return ctx, err

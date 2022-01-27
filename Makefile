@@ -18,10 +18,11 @@ default: build
 
 run:
 	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
-	# * JWT_SECRET
-	# * DGRAPH_SECRET
-	# * EMAIL_API_KEY
 	# * EMAIL_API_URL
+	# * EMAIL_API_KEY
+	# * JWT_SECRET
+	# * DGRAPH_PUBLIC_KEY
+	# * DGRAPH_PRIVATE_KEY
 	go run main.go run
 
 build:
@@ -79,3 +80,11 @@ $(LANGS):
 
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort
+
+rsa:
+	#ssh-keygen -t rsa -P "" -b 2048 -m PEM -f jwtRS256.key
+	#ssh-keygen -e -m PEM -f jwtRS256.key > jwtRS256.key.pub
+	openssl genrsa -out private.pem 2048
+	openssl rsa -in private.pem -pubout -out public.pem
+	# Copy public key to the Dgraph authorization object
+	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" |  xclip -selection clipboard;

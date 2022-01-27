@@ -4,15 +4,14 @@ import (
     "log"
     "time"
     "net/http"
-    "github.com/go-chi/chi"
-    "github.com/go-chi/chi/middleware"
+    "github.com/go-chi/chi/v5"
+    "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
     "zerogov/fractal6.go/web"
     "zerogov/fractal6.go/web/auth"
-    "zerogov/fractal6.go/web/middleware/jwtauth"
     handle6 "zerogov/fractal6.go/web/handlers"
     middle6 "zerogov/fractal6.go/web/middleware"
 )
@@ -76,7 +75,8 @@ func RunServer() {
 	r.Use(cors.Handler)
     //r.Use(middle6.RequestContextMiddleware) // Set context info
     // JWT
-    r.Use(jwtauth.Verifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
+    //r.Use(jwtauth.Verifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
+    r.Use(middle6.JwtVerifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
     r.Use(middle6.JwtDecode) // Set user claims
     // Log request
     r.Use(middleware.Logger)

@@ -13,21 +13,22 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+    "github.com/go-chi/jwtauth/v5"
+    "crypto/rsa"
 
 	//"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/dgraph-io/dgo/v200"
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"google.golang.org/grpc"
-	jwt "github.com/dgrijalva/jwt-go"
 
 	"zerogov/fractal6.go/graph/codec"
 	"zerogov/fractal6.go/graph/model"
-	"zerogov/fractal6.go/web/middleware/jwtauth"
 	. "zerogov/fractal6.go/tools"
 
 )
 
-var dgraphSecret string
+var dgraphPrivateKey *rsa.PrivateKey
+var dgraphPublicKey *rsa.PublicKey
 
 // Draph database clients
 type Dgraph struct {
@@ -111,7 +112,8 @@ var DB *Dgraph
 
 func init () {
     // Get Jwt private key
-    dgraphSecret = os.Getenv("DGRAPH_SECRET")
+    dgraphPrivateKey = ParseRsaPrivate(os.Getenv("DGRAPH_PRIVATE_KEY"))
+    dgraphPublicKey = ParseRsaPublic(os.Getenv("DGRAPH_PUBLIC_KEY"))
 
     DB = initDB()
 }
@@ -252,15 +254,15 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
         Rootids: rootids,
         Ownids: ownids,
     }
-    claims := jwt.MapClaims{
+    claims := map[string]interface{}{
         "https://fractale.co/jwt/claims": dgClaims,
     }
     jwtauth.SetIssuedNow(claims)
     jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 
     // Create token
-    tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
-    //tkm := jwtauth.New("HS256", []byte(dgraphSecret), []byte("checkJwkToken_or_pubkey"))
+    tkm := jwtauth.New("RS256", dgraphPrivateKey, dgraphPublicKey)
+    //tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
     _, token, err := tkm.Encode(claims)
     if err != nil { panic("Dgraph JWT error: " + err.Error()) }
     return token

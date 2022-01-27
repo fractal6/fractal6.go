@@ -1,2 +1,4 @@
 public/
 .secret
+private.pem
+public.pem

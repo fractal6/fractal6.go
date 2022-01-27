@@ -522,7 +522,9 @@ func CheckEvent(t *model.Tension, e *model.EventRef) (string, error) {
     switch *e.EventType {
     case model.TensionEventTypeUpdated:
         if b != nil && b.Node != nil && *b.Node.Type == model.NodeTypeCircle {
-            err = fmt.Errorf("The type of tensions with circle role attached cannot be changed.")
+            err = fmt.Errorf("The type of tensions with circle attached cannot be changed.")
+        } else if b != nil && b.Node != nil && *b.Node.Type == model.NodeTypeRole {
+            err = fmt.Errorf("The type of tensions with role attached cannot be changed.")
         }
     default:
         // pass
