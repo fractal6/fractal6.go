@@ -97,8 +97,8 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
     if buildMode == "PROD" {
         token, err = tkMaster.issue(userCtx, time.Hour*24*30)
     } else {
-        //token, err = tkMaster.issue(userCtx, time.Hour*12)
-        token, err = tkMaster.issue(userCtx, time.Second*60)
+        token, err = tkMaster.issue(userCtx, time.Hour*12)
+        //token, err = tkMaster.issue(userCtx, time.Second*60)
     }
     return token, err
 }
@@ -201,6 +201,11 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
     var e error
     var updatedAt string
 
+    // Pass for ROOT user
+    if uctx.Rights.Type == model.UserTypeRoot {
+        return uctx, e
+    }
+
     // Check if User context need to be updated
     for _, v := range uctx.CheckedNameid {
         if v == nid {
@@ -229,6 +234,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
         uctx.Roles    = u.Roles
         uctx.CheckedNameid = u.CheckedNameid
         if e != nil { return uctx, e }
+        //return nil, fmt.Errorf("refresh token")
     }
     uctx.Hit++
     uctx.CheckedNameid = append(uctx.CheckedNameid, nid)

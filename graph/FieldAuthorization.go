@@ -3,8 +3,6 @@ package graph
 import (
 	"fmt"
 	"context"
-    "strings"
-
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
@@ -59,6 +57,8 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *str
 // Ensure the field value is unique. If a field is given, it check the uniqueness on a subset of the parent type.
 func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     data, err := next(ctx)
+    if err != nil { return nil, err }
+
     var v string
     switch d := data.(type) {
     case *string:
@@ -70,9 +70,8 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
     field := *graphql.GetPathContext(ctx).Field
     if f != nil {
         // Extract the fieldname and type of the object queried
-        qName :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
-        if len(qName) < 2 { return nil, LogErr("@unique", fmt.Errorf("Unknow query name")) }
-        typeName := strings.Join(qName[1:], "")
+        typeName, err := typeNameFromGraphqlContext(ctx)
+        if err != nil { return nil, LogErr("unique", err) }
         fieldName := typeName + "." + field
         filterName := typeName + "." + *f
         s := obj.(model.JsonAtom)[*f]
@@ -163,6 +162,8 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
 func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     var l int
     data, err := next(ctx)
+    if err != nil { return nil, err }
+
     switch d := data.(type) {
     case *string:
         l = len(*d)
@@ -183,6 +184,8 @@ func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *s
 func maxLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     var l int
     data, err := next(ctx)
+    if err != nil { return nil, err }
+
     switch d := data.(type) {
     case *string:
         l = len(*d)

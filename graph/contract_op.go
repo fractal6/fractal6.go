@@ -76,6 +76,13 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     if err != nil { return false, contract, err }
     ok = ok || contract != nil
 
+    // Mark contract as read
+    _, err = db.GetDB().Meta("markContractAsRead", map[string]string{
+        "username": uctx.Username,
+        "contractid": cid,
+    })
+    if err != nil { return false, contract, err }
+
     if contract != nil && contract.Status == model.ContractStatusClosed {
         now := Now()
         event.CreatedAt = &now

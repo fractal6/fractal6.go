@@ -81,6 +81,13 @@ $(LANGS):
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort
 
+install:
+	# apt
+	#curl https://packages.redis.io/gpg | sudo apt-key add -
+	#echo "deb https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+	#sudo apt-get update
+	sudo apt-get install redis
+
 rsa:
 	#ssh-keygen -t rsa -P "" -b 2048 -m PEM -f jwtRS256.key
 	#ssh-keygen -e -m PEM -f jwtRS256.key > jwtRS256.key.pub

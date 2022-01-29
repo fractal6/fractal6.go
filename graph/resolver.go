@@ -188,7 +188,13 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
         panic("not implemented")
     }
 
-    res := db.GetDB().Meta(f, v, k)
+    var maps map[string]string
+    if k == nil {
+        maps = map[string]string{"id": v}
+    } else {
+        maps = map[string]string{*k: v}
+    }
+    res, err := db.GetDB().Meta(f, maps)
     if err != nil { return nil, err }
     err = Map2Struct(res, &data)
     return data, err

@@ -3,8 +3,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strings"
-
 	"github.com/99designs/gqlgen/graphql"
 
 	//"fractale/fractal6.go/db"
@@ -94,9 +92,8 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
     if input.Set != nil {
         // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
         n_nodes := 0
-        qName :=  SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
-        if len(qName) < 2 { return nil, LogErr("updateNodeArtefact", fmt.Errorf("Unknow query name")) }
-        typeName := strings.Join(qName[1:], "")
+        typeName, err := typeNameFromGraphqlContext(ctx)
+        if err != nil { return nil, LogErr("UpdateNodeArtefact", err) }
         if len(input.Filter.ID) > 0 {
             n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")
         } else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {

@@ -45,10 +45,10 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
 
     /* Rebuild the Graphql inputs request from this context */
     rc := graphql.GetResolverContext(ctx)
-    // rc.Field.Name
-    queryName := rc.Path().String()
     gc := graphql.GetRequestContext(ctx)
-    variables, _ := json.Marshal(gc.Variables)
+    queryName := rc.Path().String()
+    typeName, err := typeNameFromGraphqlContext(ctx)
+    if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
 
     // Return error if jwt token error (particurly when has expired)
     if strings.HasPrefix(queryName, "update") || strings.HasPrefix(queryName, "delete") {
@@ -58,24 +58,35 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
 
     // Remove some input
     rawQuery := gc.RawQuery
+    variables := gc.Variables
     if ctx.Value("cut_history") != nil {
         // Go along PushHistory...
-        reg := regexp.MustCompile(`,?\s*history\s*:\s*\[[^\]]*\]`)
+        // improve that hack with gqlgen #1144 issue
+        // lazy (non-greedy) matching
+        reg := regexp.MustCompile(`,?\s*history\s*:\s*\[("[^"]*"|[^\]])*?\]`)
         // If we remove completely history, it cause some "no data" box error on the frontend.
         rawQuery = reg.ReplaceAllString(rawQuery, "history:[]")
+
+        // If Graphql variables are given...
+        t := strings.ToLower(typeName)
+        if variables[t] != nil && variables[t].(map[string]interface{})["set"] != nil {
+            s := variables[t].(map[string]interface{})["set"].(map[string]interface{})
+            s["history"] = nil
+        }
     }
 
+    variables_, _ := json.Marshal(variables)
     reqInput := map[string]string{
         "QueryName": queryName,
         // Warning: CleanString will lose format for text and mardown text data.
         //"RawQuery": tools.CleanString(gc.RawQuery, true),
         "RawQuery": tools.QuoteString(rawQuery),
-        "Variables": string(variables),
+        "Variables": string(variables_),
     }
 
     // Send request
     uctx := webauth.GetUserContextOrEmpty(ctx)
-    err := db.QueryGql(uctx, "rawQuery", reqInput, data)
+    err = db.QueryGql(uctx, "rawQuery", reqInput, data)
     if data != nil && err != nil {
         // Gqlgen ignore the data if there is an error returned
         // see https://github.com/99designs/gqlgen/issues/1191
@@ -100,8 +111,8 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
         k, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_k")
         v, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_v")
-        kk := fmt.Sprintf("%s", k)
-        db.Meta(fmt.Sprintf("%s", f), fmt.Sprintf("%s", v), &kk)
+        maps := map[string]string{fmt.Sprintf("%s", k): fmt.Sprintf("%s", v)}
+        db.Meta(fmt.Sprintf("%s", f), maps)
     }
 
     return err

@@ -439,9 +439,13 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     // --
     rootid, err := codec.Nid2rootid(*event.New)
     if err != nil { return ok, err }
-    if rootid != *event.New {return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle.")) }
-    i := auth.UserIsMember(uctx, rootid)
-    if i>=0 {return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation.")) }
+    if rootid != *event.New {
+        return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle."))
+    }
+    pos := auth.UserIsMember(uctx, rootid)
+    if pos >= 0 {
+        return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation."))
+    }
 
     // Validate
     // --

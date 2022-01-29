@@ -454,6 +454,17 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         `,
         M: `uid(uids) <UserEvent.isRead> "true" .`,
     },
+    "markContractAsRead": QueryMut{
+        Q: `query {
+            var(func: eq(User.username, "{{.username}}")) {
+                uids as User.events @filter(eq(UserEvent.isRead, "false")) @cascade {
+                    UserEvent.event @filter(eq(Contract.contractid, "{{.contractid}}"))
+                }
+            }
+        }
+        `,
+        M: `uid(uids) <UserEvent.isRead> "true" .`,
+    },
 }
 
 //
@@ -515,33 +526,26 @@ func (dg Dgraph) Count2(f1, v1, f2, v2, fieldName string) int {
     return values[0]
 }
 
-func (dg Dgraph) Meta(f, v string, k *string) map[string]interface{} {
+func (dg Dgraph) Meta(f string, maps map[string]string) (map[string]interface{}, error) {
     var res *api.Response
     var err error
-    var maps  map[string]string
-    if k != nil {
-        maps = map[string]string{*k: v}
-    } else {
-        maps = map[string]string{"id": v}
-    }
 
     if _, ok := dqlQueries[f]; ok { // Query Case
         // Send request
         res, err = dg.QueryDql(f, maps)
-        if err != nil { panic(err) }
+        if err != nil { return nil, err }
     } else { // Mutation Case
         // Send request
         //err := dg.MutateWithQueryDql(query, mutation)
         // @codefactor: unify api...
         res, err = dg.MutateWithQueryDql2(f, maps)
-        if err != nil { panic(err) }
-        return nil
+        return nil, err
     }
 
     // Decode response
     var r DqlResp
     err = json.Unmarshal(res.Json, &r)
-    if err != nil { panic(err) }
+    if err != nil { return nil, err }
 
     // Extract result
     if len(r.All) == 0 {
@@ -553,7 +557,7 @@ func (dg Dgraph) Meta(f, v string, k *string) map[string]interface{} {
             agg[n] = m
         }
     }
-    return agg
+    return agg, err
 }
 
 // Probe if an object exists.

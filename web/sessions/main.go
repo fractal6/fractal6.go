@@ -25,7 +25,7 @@ func GenerateToken() string {
 
 func initCache() {
     con, err := redis.DialURL("redis://localhost")
-    if err != nil { panic(err) }
+    if err != nil { panic("Redis connection error:" + err.Error()) }
     cache = con
 }
 

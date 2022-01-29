@@ -88,7 +88,7 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
             blob = input.Set.Blobs[0]
         }
         ok, contract, err = tensionEventHook(uctx, ids[0], input.Set.History, blob)
-        if err != nil  { return nil, err }
+        if err != nil { return nil, err }
         if ok {
             // History and notification Logics --
             // In order to notify user on the given event, we need to know their ids to pass and link them

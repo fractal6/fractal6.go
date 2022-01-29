@@ -7,12 +7,22 @@ import (
     "reflect"
     "github.com/99designs/gqlgen/graphql"
 
+	"fractale/fractal6.go/tools"
     "fractale/fractal6.go/graph/model"
 )
 
 //
 // Misc field utils
 //
+
+func typeNameFromGraphqlContext(ctx context.Context) (string, error) {
+    qName :=  tools.SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
+    if len(qName) < 2 {
+        return "", fmt.Errorf("Unknow query type name")
+    }
+    typeName := strings.Join(qName[1:], "")
+    return typeName, nil
+}
 
 // setContext add the {n} field in the context for further inspection in next resolvers.
 // Its used in the hook_ resolvers for Update and Delete queries.
