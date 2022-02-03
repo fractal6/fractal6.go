@@ -8,8 +8,25 @@ import (
     "encoding/json"
     "fractale/fractal6.go/db"
     webauth "fractale/fractal6.go/web/auth"
+    "github.com/spf13/viper"
 )
 
+var CREDENTIAL_PROM string
+
+func init() {
+    CREDENTIAL_PROM = viper.GetString("server.prometheus_credentials")
+}
+
+func CheckBearer(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        val := r.Header.Get("Authorization")
+        fmt.Println("cred:", CREDENTIAL_PROM)
+        fmt.Println("yaaaa", val)
+        if val == CREDENTIAL_PROM {
+            next.ServeHTTP(w, r.WithContext(r.Context()))
+        }
+    })
+}
 
 //CheckRecursiveQueryRights check if the query can be executed where a
 // a the body is expected to be string/nameid.
@@ -34,7 +51,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
         //// reset the body reader agin
         //r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
-        //// This test is not enough, as private node will be return below.
+       //// This test is not enough, as private node will be return below.
         //input := map[string]string{"key":"nameid", "value": q}
         //res, err := db.GetDB().Get(uctx, "node", input)
         //if err != nil { http.Error(w, err.Error(), 400); return }

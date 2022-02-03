@@ -1,6 +1,7 @@
 package cmd
 
 import (
+    //"fmt"
     "log"
     "time"
     "net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/rs/cors"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 
     "fractale/fractal6.go/web"
     "fractale/fractal6.go/web/auth"
@@ -48,6 +50,7 @@ func RunServer() {
     HOST := viper.GetString("server.host")
     PORT := viper.GetString("server.port")
     gqlConfig := viper.GetStringMap("graphql")
+    instrumentation := viper.GetBool("server.prometheus_instrumentation")
 
     r := chi.NewRouter()
 
@@ -139,20 +142,34 @@ func RunServer() {
     // Graphql API
     r.Post("/api", handle6.GraphqlHandler(gqlConfig))
 
+    // Serve static files
+    web.FileServer(r, "/data/", "./data")
+
+    // Serve Prometheus instrumentation
+	if instrumentation {
+        go func() {
+            for {
+                handle6.InstrumentationMeasures()
+                time.Sleep(time.Duration(time.Second * 500))
+            }
+        }()
+        secured := r.Group(nil)
+        secured.Use(middle6.CheckBearer)
+		secured.Handle("/metrics", promhttp.Handler())
+	}
+
+
+    // Serve Graphql Playground & introspection
     if buildMode == "DEV" {
-        // Serve Graphql Playground
         r.Get("/playground", handle6.PlaygroundHandler("/api"))
         r.Get("/ping", handle6.Ping)
 
         // Serve frontend static files
-        web.FileServer(r, "/", "./public")
+        //web.FileServer(r, "/", "./public")
 
         // Overwrite gql config
         gqlConfig["introspection"] = true
     }
-
-    // Serve static files
-    web.FileServer(r, "/data/", "./data")
 
     address := HOST + ":" + PORT
     log.Printf("Running (%s) @ http://%s", buildMode, address)

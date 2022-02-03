@@ -2,19 +2,20 @@ package db
 
 import (
 	"fmt"
-	"os"
 	"log"
+	"os"
 	"time"
 	"bytes"
 	"context"
+	"strings"
 	"encoding/json"
-	"text/template"
 	"net/http"
+	"text/template"
+	"crypto/rsa"
 
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-    "github.com/go-chi/jwtauth/v5"
-    "crypto/rsa"
 
 	//"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/dgraph-io/dgo/v200"
@@ -24,7 +25,6 @@ import (
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
-
 )
 
 var dgraphPrivateKey *rsa.PrivateKey
@@ -301,7 +301,9 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.getDqlQuery(op, maps)
     // Send Request
-    fmt.Println(op)
+    if !strings.HasSuffix(op, "countHas") {
+        fmt.Println(op)
+    }
     //fmt.Println(string(q))
     res, err := txn.Query(ctx, q)
     //fmt.Println(res)

@@ -2,3 +2,4 @@ public/
 .secret
 private.pem
 public.pem
+config.toml
