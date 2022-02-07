@@ -1,7 +1,7 @@
 package graph
 
 import (
-    "fmt"
+    //"fmt"
 	"context"
     "regexp"
     "strings"
@@ -14,7 +14,7 @@ import (
     webauth "fractale/fractal6.go/web/auth"
 )
 
-var cache sessions.Session
+var cache *sessions.Session
 
 func init() {
     cache = sessions.GetCache()
@@ -47,11 +47,11 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     rc := graphql.GetResolverContext(ctx)
     gc := graphql.GetRequestContext(ctx)
     queryName := rc.Path().String()
-    typeName, err := typeNameFromGraphqlContext(ctx)
+    queryType, typeName, err := queryTypeFromGraphqlContext(ctx)
     if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
 
     // Return error if jwt token error (particurly when has expired)
-    if strings.HasPrefix(queryName, "update") || strings.HasPrefix(queryName, "delete") {
+    if queryType == "add" || queryType == "update" || queryType == "delete" {
         _, err := webauth.GetUserContext(ctx)
         if err != nil { return tools.LogErr("Access denied", err) }
     }
@@ -107,12 +107,19 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
         return err
     }
 
-    // Post processing (@meta_patch)
-    if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
-        k, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_k")
-        v, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_v")
-        maps := map[string]string{fmt.Sprintf("%s", k): fmt.Sprintf("%s", v)}
-        db.Meta(fmt.Sprintf("%s", f), maps)
+    // Post processing (@meta_patch) / Post hook operation.
+    // If the query go trough the validation stack, execute.
+    //if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
+    //    k, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_k")
+    //    v, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_v")
+    //    maps := map[string]string{fmt.Sprintf("%s", k): fmt.Sprintf("%s", v)}
+    //    db.Meta(fmt.Sprintf("%s", f), maps)
+    //}
+    if f, err := cache.GetDel(ctx, uctx.Username + "meta_patch_f").Result(); f != "" && err == nil {
+        k, _ := cache.GetDel(ctx, uctx.Username + "meta_patch_k").Result()
+        v, _ := cache.GetDel(ctx, uctx.Username + "meta_patch_v").Result()
+        maps := map[string]string{k: v}
+        db.Meta(f, maps)
     }
 
     return err

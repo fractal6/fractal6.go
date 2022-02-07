@@ -56,20 +56,3 @@ type NodePatchFromFragment struct {
 	Children   []*NodeFragmentRef `json:"children,omitempty"`
 }
 
-//
-// Dgraph Payload for DQL query
-//
-
-// UserCtx Payload
-var UserCtxPayloadDg string = `{
-    User.username
-    User.name
-    User.password
-    User.rights {expand(_all_)}
-    User.roles {
-        Node.nameid
-        Node.name
-        Node.role_type
-    }
-}`
-

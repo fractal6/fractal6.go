@@ -98,7 +98,7 @@ func init() {
             Action: UserJoin,
         },
         model.TensionEventUserLeft: EventMap{
-            // Authorisation is done in the method for now (to avoid dealing with Guest node two times).
+            // Authorisation is done in the method for now ("FirstLinkHook").
             Auth: PassingHook,
             Action: UserLeave,
         },
@@ -140,7 +140,6 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 
         // Check if event make a new subscriber
         addSubscriber = addSubscriber || SubscribingEvents[*event.EventType]
-
     }
 
     // Add subscriber
@@ -450,28 +449,14 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     // Validate
     // --
     // check the invitation if a hash is given
-    // * orga invtation ? <> user invitation hash ?
+    // * orga invitation ? <> user invitation hash ?
     // * else check if User Can Join Organisation
     if *tension.Receiver.UserCanJoin  {
         guestid := codec.MemberIdCodec(rootid, uctx.Username)
-        ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
-        if err != nil { return ok, err }
-        if ex {
-            // Ensure a correct state for this Guest node.
-            err = db.GetDB().UpgradeMember(guestid, model.RoleTypeGuest)
-        } else {
-            rt := model.RoleTypeGuest
-            t := model.NodeTypeRole
-            name := "Guest"
-            n := &model.NodeFragment{
-                Name: &name,
-                RoleType: &rt,
-                Type: &t,
-                FirstLink: &uctx.Username,
-            }
-            auth.InheritNodeCharacDefault(n, tension.Receiver)
-            err = PushNode(uctx.Username, nil, n, "", guestid, rootid)
-        }
+        // Pending node as been created at invitation
+        //ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
+        //if err != nil { return ok, err }
+        err = LinkUser(rootid, guestid, uctx.Username)
         ok = true
     }
 
@@ -481,8 +466,7 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
     // Remove user reference
     // * remove User role
-    // * unlink Orga role (Guest/Member) if role_type is Guest|Member
-    // * upgrade user membership
+    // * update user membership
     // --
     var ok bool
 
@@ -501,6 +485,10 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
         nf.FirstLink = &uctx.Username
         nf.Type = &t
         node = &nf
+    }
+
+    if node.FirstLink == nil || *node.FirstLink != uctx.Username {
+        return false, fmt.Errorf("You do not play this role.")
     }
 
     ok, err := LeaveRole(uctx, tension, node)

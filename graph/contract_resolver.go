@@ -222,8 +222,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     ok, contract, err := processVote(uctx, cid)
     if !ok || err != nil {
         id := data.Vote[0].ID
-        vi := model.VoteFilter{ID:[]string{id}}
-        e := db.GetDB().Delete(*uctx, "vote", vi)
+        e := db.GetDB().Delete(*uctx, "vote", model.VoteFilter{ID:[]string{id}})
         if e != nil { panic(e) }
         return nil, err
     }

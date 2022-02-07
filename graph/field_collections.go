@@ -15,14 +15,26 @@ import (
 // Misc field utils
 //
 
-func typeNameFromGraphqlContext(ctx context.Context) (string, error) {
+func queryTypeFromGraphqlContext(ctx context.Context) (string, string, error) {
+    var err error
+    var ok bool
+    var queryType, queryName string
+
     qName :=  tools.SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
     if len(qName) < 2 {
-        return "", fmt.Errorf("Unknow query type name")
+        return queryType, queryName, fmt.Errorf("query type name unknown")
     }
-    typeName := strings.Join(qName[1:], "")
-    return typeName, nil
+    queryType =  qName[0]
+    queryName = strings.Join(qName[1:], "")
+    for _, t := range []string{"query", "get", "add", "update", "delete"} {
+        ok = ok || (queryType == t)
+    }
+    if !ok {
+        err = fmt.Errorf("query type name unknown")
+    }
+    return queryType, queryName, err
 }
+
 
 // setContext add the {n} field in the context for further inspection in next resolvers.
 // Its used in the hook_ resolvers for Update and Delete queries.

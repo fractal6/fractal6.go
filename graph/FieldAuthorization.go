@@ -20,6 +20,7 @@ func init() {
         "unique": unique,
         "oneByOne": oneByOne,
         "hasEvent": hasEvent,
+        "ref": ref,
         "minLen": minLength,
         "maxLen": maxLength,
     }
@@ -70,7 +71,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
     field := *graphql.GetPathContext(ctx).Field
     if f != nil {
         // Extract the fieldname and type of the object queried
-        typeName, err := typeNameFromGraphqlContext(ctx)
+        _, typeName, err := queryTypeFromGraphqlContext(ctx)
         if err != nil { return nil, LogErr("unique", err) }
         fieldName := typeName + "." + field
         filterName := typeName + "." + *f
@@ -156,6 +157,35 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
         return next(ctx)
     }
     return nil, LogErr("Event error", fmt.Errorf("missing event for field '%s'", field))
+}
+
+//ref ensure the given objects are just link to an existing one. (@weak: by testing that its size if not equal to one.)
+func ref(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+    data, err := next(ctx)
+    if err != nil { return nil, err }
+    test :=  func(x interface{}) bool {
+        return len(CleanNilMap(Struct2Map(x))) == 1
+    }
+    var pass bool
+    data_list, ok := InterfaceSlice(data)
+    if ok {
+        for _, d := range data_list {
+            if test(d) {
+                pass = true
+            } else {
+                pass = false
+                break
+            }
+        }
+    } else {
+        pass = test(data)
+    }
+
+    if pass {
+        return data, err
+    }
+    field := *graphql.GetPathContext(ctx).Field
+    return nil, fmt.Errorf("ref: only referecence allowed for: %s", field)
 }
 
 //inputMinLength the that the size of the field is stricly lesser than the given value

@@ -31,7 +31,7 @@ func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
     return roles
 }
 
-// usePlayRole return true if the user play the given role (Nameid)
+// userPlayRole return true if the user play the given role (Nameid)
 func UserPlayRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
     if e != nil { panic(e) }

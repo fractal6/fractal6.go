@@ -224,6 +224,12 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
     }
 }
+func (dg Dgraph) GetRegularUctx() model.UserCtx {
+    return model.UserCtx{
+        Username: "root",
+        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRegular},
+    }
+}
 
 func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
     // Get unique rootnameid
@@ -301,7 +307,7 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.getDqlQuery(op, maps)
     // Send Request
-    if !strings.HasSuffix(op, "countHas") {
+    if !strings.HasPrefix(op, "countHas") {
         fmt.Println(op)
     }
     //fmt.Println(string(q))

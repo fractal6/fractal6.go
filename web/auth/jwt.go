@@ -53,7 +53,10 @@ func (Jwt) New() *Jwt {
 
     if buildMode == "DEV" {
         // Api debug token
+
         uctx := db.DB.GetRootUctx()
+        //uctx := db.DB.GetRegularUctx()
+
         o := model.RoleTypeOwner
         uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
         apiToken, _ := tk.issue(uctx, time.Hour*48)
@@ -225,7 +228,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 
     // Update User context if node is newer
     if IsOlder(uctx.Iat, updatedAt) {
-        u, e = DB.GetUser("username", uctx.Username)
+        u, e = DB.GetUctx("username", uctx.Username)
         // @DEBUG: UserCtx is update from their fields for propagation
         uctx.Username = u.Username
         uctx.Name     = u.Name

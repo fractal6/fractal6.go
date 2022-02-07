@@ -2,12 +2,10 @@
 package cmd
 
 import (
-	"fmt"
+	//"fmt"
 	"os"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
 	"fractale/fractal6.go/tools"
 )
 
@@ -22,7 +20,7 @@ var (
 // Run the root command.
 func Run() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+        //fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(-1)
 	}
 }

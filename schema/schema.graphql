@@ -75,6 +75,8 @@ directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
 
 directive @w_meta_patch(f: String!, k: String) on INPUT_FIELD_DEFINITION
 
+directive @x_add(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
+
 directive @x_set(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
 directive @x_remove(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
@@ -180,11 +182,11 @@ type RoleExt {
   role_type: RoleType!
   color: String
   mandate(filter: MandateFilter): Mandate
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
-  nodesAggregate(filter: NodeFilter): NodeAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type OrgaAgg {
@@ -414,7 +416,7 @@ enum TensionType {
   Operational
   Governance
   Help
-
+  Alert
 
 }
 
@@ -499,46 +501,46 @@ enum UserType {
 
 }
 
-# Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0EPd3/ym98kmPFp/HtDw\nVEehAvBzl3nJjEUw4jJNBVIjiRgKI3Q7SGVE/W5Q4S/PI8mGl9aA5qY3LcvbtUPc\nvzpql1JLn/wYPeA/ttVeVps2Dtqqn7arrxpWxZmKcAGEKi0RlUrhwlC2tzfBwx0x\nXPoinb4Zyvq0BcQ+l0jx7e+Q+Qt6Rt01oYwEoXw5eKwWgI3IA2ZN1ChF0Pkoucwp\nWVRg7cOJL8nsMz59AQUFyM16+u4zHHKD+Rq5a2RT6ChZL+RS2QkNcvDSb7MTQKei\nQo8OVPLUiMVMAZ6gIjBRQBQo61rf7lv/3FDeEMXDDM0hH+vnu2D9W1yXrUGJW0TT\n4wIDAQAB\n-----END PUBLIC KEY-----"}
+# Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
-  tension: TensionRef!
+  tension: TensionRef! @x_add(r:"ref")
   blob_type: BlobType!
   pushedFlag: DateTime
   archivedFlag: DateTime
@@ -570,7 +572,7 @@ input AddContractInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   contractid: String!
-  tension: TensionRef!
+  tension: TensionRef! @x_add(r:"ref")
   status: ContractStatus!
   contract_type: ContractType!
   closedAt: DateTime
@@ -603,7 +605,7 @@ input AddEventInput {
   createdAt: DateTime!
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
-  tension: TensionRef!
+  tension: TensionRef! @x_add(r:"ref")
   event_type: TensionEvent!
   old: String
   new: String
@@ -620,7 +622,7 @@ input AddLabelInput {
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!]
-  nodes: [NodeRef!] @x_alter(r:"oneByOne")
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddLabelPayload {
@@ -728,8 +730,8 @@ input AddRoleExtInput {
   role_type: RoleType!
   color: String
   mandate: MandateRef
-  nodes: [NodeRef!] @x_alter(r:"oneByOne")
   roles: [NodeRef!]
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddRoleExtPayload {
@@ -752,10 +754,10 @@ input AddTensionInput {
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!]
-  contracts: [ContractRef!]
+  contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
@@ -770,7 +772,7 @@ input AddUserEventInput {
   createdAt: DateTime!
   isRead: Boolean!
   user: UserRef!
-  event: [EventKindRef!]
+  event: [EventKindRef!] @x_add(r:"ref")
 }
 
 type AddUserEventPayload {
@@ -790,13 +792,13 @@ input AddUserInput {
   bio: String
   utc: String
   notifyByEmail: Boolean
-  subscriptions: [TensionRef!]
+  subscriptions: [TensionRef!] @x_alter(r:"ref")
   rights: UserRightsRef!
-  roles: [NodeRef!]
-  backed_roles: [NodeRef!]
-  tensions_created: [TensionRef!]
-  tensions_assigned: [TensionRef!]
-  contracts: [ContractRef!]
+  roles: [NodeRef!] @x_add(r:"ref")
+  backed_roles: [NodeRef!] @x_add(r:"ref")
+  tensions_created: [TensionRef!] @x_add(r:"ref")
+  tensions_assigned: [TensionRef!] @x_add(r:"ref")
+  contracts: [ContractRef!] @x_add(r:"ref")
   events: [UserEventRef!]
   markAllAsRead: String
 }
@@ -824,8 +826,8 @@ input AddVoteInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   voteid: String!
-  contract: ContractRef!
-  node: NodeRef!
+  contract: ContractRef! @x_add(r:"ref")
+  node: NodeRef! @x_add(r:"ref")
   data: [Int!]!
 }
 
@@ -915,9 +917,9 @@ input BlobRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
-  tension: TensionRef
+  tension: TensionRef @x_add(r:"ref")
   blob_type: BlobType
   pushedFlag: DateTime
   archivedFlag: DateTime
@@ -985,8 +987,8 @@ input CommentRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  updatedAt: DateTime
-  message: String
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_alter
   _VOID: String
 }
 
@@ -1077,10 +1079,10 @@ input ContractRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   contractid: String
-  tension: TensionRef
+  tension: TensionRef @x_add(r:"ref")
   status: ContractStatus
   contract_type: ContractType
   closedAt: DateTime
@@ -1088,7 +1090,7 @@ input ContractRef {
   participants: [VoteRef!]
   candidates: [UserRef!]
   pending_candidates: [PendingUserRef!]
-  comments: [CommentRef!]
+  comments: [CommentRef!] @x_alter(r:"oneByOne")
   isValidator: Boolean
 }
 
@@ -1387,9 +1389,9 @@ input EventRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
-  tension: TensionRef
+  tension: TensionRef @x_add(r:"ref")
   event_type: TensionEvent
   old: String
   new: String
@@ -1518,17 +1520,17 @@ input LabelPatch {
   description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
   tensions: [TensionRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne")
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input LabelRef {
   id: ID
   rootnameid: String
-  name: String
-  description: String
-  color: String
-  tensions: [TensionRef!]
-  nodes: [NodeRef!]
+  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String @x_alter
+  tensions: [TensionRef!] @x_ro
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type MandateAggregateResult {
@@ -1581,10 +1583,10 @@ input MandatePatch {
 
 input MandateRef {
   id: ID
-  purpose: String
-  responsabilities: String
-  domains: String
-  policies: String
+  purpose: String @x_alter
+  responsabilities: String @x_alter
+  domains: String @x_alter
+  policies: String @x_alter
 }
 
 enum Mode {
@@ -1782,12 +1784,12 @@ input NodeFragmentPatch {
 
 input NodeFragmentRef {
   id: ID
-  nameid: String
-  name: String
-  about: String
-  mandate: MandateRef
-  skills: [String!]
-  children: [NodeFragmentRef!]
+  nameid: String @w_add(a:"lower")
+  name: String @x_alter(r:"minLen", n:1)
+  about: String @x_alter(r:"maxLen", n:280)
+  mandate: MandateRef @x_alter
+  skills: [String!] @x_alter
+  children: [NodeFragmentRef!] @x_alter
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -2186,8 +2188,8 @@ enum RoleExtHasFilter {
   role_type
   color
   mandate
-  nodes
   roles
+  nodes
 }
 
 input RoleExtOrder {
@@ -2210,20 +2212,20 @@ input RoleExtPatch {
   role_type: RoleType @x_alter
   color: String @x_alter
   mandate: MandateRef @x_alter
-  nodes: [NodeRef!] @x_alter(r:"oneByOne")
-  roles: [NodeRef!] @x_patch_ro
+  roles: [NodeRef!] @x_ro
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input RoleExtRef {
   id: ID
   rootnameid: String
-  name: String
-  about: String
-  role_type: RoleType
-  color: String
-  mandate: MandateRef
-  nodes: [NodeRef!]
-  roles: [NodeRef!]
+  name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  about: String @x_alter(r:"maxLen", n:280)
+  role_type: RoleType @x_alter
+  color: String @x_alter
+  mandate: MandateRef @x_alter
+  roles: [NodeRef!] @x_ro
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input RoleType_hash {
@@ -2378,7 +2380,7 @@ input TensionPatch {
   action: TensionAction @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved])
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
@@ -2391,7 +2393,7 @@ input TensionRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   emitter: NodeRef
   emitterid: String
@@ -2401,12 +2403,12 @@ input TensionRef {
   type_: TensionType
   status: TensionStatus
   action: TensionAction
-  comments: [CommentRef!]
-  assignees: [UserRef!]
-  labels: [LabelRef!]
-  blobs: [BlobRef!]
-  history: [EventRef!]
-  contracts: [ContractRef!]
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
+  history: [EventRef!] @x_alter
+  contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!]
   n_comments: Int
   n_open_contracts: Int
@@ -2687,9 +2689,9 @@ input UserEventPatch {
 input UserEventRef {
   id: ID
   createdAt: DateTime
-  isRead: Boolean
+  isRead: Boolean @x_alter
   user: UserRef
-  event: [EventKindRef!]
+  event: [EventKindRef!] @x_add(r:"ref")
 }
 
 input UserFilter {
@@ -2757,7 +2759,7 @@ input UserPatch {
   bio: String @x_patch
   utc: String @x_patch
   notifyByEmail: Boolean @x_patch
-  subscriptions: [TensionRef!] @x_patch
+  subscriptions: [TensionRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
   backed_roles: [NodeRef!] @x_patch_ro
@@ -2773,23 +2775,23 @@ input UserRef {
   createdAt: DateTime
   lastAck: DateTime
   username: String
-  name: String
+  name: String @x_patch
   password: String
-  email: String
+  email: String @x_patch
   emailHash: String
   emailValidated: Boolean
-  bio: String
-  utc: String
-  notifyByEmail: Boolean
-  subscriptions: [TensionRef!]
+  bio: String @x_patch
+  utc: String @x_patch
+  notifyByEmail: Boolean @x_patch
+  subscriptions: [TensionRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef
-  roles: [NodeRef!]
-  backed_roles: [NodeRef!]
-  tensions_created: [TensionRef!]
-  tensions_assigned: [TensionRef!]
-  contracts: [ContractRef!]
-  events: [UserEventRef!]
-  markAllAsRead: String
+  roles: [NodeRef!] @x_add(r:"ref")
+  backed_roles: [NodeRef!] @x_add(r:"ref")
+  tensions_created: [TensionRef!] @x_add(r:"ref")
+  tensions_assigned: [TensionRef!] @x_add(r:"ref")
+  contracts: [ContractRef!] @x_add(r:"ref")
+  events: [UserEventRef!] @x_alter
+  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
 }
 
 type UserRightsAggregateResult {
@@ -2900,11 +2902,11 @@ input VoteRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  updatedAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   voteid: String
-  contract: ContractRef
-  node: NodeRef
+  contract: ContractRef @x_add(r:"ref")
+  node: NodeRef @x_add(r:"ref")
   data: [Int!]
 }
 

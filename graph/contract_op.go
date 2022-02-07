@@ -34,24 +34,24 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true)
     if err != nil { return false, err }
     ok = ok || contract != nil
+    if contract == nil { return ok, err }
 
     // Post-contract action
-    if contract != nil {
-        // Add pending Nodes
-        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
-            for _, c := range contract.Candidates {
-                err = AddPendingNode(c.Username, tension)
-                if err != nil { return false, err }
-            }
+    // --
+    // Add pending Nodes
+    if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+        for _, c := range contract.Candidates {
+            err = MaybeAddPendingNode(c.Username, tension)
+            if err != nil { return false, err }
         }
-        // Push Notifications
-        err = PushContractNotifications(tid, contract)
-        if err != nil { panic(err) }
-        //for _, c := range contract.PendingCandidates {
-        //    // @todo: send signup+contract invitation
-        //    fmt.Println(c.Email)
-        //}
     }
+    // Push Notifications
+    err = PushContractNotifications(tid, contract)
+    if err != nil { panic(err) }
+    //for _, c := range contract.PendingCandidates {
+    //    // @todo: send signup+contract invitation
+    //    fmt.Println(c.Email)
+    //}
 
     return ok, err
 }
@@ -75,15 +75,16 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     ok, contract, err = processEvent(uctx, tension, &event, nil, contract, true, true)
     if err != nil { return false, contract, err }
     ok = ok || contract != nil
+    if contract == nil { return ok, contract, err }
 
     // Mark contract as read
     _, err = db.GetDB().Meta("markContractAsRead", map[string]string{
         "username": uctx.Username,
-        "contractid": cid,
+        "id": contract.ID,
     })
     if err != nil { return false, contract, err }
 
-    if contract != nil && contract.Status == model.ContractStatusClosed {
+    if contract.Status == model.ContractStatusClosed {
         now := Now()
         event.CreatedAt = &now
         event.CreatedBy = &model.UserRef{Username: &uctx.Username}
@@ -91,6 +92,14 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
         // Push Event History and Notifications
         err = PushHistory(uctx, tension.ID, []*model.EventRef{&event})
         PushEventNotifications(tension.ID, []*model.EventRef{&event})
+    } else if contract.Status == model.ContractStatusCanceled {
+        // @TODO: notify candidate of the cancel.
+        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+            for _, c := range contract.Candidates {
+                err = MaybeDeletePendingNode(c.Username, tension)
+                if err != nil { return false, contract, err }
+            }
+        }
     }
 
     return ok, contract, err

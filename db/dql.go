@@ -14,6 +14,18 @@ import (
 	. "fractale/fractal6.go/tools"
 )
 
+var userCtxPayload string = `{
+    User.username
+    User.name
+    User.password
+    User.rights {expand(_all_)}
+    User.roles {
+        Node.nameid
+        Node.name
+        Node.role_type
+    }
+}`
+
 
 var tensionHookPayload string = `
   uid
@@ -46,6 +58,7 @@ var tensionBlobHookPayload string = `
         expand(_all_)
       }
 
+      NodeFragment.first_link
       NodeFragment.skills
       NodeFragment.role_type
       NodeFragment.role_ext
@@ -468,7 +481,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 uids as User.events @filter(eq(UserEvent.isRead, "false")) @cascade {
-                    UserEvent.event @filter(eq(Contract.contractid, "{{.contractid}}"))
+                    UserEvent.event @filter(uid({{.id}}))
                 }
             }
         }
@@ -882,12 +895,12 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
 }
 
 // Returns the user context
-func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) {
+func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
         "userid": userid,
-        "payload": model.UserCtxPayloadDg,
+        "payload": userCtxPayload,
     }
     // Send request
     res, err := dg.QueryDql("getUser", maps)
@@ -918,15 +931,22 @@ func (dg Dgraph) GetUser(fieldid string, userid string) (*model.UserCtx, error) 
         err = decoder.Decode(r.All[0])
         if err != nil { return nil, err }
     }
+    return &user, err
+}
+
+func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) {
+    user, err := dg.GetUctxFull(fieldid, userid)
+    if err != nil { return user, nil }
     // Filter special roles
     for i := 0; i < len(user.Roles); i++ {
         if *user.Roles[i].RoleType == model.RoleTypeRetired ||
+        *user.Roles[i].RoleType == model.RoleTypeMember ||
         *user.Roles[i].RoleType == model.RoleTypePending {
             user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
             i--
         }
     }
-    return &user, err
+    return user, err
 }
 
 // Returns the matching nodes
@@ -1691,7 +1711,7 @@ func (dg Dgraph) MaybeDeleteFirstLink(tid, username string) error {
     return err
 }
 
-// Rewrite Contractid and voteid as theyr are use to upsert contracts and votes.
+// Rewrite Contractid and voteid as they are use to upsert contracts and votes.
 func (dg Dgraph) RewriteContractId(cid string) error {
     query := fmt.Sprintf(`query {
         var(func: uid(%s)) {

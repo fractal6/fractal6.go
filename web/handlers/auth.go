@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	//"fmt"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -18,7 +18,7 @@ import (
 	"fractale/fractal6.go/web/sessions"
 )
 
-var cache sessions.Session
+var cache *sessions.Session
 
 func init() {
     cache = sessions.GetCache()
@@ -196,6 +196,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 
 
 func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
     var token string
 
     // Get the visitor unique token or create a new one.
@@ -218,7 +219,7 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
 
     // Save the token and challenge result in cache
     // with timeout to clear it.
-    _, err = cache.Do("SETEX", token, "300", data.Text)
+    err = cache.SetEX(ctx, token, data.Text, time.Second * 300).Err()
     if err != nil {
         http.Error(w, err.Error(), 500)
         return
@@ -237,6 +238,7 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
     var data  struct {
         Email string
         Challenge string
@@ -273,12 +275,12 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
     // Get the challenge from cache
     //expected, err := redis.String(cache.Do("GET", token))
-    expected, err := cache.Do("GET", token)
+    expected, err := cache.Get(ctx, token).Result()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-    if fmt.Sprintf("%s", expected) != data.Challenge {
+    if expected != data.Challenge {
         w.Write([]byte("false"))
         return
     }
@@ -291,7 +293,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
         //
         // Set the cache with a token to identify the user
         token_url_redirect := sessions.GenerateToken()
-        _, err = cache.Do("SETEX", token_url_redirect, "3800", data.Email)
+        err = cache.SetEX(ctx, token_url_redirect, data.Email, time.Hour*1).Err()
         if err != nil {
 			http.Error(w, err.Error(), 500)
             return
@@ -301,7 +303,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
     }
 
     // Invalidate the challenge token if passed
-    _, err = cache.Do("DEL", token)
+    err = cache.Del(ctx, token).Err()
 	if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -311,6 +313,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResetPassword2(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
     var data  struct {
         Password string
         Password2 string
@@ -337,25 +340,25 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
     }
 
     // Check that the cache contains the token
-    mail_, err := cache.Do("GET", data.Token)
+    mail, err := cache.Get(ctx, data.Token).Result()
 	if err != nil {
         http.Error(w, err.Error(), 500)
 		return
 	}
-    if mail_ == nil {
+    if mail == "" {
         w.Write([]byte("false"))
         return
     }
 
 	// Set the new password for the given user
-    err = db.GetDB().SetFieldByEq("User.email", fmt.Sprintf("%s", mail_), "User.password", tools.HashPassword(data.Password))
+    err = db.GetDB().SetFieldByEq("User.email", mail, "User.password", tools.HashPassword(data.Password))
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
     }
 
     // Invalidate the reset token if passed
-    _, err = cache.Do("DEL", data.Token)
+    err = cache.Del(ctx, data.Token).Err()
 	if err != nil { panic(err) }
 
     w.Write([]byte("true"))
@@ -363,6 +366,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 
 // Check that the cache contains the given token
 func UuidCheck(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
     var data struct {
         Token string
     }
@@ -376,12 +380,12 @@ func UuidCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Check that the cache contains the token
-    x, err := cache.Do("GET", data.Token)
+    x, err := cache.Get(ctx, data.Token).Result()
 	if err != nil {
         http.Error(w, err.Error(), 500)
 		return
 	}
-    if x == nil {
+    if x == "" {
         w.Write([]byte("false"))
         return
     }

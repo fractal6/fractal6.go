@@ -152,7 +152,6 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-
     if *event.EventType == model.TensionEventMemberLinked {
         // Link user
         // --
@@ -167,7 +166,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
         err = UnlinkUser(rootnameid, nameid, *event.Old)
         if err != nil { return false, err }
     }
-    // Update NodeFragmet
+    // Update NodeFragment
     err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
 
     return ok, err
@@ -229,9 +228,10 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
     if bid != nil {
         nodeInput.Source = &model.BlobRef{ ID: bid }
     }
-    var children []model.NodeFragment
+    // @future: children not implemented
+    //var children []model.NodeFragment
 
-    // @DEBUG: for the moment, first_link and children are linked separetly, see contracts....
+    // @future: for the moment, first_link and children are linked separetly, see contracts....
     //switch *node.Type {
     //case model.NodeTypeRole:
     //    if node.FirstLink != nil {
@@ -252,23 +252,23 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
     if err != nil { return err }
 
     // Change Guest to member if user got its first role.
-    // add tension and child for existing children.
-    switch *node.Type {
-    case model.NodeTypeRole:
-        if node.FirstLink != nil && *node.RoleType != model.RoleTypeGuest {
-            err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
-        }
-    case model.NodeTypeCircle:
-        for _, child := range(children) {
-            // Add the child tension
-            tensionInput := makeNewChildTension(username, emitterid, nameid, child)
-            tid_c, err := db.GetDB().Add(db.DB.GetRootUctx(), "tension", tensionInput)
-            if err != nil { return err }
-            // Push child
-            bid_c := db.GetDB().GetLastBlobId(tid_c)
-            err = PushNode(username, bid_c, &child, emitterid, *child.Nameid, nameid)
-        }
-    }
+    // Add tension and child for existing children.
+    //switch *node.Type {
+    //case model.NodeTypeRole:
+    //    if node.FirstLink != nil && *node.RoleType != model.RoleTypeGuest {
+    //        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
+    //    }
+    //case model.NodeTypeCircle:
+    //    for _, child := range(children) {
+    //        // Add the child tension
+    //        tensionInput := makeNewChildTension(username, emitterid, nameid, child)
+    //        tid_c, err := db.GetDB().Add(db.DB.GetRootUctx(), "tension", tensionInput)
+    //        if err != nil { return err }
+    //        // Push child
+    //        bid_c := db.GetDB().GetLastBlobId(tid_c)
+    //        err = PushNode(username, bid_c, &child, emitterid, *child.Nameid, nameid)
+    //    }
+    //}
 
     return err
 }
@@ -407,7 +407,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     return tension
 }
 
-func AddPendingNode(username string, tension *model.Tension) error {
+func MaybeAddPendingNode(username string, tension *model.Tension) error {
     rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
     if err != nil { return err }
     nid := codec.MemberIdCodec(rootid, username)
@@ -421,14 +421,32 @@ func AddPendingNode(username string, tension *model.Tension) error {
             Name: &name,
             RoleType: &rt,
             Type: &t,
-            FirstLink: &username,
         }
         auth.InheritNodeCharacDefault(n, tension.Receiver)
         err = PushNode(username, nil, n, "", nid, rootid)
         if err != nil { return err }
+        err = db.GetDB().AddUserRole(username, nid)
     }
 
-    return nil
+    return err
+}
+
+func MaybeDeletePendingNode(username string, tension *model.Tension) error {
+    rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
+    if err != nil { return err }
+    nid := codec.MemberIdCodec(rootid, username)
+    ex, err :=  db.GetDB().Exists("Node.nameid", nid, nil, nil)
+    if err != nil { return err }
+    if ex {
+        // DO not use UnlinkUser here because it is protected againt deletion.
+        err := db.GetDB().RemoveUserRole(username, nid)
+        if err != nil { return err }
+        err = db.DB.Delete(db.DB.GetRootUctx(), "node", model.NodeFilter{
+            Nameid: &model.StringHashFilterStringRegExpFilter{Eq:&nid},
+        })
+    }
+
+    return err
 }
 
 //

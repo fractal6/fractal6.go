@@ -7,62 +7,54 @@ import (
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/graph/auth"
     "fractale/fractal6.go/db"
-    //"fractale/fractal6.go/text/en"
-    //webauth "fractale/fractal6.go/web/auth"
     //. "fractale/fractal6.go/tools"
 )
 
 func LinkUser(rootnameid, nameid, username string) error {
-    err := db.GetDB().AddUserRole(username, nameid)
-    if err != nil { return err }
+    // Anchor role should already exists
+    if codec.MemberIdCodec(rootnameid, username) != nameid {
+        err := db.GetDB().AddUserRole(username, nameid)
+        if err != nil { return err }
+    }
 
-    err = maybeUpdateMembership(rootnameid, username, model.RoleTypeMember)
-    if err != nil { return  err }
-
+    err := maybeUpdateMembership(rootnameid, username, model.RoleTypeMember)
     return err
 }
 
 func UnlinkUser(rootnameid, nameid, username string) error {
-    err := db.GetDB().RemoveUserRole(username, nameid)
-    if err != nil { return err }
+    // Keep Retired user for references (tension)
+    if codec.MemberIdCodec(rootnameid, username) != nameid {
+        err := db.GetDB().RemoveUserRole(username, nameid)
+        if err != nil { return err }
+    }
 
-    err = maybeUpdateMembership(rootnameid, username, model.RoleTypeGuest)
-    if err != nil { return err }
-
+    err := maybeUpdateMembership(rootnameid, username, model.RoleTypeGuest)
     return err
 }
 
 func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
-    tid := tension.ID
     parentid := tension.Receiver.Nameid
 
     // Type check
     if node.RoleType == nil { return false, fmt.Errorf("Node need a role type for this action.") }
-    if node.FirstLink == nil { return false, fmt.Errorf("Node need a linked user for this action.") }
-
-    // CanLeaveRole
-    if *node.FirstLink != uctx.Username {
-        return false, fmt.Errorf("Access denied")
-    }
 
     // Get References
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
 
     switch *node.RoleType {
     case model.RoleTypeOwner:
-        return false, fmt.Errorf("Doh, organisation destruction is not yet implemented, WIP.")
+        return false, fmt.Errorf("Doh, organisation destruction is not yet implemented.")
     case model.RoleTypeMember:
         return false, fmt.Errorf("Doh, you ave active role in this organisation. Please leave your roles first.")
     case model.RoleTypePending:
         return false, fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation.")
-    case model.RoleTypeGuest:
-        err := db.GetDB().UpgradeMember(nameid, model.RoleTypeRetired)
+    case model.RoleTypeRetired:
+        return false, fmt.Errorf("You are already retired from this role.")
+    default: // Guest Peer, Coordinator + user defined roles
+        err = UnlinkUser(rootnameid, nameid, uctx.Username)
         if err != nil {return false, err}
-    default: // Peer, Coordinator + user defined roles
-        err = UnlinkUser(rootnameid, nameid, *node.FirstLink)
-        if err != nil {return false, err}
-        // @Debug: Remove user from last blob if present
-        err = db.GetDB().MaybeDeleteFirstLink(tid, uctx.Username)
+        // @obsolete: Remove user from last blob if present
+        //err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
     }
 
     return true, err
@@ -72,31 +64,42 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
     var uctxFs *model.UserCtx
     var err error
-    var i int
     DB := db.GetDB()
-    uctxFs, err = DB.GetUser("username", username)
+    uctxFs, err = DB.GetUctxFull("username", username)
+    // @Debug: Improve speed using redis to store roles on mutation instead of jwt !
+    uctxFs.CheckedNameid = []string{rootnameid}
     if err != nil { return err }
 
     // Don't touch owner state
-    if auth.UserIsOwner(uctxFs, rootnameid) >= 0 { return nil }
+    if auth.UserIsOwner(uctxFs, rootnameid) >= 0 {
+        return nil
+    }
 
-    // Update RoleType to Guest
+    nid := codec.MemberIdCodec(rootnameid, username)
     roles := auth.GetRoles(uctxFs, rootnameid)
-    if rt == model.RoleTypeGuest && len(roles) == 1  {
-        err := DB.UpgradeMember(roles[0].Nameid, model.RoleTypeGuest)
-        if err != nil { return err }
-        return nil
+
+    if len(roles) > 2 { return nil }
+
+    // User Downgrade
+    if rt == model.RoleTypeGuest {
+        if len(roles) == 1 && *roles[0].RoleType == model.RoleTypeMember {
+            err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
+        } else if len(roles) == 1 && *roles[0].RoleType == model.RoleTypeGuest {
+            err = DB.UpgradeMember(nid, model.RoleTypeRetired)
+        }
+        return err
     }
 
-    // Update RoleType to Member
-    i = auth.UserIsGuest(uctxFs, rootnameid)
-    if rt == model.RoleTypeMember && i >= 0 {
-        // Update RoleType to Member
-        err := DB.UpgradeMember(uctxFs.Roles[i].Nameid, model.RoleTypeMember)
-        if err != nil { return err }
-        return nil
+    // User Upgrade
+    if rt == model.RoleTypeMember {
+        if len(roles) == 1 {
+            err = DB.UpgradeMember(nid, model.RoleTypeGuest)
+        } else if len(roles) == 2 {
+            err = DB.UpgradeMember(nid, model.RoleTypeMember)
+        }
+        return err
     }
 
-    return nil
+    return fmt.Errorf("role upgrade not implemented: %s", rt)
 }
 

@@ -207,8 +207,8 @@ type AddRoleExtInput struct {
 	RoleType   RoleType    `json:"role_type,omitempty"`
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
-	Nodes      []*NodeRef  `json:"nodes,omitempty"`
 	Roles      []*NodeRef  `json:"roles,omitempty"`
+	Nodes      []*NodeRef  `json:"nodes,omitempty"`
 }
 
 type AddRoleExtPayload struct {
@@ -1434,10 +1434,10 @@ type RoleExt struct {
 	RoleType       RoleType             `json:"role_type,omitempty"`
 	Color          *string              `json:"color,omitempty"`
 	Mandate        *Mandate             `json:"mandate,omitempty"`
-	Nodes          []*Node              `json:"nodes,omitempty"`
 	Roles          []*Node              `json:"roles,omitempty"`
-	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
+	Nodes          []*Node              `json:"nodes,omitempty"`
 	RolesAggregate *NodeAggregateResult `json:"rolesAggregate,omitempty"`
+	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
 }
 
 type RoleExtAggregateResult struct {
@@ -1475,8 +1475,8 @@ type RoleExtPatch struct {
 	RoleType   *RoleType   `json:"role_type,omitempty"`
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
-	Nodes      []*NodeRef  `json:"nodes,omitempty"`
 	Roles      []*NodeRef  `json:"roles,omitempty"`
+	Nodes      []*NodeRef  `json:"nodes,omitempty"`
 }
 
 type RoleExtRef struct {
@@ -1487,8 +1487,8 @@ type RoleExtRef struct {
 	RoleType   *RoleType   `json:"role_type,omitempty"`
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
-	Nodes      []*NodeRef  `json:"nodes,omitempty"`
 	Roles      []*NodeRef  `json:"roles,omitempty"`
+	Nodes      []*NodeRef  `json:"nodes,omitempty"`
 }
 
 type RoleTypeHash struct {
@@ -3817,8 +3817,8 @@ const (
 	RoleExtHasFilterRoleType   RoleExtHasFilter = "role_type"
 	RoleExtHasFilterColor      RoleExtHasFilter = "color"
 	RoleExtHasFilterMandate    RoleExtHasFilter = "mandate"
-	RoleExtHasFilterNodes      RoleExtHasFilter = "nodes"
 	RoleExtHasFilterRoles      RoleExtHasFilter = "roles"
+	RoleExtHasFilterNodes      RoleExtHasFilter = "nodes"
 )
 
 var AllRoleExtHasFilter = []RoleExtHasFilter{
@@ -3828,13 +3828,13 @@ var AllRoleExtHasFilter = []RoleExtHasFilter{
 	RoleExtHasFilterRoleType,
 	RoleExtHasFilterColor,
 	RoleExtHasFilterMandate,
-	RoleExtHasFilterNodes,
 	RoleExtHasFilterRoles,
+	RoleExtHasFilterNodes,
 }
 
 func (e RoleExtHasFilter) IsValid() bool {
 	switch e {
-	case RoleExtHasFilterRootnameid, RoleExtHasFilterName, RoleExtHasFilterAbout, RoleExtHasFilterRoleType, RoleExtHasFilterColor, RoleExtHasFilterMandate, RoleExtHasFilterNodes, RoleExtHasFilterRoles:
+	case RoleExtHasFilterRootnameid, RoleExtHasFilterName, RoleExtHasFilterAbout, RoleExtHasFilterRoleType, RoleExtHasFilterColor, RoleExtHasFilterMandate, RoleExtHasFilterRoles, RoleExtHasFilterNodes:
 		return true
 	}
 	return false
@@ -4274,17 +4274,19 @@ const (
 	TensionTypeOperational TensionType = "Operational"
 	TensionTypeGovernance  TensionType = "Governance"
 	TensionTypeHelp        TensionType = "Help"
+	TensionTypeAlert       TensionType = "Alert"
 )
 
 var AllTensionType = []TensionType{
 	TensionTypeOperational,
 	TensionTypeGovernance,
 	TensionTypeHelp,
+	TensionTypeAlert,
 }
 
 func (e TensionType) IsValid() bool {
 	switch e {
-	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp:
+	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypeAlert:
 		return true
 	}
 	return false

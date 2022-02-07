@@ -92,7 +92,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
     if input.Set != nil {
         // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
         n_nodes := 0
-        typeName, err := typeNameFromGraphqlContext(ctx)
+        _, typeName, err := queryTypeFromGraphqlContext(ctx)
         if err != nil { return nil, LogErr("UpdateNodeArtefact", err) }
         if len(input.Filter.ID) > 0 {
             n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")

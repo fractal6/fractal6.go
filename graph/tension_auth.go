@@ -133,8 +133,9 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
     // Contract Authorization
     // --
     f := validationMap[em.Validation]
-    if f == nil { return false, nil, fmt.Errorf("not implemented contract type.") }
+    if f == nil { return false, nil, LogErr("Contract not implemened", fmt.Errorf("Contact a coordinator to access this ressource.")) }
     return f(em, uctx, tension, event, contract)
+
 }
 
 

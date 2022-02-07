@@ -151,7 +151,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     }
 
     // Try getting usetCtx
-    userCtx, err := db.GetDB().GetUser(fieldId, userId)
+    userCtx, err := db.GetDB().GetUctx(fieldId, userId)
     if err != nil {
         return nil, err
     }
@@ -259,7 +259,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     }
 
     // Try getting usetCtx
-    userCtx, err := db.GetDB().GetUser("username", creds.Username)
+    userCtx, err := db.GetDB().GetUctx("username", creds.Username)
     if err != nil {
         return nil, err
     }
@@ -276,7 +276,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     userId := uctx.Username
 
     // Try getting userCtx
-    userCtx, err := db.GetDB().GetUser(fieldId, userId)
+    userCtx, err := db.GetDB().GetUctx(fieldId, userId)
     if err != nil {
         return nil, err
     }

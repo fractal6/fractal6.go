@@ -7,8 +7,8 @@ require (
 	github.com/dgraph-io/dgo/v200 v200.0.0-20200502013902-3336867fe8a1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/jwtauth/v5 v5.0.2
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/gofrs/uuid v4.1.0+incompatible
-	github.com/gomodule/redigo v1.8.5
 	github.com/lestrrat-go/jwx v1.2.18
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/prometheus/client_golang v1.12.1
@@ -27,7 +27,8 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
-	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/goccy/go-json v0.9.4 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

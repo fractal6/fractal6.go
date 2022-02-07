@@ -6,8 +6,9 @@
 package graph
 
 import (
-	"context"
 	"fmt"
+    "time"
+	"context"
 	"reflect"
 	"github.com/99designs/gqlgen/graphql"
 
@@ -29,11 +30,10 @@ type Resolver struct{
 
 // Init initialize shema config and Directives...
 func Init() gen.Config {
-    r := Resolver{
-        db:db.GetDB(),
-    }
 
-    c := gen.Config{Resolvers: &r}
+	c := gen.Config{
+		Resolvers: &Resolver{ db:db.GetDB() },
+	}
 
     //
     // Query / Payload fields
@@ -44,12 +44,16 @@ func Init() gen.Config {
     c.Directives.Meta = meta
     c.Directives.IsContractValidator = isContractValidator
 
+    // @testing: resolve hooks fo deeper layers.
+    //c.Directives.input_object_ref_test = inpu_object_ref_test
+
     //
     //  Input Fields directives
     //
 
     // Auth directive
     // - add fields are allowed by default
+    c.Directives.X_add = FieldAuthorization
     c.Directives.X_set = FieldAuthorization
     c.Directives.X_remove = FieldAuthorization
     c.Directives.X_patch = FieldAuthorization
@@ -207,7 +211,7 @@ func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f s
     var v string
     // Set function
     key := uctx.Username + "meta_patch_f"
-    _, err := cache.Do("SETEX", key, "5", f)
+    err := cache.SetEX(ctx, key, f, time.Second * 5).Err()
     if err != nil { return nil, err }
     // Set attribute name
     if k != nil {
@@ -222,7 +226,7 @@ func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f s
         }
 
         key = uctx.Username + "meta_patch_k"
-        _, err = cache.Do("SETEX", key, "5", *k)
+        err := cache.SetEX(ctx, key, *k, time.Second * 5).Err()
         if err != nil { return nil, err }
     } else {
         // get uid ?
@@ -230,7 +234,7 @@ func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f s
     }
     // Set attribute value
     key = uctx.Username + "meta_patch_v"
-    _, err = cache.Do("SETEX", key, "5", v)
+    err = cache.SetEX(ctx, key, v, time.Second * 5).Err()
     if err != nil { return nil, err }
     return next(ctx)
 }
@@ -295,4 +299,59 @@ func FieldTransform(ctx context.Context, obj interface{}, next graphql.Resolver,
     return nil, LogErr("directive error", fmt.Errorf("unknown function `%s'", a))
 }
 
+//
+// @Warning: the following code will be auto-generatd in the future.
+//
 
+
+func inpu_object_ref_test(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    d, e := next(ctx)
+    rc := graphql.GetResolverContext(ctx)
+    queryName := rc.Field.Name
+    pc := graphql.GetPathContext(ctx)
+    fieldName := *pc.Field
+
+    queryType, _, err := queryTypeFromGraphqlContext(ctx)
+    if err != nil { panic(err) }
+
+
+    l, ok := InterfaceSlice(d)
+    if ok && len(l) > 0 {
+        // List of ObjectRef
+        fmt.Println("query name:", queryName)
+        fmt.Println("field name", fieldName)
+        fmt.Println(Struct2Map(obj))
+        fmt.Println(3, pc.Path(), "|", len(pc.Path()),"|")
+        fmt.Println(Struct2Map(d), "| isList: ", ok)
+        switch queryType {
+        case "add":
+        case "update":
+        case "delete":
+        default:
+            panic("query not implemented: " + queryType )
+        }
+    }
+
+
+    m := Struct2Map(d)
+    if d != nil && len(m) > 0 {
+        // ObjectRef | add OR update
+        fmt.Println("query name:", queryName)
+        fmt.Println("field name", fieldName)
+        fmt.Println(Struct2Map(obj))
+        _, ok := InterfaceSlice(d)
+        // Can't get rc.Object !N gqlgen bug ?
+        if ok {
+            // Don't run hook on list. Field with list are validated by field level auth.
+            fmt.Println(1, pc.Path(), "|", len(pc.Path()),"|")
+            fmt.Println(Struct2Map(d), "| isList: ", ok)
+            return d, e
+        }
+        fmt.Println(2, pc.Path(), "|", len(pc.Path()),"|")
+        fmt.Println(Struct2Map(d), "| isList: ", ok)
+    }
+
+
+    fmt.Println(queryType)
+    return d, e
+}
