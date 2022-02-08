@@ -22,7 +22,7 @@ import (
 // Add Contract hook
 func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input
@@ -63,7 +63,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 // Update Contract hook
 func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input
@@ -105,7 +105,7 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 // Delete Contract hook
 func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -154,7 +154,7 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 
 func isContractValidator(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -184,7 +184,7 @@ func isContractValidator(ctx context.Context, obj interface{}, next graphql.Reso
 
 func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input

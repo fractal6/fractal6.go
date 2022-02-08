@@ -44,15 +44,13 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     // for k, a := range rc.Args {
 
     /* Rebuild the Graphql inputs request from this context */
-    rc := graphql.GetResolverContext(ctx)
     gc := graphql.GetRequestContext(ctx)
-    queryName := rc.Path().String()
-    queryType, typeName, err := queryTypeFromGraphqlContext(ctx)
+    queryType, typeName, queryName, err := queryTypeFromGraphqlContext(ctx)
     if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
 
     // Return error if jwt token error (particurly when has expired)
     if queryType == "add" || queryType == "update" || queryType == "delete" {
-        _, err := webauth.GetUserContext(ctx)
+        _, _, err := webauth.GetUserContext(ctx)
         if err != nil { return tools.LogErr("Access denied", err) }
     }
 

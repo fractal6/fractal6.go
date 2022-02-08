@@ -15,24 +15,26 @@ import (
 // Misc field utils
 //
 
-func queryTypeFromGraphqlContext(ctx context.Context) (string, string, error) {
+func queryTypeFromGraphqlContext(ctx context.Context) (string, string, string, error) {
     var err error
     var ok bool
-    var queryType, queryName string
+    var queryType, typeName, queryName string
 
-    qName :=  tools.SplitCamelCase(graphql.GetResolverContext(ctx).Field.Name)
+    rc := graphql.GetResolverContext(ctx)
+    qName :=  tools.SplitCamelCase(rc.Field.Name)
     if len(qName) < 2 {
-        return queryType, queryName, fmt.Errorf("query type name unknown")
+        return queryType, typeName, "", fmt.Errorf("query type name unknown")
     }
     queryType =  qName[0]
-    queryName = strings.Join(qName[1:], "")
+    typeName = strings.Join(qName[1:], "")
+    queryName = rc.Path().String()
     for _, t := range []string{"query", "get", "add", "update", "delete"} {
         ok = ok || (queryType == t)
     }
     if !ok {
         err = fmt.Errorf("query type name unknown")
     }
-    return queryType, queryName, err
+    return queryType, typeName, queryName, err
 }
 
 

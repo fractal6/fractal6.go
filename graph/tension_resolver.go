@@ -20,7 +20,7 @@ import (
 // Add Tension - Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input
@@ -69,7 +69,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 // Update Tension - Hook
 func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input

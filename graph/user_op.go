@@ -66,8 +66,6 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     var err error
     DB := db.GetDB()
     uctxFs, err = DB.GetUctxFull("username", username)
-    // @Debug: Improve speed using redis to store roles on mutation instead of jwt !
-    uctxFs.CheckedNameid = []string{rootnameid}
     if err != nil { return err }
 
     // Don't touch owner state

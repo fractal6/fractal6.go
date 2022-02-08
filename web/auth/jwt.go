@@ -23,13 +23,13 @@ var buildMode string
 var jwtSecret string
 
 func init () {
-    // Get Jwt private key
-    jwtSecret = os.Getenv("JWT_SECRET")
-
     // Get env mode
     if buildMode != "PROD" {
         buildMode = "DEV"
     }
+
+    // Get Jwt private key
+    jwtSecret = os.Getenv("JWT_SECRET")
 
     // Init token master
     tkMaster = Jwt{}.New()
@@ -108,6 +108,12 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
 
 // NexuserCookie create an http cookie that embed a token
 func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
+
+    // Erase growing value
+    userCtx.Roles = nil
+    // Ignore internal Hit value
+    userCtx.Hit = 0
+
     token, err := NewUserToken(userCtx)
     if err != nil {
         return nil, err
@@ -179,7 +185,21 @@ func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
     return ctx, err
 }
 
-func GetUserContext(ctx context.Context) (*model.UserCtx, error) {
+func GetUserContext(ctx context.Context) (context.Context, *model.UserCtx, error) {
+    uctx, err := GetUserContextLight(ctx)
+    if err != nil { return ctx,  uctx, err }
+
+    // Set the roles and report.
+    if uctx.Hit == 0 {
+        uctx, err := MaybeRefresh(uctx)
+        if err != nil { return ctx, uctx, err }
+        ctx = context.WithValue(ctx, tkMaster.tokenClaim, uctx)
+    }
+
+    return ctx, uctx, nil
+}
+
+func GetUserContextLight(ctx context.Context) (*model.UserCtx, error) {
     uctx := ctx.Value(tkMaster.tokenClaim).(*model.UserCtx)
     userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
     if userCtxErr != nil { return uctx, userCtxErr.(error) }
@@ -189,16 +209,20 @@ func GetUserContext(ctx context.Context) (*model.UserCtx, error) {
 }
 
 func GetUserContextOrEmpty(ctx context.Context) model.UserCtx {
-    uctx := ctx.Value(tkMaster.tokenClaim).(*model.UserCtx)
-    userCtxErr := ctx.Value(tkMaster.tokenClaimErr)
-    if userCtxErr != nil { return model.UserCtx{} }
+    _, uctx, err := GetUserContext(ctx)
+    if err != nil { return model.UserCtx{} }
+    return *uctx
+}
 
-    uctx.Iat = ctx.Value("iat").(string)
+func GetUserContextOrEmptyLight(ctx context.Context) model.UserCtx {
+    uctx, err := GetUserContextLight(ctx)
+    if err != nil { return model.UserCtx{} }
     return *uctx
 }
 
 // CheckUserCtxIat update the user token if the given
 // node has been updated after that the token's iat.
+// @deprecated: has been replaced by MaybeRefresh in resolvers
 func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
     var u *model.UserCtx
     var e error
@@ -242,4 +266,17 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
     uctx.Hit++
     uctx.CheckedNameid = append(uctx.CheckedNameid, nid)
     return uctx, e
+}
+
+func MaybeRefresh(uctx *model.UserCtx) (*model.UserCtx, error) {
+    if uctx.Hit > 0 {
+        return uctx, nil
+    }
+
+    roles, err := db.GetDB().GetUserRoles(uctx.Username)
+    if err != nil { return nil, err }
+
+    uctx.Roles = roles
+    uctx.Hit++
+    return uctx, err
 }

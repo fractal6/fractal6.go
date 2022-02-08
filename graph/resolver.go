@@ -311,7 +311,7 @@ func inpu_object_ref_test(ctx context.Context, obj interface{}, next graphql.Res
     pc := graphql.GetPathContext(ctx)
     fieldName := *pc.Field
 
-    queryType, _, err := queryTypeFromGraphqlContext(ctx)
+    queryType, _, _, err := queryTypeFromGraphqlContext(ctx)
     if err != nil { panic(err) }
 
 

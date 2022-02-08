@@ -170,6 +170,19 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     return userCtx, nil
 }
 
+// GetAuthUserFromCtx returns the user ctx from a db.grpc request,
+// from the given user context.
+func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
+    // Try getting userCtx
+    userCtx, err := db.GetDB().GetUctx("username", uctx.Username)
+    if err != nil {
+        return nil, err
+    }
+
+    // Hide the password !
+    userCtx.Password = ""
+    return userCtx, nil
+}
 
 // ValidateNewuser check that an user doesn't exist,
 // from a db.grpc request.
@@ -269,23 +282,6 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     return userCtx, nil
 }
 
-// GetAuthUserFromCtx returns the user ctx from a db.grpc request,
-// from the given user context.
-func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
-    fieldId := "username"
-    userId := uctx.Username
-
-    // Try getting userCtx
-    userCtx, err := db.GetDB().GetUctx(fieldId, userId)
-    if err != nil {
-        return nil, err
-    }
-
-    // Hide the password !
-    userCtx.Password = ""
-    return userCtx, nil
-}
-
 //
 // Verify New orga right
 //
@@ -298,16 +294,8 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
     nodes, err := db.GetDB().GetNodes(regex, true)
     if err != nil {return ok, err}
 
-    var maxPublicOrga int
-    maxPublicOrga_, err := db.GetDB().GetSubFieldByEq("User.username", uctx.Username, "User.rights", "UserRights.maxPublicOrga")
-    if err != nil {return ok, err}
-    if maxPublicOrga_ != nil {
-        maxPublicOrga = int(maxPublicOrga_.(float64))
-        //maxPublicOrga, _ = strconv.Atoi(maxPublicOrga_.(string))
-    }
-
-    if len(nodes) >= maxPublicOrga {
-        return ok, fmt.Errorf("Number of personnal organisation are limited to %d, please contact us to create more.", maxPublicOrga)
+    if len(nodes) >= uctx.Rights.MaxPublicOrga {
+        return ok, fmt.Errorf("Number of personnal organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
     }
 
     ok = true

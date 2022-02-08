@@ -16,8 +16,6 @@ import (
 )
 
 
-
-
 // Defining the Graphql handler
 func GraphqlHandler(c map[string]interface{}) http.HandlerFunc {
     introspection := c["introspection"].(bool)

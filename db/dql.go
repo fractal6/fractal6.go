@@ -91,6 +91,17 @@ type QueryMut struct {
     M string
 }
 
+// @uture: with Go.18 rewrite this module with generics
+//
+// make QueryMut and Queries/Mutations {
+//      Q string // query blocks
+//      M string // mutations block (for dql mutaitons
+//      T expected type/
+// }
+//
+// rewrite Meta and Meta_patch for as the main generic function to uses the librairies of queries,
+// replacing all the singular functions here.
+
 // GPRC/DQL Request Template
 var dqlQueries map[string]string = map[string]string{
     // Count objects
@@ -197,6 +208,18 @@ var dqlQueries map[string]string = map[string]string{
     "getUser": `{
         all(func: eq(User.{{.fieldid}}, "{{.userid}}"))
         {{.payload}}
+    }`,
+    "getUserRoles": `{
+        var(func: eq(User.username, "{{.userid}}"))  {
+            r as User.roles
+        }
+
+        all(func: uid(r)) {
+            Node.nameid
+            Node.name
+            Node.role_type
+        }
+
     }`,
     "getNode": `{
         all(func: eq(Node.{{.fieldid}}, "{{.objid}}"))
@@ -931,7 +954,41 @@ func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, err
         err = decoder.Decode(r.All[0])
         if err != nil { return nil, err }
     }
+    user.Hit++ // Avoid reloading user during the session context
     return &user, err
+}
+
+// Returns the user roles
+func (dg Dgraph) GetUserRoles(userid string) ([]*model.Node, error) {
+    // Format Query
+    maps := map[string]string{
+        "userid": userid,
+    }
+    // Send request
+    res, err := dg.QueryDql("getUserRoles", maps)
+    if err != nil { return nil, err }
+
+    // Decode response
+    var r DqlResp
+    err = json.Unmarshal(res.Json, &r)
+    if err != nil { return nil, err }
+
+    var data []*model.Node
+    config := &mapstructure.DecoderConfig{
+        Result: &data,
+        TagName: "json",
+        DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+            if to == reflect.Struct {
+                nv := CleanCompositeName(v.(map[string]interface{}))
+                return nv, nil
+            }
+            return v, nil
+        },
+    }
+    decoder, err := mapstructure.NewDecoder(config)
+    if err != nil { return nil, err }
+    err = decoder.Decode(r.All)
+    return data, err
 }
 
 func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) {

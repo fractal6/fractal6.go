@@ -15,7 +15,7 @@ import (
 
 // GetRoles returns the list of the users roles below the given node
 func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
-    uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     var roles []*model.Node
@@ -33,7 +33,7 @@ func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
 
 // userPlayRole return true if the user play the given role (Nameid)
 func UserPlayRole(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -46,7 +46,7 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
 
 // UserIsMember return true if the user belongs to the given root
 func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
-    uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -62,7 +62,7 @@ func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
 
 // UserIsGuest return true if the user is a guest (has only one role) in the given organisation
 func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
-    uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -80,7 +80,7 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
 // UserHasRole return true if the user has at least one role in the given node
 // other than a Guest role.
 func UserHasRole(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -96,7 +96,7 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
 
 // useIsCoordo return true if the user has at least one role of Coordinator in the given node
 func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.CheckUserCtxIat(uctx, nameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -112,7 +112,7 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
 }
 
 func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
-    uctx, e := webauth.CheckUserCtxIat(uctx, rootnameid)
+    uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {

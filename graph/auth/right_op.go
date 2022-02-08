@@ -20,6 +20,7 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 
 ////////////////////////////////////////////////
 // Base authorization methods
+// @future: GBAC authorization with @auth directive (DGraph)
 ////////////////////////////////////////////////
 
 func HasCoordoRole(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {

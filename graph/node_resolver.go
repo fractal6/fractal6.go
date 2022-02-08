@@ -46,7 +46,7 @@ type UpdateArtefactInput struct {
 func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     var ok bool =  false
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -81,7 +81,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     var ok bool =  false
     // Get User context
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -92,7 +92,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
     if input.Set != nil {
         // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
         n_nodes := 0
-        _, typeName, err := queryTypeFromGraphqlContext(ctx)
+        _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
         if err != nil { return nil, LogErr("UpdateNodeArtefact", err) }
         if len(input.Filter.ID) > 0 {
             n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")

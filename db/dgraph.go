@@ -29,6 +29,7 @@ import (
 
 var dgraphPrivateKey *rsa.PrivateKey
 var dgraphPublicKey *rsa.PublicKey
+var buildMode string
 
 // Draph database clients
 type Dgraph struct {
@@ -111,6 +112,10 @@ func (q QueryString) Format(maps map[string]string) string {
 var DB *Dgraph
 
 func init () {
+    // Get env mode
+    if buildMode != "PROD" {
+        buildMode = "DEV"
+    }
     // Get Jwt private key
     dgraphPrivateKey = ParseRsaPrivate(os.Getenv("DGRAPH_PRIVATE_KEY"))
     dgraphPublicKey = ParseRsaPublic(os.Getenv("DGRAPH_PUBLIC_KEY"))
@@ -222,12 +227,14 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
     return model.UserCtx{
         Username: "root",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRoot},
+        Hit: 1,
     }
 }
 func (dg Dgraph) GetRegularUctx() model.UserCtx {
     return model.UserCtx{
         Username: "root",
         Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRegular},
+        Hit: 1,
     }
 }
 
@@ -307,7 +314,7 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.getDqlQuery(op, maps)
     // Send Request
-    if !strings.HasPrefix(op, "countHas") {
+    if !strings.HasPrefix(op, "countHas") && buildMode == "DEV" {
         fmt.Println(op)
     }
     //fmt.Println(string(q))

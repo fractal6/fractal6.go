@@ -141,8 +141,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // TokenAck update the user token.
 func TokenAck(w http.ResponseWriter, r *http.Request) {
-    ctx := r.Context()
-    oldUctx, err := auth.GetUserContext(ctx)
+    oldUctx, err := auth.GetUserContextLight(r.Context())
     if err != nil {
 		// User authentication error
 		//w.WriteHeader(http.StatusUnauthorized)

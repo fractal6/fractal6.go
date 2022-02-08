@@ -33,7 +33,7 @@ func init() {
 // If user(u) field is empty, assume a user object, else field should match the user(u) credential.
 func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     // Retrieve userCtx from token
-    uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := webauth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get attributes and check everything is ok
@@ -71,7 +71,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
     field := *graphql.GetPathContext(ctx).Field
     if f != nil {
         // Extract the fieldname and type of the object queried
-        _, typeName, err := queryTypeFromGraphqlContext(ctx)
+        _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
         if err != nil { return nil, LogErr("unique", err) }
         fieldName := typeName + "." + field
         filterName := typeName + "." + *f

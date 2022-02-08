@@ -16,7 +16,7 @@ import (
 // Signup register a new user and gives it a token.
 func CreateOrga(w http.ResponseWriter, r *http.Request) {
     // Get user token
-    uctx, err := auth.GetUserContext(r.Context())
+    uctx, err := auth.GetUserContextLight(r.Context())
     if err != nil { http.Error(w, err.Error(), 500); return }
 
     // Get request form

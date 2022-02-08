@@ -1,6 +1,7 @@
 package middleware
 
 import (
+    //"fmt"
     "net/http"
     "github.com/go-chi/jwtauth/v5"
     "fractale/fractal6.go/web/auth"
@@ -51,6 +52,7 @@ func JwtDecode(next http.Handler) http.Handler {
         default:
             // pass
         }
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
