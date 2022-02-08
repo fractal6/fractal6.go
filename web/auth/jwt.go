@@ -15,11 +15,13 @@ import (
     . "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/web/sessions"
 
 )
 
-var tkMaster *Jwt
 var buildMode string
+var cache *sessions.Session
+var tkMaster *Jwt
 var jwtSecret string
 
 func init () {
@@ -27,6 +29,9 @@ func init () {
     if buildMode != "PROD" {
         buildMode = "DEV"
     }
+
+    // Initializa cache
+    cache = sessions.GetCache()
 
     // Get Jwt private key
     jwtSecret = os.Getenv("JWT_SECRET")
@@ -269,13 +274,28 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 }
 
 func MaybeRefresh(uctx *model.UserCtx) (*model.UserCtx, error) {
+    ctx := context.Background()
+    var roles []*model.Node
+    var err error
+    var key string = uctx.Username + "roles"
+
     if uctx.Hit > 0 {
+        //1. Is fresh data
         return uctx, nil
+    } else if d, err := cache.Get(ctx, key).Bytes(); err == nil && len(d) != 0 {
+        //2. Check the cache
+        err = json.Unmarshal(d, &roles)
+        if err != nil { return nil, err }
+    } else {
+        //3. Query the database
+        roles, err = db.GetDB().GetUserRoles(uctx.Username)
+        if err != nil { return nil, err }
+        d, _ := json.Marshal(roles)
+        err = cache.SetEX(ctx, key, d, time.Second * 30).Err()
+        if err != nil { return nil, err }
     }
 
-    roles, err := db.GetDB().GetUserRoles(uctx.Username)
-    if err != nil { return nil, err }
-
+    // Return a updated version of *Uctx
     uctx.Roles = roles
     uctx.Hit++
     return uctx, err
