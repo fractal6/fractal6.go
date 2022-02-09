@@ -1,11 +1,35 @@
 package graph
 
 import (
-	//"fmt"
+	"fmt"
+    "context"
+    "encoding/json"
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
 )
+
+var ctx context.Context = context.Background()
+
+func PublishTensionEvent(notif model.EventNotif) error {
+    payload, _ := json.Marshal(notif)
+    if err := cache.Publish(ctx, "api-tension-notification", payload).Err(); err != nil {
+        fmt.Printf("Redis publish error: %v", err)
+        panic(err)
+    }
+
+    return nil
+}
+
+func PublishContractEvent(notif model.ContractNotif) error {
+    payload, _ := json.Marshal(notif)
+    if err := cache.Publish(ctx, "api-contract-notification", payload).Err(); err != nil {
+        fmt.Printf("Redis publish error: %v", err)
+        panic(err)
+    }
+
+    return nil
+}
 
 func PushHistory(uctx *model.UserCtx, tid string, evts []*model.EventRef) error {
     var inputs []model.AddEventInput
@@ -19,7 +43,6 @@ func PushHistory(uctx *model.UserCtx, tid string, evts []*model.EventRef) error 
         inputs = append(inputs, temp)
     }
     // Push events
-    //fmt.Println(Struct2Map(uctx))
     ids, err := db.GetDB().AddMany(*uctx, "event", inputs)
     if err != nil { return err }
     // Set event ids for further notifications

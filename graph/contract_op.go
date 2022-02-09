@@ -46,8 +46,7 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
         }
     }
     // Push Notifications
-    err = PushContractNotifications(tid, contract)
-    if err != nil { panic(err) }
+    PublishContractEvent(model.ContractNotif{Tid: tid, Contract: contract})
     //for _, c := range contract.PendingCandidates {
     //    // @todo: send signup+contract invitation
     //    fmt.Println(c.Email)
@@ -90,8 +89,7 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
         event.CreatedBy = &model.UserRef{Username: &uctx.Username}
 
         // Push Event History and Notifications
-        err = PushHistory(uctx, tension.ID, []*model.EventRef{&event})
-        PushEventNotifications(tension.ID, []*model.EventRef{&event})
+        PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tension.ID, History: []*model.EventRef{&event}})
     } else if contract.Status == model.ContractStatusCanceled {
         // @TODO: notify candidate of the cancel.
         if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {

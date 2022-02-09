@@ -152,17 +152,20 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
+    // Get the current first link
+    firstLink, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
+    if err != nil { return false, err }
+
     if *event.EventType == model.TensionEventMemberLinked {
         // Link user
         // --
-        firstLink, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
-        if err != nil { return false, err }
         if firstLink != nil {return false, fmt.Errorf("Role is already linked.")}
         err = LinkUser(rootnameid, nameid, *event.New)
         if err != nil { return false, err }
     } else if *event.EventType == model.TensionEventMemberUnlinked {
         // UnLink user
         // --
+        if firstLink != uctx.Username {return false, fmt.Errorf("You do not play this role.")}
         err = UnlinkUser(rootnameid, nameid, *event.Old)
         if err != nil { return false, err }
     }
@@ -435,7 +438,9 @@ func MaybeDeletePendingNode(username string, tension *model.Tension) error {
     rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
     if err != nil { return err }
     nid := codec.MemberIdCodec(rootid, username)
-    ex, err :=  db.GetDB().Exists("Node.nameid", nid, nil, nil)
+    fn := "Node.role_type"
+    fv := "Pending"
+    ex, err :=  db.GetDB().Exists("Node.nameid", nid, &fn, &fv)
     if err != nil { return err }
     if ex {
         // DO not use UnlinkUser here because it is protected againt deletion.

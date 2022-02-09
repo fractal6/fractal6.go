@@ -491,10 +491,6 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
         return false, fmt.Errorf("You can not leave this role.")
     }
 
-    if node.FirstLink == nil || *node.FirstLink != uctx.Username {
-        return false, fmt.Errorf("You do not play this role.")
-    }
-
     ok, err := LeaveRole(uctx, tension, node)
     return ok, err
 }
