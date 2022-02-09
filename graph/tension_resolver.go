@@ -4,7 +4,7 @@ import (
     "fmt"
     "context"
     "github.com/99designs/gqlgen/graphql"
-
+    "encoding/json"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/db"
     webauth"fractale/fractal6.go/web/auth"
@@ -15,7 +15,6 @@ import (
 ////////////////////////////////////////////////
 // Tension Resolver
 ////////////////////////////////////////////////
-
 
 // Add Tension - Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
@@ -58,9 +57,13 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
         return data, err
     }
     if ok {
-        err = PushHistory(uctx, id, input.History)
-        e := PushEventNotifications(id, input.History)
-        if e != nil { panic(e) }
+        notif := model.Notif{Uctx: uctx, Tid: id, History: input.History}
+        fmt.Println(Struct2Map(input.History[0]))
+        payload, _ := json.Marshal(notif)
+        if e := cache.Publish(ctx, "fractal6-tension-notification", payload).Err(); e != nil {
+            fmt.Printf("Redis publish error: %v", err)
+            panic(e)
+        }
         return data, err
     }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -98,9 +101,11 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
             // Execute query
             data, err := next(ctx)
             if err != nil { return data, err }
-            err = PushHistory(uctx, ids[0], input.Set.History)
-            e := PushEventNotifications(ids[0], input.Set.History)
-            if e != nil { panic(err) }
+            notif := model.Notif{Uctx: uctx, Tid: ids[0], History: input.Set.History}
+            payload, _ := json.Marshal(notif)
+            if e := cache.Publish(ctx, "fractal6-tension-notification", payload).Err(); e != nil {
+                fmt.Printf("Redis publish error: %v", err)
+            }
             return data, err
         } else if contract != nil {
             var t model.UpdateTensionPayload

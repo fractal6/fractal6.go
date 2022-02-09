@@ -8,7 +8,6 @@ import (
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
-    "github.com/spf13/cobra"
     "github.com/spf13/viper"
     "github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -22,27 +21,15 @@ var tkMaster *auth.Jwt
 var buildMode string
 
 func init() {
-    // Jwt init
-    tkMaster = auth.GetTokenMaster()
-
-    // Cli init
-    rootCmd.AddCommand(runCmd)
-
     // Get env mode
     if buildMode == "" {
         buildMode = "DEV"
     } else {
         buildMode = "PROD"
     }
-}
 
-var runCmd = &cobra.Command{
-    Use:   "run",
-    Short: "run server.",
-    Long:  `run server.`,
-    Run: func(cmd *cobra.Command, args []string) {
-        RunServer()
-    },
+    // Jwt init
+    tkMaster = auth.GetTokenMaster()
 }
 
 // RunServer launch the server

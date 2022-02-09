@@ -19,6 +19,7 @@ func PushHistory(uctx *model.UserCtx, tid string, evts []*model.EventRef) error 
         inputs = append(inputs, temp)
     }
     // Push events
+    //fmt.Println(Struct2Map(uctx))
     ids, err := db.GetDB().AddMany(*uctx, "event", inputs)
     if err != nil { return err }
     // Set event ids for further notifications

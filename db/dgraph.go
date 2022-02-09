@@ -116,9 +116,15 @@ func init () {
     if buildMode != "PROD" {
         buildMode = "DEV"
     }
-    // Get Jwt private key
-    dgraphPrivateKey = ParseRsaPrivate(os.Getenv("DGRAPH_PRIVATE_KEY"))
-    dgraphPublicKey = ParseRsaPublic(os.Getenv("DGRAPH_PUBLIC_KEY"))
+
+    // @DEBUG: how to integrate it with cobra to execute other command without error ?
+    if os.Getenv("DGRAPH_PRIVATE_KEY") != "" || os.Getenv("DGRAPH_PUBLIC_KEY") != ""{
+        // Get Jwt private key
+        dgraphPrivateKey = ParseRsaPrivate(os.Getenv("DGRAPH_PRIVATE_KEY"))
+        dgraphPublicKey = ParseRsaPublic(os.Getenv("DGRAPH_PUBLIC_KEY"))
+    } else {
+        log.Fatal("DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found")
+    }
 
     DB = initDB()
 }
@@ -195,7 +201,7 @@ func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
 func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
     conn, err := grpc.Dial(dg.grpcAddr, grpc.WithInsecure())
     if err != nil {
-        log.Fatal("While trying to dial gRPC")
+        log.Fatal("While trying to dial gRPC: ", err)
     }
 
     dgClient = dgo.NewDgraphClient(api.NewDgraphClient(conn))

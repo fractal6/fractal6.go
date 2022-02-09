@@ -13,9 +13,37 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "fractal6",
 		Short: "Self organisation platform for humans.",
-		Long: `FIXME`,
+		Long:  `Self organisation platform for humans.`,
 	}
 )
+
+var apiCmd = &cobra.Command{
+    Use:   "api",
+    Short: "run server.",
+    Long:  `run server.`,
+    Run: func(cmd *cobra.Command, args []string) {
+        RunServer()
+    },
+}
+
+var notifierCmd = &cobra.Command{
+    Use:   "notifier",
+    Short: "run notifier daemon.",
+    Long:  `run notifier daemon.`,
+    Run: func(cmd *cobra.Command, args []string) {
+        RunNotifier()
+    },
+}
+
+func init() {
+	cobra.OnInitialize(tools.InitViper)
+    rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
+	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+
+    // Cli init
+    rootCmd.AddCommand(apiCmd)
+    rootCmd.AddCommand(notifierCmd)
+}
 
 // Run the root command.
 func Run() {
@@ -25,10 +53,5 @@ func Run() {
 	}
 }
 
-func init() {
-	cobra.OnInitialize(tools.InitViper)
-    rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
-	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 
-}
 

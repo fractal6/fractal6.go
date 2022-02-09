@@ -10,7 +10,13 @@ type GqlErrors struct {
 
 type GqlError struct {
     Location string  `json:"location"`
-    Message string  `json:"message"`
+    Message string   `json:"message"`
+}
+
+type Notif struct {
+    Tid string          `json:"tid"`
+    Uctx *UserCtx       `json:"uctx"`
+    History []*EventRef `json:"history"`
 }
 
 // JsonAtom is a general interface

@@ -23,7 +23,15 @@ run:
 	# * JWT_SECRET
 	# * DGRAPH_PUBLIC_KEY
 	# * DGRAPH_PRIVATE_KEY
-	go run main.go run
+	go run main.go api
+
+notifier:
+	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
+	# * EMAIL_API_URL
+	# * EMAIL_API_KEY
+	# * DGRAPH_PUBLIC_KEY
+	# * DGRAPH_PRIVATE_KEY
+	ro run main.go notifier
 
 build:
 	go build $(GOFLAGS) -o $(GOBIN)/$(RELEASE) main.go

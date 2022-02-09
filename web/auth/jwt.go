@@ -35,6 +35,10 @@ func init () {
 
     // Get Jwt private key
     jwtSecret = os.Getenv("JWT_SECRET")
+    if jwtSecret == "" {
+        fmt.Println("JWT_KEY not found. JWT token disabled.")
+        return
+    }
 
     // Init token master
     tkMaster = Jwt{}.New()
