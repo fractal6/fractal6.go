@@ -195,7 +195,7 @@ func CleanAliasedMap(m map[string]interface{}) map[string]interface{} {
 
 // Keep the last key string when separated by dot (eg [a.key.name: 10] -> [name: 10])
 // + replace uid field with ID (dgraph to gqlgen compatibility
-func CleanCompositeName(m map[string]interface{}) map[string]interface{} {
+func CleanCompositeName(m map[string]interface{}, deep bool) map[string]interface{} {
     out := make(map[string]interface{}, len(m))
     for k, v := range m {
         ks := strings.Split(k, ".")
@@ -208,7 +208,11 @@ func CleanCompositeName(m map[string]interface{}) map[string]interface{} {
         var nv interface{}
         switch t := v.(type) {
         case map[string]interface{}:
-            nv = CleanAliasedMap(t)
+            if deep {
+                nv = CleanCompositeName(CleanAliasedMap(t), true)
+            } else {
+                nv = CleanAliasedMap(t)
+            }
         default:
             nv = t
         }

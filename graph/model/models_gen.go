@@ -142,38 +142,39 @@ type AddNodeFragmentPayload struct {
 }
 
 type AddNodeInput struct {
-	CreatedBy   *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt   string         `json:"createdAt,omitempty"`
-	UpdatedAt   *string        `json:"updatedAt,omitempty"`
-	Name        string         `json:"name,omitempty"`
-	Nameid      string         `json:"nameid,omitempty"`
-	Rootnameid  string         `json:"rootnameid,omitempty"`
-	Parent      *NodeRef       `json:"parent,omitempty"`
-	Type        NodeType       `json:"type_,omitempty"`
-	TensionsOut []*TensionRef  `json:"tensions_out,omitempty"`
-	TensionsIn  []*TensionRef  `json:"tensions_in,omitempty"`
-	About       *string        `json:"about,omitempty"`
-	Mandate     *MandateRef    `json:"mandate,omitempty"`
-	Source      *BlobRef       `json:"source,omitempty"`
-	Visibility  NodeVisibility `json:"visibility,omitempty"`
-	Mode        NodeMode       `json:"mode,omitempty"`
-	Rights      int            `json:"rights"`
-	IsArchived  bool           `json:"isArchived"`
-	IsRoot      bool           `json:"isRoot"`
-	IsPersonal  *bool          `json:"isPersonal"`
-	UserCanJoin *bool          `json:"userCanJoin"`
-	Children    []*NodeRef     `json:"children,omitempty"`
-	Docs        []*BlobRef     `json:"docs,omitempty"`
-	Labels      []*LabelRef    `json:"labels,omitempty"`
-	Roles       []*RoleExtRef  `json:"roles,omitempty"`
-	RoleExt     *RoleExtRef    `json:"role_ext,omitempty"`
-	RoleType    *RoleType      `json:"role_type,omitempty"`
-	Color       *string        `json:"color,omitempty"`
-	FirstLink   *UserRef       `json:"first_link,omitempty"`
-	SecondLink  *UserRef       `json:"second_link,omitempty"`
-	Skills      []string       `json:"skills,omitempty"`
-	Contracts   []*VoteRef     `json:"contracts,omitempty"`
-	OrgaAgg     *OrgaAggRef    `json:"orga_agg,omitempty"`
+	CreatedBy     *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt     string         `json:"createdAt,omitempty"`
+	UpdatedAt     *string        `json:"updatedAt,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Nameid        string         `json:"nameid,omitempty"`
+	Rootnameid    string         `json:"rootnameid,omitempty"`
+	IsRoot        bool           `json:"isRoot"`
+	Parent        *NodeRef       `json:"parent,omitempty"`
+	Type          NodeType       `json:"type_,omitempty"`
+	TensionsOut   []*TensionRef  `json:"tensions_out,omitempty"`
+	TensionsIn    []*TensionRef  `json:"tensions_in,omitempty"`
+	About         *string        `json:"about,omitempty"`
+	Mandate       *MandateRef    `json:"mandate,omitempty"`
+	Source        *BlobRef       `json:"source,omitempty"`
+	Visibility    NodeVisibility `json:"visibility,omitempty"`
+	Mode          NodeMode       `json:"mode,omitempty"`
+	Rights        int            `json:"rights"`
+	IsArchived    bool           `json:"isArchived"`
+	IsPersonal    *bool          `json:"isPersonal"`
+	UserCanJoin   *bool          `json:"userCanJoin"`
+	Children      []*NodeRef     `json:"children,omitempty"`
+	Docs          []*BlobRef     `json:"docs,omitempty"`
+	Labels        []*LabelRef    `json:"labels,omitempty"`
+	Roles         []*RoleExtRef  `json:"roles,omitempty"`
+	RoleExt       *RoleExtRef    `json:"role_ext,omitempty"`
+	RoleType      *RoleType      `json:"role_type,omitempty"`
+	Color         *string        `json:"color,omitempty"`
+	FirstLink     *UserRef       `json:"first_link,omitempty"`
+	SecondLink    *UserRef       `json:"second_link,omitempty"`
+	Skills        []string       `json:"skills,omitempty"`
+	Contracts     []*VoteRef     `json:"contracts,omitempty"`
+	OrgaAgg       *OrgaAggRef    `json:"orga_agg,omitempty"`
+	EventsHistory []*EventRef    `json:"events_history,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -1009,46 +1010,48 @@ type NearFilter struct {
 }
 
 type Node struct {
-	ID                   string                  `json:"id,omitempty"`
-	CreatedBy            *User                   `json:"createdBy,omitempty"`
-	CreatedAt            string                  `json:"createdAt,omitempty"`
-	UpdatedAt            *string                 `json:"updatedAt,omitempty"`
-	Name                 string                  `json:"name,omitempty"`
-	Nameid               string                  `json:"nameid,omitempty"`
-	Rootnameid           string                  `json:"rootnameid,omitempty"`
-	Parent               *Node                   `json:"parent,omitempty"`
-	Type                 NodeType                `json:"type_,omitempty"`
-	TensionsOut          []*Tension              `json:"tensions_out,omitempty"`
-	TensionsIn           []*Tension              `json:"tensions_in,omitempty"`
-	About                *string                 `json:"about,omitempty"`
-	Mandate              *Mandate                `json:"mandate,omitempty"`
-	Source               *Blob                   `json:"source,omitempty"`
-	Visibility           NodeVisibility          `json:"visibility,omitempty"`
-	Mode                 NodeMode                `json:"mode,omitempty"`
-	Rights               int                     `json:"rights"`
-	IsArchived           bool                    `json:"isArchived"`
-	IsRoot               bool                    `json:"isRoot"`
-	IsPersonal           *bool                   `json:"isPersonal"`
-	UserCanJoin          *bool                   `json:"userCanJoin"`
-	Children             []*Node                 `json:"children,omitempty"`
-	Docs                 []*Blob                 `json:"docs,omitempty"`
-	Labels               []*Label                `json:"labels,omitempty"`
-	Roles                []*RoleExt              `json:"roles,omitempty"`
-	RoleExt              *RoleExt                `json:"role_ext,omitempty"`
-	RoleType             *RoleType               `json:"role_type,omitempty"`
-	Color                *string                 `json:"color,omitempty"`
-	FirstLink            *User                   `json:"first_link,omitempty"`
-	SecondLink           *User                   `json:"second_link,omitempty"`
-	Skills               []string                `json:"skills,omitempty"`
-	Contracts            []*Vote                 `json:"contracts,omitempty"`
-	OrgaAgg              *OrgaAgg                `json:"orga_agg,omitempty"`
-	TensionsOutAggregate *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
-	TensionsInAggregate  *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
-	ChildrenAggregate    *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
-	DocsAggregate        *BlobAggregateResult    `json:"docsAggregate,omitempty"`
-	LabelsAggregate      *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
-	RolesAggregate       *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
-	ContractsAggregate   *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
+	ID                     string                  `json:"id,omitempty"`
+	CreatedBy              *User                   `json:"createdBy,omitempty"`
+	CreatedAt              string                  `json:"createdAt,omitempty"`
+	UpdatedAt              *string                 `json:"updatedAt,omitempty"`
+	Name                   string                  `json:"name,omitempty"`
+	Nameid                 string                  `json:"nameid,omitempty"`
+	Rootnameid             string                  `json:"rootnameid,omitempty"`
+	IsRoot                 bool                    `json:"isRoot"`
+	Parent                 *Node                   `json:"parent,omitempty"`
+	Type                   NodeType                `json:"type_,omitempty"`
+	TensionsOut            []*Tension              `json:"tensions_out,omitempty"`
+	TensionsIn             []*Tension              `json:"tensions_in,omitempty"`
+	About                  *string                 `json:"about,omitempty"`
+	Mandate                *Mandate                `json:"mandate,omitempty"`
+	Source                 *Blob                   `json:"source,omitempty"`
+	Visibility             NodeVisibility          `json:"visibility,omitempty"`
+	Mode                   NodeMode                `json:"mode,omitempty"`
+	Rights                 int                     `json:"rights"`
+	IsArchived             bool                    `json:"isArchived"`
+	IsPersonal             *bool                   `json:"isPersonal"`
+	UserCanJoin            *bool                   `json:"userCanJoin"`
+	Children               []*Node                 `json:"children,omitempty"`
+	Docs                   []*Blob                 `json:"docs,omitempty"`
+	Labels                 []*Label                `json:"labels,omitempty"`
+	Roles                  []*RoleExt              `json:"roles,omitempty"`
+	RoleExt                *RoleExt                `json:"role_ext,omitempty"`
+	RoleType               *RoleType               `json:"role_type,omitempty"`
+	Color                  *string                 `json:"color,omitempty"`
+	FirstLink              *User                   `json:"first_link,omitempty"`
+	SecondLink             *User                   `json:"second_link,omitempty"`
+	Skills                 []string                `json:"skills,omitempty"`
+	Contracts              []*Vote                 `json:"contracts,omitempty"`
+	OrgaAgg                *OrgaAgg                `json:"orga_agg,omitempty"`
+	EventsHistory          []*Event                `json:"events_history,omitempty"`
+	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
+	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
+	ChildrenAggregate      *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
+	DocsAggregate          *BlobAggregateResult    `json:"docsAggregate,omitempty"`
+	LabelsAggregate        *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
+	RolesAggregate         *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
+	ContractsAggregate     *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
+	EventsHistoryAggregate *EventAggregateResult   `json:"events_historyAggregate,omitempty"`
 }
 
 type NodeAggregateResult struct {
@@ -1079,12 +1082,12 @@ type NodeFilter struct {
 	Name       *StringTermFilter                   `json:"name,omitempty"`
 	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
 	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
+	IsRoot     *bool                               `json:"isRoot"`
 	Type       *NodeTypeHash                       `json:"type_,omitempty"`
 	About      *StringFullTextFilter               `json:"about,omitempty"`
 	Visibility *NodeVisibilityHash                 `json:"visibility,omitempty"`
 	Mode       *NodeModeHash                       `json:"mode,omitempty"`
 	IsArchived *bool                               `json:"isArchived"`
-	IsRoot     *bool                               `json:"isRoot"`
 	IsPersonal *bool                               `json:"isPersonal"`
 	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
@@ -1192,74 +1195,76 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedBy   *UserRef        `json:"createdBy,omitempty"`
-	CreatedAt   *string         `json:"createdAt,omitempty"`
-	UpdatedAt   *string         `json:"updatedAt,omitempty"`
-	Name        *string         `json:"name,omitempty"`
-	Nameid      *string         `json:"nameid,omitempty"`
-	Rootnameid  *string         `json:"rootnameid,omitempty"`
-	Parent      *NodeRef        `json:"parent,omitempty"`
-	Type        *NodeType       `json:"type_,omitempty"`
-	TensionsOut []*TensionRef   `json:"tensions_out,omitempty"`
-	TensionsIn  []*TensionRef   `json:"tensions_in,omitempty"`
-	About       *string         `json:"about,omitempty"`
-	Mandate     *MandateRef     `json:"mandate,omitempty"`
-	Source      *BlobRef        `json:"source,omitempty"`
-	Visibility  *NodeVisibility `json:"visibility,omitempty"`
-	Mode        *NodeMode       `json:"mode,omitempty"`
-	Rights      *int            `json:"rights"`
-	IsArchived  *bool           `json:"isArchived"`
-	IsRoot      *bool           `json:"isRoot"`
-	IsPersonal  *bool           `json:"isPersonal"`
-	UserCanJoin *bool           `json:"userCanJoin"`
-	Children    []*NodeRef      `json:"children,omitempty"`
-	Docs        []*BlobRef      `json:"docs,omitempty"`
-	Labels      []*LabelRef     `json:"labels,omitempty"`
-	Roles       []*RoleExtRef   `json:"roles,omitempty"`
-	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
-	RoleType    *RoleType       `json:"role_type,omitempty"`
-	Color       *string         `json:"color,omitempty"`
-	FirstLink   *UserRef        `json:"first_link,omitempty"`
-	SecondLink  *UserRef        `json:"second_link,omitempty"`
-	Skills      []string        `json:"skills,omitempty"`
-	Contracts   []*VoteRef      `json:"contracts,omitempty"`
-	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
+	CreatedBy     *UserRef        `json:"createdBy,omitempty"`
+	CreatedAt     *string         `json:"createdAt,omitempty"`
+	UpdatedAt     *string         `json:"updatedAt,omitempty"`
+	Name          *string         `json:"name,omitempty"`
+	Nameid        *string         `json:"nameid,omitempty"`
+	Rootnameid    *string         `json:"rootnameid,omitempty"`
+	IsRoot        *bool           `json:"isRoot"`
+	Parent        *NodeRef        `json:"parent,omitempty"`
+	Type          *NodeType       `json:"type_,omitempty"`
+	TensionsOut   []*TensionRef   `json:"tensions_out,omitempty"`
+	TensionsIn    []*TensionRef   `json:"tensions_in,omitempty"`
+	About         *string         `json:"about,omitempty"`
+	Mandate       *MandateRef     `json:"mandate,omitempty"`
+	Source        *BlobRef        `json:"source,omitempty"`
+	Visibility    *NodeVisibility `json:"visibility,omitempty"`
+	Mode          *NodeMode       `json:"mode,omitempty"`
+	Rights        *int            `json:"rights"`
+	IsArchived    *bool           `json:"isArchived"`
+	IsPersonal    *bool           `json:"isPersonal"`
+	UserCanJoin   *bool           `json:"userCanJoin"`
+	Children      []*NodeRef      `json:"children,omitempty"`
+	Docs          []*BlobRef      `json:"docs,omitempty"`
+	Labels        []*LabelRef     `json:"labels,omitempty"`
+	Roles         []*RoleExtRef   `json:"roles,omitempty"`
+	RoleExt       *RoleExtRef     `json:"role_ext,omitempty"`
+	RoleType      *RoleType       `json:"role_type,omitempty"`
+	Color         *string         `json:"color,omitempty"`
+	FirstLink     *UserRef        `json:"first_link,omitempty"`
+	SecondLink    *UserRef        `json:"second_link,omitempty"`
+	Skills        []string        `json:"skills,omitempty"`
+	Contracts     []*VoteRef      `json:"contracts,omitempty"`
+	OrgaAgg       *OrgaAggRef     `json:"orga_agg,omitempty"`
+	EventsHistory []*EventRef     `json:"events_history,omitempty"`
 }
 
 type NodeRef struct {
-	ID          *string         `json:"id,omitempty"`
-	CreatedBy   *UserRef        `json:"createdBy,omitempty"`
-	CreatedAt   *string         `json:"createdAt,omitempty"`
-	UpdatedAt   *string         `json:"updatedAt,omitempty"`
-	Name        *string         `json:"name,omitempty"`
-	Nameid      *string         `json:"nameid,omitempty"`
-	Rootnameid  *string         `json:"rootnameid,omitempty"`
-	Parent      *NodeRef        `json:"parent,omitempty"`
-	Type        *NodeType       `json:"type_,omitempty"`
-	TensionsOut []*TensionRef   `json:"tensions_out,omitempty"`
-	TensionsIn  []*TensionRef   `json:"tensions_in,omitempty"`
-	About       *string         `json:"about,omitempty"`
-	Mandate     *MandateRef     `json:"mandate,omitempty"`
-	Source      *BlobRef        `json:"source,omitempty"`
-	Visibility  *NodeVisibility `json:"visibility,omitempty"`
-	Mode        *NodeMode       `json:"mode,omitempty"`
-	Rights      *int            `json:"rights"`
-	IsArchived  *bool           `json:"isArchived"`
-	IsRoot      *bool           `json:"isRoot"`
-	IsPersonal  *bool           `json:"isPersonal"`
-	UserCanJoin *bool           `json:"userCanJoin"`
-	Children    []*NodeRef      `json:"children,omitempty"`
-	Docs        []*BlobRef      `json:"docs,omitempty"`
-	Labels      []*LabelRef     `json:"labels,omitempty"`
-	Roles       []*RoleExtRef   `json:"roles,omitempty"`
-	RoleExt     *RoleExtRef     `json:"role_ext,omitempty"`
-	RoleType    *RoleType       `json:"role_type,omitempty"`
-	Color       *string         `json:"color,omitempty"`
-	FirstLink   *UserRef        `json:"first_link,omitempty"`
-	SecondLink  *UserRef        `json:"second_link,omitempty"`
-	Skills      []string        `json:"skills,omitempty"`
-	Contracts   []*VoteRef      `json:"contracts,omitempty"`
-	OrgaAgg     *OrgaAggRef     `json:"orga_agg,omitempty"`
+	ID            *string         `json:"id,omitempty"`
+	CreatedBy     *UserRef        `json:"createdBy,omitempty"`
+	CreatedAt     *string         `json:"createdAt,omitempty"`
+	UpdatedAt     *string         `json:"updatedAt,omitempty"`
+	Name          *string         `json:"name,omitempty"`
+	Nameid        *string         `json:"nameid,omitempty"`
+	Rootnameid    *string         `json:"rootnameid,omitempty"`
+	IsRoot        *bool           `json:"isRoot"`
+	Parent        *NodeRef        `json:"parent,omitempty"`
+	Type          *NodeType       `json:"type_,omitempty"`
+	TensionsOut   []*TensionRef   `json:"tensions_out,omitempty"`
+	TensionsIn    []*TensionRef   `json:"tensions_in,omitempty"`
+	About         *string         `json:"about,omitempty"`
+	Mandate       *MandateRef     `json:"mandate,omitempty"`
+	Source        *BlobRef        `json:"source,omitempty"`
+	Visibility    *NodeVisibility `json:"visibility,omitempty"`
+	Mode          *NodeMode       `json:"mode,omitempty"`
+	Rights        *int            `json:"rights"`
+	IsArchived    *bool           `json:"isArchived"`
+	IsPersonal    *bool           `json:"isPersonal"`
+	UserCanJoin   *bool           `json:"userCanJoin"`
+	Children      []*NodeRef      `json:"children,omitempty"`
+	Docs          []*BlobRef      `json:"docs,omitempty"`
+	Labels        []*LabelRef     `json:"labels,omitempty"`
+	Roles         []*RoleExtRef   `json:"roles,omitempty"`
+	RoleExt       *RoleExtRef     `json:"role_ext,omitempty"`
+	RoleType      *RoleType       `json:"role_type,omitempty"`
+	Color         *string         `json:"color,omitempty"`
+	FirstLink     *UserRef        `json:"first_link,omitempty"`
+	SecondLink    *UserRef        `json:"second_link,omitempty"`
+	Skills        []string        `json:"skills,omitempty"`
+	Contracts     []*VoteRef      `json:"contracts,omitempty"`
+	OrgaAgg       *OrgaAggRef     `json:"orga_agg,omitempty"`
+	EventsHistory []*EventRef     `json:"events_history,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -3284,38 +3289,39 @@ func (e NodeFragmentOrderable) MarshalGQL(w io.Writer) {
 type NodeHasFilter string
 
 const (
-	NodeHasFilterCreatedBy   NodeHasFilter = "createdBy"
-	NodeHasFilterCreatedAt   NodeHasFilter = "createdAt"
-	NodeHasFilterUpdatedAt   NodeHasFilter = "updatedAt"
-	NodeHasFilterName        NodeHasFilter = "name"
-	NodeHasFilterNameid      NodeHasFilter = "nameid"
-	NodeHasFilterRootnameid  NodeHasFilter = "rootnameid"
-	NodeHasFilterParent      NodeHasFilter = "parent"
-	NodeHasFilterType        NodeHasFilter = "type_"
-	NodeHasFilterTensionsOut NodeHasFilter = "tensions_out"
-	NodeHasFilterTensionsIn  NodeHasFilter = "tensions_in"
-	NodeHasFilterAbout       NodeHasFilter = "about"
-	NodeHasFilterMandate     NodeHasFilter = "mandate"
-	NodeHasFilterSource      NodeHasFilter = "source"
-	NodeHasFilterVisibility  NodeHasFilter = "visibility"
-	NodeHasFilterMode        NodeHasFilter = "mode"
-	NodeHasFilterRights      NodeHasFilter = "rights"
-	NodeHasFilterIsArchived  NodeHasFilter = "isArchived"
-	NodeHasFilterIsRoot      NodeHasFilter = "isRoot"
-	NodeHasFilterIsPersonal  NodeHasFilter = "isPersonal"
-	NodeHasFilterUserCanJoin NodeHasFilter = "userCanJoin"
-	NodeHasFilterChildren    NodeHasFilter = "children"
-	NodeHasFilterDocs        NodeHasFilter = "docs"
-	NodeHasFilterLabels      NodeHasFilter = "labels"
-	NodeHasFilterRoles       NodeHasFilter = "roles"
-	NodeHasFilterRoleExt     NodeHasFilter = "role_ext"
-	NodeHasFilterRoleType    NodeHasFilter = "role_type"
-	NodeHasFilterColor       NodeHasFilter = "color"
-	NodeHasFilterFirstLink   NodeHasFilter = "first_link"
-	NodeHasFilterSecondLink  NodeHasFilter = "second_link"
-	NodeHasFilterSkills      NodeHasFilter = "skills"
-	NodeHasFilterContracts   NodeHasFilter = "contracts"
-	NodeHasFilterOrgaAgg     NodeHasFilter = "orga_agg"
+	NodeHasFilterCreatedBy     NodeHasFilter = "createdBy"
+	NodeHasFilterCreatedAt     NodeHasFilter = "createdAt"
+	NodeHasFilterUpdatedAt     NodeHasFilter = "updatedAt"
+	NodeHasFilterName          NodeHasFilter = "name"
+	NodeHasFilterNameid        NodeHasFilter = "nameid"
+	NodeHasFilterRootnameid    NodeHasFilter = "rootnameid"
+	NodeHasFilterIsRoot        NodeHasFilter = "isRoot"
+	NodeHasFilterParent        NodeHasFilter = "parent"
+	NodeHasFilterType          NodeHasFilter = "type_"
+	NodeHasFilterTensionsOut   NodeHasFilter = "tensions_out"
+	NodeHasFilterTensionsIn    NodeHasFilter = "tensions_in"
+	NodeHasFilterAbout         NodeHasFilter = "about"
+	NodeHasFilterMandate       NodeHasFilter = "mandate"
+	NodeHasFilterSource        NodeHasFilter = "source"
+	NodeHasFilterVisibility    NodeHasFilter = "visibility"
+	NodeHasFilterMode          NodeHasFilter = "mode"
+	NodeHasFilterRights        NodeHasFilter = "rights"
+	NodeHasFilterIsArchived    NodeHasFilter = "isArchived"
+	NodeHasFilterIsPersonal    NodeHasFilter = "isPersonal"
+	NodeHasFilterUserCanJoin   NodeHasFilter = "userCanJoin"
+	NodeHasFilterChildren      NodeHasFilter = "children"
+	NodeHasFilterDocs          NodeHasFilter = "docs"
+	NodeHasFilterLabels        NodeHasFilter = "labels"
+	NodeHasFilterRoles         NodeHasFilter = "roles"
+	NodeHasFilterRoleExt       NodeHasFilter = "role_ext"
+	NodeHasFilterRoleType      NodeHasFilter = "role_type"
+	NodeHasFilterColor         NodeHasFilter = "color"
+	NodeHasFilterFirstLink     NodeHasFilter = "first_link"
+	NodeHasFilterSecondLink    NodeHasFilter = "second_link"
+	NodeHasFilterSkills        NodeHasFilter = "skills"
+	NodeHasFilterContracts     NodeHasFilter = "contracts"
+	NodeHasFilterOrgaAgg       NodeHasFilter = "orga_agg"
+	NodeHasFilterEventsHistory NodeHasFilter = "events_history"
 )
 
 var AllNodeHasFilter = []NodeHasFilter{
@@ -3325,6 +3331,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterName,
 	NodeHasFilterNameid,
 	NodeHasFilterRootnameid,
+	NodeHasFilterIsRoot,
 	NodeHasFilterParent,
 	NodeHasFilterType,
 	NodeHasFilterTensionsOut,
@@ -3336,7 +3343,6 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterMode,
 	NodeHasFilterRights,
 	NodeHasFilterIsArchived,
-	NodeHasFilterIsRoot,
 	NodeHasFilterIsPersonal,
 	NodeHasFilterUserCanJoin,
 	NodeHasFilterChildren,
@@ -3351,11 +3357,12 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterSkills,
 	NodeHasFilterContracts,
 	NodeHasFilterOrgaAgg,
+	NodeHasFilterEventsHistory,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsRoot, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterContracts, NodeHasFilterOrgaAgg:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
 		return true
 	}
 	return false

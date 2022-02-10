@@ -556,46 +556,48 @@ type ComplexityRoot struct {
 	}
 
 	Node struct {
-		About                func(childComplexity int) int
-		Children             func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		ChildrenAggregate    func(childComplexity int, filter *model.NodeFilter) int
-		Color                func(childComplexity int) int
-		Contracts            func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
-		ContractsAggregate   func(childComplexity int, filter *model.VoteFilter) int
-		CreatedAt            func(childComplexity int) int
-		CreatedBy            func(childComplexity int, filter *model.UserFilter) int
-		Docs                 func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		DocsAggregate        func(childComplexity int, filter *model.BlobFilter) int
-		FirstLink            func(childComplexity int, filter *model.UserFilter) int
-		ID                   func(childComplexity int) int
-		IsArchived           func(childComplexity int) int
-		IsPersonal           func(childComplexity int) int
-		IsRoot               func(childComplexity int) int
-		Labels               func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		LabelsAggregate      func(childComplexity int, filter *model.LabelFilter) int
-		Mandate              func(childComplexity int, filter *model.MandateFilter) int
-		Mode                 func(childComplexity int) int
-		Name                 func(childComplexity int) int
-		Nameid               func(childComplexity int) int
-		OrgaAgg              func(childComplexity int, filter *model.OrgaAggFilter) int
-		Parent               func(childComplexity int, filter *model.NodeFilter) int
-		Rights               func(childComplexity int) int
-		RoleExt              func(childComplexity int, filter *model.RoleExtFilter) int
-		RoleType             func(childComplexity int) int
-		Roles                func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
-		RolesAggregate       func(childComplexity int, filter *model.RoleExtFilter) int
-		Rootnameid           func(childComplexity int) int
-		SecondLink           func(childComplexity int, filter *model.UserFilter) int
-		Skills               func(childComplexity int) int
-		Source               func(childComplexity int, filter *model.BlobFilter) int
-		TensionsIn           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsInAggregate  func(childComplexity int, filter *model.TensionFilter) int
-		TensionsOut          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsOutAggregate func(childComplexity int, filter *model.TensionFilter) int
-		Type                 func(childComplexity int) int
-		UpdatedAt            func(childComplexity int) int
-		UserCanJoin          func(childComplexity int) int
-		Visibility           func(childComplexity int) int
+		About                  func(childComplexity int) int
+		Children               func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		ChildrenAggregate      func(childComplexity int, filter *model.NodeFilter) int
+		Color                  func(childComplexity int) int
+		Contracts              func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+		ContractsAggregate     func(childComplexity int, filter *model.VoteFilter) int
+		CreatedAt              func(childComplexity int) int
+		CreatedBy              func(childComplexity int, filter *model.UserFilter) int
+		Docs                   func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		DocsAggregate          func(childComplexity int, filter *model.BlobFilter) int
+		EventsHistory          func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		EventsHistoryAggregate func(childComplexity int, filter *model.EventFilter) int
+		FirstLink              func(childComplexity int, filter *model.UserFilter) int
+		ID                     func(childComplexity int) int
+		IsArchived             func(childComplexity int) int
+		IsPersonal             func(childComplexity int) int
+		IsRoot                 func(childComplexity int) int
+		Labels                 func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate        func(childComplexity int, filter *model.LabelFilter) int
+		Mandate                func(childComplexity int, filter *model.MandateFilter) int
+		Mode                   func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Nameid                 func(childComplexity int) int
+		OrgaAgg                func(childComplexity int, filter *model.OrgaAggFilter) int
+		Parent                 func(childComplexity int, filter *model.NodeFilter) int
+		Rights                 func(childComplexity int) int
+		RoleExt                func(childComplexity int, filter *model.RoleExtFilter) int
+		RoleType               func(childComplexity int) int
+		Roles                  func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
+		RolesAggregate         func(childComplexity int, filter *model.RoleExtFilter) int
+		Rootnameid             func(childComplexity int) int
+		SecondLink             func(childComplexity int, filter *model.UserFilter) int
+		Skills                 func(childComplexity int) int
+		Source                 func(childComplexity int, filter *model.BlobFilter) int
+		TensionsIn             func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsInAggregate    func(childComplexity int, filter *model.TensionFilter) int
+		TensionsOut            func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOutAggregate   func(childComplexity int, filter *model.TensionFilter) int
+		Type                   func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
+		UserCanJoin            func(childComplexity int) int
+		Visibility             func(childComplexity int) int
 	}
 
 	NodeAggregateResult struct {
@@ -3718,6 +3720,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.DocsAggregate(childComplexity, args["filter"].(*model.BlobFilter)), true
+
+	case "Node.events_history":
+		if e.complexity.Node.EventsHistory == nil {
+			break
+		}
+
+		args, err := ec.field_Node_events_history_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.EventsHistory(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.events_historyAggregate":
+		if e.complexity.Node.EventsHistoryAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_events_historyAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.EventsHistoryAggregate(childComplexity, args["filter"].(*model.EventFilter)), true
 
 	case "Node.first_link":
 		if e.complexity.Node.FirstLink == nil {
@@ -6986,6 +7012,7 @@ type Node {
   name: String!
   nameid: String!
   rootnameid: String!
+  isRoot: Boolean!
   parent(filter: NodeFilter): Node
   type_: NodeType!
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
@@ -6997,7 +7024,6 @@ type Node {
   mode: NodeMode!
   rights: Int!
   isArchived: Boolean!
-  isRoot: Boolean!
   isPersonal: Boolean
   userCanJoin: Boolean
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -7012,6 +7038,7 @@ type Node {
   skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
+  events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
@@ -7020,6 +7047,7 @@ type Node {
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
+  events_historyAggregate(filter: EventFilter): EventAggregateResult
 }
 
 type NodeFragment {
@@ -7392,37 +7420,37 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7560,6 +7588,7 @@ input AddNodeInput {
   name: String!
   nameid: String!
   rootnameid: String!
+  isRoot: Boolean!
   parent: NodeRef
   type_: NodeType!
   tensions_out: [TensionRef!]
@@ -7571,7 +7600,6 @@ input AddNodeInput {
   mode: NodeMode!
   rights: Int!
   isArchived: Boolean!
-  isRoot: Boolean!
   isPersonal: Boolean
   userCanJoin: Boolean
   children: [NodeRef!]
@@ -7586,6 +7614,7 @@ input AddNodeInput {
   skills: [String!]
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
+  events_history: [EventRef!]
 }
 
 type AddNodePayload {
@@ -8580,12 +8609,12 @@ input NodeFilter {
   name: StringTermFilter
   nameid: StringHashFilter_StringRegExpFilter
   rootnameid: StringHashFilter_StringRegExpFilter
+  isRoot: Boolean
   type_: NodeType_hash
   about: StringFullTextFilter
   visibility: NodeVisibility_hash
   mode: NodeMode_hash
   isArchived: Boolean
-  isRoot: Boolean
   isPersonal: Boolean
   role_type: RoleType_hash
   skills: StringTermFilter
@@ -8696,6 +8725,7 @@ enum NodeHasFilter {
   name
   nameid
   rootnameid
+  isRoot
   parent
   type_
   tensions_out
@@ -8707,7 +8737,6 @@ enum NodeHasFilter {
   mode
   rights
   isArchived
-  isRoot
   isPersonal
   userCanJoin
   children
@@ -8722,6 +8751,7 @@ enum NodeHasFilter {
   skills
   contracts
   orga_agg
+  events_history
 }
 
 input NodeMode_hash {
@@ -8753,6 +8783,7 @@ input NodePatch {
   name: String @x_patch_ro
   nameid: String @x_patch_ro
   rootnameid: String @x_patch_ro
+  isRoot: Boolean @x_patch_ro
   parent: NodeRef @x_patch_ro
   type_: NodeType @x_patch_ro
   tensions_out: [TensionRef!] @x_patch_ro
@@ -8764,7 +8795,6 @@ input NodePatch {
   mode: NodeMode @x_patch_ro
   rights: Int @x_patch_ro
   isArchived: Boolean @x_patch_ro
-  isRoot: Boolean @x_patch_ro
   isPersonal: Boolean @x_patch_ro
   userCanJoin: Boolean @x_patch_ro
   children: [NodeRef!] @x_patch_ro
@@ -8779,6 +8809,7 @@ input NodePatch {
   skills: [String!] @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
   orga_agg: OrgaAggRef @x_patch_ro
+  events_history: [EventRef!] @x_patch_ro
 }
 
 input NodeRef {
@@ -8789,6 +8820,7 @@ input NodeRef {
   name: String
   nameid: String
   rootnameid: String
+  isRoot: Boolean
   parent: NodeRef
   type_: NodeType
   tensions_out: [TensionRef!]
@@ -8800,7 +8832,6 @@ input NodeRef {
   mode: NodeMode
   rights: Int
   isArchived: Boolean
-  isRoot: Boolean
   isPersonal: Boolean
   userCanJoin: Boolean
   children: [NodeRef!]
@@ -8815,6 +8846,7 @@ input NodeRef {
   skills: [String!]
   contracts: [VoteRef!]
   orga_agg: OrgaAggRef
+  events_history: [EventRef!]
 }
 
 input NodeType_hash {
@@ -13779,6 +13811,63 @@ func (ec *executionContext) field_Node_docs_args(ctx context.Context, rawArgs ma
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOBlobOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_events_historyAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_events_history_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -26972,6 +27061,38 @@ func (ec *executionContext) _Node_rootnameid(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRoot, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_parent(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -27328,38 +27449,6 @@ func (ec *executionContext) _Node_isArchived(ctx context.Context, field graphql.
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.IsArchived, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Node_isRoot(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsRoot, nil
 	})
 
 	if resTmp == nil {
@@ -27870,6 +27959,70 @@ func (ec *executionContext) _Node_orga_agg(ctx context.Context, field graphql.Co
 	return ec.marshalOOrgaAgg2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_events_history(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_events_history_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.EventsHistory, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "getNodeHistory")
+			if err != nil {
+				return nil, err
+			}
+			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Meta == nil {
+				return nil, errors.New("directive meta is not implemented")
+			}
+			return ec.directives.Meta(ctx, obj, directive0, f, k)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Event); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Event`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Event)
+	fc.Result = res
+	return ec.marshalOEvent2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_tensions_outAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -28120,6 +28273,42 @@ func (ec *executionContext) _Node_contractsAggregate(ctx context.Context, field 
 	res := resTmp.(*model.VoteAggregateResult)
 	fc.Result = res
 	return ec.marshalOVoteAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Node_events_historyAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Node_events_historyAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventsHistoryAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventAggregateResult)
+	fc.Result = res
+	return ec.marshalOEventAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NodeAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
@@ -40590,6 +40779,14 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "isRoot":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
+			it.IsRoot, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "parent":
 			var err error
 
@@ -40675,14 +40872,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
 			it.IsArchived, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isRoot":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -40795,6 +40984,14 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
 			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "events_history":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
+			it.EventsHistory, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -46177,6 +46374,14 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "isRoot":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
+			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "type_":
 			var err error
 
@@ -46214,14 +46419,6 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
 			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isRoot":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -47240,6 +47437,30 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "isRoot":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsRoot = data
+			} else if tmp == nil {
+				it.IsRoot = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "parent":
 			var err error
 
@@ -47516,30 +47737,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.IsArchived = data
 			} else if tmp == nil {
 				it.IsArchived = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "isRoot":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*bool); ok {
-				it.IsRoot = data
-			} else if tmp == nil {
-				it.IsRoot = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -47900,6 +48097,32 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.OrgaAggRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "events_history":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.EventRef); ok {
+				it.EventsHistory = data
+			} else if tmp == nil {
+				it.EventsHistory = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -47968,6 +48191,14 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRoot":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
+			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -48056,14 +48287,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
 			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isRoot":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -48176,6 +48399,14 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
 			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "events_history":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
+			it.EventsHistory, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -57294,6 +57525,16 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "isRoot":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_isRoot(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "parent":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Node_parent(ctx, field, obj)
@@ -57379,16 +57620,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		case "isArchived":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Node_isArchived(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "isRoot":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Node_isRoot(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -57494,6 +57725,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = innerFunc(ctx)
 
+		case "events_history":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_events_history(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "tensions_outAggregate":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Node_tensions_outAggregate(ctx, field, obj)
@@ -57539,6 +57777,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		case "contractsAggregate":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Node_contractsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "events_historyAggregate":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_events_historyAggregate(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

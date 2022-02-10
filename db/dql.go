@@ -141,6 +141,29 @@ var dqlQueries map[string]string = map[string]string{
             n_guests: sum(val(guest))
         }
     }`,
+    "getNodeHistory": `{
+        var(func: eq(Node.nameid, "{{.nameid}}")) {
+            n1 as uid
+            n2 as Node.children
+        }
+
+        var(func: uid(n1, n2)) {
+            Node.tensions_in {
+                h as Tension.history
+            }
+        }
+
+        all(func: uid(h), first:25, orderdesc: Post.createdAt) {
+            Post.createdAt
+            Post.createdBy { User.username }
+            Event.event_type
+            Event.tension {
+                uid
+                Tension.title
+                Tension.receiver { Node.name Node.nameid }
+            }
+        }
+    }`,
     // Get the total number of roles and circle recursively
     //    var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
     //        c as Node.children @filter(eq(Node.isArchived, false))
@@ -623,7 +646,7 @@ func (dg Dgraph) CountHas2(fieldName, f2, v2 string) int {
     return values[0]
 }
 
-func (dg Dgraph) Meta(f string, maps map[string]string) (map[string]interface{}, error) {
+func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{}, error) {
     var res *api.Response
     var err error
 
@@ -645,16 +668,15 @@ func (dg Dgraph) Meta(f string, maps map[string]string) (map[string]interface{},
     if err != nil { return nil, err }
 
     // Extract result
-    if len(r.All) == 0 {
-        panic("no result for: "+ f)
-    }
-    agg := make(map[string]interface{}, len(r.All))
-    for _, s := range r.All {
-        for n, m := range s {
-            agg[n] = m
+    x := make([]map[string]interface{}, len(r.All))
+    for i, s := range r.All {
+        y := make(map[string]interface{}, len(s))
+        for n, m := range CleanCompositeName(s, true) {
+            y[n] = m
         }
+        x[i] = y
     }
-    return agg, err
+    return x, err
 }
 
 // Probe if an object exists.
@@ -943,7 +965,7 @@ func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, err
             TagName: "json",
             DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
                 if to == reflect.Struct {
-                    nv := CleanCompositeName(v.(map[string]interface{}))
+                    nv := CleanCompositeName(v.(map[string]interface{}), false)
                     return nv, nil
                 }
                 return v, nil
@@ -979,7 +1001,7 @@ func (dg Dgraph) GetUserRoles(userid string) ([]*model.Node, error) {
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1037,7 +1059,7 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1089,7 +1111,7 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
             TagName: "json",
             DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
                 if to == reflect.Struct {
-                    nv := CleanCompositeName(v.(map[string]interface{}))
+                    nv := CleanCompositeName(v.(map[string]interface{}), false)
                     return nv, nil
                 }
                 return v, nil
@@ -1139,7 +1161,7 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
             TagName: "json",
             DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
                 if to == reflect.Struct {
-                    nv := CleanCompositeName(v.(map[string]interface{}))
+                    nv := CleanCompositeName(v.(map[string]interface{}), false)
                     return nv, nil
                 }
                 return v, nil
@@ -1175,7 +1197,7 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error)
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1209,7 +1231,7 @@ func (dg Dgraph) GetSubMembers(fieldid string, objid string) ([]model.Node, erro
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1243,7 +1265,7 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string) ([]model.Label, erro
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1286,7 +1308,7 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, erro
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1329,7 +1351,7 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string) ([]model.RoleExt, err
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1372,7 +1394,7 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string) ([]model.RoleExt, err
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil
@@ -1422,7 +1444,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
         TagName: "json",
         DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
             if to == reflect.Struct {
-                nv := CleanCompositeName(v.(map[string]interface{}))
+                nv := CleanCompositeName(v.(map[string]interface{}), false)
                 return nv, nil
             }
             return v, nil

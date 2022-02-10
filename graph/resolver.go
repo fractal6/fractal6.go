@@ -200,7 +200,24 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
     }
     res, err := db.GetDB().Meta(f, maps)
     if err != nil { return nil, err }
-    err = Map2Struct(res, &data)
+    rt := reflect.TypeOf(data)
+    switch rt.Kind() {
+    case reflect.Slice:
+        // Convert list of map to the desired list of interface
+        t := reflect.MakeSlice(rt , 1, 1)
+        newData := reflect.MakeSlice(rt , 0, len(res))
+        for i := 0; i < len(res); i++ {
+            v := reflect.ValueOf(t.Interface()).Index(0).Interface()
+            if err := Map2Struct(res[i], &v); err != nil {
+                return data, err
+            }
+            newData = reflect.Append(newData, reflect.ValueOf(v))
+        }
+        data = newData.Interface()
+    default:
+        // Assume interface
+        err = Map2Struct(res[0], &data)
+    }
     return data, err
 }
 
