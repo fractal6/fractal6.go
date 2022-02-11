@@ -126,13 +126,13 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
     "getOrgaAgg": `{
-        var(func: eq(Node.nameid, "{{.nameid}}"))  {
+        var(func: eq(Node.nameid, "{{.nameid}}")) {
             Node.children @filter(eq(Node.role_type, "Guest")) {
                 guest as count(uid)
             }
         }
-        var(func: eq(Node.nameid, "{{.nameid}}"))  {
-            Node.children @filter(eq(Node.role_type, "Member")) {
+        var(func: eq(Node.nameid, "{{.nameid}}")) {
+            Node.children @filter(eq(Node.role_type, "Member") OR eq(Node.role_type, "Owner")) {
                 member as count(uid)
             }
         }

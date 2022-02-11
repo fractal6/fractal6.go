@@ -436,31 +436,23 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 
     // Only root node can be joined
     // --
-    rootid, err := codec.Nid2rootid(*event.New)
+    username := *event.New
+    rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
     if err != nil { return ok, err }
-    if rootid != *event.New {
-        return ok, LogErr("Value error", fmt.Errorf("guest user can only join the root circle."))
-    }
-    pos := auth.UserIsMember(uctx, rootid)
-    if pos >= 0 {
-        return ok, LogErr("Value error", fmt.Errorf("You are already a member of this organisation."))
-    }
 
     // Validate
     // --
     // check the invitation if a hash is given
     // * orga invitation ? <> user invitation hash ?
     // * else check if User Can Join Organisation
-    if *tension.Receiver.UserCanJoin  {
-        guestid := codec.MemberIdCodec(rootid, uctx.Username)
-        // Pending node as been created at invitation
-        //ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
-        //if err != nil { return ok, err }
-        err = LinkUser(rootid, guestid, uctx.Username)
-        ok = true
-    }
+    // @debug: this should be done before the contract creation.
+    guestid := codec.MemberIdCodec(rootid, username)
+    // Pending node as been created at invitation
+    //ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
+    //if err != nil { return ok, err }
+    err = LinkUser(rootid, guestid, username)
 
-    return ok, err
+    return true, err
 }
 
 func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {

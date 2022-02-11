@@ -192,6 +192,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
         panic("not implemented")
     }
 
+    // Query
     var maps map[string]string
     if k == nil {
         maps = map[string]string{"id": v}
@@ -200,6 +201,8 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
     }
     res, err := db.GetDB().Meta(f, maps)
     if err != nil { return nil, err }
+
+    // Map result
     rt := reflect.TypeOf(data)
     switch rt.Kind() {
     case reflect.Slice:
@@ -216,7 +219,14 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
         data = newData.Interface()
     default:
         // Assume interface
-        err = Map2Struct(res[0], &data)
+        // Merge results (needed for user defined returns (see getOrgaAgg))
+        m := make(map[string]interface{}, 2)
+        for _, s := range res {
+            for k, v := range s {
+                m[k] = v
+            }
+        }
+        err = Map2Struct(m, &data)
     }
     return data, err
 }

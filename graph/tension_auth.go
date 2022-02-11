@@ -233,12 +233,14 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
     }
 
     if contract == nil {
-        // If user is participant return true whitout a contract
         if uctx.Username == *event.New {
-            return true, nil, nil
+            // If user is participant and have rights,
+            // return true whitout a contract
+            ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
+            return ok, nil, err
         } else {
             // Futur: return the contract instead of using addContract ?
-            return false, nil, fmt.Errorf("User addContract query instead.")
+            return false, nil, fmt.Errorf("Use addContract query instead.")
         }
     }
 

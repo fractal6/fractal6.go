@@ -52,6 +52,45 @@ func PushHistory(notif *model.EventNotif) error {
     return err
 }
 
+// GetUserToNotify returns a list of user should receive notifications uponf tension updates.
+func GetUsersToNotify(tid string, withAssigness, withSuscribers bool) ([]string, error) {
+    us := []string{}
+    users := make(map[string]bool)
+
+    // Get Coordos @TODO
+    // * Get direct coordos
+    // * Get node first_link yf any (watchout when linking/unlink)
+    if withAssigness {
+        // Get Assignees
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username")
+        if err != nil { return us, err }
+        assignees := InterfaceToStringSlice(res)
+        // Append without duplicate
+        for _, u := range assignees {
+            if users[u] { continue }
+            users[u] = true
+        }
+    }
+    if withSuscribers {
+        // Get Subscribers
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username")
+        if err != nil { return us, err }
+        subscribers := InterfaceToStringSlice(res)
+        // Append without duplicate
+        for _, u := range subscribers {
+            if users[u] { continue }
+            users[u] = true
+        }
+    }
+
+    // @todo: Check go 1.19 for generic and maps.Keys !
+    for u, _ := range users {
+        us = append(us, u)
+    }
+
+    return us, nil
+}
+
 // Notify users for Event events, where events can be batch of event.
 // @performance: @defer this with Redis
 func PushEventNotifications(notif model.EventNotif) error {
@@ -143,41 +182,3 @@ func PushContractNotifications(notif model.ContractNotif) error {
     return err
 }
 
-// GetUserToNotify returns a list of user should receive notifications uponf tension updates.
-func GetUsersToNotify(tid string, withAssigness, withSuscribers bool) ([]string, error) {
-    us := []string{}
-    users := make(map[string]bool)
-
-    // Get Coordos @TODO
-    // * Get direct coordos
-    // * Get node first_link yf any (watchout when linking/unlink)
-    if withAssigness {
-        // Get Assignees
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username")
-        if err != nil { return us, err }
-        assignees := InterfaceToStringSlice(res)
-        // Append without duplicate
-        for _, u := range assignees {
-            if users[u] { continue }
-            users[u] = true
-        }
-    }
-    if withSuscribers {
-        // Get Subscribers
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username")
-        if err != nil { return us, err }
-        subscribers := InterfaceToStringSlice(res)
-        // Append without duplicate
-        for _, u := range subscribers {
-            if users[u] { continue }
-            users[u] = true
-        }
-    }
-
-    // @todo: Check go 1.19 for generic and maps.Keys !
-    for u, _ := range users {
-        us = append(us, u)
-    }
-
-    return us, nil
-}
