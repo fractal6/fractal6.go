@@ -18,6 +18,7 @@ type UserCtx struct {
     Iat            string
     CheckedNameid  []string // keep the nameid checked for context session to limit the db requests.
     Hit            int
+    NoCache        bool
 }
 
 //

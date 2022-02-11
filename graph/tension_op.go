@@ -477,8 +477,11 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     if model.RoleType(*event.Old) == model.RoleTypeGuest {
         rootid, e := codec.Nid2rootid(*event.New)
         if e != nil { return ok, e }
+        uctx.NoCache = true
         i := auth.UserIsGuest(uctx, rootid)
-        if i<0 {return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation.")) }
+        if i < 0 {
+            return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation."))
+        }
         var nf model.NodeFragment
         t := model.NodeTypeRole
         StructMap(uctx.Roles[i], &nf)

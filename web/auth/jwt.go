@@ -284,21 +284,18 @@ func MaybeRefresh(uctx *model.UserCtx) (*model.UserCtx, error) {
     var key string = uctx.Username + "roles"
 
     if uctx.Hit > 0 {
-        fmt.Println(1)
         //1. Is fresh data
         return uctx, nil
-    } else if d, err := cache.Get(ctx, key).Bytes(); err == nil && len(d) != 0 {
-        fmt.Println(2)
+    } else if d, err := cache.Get(ctx, key).Bytes(); err == nil && len(d) != 0 && !uctx.NoCache {
         //2. Check the cache
         err = json.Unmarshal(d, &roles)
         if err != nil { return nil, err }
     } else {
-        fmt.Println(3)
         //3. Query the database
         roles, err = db.GetDB().GetUserRoles(uctx.Username)
         if err != nil { return nil, err }
         d, _ := json.Marshal(roles)
-        err = cache.SetEX(ctx, key, d, time.Second * 30).Err()
+        err = cache.SetEX(ctx, key, d, time.Second * 10).Err()
         if err != nil { return nil, err }
     }
 
