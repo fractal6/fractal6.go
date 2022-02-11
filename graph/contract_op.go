@@ -46,7 +46,7 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
         }
     }
     // Push Notifications
-    PublishContractEvent(model.ContractNotif{Tid: tid, Contract: contract})
+    PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: tid, Contract: contract})
     //for _, c := range contract.PendingCandidates {
     //    // @todo: send signup+contract invitation
     //    fmt.Println(c.Email)

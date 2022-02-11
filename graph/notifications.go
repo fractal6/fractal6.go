@@ -31,34 +31,34 @@ func PublishContractEvent(notif model.ContractNotif) error {
     return nil
 }
 
-func PushHistory(uctx *model.UserCtx, tid string, evts []*model.EventRef) error {
+func PushHistory(notif *model.EventNotif) error {
     var inputs []model.AddEventInput
-    for _, e := range evts {
+    for _, e := range notif.History {
         // Build AddtensionInput
         var temp model.AddEventInput
         StructMap(e, &temp)
-        temp.Tension = &model.TensionRef{ID: &tid}
+        temp.Tension = &model.TensionRef{ID: &notif.Tid}
 
         // Push AddtensionInput
         inputs = append(inputs, temp)
     }
     // Push events
-    ids, err := db.GetDB().AddMany(*uctx, "event", inputs)
+    ids, err := db.GetDB().AddMany(*notif.Uctx, "event", inputs)
     if err != nil { return err }
     // Set event ids for further notifications
     for i, id := range ids {
-        evts[i].ID = &id
+        notif.History[i].ID = &id
     }
     return err
 }
 
 // Notify users for Event events, where events can be batch of event.
 // @performance: @defer this with Redis
-func PushEventNotifications(tid string, evts []*model.EventRef) error {
+func PushEventNotifications(notif model.EventNotif) error {
     // Only the event with an ID will be notified.
     var eventBatch []*model.EventKindRef
     var createdAt string
-    for i, e := range evts {
+    for i, e := range notif.History {
         if i == 0 {
             createdAt = *e.CreatedAt
         }
@@ -71,12 +71,15 @@ func PushEventNotifications(tid string, evts []*model.EventRef) error {
     }
 
     // Get people to notify
-    users, err := GetUsersToNotify(tid, true, true)
+    users, err := GetUsersToNotify(notif.Tid, true, true)
     if err != nil { return err }
 
     // Push user event notification
     for _, u := range users {
-        // suscription list
+        // Don't self notify.
+        if u == notif.Uctx.Username { continue }
+
+        // User Event
         _, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
             User: &model.UserRef{Username: &u},
             IsRead: false,
@@ -96,21 +99,21 @@ func PushEventNotifications(tid string, evts []*model.EventRef) error {
 
 // Notify users for Contract event.
 // @performance: @defer this with Redis
-func PushContractNotifications(tid string, contract *model.Contract) error {
+func PushContractNotifications(notif model.ContractNotif) error {
     // Only the event with an ID will be notified.
     var eventBatch []*model.EventKindRef
     var createdAt string
-    if contract == nil {
+    if notif.Contract == nil {
         return nil
     }
-    createdAt = contract.CreatedAt
-    eventBatch = append(eventBatch, &model.EventKindRef{ContractRef: &model.ContractRef{ID: &contract.ID}})
+    createdAt = notif.Contract.CreatedAt
+    eventBatch = append(eventBatch, &model.EventKindRef{ContractRef: &model.ContractRef{ID: &notif.Contract.ID}})
 
     // Get people to notify
-    users, err := GetUsersToNotify(tid, true, false)
+    users, err := GetUsersToNotify(notif.Tid, true, false)
     if err != nil { return err }
     // Add Candidates
-    for _, c := range contract.Candidates {
+    for _, c := range notif.Contract.Candidates {
         for _, dup := range users {
             if dup == c.Username { break }
         }
@@ -119,9 +122,10 @@ func PushContractNotifications(tid string, contract *model.Contract) error {
 
     // Push user event notification
     for _, u := range users {
-        //@TODO
-        // don't self notify.
-        //if u == uctx.Username { continue }
+        // Don't self notify.
+        if u == notif.Uctx.Username { continue }
+
+        // User Event
         _, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
             User: &model.UserRef{Username: &u},
             IsRead: false,

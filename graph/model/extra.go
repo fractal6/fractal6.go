@@ -14,13 +14,14 @@ type GqlError struct {
 }
 
 type EventNotif struct {
-    Tid string          `json:"tid"`
-    Uctx *UserCtx       `json:"uctx"`
-    History []*EventRef `json:"history"`
+    Uctx *UserCtx        `json:"uctx"`
+    Tid string           `json:"tid"`
+    History []*EventRef  `json:"history"`
 }
 
 type ContractNotif struct {
-    Tid string               `json:"tid"`
+    Uctx *UserCtx       `json:"uctx"`
+    Tid string          `json:"tid"`
     Contract *Contract  `json:"contract"`
 }
 

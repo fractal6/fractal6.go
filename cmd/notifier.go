@@ -58,10 +58,10 @@ func RunNotifier() {
             }
 
             // Push notification
-            if err := graph.PushHistory(notif.Uctx, notif.Tid, notif.History); err != nil {
+            if err := graph.PushHistory(&notif); err != nil {
                 log.Printf("PushHistory error: %v", err)
             }
-            if err := graph.PushEventNotifications(notif.Tid, notif.History); err != nil {
+            if err := graph.PushEventNotifications(notif); err != nil {
                 log.Printf("PushEventNotifications error: %v", err)
             }
 
@@ -80,7 +80,7 @@ func RunNotifier() {
             }
 
             // Push notification
-            if err := graph.PushContractNotifications(notif.Tid, notif.Contract); err != nil {
+            if err := graph.PushContractNotifications(notif); err != nil {
                 log.Printf("PushContractNotification error: %v: ", err)
             }
 
