@@ -176,6 +176,11 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
+	AddNotifPayload struct {
+		Notif   func(childComplexity int, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
 	AddOrgaAggPayload struct {
 		NumUids func(childComplexity int) int
 		OrgaAgg func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
@@ -357,6 +362,12 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
+	DeleteNotifPayload struct {
+		Msg     func(childComplexity int) int
+		Notif   func(childComplexity int, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
 	DeleteOrgaAggPayload struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
@@ -509,6 +520,7 @@ type ComplexityRoot struct {
 		AddMandate          func(childComplexity int, input []*model.AddMandateInput) int
 		AddNode             func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
 		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
+		AddNotif            func(childComplexity int, input []*model.AddNotifInput) int
 		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
 		AddPendingUser      func(childComplexity int, input []*model.AddPendingUserInput) int
 		AddRoleExt          func(childComplexity int, input []*model.AddRoleExtInput) int
@@ -526,6 +538,7 @@ type ComplexityRoot struct {
 		DeleteMandate       func(childComplexity int, filter model.MandateFilter) int
 		DeleteNode          func(childComplexity int, filter model.NodeFilter) int
 		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
+		DeleteNotif         func(childComplexity int, filter model.NotifFilter) int
 		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
 		DeletePendingUser   func(childComplexity int, filter model.PendingUserFilter) int
 		DeletePost          func(childComplexity int, filter model.PostFilter) int
@@ -544,6 +557,7 @@ type ComplexityRoot struct {
 		UpdateMandate       func(childComplexity int, input model.UpdateMandateInput) int
 		UpdateNode          func(childComplexity int, input model.UpdateNodeInput) int
 		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
+		UpdateNotif         func(childComplexity int, input model.UpdateNotifInput) int
 		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
 		UpdatePendingUser   func(childComplexity int, input model.UpdatePendingUserInput) int
 		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
@@ -659,6 +673,26 @@ type ComplexityRoot struct {
 		SecondLinkMin func(childComplexity int) int
 	}
 
+	Notif struct {
+		Contract  func(childComplexity int, filter *model.ContractFilter) int
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int, filter *model.UserFilter) int
+		ID        func(childComplexity int) int
+		Message   func(childComplexity int) int
+		Tension   func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	NotifAggregateResult struct {
+		Count        func(childComplexity int) int
+		CreatedAtMax func(childComplexity int) int
+		CreatedAtMin func(childComplexity int) int
+		MessageMax   func(childComplexity int) int
+		MessageMin   func(childComplexity int) int
+		UpdatedAtMax func(childComplexity int) int
+		UpdatedAtMin func(childComplexity int) int
+	}
+
 	OrgaAgg struct {
 		NGuests  func(childComplexity int) int
 		NMembers func(childComplexity int) int
@@ -727,6 +761,7 @@ type ComplexityRoot struct {
 		AggregateMandate       func(childComplexity int, filter *model.MandateFilter) int
 		AggregateNode          func(childComplexity int, filter *model.NodeFilter) int
 		AggregateNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter) int
+		AggregateNotif         func(childComplexity int, filter *model.NotifFilter) int
 		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
 		AggregatePendingUser   func(childComplexity int, filter *model.PendingUserFilter) int
 		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
@@ -744,6 +779,7 @@ type ComplexityRoot struct {
 		GetMandate             func(childComplexity int, id string) int
 		GetNode                func(childComplexity int, id *string, nameid *string) int
 		GetNodeFragment        func(childComplexity int, id string) int
+		GetNotif               func(childComplexity int, id string) int
 		GetPost                func(childComplexity int, id string) int
 		GetRoleExt             func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
@@ -759,6 +795,7 @@ type ComplexityRoot struct {
 		QueryMandate           func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		QueryNode              func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		QueryNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
+		QueryNotif             func(childComplexity int, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) int
 		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 		QueryPendingUser       func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
 		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
@@ -894,6 +931,11 @@ type ComplexityRoot struct {
 
 	UpdateNodePayload struct {
 		Node    func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
+	UpdateNotifPayload struct {
+		Notif   func(childComplexity int, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
 	}
 
@@ -1099,12 +1141,15 @@ type MutationResolver interface {
 	AddUser(ctx context.Context, input []*model.AddUserInput, upsert *bool) (*model.AddUserPayload, error)
 	UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.UpdateUserPayload, error)
 	DeleteUser(ctx context.Context, filter model.UserFilter) (*model.DeleteUserPayload, error)
-	AddUserEvent(ctx context.Context, input []*model.AddUserEventInput) (*model.AddUserEventPayload, error)
-	UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (*model.UpdateUserEventPayload, error)
-	DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (*model.DeleteUserEventPayload, error)
 	AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (*model.AddUserRightsPayload, error)
 	UpdateUserRights(ctx context.Context, input model.UpdateUserRightsInput) (*model.UpdateUserRightsPayload, error)
 	DeleteUserRights(ctx context.Context, filter model.UserRightsFilter) (*model.DeleteUserRightsPayload, error)
+	AddUserEvent(ctx context.Context, input []*model.AddUserEventInput) (*model.AddUserEventPayload, error)
+	UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (*model.UpdateUserEventPayload, error)
+	DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (*model.DeleteUserEventPayload, error)
+	AddNotif(ctx context.Context, input []*model.AddNotifInput) (*model.AddNotifPayload, error)
+	UpdateNotif(ctx context.Context, input model.UpdateNotifInput) (*model.UpdateNotifPayload, error)
+	DeleteNotif(ctx context.Context, filter model.NotifFilter) (*model.DeleteNotifPayload, error)
 }
 type QueryResolver interface {
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
@@ -1152,11 +1197,14 @@ type QueryResolver interface {
 	GetUser(ctx context.Context, id *string, username *string) (*model.User, error)
 	QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) ([]*model.User, error)
 	AggregateUser(ctx context.Context, filter *model.UserFilter) (*model.UserAggregateResult, error)
+	QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) ([]*model.UserRights, error)
+	AggregateUserRights(ctx context.Context, filter *model.UserRightsFilter) (*model.UserRightsAggregateResult, error)
 	GetUserEvent(ctx context.Context, id string) (*model.UserEvent, error)
 	QueryUserEvent(ctx context.Context, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) ([]*model.UserEvent, error)
 	AggregateUserEvent(ctx context.Context, filter *model.UserEventFilter) (*model.UserEventAggregateResult, error)
-	QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) ([]*model.UserRights, error)
-	AggregateUserRights(ctx context.Context, filter *model.UserRightsFilter) (*model.UserRightsAggregateResult, error)
+	GetNotif(ctx context.Context, id string) (*model.Notif, error)
+	QueryNotif(ctx context.Context, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) ([]*model.Notif, error)
+	AggregateNotif(ctx context.Context, filter *model.NotifFilter) (*model.NotifAggregateResult, error)
 }
 
 type executableSchema struct {
@@ -1344,6 +1392,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddNodePayload.NumUids(childComplexity), true
+
+	case "AddNotifPayload.notif":
+		if e.complexity.AddNotifPayload.Notif == nil {
+			break
+		}
+
+		args, err := ec.field_AddNotifPayload_notif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddNotifPayload.Notif(childComplexity, args["filter"].(*model.NotifFilter), args["order"].(*model.NotifOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddNotifPayload.numUids":
+		if e.complexity.AddNotifPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddNotifPayload.NumUids(childComplexity), true
 
 	case "AddOrgaAggPayload.numUids":
 		if e.complexity.AddOrgaAggPayload.NumUids == nil {
@@ -2289,6 +2356,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteNodePayload.NumUids(childComplexity), true
 
+	case "DeleteNotifPayload.msg":
+		if e.complexity.DeleteNotifPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteNotifPayload.Msg(childComplexity), true
+
+	case "DeleteNotifPayload.notif":
+		if e.complexity.DeleteNotifPayload.Notif == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteNotifPayload_notif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteNotifPayload.Notif(childComplexity, args["filter"].(*model.NotifFilter), args["order"].(*model.NotifOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeleteNotifPayload.numUids":
+		if e.complexity.DeleteNotifPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteNotifPayload.NumUids(childComplexity), true
+
 	case "DeleteOrgaAggPayload.msg":
 		if e.complexity.DeleteOrgaAggPayload.Msg == nil {
 			break
@@ -3088,6 +3181,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddNodeFragment(childComplexity, args["input"].([]*model.AddNodeFragmentInput)), true
 
+	case "Mutation.addNotif":
+		if e.complexity.Mutation.AddNotif == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addNotif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddNotif(childComplexity, args["input"].([]*model.AddNotifInput)), true
+
 	case "Mutation.addOrgaAgg":
 		if e.complexity.Mutation.AddOrgaAgg == nil {
 			break
@@ -3291,6 +3396,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteNodeFragment(childComplexity, args["filter"].(model.NodeFragmentFilter)), true
+
+	case "Mutation.deleteNotif":
+		if e.complexity.Mutation.DeleteNotif == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteNotif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteNotif(childComplexity, args["filter"].(model.NotifFilter)), true
 
 	case "Mutation.deleteOrgaAgg":
 		if e.complexity.Mutation.DeleteOrgaAgg == nil {
@@ -3507,6 +3624,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateNodeFragment(childComplexity, args["input"].(model.UpdateNodeFragmentInput)), true
+
+	case "Mutation.updateNotif":
+		if e.complexity.Mutation.UpdateNotif == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateNotif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateNotif(childComplexity, args["input"].(model.UpdateNotifInput)), true
 
 	case "Mutation.updateOrgaAgg":
 		if e.complexity.Mutation.UpdateOrgaAgg == nil {
@@ -4395,6 +4524,119 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NodeFragmentAggregateResult.SecondLinkMin(childComplexity), true
 
+	case "Notif.contract":
+		if e.complexity.Notif.Contract == nil {
+			break
+		}
+
+		args, err := ec.field_Notif_contract_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Notif.Contract(childComplexity, args["filter"].(*model.ContractFilter)), true
+
+	case "Notif.createdAt":
+		if e.complexity.Notif.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Notif.CreatedAt(childComplexity), true
+
+	case "Notif.createdBy":
+		if e.complexity.Notif.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_Notif_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Notif.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "Notif.id":
+		if e.complexity.Notif.ID == nil {
+			break
+		}
+
+		return e.complexity.Notif.ID(childComplexity), true
+
+	case "Notif.message":
+		if e.complexity.Notif.Message == nil {
+			break
+		}
+
+		return e.complexity.Notif.Message(childComplexity), true
+
+	case "Notif.tension_":
+		if e.complexity.Notif.Tension == nil {
+			break
+		}
+
+		args, err := ec.field_Notif_tension__args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Notif.Tension(childComplexity, args["filter"].(*model.TensionFilter)), true
+
+	case "Notif.updatedAt":
+		if e.complexity.Notif.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Notif.UpdatedAt(childComplexity), true
+
+	case "NotifAggregateResult.count":
+		if e.complexity.NotifAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.Count(childComplexity), true
+
+	case "NotifAggregateResult.createdAtMax":
+		if e.complexity.NotifAggregateResult.CreatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.CreatedAtMax(childComplexity), true
+
+	case "NotifAggregateResult.createdAtMin":
+		if e.complexity.NotifAggregateResult.CreatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "NotifAggregateResult.messageMax":
+		if e.complexity.NotifAggregateResult.MessageMax == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.MessageMax(childComplexity), true
+
+	case "NotifAggregateResult.messageMin":
+		if e.complexity.NotifAggregateResult.MessageMin == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.MessageMin(childComplexity), true
+
+	case "NotifAggregateResult.updatedAtMax":
+		if e.complexity.NotifAggregateResult.UpdatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.UpdatedAtMax(childComplexity), true
+
+	case "NotifAggregateResult.updatedAtMin":
+		if e.complexity.NotifAggregateResult.UpdatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.UpdatedAtMin(childComplexity), true
+
 	case "OrgaAgg.n_guests":
 		if e.complexity.OrgaAgg.NGuests == nil {
 			break
@@ -4725,6 +4967,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateNodeFragment(childComplexity, args["filter"].(*model.NodeFragmentFilter)), true
 
+	case "Query.aggregateNotif":
+		if e.complexity.Query.AggregateNotif == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateNotif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateNotif(childComplexity, args["filter"].(*model.NotifFilter)), true
+
 	case "Query.aggregateOrgaAgg":
 		if e.complexity.Query.AggregateOrgaAgg == nil {
 			break
@@ -4929,6 +5183,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetNodeFragment(childComplexity, args["id"].(string)), true
 
+	case "Query.getNotif":
+		if e.complexity.Query.GetNotif == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getNotif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetNotif(childComplexity, args["id"].(string)), true
+
 	case "Query.getPost":
 		if e.complexity.Query.GetPost == nil {
 			break
@@ -5108,6 +5374,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryNodeFragment(childComplexity, args["filter"].(*model.NodeFragmentFilter), args["order"].(*model.NodeFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryNotif":
+		if e.complexity.Query.QueryNotif == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryNotif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryNotif(childComplexity, args["filter"].(*model.NotifFilter), args["order"].(*model.NotifOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryOrgaAgg":
 		if e.complexity.Query.QueryOrgaAgg == nil {
@@ -5987,6 +6265,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateNodePayload.NumUids(childComplexity), true
+
+	case "UpdateNotifPayload.notif":
+		if e.complexity.UpdateNotifPayload.Notif == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateNotifPayload_notif_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateNotifPayload.Notif(childComplexity, args["filter"].(*model.NotifFilter), args["order"].(*model.NotifOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateNotifPayload.numUids":
+		if e.complexity.UpdateNotifPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateNotifPayload.NumUids(childComplexity), true
 
 	case "UpdateOrgaAggPayload.numUids":
 		if e.complexity.UpdateOrgaAggPayload.NumUids == nil {
@@ -7264,6 +7561,13 @@ type User {
   eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
 }
 
+type UserRights {
+  canLogin: Boolean!
+  canCreateRoot: Boolean!
+  maxPublicOrga: Int!
+  type_: UserType!
+}
+
 type UserEvent {
   id: ID!
   createdAt: DateTime!
@@ -7272,13 +7576,16 @@ type UserEvent {
   event(filter: EventKindFilter, first: Int, offset: Int): [EventKind!]
 }
 
-union EventKind= Event| Contract
+union EventKind= Event| Contract| Notif
 
-type UserRights {
-  canLogin: Boolean!
-  canCreateRoot: Boolean!
-  maxPublicOrga: Int!
-  type_: UserType!
+type Notif {
+  tension_(filter: TensionFilter): Tension
+  contract(filter: ContractFilter): Contract
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  message: String
 }
 
 enum NodeType {
@@ -7420,37 +7727,37 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
 directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7619,6 +7926,20 @@ input AddNodeInput {
 
 type AddNodePayload {
   node(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
+  numUids: Int
+}
+
+input AddNotifInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  tension_: TensionRef
+  contract: ContractRef
+}
+
+type AddNotifPayload {
+  notif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
   numUids: Int
 }
 
@@ -8105,6 +8426,12 @@ type DeleteNodePayload {
   numUids: Int
 }
 
+type DeleteNotifPayload {
+  notif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
+  msg: String
+  numUids: Int
+}
+
 type DeleteOrgaAggPayload {
   orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   msg: String
@@ -8266,16 +8593,19 @@ input EventKindFilter {
   memberTypes: [EventKindType!]
   eventFilter: EventFilter
   contractFilter: ContractFilter
+  notifFilter: NotifFilter
 }
 
 input EventKindRef {
   eventRef: EventRef
   contractRef: ContractRef
+  notifRef: NotifRef
 }
 
 enum EventKindType {
   Event
   Contract
+  Notif
 }
 
 input EventOrder {
@@ -8568,12 +8898,15 @@ type Mutation {
   addUser(input: [AddUserInput!]!, upsert: Boolean @hook_addUserInput): AddUserPayload @hook_addUser
   updateUser(input: UpdateUserInput! @hook_updateUserInput): UpdateUserPayload @hook_updateUser
   deleteUser(filter: UserFilter! @hook_deleteUserInput): DeleteUserPayload @hook_deleteUser
-  addUserEvent(input: [AddUserEventInput!]!): AddUserEventPayload
-  updateUserEvent(input: UpdateUserEventInput!): UpdateUserEventPayload
-  deleteUserEvent(filter: UserEventFilter!): DeleteUserEventPayload
   addUserRights(input: [AddUserRightsInput!]!): AddUserRightsPayload
   updateUserRights(input: UpdateUserRightsInput!): UpdateUserRightsPayload
   deleteUserRights(filter: UserRightsFilter!): DeleteUserRightsPayload
+  addUserEvent(input: [AddUserEventInput!]!): AddUserEventPayload
+  updateUserEvent(input: UpdateUserEventInput!): UpdateUserEventPayload
+  deleteUserEvent(filter: UserEventFilter!): DeleteUserEventPayload
+  addNotif(input: [AddNotifInput!]!): AddNotifPayload
+  updateNotif(input: UpdateNotifInput!): UpdateNotifPayload
+  deleteNotif(filter: NotifFilter!): DeleteNotifPayload
 }
 
 input NearFilter {
@@ -8859,6 +9192,66 @@ input NodeVisibility_hash {
   in: [NodeVisibility]
 }
 
+type NotifAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
+  messageMin: String
+  messageMax: String
+}
+
+input NotifFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  message: StringFullTextFilter
+  has: [NotifHasFilter]
+  and: [NotifFilter]
+  or: [NotifFilter]
+  not: NotifFilter
+}
+
+enum NotifHasFilter {
+  createdBy
+  createdAt
+  updatedAt
+  message
+  tension_
+  contract
+}
+
+input NotifOrder {
+  asc: NotifOrderable
+  desc: NotifOrderable
+  then: NotifOrder
+}
+
+enum NotifOrderable {
+  createdAt
+  updatedAt
+  message
+}
+
+input NotifPatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  tension_: TensionRef @x_patch_ro
+  contract: ContractRef @x_patch_ro
+}
+
+input NotifRef {
+  id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  tension_: TensionRef
+  contract: ContractRef
+}
+
 type OrgaAggAggregateResult {
   count: Int
   n_membersMin: Int
@@ -9073,11 +9466,14 @@ type Query {
   getUser(id: ID, username: String @hook_getUserInput): User
   queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int @hook_queryUserInput): [User]
   aggregateUser(filter: UserFilter): UserAggregateResult
+  queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
+  aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
   getUserEvent(id: ID!): UserEvent
   queryUserEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   aggregateUserEvent(filter: UserEventFilter): UserEventAggregateResult
-  queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
-  aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
+  getNotif(id: ID!): Notif
+  queryNotif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
+  aggregateNotif(filter: NotifFilter): NotifAggregateResult
 }
 
 type RoleExtAggregateResult {
@@ -9441,6 +9837,17 @@ input UpdateNodeInput {
 
 type UpdateNodePayload {
   node(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
+  numUids: Int
+}
+
+input UpdateNotifInput {
+  filter: NotifFilter!
+  set: NotifPatch
+  remove: NotifPatch
+}
+
+type UpdateNotifPayload {
+  notif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
   numUids: Int
 }
 
@@ -10856,6 +11263,48 @@ func (ec *executionContext) field_AddNodePayload_node_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_AddNotifPayload_notif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NotifFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NotifOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11903,6 +12352,48 @@ func (ec *executionContext) field_DeleteNodePayload_node_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteNotifPayload_notif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NotifFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NotifOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12627,6 +13118,21 @@ func (ec *executionContext) field_Mutation_addNode_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addNotif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddNotifInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddNotifInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNotifInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13009,6 +13515,21 @@ func (ec *executionContext) field_Mutation_deleteNode_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteNotif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NotifFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNNotifFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13376,6 +13897,21 @@ func (ec *executionContext) field_Mutation_updateNode_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdateNodeInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateNotif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateNotifInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateNotifInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNotifInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -14227,6 +14763,51 @@ func (ec *executionContext) field_Node_tensions_out_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Notif_contract_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ContractFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Notif_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Notif_tension__args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Post_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14384,6 +14965,21 @@ func (ec *executionContext) field_Query_aggregateNode_args(ctx context.Context, 
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_aggregateNotif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NotifFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -14703,6 +15299,21 @@ func (ec *executionContext) field_Query_getNode_args(ctx context.Context, rawArg
 		}
 	}
 	args["nameid"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getNotif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -15267,6 +15878,48 @@ func (ec *executionContext) field_Query_queryNode_args(ctx context.Context, rawA
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryNotif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NotifFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NotifOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -16656,6 +17309,48 @@ func (ec *executionContext) field_UpdateNodePayload_node_args(ctx context.Contex
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdateNotifPayload_notif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NotifFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NotifOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -18246,6 +18941,71 @@ func (ec *executionContext) _AddNodePayload_numUids(ctx context.Context, field g
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AddNodePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddNotifPayload_notif(ctx context.Context, field graphql.CollectedField, obj *model.AddNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddNotifPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddNotifPayload_notif_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Notif, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Notif)
+	fc.Result = res
+	return ec.marshalONotif2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddNotifPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddNotifPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -21792,6 +22552,100 @@ func (ec *executionContext) _DeleteNodePayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "DeleteNodePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteNotifPayload_notif(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteNotifPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteNotifPayload_notif_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Notif, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Notif)
+	fc.Result = res
+	return ec.marshalONotif2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteNotifPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteNotifPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteNotifPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteNotifPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -26617,6 +27471,114 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	return ec.marshalODeleteUserPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserPayload(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addUserRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddUserRights(rctx, args["input"].([]*model.AddUserRightsInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddUserRightsPayload)
+	fc.Result = res
+	return ec.marshalOAddUserRightsPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserRightsPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateUserRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUserRights(rctx, args["input"].(model.UpdateUserRightsInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateUserRightsPayload)
+	fc.Result = res
+	return ec.marshalOUpdateUserRightsPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserRightsPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteUserRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteUserRights(rctx, args["filter"].(model.UserRightsFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteUserRightsPayload)
+	fc.Result = res
+	return ec.marshalODeleteUserRightsPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserRightsPayload(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -26725,7 +27687,7 @@ func (ec *executionContext) _Mutation_deleteUserEvent(ctx context.Context, field
 	return ec.marshalODeleteUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_addUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_addNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -26742,7 +27704,7 @@ func (ec *executionContext) _Mutation_addUserRights(ctx context.Context, field g
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addUserRights_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_addNotif_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -26750,18 +27712,18 @@ func (ec *executionContext) _Mutation_addUserRights(ctx context.Context, field g
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddUserRights(rctx, args["input"].([]*model.AddUserRightsInput))
+		return ec.resolvers.Mutation().AddNotif(rctx, args["input"].([]*model.AddNotifInput))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.AddUserRightsPayload)
+	res := resTmp.(*model.AddNotifPayload)
 	fc.Result = res
-	return ec.marshalOAddUserRightsPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserRightsPayload(ctx, field.Selections, res)
+	return ec.marshalOAddNotifPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNotifPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -26778,7 +27740,7 @@ func (ec *executionContext) _Mutation_updateUserRights(ctx context.Context, fiel
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateUserRights_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateNotif_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -26786,18 +27748,18 @@ func (ec *executionContext) _Mutation_updateUserRights(ctx context.Context, fiel
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUserRights(rctx, args["input"].(model.UpdateUserRightsInput))
+		return ec.resolvers.Mutation().UpdateNotif(rctx, args["input"].(model.UpdateNotifInput))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UpdateUserRightsPayload)
+	res := resTmp.(*model.UpdateNotifPayload)
 	fc.Result = res
-	return ec.marshalOUpdateUserRightsPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserRightsPayload(ctx, field.Selections, res)
+	return ec.marshalOUpdateNotifPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNotifPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_deleteUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_deleteNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -26814,7 +27776,7 @@ func (ec *executionContext) _Mutation_deleteUserRights(ctx context.Context, fiel
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteUserRights_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_deleteNotif_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -26822,15 +27784,15 @@ func (ec *executionContext) _Mutation_deleteUserRights(ctx context.Context, fiel
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteUserRights(rctx, args["filter"].(model.UserRightsFilter))
+		return ec.resolvers.Mutation().DeleteNotif(rctx, args["filter"].(model.NotifFilter))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteUserRightsPayload)
+	res := resTmp.(*model.DeleteNotifPayload)
 	fc.Result = res
-	return ec.marshalODeleteUserRightsPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserRightsPayload(ctx, field.Selections, res)
+	return ec.marshalODeleteNotifPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNotifPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Node_id(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
@@ -29785,6 +30747,442 @@ func (ec *executionContext) _NodeFragmentAggregateResult_colorMax(ctx context.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Notif_tension_(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Notif_tension__args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tension, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Notif_contract(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Notif_contract_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Contract, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Contract)
+	fc.Result = res
+	return ec.marshalOContract2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContract(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Notif_id(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Notif_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Notif_createdBy_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Notif_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Notif_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Notif_message(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_updatedAtMin(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_updatedAtMax(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_messageMin(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MessageMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NotifAggregateResult_messageMax(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MessageMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _OrgaAgg_n_members(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAgg) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -32332,6 +33730,78 @@ func (ec *executionContext) _Query_aggregateUser(ctx context.Context, field grap
 	return ec.marshalOUserAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_queryUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryUserRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryUserRights(rctx, args["filter"].(*model.UserRightsFilter), args["order"].(*model.UserRightsOrder), args["first"].(*int), args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserRights)
+	fc.Result = res
+	return ec.marshalOUserRights2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRights(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregateUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregateUserRights_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateUserRights(rctx, args["filter"].(*model.UserRightsFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserRightsAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserRightsAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_getUserEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -32440,7 +33910,7 @@ func (ec *executionContext) _Query_aggregateUserEvent(ctx context.Context, field
 	return ec.marshalOUserEventAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventAggregateResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_queryUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_getNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -32457,7 +33927,7 @@ func (ec *executionContext) _Query_queryUserRights(ctx context.Context, field gr
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_queryUserRights_args(ctx, rawArgs)
+	args, err := ec.field_Query_getNotif_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -32465,18 +33935,18 @@ func (ec *executionContext) _Query_queryUserRights(ctx context.Context, field gr
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryUserRights(rctx, args["filter"].(*model.UserRightsFilter), args["order"].(*model.UserRightsOrder), args["first"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().GetNotif(rctx, args["id"].(string))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.UserRights)
+	res := resTmp.(*model.Notif)
 	fc.Result = res
-	return ec.marshalOUserRights2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRights(ctx, field.Selections, res)
+	return ec.marshalONotif2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_aggregateUserRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_queryNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -32493,7 +33963,7 @@ func (ec *executionContext) _Query_aggregateUserRights(ctx context.Context, fiel
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_aggregateUserRights_args(ctx, rawArgs)
+	args, err := ec.field_Query_queryNotif_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -32501,15 +33971,51 @@ func (ec *executionContext) _Query_aggregateUserRights(ctx context.Context, fiel
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateUserRights(rctx, args["filter"].(*model.UserRightsFilter))
+		return ec.resolvers.Query().QueryNotif(rctx, args["filter"].(*model.NotifFilter), args["order"].(*model.NotifOrder), args["first"].(*int), args["offset"].(*int))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UserRightsAggregateResult)
+	res := resTmp.([]*model.Notif)
 	fc.Result = res
-	return ec.marshalOUserRightsAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsAggregateResult(ctx, field.Selections, res)
+	return ec.marshalONotif2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregateNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregateNotif_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateNotif(rctx, args["filter"].(*model.NotifFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NotifAggregateResult)
+	fc.Result = res
+	return ec.marshalONotifAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -35368,6 +36874,71 @@ func (ec *executionContext) _UpdateNodePayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "UpdateNodePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateNotifPayload_notif(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateNotifPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdateNotifPayload_notif_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Notif, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Notif)
+	fc.Result = res
+	return ec.marshalONotif2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateNotifPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateNotifPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateNotifPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -41001,6 +42572,93 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj interface{}) (model.AddNotifInput, error) {
+	var it model.AddNotifInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tension_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_"))
+			it.Tension, err = ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contract":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
+			it.Contract, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, obj interface{}) (model.AddOrgaAggInput, error) {
 	var it model.AddOrgaAggInput
 	asMap := map[string]interface{}{}
@@ -44550,6 +46208,14 @@ func (ec *executionContext) unmarshalInputEventKindFilter(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "notifFilter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifFilter"))
+			it.NotifFilter, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -44578,6 +46244,14 @@ func (ec *executionContext) unmarshalInputEventKindRef(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractRef"))
 			it.ContractRef, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "notifRef":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifRef"))
+			it.NotifRef, err = ec.unmarshalONotifRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -48478,6 +50152,384 @@ func (ec *executionContext) unmarshalInputNodeVisibility_hash(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNotifFilter(ctx context.Context, obj interface{}) (model.NotifFilter, error) {
+	var it model.NotifFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalONotifHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNotifOrder(ctx context.Context, obj interface{}) (model.NotifOrder, error) {
+	var it model.NotifOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj interface{}) (model.NotifPatch, error) {
+	var it model.NotifPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.CreatedBy = data
+			} else if tmp == nil {
+				it.CreatedBy = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "tension_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.TensionRef); ok {
+				it.Tension = data
+			} else if tmp == nil {
+				it.Tension = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "contract":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ContractRef); ok {
+				it.Contract = data
+			} else if tmp == nil {
+				it.Contract = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ContractRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj interface{}) (model.NotifRef, error) {
+	var it model.NotifRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tension_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_"))
+			it.Tension, err = ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contract":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
+			it.Contract, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputOrgaAggFilter(ctx context.Context, obj interface{}) (model.OrgaAggFilter, error) {
 	var it model.OrgaAggFilter
 	asMap := map[string]interface{}{}
@@ -51816,6 +53868,45 @@ func (ec *executionContext) unmarshalInputUpdateNodeInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateNotifInput(ctx context.Context, obj interface{}) (model.UpdateNotifInput, error) {
+	var it model.UpdateNotifInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNNotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context, obj interface{}) (model.UpdateOrgaAggInput, error) {
 	var it model.UpdateOrgaAggInput
 	asMap := map[string]interface{}{}
@@ -54372,6 +56463,13 @@ func (ec *executionContext) _EventKind(ctx context.Context, sel ast.SelectionSet
 			return graphql.Null
 		}
 		return ec._Contract(ctx, sel, obj)
+	case model.Notif:
+		return ec._Notif(ctx, sel, &obj)
+	case *model.Notif:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Notif(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -54681,6 +56779,41 @@ func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.Selecti
 		case "numUids":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._AddNodePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addNotifPayloadImplementors = []string{"AddNotifPayload"}
+
+func (ec *executionContext) _AddNotifPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNotifPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addNotifPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddNotifPayload")
+		case "notif":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddNotifPayload_notif(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "numUids":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddNotifPayload_numUids(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -56002,6 +58135,48 @@ func (ec *executionContext) _DeleteNodePayload(ctx context.Context, sel ast.Sele
 		case "numUids":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._DeleteNodePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteNotifPayloadImplementors = []string{"DeleteNotifPayload"}
+
+func (ec *executionContext) _DeleteNotifPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNotifPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNotifPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteNotifPayload")
+		case "notif":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNotifPayload_notif(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "msg":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNotifPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "numUids":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteNotifPayload_numUids(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -57395,6 +59570,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
+		case "addUserRights":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUserRights(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+		case "updateUserRights":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserRights(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+		case "deleteUserRights":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteUserRights(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addUserEvent":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addUserEvent(ctx, field)
@@ -57416,23 +59612,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
-		case "addUserRights":
+		case "addNotif":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addUserRights(ctx, field)
+				return ec._Mutation_addNotif(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
-		case "updateUserRights":
+		case "updateNotif":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateUserRights(ctx, field)
+				return ec._Mutation_updateNotif(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
-		case "deleteUserRights":
+		case "deleteNotif":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteUserRights(ctx, field)
+				return ec._Mutation_deleteNotif(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -58200,6 +60396,155 @@ func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, se
 		case "colorMax":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._NodeFragmentAggregateResult_colorMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var notifImplementors = []string{"Notif", "EventKind"}
+
+func (ec *executionContext) _Notif(ctx context.Context, sel ast.SelectionSet, obj *model.Notif) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, notifImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Notif")
+		case "tension_":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_tension_(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "contract":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_contract(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdBy":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_createdBy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "message":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Notif_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var notifAggregateResultImplementors = []string{"NotifAggregateResult"}
+
+func (ec *executionContext) _NotifAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NotifAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, notifAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NotifAggregateResult")
+		case "count":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "createdAtMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "createdAtMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "updatedAtMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "updatedAtMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "messageMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_messageMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "messageMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._NotifAggregateResult_messageMax(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -59561,6 +61906,46 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "queryUserRights":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryUserRights(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateUserRights":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateUserRights(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "getUserEvent":
 			field := field
 
@@ -59621,7 +62006,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "queryUserRights":
+		case "getNotif":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -59630,7 +62015,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_queryUserRights(ctx, field)
+				res = ec._Query_getNotif(ctx, field)
 				return res
 			}
 
@@ -59641,7 +62026,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "aggregateUserRights":
+		case "queryNotif":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -59650,7 +62035,27 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_aggregateUserRights(ctx, field)
+				res = ec._Query_queryNotif(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateNotif":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateNotif(ctx, field)
 				return res
 			}
 
@@ -60602,6 +63007,41 @@ func (ec *executionContext) _UpdateNodePayload(ctx context.Context, sel ast.Sele
 		case "numUids":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._UpdateNodePayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateNotifPayloadImplementors = []string{"UpdateNotifPayload"}
+
+func (ec *executionContext) _UpdateNotifPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNotifPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateNotifPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateNotifPayload")
+		case "notif":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateNotifPayload_notif(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "numUids":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateNotifPayload_numUids(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -62364,6 +64804,28 @@ func (ec *executionContext) unmarshalNAddNodeInput2ᚖfractaleᚋfractal6ᚗgo�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddNotifInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNotifInputᚄ(ctx context.Context, v interface{}) ([]*model.AddNotifInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddNotifInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddNotifInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNotifInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddNotifInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNotifInput(ctx context.Context, v interface{}) (*model.AddNotifInput, error) {
+	res, err := ec.unmarshalInputAddNotifInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInputᚄ(ctx context.Context, v interface{}) ([]*model.AddOrgaAggInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -62977,6 +65439,16 @@ func (ec *executionContext) marshalNNodeVisibility2fractaleᚋfractal6ᚗgoᚋgr
 	return v
 }
 
+func (ec *executionContext) unmarshalNNotifFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx context.Context, v interface{}) (model.NotifFilter, error) {
+	res, err := ec.unmarshalInputNotifFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx context.Context, v interface{}) (*model.NotifFilter, error) {
+	res, err := ec.unmarshalInputNotifFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNOrgaAggFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (model.OrgaAggFilter, error) {
 	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -63397,6 +65869,11 @@ func (ec *executionContext) unmarshalNUpdateNodeFragmentInput2fractaleᚋfractal
 
 func (ec *executionContext) unmarshalNUpdateNodeInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNodeInput(ctx context.Context, v interface{}) (model.UpdateNodeInput, error) {
 	res, err := ec.unmarshalInputUpdateNodeInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateNotifInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNotifInput(ctx context.Context, v interface{}) (model.UpdateNotifInput, error) {
+	res, err := ec.unmarshalInputUpdateNotifInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -63930,6 +66407,13 @@ func (ec *executionContext) marshalOAddNodePayload2ᚖfractaleᚋfractal6ᚗgo�
 		return graphql.Null
 	}
 	return ec._AddNodePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddNotifPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddNotifPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddNotifPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddNotifPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddOrgaAggPayload) graphql.Marshaler {
@@ -65251,6 +67735,13 @@ func (ec *executionContext) marshalODeleteNodePayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._DeleteNodePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteNotifPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteNotifPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteNotifPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteNotifPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteOrgaAggPayload) graphql.Marshaler {
@@ -67564,6 +70055,206 @@ func (ec *executionContext) unmarshalONodeVisibility_hash2ᚖfractaleᚋfractal6
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalONotif2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx context.Context, sel ast.SelectionSet, v []*model.Notif) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONotif2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalONotif2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotif(ctx context.Context, sel ast.SelectionSet, v *model.Notif) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Notif(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalONotifAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.NotifAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._NotifAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx context.Context, v interface{}) ([]*model.NotifFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.NotifFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx context.Context, v interface{}) (*model.NotifFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNotifFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONotifHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx context.Context, v interface{}) ([]*model.NotifHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.NotifHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalONotifHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalONotifHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.NotifHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONotifHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalONotifHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx context.Context, v interface{}) (*model.NotifHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.NotifHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalONotifHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.NotifHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx context.Context, v interface{}) (*model.NotifOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNotifOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx context.Context, v interface{}) (*model.NotifOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.NotifOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx context.Context, sel ast.SelectionSet, v *model.NotifOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx context.Context, v interface{}) (*model.NotifPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNotifPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONotifRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifRef(ctx context.Context, v interface{}) (*model.NotifRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNotifRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOOrgaAgg2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx context.Context, sel ast.SelectionSet, v []*model.OrgaAgg) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -69401,6 +72092,13 @@ func (ec *executionContext) marshalOUpdateNodePayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._UpdateNodePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateNotifPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateNotifPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateNotifPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateNotifPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateOrgaAggPayload) graphql.Marshaler {

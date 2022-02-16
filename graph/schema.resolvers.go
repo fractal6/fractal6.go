@@ -210,6 +210,18 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (data *model.AddUserRightsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateUserRights(ctx context.Context, input model.UpdateUserRightsInput) (data *model.UpdateUserRightsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteUserRights(ctx context.Context, filter model.UserRightsFilter) (data *model.DeleteUserRightsPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddUserEvent(ctx context.Context, input []*model.AddUserEventInput) (data *model.AddUserEventPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -223,15 +235,15 @@ func (r *mutationResolver) DeleteUserEvent(ctx context.Context, filter model.Use
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (data *model.AddUserRightsPayload, errors error) {
+func (r *mutationResolver) AddNotif(ctx context.Context, input []*model.AddNotifInput) (data *model.AddNotifPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateUserRights(ctx context.Context, input model.UpdateUserRightsInput) (data *model.UpdateUserRightsPayload, errors error) {
+func (r *mutationResolver) UpdateNotif(ctx context.Context, input model.UpdateNotifInput) (data *model.UpdateNotifPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteUserRights(ctx context.Context, filter model.UserRightsFilter) (data *model.DeleteUserRightsPayload, errors error) {
+func (r *mutationResolver) DeleteNotif(ctx context.Context, filter model.NotifFilter) (data *model.DeleteNotifPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -423,6 +435,14 @@ func (r *queryResolver) AggregateUser(ctx context.Context, filter *model.UserFil
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) (data []*model.UserRights, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateUserRights(ctx context.Context, filter *model.UserRightsFilter) (data *model.UserRightsAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) GetUserEvent(ctx context.Context, id string) (data *model.UserEvent, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -435,11 +455,15 @@ func (r *queryResolver) AggregateUserEvent(ctx context.Context, filter *model.Us
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) (data []*model.UserRights, errors error) {
+func (r *queryResolver) GetNotif(ctx context.Context, id string) (data *model.Notif, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) AggregateUserRights(ctx context.Context, filter *model.UserRightsFilter) (data *model.UserRightsAggregateResult, errors error) {
+func (r *queryResolver) QueryNotif(ctx context.Context, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) (data []*model.Notif, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateNotif(ctx context.Context, filter *model.NotifFilter) (data *model.NotifAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

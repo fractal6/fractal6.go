@@ -4,6 +4,7 @@ import (
     //"fmt"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
+    "fractale/fractal6.go/db"
     webauth "fractale/fractal6.go/web/auth"
 )
 
@@ -20,11 +21,10 @@ func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
 
     var roles []*model.Node
     for _, r := range uctx.Roles {
-        rid, err := codec.Nid2rootid(r.Nameid)
-        if err != nil { panic(err.Error()) }
-
-        if rid == rootnameid  {
+        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
             roles = append(roles, r)
+        } else if err != nil {
+            panic(err.Error())
         }
     }
 
@@ -50,11 +50,14 @@ func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        rid, err := codec.Nid2rootid(r.Nameid)
-        if err != nil { panic(err.Error()) }
+        if *r.RoleType == model.RoleTypeRetired || *r.RoleType == model.RoleTypePending {
+            continue
+        }
 
-        if rid == rootnameid {
+        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
             return i
+        } else if err != nil {
+            panic(err.Error())
         }
     }
     return -1
@@ -66,11 +69,14 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        rid, err := codec.Nid2rootid(r.Nameid)
-        if err != nil { panic(err.Error()) }
+        if *r.RoleType != model.RoleTypeGuest {
+            continue
+        }
 
-        if rid == rootnameid && *r.RoleType == model.RoleTypeGuest {
+        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
             return i
+        } else if err != nil {
+            panic(err.Error())
         }
     }
 
@@ -84,11 +90,14 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        pid, err := codec.Nid2pid(r.Nameid)
-        if err != nil { panic(err.Error()) }
+        if *r.RoleType == model.RoleTypeGuest || *r.RoleType == model.RoleTypePending || *r.RoleType == model.RoleTypeRetired {
+            continue
+        }
 
-        if pid == nameid && *r.RoleType != model.RoleTypeGuest {
+        if pid, err := codec.Nid2pid(r.Nameid); err == nil && pid == nameid {
             return i
+        } else if err != nil {
+            panic(err.Error())
         }
     }
     return -1
@@ -100,11 +109,14 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        pid, err := codec.Nid2pid(r.Nameid)
-        if err != nil { panic(err.Error()) }
+        if *r.RoleType != model.RoleTypeCoordinator {
+            continue
+        }
 
-        if pid == nameid && *r.RoleType == model.RoleTypeCoordinator {
+        if pid, err := codec.Nid2pid(r.Nameid); err == nil && pid == nameid {
             return i
+        } else if err != nil {
+            panic(err.Error())
         }
     }
 
@@ -116,14 +128,27 @@ func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        rid, err := codec.Nid2rootid(r.Nameid)
-        if err != nil { panic(err.Error()) }
+        if *r.RoleType != model.RoleTypeOwner {
+            continue
+        }
 
-        if rid == rootnameid && *r.RoleType == model.RoleTypeOwner {
+        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
             return i
+        } else if err != nil {
+            panic(err.Error())
         }
     }
 
     return -1
 }
 
+//
+// Wrapper when uctx is unknown
+//
+
+func IsMember(username, rootnameid string) int {
+    uctx, e := db.GetDB().GetUctxFull("username", username)
+    if e != nil { panic(e) }
+    return UserIsMember(uctx, rootnameid)
+
+}

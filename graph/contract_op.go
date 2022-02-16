@@ -5,6 +5,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/graph/auth"
 	. "fractale/fractal6.go/tools"
 )
 
@@ -29,6 +30,26 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     contract, err := db.GetDB().GetContractHook(cid)
     if err != nil { return false, err }
     if contract == nil { return false, fmt.Errorf("contract not found.") }
+
+    // Validate Candidates
+    // for now...
+    if len(contract.Candidates) > 1 {
+        return false, fmt.Errorf("Candidate need to be singleton for security reason.")
+    }
+    switch contract.Event.EventType {
+    case model.TensionEventUserJoined:
+        for _, c := range contract.Candidates {
+            if i := auth.IsMember(c.Username, contract.Tension.Receiverid); i >= 0 {
+                return false, fmt.Errorf("A candidate is already member.")
+            }
+        }
+    case model.TensionEventMemberLinked:
+        // pass, this shouldn't be a security flaw.
+    default:
+        if contract.Candidates != nil {
+            return false, fmt.Errorf("Contract candidates not implemented for this event (contract).")
+        }
+    }
 
     // Process event
     ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true)

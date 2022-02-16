@@ -82,7 +82,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     if rt == model.RoleTypeGuest {
         if len(roles) == 1 && *roles[0].RoleType == model.RoleTypeMember {
             err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
-        } else if len(roles) == 1 && *roles[0].RoleType == model.RoleTypeGuest {
+        } else if len(roles) == 1 && (*roles[0].RoleType == model.RoleTypeGuest || *roles[0].RoleType == model.RoleTypePending) {
             err = DB.UpgradeMember(nid, model.RoleTypeRetired)
         }
         return err

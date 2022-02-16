@@ -414,9 +414,9 @@ func MaybeAddPendingNode(username string, tension *model.Tension) error {
     rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
     if err != nil { return err }
     nid := codec.MemberIdCodec(rootid, username)
-    ex, err :=  db.GetDB().Exists("Node.nameid", nid, nil, nil)
+    rt, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.role_type")
     if err != nil { return err }
-    if !ex {
+    if rt == nil {
         rt := model.RoleTypePending
         t := model.NodeTypeRole
         name := "Pending"
@@ -429,6 +429,8 @@ func MaybeAddPendingNode(username string, tension *model.Tension) error {
         err = PushNode(username, nil, n, "", nid, rootid)
         if err != nil { return err }
         err = db.GetDB().AddUserRole(username, nid)
+    } else if rt.(string) == string(model.RoleTypeRetired) {
+        err = db.GetDB().UpgradeMember(nid, model.RoleTypePending)
     }
 
     return err
@@ -443,12 +445,13 @@ func MaybeDeletePendingNode(username string, tension *model.Tension) error {
     ex, err :=  db.GetDB().Exists("Node.nameid", nid, &fn, &fv)
     if err != nil { return err }
     if ex {
-        // DO not use UnlinkUser here because it is protected againt deletion.
-        err := db.GetDB().RemoveUserRole(username, nid)
-        if err != nil { return err }
-        err = db.DB.Delete(db.DB.GetRootUctx(), "node", model.NodeFilter{
-            Nameid: &model.StringHashFilterStringRegExpFilter{Eq:&nid},
-        })
+        // REMOVING node have unattended effect (emitter missing)
+        //err := db.GetDB().RemoveUserRole(username, nid)
+        //if err != nil { return err }
+        //err = db.DB.Delete(db.DB.GetRootUctx(), "node", model.NodeFilter{
+        //    Nameid: &model.StringHashFilterStringRegExpFilter{Eq:&nid},
+        //})
+        err = UnlinkUser(rootid, nid, username)
     }
 
     return err

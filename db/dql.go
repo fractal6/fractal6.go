@@ -73,7 +73,7 @@ var tensionBlobHookPayload string = `
 var contractHookPayload string = `{
   uid
   Post.createdAt
-  Contract.tension { uid }
+  Contract.tension { uid Tension.receiverid }
   Contract.status
   Contract.contract_type
   Contract.event {
@@ -1017,14 +1017,14 @@ func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) 
     user, err := dg.GetUctxFull(fieldid, userid)
     if err != nil { return user, nil }
     // Filter special roles
-    for i := 0; i < len(user.Roles); i++ {
-        if *user.Roles[i].RoleType == model.RoleTypeRetired ||
-        *user.Roles[i].RoleType == model.RoleTypeMember ||
-        *user.Roles[i].RoleType == model.RoleTypePending {
-            user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
-            i--
-        }
-    }
+    //for i := 0; i < len(user.Roles); i++ {
+    //    if *user.Roles[i].RoleType == model.RoleTypeRetired ||
+    //    *user.Roles[i].RoleType == model.RoleTypeMember ||
+    //    *user.Roles[i].RoleType == model.RoleTypePending {
+    //        user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
+    //        i--
+    //    }
+    //}
     return user, err
 }
 

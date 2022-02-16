@@ -182,6 +182,20 @@ type AddNodePayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
+type AddNotifInput struct {
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	CreatedAt string       `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	Tension   *TensionRef  `json:"tension_,omitempty"`
+	Contract  *ContractRef `json:"contract,omitempty"`
+}
+
+type AddNotifPayload struct {
+	Notif   []*Notif `json:"notif,omitempty"`
+	NumUids *int     `json:"numUids"`
+}
+
 type AddOrgaAggInput struct {
 	NMembers *int `json:"n_members"`
 	NGuests  *int `json:"n_guests"`
@@ -647,6 +661,12 @@ type DeleteNodePayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
+type DeleteNotifPayload struct {
+	Notif   []*Notif `json:"notif,omitempty"`
+	Msg     *string  `json:"msg,omitempty"`
+	NumUids *int     `json:"numUids"`
+}
+
 type DeleteOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
@@ -788,11 +808,13 @@ type EventKindFilter struct {
 	MemberTypes    []EventKindType `json:"memberTypes,omitempty"`
 	EventFilter    *EventFilter    `json:"eventFilter,omitempty"`
 	ContractFilter *ContractFilter `json:"contractFilter,omitempty"`
+	NotifFilter    *NotifFilter    `json:"notifFilter,omitempty"`
 }
 
 type EventKindRef struct {
 	EventRef    *EventRef    `json:"eventRef,omitempty"`
 	ContractRef *ContractRef `json:"contractRef,omitempty"`
+	NotifRef    *NotifRef    `json:"notifRef,omitempty"`
 }
 
 type EventOrder struct {
@@ -1275,6 +1297,63 @@ type NodeTypeHash struct {
 type NodeVisibilityHash struct {
 	Eq *NodeVisibility   `json:"eq,omitempty"`
 	In []*NodeVisibility `json:"in,omitempty"`
+}
+
+type Notif struct {
+	Tension   *Tension  `json:"tension_,omitempty"`
+	Contract  *Contract `json:"contract,omitempty"`
+	ID        string    `json:"id,omitempty"`
+	CreatedBy *User     `json:"createdBy,omitempty"`
+	CreatedAt string    `json:"createdAt,omitempty"`
+	UpdatedAt *string   `json:"updatedAt,omitempty"`
+	Message   *string   `json:"message,omitempty"`
+}
+
+func (Notif) IsEventKind() {}
+
+type NotifAggregateResult struct {
+	Count        *int    `json:"count"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+}
+
+type NotifFilter struct {
+	ID        []string              `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter `json:"message,omitempty"`
+	Has       []*NotifHasFilter     `json:"has,omitempty"`
+	And       []*NotifFilter        `json:"and,omitempty"`
+	Or        []*NotifFilter        `json:"or,omitempty"`
+	Not       *NotifFilter          `json:"not,omitempty"`
+}
+
+type NotifOrder struct {
+	Asc  *NotifOrderable `json:"asc,omitempty"`
+	Desc *NotifOrderable `json:"desc,omitempty"`
+	Then *NotifOrder     `json:"then,omitempty"`
+}
+
+type NotifPatch struct {
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	CreatedAt *string      `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	Tension   *TensionRef  `json:"tension_,omitempty"`
+	Contract  *ContractRef `json:"contract,omitempty"`
+}
+
+type NotifRef struct {
+	ID        *string      `json:"id,omitempty"`
+	CreatedBy *UserRef     `json:"createdBy,omitempty"`
+	CreatedAt *string      `json:"createdAt,omitempty"`
+	UpdatedAt *string      `json:"updatedAt,omitempty"`
+	Message   *string      `json:"message,omitempty"`
+	Tension   *TensionRef  `json:"tension_,omitempty"`
+	Contract  *ContractRef `json:"contract,omitempty"`
 }
 
 type OrgaAgg struct {
@@ -1786,6 +1865,17 @@ type UpdateNodeInput struct {
 type UpdateNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
 	NumUids *int    `json:"numUids"`
+}
+
+type UpdateNotifInput struct {
+	Filter *NotifFilter `json:"filter,omitempty"`
+	Set    *NotifPatch  `json:"set,omitempty"`
+	Remove *NotifPatch  `json:"remove,omitempty"`
+}
+
+type UpdateNotifPayload struct {
+	Notif   []*Notif `json:"notif,omitempty"`
+	NumUids *int     `json:"numUids"`
 }
 
 type UpdateOrgaAggInput struct {
@@ -2815,16 +2905,18 @@ type EventKindType string
 const (
 	EventKindTypeEvent    EventKindType = "Event"
 	EventKindTypeContract EventKindType = "Contract"
+	EventKindTypeNotif    EventKindType = "Notif"
 )
 
 var AllEventKindType = []EventKindType{
 	EventKindTypeEvent,
 	EventKindTypeContract,
+	EventKindTypeNotif,
 }
 
 func (e EventKindType) IsValid() bool {
 	switch e {
-	case EventKindTypeEvent, EventKindTypeContract:
+	case EventKindTypeEvent, EventKindTypeContract, EventKindTypeNotif:
 		return true
 	}
 	return false
@@ -3564,6 +3656,98 @@ func (e *NodeVisibility) UnmarshalGQL(v interface{}) error {
 }
 
 func (e NodeVisibility) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NotifHasFilter string
+
+const (
+	NotifHasFilterCreatedBy NotifHasFilter = "createdBy"
+	NotifHasFilterCreatedAt NotifHasFilter = "createdAt"
+	NotifHasFilterUpdatedAt NotifHasFilter = "updatedAt"
+	NotifHasFilterMessage   NotifHasFilter = "message"
+	NotifHasFilterTension   NotifHasFilter = "tension_"
+	NotifHasFilterContract  NotifHasFilter = "contract"
+)
+
+var AllNotifHasFilter = []NotifHasFilter{
+	NotifHasFilterCreatedBy,
+	NotifHasFilterCreatedAt,
+	NotifHasFilterUpdatedAt,
+	NotifHasFilterMessage,
+	NotifHasFilterTension,
+	NotifHasFilterContract,
+}
+
+func (e NotifHasFilter) IsValid() bool {
+	switch e {
+	case NotifHasFilterCreatedBy, NotifHasFilterCreatedAt, NotifHasFilterUpdatedAt, NotifHasFilterMessage, NotifHasFilterTension, NotifHasFilterContract:
+		return true
+	}
+	return false
+}
+
+func (e NotifHasFilter) String() string {
+	return string(e)
+}
+
+func (e *NotifHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NotifHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NotifHasFilter", str)
+	}
+	return nil
+}
+
+func (e NotifHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type NotifOrderable string
+
+const (
+	NotifOrderableCreatedAt NotifOrderable = "createdAt"
+	NotifOrderableUpdatedAt NotifOrderable = "updatedAt"
+	NotifOrderableMessage   NotifOrderable = "message"
+)
+
+var AllNotifOrderable = []NotifOrderable{
+	NotifOrderableCreatedAt,
+	NotifOrderableUpdatedAt,
+	NotifOrderableMessage,
+}
+
+func (e NotifOrderable) IsValid() bool {
+	switch e {
+	case NotifOrderableCreatedAt, NotifOrderableUpdatedAt, NotifOrderableMessage:
+		return true
+	}
+	return false
+}
+
+func (e NotifOrderable) String() string {
+	return string(e)
+}
+
+func (e *NotifOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NotifOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NotifOrderable", str)
+	}
+	return nil
+}
+
+func (e NotifOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
