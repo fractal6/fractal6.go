@@ -38,8 +38,8 @@ var tensionHookPayload string = `
   }
   Tension.receiver {
     Node.nameid
-    Node.visibility
     Node.mode
+    Node.visibility
     Node.userCanJoin
   }
 `
@@ -260,6 +260,16 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid("{{.id}}"))
         {{.payload}}
     }`,
+    "getTensionSimple": `{
+        all(func: uid("{{.id}}")) {
+            uid
+            Tension.receiver {
+                Node.nameid
+                Node.mode
+                Node.visibility
+            }
+        }
+    }`,
     "getContractHook": `{
         all(func: uid("{{.id}}"))
         {{.payload}}
@@ -289,11 +299,45 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     "getCoordos": `{
         all(func: eq(Node.nameid, "{{.nameid}}")) {
-            Node.children @filter(eq(Node.role_type, "Coordinator") AND eq(Node.isArchived, false)) { uid }
+            Node.children @filter((eq(Node.role_type, "Coordinator") OR eq(Node.role_type, "Owner")) AND eq(Node.isArchived, false)) { uid }
+        }
+    }`,
+    "getCoordos2": `{
+        var(func: eq(Node.nameid, "{{.nameid}}")) {
+            Node.children @filter((eq(Node.role_type, "Coordinator") OR eq(Node.role_type, "Owner")) AND eq(Node.isArchived, false)) {
+                u as Node.first_link
+            }
+        }
+
+        all(func: uid(u)) {
+            User.username
+        }
+    }`,
+    "getCoordosFromTid": `{
+        var(func: uid({{.tid}})) {
+            Tension.receiver {
+                Node.children @filter((eq(Node.role_type, "Coordinator") OR eq(Node.role_type, "Owner")) AND eq(Node.isArchived, false)) {
+                    u as Node.first_link
+                }
+            }
+        }
+
+        all(func: uid(u)) {
+            User.username
         }
     }`,
     "getParents": `{
         all(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+            Node.parent @normalize
+            Node.nameid
+        }
+    }`,
+    "getParentFromTid": `{
+        var(func: uid({{.tid}})) {
+            n as Tension.receiver
+        }
+
+        all(func: uid(n)) @recurse {
             Node.parent @normalize
             Node.nameid
         }

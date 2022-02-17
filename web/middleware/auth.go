@@ -88,9 +88,8 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
         // reset the body reader agin
         r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
-        newNameids, err := db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
+        _, err = db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
         // to be completed, rewrite body !?
-        fmt.Println(newNameids)
 
 
         //// Failed silently, or with discretion....

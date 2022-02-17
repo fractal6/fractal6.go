@@ -23,6 +23,10 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 // @future: GBAC authorization with @auth directive (DGraph)
 ////////////////////////////////////////////////
 
+//
+// Getters
+//
+
 func HasCoordoRole(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {
     // Get the node mode eventually
     if mode == nil {
@@ -41,6 +45,66 @@ func HasCoordoRole(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bo
     }
     return ok, err
 }
+
+func GetCoordosFromTid(tid string) ([]model.User, error) {
+    var coordos []model.User
+
+    // Check user rights
+    nodes, err := db.GetDB().Meta("getCoordosFromTid", map[string]string{"tid":tid})
+    if err != nil { return coordos, LogErr("Internal error", err) }
+
+    // Return direct coordos
+    if len(nodes) > 0 {
+        for _, c := range nodes {
+            var coordo model.User
+            if err := Map2Struct(c, &coordo); err != nil {
+                return coordos, err
+            }
+            coordos = append(coordos, coordo)
+        }
+        return coordos, err
+    }
+
+    // Return first met parent coordos
+    var parents []string
+    node, err := db.GetDB().Meta("getParentFromTid", map[string]string{"tid":tid})
+    if err != nil { return coordos, LogErr("Internal Error", err) }
+    if len(node) == 0 || node[0]["parent"] == nil {
+        return coordos, err
+    }
+    // @debug: dql decoding !
+    if nodes := node[0]["parent"].([]interface{}); len(nodes) > 0 {
+        if nids, ok :=  nodes[0].(model.JsonAtom)["nameid"]; ok && nids != nil {
+            println(nids.(int))
+            for _, v := range nids.([]interface{}) {
+                parents = append(parents, v.(string))
+            }
+        }
+    }
+
+    for _, nameid := range parents {
+        res, err := db.GetDB().Meta("getCoordos2", map[string]string{"nameid": nameid})
+        if err != nil { return coordos, LogErr("Internal error", err) }
+
+        // stop at the first circle with coordos
+        if len(res) > 0 {
+            for _, c := range res {
+                var coordo model.User
+                if err := Map2Struct(c, &coordo); err != nil {
+                    return coordos, err
+                }
+                coordos = append(coordos, coordo)
+            }
+            return coordos, err
+        }
+    }
+
+    return coordos, err
+}
+
+//
+// Checkers
+//
 
 // ChechUserRight return true if the user has access right (e.g. Coordo) on the given node
 func CheckUserRights(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bool, error) {
@@ -70,7 +134,6 @@ func CheckUpperRights(uctx *model.UserCtx, nameid string, mode model.NodeMode) (
     var ok bool = false
     parents, err := db.GetDB().GetParents(nameid)
     if err != nil { return ok, LogErr("Internal Error", err) }
-    if len(parents) == 0 { return ok, err }
 
     for _, p := range(parents) {
         ok, err = CheckUserRights(uctx, p, mode)

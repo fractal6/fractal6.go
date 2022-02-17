@@ -42,6 +42,15 @@ func VoteIdCodec(contractid string, rootnameid, username string) (string) {
     return nameid
 }
 
+func Cid2Tid(contractid string) string {
+    parts := strings.Split(contractid, "#")
+    if len(parts) > 0 {
+        return parts[0]
+    }
+
+    return ""
+}
+
 // Get the parent nameid from the given nameid (ROLE)
 // @debug nearestCircleId
 func Nid2pid(nid string) (string, error) {

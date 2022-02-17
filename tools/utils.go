@@ -213,6 +213,13 @@ func CleanCompositeName(m map[string]interface{}, deep bool) map[string]interfac
             } else {
                 nv = CleanAliasedMap(t)
             }
+        case []interface{}:
+            for i, x := range t {
+                if m, ok := x.(model.JsonAtom); ok {
+                    t[i] = CleanCompositeName(CleanAliasedMap(m), true)
+                }
+            }
+            nv = t
         default:
             nv = t
         }
@@ -259,7 +266,13 @@ func ToUnionHookFunc() mapstructure.DecodeHookFunc {
                         return data, err
                     }
                     d = &partial
-                // Ad other unions here...
+                case "Notif":
+                    var partial model.Notif
+                    if err := json.Unmarshal(b, &partial); err != nil {
+                        return data, err
+                    }
+                    d = &partial
+                // Add other unions here...
                 }
 
 			return d, nil

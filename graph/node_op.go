@@ -410,12 +410,26 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     return tension
 }
 
-func MaybeAddPendingNode(username string, tension *model.Tension) error {
+func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) {
+    ok := false
+    if tension.Receiver == nil {
+        var tension_m []map[string]interface{}
+        var err error
+        if tension_m, err = db.GetDB().Meta("getTensionSimple", map[string]string{"id": tension.ID}); err != nil {
+            return ok, err
+        } else if len(tension_m) == 0 {
+            return ok, fmt.Errorf("no tension found for tid: %s", tension.ID)
+        }
+        if err = Map2Struct(tension_m[0], tension); err != nil {
+            return ok, err
+        }
+    }
+
     rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
-    if err != nil { return err }
+    if err != nil { return ok, err }
     nid := codec.MemberIdCodec(rootid, username)
     rt, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.role_type")
-    if err != nil { return err }
+    if err != nil { return ok, err }
     if rt == nil {
         rt := model.RoleTypePending
         t := model.NodeTypeRole
@@ -427,17 +441,18 @@ func MaybeAddPendingNode(username string, tension *model.Tension) error {
         }
         auth.InheritNodeCharacDefault(n, tension.Receiver)
         err = PushNode(username, nil, n, "", nid, rootid)
-        if err != nil { return err }
+        if err != nil { return ok, err }
         err = db.GetDB().AddUserRole(username, nid)
+        ok = true
     } else if rt.(string) == string(model.RoleTypeRetired) {
         err = db.GetDB().UpgradeMember(nid, model.RoleTypePending)
     }
 
-    return err
+    return ok, err
 }
 
 func MaybeDeletePendingNode(username string, tension *model.Tension) error {
-    rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
+    rootid, err := codec.Nid2rootid(tension.Receiverid)
     if err != nil { return err }
     nid := codec.MemberIdCodec(rootid, username)
     fn := "Node.role_type"

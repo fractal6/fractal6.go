@@ -35,6 +35,16 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
     }
     input := inputs[0]
 
+    // Eventually add a pending node
+    pendingNodeCreated := false
+    if *input.Event.EventType == model.TensionEventMemberLinked || *input.Event.EventType == model.TensionEventUserJoined {
+        // Add pending Nodes
+        for _, c := range input.Candidates {
+            pendingNodeCreated, err = MaybeAddPendingNode(*c.Username, &model.Tension{ID: *input.Tension.ID})
+            if err != nil { return false, err }
+        }
+    }
+
     // Execute query
     data, err := next(ctx)
     if err != nil { return nil, err }
@@ -48,11 +58,19 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
     // Validate and process Blob Event
     var event model.EventRef
     StructMap(*input.Event, &event)
-    ok, err := contractEventHook(uctx, cid, tid, &event, nil)
+    ok, contract, err := contractEventHook(uctx, cid, tid, &event, nil)
     if !ok || err != nil {
         // Delete the tension just added
         e := db.GetDB().DeepDelete("contract", id)
         if e != nil { panic(e) }
+
+        if pendingNodeCreated {
+            // Delete pending Nodes
+            for _, c := range contract.Candidates {
+                err = MaybeDeletePendingNode(c.Username, contract.Tension)
+                if err != nil { return false, err }
+            }
+        }
     }
     if ok || err != nil {
         return data, err
@@ -136,6 +154,26 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
     if !ok {
         return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
     }
+
+    // Eventually reset the pending node state
+    contract, err := db.GetDB().GetContractHook(ids[0])
+    if err != nil { return nil, err }
+
+    // Clear eventual pending roles.
+    if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+        for _, c := range contract.Candidates {
+            err = MaybeDeletePendingNode(c.Username, contract.Tension)
+            if err != nil { return nil, err }
+        }
+    }
+
+    // Notify user of the cancel
+    msg := fmt.Sprintf("Contract %s has been cancelled.", contract.ID)
+    var to []string
+    for _, p := range contract.Participants {
+        to = append(to, p.Node.FirstLink.Username)
+    }
+    PublishNotifEvent(model.NotifNotif{Uctx: uctx, Tid: &contract.Tension.ID, Cid: &contract.ID, Msg: msg, To: to})
 
     // Deep delete
     err = db.GetDB().DeepDelete("contract", ids[0])
@@ -227,8 +265,25 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
         return nil, err
     }
 
-    data.Vote[0].Contract = contract
+    if contract.Status == model.ContractStatusCanceled {
+        // Eventually reset the pending node state
+        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+            for _, c := range contract.Candidates {
+                err = MaybeDeletePendingNode(c.Username, contract.Tension)
+                if err != nil { return nil, err }
+            }
+        }
 
+        // Notify user of the cancel
+        msg := fmt.Sprintf("Contract %s has been cancelled.", contract.ID)
+        var to []string
+        for _, p := range contract.Participants {
+            to = append(to, p.Node.FirstLink.Username)
+        }
+        PublishNotifEvent(model.NotifNotif{Uctx: uctx, Tid: &contract.Tension.ID, Cid: &contract.ID, Msg: msg, To: to})
+    }
+
+    data.Vote[0].Contract = contract
     return data, err
 }
 

@@ -76,7 +76,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     variables_, _ := json.Marshal(variables)
     reqInput := map[string]string{
         "QueryName": queryName,
-        // Warning: CleanString will lose format for text and mardown text data.
+        // @warning: CleanString will lose format for text and mardown text data.
         //"RawQuery": tools.CleanString(gc.RawQuery, true),
         "RawQuery": tools.QuoteString(rawQuery),
         "Variables": string(variables_),

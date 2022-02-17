@@ -33,6 +33,7 @@ func RunNotifier() {
         ctx,
         "api-tension-notification",
         "api-contract-notification",
+        "api-notif-notification",
     )
 
     if _, err := subscriber.Receive(ctx); err != nil {
@@ -40,51 +41,86 @@ func RunNotifier() {
         return
     }
 
-    ch := subscriber.Channel()
-
-    for msg := range ch {
+    for msg := range subscriber.Channel() {
         switch msg.Channel {
         case "api-tension-notification":
-            // go func() { }
+            go processTensionNotification(msg)
 
-            // Extract message
-            var notif model.EventNotif
-            if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
-                log.Printf("unmarshaling error for channel %s: %v", msg.Channel, err)
-            }
-            if len(notif.History) == 0 {
-                log.Printf("No event in notif.")
-                continue
-            }
-
-            // Push notification
-            if err := graph.PushHistory(&notif); err != nil {
-                log.Printf("PushHistory error: %v", err)
-            }
-            if err := graph.PushEventNotifications(notif); err != nil {
-                log.Printf("PushEventNotifications error: %v", err)
-            }
-
-            fmt.Printf(".")
         case "api-contract-notification":
-            // go func() { }
+            go processContractNotification(msg)
 
-            // Extract message
-            var notif model.ContractNotif
-            if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
-                log.Printf("unmarshaling error for channel %s: %v", msg.Channel, err)
-            }
-            if notif.Contract == nil {
-                log.Printf("No contract in notif.")
-                continue
-            }
+        case "api-notif-notification":
+            go processNotifNotification(msg)
 
-            // Push notification
-            if err := graph.PushContractNotifications(notif); err != nil {
-                log.Printf("PushContractNotification error: %v: ", err)
-            }
-
-            fmt.Printf(".")
         }
     }
+}
+
+func handlePanic(info string) {
+    if r := recover(); r != nil {
+        fmt.Printf("error: Recovering from panic (%s): %v\n", info, r)
+    }
+}
+
+func processTensionNotification(msg *redis.Message) {
+    defer handlePanic("tension event")
+    // Extract message
+    var notif model.EventNotif
+    if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
+        log.Printf("unmarshaling error for channel %s: %v", msg.Channel, err)
+    }
+    if len(notif.History) == 0 {
+        log.Printf("No event in notif.")
+        return
+    }
+
+    // Push notification
+    if err := graph.PushHistory(&notif); err != nil {
+        log.Printf("PushHistory error: %v", err)
+    }
+    if err := graph.PushEventNotifications(notif); err != nil {
+        log.Printf("PushEventNotifications error: %v", err)
+    }
+
+    fmt.Printf(".")
+}
+
+func processContractNotification(msg *redis.Message) {
+    defer handlePanic("contract event")
+    // Extract message
+    var notif model.ContractNotif
+    if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
+        log.Printf("unmarshaling error for channel %s: %v", msg.Channel, err)
+    }
+    if notif.Contract == nil {
+        log.Printf("No contract in notif.")
+        return
+    }
+
+    // Push notification
+    if err := graph.PushContractNotifications(notif); err != nil {
+        log.Printf("PushContractNotification error: %v: ", err)
+    }
+
+    fmt.Printf(".")
+}
+
+func processNotifNotification(msg *redis.Message) {
+    defer handlePanic("notif event")
+    // Extract message
+    var notif model.NotifNotif
+    if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
+        log.Printf("unmarshaling error for channel %s: %v", msg.Channel, err)
+    }
+    if len(notif.Msg) == 0 {
+        log.Printf("No message in notif.")
+        return
+    }
+
+    // Push notification
+    if err := graph.PushNotifNotifications(notif); err != nil {
+        log.Printf("PushEventNotifications error: %v", err)
+    }
+
+    fmt.Printf(".")
 }

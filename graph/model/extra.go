@@ -25,6 +25,14 @@ type ContractNotif struct {
     Contract *Contract  `json:"contract"`
 }
 
+type NotifNotif struct {
+    Uctx *UserCtx  `json:"uctx"`
+    Msg string     `json:"msg"`
+    Tid *string    `json:"tid"`
+    Cid *string    `json:"cid"`
+    To []string    `json:"to"`
+}
+
 // JsonAtom is a general interface
 // for decoding unknonw structure
 type JsonAtom = map[string]interface{}

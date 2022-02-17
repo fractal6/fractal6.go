@@ -12,60 +12,51 @@ import (
 // contractEventHook is applied for addContract query directives.
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload).
 // All events in History must pass.
-func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventRef, bid *string) (bool, error) {
+func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventRef, bid *string) (bool, *model.Contract, error) {
     var ok bool = true
     var err error
     var tension *model.Tension
     if event == nil {
-        return false, fmt.Errorf("No event given.")
+        return false, nil, fmt.Errorf("No event given.")
     }
     if tension == nil {
         // Fetch Tension, target Node and blob charac (last if bid undefined)
         // @DEBUG: blob is not always needed (Moving non node tension, Invite, etc)
         tension, err = db.GetDB().GetTensionHook(tid, true, nil)
-        if err != nil { return false, err }
+        if err != nil { return false, nil, err }
     }
 
     // Fetch the contract
     contract, err := db.GetDB().GetContractHook(cid)
-    if err != nil { return false, err }
-    if contract == nil { return false, fmt.Errorf("contract not found.") }
+    if err != nil { return false, contract, err }
+    if contract == nil { return false, contract, fmt.Errorf("contract not found.") }
 
     // Validate Candidates
     // for now...
     if len(contract.Candidates) > 1 {
-        return false, fmt.Errorf("Candidate need to be singleton for security reason.")
+        return false, contract, fmt.Errorf("Candidate need to be singleton for security reason.")
     }
     switch contract.Event.EventType {
     case model.TensionEventUserJoined:
         for _, c := range contract.Candidates {
             if i := auth.IsMember(c.Username, contract.Tension.Receiverid); i >= 0 {
-                return false, fmt.Errorf("A candidate is already member.")
+                return false, contract, fmt.Errorf("A candidate is already member.")
             }
         }
     case model.TensionEventMemberLinked:
         // pass, this shouldn't be a security flaw.
     default:
         if contract.Candidates != nil {
-            return false, fmt.Errorf("Contract candidates not implemented for this event (contract).")
+            return false, contract, fmt.Errorf("Contract candidates not implemented for this event (contract).")
         }
     }
 
     // Process event
     ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true)
-    if err != nil { return false, err }
+    if err != nil { return false, contract, err }
     ok = ok || contract != nil
-    if contract == nil { return ok, err }
+    if contract == nil { return ok, contract, err }
 
-    // Post-contract action
-    // --
-    // Add pending Nodes
-    if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
-        for _, c := range contract.Candidates {
-            err = MaybeAddPendingNode(c.Username, tension)
-            if err != nil { return false, err }
-        }
-    }
     // Push Notifications
     PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: tid, Contract: contract})
     //for _, c := range contract.PendingCandidates {
@@ -73,7 +64,7 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     //    fmt.Println(c.Email)
     //}
 
-    return ok, err
+    return ok, contract, err
 }
 
 func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error) {
@@ -111,14 +102,6 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
 
         // Push Event History and Notifications
         PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tension.ID, History: []*model.EventRef{&event}})
-    } else if contract.Status == model.ContractStatusCanceled {
-        // @TODO: notify candidate of the cancel.
-        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
-            for _, c := range contract.Candidates {
-                err = MaybeDeletePendingNode(c.Username, tension)
-                if err != nil { return false, contract, err }
-            }
-        }
     }
 
     return ok, contract, err
