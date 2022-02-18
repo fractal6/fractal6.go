@@ -7,21 +7,11 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/web/email"
 	. "fractale/fractal6.go/tools"
 )
 
 var ctx context.Context = context.Background()
-
-// Notification Reason Type enum
-type NotifReason int
-const (
-    Unknown NotifReason = iota
-    IsCandidate
-    IsCoordo
-    IsFirstLink
-    IsAssignee
-    IsSubscriber
-)
 
 //
 // Publisher functions (Redis)
@@ -62,53 +52,50 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 //
 
 // GetUserToNotify returns a list of user should receive notifications uponf tension updates.
-func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]NotifReason, error) {
-    users := make(map[string]NotifReason)
+func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
+    users := make(map[string]model.UserNotifInfo)
 
     {
         // Get Coordos
         coordos, err := auth.GetCoordosFromTid(tid)
         if err != nil { return users, err }
-        // Append without duplicate
         for _, user := range coordos {
             if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = IsCoordo
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsCoordo}
         }
     }
 
     {
         // Get First-link
-        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", "User.username")
+        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", "User.username User.email")
         if err != nil { return users, err }
         if res != nil {
-            u := res.(model.User).Username
-            if _, ex := users[u]; !ex {
-                users[u] = IsFirstLink
+            user := res.(model.User)
+            if _, ex := users[user.Username]; !ex {
+                users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
             }
         }
     }
 
     if withAssignees {
         // Get Assignees
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username")
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username User.email")
         if err != nil { return users, err }
-        assignees := InterfaceToStringSlice(res)
-        // Append without duplicate
-        for _, u := range assignees {
-            if _, ex := users[u]; ex { continue }
-            users[u] = IsAssignee
+        for _, u := range res.([]interface{}) {
+            user := u.(model.User)
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
         }
     }
 
     if withSubscribers {
         // Get Subscribers
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username")
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username User.email")
         if err != nil { return users, err }
-        subscribers := InterfaceToStringSlice(res)
-        // Append without duplicate
-        for _, u := range subscribers {
-            if _, ex := users[u]; ex { continue }
-            users[u] = IsSubscriber
+        for _, u := range res.([]interface{}) {
+            user := u.(model.User)
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
         }
     }
 
@@ -169,12 +156,12 @@ func PushEventNotifications(notif model.EventNotif) error {
     if err != nil { return err }
 
     // Push user event notification
-    for u, reason := range users {
+    for u, ui := range users {
         // Don't self notify.
         if u == notif.Uctx.Username { continue }
 
         // User Event
-        _, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
+        eid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
             User: &model.UserRef{Username: &u},
             IsRead: false,
             CreatedAt: createdAt,
@@ -183,10 +170,10 @@ func PushEventNotifications(notif model.EventNotif) error {
         if err != nil { return err }
 
         // Email
-        fmt.Println("todo mail: ", u, reason)
-        // if user.notiftByEmail {
-        //   sendEventNotificationEmail(u, eventBatch)
-        // }
+         if notif.Uctx.Rights.HasEmailNotifications {
+             ui.Eid = eid
+             err = email.SendEventNotificationEmail(ui, notif)
+        }
     }
 
     return err
@@ -209,16 +196,16 @@ func PushContractNotifications(notif model.ContractNotif) error {
     // +
     // Add Candidates
     for _, c := range notif.Contract.Candidates {
-        users[c.Username] = IsCandidate
+        users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsCandidate}
     }
 
     // Push user event notification
-    for u, reason := range users {
+    for u, ui := range users {
         // Don't self notify.
         if u == notif.Uctx.Username { continue }
 
         // User Event
-        _, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
+        eid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
             User: &model.UserRef{Username: &u},
             IsRead: false,
             CreatedAt: createdAt,
@@ -227,10 +214,10 @@ func PushContractNotifications(notif model.ContractNotif) error {
         if err != nil { return err }
 
         // Email
-        fmt.Println("todo mail: ", u, reason)
-        // if user.notiftByEmail {
-        //   sendContractNotificationEmail(u, eventBatch)
-        // }
+         if notif.Uctx.Rights.HasEmailNotifications {
+             ui.Eid = eid
+             err = email.SendContractNotificationEmail(ui, notif)
+        }
     }
 
     return err

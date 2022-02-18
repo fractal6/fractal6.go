@@ -311,6 +311,7 @@ var dqlQueries map[string]string = map[string]string{
 
         all(func: uid(u)) {
             User.username
+            User.email
         }
     }`,
     "getCoordosFromTid": `{
@@ -324,6 +325,7 @@ var dqlQueries map[string]string = map[string]string{
 
         all(func: uid(u)) {
             User.username
+            User.email
         }
     }`,
     "getParents": `{

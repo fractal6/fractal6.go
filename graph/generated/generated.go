@@ -1054,10 +1054,11 @@ type ComplexityRoot struct {
 	}
 
 	UserRights struct {
-		CanCreateRoot func(childComplexity int) int
-		CanLogin      func(childComplexity int) int
-		MaxPublicOrga func(childComplexity int) int
-		Type          func(childComplexity int) int
+		CanCreateRoot         func(childComplexity int) int
+		CanLogin              func(childComplexity int) int
+		HasEmailNotifications func(childComplexity int) int
+		MaxPublicOrga         func(childComplexity int) int
+		Type                  func(childComplexity int) int
 	}
 
 	UserRightsAggregateResult struct {
@@ -6954,6 +6955,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserRights.CanLogin(childComplexity), true
 
+	case "UserRights.hasEmailNotifications":
+		if e.complexity.UserRights.HasEmailNotifications == nil {
+			break
+		}
+
+		return e.complexity.UserRights.HasEmailNotifications(childComplexity), true
+
 	case "UserRights.maxPublicOrga":
 		if e.complexity.UserRights.MaxPublicOrga == nil {
 			break
@@ -7562,10 +7570,11 @@ type User {
 }
 
 type UserRights {
+  type_: UserType!
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
-  type_: UserType!
+  hasEmailNotifications: Boolean!
 }
 
 type UserEvent {
@@ -7727,37 +7736,37 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8048,10 +8057,11 @@ type AddUserPayload {
 }
 
 input AddUserRightsInput {
+  type_: UserType!
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
-  type_: UserType!
+  hasEmailNotifications: Boolean!
 }
 
 type AddUserRightsPayload {
@@ -10138,10 +10148,11 @@ input UserRightsFilter {
 }
 
 enum UserRightsHasFilter {
+  type_
   canLogin
   canCreateRoot
   maxPublicOrga
-  type_
+  hasEmailNotifications
 }
 
 input UserRightsOrder {
@@ -10155,17 +10166,19 @@ enum UserRightsOrderable {
 }
 
 input UserRightsPatch {
+  type_: UserType @x_patch_ro
   canLogin: Boolean @x_patch_ro
   canCreateRoot: Boolean @x_patch_ro
   maxPublicOrga: Int @x_patch_ro
-  type_: UserType @x_patch_ro
+  hasEmailNotifications: Boolean @x_patch_ro
 }
 
 input UserRightsRef {
+  type_: UserType
   canLogin: Boolean
   canCreateRoot: Boolean
   maxPublicOrga: Int
-  type_: UserType
+  hasEmailNotifications: Boolean
 }
 
 type VoteAggregateResult {
@@ -39432,6 +39445,38 @@ func (ec *executionContext) _UserEventAggregateResult_createdAtMax(ctx context.C
 	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserRights_type_(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserRights",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.UserType)
+	fc.Result = res
+	return ec.marshalNUserType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserRights_canLogin(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -39528,7 +39573,7 @@ func (ec *executionContext) _UserRights_maxPublicOrga(ctx context.Context, field
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _UserRights_type_(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
+func (ec *executionContext) _UserRights_hasEmailNotifications(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -39546,7 +39591,7 @@ func (ec *executionContext) _UserRights_type_(ctx context.Context, field graphql
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
+		return obj.HasEmailNotifications, nil
 	})
 
 	if resTmp == nil {
@@ -39555,9 +39600,9 @@ func (ec *executionContext) _UserRights_type_(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.UserType)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNUserType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserRightsAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.UserRightsAggregateResult) (ret graphql.Marshaler) {
@@ -43652,6 +43697,14 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
+		case "type_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			it.Type, err = ec.unmarshalNUserType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "canLogin":
 			var err error
 
@@ -43676,11 +43729,11 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "type_":
+		case "hasEmailNotifications":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalNUserType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailNotifications"))
+			it.HasEmailNotifications, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -55773,6 +55826,32 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 
 	for k, v := range asMap {
 		switch k {
+		case "type_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserType); ok {
+				it.Type = data
+			} else if tmp == nil {
+				it.Type = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserType`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "canLogin":
 			var err error
 
@@ -55845,13 +55924,11 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "type_":
+		case "hasEmailNotifications":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
-			}
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailNotifications"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_patch_ro == nil {
 					return nil, errors.New("directive x_patch_ro is not implemented")
@@ -55863,12 +55940,12 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*model.UserType); ok {
-				it.Type = data
+			if data, ok := tmp.(*bool); ok {
+				it.HasEmailNotifications = data
 			} else if tmp == nil {
-				it.Type = nil
+				it.HasEmailNotifications = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserType`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		}
@@ -55886,6 +55963,14 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 
 	for k, v := range asMap {
 		switch k {
+		case "type_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			it.Type, err = ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "canLogin":
 			var err error
 
@@ -55910,11 +55995,11 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "type_":
+		case "hasEmailNotifications":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailNotifications"))
+			it.HasEmailNotifications, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -63901,6 +63986,16 @@ func (ec *executionContext) _UserRights(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserRights")
+		case "type_":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserRights_type_(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "canLogin":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._UserRights_canLogin(ctx, field, obj)
@@ -63931,9 +64026,9 @@ func (ec *executionContext) _UserRights(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "type_":
+		case "hasEmailNotifications":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._UserRights_type_(ctx, field, obj)
+				return ec._UserRights_hasEmailNotifications(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

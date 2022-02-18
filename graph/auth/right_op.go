@@ -75,7 +75,6 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
     // @debug: dql decoding !
     if nodes := node[0]["parent"].([]interface{}); len(nodes) > 0 {
         if nids, ok :=  nodes[0].(model.JsonAtom)["nameid"]; ok && nids != nil {
-            println(nids.(int))
             for _, v := range nids.([]interface{}) {
                 parents = append(parents, v.(string))
             }

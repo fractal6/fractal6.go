@@ -301,10 +301,11 @@ type AddUserPayload struct {
 }
 
 type AddUserRightsInput struct {
-	CanLogin      bool     `json:"canLogin"`
-	CanCreateRoot bool     `json:"canCreateRoot"`
-	MaxPublicOrga int      `json:"maxPublicOrga"`
-	Type          UserType `json:"type_,omitempty"`
+	Type                  UserType `json:"type_,omitempty"`
+	CanLogin              bool     `json:"canLogin"`
+	CanCreateRoot         bool     `json:"canCreateRoot"`
+	MaxPublicOrga         int      `json:"maxPublicOrga"`
+	HasEmailNotifications bool     `json:"hasEmailNotifications"`
 }
 
 type AddUserRightsPayload struct {
@@ -2142,10 +2143,11 @@ type UserRef struct {
 }
 
 type UserRights struct {
-	CanLogin      bool     `json:"canLogin"`
-	CanCreateRoot bool     `json:"canCreateRoot"`
-	MaxPublicOrga int      `json:"maxPublicOrga"`
-	Type          UserType `json:"type_,omitempty"`
+	Type                  UserType `json:"type_,omitempty"`
+	CanLogin              bool     `json:"canLogin"`
+	CanCreateRoot         bool     `json:"canCreateRoot"`
+	MaxPublicOrga         int      `json:"maxPublicOrga"`
+	HasEmailNotifications bool     `json:"hasEmailNotifications"`
 }
 
 type UserRightsAggregateResult struct {
@@ -2170,17 +2172,19 @@ type UserRightsOrder struct {
 }
 
 type UserRightsPatch struct {
-	CanLogin      *bool     `json:"canLogin"`
-	CanCreateRoot *bool     `json:"canCreateRoot"`
-	MaxPublicOrga *int      `json:"maxPublicOrga"`
-	Type          *UserType `json:"type_,omitempty"`
+	Type                  *UserType `json:"type_,omitempty"`
+	CanLogin              *bool     `json:"canLogin"`
+	CanCreateRoot         *bool     `json:"canCreateRoot"`
+	MaxPublicOrga         *int      `json:"maxPublicOrga"`
+	HasEmailNotifications *bool     `json:"hasEmailNotifications"`
 }
 
 type UserRightsRef struct {
-	CanLogin      *bool     `json:"canLogin"`
-	CanCreateRoot *bool     `json:"canCreateRoot"`
-	MaxPublicOrga *int      `json:"maxPublicOrga"`
-	Type          *UserType `json:"type_,omitempty"`
+	Type                  *UserType `json:"type_,omitempty"`
+	CanLogin              *bool     `json:"canLogin"`
+	CanCreateRoot         *bool     `json:"canCreateRoot"`
+	MaxPublicOrga         *int      `json:"maxPublicOrga"`
+	HasEmailNotifications *bool     `json:"hasEmailNotifications"`
 }
 
 type Vote struct {
@@ -4725,22 +4729,24 @@ func (e UserOrderable) MarshalGQL(w io.Writer) {
 type UserRightsHasFilter string
 
 const (
-	UserRightsHasFilterCanLogin      UserRightsHasFilter = "canLogin"
-	UserRightsHasFilterCanCreateRoot UserRightsHasFilter = "canCreateRoot"
-	UserRightsHasFilterMaxPublicOrga UserRightsHasFilter = "maxPublicOrga"
-	UserRightsHasFilterType          UserRightsHasFilter = "type_"
+	UserRightsHasFilterType                  UserRightsHasFilter = "type_"
+	UserRightsHasFilterCanLogin              UserRightsHasFilter = "canLogin"
+	UserRightsHasFilterCanCreateRoot         UserRightsHasFilter = "canCreateRoot"
+	UserRightsHasFilterMaxPublicOrga         UserRightsHasFilter = "maxPublicOrga"
+	UserRightsHasFilterHasEmailNotifications UserRightsHasFilter = "hasEmailNotifications"
 )
 
 var AllUserRightsHasFilter = []UserRightsHasFilter{
+	UserRightsHasFilterType,
 	UserRightsHasFilterCanLogin,
 	UserRightsHasFilterCanCreateRoot,
 	UserRightsHasFilterMaxPublicOrga,
-	UserRightsHasFilterType,
+	UserRightsHasFilterHasEmailNotifications,
 }
 
 func (e UserRightsHasFilter) IsValid() bool {
 	switch e {
-	case UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga, UserRightsHasFilterType:
+	case UserRightsHasFilterType, UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga, UserRightsHasFilterHasEmailNotifications:
 		return true
 	}
 	return false
