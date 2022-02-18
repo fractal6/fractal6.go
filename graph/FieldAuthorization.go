@@ -7,6 +7,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/graph/auth"
 	. "fractale/fractal6.go/tools"
 	webauth "fractale/fractal6.go/web/auth"
 )
@@ -20,6 +21,7 @@ func init() {
         "unique": unique,
         "oneByOne": oneByOne,
         "hasEvent": hasEvent,
+        "tensionTypeCheck": tensionTypeCheck,
         "ref": ref,
         "minLen": minLength,
         "maxLen": maxLength,
@@ -157,6 +159,39 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
         return next(ctx)
     }
     return nil, LogErr("Event error", fmt.Errorf("missing event for field '%s'", field))
+}
+
+//tensionTypeCheck check is the user can use a tension type.
+func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+    data, err := next(ctx)
+    if err != nil { return nil, err }
+
+    if data.(model.TensionType) == model.TensionTypeAlert {
+        ctx, uctx, err := webauth.GetUserContext(ctx)
+
+        // Get receiverid
+        var receiverid string
+        if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
+            receiverid = v.(string)
+        } else if ctx.Value("id") != nil {
+            x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
+            if err != nil || x == nil { return nil, LogErr("Internal error", err) }
+            receiverid = x.(string)
+        } else {
+            return nil, LogErr("Value Error", fmt.Errorf("'%s' or id is required.", *f))
+        }
+
+        // Check auth
+        if i := auth.IsCoordo(uctx, receiverid); i >=0 {
+            return data, err
+        } else if err != nil {
+            return nil, err
+        }
+
+        return nil, fmt.Errorf("Only coordinator can create Alert tension.")
+    }
+
+    return data, err
 }
 
 //ref ensure the given objects are just link to an existing one. (@weak: by testing that its size if not equal to one.)

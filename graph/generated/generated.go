@@ -7997,7 +7997,7 @@ input AddTensionInput {
   receiver: NodeRef!
   receiverid: String!
   title: String!
-  type_: TensionType!
+  type_: TensionType! @x_alter(r:"tensionTypeCheck")
   status: TensionStatus!
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
@@ -9702,7 +9702,7 @@ input TensionPatch {
   receiver: NodeRef @x_patch_ro
   receiverid: String @x_patch_ro
   title: String @x_patch_ro
-  type_: TensionType @x_patch_ro
+  type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
@@ -9727,7 +9727,7 @@ input TensionRef {
   receiver: NodeRef
   receiverid: String
   title: String
-  type_: TensionType
+  type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
@@ -43048,9 +43048,29 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "tensionTypeCheck")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(model.TensionType); ok {
+				it.Type = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.TensionType`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
 			var err error
@@ -52731,10 +52751,14 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "tensionTypeCheck")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -53226,9 +53250,31 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "tensionTypeCheck")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.TensionType); ok {
+				it.Type = data
+			} else if tmp == nil {
+				it.Type = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionType`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
 			var err error

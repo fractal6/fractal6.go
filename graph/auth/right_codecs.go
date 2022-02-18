@@ -109,11 +109,34 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
-        if *r.RoleType != model.RoleTypeCoordinator {
+        if *r.RoleType != model.RoleTypeCoordinator && *r.RoleType != model.RoleTypeOwner {
             continue
         }
 
         if pid, err := codec.Nid2pid(r.Nameid); err == nil && pid == nameid {
+            return i
+        } else if err != nil {
+            panic(err.Error())
+        }
+    }
+
+    return -1
+}
+
+// IsCoordo returns true if a user has at least one role with right coordinator in a organisation
+func IsCoordo(uctx *model.UserCtx, nameid string) int {
+    uctx, e := webauth.MaybeRefresh(uctx)
+    if e != nil { panic(e) }
+
+    rootnameid, e := codec.Nid2rootid(nameid)
+    if e != nil { panic(e) }
+
+    for i, r := range uctx.Roles {
+        if *r.RoleType != model.RoleTypeCoordinator && *r.RoleType != model.RoleTypeOwner {
+            continue
+        }
+
+        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
             return i
         } else if err != nil {
             panic(err.Error())

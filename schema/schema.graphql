@@ -777,7 +777,7 @@ input AddTensionInput {
   receiver: NodeRef!
   receiverid: String!
   title: String!
-  type_: TensionType!
+  type_: TensionType! @x_alter(r:"tensionTypeCheck")
   status: TensionStatus!
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
@@ -2482,7 +2482,7 @@ input TensionPatch {
   receiver: NodeRef @x_patch_ro
   receiverid: String @x_patch_ro
   title: String @x_patch_ro
-  type_: TensionType @x_patch_ro
+  type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
@@ -2507,7 +2507,7 @@ input TensionRef {
   receiver: NodeRef
   receiverid: String
   title: String
-  type_: TensionType
+  type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
