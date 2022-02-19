@@ -14,6 +14,10 @@ import (
 	. "fractale/fractal6.go/tools"
 )
 
+// @refactor: modularize generic function (GetFilterBy*) (returns (interface{}, error}
+//            as Traverse([list of key to traver], [list of payload to get])
+//  Use Meta() for all other queries... (return []interface{})
+
 var userCtxPayload string = `{
     User.username
     User.name
@@ -342,6 +346,20 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid(n)) @recurse {
             Node.parent @normalize
             Node.nameid
+        }
+    }`,
+    // @debug: why message is in Post.message and not Comment.message !!!?
+    "getFirstComment": `{
+        all(func: uid({{.tid}})) @normalize {
+            title: Tension.title
+            receiverid: Tension.receiverid
+            Post.createdBy {
+                author_name: User.name
+                author_username: User.username
+            }
+            Tension.comments(first:1, orderasc: Post.createdAt) {
+                message: Post.message
+            }
         }
     }`,
     "getSubNodes": `{
@@ -804,11 +822,16 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) 
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
+    fields := strings.Split(strings.Trim(fieldName, " "), " ")
+
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, id)
     } else if len(r.All) == 1 {
-        x := r.All[0][fieldName]
-        return x, nil
+        if len(fields) > 1 {
+            return r.All[0], nil
+        } else {
+            return CleanCompositeName(r.All[0][fieldName].(model.JsonAtom), true), nil
+        }
     }
     return nil, err
 }
@@ -830,13 +853,18 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
-    if len(r.All) == 0 {
-        return nil, err
-    } else if len(r.All) > 1 {
-        return nil, fmt.Errorf("Only one resuts allowed for DQL query: %s %s", fieldName, objid)
+    fields := strings.Split(strings.Trim(fieldName, " "), " ")
+
+    if len(r.All) > 1 {
+        return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
+    } else if len(r.All) == 1 {
+        if len(fields) > 1 {
+            return r.All[0], nil
+        } else {
+            return CleanCompositeName(r.All[0][fieldName].(model.JsonAtom), true), nil
+        }
     }
-    x := r.All[0][fieldName]
-    return x, err
+    return nil, err
 }
 
 // Returns a subfield from uid
@@ -856,19 +884,29 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
+    fields := strings.Split(strings.Trim(fieldNameTarget, " "), " ")
+
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
         switch x := r.All[0][fieldNameSource].(type) {
         case model.JsonAtom:
             if x != nil {
-                return x[fieldNameTarget], nil
+                if len(fields) > 1 {
+                    return CleanCompositeName(x, true), nil
+                } else {
+                    return x[fieldNameTarget], nil
+                }
             }
         case []interface{}:
             if x != nil {
                 var y []interface{}
                 for _, v := range(x) {
-                    y = append(y, v.(model.JsonAtom)[fieldNameTarget])
+                    if len(fields) > 1 {
+                        y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
+                    } else {
+                        y = append(y, v.(model.JsonAtom)[fieldNameTarget])
+                    }
                 }
                 return y, nil
             }
@@ -897,19 +935,29 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
+    fields := strings.Split(strings.Trim(fieldNameTarget, " "), " ")
+
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
         switch x := r.All[0][fieldNameSource].(type) {
         case model.JsonAtom:
             if x != nil {
-                return x[fieldNameTarget], nil
+                if len(fields) > 1 {
+                    return CleanCompositeName(x, true), nil
+                } else {
+                    return x[fieldNameTarget], nil
+                }
             }
         case []interface{}:
             if x != nil {
                 var y []interface{}
                 for _, v := range(x) {
-                    y = append(y, v.(model.JsonAtom)[fieldNameTarget])
+                    if len(fields) > 1 {
+                        y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
+                    } else {
+                        y = append(y, v.(model.JsonAtom)[fieldNameTarget])
+                    }
                 }
                 return y, nil
             }
@@ -938,6 +986,8 @@ func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldName
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
+    fields := strings.Split(strings.Trim(subFieldNameTarget, " "), " ")
+
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
@@ -945,7 +995,11 @@ func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldName
         if x != nil {
             y := x[fieldNameTarget].(model.JsonAtom)
             if y != nil {
-                return y[subFieldNameTarget], nil
+                if len(fields) > 1 {
+                    return CleanCompositeName(y, true), nil
+                } else {
+                    return y[subFieldNameTarget], nil
+                }
             }
         }
     }
@@ -971,6 +1025,8 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
     err = json.Unmarshal(res.Json, &r)
     if err != nil { return nil, err }
 
+    fields := strings.Split(strings.Trim(subFieldNameTarget, " "), " ")
+
     if len(r.All) > 1 {
         return nil, fmt.Errorf("Got multiple in DQL query")
     } else if len(r.All) == 1 {
@@ -978,7 +1034,11 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
         if x != nil {
             y := x[fieldNameTarget].(model.JsonAtom)
             if y != nil {
-                return y[subFieldNameTarget], nil
+                if len(fields) > 1 {
+                    return CleanCompositeName(y, true), nil
+                } else {
+                    return y[subFieldNameTarget], nil
+                }
             }
         }
     }
@@ -1170,7 +1230,7 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
     }
 
     // Assume that tension does not exists if receiver is empty
-    // This is becausae DQL returns an object with t uid even is non existent.
+    // This is because DQL returns an object with t uid even is non existent.
     if obj.Receiver == nil { return nil, err }
     return &obj, err
 }

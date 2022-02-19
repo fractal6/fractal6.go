@@ -36,7 +36,7 @@ func init () {
     // Get Jwt private key
     jwtSecret = os.Getenv("JWT_SECRET")
     if jwtSecret == "" {
-        fmt.Println("JWT_KEY not found. JWT token disabled.")
+        fmt.Println("JWT_SECRET not found. JWT token disabled.")
         return
     }
 

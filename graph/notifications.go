@@ -70,9 +70,11 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", "User.username User.email")
         if err != nil { return users, err }
         if res != nil {
-            user := res.(model.User)
-            if _, ex := users[user.Username]; !ex {
-                users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
+            var user model.User
+            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                if _, ex := users[user.Username]; !ex {
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
+                }
             }
         }
     }
@@ -81,10 +83,14 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         // Get Assignees
         res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username User.email")
         if err != nil { return users, err }
-        for _, u := range res.([]interface{}) {
-            user := u.(model.User)
-            if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
+        if assignees, ok := InterfaceSlice(res); ok {
+            for _, u := range assignees {
+                var user model.User
+                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+                    if _, ex := users[user.Username]; ex { continue }
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
+                }
+            }
         }
     }
 
@@ -92,10 +98,14 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         // Get Subscribers
         res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username User.email")
         if err != nil { return users, err }
-        for _, u := range res.([]interface{}) {
-            user := u.(model.User)
-            if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
+        if subscribers, ok := InterfaceSlice(res); ok {
+            for _, u := range subscribers {
+                var user model.User
+                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+                    if _, ex := users[user.Username]; ex { continue }
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
+                }
+            }
         }
     }
 

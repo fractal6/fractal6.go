@@ -85,6 +85,7 @@ func Struct2Map(item interface{}) map[string]interface{} {
 }
 
 func Map2Struct(item map[string]interface{}, res interface{}) error {
+    // @performance: use marshal/unmarshal instead ?
     decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
             Result: res,
             TagName: "json",
