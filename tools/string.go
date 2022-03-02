@@ -165,3 +165,7 @@ func SplitCamelCase(src string) (entries []string) {
 	}
 	return
 }
+
+func Humanize(src string) (t string) {
+    return strings.Join(SplitCamelCase(src), " ")
+}

@@ -5,9 +5,11 @@ import (
     "log"
     "context"
     "encoding/json"
+    "runtime/debug"
     "github.com/go-redis/redis/v8"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph"
+    "fractale/fractal6.go/web/email"
     //. "fractale/fractal6.go/tools"
 )
 
@@ -59,6 +61,10 @@ func RunNotifier() {
 func handlePanic(info string) {
     if r := recover(); r != nil {
         fmt.Printf("error: Recovering from panic (%s): %v\n", info, r)
+        email.SendMaintainerEmail(
+            fmt.Sprintf("[%s/error] %v", info, r),
+            string(debug.Stack()),
+        )
     }
 }
 

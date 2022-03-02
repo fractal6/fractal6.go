@@ -316,6 +316,7 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid(u)) {
             User.username
             User.email
+            User.name
         }
     }`,
     "getCoordosFromTid": `{
@@ -330,6 +331,7 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid(u)) {
             User.username
             User.email
+            User.name
         }
     }`,
     "getParents": `{
@@ -355,10 +357,34 @@ var dqlQueries map[string]string = map[string]string{
             receiverid: Tension.receiverid
             Post.createdBy {
                 author_name: User.name
-                author_username: User.username
             }
             Tension.comments(first:1, orderasc: Post.createdAt) {
                 message: Post.message
+            }
+        }
+    }`,
+    "getLastComment": `{
+        all(func: uid({{.tid}})) @normalize {
+            title: Tension.title
+            receiverid: Tension.receiverid
+            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                message: Post.message
+                Post.createdBy @filter(eq(User.username, "{{.username}}")) {
+                    author_name: User.name
+                }
+            }
+        }
+    }`,
+    "getLastContractComment": `{
+        all(func: uid({{.cid}})) @normalize {
+            Contract.tension {
+                receiverid: Tension.receiverid
+            }
+            Contract.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                message: Post.message
+                Post.createdBy @filter(eq(User.username, "{{.username}}")) {
+                    author_name: User.name
+                }
             }
         }
     }`,
@@ -828,9 +854,9 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) 
         return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, id)
     } else if len(r.All) == 1 {
         if len(fields) > 1 {
-            return r.All[0], nil
-        } else {
             return CleanCompositeName(r.All[0][fieldName].(model.JsonAtom), true), nil
+        } else {
+            return r.All[0][fieldName], nil
         }
     }
     return nil, err
@@ -859,9 +885,9 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
         return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
     } else if len(r.All) == 1 {
         if len(fields) > 1 {
-            return r.All[0], nil
-        } else {
             return CleanCompositeName(r.All[0][fieldName].(model.JsonAtom), true), nil
+        } else {
+            return r.All[0][fieldName], nil
         }
     }
     return nil, err
@@ -921,10 +947,10 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string) (interface{}, error) {
     // Format Query
     maps := map[string]string{
-        "fieldid":fieldid,
-        "value":value,
-        "fieldNameSource":fieldNameSource,
-        "fieldNameTarget":fieldNameTarget,
+        "fieldid": fieldid,
+        "value": value,
+        "fieldNameSource": fieldNameSource,
+        "fieldNameTarget": fieldNameTarget,
     }
     // Send request
     res, err := dg.QueryDql("getSubFieldByEq", maps)

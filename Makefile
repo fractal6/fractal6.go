@@ -16,7 +16,7 @@ default: build
 # Build commands
 #
 
-run:
+run_api:
 	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
 	# * EMAIL_API_URL
 	# * EMAIL_API_KEY
@@ -25,13 +25,13 @@ run:
 	# * DGRAPH_PRIVATE_KEY
 	go run main.go api
 
-notifier:
+run_notifier:
 	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
 	# * EMAIL_API_URL
 	# * EMAIL_API_KEY
 	# * DGRAPH_PUBLIC_KEY
 	# * DGRAPH_PRIVATE_KEY
-	ro run main.go notifier
+	go run main.go notifier
 
 build:
 	go build $(GOFLAGS) -o $(GOBIN)/$(RELEASE) main.go

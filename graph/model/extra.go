@@ -22,6 +22,7 @@ type NotifReason int
 const (
     ReasonUnknown NotifReason = iota
     ReasonIsCandidate
+    ReasonIsParticipant
     ReasonIsCoordo
     ReasonIsFirstLink
     ReasonIsAssignee
@@ -31,21 +32,21 @@ const (
 func (n NotifReason) ToText() string {
     switch n {
     case ReasonIsCandidate:
-        return "candidate"
+        return "you are invited"
     case ReasonIsCoordo:
-        return "coordinator"
+        return "you are coordinator"
     case ReasonIsFirstLink:
-        return "first-link"
+        return "you are first-link"
     case ReasonIsAssignee:
-        return "assignee"
+        return "you are assigned to this tension"
     case ReasonIsSubscriber:
-        return "subscriber"
+        return "you are subscribed to this tension"
     default:
-        return "unknown"
+        return "unknown reason"
     }
 }
 
-// User info when pushing notification
+// Info about user to notify when pushing notification
 type UserNotifInfo struct {
     User User
     Reason NotifReason
@@ -71,6 +72,90 @@ type NotifNotif struct {
     Tid *string    `json:"tid"`
     Cid *string    `json:"cid"`
     To []string    `json:"to"`
+}
+
+//
+// Object methods
+//
+
+func (notif EventNotif) IsEmailable() bool {
+    for _, e := range notif.History {
+        if TensionEventCreated == *e.EventType ||
+        TensionEventCommentPushed == *e.EventType ||
+        TensionEventReopened == *e.EventType ||
+        TensionEventClosed == *e.EventType ||
+        TensionEventMemberUnlinked == *e.EventType ||
+        TensionEventUserLeft == *e.EventType {
+            return true
+        }
+    }
+    return false
+}
+
+func (notif ContractNotif) IsEmailable() bool {
+    e := notif.Contract.Event
+    if TensionEventCreated == e.EventType ||
+    TensionEventCommentPushed == e.EventType ||
+    TensionEventReopened == e.EventType ||
+    TensionEventClosed == e.EventType ||
+    TensionEventMemberUnlinked == e.EventType ||
+    TensionEventUserLeft == e.EventType {
+        return true
+    }
+    return false
+}
+
+
+func (notif EventNotif) HasEvent(ev TensionEvent) bool {
+    for _, e := range notif.History {
+        if ev == *e.EventType {
+            return true
+        }
+    }
+    return false
+}
+
+func (notif EventNotif) GetCreatedAt() string {
+    for _, e := range notif.History {
+        if e.CreatedAt != nil {
+            return *e.CreatedAt
+        }
+    }
+    return ""
+}
+
+func (notif EventNotif) GetExUser() string {
+    for _, e := range notif.History {
+        if *e.EventType == TensionEventUserLeft || *e.EventType == TensionEventMemberUnlinked {
+            if e.Old != nil {
+                return *e.Old
+            }
+        }
+    }
+    return ""
+}
+
+// Event methods
+
+func (e TensionEvent) ToContractText() (t string) {
+    switch e {
+	case TensionEventMoved:
+		t = "Move tension"
+
+	case TensionEventMemberLinked:
+		t = "New first-link"
+
+	case TensionEventMemberUnlinked:
+		t = "Retired first-link"
+
+	case TensionEventUserJoined:
+		t = "New member"
+
+	default:
+        // Humanize (@debug: cannot import tools because of cycle error.)
+		t = string(e)
+    }
+    return
 }
 
 

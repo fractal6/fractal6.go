@@ -67,7 +67,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
     {
         // Get First-link
-        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", "User.username User.email")
+        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", "User.username User.email User.name")
         if err != nil { return users, err }
         if res != nil {
             var user model.User
@@ -81,7 +81,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
     if withAssignees {
         // Get Assignees
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username User.email")
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username User.email User.name")
         if err != nil { return users, err }
         if assignees, ok := InterfaceSlice(res); ok {
             for _, u := range assignees {
@@ -96,7 +96,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
     if withSubscribers {
         // Get Subscribers
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username User.email")
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username User.email User.name")
         if err != nil { return users, err }
         if subscribers, ok := InterfaceSlice(res); ok {
             for _, u := range subscribers {
@@ -183,6 +183,7 @@ func PushEventNotifications(notif model.EventNotif) error {
          if notif.Uctx.Rights.HasEmailNotifications {
              ui.Eid = eid
              err = email.SendEventNotificationEmail(ui, notif)
+             if err != nil { return err }
         }
     }
 
@@ -208,6 +209,11 @@ func PushContractNotifications(notif model.ContractNotif) error {
     for _, c := range notif.Contract.Candidates {
         users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsCandidate}
     }
+    // +
+    // Add Participants
+    for _, p := range notif.Contract.Participants {
+        users[p.Node.FirstLink.Username] = model.UserNotifInfo{User: *p.Node.FirstLink, Reason: model.ReasonIsParticipant}
+    }
 
     // Push user event notification
     for u, ui := range users {
@@ -224,9 +230,14 @@ func PushContractNotifications(notif model.ContractNotif) error {
         if err != nil { return err }
 
         // Email
-         if notif.Uctx.Rights.HasEmailNotifications {
+        if notif.Uctx.Rights.HasEmailNotifications &&
+        (ui.Reason == model.ReasonIsCandidate ||
+        ui.Reason == model.ReasonIsParticipant ||
+        ui.Reason == model.ReasonIsCoordo ||
+        ui.Reason == model.ReasonIsAssignee ) {
              ui.Eid = eid
              err = email.SendContractNotificationEmail(ui, notif)
+             if err != nil { return err }
         }
     }
 
