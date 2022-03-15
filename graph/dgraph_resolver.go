@@ -151,7 +151,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
 //
 //    // Format collected fields
 //    inputType := strings.Split(fmt.Sprintf("%T", rc.Args[mutCtx.argName]), ".")[1]
-//    queryGraph := strings.Join(GetPreloads(ctx), " ")
+//    queryGraph := GetQueryGraph(ctx)
 //
 //    // Build the graphql raw request
 //    reqInput := map[string]string{

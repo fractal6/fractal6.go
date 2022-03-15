@@ -22,6 +22,7 @@ type NotifReason int
 const (
     ReasonUnknown NotifReason = iota
     ReasonIsCandidate
+    ReasonIsPendingCandidate
     ReasonIsParticipant
     ReasonIsCoordo
     ReasonIsFirstLink

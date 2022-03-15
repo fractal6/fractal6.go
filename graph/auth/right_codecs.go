@@ -169,8 +169,8 @@ func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
 // Wrapper when uctx is unknown
 //
 
-func IsMember(username, rootnameid string) int {
-    uctx, e := db.GetDB().GetUctxFull("username", username)
+func IsMember(fieldname, username, rootnameid string) int {
+    uctx, e := db.GetDB().GetUctxFull(fieldname, username)
     if e != nil { panic(e) }
     return UserIsMember(uctx, rootnameid)
 

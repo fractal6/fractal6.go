@@ -35,16 +35,25 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     // for now...
     if len(contract.Candidates) > 1 {
         return false, contract, fmt.Errorf("Candidate need to be singleton for security reason.")
+    } else {
+        // Is a pending candidates (email given) existes, move it to candidates.
     }
     switch contract.Event.EventType {
     case model.TensionEventUserJoined:
         for _, c := range contract.Candidates {
-            if i := auth.IsMember(c.Username, contract.Tension.Receiverid); i >= 0 {
-                return false, contract, fmt.Errorf("A candidate is already member.")
+            if i := auth.IsMember("username", c.Username, contract.Tension.Receiverid); i >= 0 {
+                return false, contract, fmt.Errorf("Candidate '%s' is already member.", c.Username)
+            }
+        }
+        for _, c := range contract.PendingCandidates {
+            if c.Email == nil { continue }
+            if i := auth.IsMember("email", *c.Email, contract.Tension.Receiverid); i >= 0 {
+                return false, contract, fmt.Errorf("Candidate '%s' is already member.", *c.Email)
             }
         }
     case model.TensionEventMemberLinked:
         // pass, this shouldn't be a security flaw.
+        // @todo: check if role has already a first-link.
     default:
         if contract.Candidates != nil {
             return false, contract, fmt.Errorf("Contract candidates not implemented for this event (contract).")
@@ -59,10 +68,6 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
 
     // Push Notifications
     PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: tid, Contract: contract})
-    //for _, c := range contract.PendingCandidates {
-    //    // @todo: send signup+contract invitation
-    //    fmt.Println(c.Email)
-    //}
 
     return ok, contract, err
 }

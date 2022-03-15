@@ -118,6 +118,10 @@ func GetPreloads(ctx context.Context) []string {
   )
 }
 
+func GetQueryGraph(ctx context.Context) string {
+    return strings.Join(GetPreloads(ctx), " ")
+}
+
 func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string, first bool) (preloads []string) {
   //if first {
   //  fmt.Println(ctx.OperationName) // user define name of operation

@@ -1,14 +1,15 @@
 package graph
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
-    "context"
-    "encoding/json"
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/graph/auth"
-	"fractale/fractal6.go/web/email"
+	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/email"
+	"fractale/fractal6.go/web/sessions"
 )
 
 var ctx context.Context = context.Background()
@@ -210,6 +211,12 @@ func PushContractNotifications(notif model.ContractNotif) error {
         users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsCandidate}
     }
     // +
+    // Add Pending Candidates
+    for _, c := range notif.Contract.PendingCandidates {
+        if c.Email == nil { continue }
+        users[*c.Email] = model.UserNotifInfo{User: model.User{Email: *c.Email}, Reason: model.ReasonIsPendingCandidate}
+    }
+    // +
     // Add Participants
     for _, p := range notif.Contract.Participants {
         users[p.Node.FirstLink.Username] = model.UserNotifInfo{User: *p.Node.FirstLink, Reason: model.ReasonIsParticipant}
@@ -221,17 +228,27 @@ func PushContractNotifications(notif model.ContractNotif) error {
         if u == notif.Uctx.Username { continue }
 
         // User Event
-        eid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
-            User: &model.UserRef{Username: &u},
-            IsRead: false,
-            CreatedAt: createdAt,
-            Event: eventBatch,
-        })
-        if err != nil { return err }
+        var eid string
+        if ui.Reason == model.ReasonIsPendingCandidate {
+            // Add a verification token if not exists
+            // (assumes PendingUser has already been created)
+            token := sessions.GenerateToken()
+            _, err := db.GetDB().Meta("setPendingUserToken", map[string]string{"email":u, "token":token})
+            if err != nil { return err }
+        } else {
+            eid, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
+                User: &model.UserRef{Username: &u},
+                IsRead: false,
+                CreatedAt: createdAt,
+                Event: eventBatch,
+            })
+            if err != nil { return err }
+        }
 
         // Email
         if notif.Uctx.Rights.HasEmailNotifications &&
         (ui.Reason == model.ReasonIsCandidate ||
+        ui.Reason == model.ReasonIsPendingCandidate ||
         ui.Reason == model.ReasonIsParticipant ||
         ui.Reason == model.ReasonIsCoordo ||
         ui.Reason == model.ReasonIsAssignee ) {

@@ -201,6 +201,11 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	AddUserEventFragmentPayload struct {
+		NumUids           func(childComplexity int) int
+		UserEventFragment func(childComplexity int, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) int
+	}
+
 	AddUserEventPayload struct {
 		NumUids   func(childComplexity int) int
 		UserEvent func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
@@ -398,6 +403,12 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	DeleteUserEventFragmentPayload struct {
+		Msg               func(childComplexity int) int
+		NumUids           func(childComplexity int) int
+		UserEventFragment func(childComplexity int, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) int
+	}
+
 	DeleteUserEventPayload struct {
 		Msg       func(childComplexity int) int
 		NumUids   func(childComplexity int) int
@@ -511,62 +522,65 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddBlob             func(childComplexity int, input []*model.AddBlobInput) int
-		AddComment          func(childComplexity int, input []*model.AddCommentInput) int
-		AddContract         func(childComplexity int, input []*model.AddContractInput, upsert *bool) int
-		AddEvent            func(childComplexity int, input []*model.AddEventInput) int
-		AddEventFragment    func(childComplexity int, input []*model.AddEventFragmentInput) int
-		AddLabel            func(childComplexity int, input []*model.AddLabelInput) int
-		AddMandate          func(childComplexity int, input []*model.AddMandateInput) int
-		AddNode             func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
-		AddNodeFragment     func(childComplexity int, input []*model.AddNodeFragmentInput) int
-		AddNotif            func(childComplexity int, input []*model.AddNotifInput) int
-		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
-		AddPendingUser      func(childComplexity int, input []*model.AddPendingUserInput) int
-		AddRoleExt          func(childComplexity int, input []*model.AddRoleExtInput) int
-		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
-		AddUser             func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
-		AddUserEvent        func(childComplexity int, input []*model.AddUserEventInput) int
-		AddUserRights       func(childComplexity int, input []*model.AddUserRightsInput) int
-		AddVote             func(childComplexity int, input []*model.AddVoteInput, upsert *bool) int
-		DeleteBlob          func(childComplexity int, filter model.BlobFilter) int
-		DeleteComment       func(childComplexity int, filter model.CommentFilter) int
-		DeleteContract      func(childComplexity int, filter model.ContractFilter) int
-		DeleteEvent         func(childComplexity int, filter model.EventFilter) int
-		DeleteEventFragment func(childComplexity int, filter model.EventFragmentFilter) int
-		DeleteLabel         func(childComplexity int, filter model.LabelFilter) int
-		DeleteMandate       func(childComplexity int, filter model.MandateFilter) int
-		DeleteNode          func(childComplexity int, filter model.NodeFilter) int
-		DeleteNodeFragment  func(childComplexity int, filter model.NodeFragmentFilter) int
-		DeleteNotif         func(childComplexity int, filter model.NotifFilter) int
-		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
-		DeletePendingUser   func(childComplexity int, filter model.PendingUserFilter) int
-		DeletePost          func(childComplexity int, filter model.PostFilter) int
-		DeleteRoleExt       func(childComplexity int, filter model.RoleExtFilter) int
-		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
-		DeleteUser          func(childComplexity int, filter model.UserFilter) int
-		DeleteUserEvent     func(childComplexity int, filter model.UserEventFilter) int
-		DeleteUserRights    func(childComplexity int, filter model.UserRightsFilter) int
-		DeleteVote          func(childComplexity int, filter model.VoteFilter) int
-		UpdateBlob          func(childComplexity int, input model.UpdateBlobInput) int
-		UpdateComment       func(childComplexity int, input model.UpdateCommentInput) int
-		UpdateContract      func(childComplexity int, input model.UpdateContractInput) int
-		UpdateEvent         func(childComplexity int, input model.UpdateEventInput) int
-		UpdateEventFragment func(childComplexity int, input model.UpdateEventFragmentInput) int
-		UpdateLabel         func(childComplexity int, input model.UpdateLabelInput) int
-		UpdateMandate       func(childComplexity int, input model.UpdateMandateInput) int
-		UpdateNode          func(childComplexity int, input model.UpdateNodeInput) int
-		UpdateNodeFragment  func(childComplexity int, input model.UpdateNodeFragmentInput) int
-		UpdateNotif         func(childComplexity int, input model.UpdateNotifInput) int
-		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
-		UpdatePendingUser   func(childComplexity int, input model.UpdatePendingUserInput) int
-		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
-		UpdateRoleExt       func(childComplexity int, input model.UpdateRoleExtInput) int
-		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
-		UpdateUser          func(childComplexity int, input model.UpdateUserInput) int
-		UpdateUserEvent     func(childComplexity int, input model.UpdateUserEventInput) int
-		UpdateUserRights    func(childComplexity int, input model.UpdateUserRightsInput) int
-		UpdateVote          func(childComplexity int, input model.UpdateVoteInput) int
+		AddBlob                 func(childComplexity int, input []*model.AddBlobInput) int
+		AddComment              func(childComplexity int, input []*model.AddCommentInput) int
+		AddContract             func(childComplexity int, input []*model.AddContractInput, upsert *bool) int
+		AddEvent                func(childComplexity int, input []*model.AddEventInput) int
+		AddEventFragment        func(childComplexity int, input []*model.AddEventFragmentInput) int
+		AddLabel                func(childComplexity int, input []*model.AddLabelInput) int
+		AddMandate              func(childComplexity int, input []*model.AddMandateInput) int
+		AddNode                 func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
+		AddNodeFragment         func(childComplexity int, input []*model.AddNodeFragmentInput) int
+		AddNotif                func(childComplexity int, input []*model.AddNotifInput) int
+		AddOrgaAgg              func(childComplexity int, input []*model.AddOrgaAggInput) int
+		AddPendingUser          func(childComplexity int, input []*model.AddPendingUserInput, upsert *bool) int
+		AddRoleExt              func(childComplexity int, input []*model.AddRoleExtInput) int
+		AddTension              func(childComplexity int, input []*model.AddTensionInput) int
+		AddUser                 func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
+		AddUserEvent            func(childComplexity int, input []*model.AddUserEventInput) int
+		AddUserEventFragment    func(childComplexity int, input []*model.AddUserEventFragmentInput) int
+		AddUserRights           func(childComplexity int, input []*model.AddUserRightsInput) int
+		AddVote                 func(childComplexity int, input []*model.AddVoteInput, upsert *bool) int
+		DeleteBlob              func(childComplexity int, filter model.BlobFilter) int
+		DeleteComment           func(childComplexity int, filter model.CommentFilter) int
+		DeleteContract          func(childComplexity int, filter model.ContractFilter) int
+		DeleteEvent             func(childComplexity int, filter model.EventFilter) int
+		DeleteEventFragment     func(childComplexity int, filter model.EventFragmentFilter) int
+		DeleteLabel             func(childComplexity int, filter model.LabelFilter) int
+		DeleteMandate           func(childComplexity int, filter model.MandateFilter) int
+		DeleteNode              func(childComplexity int, filter model.NodeFilter) int
+		DeleteNodeFragment      func(childComplexity int, filter model.NodeFragmentFilter) int
+		DeleteNotif             func(childComplexity int, filter model.NotifFilter) int
+		DeleteOrgaAgg           func(childComplexity int, filter model.OrgaAggFilter) int
+		DeletePendingUser       func(childComplexity int, filter model.PendingUserFilter) int
+		DeletePost              func(childComplexity int, filter model.PostFilter) int
+		DeleteRoleExt           func(childComplexity int, filter model.RoleExtFilter) int
+		DeleteTension           func(childComplexity int, filter model.TensionFilter) int
+		DeleteUser              func(childComplexity int, filter model.UserFilter) int
+		DeleteUserEvent         func(childComplexity int, filter model.UserEventFilter) int
+		DeleteUserEventFragment func(childComplexity int, filter model.UserEventFragmentFilter) int
+		DeleteUserRights        func(childComplexity int, filter model.UserRightsFilter) int
+		DeleteVote              func(childComplexity int, filter model.VoteFilter) int
+		UpdateBlob              func(childComplexity int, input model.UpdateBlobInput) int
+		UpdateComment           func(childComplexity int, input model.UpdateCommentInput) int
+		UpdateContract          func(childComplexity int, input model.UpdateContractInput) int
+		UpdateEvent             func(childComplexity int, input model.UpdateEventInput) int
+		UpdateEventFragment     func(childComplexity int, input model.UpdateEventFragmentInput) int
+		UpdateLabel             func(childComplexity int, input model.UpdateLabelInput) int
+		UpdateMandate           func(childComplexity int, input model.UpdateMandateInput) int
+		UpdateNode              func(childComplexity int, input model.UpdateNodeInput) int
+		UpdateNodeFragment      func(childComplexity int, input model.UpdateNodeFragmentInput) int
+		UpdateNotif             func(childComplexity int, input model.UpdateNotifInput) int
+		UpdateOrgaAgg           func(childComplexity int, input model.UpdateOrgaAggInput) int
+		UpdatePendingUser       func(childComplexity int, input model.UpdatePendingUserInput) int
+		UpdatePost              func(childComplexity int, input model.UpdatePostInput) int
+		UpdateRoleExt           func(childComplexity int, input model.UpdateRoleExtInput) int
+		UpdateTension           func(childComplexity int, input model.UpdateTensionInput) int
+		UpdateUser              func(childComplexity int, input model.UpdateUserInput) int
+		UpdateUserEvent         func(childComplexity int, input model.UpdateUserEventInput) int
+		UpdateUserEventFragment func(childComplexity int, input model.UpdateUserEventFragmentInput) int
+		UpdateUserRights        func(childComplexity int, input model.UpdateUserRightsInput) int
+		UpdateVote              func(childComplexity int, input model.UpdateVoteInput) int
 	}
 
 	Node struct {
@@ -711,13 +725,18 @@ type ComplexityRoot struct {
 	}
 
 	PendingUser struct {
-		Email func(childComplexity int) int
+		Email           func(childComplexity int) int
+		Events          func(childComplexity int, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) int
+		EventsAggregate func(childComplexity int, filter *model.UserEventFragmentFilter) int
+		Token           func(childComplexity int) int
 	}
 
 	PendingUserAggregateResult struct {
 		Count    func(childComplexity int) int
 		EmailMax func(childComplexity int) int
 		EmailMin func(childComplexity int) int
+		TokenMax func(childComplexity int) int
+		TokenMin func(childComplexity int) int
 	}
 
 	Point struct {
@@ -752,59 +771,62 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		AggregateBlob          func(childComplexity int, filter *model.BlobFilter) int
-		AggregateComment       func(childComplexity int, filter *model.CommentFilter) int
-		AggregateContract      func(childComplexity int, filter *model.ContractFilter) int
-		AggregateEvent         func(childComplexity int, filter *model.EventFilter) int
-		AggregateEventFragment func(childComplexity int, filter *model.EventFragmentFilter) int
-		AggregateLabel         func(childComplexity int, filter *model.LabelFilter) int
-		AggregateMandate       func(childComplexity int, filter *model.MandateFilter) int
-		AggregateNode          func(childComplexity int, filter *model.NodeFilter) int
-		AggregateNodeFragment  func(childComplexity int, filter *model.NodeFragmentFilter) int
-		AggregateNotif         func(childComplexity int, filter *model.NotifFilter) int
-		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
-		AggregatePendingUser   func(childComplexity int, filter *model.PendingUserFilter) int
-		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
-		AggregateRoleExt       func(childComplexity int, filter *model.RoleExtFilter) int
-		AggregateTension       func(childComplexity int, filter *model.TensionFilter) int
-		AggregateUser          func(childComplexity int, filter *model.UserFilter) int
-		AggregateUserEvent     func(childComplexity int, filter *model.UserEventFilter) int
-		AggregateUserRights    func(childComplexity int, filter *model.UserRightsFilter) int
-		AggregateVote          func(childComplexity int, filter *model.VoteFilter) int
-		GetBlob                func(childComplexity int, id string) int
-		GetComment             func(childComplexity int, id string) int
-		GetContract            func(childComplexity int, id *string, contractid *string) int
-		GetEvent               func(childComplexity int, id string) int
-		GetLabel               func(childComplexity int, id string) int
-		GetMandate             func(childComplexity int, id string) int
-		GetNode                func(childComplexity int, id *string, nameid *string) int
-		GetNodeFragment        func(childComplexity int, id string) int
-		GetNotif               func(childComplexity int, id string) int
-		GetPost                func(childComplexity int, id string) int
-		GetRoleExt             func(childComplexity int, id string) int
-		GetTension             func(childComplexity int, id string) int
-		GetUser                func(childComplexity int, id *string, username *string) int
-		GetUserEvent           func(childComplexity int, id string) int
-		GetVote                func(childComplexity int, id *string, voteid *string) int
-		QueryBlob              func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		QueryComment           func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
-		QueryContract          func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
-		QueryEvent             func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
-		QueryEventFragment     func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
-		QueryLabel             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		QueryMandate           func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
-		QueryNode              func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		QueryNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
-		QueryNotif             func(childComplexity int, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) int
-		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
-		QueryPendingUser       func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
-		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
-		QueryRoleExt           func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
-		QueryTension           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		QueryUser              func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		QueryUserEvent         func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
-		QueryUserRights        func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
-		QueryVote              func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+		AggregateBlob              func(childComplexity int, filter *model.BlobFilter) int
+		AggregateComment           func(childComplexity int, filter *model.CommentFilter) int
+		AggregateContract          func(childComplexity int, filter *model.ContractFilter) int
+		AggregateEvent             func(childComplexity int, filter *model.EventFilter) int
+		AggregateEventFragment     func(childComplexity int, filter *model.EventFragmentFilter) int
+		AggregateLabel             func(childComplexity int, filter *model.LabelFilter) int
+		AggregateMandate           func(childComplexity int, filter *model.MandateFilter) int
+		AggregateNode              func(childComplexity int, filter *model.NodeFilter) int
+		AggregateNodeFragment      func(childComplexity int, filter *model.NodeFragmentFilter) int
+		AggregateNotif             func(childComplexity int, filter *model.NotifFilter) int
+		AggregateOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter) int
+		AggregatePendingUser       func(childComplexity int, filter *model.PendingUserFilter) int
+		AggregatePost              func(childComplexity int, filter *model.PostFilter) int
+		AggregateRoleExt           func(childComplexity int, filter *model.RoleExtFilter) int
+		AggregateTension           func(childComplexity int, filter *model.TensionFilter) int
+		AggregateUser              func(childComplexity int, filter *model.UserFilter) int
+		AggregateUserEvent         func(childComplexity int, filter *model.UserEventFilter) int
+		AggregateUserEventFragment func(childComplexity int, filter *model.UserEventFragmentFilter) int
+		AggregateUserRights        func(childComplexity int, filter *model.UserRightsFilter) int
+		AggregateVote              func(childComplexity int, filter *model.VoteFilter) int
+		GetBlob                    func(childComplexity int, id string) int
+		GetComment                 func(childComplexity int, id string) int
+		GetContract                func(childComplexity int, id *string, contractid *string) int
+		GetEvent                   func(childComplexity int, id string) int
+		GetLabel                   func(childComplexity int, id string) int
+		GetMandate                 func(childComplexity int, id string) int
+		GetNode                    func(childComplexity int, id *string, nameid *string) int
+		GetNodeFragment            func(childComplexity int, id string) int
+		GetNotif                   func(childComplexity int, id string) int
+		GetPendingUser             func(childComplexity int, email string) int
+		GetPost                    func(childComplexity int, id string) int
+		GetRoleExt                 func(childComplexity int, id string) int
+		GetTension                 func(childComplexity int, id string) int
+		GetUser                    func(childComplexity int, id *string, username *string) int
+		GetUserEvent               func(childComplexity int, id string) int
+		GetVote                    func(childComplexity int, id *string, voteid *string) int
+		QueryBlob                  func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
+		QueryComment               func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
+		QueryContract              func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
+		QueryEvent                 func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		QueryEventFragment         func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
+		QueryLabel                 func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		QueryMandate               func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
+		QueryNode                  func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		QueryNodeFragment          func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
+		QueryNotif                 func(childComplexity int, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) int
+		QueryOrgaAgg               func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
+		QueryPendingUser           func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
+		QueryPost                  func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		QueryRoleExt               func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
+		QueryTension               func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		QueryUser                  func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		QueryUserEvent             func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
+		QueryUserEventFragment     func(childComplexity int, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) int
+		QueryUserRights            func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
+		QueryVote                  func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
 	}
 
 	RoleExt struct {
@@ -964,6 +986,11 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	UpdateUserEventFragmentPayload struct {
+		NumUids           func(childComplexity int) int
+		UserEventFragment func(childComplexity int, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) int
+	}
+
 	UpdateUserEventPayload struct {
 		NumUids   func(childComplexity int) int
 		UserEvent func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
@@ -1053,6 +1080,18 @@ type ComplexityRoot struct {
 		CreatedAtMin func(childComplexity int) int
 	}
 
+	UserEventFragment struct {
+		CreatedAt func(childComplexity int) int
+		Event     func(childComplexity int, filter *model.EventKindFilter, first *int, offset *int) int
+		IsRead    func(childComplexity int) int
+	}
+
+	UserEventFragmentAggregateResult struct {
+		Count        func(childComplexity int) int
+		CreatedAtMax func(childComplexity int) int
+		CreatedAtMin func(childComplexity int) int
+	}
+
 	UserRights struct {
 		CanCreateRoot         func(childComplexity int) int
 		CanLogin              func(childComplexity int) int
@@ -1133,7 +1172,7 @@ type MutationResolver interface {
 	AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (*model.AddContractPayload, error)
 	UpdateContract(ctx context.Context, input model.UpdateContractInput) (*model.UpdateContractPayload, error)
 	DeleteContract(ctx context.Context, filter model.ContractFilter) (*model.DeleteContractPayload, error)
-	AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput) (*model.AddPendingUserPayload, error)
+	AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput, upsert *bool) (*model.AddPendingUserPayload, error)
 	UpdatePendingUser(ctx context.Context, input model.UpdatePendingUserInput) (*model.UpdatePendingUserPayload, error)
 	DeletePendingUser(ctx context.Context, filter model.PendingUserFilter) (*model.DeletePendingUserPayload, error)
 	AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (*model.AddVotePayload, error)
@@ -1148,6 +1187,9 @@ type MutationResolver interface {
 	AddUserEvent(ctx context.Context, input []*model.AddUserEventInput) (*model.AddUserEventPayload, error)
 	UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (*model.UpdateUserEventPayload, error)
 	DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (*model.DeleteUserEventPayload, error)
+	AddUserEventFragment(ctx context.Context, input []*model.AddUserEventFragmentInput) (*model.AddUserEventFragmentPayload, error)
+	UpdateUserEventFragment(ctx context.Context, input model.UpdateUserEventFragmentInput) (*model.UpdateUserEventFragmentPayload, error)
+	DeleteUserEventFragment(ctx context.Context, filter model.UserEventFragmentFilter) (*model.DeleteUserEventFragmentPayload, error)
 	AddNotif(ctx context.Context, input []*model.AddNotifInput) (*model.AddNotifPayload, error)
 	UpdateNotif(ctx context.Context, input model.UpdateNotifInput) (*model.UpdateNotifPayload, error)
 	DeleteNotif(ctx context.Context, filter model.NotifFilter) (*model.DeleteNotifPayload, error)
@@ -1190,6 +1232,7 @@ type QueryResolver interface {
 	GetContract(ctx context.Context, id *string, contractid *string) (*model.Contract, error)
 	QueryContract(ctx context.Context, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) ([]*model.Contract, error)
 	AggregateContract(ctx context.Context, filter *model.ContractFilter) (*model.ContractAggregateResult, error)
+	GetPendingUser(ctx context.Context, email string) (*model.PendingUser, error)
 	QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) ([]*model.PendingUser, error)
 	AggregatePendingUser(ctx context.Context, filter *model.PendingUserFilter) (*model.PendingUserAggregateResult, error)
 	GetVote(ctx context.Context, id *string, voteid *string) (*model.Vote, error)
@@ -1203,6 +1246,8 @@ type QueryResolver interface {
 	GetUserEvent(ctx context.Context, id string) (*model.UserEvent, error)
 	QueryUserEvent(ctx context.Context, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) ([]*model.UserEvent, error)
 	AggregateUserEvent(ctx context.Context, filter *model.UserEventFilter) (*model.UserEventAggregateResult, error)
+	QueryUserEventFragment(ctx context.Context, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) ([]*model.UserEventFragment, error)
+	AggregateUserEventFragment(ctx context.Context, filter *model.UserEventFragmentFilter) (*model.UserEventFragmentAggregateResult, error)
 	GetNotif(ctx context.Context, id string) (*model.Notif, error)
 	QueryNotif(ctx context.Context, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) ([]*model.Notif, error)
 	AggregateNotif(ctx context.Context, filter *model.NotifFilter) (*model.NotifAggregateResult, error)
@@ -1488,6 +1533,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddUserEventFragmentPayload.numUids":
+		if e.complexity.AddUserEventFragmentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddUserEventFragmentPayload.NumUids(childComplexity), true
+
+	case "AddUserEventFragmentPayload.userEventFragment":
+		if e.complexity.AddUserEventFragmentPayload.UserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_AddUserEventFragmentPayload_userEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddUserEventFragmentPayload.UserEventFragment(childComplexity, args["filter"].(*model.UserEventFragmentFilter), args["order"].(*model.UserEventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddUserEventPayload.numUids":
 		if e.complexity.AddUserEventPayload.NumUids == nil {
@@ -2513,6 +2577,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "DeleteUserEventFragmentPayload.msg":
+		if e.complexity.DeleteUserEventFragmentPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteUserEventFragmentPayload.Msg(childComplexity), true
+
+	case "DeleteUserEventFragmentPayload.numUids":
+		if e.complexity.DeleteUserEventFragmentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteUserEventFragmentPayload.NumUids(childComplexity), true
+
+	case "DeleteUserEventFragmentPayload.userEventFragment":
+		if e.complexity.DeleteUserEventFragmentPayload.UserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteUserEventFragmentPayload_userEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteUserEventFragmentPayload.UserEventFragment(childComplexity, args["filter"].(*model.UserEventFragmentFilter), args["order"].(*model.UserEventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteUserEventPayload.msg":
 		if e.complexity.DeleteUserEventPayload.Msg == nil {
 			break
@@ -3216,7 +3306,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddPendingUser(childComplexity, args["input"].([]*model.AddPendingUserInput)), true
+		return e.complexity.Mutation.AddPendingUser(childComplexity, args["input"].([]*model.AddPendingUserInput), args["upsert"].(*bool)), true
 
 	case "Mutation.addRoleExt":
 		if e.complexity.Mutation.AddRoleExt == nil {
@@ -3265,6 +3355,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddUserEvent(childComplexity, args["input"].([]*model.AddUserEventInput)), true
+
+	case "Mutation.addUserEventFragment":
+		if e.complexity.Mutation.AddUserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addUserEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddUserEventFragment(childComplexity, args["input"].([]*model.AddUserEventFragmentInput)), true
 
 	case "Mutation.addUserRights":
 		if e.complexity.Mutation.AddUserRights == nil {
@@ -3494,6 +3596,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteUserEvent(childComplexity, args["filter"].(model.UserEventFilter)), true
 
+	case "Mutation.deleteUserEventFragment":
+		if e.complexity.Mutation.DeleteUserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteUserEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteUserEventFragment(childComplexity, args["filter"].(model.UserEventFragmentFilter)), true
+
 	case "Mutation.deleteUserRights":
 		if e.complexity.Mutation.DeleteUserRights == nil {
 			break
@@ -3721,6 +3835,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUserEvent(childComplexity, args["input"].(model.UpdateUserEventInput)), true
+
+	case "Mutation.updateUserEventFragment":
+		if e.complexity.Mutation.UpdateUserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserEventFragment(childComplexity, args["input"].(model.UpdateUserEventFragmentInput)), true
 
 	case "Mutation.updateUserRights":
 		if e.complexity.Mutation.UpdateUserRights == nil {
@@ -4722,6 +4848,37 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PendingUser.Email(childComplexity), true
 
+	case "PendingUser.events":
+		if e.complexity.PendingUser.Events == nil {
+			break
+		}
+
+		args, err := ec.field_PendingUser_events_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.PendingUser.Events(childComplexity, args["filter"].(*model.UserEventFragmentFilter), args["order"].(*model.UserEventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "PendingUser.eventsAggregate":
+		if e.complexity.PendingUser.EventsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_PendingUser_eventsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.PendingUser.EventsAggregate(childComplexity, args["filter"].(*model.UserEventFragmentFilter)), true
+
+	case "PendingUser.token":
+		if e.complexity.PendingUser.Token == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.Token(childComplexity), true
+
 	case "PendingUserAggregateResult.count":
 		if e.complexity.PendingUserAggregateResult.Count == nil {
 			break
@@ -4742,6 +4899,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PendingUserAggregateResult.EmailMin(childComplexity), true
+
+	case "PendingUserAggregateResult.tokenMax":
+		if e.complexity.PendingUserAggregateResult.TokenMax == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.TokenMax(childComplexity), true
+
+	case "PendingUserAggregateResult.tokenMin":
+		if e.complexity.PendingUserAggregateResult.TokenMin == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.TokenMin(childComplexity), true
 
 	case "Point.latitude":
 		if e.complexity.Point.Latitude == nil {
@@ -5064,6 +5235,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateUserEvent(childComplexity, args["filter"].(*model.UserEventFilter)), true
 
+	case "Query.aggregateUserEventFragment":
+		if e.complexity.Query.AggregateUserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateUserEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateUserEventFragment(childComplexity, args["filter"].(*model.UserEventFragmentFilter)), true
+
 	case "Query.aggregateUserRights":
 		if e.complexity.Query.AggregateUserRights == nil {
 			break
@@ -5195,6 +5378,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetNotif(childComplexity, args["id"].(string)), true
+
+	case "Query.getPendingUser":
+		if e.complexity.Query.GetPendingUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getPendingUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetPendingUser(childComplexity, args["email"].(string)), true
 
 	case "Query.getPost":
 		if e.complexity.Query.GetPost == nil {
@@ -5471,6 +5666,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryUserEvent(childComplexity, args["filter"].(*model.UserEventFilter), args["order"].(*model.UserEventOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryUserEventFragment":
+		if e.complexity.Query.QueryUserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryUserEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryUserEventFragment(childComplexity, args["filter"].(*model.UserEventFragmentFilter), args["order"].(*model.UserEventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryUserRights":
 		if e.complexity.Query.QueryUserRights == nil {
@@ -6381,6 +6588,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "UpdateUserEventFragmentPayload.numUids":
+		if e.complexity.UpdateUserEventFragmentPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateUserEventFragmentPayload.NumUids(childComplexity), true
+
+	case "UpdateUserEventFragmentPayload.userEventFragment":
+		if e.complexity.UpdateUserEventFragmentPayload.UserEventFragment == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateUserEventFragmentPayload_userEventFragment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateUserEventFragmentPayload.UserEventFragment(childComplexity, args["filter"].(*model.UserEventFragmentFilter), args["order"].(*model.UserEventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "UpdateUserEventPayload.numUids":
 		if e.complexity.UpdateUserEventPayload.NumUids == nil {
 			break
@@ -6940,6 +7166,53 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserEventAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "UserEventFragment.createdAt":
+		if e.complexity.UserEventFragment.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserEventFragment.CreatedAt(childComplexity), true
+
+	case "UserEventFragment.event":
+		if e.complexity.UserEventFragment.Event == nil {
+			break
+		}
+
+		args, err := ec.field_UserEventFragment_event_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UserEventFragment.Event(childComplexity, args["filter"].(*model.EventKindFilter), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UserEventFragment.isRead":
+		if e.complexity.UserEventFragment.IsRead == nil {
+			break
+		}
+
+		return e.complexity.UserEventFragment.IsRead(childComplexity), true
+
+	case "UserEventFragmentAggregateResult.count":
+		if e.complexity.UserEventFragmentAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.UserEventFragmentAggregateResult.Count(childComplexity), true
+
+	case "UserEventFragmentAggregateResult.createdAtMax":
+		if e.complexity.UserEventFragmentAggregateResult.CreatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.UserEventFragmentAggregateResult.CreatedAtMax(childComplexity), true
+
+	case "UserEventFragmentAggregateResult.createdAtMin":
+		if e.complexity.UserEventFragmentAggregateResult.CreatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.UserEventFragmentAggregateResult.CreatedAtMin(childComplexity), true
 
 	case "UserRights.canCreateRoot":
 		if e.complexity.UserRights.CanCreateRoot == nil {
@@ -7523,6 +7796,10 @@ type Contract {
 
 type PendingUser {
   email: String
+  events(filter: UserEventFragmentFilter, order: UserEventFragmentOrder, first: Int, offset: Int): [UserEventFragment!]
+  token: String @hidden
+
+  eventsAggregate(filter: UserEventFragmentFilter): UserEventFragmentAggregateResult
 }
 
 type Vote {
@@ -7582,6 +7859,12 @@ type UserEvent {
   createdAt: DateTime!
   isRead: Boolean!
   user(filter: UserFilter): User!
+  event(filter: EventKindFilter, first: Int, offset: Int): [EventKind!]
+}
+
+type UserEventFragment {
+  createdAt: DateTime!
+  isRead: Boolean!
   event(filter: EventKindFilter, first: Int, offset: Int): [EventKind!]
 }
 
@@ -7736,37 +8019,37 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
 directive @lambda on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -7963,7 +8246,9 @@ type AddOrgaAggPayload {
 }
 
 input AddPendingUserInput {
-  email: String
+  email: String @w_alter(a:"lower")
+  events: [UserEventFragmentRef!]
+  token: String
 }
 
 type AddPendingUserPayload {
@@ -8016,6 +8301,17 @@ type AddTensionPayload {
   numUids: Int
 }
 
+input AddUserEventFragmentInput {
+  createdAt: DateTime!
+  isRead: Boolean!
+  event: [EventKindRef!]
+}
+
+type AddUserEventFragmentPayload {
+  userEventFragment(filter: UserEventFragmentFilter, order: UserEventFragmentOrder, first: Int, offset: Int): [UserEventFragment]
+  numUids: Int
+}
+
 input AddUserEventInput {
   createdAt: DateTime!
   isRead: Boolean!
@@ -8031,10 +8327,10 @@ type AddUserEventPayload {
 input AddUserInput {
   createdAt: DateTime!
   lastAck: DateTime!
-  username: String!
+  username: String! @w_add(a:"lower")
   name: String
   password: String!
-  email: String!
+  email: String! @w_alter(a:"lower")
   emailHash: String
   emailValidated: Boolean!
   bio: String
@@ -8472,6 +8768,12 @@ type DeleteTensionPayload {
   numUids: Int
 }
 
+type DeleteUserEventFragmentPayload {
+  userEventFragment(filter: UserEventFragmentFilter, order: UserEventFragmentOrder, first: Int, offset: Int): [UserEventFragment]
+  msg: String
+  numUids: Int
+}
+
 type DeleteUserEventPayload {
   userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   msg: String
@@ -8896,16 +9198,16 @@ type Mutation {
   addEventFragment(input: [AddEventFragmentInput!]!): AddEventFragmentPayload
   updateEventFragment(input: UpdateEventFragmentInput!): UpdateEventFragmentPayload
   deleteEventFragment(filter: EventFragmentFilter!): DeleteEventFragmentPayload
-  addContract(input: [AddContractInput!]!, upsert: Boolean @hook_addContractInput): AddContractPayload @hook_addContract
+  addContract(input: [AddContractInput!]! @hook_addContractInput, upsert: Boolean): AddContractPayload @hook_addContract
   updateContract(input: UpdateContractInput! @hook_updateContractInput): UpdateContractPayload @hook_updateContract
   deleteContract(filter: ContractFilter! @hook_deleteContractInput): DeleteContractPayload @hook_deleteContract
-  addPendingUser(input: [AddPendingUserInput!]!): AddPendingUserPayload
+  addPendingUser(input: [AddPendingUserInput!]!, upsert: Boolean): AddPendingUserPayload
   updatePendingUser(input: UpdatePendingUserInput!): UpdatePendingUserPayload
   deletePendingUser(filter: PendingUserFilter!): DeletePendingUserPayload
-  addVote(input: [AddVoteInput!]!, upsert: Boolean @hook_addVoteInput): AddVotePayload @hook_addVote
+  addVote(input: [AddVoteInput!]! @hook_addVoteInput, upsert: Boolean): AddVotePayload @hook_addVote
   updateVote(input: UpdateVoteInput! @hook_updateVoteInput): UpdateVotePayload @hook_updateVote
   deleteVote(filter: VoteFilter! @hook_deleteVoteInput): DeleteVotePayload @hook_deleteVote
-  addUser(input: [AddUserInput!]!, upsert: Boolean @hook_addUserInput): AddUserPayload @hook_addUser
+  addUser(input: [AddUserInput!]! @hook_addUserInput, upsert: Boolean): AddUserPayload @hook_addUser
   updateUser(input: UpdateUserInput! @hook_updateUserInput): UpdateUserPayload @hook_updateUser
   deleteUser(filter: UserFilter! @hook_deleteUserInput): DeleteUserPayload @hook_deleteUser
   addUserRights(input: [AddUserRightsInput!]!): AddUserRightsPayload
@@ -8914,6 +9216,9 @@ type Mutation {
   addUserEvent(input: [AddUserEventInput!]!): AddUserEventPayload
   updateUserEvent(input: UpdateUserEventInput!): UpdateUserEventPayload
   deleteUserEvent(filter: UserEventFilter!): DeleteUserEventPayload
+  addUserEventFragment(input: [AddUserEventFragmentInput!]!): AddUserEventFragmentPayload
+  updateUserEventFragment(input: UpdateUserEventFragmentInput!): UpdateUserEventFragmentPayload
+  deleteUserEventFragment(filter: UserEventFragmentFilter!): DeleteUserEventFragmentPayload
   addNotif(input: [AddNotifInput!]!): AddNotifPayload
   updateNotif(input: UpdateNotifInput!): UpdateNotifPayload
   deleteNotif(filter: NotifFilter!): DeleteNotifPayload
@@ -9311,9 +9616,12 @@ type PendingUserAggregateResult {
   count: Int
   emailMin: String
   emailMax: String
+  tokenMin: String
+  tokenMax: String
 }
 
 input PendingUserFilter {
+  email: StringHashFilter
   has: [PendingUserHasFilter]
   and: [PendingUserFilter]
   or: [PendingUserFilter]
@@ -9322,6 +9630,8 @@ input PendingUserFilter {
 
 enum PendingUserHasFilter {
   email
+  events
+  token
 }
 
 input PendingUserOrder {
@@ -9332,14 +9642,19 @@ input PendingUserOrder {
 
 enum PendingUserOrderable {
   email
+  token
 }
 
 input PendingUserPatch {
-  email: String @x_patch_ro
+  email: String @w_alter(a:"lower")
+  events: [UserEventFragmentRef!] @x_patch_ro
+  token: String @x_patch_ro
 }
 
 input PendingUserRef {
-  email: String
+  email: String @w_alter(a:"lower")
+  events: [UserEventFragmentRef!]
+  token: String
 }
 
 type Point {
@@ -9440,22 +9755,22 @@ type Query {
   getMandate(id: ID!): Mandate
   queryMandate(filter: MandateFilter, order: MandateOrder, first: Int, offset: Int): [Mandate]
   aggregateMandate(filter: MandateFilter): MandateAggregateResult
-  getLabel(id: ID! @hook_getLabelInput): Label
-  queryLabel(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int @hook_queryLabelInput): [Label]
+  getLabel(id: ID!): Label
+  queryLabel(filter: LabelFilter @hook_queryLabelInput, order: LabelOrder, first: Int, offset: Int): [Label]
   aggregateLabel(filter: LabelFilter): LabelAggregateResult
-  getRoleExt(id: ID! @hook_getRoleExtInput): RoleExt
-  queryRoleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int @hook_queryRoleExtInput): [RoleExt]
+  getRoleExt(id: ID!): RoleExt
+  queryRoleExt(filter: RoleExtFilter @hook_queryRoleExtInput, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   aggregateRoleExt(filter: RoleExtFilter): RoleExtAggregateResult
   queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
-  getTension(id: ID! @hook_getTensionInput): Tension
-  queryTension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int @hook_queryTensionInput): [Tension]
+  getTension(id: ID!): Tension
+  queryTension(filter: TensionFilter @hook_queryTensionInput, order: TensionOrder, first: Int, offset: Int): [Tension]
   aggregateTension(filter: TensionFilter): TensionAggregateResult
-  getComment(id: ID! @hook_getCommentInput): Comment
-  queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int @hook_queryCommentInput): [Comment]
+  getComment(id: ID!): Comment
+  queryComment(filter: CommentFilter @hook_queryCommentInput, order: CommentOrder, first: Int, offset: Int): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
   getBlob(id: ID!): Blob
   queryBlob(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
@@ -9465,22 +9780,25 @@ type Query {
   aggregateEvent(filter: EventFilter): EventAggregateResult
   queryEventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   aggregateEventFragment(filter: EventFragmentFilter): EventFragmentAggregateResult
-  getContract(id: ID, contractid: String @hook_getContractInput): Contract
-  queryContract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int @hook_queryContractInput): [Contract]
+  getContract(id: ID, contractid: String): Contract
+  queryContract(filter: ContractFilter @hook_queryContractInput, order: ContractOrder, first: Int, offset: Int): [Contract]
   aggregateContract(filter: ContractFilter): ContractAggregateResult
+  getPendingUser(email: String!): PendingUser
   queryPendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   aggregatePendingUser(filter: PendingUserFilter): PendingUserAggregateResult
-  getVote(id: ID, voteid: String @hook_getVoteInput): Vote
-  queryVote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int @hook_queryVoteInput): [Vote]
+  getVote(id: ID, voteid: String): Vote
+  queryVote(filter: VoteFilter @hook_queryVoteInput, order: VoteOrder, first: Int, offset: Int): [Vote]
   aggregateVote(filter: VoteFilter): VoteAggregateResult
-  getUser(id: ID, username: String @hook_getUserInput): User
-  queryUser(filter: UserFilter, order: UserOrder, first: Int, offset: Int @hook_queryUserInput): [User]
+  getUser(id: ID, username: String): User
+  queryUser(filter: UserFilter @hook_queryUserInput, order: UserOrder, first: Int, offset: Int): [User]
   aggregateUser(filter: UserFilter): UserAggregateResult
   queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
   aggregateUserRights(filter: UserRightsFilter): UserRightsAggregateResult
   getUserEvent(id: ID!): UserEvent
   queryUserEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   aggregateUserEvent(filter: UserEventFilter): UserEventAggregateResult
+  queryUserEventFragment(filter: UserEventFragmentFilter, order: UserEventFragmentOrder, first: Int, offset: Int): [UserEventFragment]
+  aggregateUserEventFragment(filter: UserEventFragmentFilter): UserEventFragmentAggregateResult
   getNotif(id: ID!): Notif
   queryNotif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
   aggregateNotif(filter: NotifFilter): NotifAggregateResult
@@ -9916,6 +10234,17 @@ type UpdateTensionPayload {
   numUids: Int
 }
 
+input UpdateUserEventFragmentInput {
+  filter: UserEventFragmentFilter!
+  set: UserEventFragmentPatch
+  remove: UserEventFragmentPatch
+}
+
+type UpdateUserEventFragmentPayload {
+  userEventFragment(filter: UserEventFragmentFilter, order: UserEventFragmentOrder, first: Int, offset: Int): [UserEventFragment]
+  numUids: Int
+}
+
 input UpdateUserEventInput {
   filter: UserEventFilter!
   set: UserEventPatch
@@ -9998,6 +10327,48 @@ input UserEventFilter {
   and: [UserEventFilter]
   or: [UserEventFilter]
   not: UserEventFilter
+}
+
+type UserEventFragmentAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+}
+
+input UserEventFragmentFilter {
+  createdAt: DateTimeFilter
+  has: [UserEventFragmentHasFilter]
+  and: [UserEventFragmentFilter]
+  or: [UserEventFragmentFilter]
+  not: UserEventFragmentFilter
+}
+
+enum UserEventFragmentHasFilter {
+  createdAt
+  isRead
+  event
+}
+
+input UserEventFragmentOrder {
+  asc: UserEventFragmentOrderable
+  desc: UserEventFragmentOrderable
+  then: UserEventFragmentOrder
+}
+
+enum UserEventFragmentOrderable {
+  createdAt
+}
+
+input UserEventFragmentPatch {
+  createdAt: DateTime @x_patch_ro
+  isRead: Boolean @x_patch_ro
+  event: [EventKindRef!] @x_patch_ro
+}
+
+input UserEventFragmentRef {
+  createdAt: DateTime
+  isRead: Boolean
+  event: [EventKindRef!]
 }
 
 enum UserEventHasFilter {
@@ -10091,7 +10462,7 @@ input UserPatch {
   username: String @x_patch_ro
   name: String @x_patch
   password: String @x_patch_ro
-  email: String @x_patch
+  email: String @w_alter(a:"lower")
   emailHash: String @x_patch_ro
   emailValidated: Boolean @x_patch_ro
   bio: String @x_patch
@@ -10112,10 +10483,10 @@ input UserRef {
   id: ID
   createdAt: DateTime
   lastAck: DateTime
-  username: String
+  username: String @w_add(a:"lower")
   name: String @x_patch
   password: String
-  email: String @x_patch
+  email: String @w_alter(a:"lower")
   emailHash: String
   emailValidated: Boolean
   bio: String @x_patch
@@ -11486,6 +11857,48 @@ func (ec *executionContext) field_AddTensionPayload_tension_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_AddUserEventFragmentPayload_userEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12617,6 +13030,48 @@ func (ec *executionContext) field_DeleteTensionPayload_tension_args(ctx context.
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteUserEventFragmentPayload_userEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -12982,16 +13437,9 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 	var arg0 []*model.AddContractInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddContractInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddContractInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddContractInputᚄ(ctx, tmp)
 		}
-	}
-	args["input"] = arg0
-	var arg1 *bool
-	if tmp, ok := rawArgs["upsert"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_addContractInput == nil {
 				return nil, errors.New("directive hook_addContractInput is not implemented")
@@ -13003,12 +13451,21 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
-		if data, ok := tmp.(*bool); ok {
-			arg1 = data
+		if data, ok := tmp.([]*model.AddContractInput); ok {
+			arg0 = data
 		} else if tmp == nil {
-			arg1 = nil
+			arg0 = nil
 		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp))
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddContractInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["upsert"] = arg1
@@ -13173,6 +13630,15 @@ func (ec *executionContext) field_Mutation_addPendingUser_args(ctx context.Conte
 		}
 	}
 	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["upsert"] = arg1
 	return args, nil
 }
 
@@ -13240,6 +13706,21 @@ func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addUserEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddUserEventFragmentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddUserEventFragmentInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventFragmentInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13276,16 +13757,9 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 	var arg0 []*model.AddUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddUserInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddUserInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserInputᚄ(ctx, tmp)
 		}
-	}
-	args["input"] = arg0
-	var arg1 *bool
-	if tmp, ok := rawArgs["upsert"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_addUserInput == nil {
 				return nil, errors.New("directive hook_addUserInput is not implemented")
@@ -13297,12 +13771,21 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
-		if data, ok := tmp.(*bool); ok {
-			arg1 = data
+		if data, ok := tmp.([]*model.AddUserInput); ok {
+			arg0 = data
 		} else if tmp == nil {
-			arg1 = nil
+			arg0 = nil
 		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp))
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddUserInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["upsert"] = arg1
@@ -13315,16 +13798,9 @@ func (ec *executionContext) field_Mutation_addVote_args(ctx context.Context, raw
 	var arg0 []*model.AddVoteInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddVoteInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddVoteInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddVoteInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddVoteInputᚄ(ctx, tmp)
 		}
-	}
-	args["input"] = arg0
-	var arg1 *bool
-	if tmp, ok := rawArgs["upsert"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, tmp) }
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hook_addVoteInput == nil {
 				return nil, errors.New("directive hook_addVoteInput is not implemented")
@@ -13336,12 +13812,21 @@ func (ec *executionContext) field_Mutation_addVote_args(ctx context.Context, raw
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
-		if data, ok := tmp.(*bool); ok {
-			arg1 = data
+		if data, ok := tmp.([]*model.AddVoteInput); ok {
+			arg0 = data
 		} else if tmp == nil {
-			arg1 = nil
+			arg0 = nil
 		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp))
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddVoteInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["upsert"] = arg1
@@ -13642,6 +14127,21 @@ func (ec *executionContext) field_Mutation_deleteTension_args(ctx context.Contex
 			arg0 = data
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.TensionFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteUserEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNUserEventFragmentFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["filter"] = arg0
@@ -14032,6 +14532,21 @@ func (ec *executionContext) field_Mutation_updateTension_args(ctx context.Contex
 			arg0 = data
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateTensionInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateUserEventFragmentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateUserEventFragmentInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventFragmentInput(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["input"] = arg0
@@ -14821,6 +15336,63 @@ func (ec *executionContext) field_Notif_tension__args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_PendingUser_eventsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_PendingUser_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Post_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15076,6 +15648,21 @@ func (ec *executionContext) field_Query_aggregateTension_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateUserEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateUserEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15157,22 +15744,9 @@ func (ec *executionContext) field_Query_getComment_args(ctx context.Context, raw
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getCommentInput == nil {
-				return nil, errors.New("directive hook_getCommentInput is not implemented")
-			}
-			return ec.directives.Hook_getCommentInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(string); ok {
-			arg0 = data
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+			return nil, err
 		}
 	}
 	args["id"] = arg0
@@ -15194,24 +15768,9 @@ func (ec *executionContext) field_Query_getContract_args(ctx context.Context, ra
 	var arg1 *string
 	if tmp, ok := rawArgs["contractid"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getContractInput == nil {
-				return nil, errors.New("directive hook_getContractInput is not implemented")
-			}
-			return ec.directives.Hook_getContractInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*string); ok {
-			arg1 = data
-		} else if tmp == nil {
-			arg1 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp))
+			return nil, err
 		}
 	}
 	args["contractid"] = arg1
@@ -15239,22 +15798,9 @@ func (ec *executionContext) field_Query_getLabel_args(ctx context.Context, rawAr
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getLabelInput == nil {
-				return nil, errors.New("directive hook_getLabelInput is not implemented")
-			}
-			return ec.directives.Hook_getLabelInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(string); ok {
-			arg0 = data
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+			return nil, err
 		}
 	}
 	args["id"] = arg0
@@ -15330,6 +15876,21 @@ func (ec *executionContext) field_Query_getNotif_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getPendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_getPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -15351,22 +15912,9 @@ func (ec *executionContext) field_Query_getRoleExt_args(ctx context.Context, raw
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getRoleExtInput == nil {
-				return nil, errors.New("directive hook_getRoleExtInput is not implemented")
-			}
-			return ec.directives.Hook_getRoleExtInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(string); ok {
-			arg0 = data
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+			return nil, err
 		}
 	}
 	args["id"] = arg0
@@ -15379,22 +15927,9 @@ func (ec *executionContext) field_Query_getTension_args(ctx context.Context, raw
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getTensionInput == nil {
-				return nil, errors.New("directive hook_getTensionInput is not implemented")
-			}
-			return ec.directives.Hook_getTensionInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(string); ok {
-			arg0 = data
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+			return nil, err
 		}
 	}
 	args["id"] = arg0
@@ -15431,24 +15966,9 @@ func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArg
 	var arg1 *string
 	if tmp, ok := rawArgs["username"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getUserInput == nil {
-				return nil, errors.New("directive hook_getUserInput is not implemented")
-			}
-			return ec.directives.Hook_getUserInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*string); ok {
-			arg1 = data
-		} else if tmp == nil {
-			arg1 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp))
+			return nil, err
 		}
 	}
 	args["username"] = arg1
@@ -15470,24 +15990,9 @@ func (ec *executionContext) field_Query_getVote_args(ctx context.Context, rawArg
 	var arg1 *string
 	if tmp, ok := rawArgs["voteid"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_getVoteInput == nil {
-				return nil, errors.New("directive hook_getVoteInput is not implemented")
-			}
-			return ec.directives.Hook_getVoteInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*string); ok {
-			arg1 = data
-		} else if tmp == nil {
-			arg1 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp))
+			return nil, err
 		}
 	}
 	args["voteid"] = arg1
@@ -15542,9 +16047,26 @@ func (ec *executionContext) field_Query_queryComment_args(ctx context.Context, r
 	var arg0 *model.CommentFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryCommentInput == nil {
+				return nil, errors.New("directive hook_queryCommentInput is not implemented")
+			}
+			return ec.directives.Hook_queryCommentInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.CommentFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CommentFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -15569,24 +16091,9 @@ func (ec *executionContext) field_Query_queryComment_args(ctx context.Context, r
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryCommentInput == nil {
-				return nil, errors.New("directive hook_queryCommentInput is not implemented")
-			}
-			return ec.directives.Hook_queryCommentInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -15599,9 +16106,26 @@ func (ec *executionContext) field_Query_queryContract_args(ctx context.Context, 
 	var arg0 *model.ContractFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryContractInput == nil {
+				return nil, errors.New("directive hook_queryContractInput is not implemented")
+			}
+			return ec.directives.Hook_queryContractInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ContractFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ContractFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -15626,24 +16150,9 @@ func (ec *executionContext) field_Query_queryContract_args(ctx context.Context, 
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryContractInput == nil {
-				return nil, errors.New("directive hook_queryContractInput is not implemented")
-			}
-			return ec.directives.Hook_queryContractInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -15740,9 +16249,26 @@ func (ec *executionContext) field_Query_queryLabel_args(ctx context.Context, raw
 	var arg0 *model.LabelFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryLabelInput == nil {
+				return nil, errors.New("directive hook_queryLabelInput is not implemented")
+			}
+			return ec.directives.Hook_queryLabelInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.LabelFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.LabelFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -15767,24 +16293,9 @@ func (ec *executionContext) field_Query_queryLabel_args(ctx context.Context, raw
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryLabelInput == nil {
-				return nil, errors.New("directive hook_queryLabelInput is not implemented")
-			}
-			return ec.directives.Hook_queryLabelInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -16091,9 +16602,26 @@ func (ec *executionContext) field_Query_queryRoleExt_args(ctx context.Context, r
 	var arg0 *model.RoleExtFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalORoleExtFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalORoleExtFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryRoleExtInput == nil {
+				return nil, errors.New("directive hook_queryRoleExtInput is not implemented")
+			}
+			return ec.directives.Hook_queryRoleExtInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.RoleExtFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.RoleExtFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -16118,24 +16646,9 @@ func (ec *executionContext) field_Query_queryRoleExt_args(ctx context.Context, r
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryRoleExtInput == nil {
-				return nil, errors.New("directive hook_queryRoleExtInput is not implemented")
-			}
-			return ec.directives.Hook_queryRoleExtInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -16148,9 +16661,26 @@ func (ec *executionContext) field_Query_queryTension_args(ctx context.Context, r
 	var arg0 *model.TensionFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryTensionInput == nil {
+				return nil, errors.New("directive hook_queryTensionInput is not implemented")
+			}
+			return ec.directives.Hook_queryTensionInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.TensionFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -16175,24 +16705,51 @@ func (ec *executionContext) field_Query_queryTension_args(ctx context.Context, r
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryTensionInput == nil {
-				return nil, errors.New("directive hook_queryTensionInput is not implemented")
-			}
-			return ec.directives.Hook_queryTensionInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
+			return nil, err
 		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryUserEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -16289,9 +16846,26 @@ func (ec *executionContext) field_Query_queryUser_args(ctx context.Context, rawA
 	var arg0 *model.UserFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryUserInput == nil {
+				return nil, errors.New("directive hook_queryUserInput is not implemented")
+			}
+			return ec.directives.Hook_queryUserInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.UserFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -16316,24 +16890,9 @@ func (ec *executionContext) field_Query_queryUser_args(ctx context.Context, rawA
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryUserInput == nil {
-				return nil, errors.New("directive hook_queryUserInput is not implemented")
-			}
-			return ec.directives.Hook_queryUserInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -16346,9 +16905,26 @@ func (ec *executionContext) field_Query_queryVote_args(ctx context.Context, rawA
 	var arg0 *model.VoteFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOVoteFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOVoteFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryVoteInput == nil {
+				return nil, errors.New("directive hook_queryVoteInput is not implemented")
+			}
+			return ec.directives.Hook_queryVoteInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.VoteFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.VoteFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -16373,24 +16949,9 @@ func (ec *executionContext) field_Query_queryVote_args(ctx context.Context, rawA
 	var arg3 *int
 	if tmp, ok := rawArgs["offset"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, tmp) }
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hook_queryVoteInput == nil {
-				return nil, errors.New("directive hook_queryVoteInput is not implemented")
-			}
-			return ec.directives.Hook_queryVoteInput(ctx, rawArgs, directive0)
-		}
-
-		tmp, err = directive1(ctx)
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if data, ok := tmp.(*int); ok {
-			arg3 = data
-		} else if tmp == nil {
-			arg3 = nil
-		} else {
-			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp))
+			return nil, err
 		}
 	}
 	args["offset"] = arg3
@@ -17600,6 +18161,48 @@ func (ec *executionContext) field_UpdateTensionPayload_tension_args(ctx context.
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateUserEventFragmentPayload_userEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserEventFragmentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserEventFragmentOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -17765,6 +18368,39 @@ func (ec *executionContext) field_UpdateVotePayload_vote_args(ctx context.Contex
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UserEventFragment_event_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventKindFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventKindFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -19279,6 +19915,71 @@ func (ec *executionContext) _AddTensionPayload_numUids(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AddTensionPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddUserEventFragmentPayload_userEventFragment(ctx context.Context, field graphql.CollectedField, obj *model.AddUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddUserEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_AddUserEventFragmentPayload_userEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserEventFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEventFragment)
+	fc.Result = res
+	return ec.marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AddUserEventFragmentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AddUserEventFragmentPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -23129,6 +23830,100 @@ func (ec *executionContext) _DeleteTensionPayload_numUids(ctx context.Context, f
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "DeleteTensionPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserEventFragmentPayload_userEventFragment(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteUserEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_DeleteUserEventFragmentPayload_userEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserEventFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEventFragment)
+	fc.Result = res
+	return ec.marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserEventFragmentPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteUserEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteUserEventFragmentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteUserEventFragmentPayload",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -27065,7 +27860,7 @@ func (ec *executionContext) _Mutation_addPendingUser(ctx context.Context, field 
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddPendingUser(rctx, args["input"].([]*model.AddPendingUserInput))
+		return ec.resolvers.Mutation().AddPendingUser(rctx, args["input"].([]*model.AddPendingUserInput), args["upsert"].(*bool))
 	})
 
 	if resTmp == nil {
@@ -27698,6 +28493,114 @@ func (ec *executionContext) _Mutation_deleteUserEvent(ctx context.Context, field
 	res := resTmp.(*model.DeleteUserEventPayload)
 	fc.Result = res
 	return ec.marshalODeleteUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addUserEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addUserEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddUserEventFragment(rctx, args["input"].([]*model.AddUserEventFragmentInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddUserEventFragmentPayload)
+	fc.Result = res
+	return ec.marshalOAddUserEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventFragmentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateUserEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateUserEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUserEventFragment(rctx, args["input"].(model.UpdateUserEventFragmentInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateUserEventFragmentPayload)
+	fc.Result = res
+	return ec.marshalOUpdateUserEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventFragmentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteUserEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteUserEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteUserEventFragment(rctx, args["filter"].(model.UserEventFragmentFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteUserEventFragmentPayload)
+	fc.Result = res
+	return ec.marshalODeleteUserEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventFragmentPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -31544,6 +32447,127 @@ func (ec *executionContext) _PendingUser_email(ctx context.Context, field graphq
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PendingUser_events(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_PendingUser_events_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Events, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEventFragment)
+	fc.Result = res
+	return ec.marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUser_token(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Token, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUser_eventsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_PendingUser_eventsAggregate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserEventFragmentAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserEventFragmentAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentAggregateResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PendingUserAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -31621,6 +32645,64 @@ func (ec *executionContext) _PendingUserAggregateResult_emailMax(ctx context.Con
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EmailMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_tokenMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TokenMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_tokenMax(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TokenMax, nil
 	})
 
 	if resTmp == nil {
@@ -33455,6 +34537,42 @@ func (ec *executionContext) _Query_aggregateContract(ctx context.Context, field 
 	return ec.marshalOContractAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractAggregateResult(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getPendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getPendingUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetPendingUser(rctx, args["email"].(string))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.PendingUser)
+	fc.Result = res
+	return ec.marshalOPendingUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_queryPendingUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -33921,6 +35039,78 @@ func (ec *executionContext) _Query_aggregateUserEvent(ctx context.Context, field
 	res := resTmp.(*model.UserEventAggregateResult)
 	fc.Result = res
 	return ec.marshalOUserEventAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_queryUserEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_queryUserEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryUserEventFragment(rctx, args["filter"].(*model.UserEventFragmentFilter), args["order"].(*model.UserEventFragmentOrder), args["first"].(*int), args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEventFragment)
+	fc.Result = res
+	return ec.marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_aggregateUserEventFragment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_aggregateUserEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateUserEventFragment(rctx, args["filter"].(*model.UserEventFragmentFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserEventFragmentAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserEventFragmentAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getNotif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -37297,6 +38487,71 @@ func (ec *executionContext) _UpdateTensionPayload_numUids(ctx context.Context, f
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UpdateUserEventFragmentPayload_userEventFragment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateUserEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UpdateUserEventFragmentPayload_userEventFragment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserEventFragment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.UserEventFragment)
+	fc.Result = res
+	return ec.marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateUserEventFragmentPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserEventFragmentPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateUserEventFragmentPayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UpdateUserEventPayload_userEvent(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserEventPayload) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -39425,6 +40680,193 @@ func (ec *executionContext) _UserEventAggregateResult_createdAtMax(ctx context.C
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "UserEventAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventFragment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.UserEventFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventFragment_isRead(ctx context.Context, field graphql.CollectedField, obj *model.UserEventFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRead, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventFragment_event(ctx context.Context, field graphql.CollectedField, obj *model.UserEventFragment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventFragment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_UserEventFragment_event_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Event, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.EventKind)
+	fc.Result = res
+	return ec.marshalOEventKind2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventFragmentAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.UserEventFragmentAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventFragmentAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventFragmentAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField, obj *model.UserEventFragmentAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventFragmentAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserEventFragmentAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField, obj *model.UserEventFragmentAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserEventFragmentAggregateResult",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -42748,7 +44190,43 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Email = data
+			} else if tmp == nil {
+				it.Email = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
+			it.Events, err = ec.unmarshalOUserEventFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			it.Token, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -43332,6 +44810,45 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddUserEventFragmentInput(ctx context.Context, obj interface{}) (model.AddUserEventFragmentInput, error) {
+	var it model.AddUserEventFragmentInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			it.IsRead, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			it.Event, err = ec.unmarshalOEventKindRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddUserEventInput(ctx context.Context, obj interface{}) (model.AddUserEventInput, error) {
 	var it model.AddUserEventInput
 	asMap := map[string]interface{}{}
@@ -43430,9 +44947,27 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Username = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
 			var err error
@@ -43454,9 +44989,27 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Email = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emailHash":
 			var err error
@@ -50792,6 +52345,14 @@ func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context,
 
 	for k, v := range asMap {
 		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "has":
 			var err error
 
@@ -50884,6 +52445,60 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Email = data
+			} else if tmp == nil {
+				it.Email = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserEventFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserEventFragmentRef); ok {
+				it.Events = data
+			} else if tmp == nil {
+				it.Events = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserEventFragmentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_patch_ro == nil {
 					return nil, errors.New("directive x_patch_ro is not implemented")
 				}
@@ -50895,9 +52510,9 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(*string); ok {
-				it.Email = data
+				it.Token = data
 			} else if tmp == nil {
-				it.Email = nil
+				it.Token = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -50921,7 +52536,43 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Email = data
+			} else if tmp == nil {
+				it.Email = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
+			it.Events, err = ec.unmarshalOUserEventFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			it.Token, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -54201,6 +55852,45 @@ func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserEventFragmentInput(ctx context.Context, obj interface{}) (model.UpdateUserEventFragmentInput, error) {
+	var it model.UpdateUserEventFragmentInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOUserEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOUserEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateUserEventInput(ctx context.Context, obj interface{}) (model.UpdateUserEventInput, error) {
 	var it model.UpdateUserEventInput
 	asMap := map[string]interface{}{}
@@ -54419,6 +56109,228 @@ func (ec *executionContext) unmarshalInputUserEventFilter(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
 			it.Not, err = ec.unmarshalOUserEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventFragmentFilter(ctx context.Context, obj interface{}) (model.UserEventFragmentFilter, error) {
+	var it model.UserEventFragmentFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOUserEventFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOUserEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOUserEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventFragmentOrder(ctx context.Context, obj interface{}) (model.UserEventFragmentOrder, error) {
+	var it model.UserEventFragmentOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOUserEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOUserEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventFragmentPatch(ctx context.Context, obj interface{}) (model.UserEventFragmentPatch, error) {
+	var it model.UserEventFragmentPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsRead = data
+			} else if tmp == nil {
+				it.IsRead = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventKindRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.EventKindRef); ok {
+				it.Event = data
+			} else if tmp == nil {
+				it.Event = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventKindRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserEventFragmentRef(ctx context.Context, obj interface{}) (model.UserEventFragmentRef, error) {
+	var it model.UserEventFragmentRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRead":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
+			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
+			it.Event, err = ec.unmarshalOEventKindRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -54928,10 +56840,14 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch == nil {
-					return nil, errors.New("directive x_patch is not implemented")
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -55365,9 +57281,29 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Username = data
+			} else if tmp == nil {
+				it.Username = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
 			var err error
@@ -55407,10 +57343,14 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch == nil {
-					return nil, errors.New("directive x_patch is not implemented")
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -57100,6 +59040,41 @@ func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var addUserEventFragmentPayloadImplementors = []string{"AddUserEventFragmentPayload"}
+
+func (ec *executionContext) _AddUserEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserEventFragmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addUserEventFragmentPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddUserEventFragmentPayload")
+		case "userEventFragment":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserEventFragmentPayload_userEventFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "numUids":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AddUserEventFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var addUserEventPayloadImplementors = []string{"AddUserEventPayload"}
 
 func (ec *executionContext) _AddUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserEventPayload) graphql.Marshaler {
@@ -58533,6 +60508,48 @@ func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.S
 	return out
 }
 
+var deleteUserEventFragmentPayloadImplementors = []string{"DeleteUserEventFragmentPayload"}
+
+func (ec *executionContext) _DeleteUserEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserEventFragmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserEventFragmentPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteUserEventFragmentPayload")
+		case "userEventFragment":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserEventFragmentPayload_userEventFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "msg":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserEventFragmentPayload_msg(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "numUids":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteUserEventFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteUserEventPayloadImplementors = []string{"DeleteUserEventPayload"}
 
 func (ec *executionContext) _DeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserEventPayload) graphql.Marshaler {
@@ -59743,6 +61760,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
+		case "addUserEventFragment":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addUserEventFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+		case "updateUserEventFragment":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserEventFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+		case "deleteUserEventFragment":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteUserEventFragment(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "addNotif":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addNotif(ctx, field)
@@ -60827,6 +62865,27 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = innerFunc(ctx)
 
+		case "events":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_events(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "token":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_token(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "eventsAggregate":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_eventsAggregate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -60865,6 +62924,20 @@ func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel
 		case "emailMax":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._PendingUserAggregateResult_emailMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "tokenMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_tokenMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "tokenMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_tokenMax(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -61877,6 +63950,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getPendingUser":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getPendingUser(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "queryPendingUser":
 			field := field
 
@@ -62127,6 +64220,46 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_aggregateUserEvent(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "queryUserEventFragment":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryUserEventFragment(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateUserEventFragment":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateUserEventFragment(ctx, field)
 				return res
 			}
 
@@ -63363,6 +65496,41 @@ func (ec *executionContext) _UpdateTensionPayload(ctx context.Context, sel ast.S
 	return out
 }
 
+var updateUserEventFragmentPayloadImplementors = []string{"UpdateUserEventFragmentPayload"}
+
+func (ec *executionContext) _UpdateUserEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserEventFragmentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserEventFragmentPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateUserEventFragmentPayload")
+		case "userEventFragment":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserEventFragmentPayload_userEventFragment(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "numUids":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateUserEventFragmentPayload_numUids(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var updateUserEventPayloadImplementors = []string{"UpdateUserEventPayload"}
 
 func (ec *executionContext) _UpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserEventPayload) graphql.Marshaler {
@@ -64007,6 +66175,96 @@ func (ec *executionContext) _UserEventAggregateResult(ctx context.Context, sel a
 		case "createdAtMax":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._UserEventAggregateResult_createdAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userEventFragmentImplementors = []string{"UserEventFragment"}
+
+func (ec *executionContext) _UserEventFragment(ctx context.Context, sel ast.SelectionSet, obj *model.UserEventFragment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userEventFragmentImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserEventFragment")
+		case "createdAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventFragment_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isRead":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventFragment_isRead(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "event":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventFragment_event(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userEventFragmentAggregateResultImplementors = []string{"UserEventFragmentAggregateResult"}
+
+func (ec *executionContext) _UserEventFragmentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserEventFragmentAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userEventFragmentAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserEventFragmentAggregateResult")
+		case "count":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventFragmentAggregateResult_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "createdAtMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventFragmentAggregateResult_createdAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "createdAtMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserEventFragmentAggregateResult_createdAtMax(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -65055,6 +67313,28 @@ func (ec *executionContext) unmarshalNAddTensionInput2ᚖfractaleᚋfractal6ᚗg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddUserEventFragmentInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventFragmentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserEventFragmentInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddUserEventFragmentInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddUserEventFragmentInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventFragmentInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddUserEventFragmentInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventFragmentInput(ctx context.Context, v interface{}) (*model.AddUserEventFragmentInput, error) {
+	res, err := ec.unmarshalInputAddUserEventFragmentInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddUserEventInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserEventInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -66043,6 +68323,11 @@ func (ec *executionContext) unmarshalNUpdateTensionInput2fractaleᚋfractal6ᚗg
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateUserEventFragmentInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventFragmentInput(ctx context.Context, v interface{}) (model.UpdateUserEventFragmentInput, error) {
+	res, err := ec.unmarshalInputUpdateUserEventFragmentInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateUserEventInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventInput(ctx context.Context, v interface{}) (model.UpdateUserEventInput, error) {
 	res, err := ec.unmarshalInputUpdateUserEventInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -66090,6 +68375,31 @@ func (ec *executionContext) unmarshalNUserEventFilter2fractaleᚋfractal6ᚗgo�
 
 func (ec *executionContext) unmarshalNUserEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx context.Context, v interface{}) (*model.UserEventFilter, error) {
 	res, err := ec.unmarshalInputUserEventFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserEventFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx context.Context, sel ast.SelectionSet, v *model.UserEventFragment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserEventFragment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUserEventFragmentFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx context.Context, v interface{}) (model.UserEventFragmentFilter, error) {
+	res, err := ec.unmarshalInputUserEventFragmentFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx context.Context, v interface{}) (*model.UserEventFragmentFilter, error) {
+	res, err := ec.unmarshalInputUserEventFragmentFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUserEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentRef(ctx context.Context, v interface{}) (*model.UserEventFragmentRef, error) {
+	res, err := ec.unmarshalInputUserEventFragmentRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -66583,6 +68893,13 @@ func (ec *executionContext) marshalOAddTensionPayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._AddTensionPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddUserEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddUserEventFragmentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddUserEventFragmentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddUserEventPayload) graphql.Marshaler {
@@ -67918,6 +70235,13 @@ func (ec *executionContext) marshalODeleteTensionPayload2ᚖfractaleᚋfractal6�
 		return graphql.Null
 	}
 	return ec._DeleteTensionPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteUserEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteUserEventFragmentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteUserEventFragmentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteUserEventPayload) graphql.Marshaler {
@@ -72277,6 +74601,13 @@ func (ec *executionContext) marshalOUpdateTensionPayload2ᚖfractaleᚋfractal6�
 	return ec._UpdateTensionPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOUpdateUserEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateUserEventFragmentPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateUserEventFragmentPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOUpdateUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateUserEventPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -72535,6 +74866,265 @@ func (ec *executionContext) unmarshalOUserEventFilter2ᚖfractaleᚋfractal6ᚗg
 	}
 	res, err := ec.unmarshalInputUserEventFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx context.Context, sel ast.SelectionSet, v []*model.UserEventFragment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUserEventFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUserEventFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.UserEventFragment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserEventFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUserEventFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragment(ctx context.Context, sel ast.SelectionSet, v *model.UserEventFragment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UserEventFragment(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUserEventFragmentAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.UserEventFragmentAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UserEventFragmentAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx context.Context, v interface{}) ([]*model.UserEventFragmentFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.UserEventFragmentFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentFilter(ctx context.Context, v interface{}) (*model.UserEventFragmentFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserEventFragmentFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx context.Context, v interface{}) ([]*model.UserEventFragmentHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.UserEventFragmentHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOUserEventFragmentHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOUserEventFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.UserEventFragmentHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUserEventFragmentHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx context.Context, v interface{}) (*model.UserEventFragmentHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.UserEventFragmentHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUserEventFragmentHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.UserEventFragmentHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrder(ctx context.Context, v interface{}) (*model.UserEventFragmentOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserEventFragmentOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrderable(ctx context.Context, v interface{}) (*model.UserEventFragmentOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.UserEventFragmentOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUserEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentOrderable(ctx context.Context, sel ast.SelectionSet, v *model.UserEventFragmentOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentPatch(ctx context.Context, v interface{}) (*model.UserEventFragmentPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserEventFragmentPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserEventFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentRefᚄ(ctx context.Context, v interface{}) ([]*model.UserEventFragmentRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.UserEventFragmentRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNUserEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFragmentRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOUserEventHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx context.Context, v interface{}) ([]*model.UserEventHasFilter, error) {

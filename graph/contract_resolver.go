@@ -3,6 +3,7 @@ package graph
 import (
     "fmt"
     "context"
+    "strings"
     "github.com/99designs/gqlgen/graphql"
 
     "fractale/fractal6.go/graph/model"
@@ -18,6 +19,48 @@ import (
 // Contract Resolver
 ////////////////////////////////////////////////
 
+
+func addContractInputHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    data, err := next(ctx)
+    if err != nil {
+        return data, err
+    }
+
+    // Move pendingCandidate to candidate if email exists in User
+    newData := data.([]*model.AddContractInput)
+    for i, input := range newData {
+        var pendings []*model.PendingUserRef
+        var candidates []*model.UserRef
+        for _, c := range input.PendingCandidates {
+            if c.Email == nil { continue }
+            if v, _ := db.GetDB().GetFieldByEq("User.email", *c.Email, "User.username"); v != nil {
+                username := v.(string)
+                candidates = append(candidates, &model.UserRef{Username: &username})
+                emailPart := strings.Split(*c.Email, "@")[0]
+                if input.Event.Old != nil && strings.HasPrefix(*input.Event.Old, emailPart) {
+                    newData[i].Event.Old = &username
+                }
+                if input.Event.New != nil && strings.HasPrefix(*input.Event.New, emailPart) {
+                    newData[i].Event.New = &username
+                }
+                newData[i].Contractid = codec.ContractIdCodec(
+                    *newData[i].Tension.ID,
+                    *newData[i].Event.EventType,
+                    *newData[i].Event.Old,
+                    *newData[i].Event.New,
+                )
+            } else if err := webauth.ValidateEmail(*c.Email); err != nil {
+                return nil, err
+            } else {
+               pendings = append(pendings, c)
+            }
+        }
+        newData[i].PendingCandidates = pendings
+        newData[i].Candidates = append(newData[i].Candidates, candidates...)
+    }
+
+    return newData, err
+}
 
 // Add Contract hook
 func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {

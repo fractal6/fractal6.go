@@ -465,9 +465,10 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     blob := GetBlob(tension)
     if blob == nil { return false, fmt.Errorf("blob not found.")}
     node := blob.Node
+    role_type := model.RoleType(*event.New)
 
-    if model.RoleType(*event.Old) == model.RoleTypeGuest {
-        rootid, e := codec.Nid2rootid(*event.New)
+    if role_type == model.RoleTypeGuest {
+        rootid, e := codec.Nid2rootid(tension.Emitter.Nameid)
         if e != nil { return ok, e }
         uctx.NoCache = true
         i := auth.UserIsGuest(uctx, rootid)
@@ -480,9 +481,9 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
         nf.FirstLink = &uctx.Username
         nf.Type = &t
         node = &nf
-    } else if model.RoleType(*event.Old) == model.RoleTypeRetired ||
-    model.RoleType(*event.Old) == model.RoleTypeMember ||
-    model.RoleType(*event.Old) == model.RoleTypePending {
+    } else if role_type == model.RoleTypeRetired ||
+    role_type == model.RoleTypeMember ||
+    role_type == model.RoleTypePending {
         return false, fmt.Errorf("You can not leave this role.")
     }
 

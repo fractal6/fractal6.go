@@ -207,7 +207,9 @@ type AddOrgaAggPayload struct {
 }
 
 type AddPendingUserInput struct {
-	Email *string `json:"email,omitempty"`
+	Email  *string                 `json:"email,omitempty"`
+	Events []*UserEventFragmentRef `json:"events,omitempty"`
+	Token  *string                 `json:"token,omitempty"`
 }
 
 type AddPendingUserPayload struct {
@@ -258,6 +260,17 @@ type AddTensionInput struct {
 type AddTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
 	NumUids *int       `json:"numUids"`
+}
+
+type AddUserEventFragmentInput struct {
+	CreatedAt string          `json:"createdAt,omitempty"`
+	IsRead    bool            `json:"isRead"`
+	Event     []*EventKindRef `json:"event,omitempty"`
+}
+
+type AddUserEventFragmentPayload struct {
+	UserEventFragment []*UserEventFragment `json:"userEventFragment,omitempty"`
+	NumUids           *int                 `json:"numUids"`
 }
 
 type AddUserEventInput struct {
@@ -696,6 +709,12 @@ type DeleteTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
 	NumUids *int       `json:"numUids"`
+}
+
+type DeleteUserEventFragmentPayload struct {
+	UserEventFragment []*UserEventFragment `json:"userEventFragment,omitempty"`
+	Msg               *string              `json:"msg,omitempty"`
+	NumUids           *int                 `json:"numUids"`
 }
 
 type DeleteUserEventPayload struct {
@@ -1398,20 +1417,26 @@ type OrgaAggRef struct {
 }
 
 type PendingUser struct {
-	Email *string `json:"email,omitempty"`
+	Email           *string                           `json:"email,omitempty"`
+	Events          []*UserEventFragment              `json:"events,omitempty"`
+	Token           *string                           `json:"token,omitempty"`
+	EventsAggregate *UserEventFragmentAggregateResult `json:"eventsAggregate,omitempty"`
 }
 
 type PendingUserAggregateResult struct {
 	Count    *int    `json:"count"`
 	EmailMin *string `json:"emailMin,omitempty"`
 	EmailMax *string `json:"emailMax,omitempty"`
+	TokenMin *string `json:"tokenMin,omitempty"`
+	TokenMax *string `json:"tokenMax,omitempty"`
 }
 
 type PendingUserFilter struct {
-	Has []*PendingUserHasFilter `json:"has,omitempty"`
-	And []*PendingUserFilter    `json:"and,omitempty"`
-	Or  []*PendingUserFilter    `json:"or,omitempty"`
-	Not *PendingUserFilter      `json:"not,omitempty"`
+	Email *StringHashFilter       `json:"email,omitempty"`
+	Has   []*PendingUserHasFilter `json:"has,omitempty"`
+	And   []*PendingUserFilter    `json:"and,omitempty"`
+	Or    []*PendingUserFilter    `json:"or,omitempty"`
+	Not   *PendingUserFilter      `json:"not,omitempty"`
 }
 
 type PendingUserOrder struct {
@@ -1421,11 +1446,15 @@ type PendingUserOrder struct {
 }
 
 type PendingUserPatch struct {
-	Email *string `json:"email,omitempty"`
+	Email  *string                 `json:"email,omitempty"`
+	Events []*UserEventFragmentRef `json:"events,omitempty"`
+	Token  *string                 `json:"token,omitempty"`
 }
 
 type PendingUserRef struct {
-	Email *string `json:"email,omitempty"`
+	Email  *string                 `json:"email,omitempty"`
+	Events []*UserEventFragmentRef `json:"events,omitempty"`
+	Token  *string                 `json:"token,omitempty"`
 }
 
 type Point struct {
@@ -1934,6 +1963,17 @@ type UpdateTensionPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
+type UpdateUserEventFragmentInput struct {
+	Filter *UserEventFragmentFilter `json:"filter,omitempty"`
+	Set    *UserEventFragmentPatch  `json:"set,omitempty"`
+	Remove *UserEventFragmentPatch  `json:"remove,omitempty"`
+}
+
+type UpdateUserEventFragmentPayload struct {
+	UserEventFragment []*UserEventFragment `json:"userEventFragment,omitempty"`
+	NumUids           *int                 `json:"numUids"`
+}
+
 type UpdateUserEventInput struct {
 	Filter *UserEventFilter `json:"filter,omitempty"`
 	Set    *UserEventPatch  `json:"set,omitempty"`
@@ -2055,6 +2095,44 @@ type UserEventFilter struct {
 	And       []*UserEventFilter    `json:"and,omitempty"`
 	Or        []*UserEventFilter    `json:"or,omitempty"`
 	Not       *UserEventFilter      `json:"not,omitempty"`
+}
+
+type UserEventFragment struct {
+	CreatedAt string      `json:"createdAt,omitempty"`
+	IsRead    bool        `json:"isRead"`
+	Event     []EventKind `json:"event,omitempty"`
+}
+
+type UserEventFragmentAggregateResult struct {
+	Count        *int    `json:"count"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+}
+
+type UserEventFragmentFilter struct {
+	CreatedAt *DateTimeFilter               `json:"createdAt,omitempty"`
+	Has       []*UserEventFragmentHasFilter `json:"has,omitempty"`
+	And       []*UserEventFragmentFilter    `json:"and,omitempty"`
+	Or        []*UserEventFragmentFilter    `json:"or,omitempty"`
+	Not       *UserEventFragmentFilter      `json:"not,omitempty"`
+}
+
+type UserEventFragmentOrder struct {
+	Asc  *UserEventFragmentOrderable `json:"asc,omitempty"`
+	Desc *UserEventFragmentOrderable `json:"desc,omitempty"`
+	Then *UserEventFragmentOrder     `json:"then,omitempty"`
+}
+
+type UserEventFragmentPatch struct {
+	CreatedAt *string         `json:"createdAt,omitempty"`
+	IsRead    *bool           `json:"isRead"`
+	Event     []*EventKindRef `json:"event,omitempty"`
+}
+
+type UserEventFragmentRef struct {
+	CreatedAt *string         `json:"createdAt,omitempty"`
+	IsRead    *bool           `json:"isRead"`
+	Event     []*EventKindRef `json:"event,omitempty"`
 }
 
 type UserEventOrder struct {
@@ -3840,16 +3918,20 @@ func (e OrgaAggOrderable) MarshalGQL(w io.Writer) {
 type PendingUserHasFilter string
 
 const (
-	PendingUserHasFilterEmail PendingUserHasFilter = "email"
+	PendingUserHasFilterEmail  PendingUserHasFilter = "email"
+	PendingUserHasFilterEvents PendingUserHasFilter = "events"
+	PendingUserHasFilterToken  PendingUserHasFilter = "token"
 )
 
 var AllPendingUserHasFilter = []PendingUserHasFilter{
 	PendingUserHasFilterEmail,
+	PendingUserHasFilterEvents,
+	PendingUserHasFilterToken,
 }
 
 func (e PendingUserHasFilter) IsValid() bool {
 	switch e {
-	case PendingUserHasFilterEmail:
+	case PendingUserHasFilterEmail, PendingUserHasFilterEvents, PendingUserHasFilterToken:
 		return true
 	}
 	return false
@@ -3880,15 +3962,17 @@ type PendingUserOrderable string
 
 const (
 	PendingUserOrderableEmail PendingUserOrderable = "email"
+	PendingUserOrderableToken PendingUserOrderable = "token"
 )
 
 var AllPendingUserOrderable = []PendingUserOrderable{
 	PendingUserOrderableEmail,
+	PendingUserOrderableToken,
 }
 
 func (e PendingUserOrderable) IsValid() bool {
 	switch e {
-	case PendingUserOrderableEmail:
+	case PendingUserOrderableEmail, PendingUserOrderableToken:
 		return true
 	}
 	return false
@@ -4505,6 +4589,88 @@ func (e *TensionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e TensionType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserEventFragmentHasFilter string
+
+const (
+	UserEventFragmentHasFilterCreatedAt UserEventFragmentHasFilter = "createdAt"
+	UserEventFragmentHasFilterIsRead    UserEventFragmentHasFilter = "isRead"
+	UserEventFragmentHasFilterEvent     UserEventFragmentHasFilter = "event"
+)
+
+var AllUserEventFragmentHasFilter = []UserEventFragmentHasFilter{
+	UserEventFragmentHasFilterCreatedAt,
+	UserEventFragmentHasFilterIsRead,
+	UserEventFragmentHasFilterEvent,
+}
+
+func (e UserEventFragmentHasFilter) IsValid() bool {
+	switch e {
+	case UserEventFragmentHasFilterCreatedAt, UserEventFragmentHasFilterIsRead, UserEventFragmentHasFilterEvent:
+		return true
+	}
+	return false
+}
+
+func (e UserEventFragmentHasFilter) String() string {
+	return string(e)
+}
+
+func (e *UserEventFragmentHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserEventFragmentHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserEventFragmentHasFilter", str)
+	}
+	return nil
+}
+
+func (e UserEventFragmentHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserEventFragmentOrderable string
+
+const (
+	UserEventFragmentOrderableCreatedAt UserEventFragmentOrderable = "createdAt"
+)
+
+var AllUserEventFragmentOrderable = []UserEventFragmentOrderable{
+	UserEventFragmentOrderableCreatedAt,
+}
+
+func (e UserEventFragmentOrderable) IsValid() bool {
+	switch e {
+	case UserEventFragmentOrderableCreatedAt:
+		return true
+	}
+	return false
+}
+
+func (e UserEventFragmentOrderable) String() string {
+	return string(e)
+}
+
+func (e *UserEventFragmentOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserEventFragmentOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserEventFragmentOrderable", str)
+	}
+	return nil
+}
+
+func (e UserEventFragmentOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

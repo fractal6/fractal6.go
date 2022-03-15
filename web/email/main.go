@@ -116,7 +116,18 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         }
     }
 
-    url_redirect = fmt.Sprintf("https://fractale.co/tension//%s?eid=%s", notif.Tid, ui.Eid)
+    url_redirect = fmt.Sprintf("https://fractale.co/tension//%s", notif.Tid)
+
+    if ui.Eid != "" {
+        // Eid var is used to mark the event as read from the client.
+        url_redirect += fmt.Sprintf("?eid=%s", ui.Eid)
+    } else if ui.Reason == model.ReasonIsPendingCandidate {
+        // Puid var is used to identify the pending users from client.
+        token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
+        if err != nil { return err }
+        url_redirect += fmt.Sprintf("?puid=%s", token)
+    }
+
     if createdAt := notif.GetCreatedAt(); createdAt != "" {
         url_redirect += fmt.Sprintf("&goto=%s", createdAt)
     }
@@ -259,9 +270,11 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
     if ui.User.Name != nil {
         rcpt_name = *ui.User.Name
-    } else {
+    } else if ui.User.Username != "" {
 		rcpt_name = "@" + ui.User.Username
-	}
+	} else {
+        rcpt_name = ""
+    }
 
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
 
@@ -296,20 +309,20 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         switch  e {
         case model.TensionEventUserJoined:
             t = fmt.Sprintf(`Hi %s,<br><br> Your are kindly invited as a new member by %s.<br>
-            You can see this invitation and, accept or reject it, by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
+            You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
         case model.TensionEventMemberLinked:
             t = fmt.Sprintf(`Hi %s,<br><br> Your are kindly invited to take a new role by %s.<br>
-            You can see this invitation and, accept or reject it, by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
+            You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
         default:
             t = fmt.Sprintf(`Hi %s,<br><br> Your have a new invitation from %s.<br>
-            You can see this invitation and, accept or reject it, by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
+            You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
         }
         return
     }
 
     // Other than candidate text for open contract
     default_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s](%s) A pending contract needs your attention", recv, e.ToContractText())
+        return fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())
     }
     default_payload := func(e model.TensionEvent) string {
         return fmt.Sprintf(`Hi %s,<br><br>
@@ -317,7 +330,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
 
     closed_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s](%s) contract accepted", recv, e.ToContractText())
+        return fmt.Sprintf("[%s][%s] contract accepted", recv, e.ToContractText())
     }
     closed_payload := func(e model.TensionEvent) string {
         return fmt.Sprintf(`Hi %s,<br><br>
@@ -325,7 +338,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
 
     canceled_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s](%s) contract canceled", recv, e.ToContractText())
+        return fmt.Sprintf("[%s][%s] contract canceled", recv, e.ToContractText())
     }
     canceled_payload := func(e model.TensionEvent) string {
         return fmt.Sprintf(`Hi %s,<br><br>
@@ -336,7 +349,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     e := notif.Contract.Event.EventType
     switch notif.Contract.Status {
     case model.ContractStatusOpen:
-        if ui.Reason == model.ReasonIsCandidate {
+        if ui.Reason == model.ReasonIsCandidate || ui.Reason == model.ReasonIsPendingCandidate {
             subject = candidate_subject(e)
             payload = candidate_payload(e)
         } else {

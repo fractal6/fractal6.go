@@ -80,10 +80,11 @@ func processTensionNotification(msg *redis.Message) {
         return
     }
 
-    // Push notification
+    // Push event in tension event history
     if err := graph.PushHistory(&notif); err != nil {
         log.Printf("PushHistory error: %v", err)
     }
+    // Push notification
     if err := graph.PushEventNotifications(notif); err != nil {
         log.Printf("PushEventNotifications error: %v", err)
     }

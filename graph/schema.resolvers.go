@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
+	. "fractale/fractal6.go/tools"
+	webauth "fractale/fractal6.go/web/auth"
 )
 
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (data *model.AddNodePayload, errors error) {
@@ -158,7 +160,13 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 }
 
 func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	// Inputs is updated in hooks.
+	// @debug: field with arguments will be ignored
+	_, uctx, err := webauth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+	errors = r.db.AddExtra(*uctx, "contract", input, upsert, GetQueryGraph(ctx), &data)
 	return data, errors
 }
 
@@ -172,7 +180,7 @@ func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.Cont
 	return data, errors
 }
 
-func (r *mutationResolver) AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput) (data *model.AddPendingUserPayload, errors error) {
+func (r *mutationResolver) AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput, upsert *bool) (data *model.AddPendingUserPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -232,6 +240,18 @@ func (r *mutationResolver) UpdateUserEvent(ctx context.Context, input model.Upda
 }
 
 func (r *mutationResolver) DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (data *model.DeleteUserEventPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) AddUserEventFragment(ctx context.Context, input []*model.AddUserEventFragmentInput) (data *model.AddUserEventFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateUserEventFragment(ctx context.Context, input model.UpdateUserEventFragmentInput) (data *model.UpdateUserEventFragmentPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteUserEventFragment(ctx context.Context, filter model.UserEventFragmentFilter) (data *model.DeleteUserEventFragmentPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -401,6 +421,10 @@ func (r *queryResolver) AggregateContract(ctx context.Context, filter *model.Con
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) GetPendingUser(ctx context.Context, email string) (data *model.PendingUser, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) (data []*model.PendingUser, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -452,6 +476,14 @@ func (r *queryResolver) QueryUserEvent(ctx context.Context, filter *model.UserEv
 }
 
 func (r *queryResolver) AggregateUserEvent(ctx context.Context, filter *model.UserEventFilter) (data *model.UserEventAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryUserEventFragment(ctx context.Context, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) (data []*model.UserEventFragment, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregateUserEventFragment(ctx context.Context, filter *model.UserEventFragmentFilter) (data *model.UserEventFragmentAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

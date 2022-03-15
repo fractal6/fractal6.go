@@ -62,6 +62,17 @@ var gqlQueries map[string]string = map[string]string{
             "input": {{.InputPayload}}
         }
     }`,
+    // Extra
+    "addExtra": `{
+        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!){
+            {{.QueryName}}{{.QueryInput}} {
+                {{.QueryGraph}}
+            }
+        }",
+        "variables": {
+            "input": {{.InputPayload}}
+        }
+    }`,
 }
 
 //
@@ -242,29 +253,46 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
     return err
 }
 
-// Like Update but with a given payload
-func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{}, qgraph string) (interface{}, error) {
+// Add codec, to be used in the resolver functions
+func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, upsert *bool, qg string, data interface{}) error {
     Vertex := strings.Title(vertex)
-    queryName := "update" + Vertex
-    inputType := "Update" + Vertex + "Input"
-    queryGraph := vertex + " {" + qgraph + "}"
+    queryName := "add" + Vertex
+    inputType := "Add" + Vertex + "Input"
+    //queryGraph := vertex + " {" + qgraph + "}"
 
     // Build the string request
-    inputs, _ := MarshalWithoutNil(input)
+    var queryInput string
+    if upsert != nil {
+        queryInput = fmt.Sprintf(`(input: $input, upsert: %t)`, *upsert)
+    } else {
+        queryInput = `(input: $input)`
+    }
+
+    var inputs string
+    slice, ok := InterfaceSlice(input)
+    if ok {
+        var ipts []string
+        for _, x := range slice {
+            s, _ := MarshalWithoutNil(x)
+            ipts = append(ipts, string(s))
+        }
+        inputs = "[" + strings.Join(ipts, ",") + "]"
+    } else {
+        x, _ := MarshalWithoutNil(input)
+        inputs = string(x)
+    }
+
     reqInput := map[string]string{
-        "QueryName": queryName, // function name (e.g addUser)
+        "QueryName": queryName, // Query name (e.g addUser)
         "InputType": inputType, // input type name (e.g AddUserInput)
+        "QueryInput": QuoteString(queryInput), // inputs data
+        "QueryGraph": CleanString(qg, true), // output data
         "InputPayload": string(inputs), // inputs data
-        "QueryGraph": CleanString(queryGraph, true), // output data
     }
 
     // Send request
-    payload := make(model.JsonAtom, 1)
-    err := dg.QueryGql(uctx, "update", reqInput, payload)
-    if payload[queryName] == nil && err == nil {
-        return nil, fmt.Errorf("Unauthorized request. Possibly, name already exists.")
-    }
-    return payload[queryName], err
+    err := dg.QueryGql(uctx, "addExtra", reqInput, data)
+    return err
 }
 
 //

@@ -126,7 +126,7 @@ func Init() gen.Config {
     //Contract
     c.Directives.Hook_getContractInput = nothing
     c.Directives.Hook_queryContractInput = nothing
-    c.Directives.Hook_addContractInput = nothing
+    c.Directives.Hook_addContractInput = addContractInputHook
     c.Directives.Hook_updateContractInput = setContextWithID // used by isOwner auth rule
     c.Directives.Hook_deleteContractInput = nothing
     // --

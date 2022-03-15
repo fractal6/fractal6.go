@@ -367,7 +367,7 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid({{.tid}})) @normalize {
             title: Tension.title
             receiverid: Tension.receiverid
-            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+            Tension.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message
                 Post.createdBy @filter(eq(User.username, "{{.username}}")) {
                     author_name: User.name
@@ -380,7 +380,7 @@ var dqlQueries map[string]string = map[string]string{
             Contract.tension {
                 receiverid: Tension.receiverid
             }
-            Contract.comments(first:1, orderdesc: Post.createdAt) @cascade {
+            Contract.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message
                 Post.createdBy @filter(eq(User.username, "{{.username}}")) {
                     author_name: User.name
@@ -606,7 +606,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 uids as User.events @filter(eq(UserEvent.isRead, "false")) @cascade {
-                    UserEvent.event @filter(type(Event))
+                    UserEvent.event @filter(NOT type(Contract))
                 }
             }
         }
@@ -623,6 +623,15 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         }
         `,
         M: `uid(uids) <UserEvent.isRead> "true" .`,
+    },
+    "setPendingUserToken": QueryMut{
+        Q: `query {
+            var(func: eq(PendingUser.email, "{{.email}}")) @filter(NOT has(PendingUser.token)) {
+                u as uid
+            }
+        }
+        `,
+        M: `uid(u) <PendingUser.token> "{{.token}}" .`,
     },
 }
 
