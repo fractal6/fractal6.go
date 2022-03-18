@@ -180,18 +180,6 @@ func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.Cont
 	return data, errors
 }
 
-func (r *mutationResolver) AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput, upsert *bool) (data *model.AddPendingUserPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) UpdatePendingUser(ctx context.Context, input model.UpdatePendingUserInput) (data *model.UpdatePendingUserPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeletePendingUser(ctx context.Context, filter model.PendingUserFilter) (data *model.DeletePendingUserPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (data *model.AddVotePayload, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
@@ -218,6 +206,18 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, filter model.UserFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) AddPendingUser(ctx context.Context, input []*model.AddPendingUserInput, upsert *bool) (data *model.AddPendingUserPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdatePendingUser(ctx context.Context, input model.UpdatePendingUserInput) (data *model.UpdatePendingUserPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeletePendingUser(ctx context.Context, filter model.PendingUserFilter) (data *model.DeletePendingUserPayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddUserRights(ctx context.Context, input []*model.AddUserRightsInput) (data *model.AddUserRightsPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -240,18 +240,6 @@ func (r *mutationResolver) UpdateUserEvent(ctx context.Context, input model.Upda
 }
 
 func (r *mutationResolver) DeleteUserEvent(ctx context.Context, filter model.UserEventFilter) (data *model.DeleteUserEventPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) AddUserEventFragment(ctx context.Context, input []*model.AddUserEventFragmentInput) (data *model.AddUserEventFragmentPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) UpdateUserEventFragment(ctx context.Context, input model.UpdateUserEventFragmentInput) (data *model.UpdateUserEventFragmentPayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteUserEventFragment(ctx context.Context, filter model.UserEventFragmentFilter) (data *model.DeleteUserEventFragmentPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -421,18 +409,6 @@ func (r *queryResolver) AggregateContract(ctx context.Context, filter *model.Con
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetPendingUser(ctx context.Context, email string) (data *model.PendingUser, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) (data []*model.PendingUser, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) AggregatePendingUser(ctx context.Context, filter *model.PendingUserFilter) (data *model.PendingUserAggregateResult, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) GetVote(ctx context.Context, id *string, voteid *string) (data *model.Vote, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -445,7 +421,7 @@ func (r *queryResolver) AggregateVote(ctx context.Context, filter *model.VoteFil
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string) (data *model.User, errors error) {
+func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string, email *string) (data *model.User, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
 	return data, errors
 }
@@ -456,6 +432,18 @@ func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter,
 }
 
 func (r *queryResolver) AggregateUser(ctx context.Context, filter *model.UserFilter) (data *model.UserAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetPendingUser(ctx context.Context, id *string, email *string) (data *model.PendingUser, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) (data []*model.PendingUser, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) AggregatePendingUser(ctx context.Context, filter *model.PendingUserFilter) (data *model.PendingUserAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -476,14 +464,6 @@ func (r *queryResolver) QueryUserEvent(ctx context.Context, filter *model.UserEv
 }
 
 func (r *queryResolver) AggregateUserEvent(ctx context.Context, filter *model.UserEventFilter) (data *model.UserEventAggregateResult, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) QueryUserEventFragment(ctx context.Context, filter *model.UserEventFragmentFilter, order *model.UserEventFragmentOrder, first *int, offset *int) (data []*model.UserEventFragment, errors error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) AggregateUserEventFragment(ctx context.Context, filter *model.UserEventFragmentFilter) (data *model.UserEventFragmentAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

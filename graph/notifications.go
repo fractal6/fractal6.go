@@ -9,7 +9,6 @@ import (
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/email"
-	"fractale/fractal6.go/web/sessions"
 )
 
 var ctx context.Context = context.Background()
@@ -56,6 +55,8 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
 
+    user_selection := "User.username User.email User.name User.notifyByEmail"
+
     {
         // Get Coordos
         coordos, err := auth.GetCoordosFromTid(tid)
@@ -68,7 +69,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
     {
         // Get First-link
-        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", "User.username User.email User.name")
+        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
         if err != nil { return users, err }
         if res != nil {
             var user model.User
@@ -82,7 +83,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
     if withAssignees {
         // Get Assignees
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", "User.username User.email User.name")
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", user_selection)
         if err != nil { return users, err }
         if assignees, ok := InterfaceSlice(res); ok {
             for _, u := range assignees {
@@ -97,7 +98,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
     if withSubscribers {
         // Get Subscribers
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", "User.username User.email User.name")
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", user_selection)
         if err != nil { return users, err }
         if subscribers, ok := InterfaceSlice(res); ok {
             for _, u := range subscribers {
@@ -170,6 +171,8 @@ func PushEventNotifications(notif model.EventNotif) error {
     for u, ui := range users {
         // Don't self notify.
         if u == notif.Uctx.Username { continue }
+        // Pending user has no history yet
+        if ui.Reason == model.ReasonIsPendingCandidate { continue }
 
         // User Event
         eid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
@@ -181,7 +184,7 @@ func PushEventNotifications(notif model.EventNotif) error {
         if err != nil { return err }
 
         // Email
-         if notif.Uctx.Rights.HasEmailNotifications {
+         if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail {
              ui.Eid = eid
              err = email.SendEventNotificationEmail(ui, notif)
              if err != nil { return err }
@@ -230,12 +233,17 @@ func PushContractNotifications(notif model.ContractNotif) error {
         // User Event
         var eid string
         if ui.Reason == model.ReasonIsPendingCandidate {
-            // Add a verification token if not exists
-            // (assumes PendingUser has already been created)
-            token := sessions.GenerateToken()
-            _, err := db.GetDB().Meta("setPendingUserToken", map[string]string{"email":u, "token":token})
+            // Update pending users
+            err = MaybeSetPendingUserToken(u)
+            if err != nil { return err }
+            // Link contract
+            err = db.GetDB().Update(db.GetDB().GetRootUctx(), "pendingUser", &model.UpdatePendingUserInput{
+                Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &u}},
+                Set: &model.PendingUserPatch{Contracts: []*model.ContractRef{&model.ContractRef{ID: &notif.Contract.ID}}},
+            })
             if err != nil { return err }
         } else {
+            // Push user event
             eid, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
                 User: &model.UserRef{Username: &u},
                 IsRead: false,
@@ -246,7 +254,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
         }
 
         // Email
-        if notif.Uctx.Rights.HasEmailNotifications &&
+        if notif.Uctx.Rights.HasEmailNotifications && (ui.User.NotifyByEmail || ui.Reason == model.ReasonIsPendingCandidate) &&
         (ui.Reason == model.ReasonIsCandidate ||
         ui.Reason == model.ReasonIsPendingCandidate ||
         ui.Reason == model.ReasonIsParticipant ||

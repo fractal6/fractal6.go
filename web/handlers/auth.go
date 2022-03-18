@@ -10,6 +10,7 @@ import (
 	"github.com/steambap/captcha"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/tools"
 	. "fractale/fractal6.go/tools"
@@ -58,6 +59,18 @@ func Signup(w http.ResponseWriter, r *http.Request) {
             http.Error(w, err.Error(), 500)
         }
 		return
+    }
+
+    // Check if user has pending invitations
+    if x, err := db.GetDB().Exists("PendingUser.email", creds.Email, nil, nil); err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+	} else if x {
+        err = graph.SyncPendingUser(creds.Username, creds.Email)
+        if err != nil {
+            http.Error(w, err.Error(), 500)
+            return
+        }
     }
 
 	// Create a new cookie with token

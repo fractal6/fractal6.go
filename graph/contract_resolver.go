@@ -36,6 +36,8 @@ func addContractInputHook(ctx context.Context, obj interface{}, next graphql.Res
             if v, _ := db.GetDB().GetFieldByEq("User.email", *c.Email, "User.username"); v != nil {
                 username := v.(string)
                 candidates = append(candidates, &model.UserRef{Username: &username})
+
+                // Update Contract
                 emailPart := strings.Split(*c.Email, "@")[0]
                 if input.Event.Old != nil && strings.HasPrefix(*input.Event.Old, emailPart) {
                     newData[i].Event.Old = &username

@@ -215,9 +215,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     // Buid email
     content := fmt.Sprintf(`<html>
     <head> <meta charset="utf-8"> </head>
-    <body>
-    %s
-    </body>
+    <body> %s </body>
     </html>`, payload)
 
     body = fmt.Sprintf(`{
@@ -269,9 +267,9 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         }
     }
     if ui.User.Name != nil {
-        rcpt_name = *ui.User.Name
+        rcpt_name = " " + *ui.User.Name
     } else if ui.User.Username != "" {
-		rcpt_name = "@" + ui.User.Username
+		rcpt_name = " @" + ui.User.Username
 	} else {
         rcpt_name = ""
     }
@@ -308,13 +306,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     candidate_payload := func(e model.TensionEvent	) (t string) {
         switch  e {
         case model.TensionEventUserJoined:
-            t = fmt.Sprintf(`Hi %s,<br><br> Your are kindly invited as a new member by %s.<br>
+            t = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited as a new member by %s.<br><br>
             You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
         case model.TensionEventMemberLinked:
-            t = fmt.Sprintf(`Hi %s,<br><br> Your are kindly invited to take a new role by %s.<br>
+            t = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited to take a new role by %s.<br><br>
             You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
         default:
-            t = fmt.Sprintf(`Hi %s,<br><br> Your have a new invitation from %s.<br>
+            t = fmt.Sprintf(`Hi%s,<br><br> Your have a new invitation from %s.<br><br>
             You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
         }
         return
@@ -325,7 +323,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         return fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())
     }
     default_payload := func(e model.TensionEvent) string {
-        return fmt.Sprintf(`Hi %s,<br><br>
+        return fmt.Sprintf(`Hi%s,<br><br>
         A vote is requested to process the following contract:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
     }
 
@@ -333,7 +331,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         return fmt.Sprintf("[%s][%s] contract accepted", recv, e.ToContractText())
     }
     closed_payload := func(e model.TensionEvent) string {
-        return fmt.Sprintf(`Hi %s,<br><br>
+        return fmt.Sprintf(`Hi%s,<br><br>
         The following contract has been accepted:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
     }
 
@@ -341,7 +339,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         return fmt.Sprintf("[%s][%s] contract canceled", recv, e.ToContractText())
     }
     canceled_payload := func(e model.TensionEvent) string {
-        return fmt.Sprintf(`Hi %s,<br><br>
+        return fmt.Sprintf(`Hi%s,<br><br>
         The following contract has been canceled:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
     }
 
@@ -390,9 +388,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     // Buid email
     content := fmt.Sprintf(`<html>
     <head> <meta charset="utf-8"> </head>
-    <body>
-    %s
-    </body>
+    <body> %s </body>
     </html>`, payload)
 
     body = fmt.Sprintf(`{

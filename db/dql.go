@@ -317,6 +317,7 @@ var dqlQueries map[string]string = map[string]string{
             User.username
             User.email
             User.name
+            User.notifyByEmail
         }
     }`,
     "getCoordosFromTid": `{
@@ -332,6 +333,7 @@ var dqlQueries map[string]string = map[string]string{
             User.username
             User.email
             User.name
+            User.notifyByEmail
         }
     }`,
     "getParents": `{
@@ -863,7 +865,7 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) 
         return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, id)
     } else if len(r.All) == 1 {
         if len(fields) > 1 {
-            return CleanCompositeName(r.All[0][fieldName].(model.JsonAtom), true), nil
+            return CleanCompositeName(r.All[0], true), nil
         } else {
             return r.All[0][fieldName], nil
         }
@@ -894,7 +896,7 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
         return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
     } else if len(r.All) == 1 {
         if len(fields) > 1 {
-            return CleanCompositeName(r.All[0][fieldName].(model.JsonAtom), true), nil
+            return CleanCompositeName(r.All[0], true), nil
         } else {
             return r.All[0][fieldName], nil
         }
@@ -1958,9 +1960,8 @@ func (dg Dgraph) RewriteContractId(cid string) error {
 // Deletions
 
 // DeepDelete delete edges recursively for type {t} and id {id}.
-// If {rid] is given, it represents the reverse node that should be cleaned up.
+// If {rid} is given, it represents the reverse node that should be cleaned up.
 func (dg Dgraph) DeepDelete(t string, id string) (error) {
-    var q string = "delete"
     var reverse string
     var query string
 
@@ -1976,9 +1977,8 @@ func (dg Dgraph) DeepDelete(t string, id string) (error) {
         return fmt.Errorf("delete query not implemented for this type %s", t)
     }
 
-    q = q + strings.Title(t)
     maps := map[string]string{"id": id}
-    query = dg.getDqlQuery(q, maps)
+    query = dg.getDqlQuery("delete" + strings.Title(t), maps)
     mu := fmt.Sprintf(`
         %s
         uid(all_ids) * * .

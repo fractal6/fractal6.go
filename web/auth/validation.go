@@ -93,7 +93,7 @@ var (
     }`)
     ErrPasswordRequirements = errors.New(`{
         "errors":[{
-            "message":"Password need to contains at least one number.",
+            "message":"Password need to contains at least one number and one letter.",
             "location": "password"
         }]
     }`)
@@ -256,6 +256,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         Email:          creds.Email,
         //EmailHash:      *string,
         EmailValidated: false,
+        NotifyByEmail: true,
         Name:           creds.Name,
         Password:       tools.HashPassword(creds.Password),
         Rights: &model.UserRightsRef{

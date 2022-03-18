@@ -207,9 +207,9 @@ type AddOrgaAggPayload struct {
 }
 
 type AddPendingUserInput struct {
-	Email  *string                 `json:"email,omitempty"`
-	Events []*UserEventFragmentRef `json:"events,omitempty"`
-	Token  *string                 `json:"token,omitempty"`
+	Email     *string        `json:"email,omitempty"`
+	Token     *string        `json:"token,omitempty"`
+	Contracts []*ContractRef `json:"contracts,omitempty"`
 }
 
 type AddPendingUserPayload struct {
@@ -262,17 +262,6 @@ type AddTensionPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
-type AddUserEventFragmentInput struct {
-	CreatedAt string          `json:"createdAt,omitempty"`
-	IsRead    bool            `json:"isRead"`
-	Event     []*EventKindRef `json:"event,omitempty"`
-}
-
-type AddUserEventFragmentPayload struct {
-	UserEventFragment []*UserEventFragment `json:"userEventFragment,omitempty"`
-	NumUids           *int                 `json:"numUids"`
-}
-
 type AddUserEventInput struct {
 	CreatedAt string          `json:"createdAt,omitempty"`
 	IsRead    bool            `json:"isRead"`
@@ -296,7 +285,7 @@ type AddUserInput struct {
 	EmailValidated   bool            `json:"emailValidated"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
-	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	NotifyByEmail    bool            `json:"notifyByEmail"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
@@ -709,12 +698,6 @@ type DeleteTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
 	NumUids *int       `json:"numUids"`
-}
-
-type DeleteUserEventFragmentPayload struct {
-	UserEventFragment []*UserEventFragment `json:"userEventFragment,omitempty"`
-	Msg               *string              `json:"msg,omitempty"`
-	NumUids           *int                 `json:"numUids"`
 }
 
 type DeleteUserEventPayload struct {
@@ -1417,10 +1400,11 @@ type OrgaAggRef struct {
 }
 
 type PendingUser struct {
-	Email           *string                           `json:"email,omitempty"`
-	Events          []*UserEventFragment              `json:"events,omitempty"`
-	Token           *string                           `json:"token,omitempty"`
-	EventsAggregate *UserEventFragmentAggregateResult `json:"eventsAggregate,omitempty"`
+	ID                 string                   `json:"id,omitempty"`
+	Email              *string                  `json:"email,omitempty"`
+	Token              *string                  `json:"token,omitempty"`
+	Contracts          []*Contract              `json:"contracts,omitempty"`
+	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 }
 
 type PendingUserAggregateResult struct {
@@ -1432,6 +1416,7 @@ type PendingUserAggregateResult struct {
 }
 
 type PendingUserFilter struct {
+	ID    []string                `json:"id,omitempty"`
 	Email *StringHashFilter       `json:"email,omitempty"`
 	Has   []*PendingUserHasFilter `json:"has,omitempty"`
 	And   []*PendingUserFilter    `json:"and,omitempty"`
@@ -1446,15 +1431,16 @@ type PendingUserOrder struct {
 }
 
 type PendingUserPatch struct {
-	Email  *string                 `json:"email,omitempty"`
-	Events []*UserEventFragmentRef `json:"events,omitempty"`
-	Token  *string                 `json:"token,omitempty"`
+	Email     *string        `json:"email,omitempty"`
+	Token     *string        `json:"token,omitempty"`
+	Contracts []*ContractRef `json:"contracts,omitempty"`
 }
 
 type PendingUserRef struct {
-	Email  *string                 `json:"email,omitempty"`
-	Events []*UserEventFragmentRef `json:"events,omitempty"`
-	Token  *string                 `json:"token,omitempty"`
+	ID        *string        `json:"id,omitempty"`
+	Email     *string        `json:"email,omitempty"`
+	Token     *string        `json:"token,omitempty"`
+	Contracts []*ContractRef `json:"contracts,omitempty"`
 }
 
 type Point struct {
@@ -1963,17 +1949,6 @@ type UpdateTensionPayload struct {
 	NumUids *int       `json:"numUids"`
 }
 
-type UpdateUserEventFragmentInput struct {
-	Filter *UserEventFragmentFilter `json:"filter,omitempty"`
-	Set    *UserEventFragmentPatch  `json:"set,omitempty"`
-	Remove *UserEventFragmentPatch  `json:"remove,omitempty"`
-}
-
-type UpdateUserEventFragmentPayload struct {
-	UserEventFragment []*UserEventFragment `json:"userEventFragment,omitempty"`
-	NumUids           *int                 `json:"numUids"`
-}
-
 type UpdateUserEventInput struct {
 	Filter *UserEventFilter `json:"filter,omitempty"`
 	Set    *UserEventPatch  `json:"set,omitempty"`
@@ -2030,7 +2005,7 @@ type User struct {
 	EmailValidated            bool                      `json:"emailValidated"`
 	Bio                       *string                   `json:"bio,omitempty"`
 	Utc                       *string                   `json:"utc,omitempty"`
-	NotifyByEmail             *bool                     `json:"notifyByEmail"`
+	NotifyByEmail             bool                      `json:"notifyByEmail"`
 	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
 	Rights                    *UserRights               `json:"rights,omitempty"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
@@ -2095,44 +2070,6 @@ type UserEventFilter struct {
 	And       []*UserEventFilter    `json:"and,omitempty"`
 	Or        []*UserEventFilter    `json:"or,omitempty"`
 	Not       *UserEventFilter      `json:"not,omitempty"`
-}
-
-type UserEventFragment struct {
-	CreatedAt string      `json:"createdAt,omitempty"`
-	IsRead    bool        `json:"isRead"`
-	Event     []EventKind `json:"event,omitempty"`
-}
-
-type UserEventFragmentAggregateResult struct {
-	Count        *int    `json:"count"`
-	CreatedAtMin *string `json:"createdAtMin,omitempty"`
-	CreatedAtMax *string `json:"createdAtMax,omitempty"`
-}
-
-type UserEventFragmentFilter struct {
-	CreatedAt *DateTimeFilter               `json:"createdAt,omitempty"`
-	Has       []*UserEventFragmentHasFilter `json:"has,omitempty"`
-	And       []*UserEventFragmentFilter    `json:"and,omitempty"`
-	Or        []*UserEventFragmentFilter    `json:"or,omitempty"`
-	Not       *UserEventFragmentFilter      `json:"not,omitempty"`
-}
-
-type UserEventFragmentOrder struct {
-	Asc  *UserEventFragmentOrderable `json:"asc,omitempty"`
-	Desc *UserEventFragmentOrderable `json:"desc,omitempty"`
-	Then *UserEventFragmentOrder     `json:"then,omitempty"`
-}
-
-type UserEventFragmentPatch struct {
-	CreatedAt *string         `json:"createdAt,omitempty"`
-	IsRead    *bool           `json:"isRead"`
-	Event     []*EventKindRef `json:"event,omitempty"`
-}
-
-type UserEventFragmentRef struct {
-	CreatedAt *string         `json:"createdAt,omitempty"`
-	IsRead    *bool           `json:"isRead"`
-	Event     []*EventKindRef `json:"event,omitempty"`
 }
 
 type UserEventOrder struct {
@@ -3918,20 +3855,20 @@ func (e OrgaAggOrderable) MarshalGQL(w io.Writer) {
 type PendingUserHasFilter string
 
 const (
-	PendingUserHasFilterEmail  PendingUserHasFilter = "email"
-	PendingUserHasFilterEvents PendingUserHasFilter = "events"
-	PendingUserHasFilterToken  PendingUserHasFilter = "token"
+	PendingUserHasFilterEmail     PendingUserHasFilter = "email"
+	PendingUserHasFilterToken     PendingUserHasFilter = "token"
+	PendingUserHasFilterContracts PendingUserHasFilter = "contracts"
 )
 
 var AllPendingUserHasFilter = []PendingUserHasFilter{
 	PendingUserHasFilterEmail,
-	PendingUserHasFilterEvents,
 	PendingUserHasFilterToken,
+	PendingUserHasFilterContracts,
 }
 
 func (e PendingUserHasFilter) IsValid() bool {
 	switch e {
-	case PendingUserHasFilterEmail, PendingUserHasFilterEvents, PendingUserHasFilterToken:
+	case PendingUserHasFilterEmail, PendingUserHasFilterToken, PendingUserHasFilterContracts:
 		return true
 	}
 	return false
@@ -4589,88 +4526,6 @@ func (e *TensionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e TensionType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type UserEventFragmentHasFilter string
-
-const (
-	UserEventFragmentHasFilterCreatedAt UserEventFragmentHasFilter = "createdAt"
-	UserEventFragmentHasFilterIsRead    UserEventFragmentHasFilter = "isRead"
-	UserEventFragmentHasFilterEvent     UserEventFragmentHasFilter = "event"
-)
-
-var AllUserEventFragmentHasFilter = []UserEventFragmentHasFilter{
-	UserEventFragmentHasFilterCreatedAt,
-	UserEventFragmentHasFilterIsRead,
-	UserEventFragmentHasFilterEvent,
-}
-
-func (e UserEventFragmentHasFilter) IsValid() bool {
-	switch e {
-	case UserEventFragmentHasFilterCreatedAt, UserEventFragmentHasFilterIsRead, UserEventFragmentHasFilterEvent:
-		return true
-	}
-	return false
-}
-
-func (e UserEventFragmentHasFilter) String() string {
-	return string(e)
-}
-
-func (e *UserEventFragmentHasFilter) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = UserEventFragmentHasFilter(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid UserEventFragmentHasFilter", str)
-	}
-	return nil
-}
-
-func (e UserEventFragmentHasFilter) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type UserEventFragmentOrderable string
-
-const (
-	UserEventFragmentOrderableCreatedAt UserEventFragmentOrderable = "createdAt"
-)
-
-var AllUserEventFragmentOrderable = []UserEventFragmentOrderable{
-	UserEventFragmentOrderableCreatedAt,
-}
-
-func (e UserEventFragmentOrderable) IsValid() bool {
-	switch e {
-	case UserEventFragmentOrderableCreatedAt:
-		return true
-	}
-	return false
-}
-
-func (e UserEventFragmentOrderable) String() string {
-	return string(e)
-}
-
-func (e *UserEventFragmentOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = UserEventFragmentOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid UserEventFragmentOrderable", str)
-	}
-	return nil
-}
-
-func (e UserEventFragmentOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

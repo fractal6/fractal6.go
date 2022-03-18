@@ -1,13 +1,14 @@
 package graph
 
 import (
-    "fmt"
-
-    "fractale/fractal6.go/graph/model"
-    "fractale/fractal6.go/graph/codec"
-    "fractale/fractal6.go/graph/auth"
-    "fractale/fractal6.go/db"
-    //. "fractale/fractal6.go/tools"
+	"fmt"
+    "strings"
+	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/graph/codec"
+	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/web/sessions"
+	. "fractale/fractal6.go/tools"
 )
 
 func LinkUser(rootnameid, nameid, username string) error {
@@ -101,3 +102,87 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     return fmt.Errorf("role upgrade not implemented: %s", rt)
 }
 
+// Pending user operations
+
+func MaybeSetPendingUserToken(email string) error {
+    // Add a verification token if not exists
+    // (assumes PendingUser has already been created)
+    token := sessions.GenerateToken()
+    _, err := db.GetDB().Meta("setPendingUserToken", map[string]string{"email":email, "token":token})
+    return err
+}
+
+func SyncPendingUser(username, email string) error {
+    // Get the linked contract
+    contracts, err := db.GetDB().GetSubFieldByEq("PendingUser.email", email, "PendingUser.contracts", "uid Post.createdAt")
+    if err != nil { return err }
+
+    // Build inputs
+    var inputs []model.AddUserEventInput
+    for _, c := range contracts.([]interface{}) {
+        // Aggregate event inputs
+        con := c.(model.JsonAtom)
+        cid := con["id"].(string)
+        createdAt, ok := con["createdAt"].(string)
+        if !ok { continue } // If a contract gets deletes, the uid only will subsits in the list.
+        inputs = append(inputs, model.AddUserEventInput{
+            User: &model.UserRef{Email: &email},
+            IsRead: false,
+            CreatedAt: createdAt,
+            Event: []*model.EventKindRef{&model.EventKindRef{ContractRef: &model.ContractRef{ID: &cid}}},
+        })
+
+        // Fetch contract
+        contract, err := db.GetDB().GetContractHook(cid)
+        if err != nil { return err }
+
+        // Update contract
+        // --
+        var contractPatch model.ContractPatch
+        // Set event type
+        StructMap(contract.Event, &contractPatch.Event)
+        // Set candidate
+        contractPatch.Candidates = []*model.UserRef{&model.UserRef{Email: &email}}
+        emailPart := strings.Split(email, "@")[0]
+        if contract.Event.Old != nil && strings.HasPrefix(*contract.Event.Old, emailPart) {
+            contractPatch.Event.Old = &username
+        }
+        if contract.Event.New != nil && strings.HasPrefix(*contract.Event.New, emailPart) {
+            contractPatch.Event.New = &username
+        }
+        contractid := codec.ContractIdCodec(
+            contract.Tension.ID,
+            *contractPatch.Event.EventType,
+            *contractPatch.Event.Old,
+            *contractPatch.Event.New,
+        )
+        contractPatch.Contractid = &contractid
+        err = db.DB.Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
+            Filter: &model.ContractFilter{ID: []string{cid}},
+            Set: &contractPatch,
+        })
+        if err != nil { return err }
+
+        // Do MaybeAddPendingNode for each invitation.
+        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+            // Add pending Nodes
+            for _, pc := range contract.PendingCandidates {
+                if *pc.Email == email {
+                    _, err = MaybeAddPendingNode(username, &model.Tension{ID: contract.Tension.ID})
+                    if err != nil { return err }
+                }
+            }
+        }
+    }
+
+    // Push user events
+    _, err = db.GetDB().AddMany(db.GetDB().GetRootUctx(), "userEvent", inputs)
+    if err != nil { return err }
+
+    // Remove pending user
+    err = db.DB.Delete(db.DB.GetRootUctx(), "pendingUser", model.PendingUserFilter{
+        Email: &model.StringHashFilter{Eq: &email},
+    })
+
+    return err
+}
