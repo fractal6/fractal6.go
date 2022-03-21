@@ -27,19 +27,21 @@ type UserCtx struct {
 
 // UserCreds are data sink/form for login request
 type UserCreds struct {
-    Username string  `json:"username"`
-    Email    string  `json:"email"`
-    Name     *string `json:"name"`
-    Password string  `json:"password"`
+    Username   string  `json:"username"`
+    Email      string  `json:"email"`
+    Name       *string `json:"name"`
+    Password   string  `json:"password"`
+    Puid       *string `json:"puid"`
+    EmailToken *string `json:"email_token"`
 }
 
 
 // OrgaForm are data sink/form for creating new organisation
 type OrgaForm struct {
-    Name    string   `json:"name"`
-    Nameid  string   `json:"nameid"`
-    About   *string  `json:"about"`
-    Purpose *string  `json:"purpose"`
+    Name    string  `json:"name"`
+    Nameid  string  `json:"nameid"`
+    About   *string `json:"about"`
+    Purpose *string `json:"purpose"`
 }
 
 //

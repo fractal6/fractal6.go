@@ -202,11 +202,6 @@ func ValidateNewUser(creds model.UserCreds) error {
     if err != nil {
         return err
     }
-    // Password validation
-    err = ValidatePassword(password)
-    if err != nil {
-        return err
-    }
     // Name validation
     if name != nil {
         err = ValidateName(*name)
@@ -214,12 +209,15 @@ func ValidateNewUser(creds model.UserCreds) error {
             return err
         }
     }
+    // Password validation
+    err = ValidatePassword(password)
+    if err != nil {
+        return err
+    }
     // TODO: password complexity check
 
-    DB := db.GetDB()
-
     // Chech username existence
-    ex1, err1 := DB.Exists("User.username", username, nil, nil)
+    ex1, err1 := db.DB.Exists("User.username", username, nil, nil)
     if err1 != nil {
         return err1
     }
@@ -227,7 +225,7 @@ func ValidateNewUser(creds model.UserCreds) error {
         return ErrUsernameExist
     }
     // Chech email existence
-    ex2, err2 := DB.Exists("User.email", email, nil, nil)
+    ex2, err2 := db.DB.Exists("User.email", email, nil, nil)
     if err2 != nil {
         return err2
     }
@@ -258,7 +256,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         EmailValidated: false,
         NotifyByEmail: true,
         Name:           creds.Name,
-        Password:       tools.HashPassword(creds.Password),
+        Password:       creds.Password,
         Rights: &model.UserRightsRef{
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,

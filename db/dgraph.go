@@ -40,6 +40,7 @@ type Dgraph struct {
     // HTTP/Graphql and GPRC/DQL client template
     gqlTemplates map[string]*QueryString
     dqlTemplates map[string]*QueryString
+    dqlMutTemplates map[string]*QueryString
 }
 
 type DgraphClaims struct {
@@ -149,8 +150,9 @@ func initDB() *Dgraph {
         fmt.Println("Dgraph Grpc addr:", grpcAddr)
     }
 
-    dqlT := map[string]*QueryString{}
     gqlT := map[string]*QueryString{}
+    dqlT := map[string]*QueryString{}
+    dqlMutT := map[string]*QueryString{}
 
     for op, q := range(dqlQueries) {
         dqlT[op] = &QueryString{Q:q}
@@ -159,6 +161,8 @@ func initDB() *Dgraph {
     for op, q := range(dqlMutations) {
         dqlT[op] = &QueryString{Q:q.Q}
         dqlT[op].Init()
+        dqlMutT[op] = &QueryString{Q:q.M}
+        dqlMutT[op].Init()
     }
     for op, q := range(gqlQueries) {
         gqlT[op] = &QueryString{Q:q}
@@ -168,14 +172,25 @@ func initDB() *Dgraph {
     return &Dgraph{
         gqlAddr: dgraphApiAddr,
         grpcAddr: grpcAddr,
-        dqlTemplates: dqlT,
         gqlTemplates: gqlT,
+        dqlTemplates: dqlT,
+        dqlMutTemplates: dqlMutT,
     }
 }
 
 //
 // Internals
 //
+
+func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
+    var q string
+    if _q, ok := dg.gqlTemplates[op]; ok {
+        q = _q.Format(m)
+    } else {
+        panic("unknonw GQL query op: " + op)
+    }
+    return q
+}
 
 func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
     var q string
@@ -187,12 +202,12 @@ func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
     return q
 }
 
-func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
+func (dg Dgraph) getDqlMutQuery(op string, m map[string]string) string {
     var q string
-    if _q, ok := dg.gqlTemplates[op]; ok {
+    if _q, ok := dg.dqlMutTemplates[op]; ok {
         q = _q.Format(m)
     } else {
-        panic("unknonw GQL query op: " + op)
+        panic("unknonw DQL query op: " + op)
     }
     return q
 }
@@ -360,7 +375,7 @@ func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Re
     defer txn.Discard(ctx)
 
     query := dg.getDqlQuery(op, maps)
-    muSet := dqlMutations[op].M
+    muSet := dg.getDqlMutQuery(op, maps)
 
     req := &api.Request{
         Query: query,
@@ -513,7 +528,7 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
         for k, val := range res.Data {
             v[k] = val
         }
-    default: // Payload data type
+    default: // Interface{} data type (Payload)
         var config *mapstructure.DecoderConfig
         if op == "query" || op == "rawQuery" {
             // Decoder config to handle aliased request

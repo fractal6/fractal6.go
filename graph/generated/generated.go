@@ -714,16 +714,28 @@ type ComplexityRoot struct {
 		Contracts          func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		ContractsAggregate func(childComplexity int, filter *model.ContractFilter) int
 		Email              func(childComplexity int) int
+		EmailToken         func(childComplexity int) int
 		ID                 func(childComplexity int) int
+		Password           func(childComplexity int) int
 		Token              func(childComplexity int) int
+		UpdatedAt          func(childComplexity int) int
+		Username           func(childComplexity int) int
 	}
 
 	PendingUserAggregateResult struct {
-		Count    func(childComplexity int) int
-		EmailMax func(childComplexity int) int
-		EmailMin func(childComplexity int) int
-		TokenMax func(childComplexity int) int
-		TokenMin func(childComplexity int) int
+		Count         func(childComplexity int) int
+		EmailMax      func(childComplexity int) int
+		EmailMin      func(childComplexity int) int
+		EmailTokenMax func(childComplexity int) int
+		EmailTokenMin func(childComplexity int) int
+		PasswordMax   func(childComplexity int) int
+		PasswordMin   func(childComplexity int) int
+		TokenMax      func(childComplexity int) int
+		TokenMin      func(childComplexity int) int
+		UpdatedAtMax  func(childComplexity int) int
+		UpdatedAtMin  func(childComplexity int) int
+		UsernameMax   func(childComplexity int) int
+		UsernameMin   func(childComplexity int) int
 	}
 
 	Point struct {
@@ -786,7 +798,7 @@ type ComplexityRoot struct {
 		GetNode                func(childComplexity int, id *string, nameid *string) int
 		GetNodeFragment        func(childComplexity int, id string) int
 		GetNotif               func(childComplexity int, id string) int
-		GetPendingUser         func(childComplexity int, id *string, email *string) int
+		GetPendingUser         func(childComplexity int, id *string, username *string, email *string) int
 		GetPost                func(childComplexity int, id string) int
 		GetRoleExt             func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
@@ -1203,7 +1215,7 @@ type QueryResolver interface {
 	GetUser(ctx context.Context, id *string, username *string, email *string) (*model.User, error)
 	QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) ([]*model.User, error)
 	AggregateUser(ctx context.Context, filter *model.UserFilter) (*model.UserAggregateResult, error)
-	GetPendingUser(ctx context.Context, id *string, email *string) (*model.PendingUser, error)
+	GetPendingUser(ctx context.Context, id *string, username *string, email *string) (*model.PendingUser, error)
 	QueryPendingUser(ctx context.Context, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) ([]*model.PendingUser, error)
 	AggregatePendingUser(ctx context.Context, filter *model.PendingUserFilter) (*model.PendingUserAggregateResult, error)
 	QueryUserRights(ctx context.Context, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) ([]*model.UserRights, error)
@@ -4754,6 +4766,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PendingUser.Email(childComplexity), true
 
+	case "PendingUser.email_token":
+		if e.complexity.PendingUser.EmailToken == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.EmailToken(childComplexity), true
+
 	case "PendingUser.id":
 		if e.complexity.PendingUser.ID == nil {
 			break
@@ -4761,12 +4780,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PendingUser.ID(childComplexity), true
 
+	case "PendingUser.password":
+		if e.complexity.PendingUser.Password == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.Password(childComplexity), true
+
 	case "PendingUser.token":
 		if e.complexity.PendingUser.Token == nil {
 			break
 		}
 
 		return e.complexity.PendingUser.Token(childComplexity), true
+
+	case "PendingUser.updatedAt":
+		if e.complexity.PendingUser.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.UpdatedAt(childComplexity), true
+
+	case "PendingUser.username":
+		if e.complexity.PendingUser.Username == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.Username(childComplexity), true
 
 	case "PendingUserAggregateResult.count":
 		if e.complexity.PendingUserAggregateResult.Count == nil {
@@ -4789,6 +4829,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PendingUserAggregateResult.EmailMin(childComplexity), true
 
+	case "PendingUserAggregateResult.email_tokenMax":
+		if e.complexity.PendingUserAggregateResult.EmailTokenMax == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.EmailTokenMax(childComplexity), true
+
+	case "PendingUserAggregateResult.email_tokenMin":
+		if e.complexity.PendingUserAggregateResult.EmailTokenMin == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.EmailTokenMin(childComplexity), true
+
+	case "PendingUserAggregateResult.passwordMax":
+		if e.complexity.PendingUserAggregateResult.PasswordMax == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.PasswordMax(childComplexity), true
+
+	case "PendingUserAggregateResult.passwordMin":
+		if e.complexity.PendingUserAggregateResult.PasswordMin == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.PasswordMin(childComplexity), true
+
 	case "PendingUserAggregateResult.tokenMax":
 		if e.complexity.PendingUserAggregateResult.TokenMax == nil {
 			break
@@ -4802,6 +4870,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PendingUserAggregateResult.TokenMin(childComplexity), true
+
+	case "PendingUserAggregateResult.updatedAtMax":
+		if e.complexity.PendingUserAggregateResult.UpdatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.UpdatedAtMax(childComplexity), true
+
+	case "PendingUserAggregateResult.updatedAtMin":
+		if e.complexity.PendingUserAggregateResult.UpdatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.UpdatedAtMin(childComplexity), true
+
+	case "PendingUserAggregateResult.usernameMax":
+		if e.complexity.PendingUserAggregateResult.UsernameMax == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.UsernameMax(childComplexity), true
+
+	case "PendingUserAggregateResult.usernameMin":
+		if e.complexity.PendingUserAggregateResult.UsernameMin == nil {
+			break
+		}
+
+		return e.complexity.PendingUserAggregateResult.UsernameMin(childComplexity), true
 
 	case "Point.latitude":
 		if e.complexity.Point.Latitude == nil {
@@ -5266,7 +5362,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetPendingUser(childComplexity, args["id"].(*string), args["email"].(*string)), true
+		return e.complexity.Query.GetPendingUser(childComplexity, args["id"].(*string), args["username"].(*string), args["email"].(*string)), true
 
 	case "Query.getPost":
 		if e.complexity.Query.GetPost == nil {
@@ -7639,7 +7735,11 @@ type User {
 
 type PendingUser {
   id: ID!
+  updatedAt: DateTime
+  username: String
+  password: String @hidden
   email: String @hidden
+  email_token: String @hidden
   token: String @hidden
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
 
@@ -7813,37 +7913,37 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8040,7 +8140,11 @@ type AddOrgaAggPayload {
 }
 
 input AddPendingUserInput {
+  updatedAt: DateTime
+  username: String @w_alter(a:"lower")
+  password: String
   email: String @w_alter(a:"lower")
+  email_token: String
   token: String
   contracts: [ContractRef!]
 }
@@ -9388,15 +9492,26 @@ input OrgaAggRef {
 
 type PendingUserAggregateResult {
   count: Int
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
+  usernameMin: String
+  usernameMax: String
+  passwordMin: String
+  passwordMax: String
   emailMin: String
   emailMax: String
+  email_tokenMin: String
+  email_tokenMax: String
   tokenMin: String
   tokenMax: String
 }
 
 input PendingUserFilter {
   id: [ID!]
+  username: StringHashFilter
   email: StringHashFilter
+  email_token: StringHashFilter
+  token: StringHashFilter
   has: [PendingUserHasFilter]
   and: [PendingUserFilter]
   or: [PendingUserFilter]
@@ -9404,7 +9519,11 @@ input PendingUserFilter {
 }
 
 enum PendingUserHasFilter {
+  updatedAt
+  username
+  password
   email
+  email_token
   token
   contracts
 }
@@ -9416,19 +9535,31 @@ input PendingUserOrder {
 }
 
 enum PendingUserOrderable {
+  updatedAt
+  username
+  password
   email
+  email_token
   token
 }
 
 input PendingUserPatch {
+  updatedAt: DateTime @x_patch_ro
+  username: String @w_alter(a:"lower")
+  password: String @x_patch_ro
   email: String @w_alter(a:"lower")
+  email_token: String @x_patch_ro
   token: String @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
 }
 
 input PendingUserRef {
   id: ID
+  updatedAt: DateTime
+  username: String @w_alter(a:"lower")
+  password: String
   email: String @w_alter(a:"lower")
+  email_token: String
   token: String
   contracts: [ContractRef!]
 }
@@ -9565,7 +9696,7 @@ type Query {
   getUser(id: ID, username: String, email: String): User
   queryUser(filter: UserFilter @hook_queryUserInput, order: UserOrder, first: Int, offset: Int): [User]
   aggregateUser(filter: UserFilter): UserAggregateResult
-  getPendingUser(id: ID, email: String): PendingUser
+  getPendingUser(id: ID, username: String, email: String): PendingUser
   queryPendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   aggregatePendingUser(filter: PendingUserFilter): PendingUserAggregateResult
   queryUserRights(filter: UserRightsFilter, order: UserRightsOrder, first: Int, offset: Int): [UserRights]
@@ -15466,14 +15597,23 @@ func (ec *executionContext) field_Query_getPendingUser_args(ctx context.Context,
 	}
 	args["id"] = arg0
 	var arg1 *string
-	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+	if tmp, ok := rawArgs["username"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["email"] = arg1
+	args["username"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg2
 	return args, nil
 }
 
@@ -31661,6 +31801,113 @@ func (ec *executionContext) _PendingUser_id(ctx context.Context, field graphql.C
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PendingUser_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUser_username(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUser_password(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Password, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PendingUser_email(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -31681,6 +31928,55 @@ func (ec *executionContext) _PendingUser_email(ctx context.Context, field graphq
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
 			return obj.Email, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hidden == nil {
+				return nil, errors.New("directive hidden is not implemented")
+			}
+			return ec.directives.Hidden(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUser_email_token(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.EmailToken, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Hidden == nil {
@@ -31860,6 +32156,180 @@ func (ec *executionContext) _PendingUserAggregateResult_count(ctx context.Contex
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PendingUserAggregateResult_updatedAtMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_updatedAtMax(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_usernameMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UsernameMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_usernameMax(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UsernameMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_passwordMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PasswordMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_passwordMax(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PasswordMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PendingUserAggregateResult_emailMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -31908,6 +32378,64 @@ func (ec *executionContext) _PendingUserAggregateResult_emailMax(ctx context.Con
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EmailMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_email_tokenMin(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailTokenMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PendingUserAggregateResult_email_tokenMax(ctx context.Context, field graphql.CollectedField, obj *model.PendingUserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PendingUserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailTokenMax, nil
 	})
 
 	if resTmp == nil {
@@ -34041,7 +34569,7 @@ func (ec *executionContext) _Query_getPendingUser(ctx context.Context, field gra
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetPendingUser(rctx, args["id"].(*string), args["email"].(*string))
+		return ec.resolvers.Query().GetPendingUser(rctx, args["id"].(*string), args["username"].(*string), args["email"].(*string))
 	})
 
 	if resTmp == nil {
@@ -43128,6 +43656,50 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 
 	for k, v := range asMap {
 		switch k {
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Username = data
+			} else if tmp == nil {
+				it.Username = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "email":
 			var err error
 
@@ -43155,6 +43727,14 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "email_token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
+			it.EmailToken, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		case "token":
 			var err error
@@ -51256,11 +51836,35 @@ func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "email":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email_token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
+			it.EmailToken, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			it.Token, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -51350,6 +51954,82 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 
 	for k, v := range asMap {
 		switch k {
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Username = data
+			} else if tmp == nil {
+				it.Username = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Password = data
+			} else if tmp == nil {
+				it.Password = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "email":
 			var err error
 
@@ -51374,6 +52054,30 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				it.Email = data
 			} else if tmp == nil {
 				it.Email = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "email_token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.EmailToken = data
+			} else if tmp == nil {
+				it.EmailToken = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -51451,6 +52155,50 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Username = data
+			} else if tmp == nil {
+				it.Username = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "email":
 			var err error
 
@@ -51478,6 +52226,14 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "email_token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
+			it.EmailToken, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		case "token":
 			var err error
@@ -61428,9 +62184,37 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updatedAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "username":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_username(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "password":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_password(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "email":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._PendingUser_email(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "email_token":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUser_email_token(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -61484,6 +62268,48 @@ func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel
 
 			out.Values[i] = innerFunc(ctx)
 
+		case "updatedAtMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_updatedAtMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "updatedAtMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_updatedAtMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "usernameMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_usernameMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "usernameMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_usernameMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "passwordMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_passwordMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "passwordMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_passwordMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "emailMin":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._PendingUserAggregateResult_emailMin(ctx, field, obj)
@@ -61494,6 +62320,20 @@ func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel
 		case "emailMax":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._PendingUserAggregateResult_emailMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "email_tokenMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_email_tokenMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "email_tokenMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PendingUserAggregateResult_email_tokenMax(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

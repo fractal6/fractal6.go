@@ -435,7 +435,7 @@ func (r *queryResolver) AggregateUser(ctx context.Context, filter *model.UserFil
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetPendingUser(ctx context.Context, id *string, email *string) (data *model.PendingUser, errors error) {
+func (r *queryResolver) GetPendingUser(ctx context.Context, id *string, username *string, email *string) (data *model.PendingUser, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

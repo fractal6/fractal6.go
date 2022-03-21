@@ -28,6 +28,13 @@ func IsOlder(d1, d2 string) bool {
     return date1.Before(date2)
 }
 
+//TimeDelta returns the time difference (Duration) d1 - d2
+func TimeDelta(d1, d2 string) time.Duration {
+    date1, _ := time.Parse(time.RFC3339, d1)
+    date2, _ := time.Parse(time.RFC3339, d2)
+    return date1.Sub(date2)
+}
+
 //InitViper Read the config file
 func InitViper() {
 	viper.AddConfigPath("./")

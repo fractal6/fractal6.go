@@ -29,6 +29,7 @@ func init() {
     maintainerEmail = viper.GetString("server.maintainer_email")
 }
 
+// Send an email with a http request to the email server API to the admin email.
 func SendMaintainerEmail(subject, body string) error {
     body = fmt.Sprintf(`{
         "from": "%s <alert@fractale.co>",
@@ -55,7 +56,45 @@ func SendMaintainerEmail(subject, body string) error {
     return nil
 }
 
-// Post send an email with a http request to the email server API
+// Send an verification email for signup
+func SendVerificationEmail(email, token string) error {
+    url_redirect := fmt.Sprintf("https://fractale.co/verification?token=%s", token)
+
+    content := fmt.Sprintf(`<html>
+	<head>
+	<title>Activate your Fractale account</title>
+	<meta charset="utf-8">
+	</head>
+	<body>
+	<p>To activate your account at <b>fractale.co</b>, click the link below (valid one hour):</p>
+	<a href="%s">%s</a>
+	<br><br>—
+	<small>If you are not at the origin of this request, please ignore this mail.</small>
+	</body>
+    </html>`, url_redirect, url_redirect)
+
+    body := fmt.Sprintf(`{
+        "from": "Fractale <noreply@fractale.co>",
+        "to": ["%s"],
+        "subject": "Activate yout account at fractale.co",
+        "html_body": "%s"
+    }`, email, tools.CleanString(content, true))
+
+    req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("X-Server-API-Key", emailSecret)
+
+    customTransport := http.DefaultTransport.(*http.Transport).Clone()
+    customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+    client := &http.Client{Transport: customTransport}
+    resp, err := client.Do(req)
+    if err != nil { return err }
+    defer resp.Body.Close()
+
+    return nil
+}
+
+// Send an email to reset a user password
 func SendResetEmail(email, token string) error {
     url_redirect := fmt.Sprintf("https://fractale.co/password-reset?x=%s", token)
 
@@ -121,11 +160,6 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     if ui.Eid != "" {
         // Eid var is used to mark the event as read from the client.
         url_redirect += fmt.Sprintf("?eid=%s", ui.Eid)
-    } else if ui.Reason == model.ReasonIsPendingCandidate {
-        // Puid var is used to identify the pending users from client.
-        token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
-        if err != nil { return err }
-        url_redirect += fmt.Sprintf("?puid=%s", token)
     }
 
     if createdAt := notif.GetCreatedAt(); createdAt != "" {
@@ -275,6 +309,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
 
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
+
+    if ui.Reason == model.ReasonIsPendingCandidate {
+        // Puid var is used to identify the pending users from client.
+        token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
+        if err != nil { return err }
+        url_redirect += fmt.Sprintf("?puid=%s", token)
+    }
 
     // Fetch tension data
     if m, err := db.GetDB().Meta("getLastContractComment", map[string]string{"cid":notif.Contract.ID, "username": notif.Uctx.Username}); err != nil {

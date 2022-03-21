@@ -79,7 +79,7 @@ var gqlQueries map[string]string = map[string]string{
 // Graphql requests
 //
 
-// Get a new vertex
+// Get a new vertex (NOT USED YET...)
 func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string, graph string) (interface{}, error) {
     Vertex := strings.Title(vertex)
     queryName := "get" + Vertex

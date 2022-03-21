@@ -207,9 +207,13 @@ type AddOrgaAggPayload struct {
 }
 
 type AddPendingUserInput struct {
-	Email     *string        `json:"email,omitempty"`
-	Token     *string        `json:"token,omitempty"`
-	Contracts []*ContractRef `json:"contracts,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
+	Username   *string        `json:"username,omitempty"`
+	Password   *string        `json:"password,omitempty"`
+	Email      *string        `json:"email,omitempty"`
+	EmailToken *string        `json:"email_token,omitempty"`
+	Token      *string        `json:"token,omitempty"`
+	Contracts  []*ContractRef `json:"contracts,omitempty"`
 }
 
 type AddPendingUserPayload struct {
@@ -1401,27 +1405,42 @@ type OrgaAggRef struct {
 
 type PendingUser struct {
 	ID                 string                   `json:"id,omitempty"`
+	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
+	Username           *string                  `json:"username,omitempty"`
+	Password           *string                  `json:"password,omitempty"`
 	Email              *string                  `json:"email,omitempty"`
+	EmailToken         *string                  `json:"email_token,omitempty"`
 	Token              *string                  `json:"token,omitempty"`
 	Contracts          []*Contract              `json:"contracts,omitempty"`
 	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 }
 
 type PendingUserAggregateResult struct {
-	Count    *int    `json:"count"`
-	EmailMin *string `json:"emailMin,omitempty"`
-	EmailMax *string `json:"emailMax,omitempty"`
-	TokenMin *string `json:"tokenMin,omitempty"`
-	TokenMax *string `json:"tokenMax,omitempty"`
+	Count         *int    `json:"count"`
+	UpdatedAtMin  *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax  *string `json:"updatedAtMax,omitempty"`
+	UsernameMin   *string `json:"usernameMin,omitempty"`
+	UsernameMax   *string `json:"usernameMax,omitempty"`
+	PasswordMin   *string `json:"passwordMin,omitempty"`
+	PasswordMax   *string `json:"passwordMax,omitempty"`
+	EmailMin      *string `json:"emailMin,omitempty"`
+	EmailMax      *string `json:"emailMax,omitempty"`
+	EmailTokenMin *string `json:"email_tokenMin,omitempty"`
+	EmailTokenMax *string `json:"email_tokenMax,omitempty"`
+	TokenMin      *string `json:"tokenMin,omitempty"`
+	TokenMax      *string `json:"tokenMax,omitempty"`
 }
 
 type PendingUserFilter struct {
-	ID    []string                `json:"id,omitempty"`
-	Email *StringHashFilter       `json:"email,omitempty"`
-	Has   []*PendingUserHasFilter `json:"has,omitempty"`
-	And   []*PendingUserFilter    `json:"and,omitempty"`
-	Or    []*PendingUserFilter    `json:"or,omitempty"`
-	Not   *PendingUserFilter      `json:"not,omitempty"`
+	ID         []string                `json:"id,omitempty"`
+	Username   *StringHashFilter       `json:"username,omitempty"`
+	Email      *StringHashFilter       `json:"email,omitempty"`
+	EmailToken *StringHashFilter       `json:"email_token,omitempty"`
+	Token      *StringHashFilter       `json:"token,omitempty"`
+	Has        []*PendingUserHasFilter `json:"has,omitempty"`
+	And        []*PendingUserFilter    `json:"and,omitempty"`
+	Or         []*PendingUserFilter    `json:"or,omitempty"`
+	Not        *PendingUserFilter      `json:"not,omitempty"`
 }
 
 type PendingUserOrder struct {
@@ -1431,16 +1450,24 @@ type PendingUserOrder struct {
 }
 
 type PendingUserPatch struct {
-	Email     *string        `json:"email,omitempty"`
-	Token     *string        `json:"token,omitempty"`
-	Contracts []*ContractRef `json:"contracts,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
+	Username   *string        `json:"username,omitempty"`
+	Password   *string        `json:"password,omitempty"`
+	Email      *string        `json:"email,omitempty"`
+	EmailToken *string        `json:"email_token,omitempty"`
+	Token      *string        `json:"token,omitempty"`
+	Contracts  []*ContractRef `json:"contracts,omitempty"`
 }
 
 type PendingUserRef struct {
-	ID        *string        `json:"id,omitempty"`
-	Email     *string        `json:"email,omitempty"`
-	Token     *string        `json:"token,omitempty"`
-	Contracts []*ContractRef `json:"contracts,omitempty"`
+	ID         *string        `json:"id,omitempty"`
+	UpdatedAt  *string        `json:"updatedAt,omitempty"`
+	Username   *string        `json:"username,omitempty"`
+	Password   *string        `json:"password,omitempty"`
+	Email      *string        `json:"email,omitempty"`
+	EmailToken *string        `json:"email_token,omitempty"`
+	Token      *string        `json:"token,omitempty"`
+	Contracts  []*ContractRef `json:"contracts,omitempty"`
 }
 
 type Point struct {
@@ -3855,20 +3882,28 @@ func (e OrgaAggOrderable) MarshalGQL(w io.Writer) {
 type PendingUserHasFilter string
 
 const (
-	PendingUserHasFilterEmail     PendingUserHasFilter = "email"
-	PendingUserHasFilterToken     PendingUserHasFilter = "token"
-	PendingUserHasFilterContracts PendingUserHasFilter = "contracts"
+	PendingUserHasFilterUpdatedAt  PendingUserHasFilter = "updatedAt"
+	PendingUserHasFilterUsername   PendingUserHasFilter = "username"
+	PendingUserHasFilterPassword   PendingUserHasFilter = "password"
+	PendingUserHasFilterEmail      PendingUserHasFilter = "email"
+	PendingUserHasFilterEmailToken PendingUserHasFilter = "email_token"
+	PendingUserHasFilterToken      PendingUserHasFilter = "token"
+	PendingUserHasFilterContracts  PendingUserHasFilter = "contracts"
 )
 
 var AllPendingUserHasFilter = []PendingUserHasFilter{
+	PendingUserHasFilterUpdatedAt,
+	PendingUserHasFilterUsername,
+	PendingUserHasFilterPassword,
 	PendingUserHasFilterEmail,
+	PendingUserHasFilterEmailToken,
 	PendingUserHasFilterToken,
 	PendingUserHasFilterContracts,
 }
 
 func (e PendingUserHasFilter) IsValid() bool {
 	switch e {
-	case PendingUserHasFilterEmail, PendingUserHasFilterToken, PendingUserHasFilterContracts:
+	case PendingUserHasFilterUpdatedAt, PendingUserHasFilterUsername, PendingUserHasFilterPassword, PendingUserHasFilterEmail, PendingUserHasFilterEmailToken, PendingUserHasFilterToken, PendingUserHasFilterContracts:
 		return true
 	}
 	return false
@@ -3898,18 +3933,26 @@ func (e PendingUserHasFilter) MarshalGQL(w io.Writer) {
 type PendingUserOrderable string
 
 const (
-	PendingUserOrderableEmail PendingUserOrderable = "email"
-	PendingUserOrderableToken PendingUserOrderable = "token"
+	PendingUserOrderableUpdatedAt  PendingUserOrderable = "updatedAt"
+	PendingUserOrderableUsername   PendingUserOrderable = "username"
+	PendingUserOrderablePassword   PendingUserOrderable = "password"
+	PendingUserOrderableEmail      PendingUserOrderable = "email"
+	PendingUserOrderableEmailToken PendingUserOrderable = "email_token"
+	PendingUserOrderableToken      PendingUserOrderable = "token"
 )
 
 var AllPendingUserOrderable = []PendingUserOrderable{
+	PendingUserOrderableUpdatedAt,
+	PendingUserOrderableUsername,
+	PendingUserOrderablePassword,
 	PendingUserOrderableEmail,
+	PendingUserOrderableEmailToken,
 	PendingUserOrderableToken,
 }
 
 func (e PendingUserOrderable) IsValid() bool {
 	switch e {
-	case PendingUserOrderableEmail, PendingUserOrderableToken:
+	case PendingUserOrderableUpdatedAt, PendingUserOrderableUsername, PendingUserOrderablePassword, PendingUserOrderableEmail, PendingUserOrderableEmailToken, PendingUserOrderableToken:
 		return true
 	}
 	return false

@@ -12,7 +12,6 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/tools"
 	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/email"
@@ -25,11 +24,9 @@ func init() {
     cache = sessions.GetCache()
 }
 
-
 // Signup register a new user and gives it a token.
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var creds model.UserCreds
-    var uctx *model.UserCtx
 
 	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
@@ -48,6 +45,105 @@ func Signup(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    // Try to get PendingUser
+    pending_, err := db.DB.GetFieldByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
+    pending, _ := pending_.(model.JsonAtom)
+
+    // Delay to prevent attack and uiser creation hijacking
+    now := Now()
+    if pending["updatedAt"] != nil &&
+    TimeDelta(now, pending["updatedAt"].(string)) < time.Minute * 5 {
+        http.Error(w, "Username already exists", 401)
+        return
+    }
+
+    email_token := sessions.GenerateToken()
+    passwd := HashPassword(creds.Password)
+    if pending["id"] != nil {
+        // Update pending user
+        err = db.DB.Update(db.DB.GetRootUctx(), "pendingUser", model.UpdatePendingUserInput{
+            Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &creds.Email}},
+            Set: &model.PendingUserPatch{
+                Username: &creds.Username,
+                Password: &passwd,
+                EmailToken: &email_token,
+                UpdatedAt: &now,
+            },
+        })
+    } else {
+        // Create pending user
+        _, err = db.DB.Add(db.DB.GetRootUctx(), "pendingUser", model.AddPendingUserInput{
+            Email: &creds.Email,
+            Username: &creds.Username,
+            Password: &passwd,
+            EmailToken: &email_token,
+            UpdatedAt: &now,
+        })
+    }
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
+
+    // Send verification email
+    err = email.SendVerificationEmail(creds.Email, email_token)
+    if err != nil { panic(err) }
+
+    w.Write([]byte("ok"))
+}
+
+// Signup confirmation
+func SignupValidate(w http.ResponseWriter, r *http.Request) {
+	var creds model.UserCreds
+    var uctx *model.UserCtx
+
+	// Get the JSON body and decode into UserCreds
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+    // Ignore username/email case
+    creds.Username = strings.ToLower(creds.Username)
+
+    // Update Creds depending on PendingUser
+    pending := struct{
+        Username string
+        Email string
+        Password string
+        UpdatedAt *string
+    }{}
+    if creds.EmailToken != nil {
+        // User has already been validated and saved in UserPending
+        if err = db.DB.Meta1("getUserPending", map[string]string{"k":"email_token", "v":*creds.EmailToken}, &pending); err != nil {
+            http.Error(w, err.Error(), 500)
+            return
+        } else if pending.UpdatedAt != nil &&
+        TimeDelta(Now(), *pending.UpdatedAt) > time.Hour * 24 {
+            http.Error(w, "The session has exprired, sorry.", 500)
+            return
+        }
+    } else if creds.Puid != nil {
+        // User has not been registered in UserPending
+        if err = db.DB.Meta1("getUserPending", map[string]string{"k":"token", "v":*creds.Puid}, &pending); err != nil {
+            http.Error(w, err.Error(), 500)
+            return
+        } else if pending.Email == "" {
+            http.Error(w, "Token not found.", 400)
+            return
+        }
+        creds.Email = pending.Email
+        if auth.ValidateNewUser(creds); err != nil {
+            http.Error(w, err.Error(), 401)
+            return
+        }
+        creds.Password = HashPassword(creds.Password)
+    } else {
+        http.Error(w, "token validation error", 500)
+        return
+    }
+
     // Upsert new user
     uctx, err = auth.CreateNewUser(creds)
     if err != nil {
@@ -61,16 +157,11 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-    // Check if user has pending invitations
-    if x, err := db.GetDB().Exists("PendingUser.email", creds.Email, nil, nil); err != nil {
+    // Sync and remove pending user
+    err = graph.SyncPendingUser(creds.Username, creds.Email)
+    if err != nil {
         http.Error(w, err.Error(), 500)
-		return
-	} else if x {
-        err = graph.SyncPendingUser(creds.Username, creds.Email)
-        if err != nil {
-            http.Error(w, err.Error(), 500)
-            return
-        }
+        return
     }
 
 	// Create a new cookie with token
@@ -280,7 +371,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
     // Try to Extract session token
     c, err := r.Cookie("challenge_token")
     if err != nil || c.Value == "" {
-        http.Error(w, "Unauthorized, please try again later", 400)
+        http.Error(w, "Unauthorized, please try again in a few seconds.", 400)
 		return
     }
     token := c.Value
@@ -363,7 +454,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
     }
 
 	// Set the new password for the given user
-    err = db.GetDB().SetFieldByEq("User.email", mail, "User.password", tools.HashPassword(data.Password))
+    err = db.GetDB().SetFieldByEq("User.email", mail, "User.password", HashPassword(data.Password))
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return

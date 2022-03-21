@@ -237,7 +237,7 @@ var dqlQueries map[string]string = map[string]string{
         {{.payload}}
     }`,
     "getUserRoles": `{
-        var(func: eq(User.username, "{{.userid}}"))  {
+        var(func: eq(User.username, "{{.userid}}")) {
             r as User.roles
         }
 
@@ -247,6 +247,14 @@ var dqlQueries map[string]string = map[string]string{
             Node.role_type
         }
 
+    }`,
+    "getPendingUser": `{
+        all(func: eq(PendingUser.{{.k}}, "{{.v}}")) {
+            PendingUser.username
+            PendingUser.email
+            PendingUser.password
+            PendingUser.updatedAt
+        }
     }`,
     "getNode": `{
         all(func: eq(Node.{{.fieldid}}, "{{.objid}}"))
@@ -778,6 +786,15 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{
         x[i] = y
     }
     return x, err
+}
+
+func (dg Dgraph) Meta1(f string, maps map[string]string, data interface{}) (error) {
+	x, err := dg.Meta(f, maps)
+    if err != nil { return err }
+    if len(x) > 0 {
+        Map2Struct(x[0], data)
+    }
+    return nil
 }
 
 // Probe if an object exists.
