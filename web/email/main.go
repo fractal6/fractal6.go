@@ -36,7 +36,7 @@ func SendMaintainerEmail(subject, body string) error {
         "to": ["%s"],
         "subject": "%s",
         "plain_body": "%s",
-    }`, "fractal6 alert", maintainerEmail, subject, tools.CleanString(body, true))
+    }`, "Fractal6 Alert", maintainerEmail, subject, tools.CleanString(body, true))
     // Other fields: http://apiv1.postalserver.io/controllers/send/message
 
     req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
@@ -58,7 +58,7 @@ func SendMaintainerEmail(subject, body string) error {
 
 // Send an verification email for signup
 func SendVerificationEmail(email, token string) error {
-    url_redirect := fmt.Sprintf("https://fractale.co/verification?token=%s", token)
+    url_redirect := fmt.Sprintf("https://fractale.co/verification?email_token=%s", token)
 
     content := fmt.Sprintf(`<html>
 	<head>
@@ -68,7 +68,7 @@ func SendVerificationEmail(email, token string) error {
 	<body>
 	<p>To activate your account at <b>fractale.co</b>, click the link below (valid one hour):</p>
 	<a href="%s">%s</a>
-	<br><br>—
+	<br><br>—<br>
 	<small>If you are not at the origin of this request, please ignore this mail.</small>
 	</body>
     </html>`, url_redirect, url_redirect)
@@ -76,7 +76,7 @@ func SendVerificationEmail(email, token string) error {
     body := fmt.Sprintf(`{
         "from": "Fractale <noreply@fractale.co>",
         "to": ["%s"],
-        "subject": "Activate yout account at fractale.co",
+        "subject": "Activate your account at fractale.co",
         "html_body": "%s"
     }`, email, tools.CleanString(content, true))
 
@@ -104,11 +104,11 @@ func SendResetEmail(email, token string) error {
 	<meta charset="utf-8">
 	</head>
 	<body>
-	<h2> Forgot your password?</h2>
+	<h2>Forgot your password?</h2>
 	<p>To reset your password at <b>fractale.co</b>, click the link below (valid one hour):</p>
 	<a href="%s">%s</a>
-	<br><br>
-	<p>If you are not at the origin of this request, please ignore this mail.</p>
+	<br><br>—<br>
+	<small>If you are not at the origin of this request, please ignore this mail.</small>
 	</body>
     </html>`, url_redirect, url_redirect)
 

@@ -1,20 +1,15 @@
 package handlers
 
 import (
-    "fmt"
-    "context"
     "net/http"
-    "runtime/debug"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
     "github.com/99designs/gqlgen/graphql/playground"
-    "github.com/vektah/gqlparser/v2/gqlerror"
-	"github.com/99designs/gqlgen/graphql"
 
 	gen "fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph"
-	"fractale/fractal6.go/web/email"
+	"fractale/fractal6.go/web/middleware"
 )
 
 
@@ -44,18 +39,7 @@ func GraphqlHandler(c map[string]interface{}) http.HandlerFunc {
     }
 
 	// Set the default behavior to handle non implemented query
-	h.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
-        qn := graphql.GetResolverContext(ctx).Field.Name
-
-        // Log error
-        fmt.Printf("panic on `%s`:\n%s\n", qn, string(debug.Stack()))
-        email.SendMaintainerEmail(
-            fmt.Sprintf("[fractal6-api/error] %v", err),
-            string(debug.Stack()),
-        )
-
-        return gqlerror.Errorf("Internal error on '%s': %v", qn, err)
-	})
+	h.SetRecoverFunc(middleware.GqlRecover)
 
     return h.ServeHTTP
 

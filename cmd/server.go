@@ -71,7 +71,8 @@ func RunServer() {
     // Log request
     r.Use(middleware.Logger)
     // Recover from panic
-    r.Use(middleware.Recoverer)
+    //r.Use(middleware.Recoverer)
+    r.Use(middle6.Recoverer)
     // Set a timeout value on the request context (ctx), that will signal
     // through ctx.Done() that the request has timed out and further
     // processing should be stopped.
@@ -83,6 +84,7 @@ func RunServer() {
         r.Route("/auth", func(r chi.Router) {
             // User
             r.Post("/signup", handle6.Signup)
+            r.Post("/validate", handle6.SignupValidate)
             r.Post("/login", handle6.Login)
             r.Post("/tokenack", handle6.TokenAck)
             r.Post("/resetpasswordchallenge", handle6.ResetPasswordChallenge)

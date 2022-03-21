@@ -53,7 +53,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
     now := Now()
     if pending["updatedAt"] != nil &&
     TimeDelta(now, pending["updatedAt"].(string)) < time.Minute * 5 {
-        http.Error(w, "Username already exists", 401)
+        http.Error(w, auth.ErrUsernameExist.Error(), 401)
         return
     }
 
@@ -64,12 +64,17 @@ func Signup(w http.ResponseWriter, r *http.Request) {
         err = db.DB.Update(db.DB.GetRootUctx(), "pendingUser", model.UpdatePendingUserInput{
             Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &creds.Email}},
             Set: &model.PendingUserPatch{
-                Username: &creds.Username,
                 Password: &passwd,
                 EmailToken: &email_token,
                 UpdatedAt: &now,
             },
         })
+        if err != nil {
+            http.Error(w, err.Error(), 500)
+            return
+        }
+        // @id field cant't be update with graphql (@debug dgraph)
+        err = db.DB.SetFieldByEq("PendingUser.email", creds.Email, "PendingUser.username", creds.Username)
     } else {
         // Create pending user
         _, err = db.DB.Add(db.DB.GetRootUctx(), "pendingUser", model.AddPendingUserInput{
@@ -89,7 +94,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
     err = email.SendVerificationEmail(creds.Email, email_token)
     if err != nil { panic(err) }
 
-    w.Write([]byte("ok"))
+    w.Write([]byte("true"))
 }
 
 // Signup confirmation
@@ -116,7 +121,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
     }{}
     if creds.EmailToken != nil {
         // User has already been validated and saved in UserPending
-        if err = db.DB.Meta1("getUserPending", map[string]string{"k":"email_token", "v":*creds.EmailToken}, &pending); err != nil {
+        if err = db.DB.Meta1("getPendingUser", map[string]string{"k":"email_token", "v":*creds.EmailToken}, &pending); err != nil {
             http.Error(w, err.Error(), 500)
             return
         } else if pending.UpdatedAt != nil &&
@@ -124,9 +129,10 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             http.Error(w, "The session has exprired, sorry.", 500)
             return
         }
+        StructMap(pending, &creds)
     } else if creds.Puid != nil {
         // User has not been registered in UserPending
-        if err = db.DB.Meta1("getUserPending", map[string]string{"k":"token", "v":*creds.Puid}, &pending); err != nil {
+        if err = db.DB.Meta1("getPendingUser", map[string]string{"k":"token", "v":*creds.Puid}, &pending); err != nil {
             http.Error(w, err.Error(), 500)
             return
         } else if pending.Email == "" {

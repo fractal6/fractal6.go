@@ -5,11 +5,10 @@ import (
     "log"
     "context"
     "encoding/json"
-    "runtime/debug"
     "github.com/go-redis/redis/v8"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph"
-    "fractale/fractal6.go/web/email"
+    "fractale/fractal6.go/web/middleware"
     //. "fractale/fractal6.go/tools"
 )
 
@@ -58,18 +57,8 @@ func RunNotifier() {
     }
 }
 
-func handlePanic(info string) {
-    if r := recover(); r != nil {
-        fmt.Printf("error: Recovering from panic (%s): %v\n", info, r)
-        email.SendMaintainerEmail(
-            fmt.Sprintf("[%s/error] %v", info, r),
-            string(debug.Stack()),
-        )
-    }
-}
-
 func processTensionNotification(msg *redis.Message) {
-    defer handlePanic("tension event")
+    defer middleware.NotifRecover("tension event")
     // Extract message
     var notif model.EventNotif
     if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
@@ -93,7 +82,7 @@ func processTensionNotification(msg *redis.Message) {
 }
 
 func processContractNotification(msg *redis.Message) {
-    defer handlePanic("contract event")
+    defer middleware.NotifRecover("contract event")
     // Extract message
     var notif model.ContractNotif
     if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
@@ -113,7 +102,7 @@ func processContractNotification(msg *redis.Message) {
 }
 
 func processNotifNotification(msg *redis.Message) {
-    defer handlePanic("notif event")
+    defer middleware.NotifRecover("notif event")
     // Extract message
     var notif model.NotifNotif
     if err := json.Unmarshal([]byte(msg.Payload), &notif); err != nil {
