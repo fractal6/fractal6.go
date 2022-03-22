@@ -150,6 +150,11 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    if creds.Username == "" || creds.Email == "" {
+        http.Error(w, "User already exists.", 500)
+        return
+    }
+
     // Upsert new user
     uctx, err = auth.CreateNewUser(creds)
     if err != nil {
