@@ -285,7 +285,6 @@ type AddUserInput struct {
 	Name             *string         `json:"name,omitempty"`
 	Password         string          `json:"password,omitempty"`
 	Email            string          `json:"email,omitempty"`
-	EmailHash        *string         `json:"emailHash,omitempty"`
 	EmailValidated   bool            `json:"emailValidated"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
@@ -2028,7 +2027,6 @@ type User struct {
 	Name                      *string                   `json:"name,omitempty"`
 	Password                  string                    `json:"password,omitempty"`
 	Email                     string                    `json:"email,omitempty"`
-	EmailHash                 *string                   `json:"emailHash,omitempty"`
 	EmailValidated            bool                      `json:"emailValidated"`
 	Bio                       *string                   `json:"bio,omitempty"`
 	Utc                       *string                   `json:"utc,omitempty"`
@@ -2065,8 +2063,6 @@ type UserAggregateResult struct {
 	PasswordMax      *string `json:"passwordMax,omitempty"`
 	EmailMin         *string `json:"emailMin,omitempty"`
 	EmailMax         *string `json:"emailMax,omitempty"`
-	EmailHashMin     *string `json:"emailHashMin,omitempty"`
-	EmailHashMax     *string `json:"emailHashMax,omitempty"`
 	BioMin           *string `json:"bioMin,omitempty"`
 	BioMax           *string `json:"bioMax,omitempty"`
 	UtcMin           *string `json:"utcMin,omitempty"`
@@ -2144,7 +2140,6 @@ type UserPatch struct {
 	Name             *string         `json:"name,omitempty"`
 	Password         *string         `json:"password,omitempty"`
 	Email            *string         `json:"email,omitempty"`
-	EmailHash        *string         `json:"emailHash,omitempty"`
 	EmailValidated   *bool           `json:"emailValidated"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
@@ -2168,7 +2163,6 @@ type UserRef struct {
 	Name             *string         `json:"name,omitempty"`
 	Password         *string         `json:"password,omitempty"`
 	Email            *string         `json:"email,omitempty"`
-	EmailHash        *string         `json:"emailHash,omitempty"`
 	EmailValidated   *bool           `json:"emailValidated"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
@@ -4665,7 +4659,6 @@ const (
 	UserHasFilterName             UserHasFilter = "name"
 	UserHasFilterPassword         UserHasFilter = "password"
 	UserHasFilterEmail            UserHasFilter = "email"
-	UserHasFilterEmailHash        UserHasFilter = "emailHash"
 	UserHasFilterEmailValidated   UserHasFilter = "emailValidated"
 	UserHasFilterBio              UserHasFilter = "bio"
 	UserHasFilterUtc              UserHasFilter = "utc"
@@ -4688,7 +4681,6 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterName,
 	UserHasFilterPassword,
 	UserHasFilterEmail,
-	UserHasFilterEmailHash,
 	UserHasFilterEmailValidated,
 	UserHasFilterBio,
 	UserHasFilterUtc,
@@ -4706,7 +4698,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailHash, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterEmailValidated, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
 		return true
 	}
 	return false
@@ -4742,7 +4734,6 @@ const (
 	UserOrderableName          UserOrderable = "name"
 	UserOrderablePassword      UserOrderable = "password"
 	UserOrderableEmail         UserOrderable = "email"
-	UserOrderableEmailHash     UserOrderable = "emailHash"
 	UserOrderableBio           UserOrderable = "bio"
 	UserOrderableUtc           UserOrderable = "utc"
 	UserOrderableMarkAllAsRead UserOrderable = "markAllAsRead"
@@ -4755,7 +4746,6 @@ var AllUserOrderable = []UserOrderable{
 	UserOrderableName,
 	UserOrderablePassword,
 	UserOrderableEmail,
-	UserOrderableEmailHash,
 	UserOrderableBio,
 	UserOrderableUtc,
 	UserOrderableMarkAllAsRead,
@@ -4763,7 +4753,7 @@ var AllUserOrderable = []UserOrderable{
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableEmailHash, UserOrderableBio, UserOrderableUtc, UserOrderableMarkAllAsRead:
+	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableBio, UserOrderableUtc, UserOrderableMarkAllAsRead:
 		return true
 	}
 	return false

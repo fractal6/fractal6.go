@@ -1011,7 +1011,6 @@ type ComplexityRoot struct {
 		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
 		CreatedAt                 func(childComplexity int) int
 		Email                     func(childComplexity int) int
-		EmailHash                 func(childComplexity int) int
 		EmailValidated            func(childComplexity int) int
 		Events                    func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		EventsAggregate           func(childComplexity int, filter *model.UserEventFilter) int
@@ -1040,8 +1039,6 @@ type ComplexityRoot struct {
 		Count            func(childComplexity int) int
 		CreatedAtMax     func(childComplexity int) int
 		CreatedAtMin     func(childComplexity int) int
-		EmailHashMax     func(childComplexity int) int
-		EmailHashMin     func(childComplexity int) int
 		EmailMax         func(childComplexity int) int
 		EmailMin         func(childComplexity int) int
 		LastAckMax       func(childComplexity int) int
@@ -6694,13 +6691,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Email(childComplexity), true
 
-	case "User.emailHash":
-		if e.complexity.User.EmailHash == nil {
-			break
-		}
-
-		return e.complexity.User.EmailHash(childComplexity), true
-
 	case "User.emailValidated":
 		if e.complexity.User.EmailValidated == nil {
 			break
@@ -6930,20 +6920,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserAggregateResult.CreatedAtMin(childComplexity), true
-
-	case "UserAggregateResult.emailHashMax":
-		if e.complexity.UserAggregateResult.EmailHashMax == nil {
-			break
-		}
-
-		return e.complexity.UserAggregateResult.EmailHashMax(childComplexity), true
-
-	case "UserAggregateResult.emailHashMin":
-		if e.complexity.UserAggregateResult.EmailHashMin == nil {
-			break
-		}
-
-		return e.complexity.UserAggregateResult.EmailHashMin(childComplexity), true
 
 	case "UserAggregateResult.emailMax":
 		if e.complexity.UserAggregateResult.EmailMax == nil {
@@ -7709,7 +7685,6 @@ type User {
   name: String
   password: String! @hidden
   email: String! @hidden
-  emailHash: String @hidden
   emailValidated: Boolean! @hidden
   bio: String
   utc: String
@@ -7913,37 +7888,37 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8218,7 +8193,6 @@ input AddUserInput {
   name: String
   password: String!
   email: String! @w_alter(a:"lower")
-  emailHash: String
   emailValidated: Boolean!
   bio: String
   utc: String
@@ -10197,8 +10171,6 @@ type UserAggregateResult {
   passwordMax: String
   emailMin: String
   emailMax: String
-  emailHashMin: String
-  emailHashMax: String
   bioMin: String
   bioMax: String
   utcMin: String
@@ -10273,7 +10245,6 @@ enum UserHasFilter {
   name
   password
   email
-  emailHash
   emailValidated
   bio
   utc
@@ -10302,7 +10273,6 @@ enum UserOrderable {
   name
   password
   email
-  emailHash
   bio
   utc
   markAllAsRead
@@ -10315,7 +10285,6 @@ input UserPatch {
   name: String @x_patch
   password: String @x_patch_ro
   email: String @w_alter(a:"lower")
-  emailHash: String @x_patch_ro
   emailValidated: Boolean @x_patch_ro
   bio: String @x_patch
   utc: String @x_patch
@@ -10339,7 +10308,6 @@ input UserRef {
   name: String @x_patch
   password: String
   email: String @w_alter(a:"lower")
-  emailHash: String
   emailValidated: Boolean
   bio: String @x_patch
   utc: String @x_patch
@@ -38727,55 +38695,6 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_emailHash(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.EmailHash, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hidden == nil {
-				return nil, errors.New("directive hidden is not implemented")
-			}
-			return ec.directives.Hidden(ctx, obj, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*string); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _User_emailValidated(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -39857,64 +39776,6 @@ func (ec *executionContext) _UserAggregateResult_emailMax(ctx context.Context, f
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EmailMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UserAggregateResult_emailHashMin(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UserAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EmailHashMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _UserAggregateResult_emailHashMax(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "UserAggregateResult",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EmailHashMax, nil
 	})
 
 	if resTmp == nil {
@@ -44493,14 +44354,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "emailHash":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHash"))
-			it.EmailHash, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		case "emailValidated":
 			var err error
@@ -56276,30 +56129,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "emailHash":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHash"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.EmailHash = data
-			} else if tmp == nil {
-				it.EmailHash = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "emailValidated":
 			var err error
 
@@ -56778,14 +56607,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "emailHash":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHash"))
-			it.EmailHash, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		case "emailValidated":
 			var err error
@@ -65083,13 +64904,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "emailHash":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._User_emailHash(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
 		case "emailValidated":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._User_emailValidated(ctx, field, obj)
@@ -65347,20 +65161,6 @@ func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.Se
 		case "emailMax":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._UserAggregateResult_emailMax(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
-		case "emailHashMin":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._UserAggregateResult_emailHashMin(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
-		case "emailHashMax":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._UserAggregateResult_emailHashMax(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
