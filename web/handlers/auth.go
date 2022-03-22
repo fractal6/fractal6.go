@@ -136,43 +136,59 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             http.Error(w, err.Error(), 500)
             return
         } else if pending.Email == "" {
-            http.Error(w, "Token not found.", 400)
-            return
+            // If user exists, set uctx
+            if ex, err := db.DB.Exists("User.username", creds.Username, nil, nil); err != nil {
+                http.Error(w, err.Error(), 500)
+                return
+            } else if ex {
+                uctx, err = auth.GetAuthUserCtx(creds)
+                if err != nil {
+                    http.Error(w, err.Error(), 500)
+                    return
+                }
+                uctx.Password = ""
+            } else {
+                http.Error(w, "Token not found.", 400)
+                return
+            }
+        } else {
+            creds.Email = pending.Email
+            if auth.ValidateNewUser(creds); err != nil {
+                http.Error(w, err.Error(), 401)
+                return
+            }
+            creds.Password = HashPassword(creds.Password)
         }
-        creds.Email = pending.Email
-        if auth.ValidateNewUser(creds); err != nil {
-            http.Error(w, err.Error(), 401)
-            return
-        }
-        creds.Password = HashPassword(creds.Password)
     } else {
         http.Error(w, "token validation error", 500)
         return
     }
 
-    if creds.Username == "" || creds.Email == "" {
-        http.Error(w, "User already exists.", 500)
-        return
-    }
-
-    // Upsert new user
-    uctx, err = auth.CreateNewUser(creds)
-    if err != nil {
-		// Credentials validation error
-        switch err.(type) {
-        case *db.GraphQLError:
-            http.Error(w, err.Error(), 401)
-        default:
-            http.Error(w, err.Error(), 500)
+    // Upsert new user and sync pending
+    if uctx == nil {
+        if creds.Username == "" || creds.Email == "" {
+            http.Error(w, "User already exists.", 500)
+            return
         }
-		return
-    }
 
-    // Sync and remove pending user
-    err = graph.SyncPendingUser(creds.Username, creds.Email)
-    if err != nil {
-        http.Error(w, err.Error(), 500)
-        return
+        uctx, err = auth.CreateNewUser(creds)
+        if err != nil {
+            // Credentials validation error
+            switch err.(type) {
+            case *db.GraphQLError:
+                http.Error(w, err.Error(), 401)
+            default:
+                http.Error(w, err.Error(), 500)
+            }
+            return
+        }
+
+        // Sync and remove pending user
+        err = graph.SyncPendingUser(creds.Username, creds.Email)
+        if err != nil {
+            http.Error(w, err.Error(), 500)
+            return
+        }
     }
 
 	// Create a new cookie with token
