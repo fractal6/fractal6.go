@@ -5,6 +5,7 @@ import (
     "errors"
     "strings"
     //"strconv"
+	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
     "fractale/fractal6.go/tools"
@@ -119,6 +120,19 @@ var (
     }`)
 )
 
+var clientVersion string
+
+func init() {
+    clientVersion = viper.GetString("server.client_version")
+}
+
+func regularizeUctx(uctx *model.UserCtx) {
+    // Hide the password !
+    uctx.Password = ""
+    // Set the client version
+    uctx.ClientVersion = clientVersion
+}
+
 //
 // Public methods
 //
@@ -165,8 +179,8 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     if !ok {
         return nil, ErrWrongPassword
     }
-    // Hide the password !
-    userCtx.Password = ""
+
+    regularizeUctx(userCtx)
     return userCtx, nil
 }
 
@@ -179,8 +193,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
         return nil, err
     }
 
-    // Hide the password !
-    userCtx.Password = ""
+    regularizeUctx(userCtx)
     return userCtx, nil
 }
 
@@ -275,8 +288,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         return nil, err
     }
 
-    // Hide the password !
-    userCtx.Password = ""
+    regularizeUctx(userCtx)
     return userCtx, nil
 }
 
