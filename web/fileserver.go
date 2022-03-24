@@ -38,6 +38,9 @@ func FileServer(r chi.Router, public string, static string) {
         //lang := r.Header.Get("Accept-Language")
         //fmt.Println(lang)
 
+        // Set Headers
+        w.Header().Set("Cache-Control", "max-age=91200")
+
 		if _, err := os.Stat(root + file); os.IsNotExist(err) {
 			http.ServeFile(w, r, path.Join(root, "index.html"))
 			return
