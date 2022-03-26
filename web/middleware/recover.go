@@ -17,10 +17,11 @@ func NotifRecover(info string) {
     if r := recover(); r != nil {
         // Email notification
         fmt.Println("------------------notif recov ------------")
-        email.SendMaintainerEmail(
+        e := email.SendMaintainerEmail(
             fmt.Sprintf("[f6-notifier][error][%s] %v", info, r),
             string(debug.Stack()),
         )
+        if e != nil { fmt.Println(e) }
 
         // Log error
         fmt.Printf("error: Recovering from panic (%s): %v\n", info, r)
@@ -33,10 +34,11 @@ func GqlRecover(ctx context.Context, err interface{}) error {
 
         // Email Notification
         fmt.Println("------------------gql recov ------------")
-        email.SendMaintainerEmail(
+        e := email.SendMaintainerEmail(
             fmt.Sprintf("[f6-graphql][error] %v", err),
             string(debug.Stack()),
         )
+        if err != nil { fmt.Println(e) }
 
         // Log error
         //fmt.Printf("panic on `%s`:\n%s\n", qn, string(debug.Stack()))
@@ -60,10 +62,11 @@ func Recoverer(next http.Handler) http.Handler {
 
                 // Email notification
                 fmt.Println("------------------rest recov ------------")
-                email.SendMaintainerEmail(
+                e := email.SendMaintainerEmail(
                     fmt.Sprintf("[f6-rest][error] %v", rvr),
                     string(debug.Stack()),
                 )
+                if e != nil { fmt.Println(e) }
                 // -----------------
 
 				logEntry := middleware.GetLogEntry(r)

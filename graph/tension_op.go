@@ -138,6 +138,7 @@ func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true)
         if !ok || err != nil { break }
 
+
         // Check if event make a new subscriber
         addSubscriber = addSubscriber || SubscribingEvents[*event.EventType]
     }

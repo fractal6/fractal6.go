@@ -17,6 +17,8 @@ var ctx context.Context = context.Background()
 // Publisher functions (Redis)
 //
 
+// Will trigger processTensionNotification in cmd/notifier.go
+// and PushEventNotifications
 func PublishTensionEvent(notif model.EventNotif) error {
     payload, _ := json.Marshal(notif)
     if err := cache.Publish(ctx, "api-tension-notification", payload).Err(); err != nil {
@@ -27,6 +29,8 @@ func PublishTensionEvent(notif model.EventNotif) error {
     return nil
 }
 
+// Will trigger processContractNotification in cmd/notifier.go
+// and PushContractNotifications
 func PublishContractEvent(notif model.ContractNotif) error {
     payload, _ := json.Marshal(notif)
     if err := cache.Publish(ctx, "api-contract-notification", payload).Err(); err != nil {
@@ -37,6 +41,8 @@ func PublishContractEvent(notif model.ContractNotif) error {
     return nil
 }
 
+// Will trigger processNotifNotification in cmd/notifier.go
+// and PushNotifNotifications
 func PublishNotifEvent(notif model.NotifNotif) error {
     payload, _ := json.Marshal(notif)
     if err := cache.Publish(ctx, "api-notif-notification", payload).Err(); err != nil {
@@ -54,7 +60,6 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 // GetUserToNotify returns a list of user should receive notifications uponf tension updates.
 func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
-
     user_selection := "User.username User.email User.name User.notifyByEmail"
 
     {
@@ -120,7 +125,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 // Notifiers functions
 //
 
-/* INTERNAL (websocket, platform notification etc */
+/* INTERNAL (websocket, platform notification etc) */
 
 // PushHistory publish event to a tension history.
 func PushHistory(notif *model.EventNotif) error {
@@ -164,8 +169,37 @@ func PushEventNotifications(notif model.EventNotif) error {
     }
 
     // Get people to notify
-    users, err := GetUsersToNotify(notif.Tid, true, true)
-    if err != nil { return err }
+    users := make(map[string]model.UserNotifInfo)
+	var err error
+    var isAlert bool
+    var receiverid string
+    if notif.HasEvent(model.TensionEventCreated) {
+        if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid"); err != nil {
+            return err
+        } else if t != nil {
+            tension := t.(model.JsonAtom)
+            isAlert = tension["type_"].(string) == string(model.TensionTypeAlert)
+            receiverid = tension["receiverid"].(string)
+        }
+    }
+    // --
+    if isAlert {
+        // Alert tension created: Notify everyone
+        user_selection := "User.username User.email User.name User.notifyByEmail"
+        if data, err := db.GetDB().GetSubMembers("nameid", receiverid, user_selection); err != nil {
+            return err
+        } else {
+            for _, n := range data {
+                user := *n.FirstLink
+                if _, ex := users[user.Username]; ex { continue }
+                users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAlert}
+            }
+        }
+    } else {
+        // Notify only suscribers and relative.
+        users, err = GetUsersToNotify(notif.Tid, true, true)
+        if err != nil { return err }
+    }
 
     // Push user event notification
     for u, ui := range users {
@@ -222,6 +256,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
     // +
     // Add Participants
     for _, p := range notif.Contract.Participants {
+        if _, ex := users[p.Node.FirstLink.Username]; ex { continue }
         users[p.Node.FirstLink.Username] = model.UserNotifInfo{User: *p.Node.FirstLink, Reason: model.ReasonIsParticipant}
     }
 
@@ -243,14 +278,26 @@ func PushContractNotifications(notif model.ContractNotif) error {
             })
             if err != nil { return err }
         } else {
-            // Push user event
-            eid, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
-                User: &model.UserRef{Username: &u},
-                IsRead: false,
-                CreatedAt: createdAt,
-                Event: eventBatch,
-            })
-            if err != nil { return err }
+            switch notif.ContractEvent {
+            case model.NewContract:
+                // Push user event
+                eid, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
+                    User: &model.UserRef{Username: &u},
+                    IsRead: false,
+                    CreatedAt: createdAt,
+                    Event: eventBatch,
+                })
+                if err != nil { return err }
+            case model.NewComment:
+                // Push user notif
+                PushNotifNotifications(model.NotifNotif{
+                    Uctx: notif.Uctx,
+                    Tid: &notif.Tid,
+                    Cid: &notif.Contract.ID,
+                    Msg: "You have a new comment",
+                    To: []string{u},
+                })
+            }
         }
 
         // Email

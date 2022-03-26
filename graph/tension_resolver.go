@@ -94,7 +94,7 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
             // Execute query
             data, err := next(ctx)
             if err != nil { return data, err }
-            PublishTensionEvent( model.EventNotif{Uctx: uctx, Tid: ids[0], History: input.Set.History})
+            PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: ids[0], History: input.Set.History})
             return data, err
         } else if contract != nil {
             var t model.UpdateTensionPayload

@@ -31,12 +31,14 @@ func init() {
 
 // Send an email with a http request to the email server API to the admin email.
 func SendMaintainerEmail(subject, body string) error {
+    if maintainerEmail == "" { return nil }
+
     body = fmt.Sprintf(`{
         "from": "%s <alert@fractale.co>",
         "to": ["%s"],
         "subject": "%s",
-        "plain_body": "%s",
-    }`, "Fractal6 Alert", maintainerEmail, subject, tools.CleanString(body, true))
+        "plain_body": "%s"
+    }`, "Fractal6 Alert", maintainerEmail, subject, tools.QuoteString(body))
     // Other fields: http://apiv1.postalserver.io/controllers/send/message
 
     req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
@@ -147,6 +149,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     var author string
     var payload string
     var message string
+    var type_hint string
     if email == "" {
         if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
             return err
@@ -154,17 +157,20 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             email = x.(string)
         }
     }
+    if ui.Reason == model.ReasonIsAlert {
+        type_hint = "[Alert]"
+    }
 
+    // Redirect Url
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s", notif.Tid)
-
     if ui.Eid != "" {
         // Eid var is used to mark the event as read from the client.
         url_redirect += fmt.Sprintf("?eid=%s", ui.Eid)
     }
-
     if createdAt := notif.GetCreatedAt(); createdAt != "" {
         url_redirect += fmt.Sprintf("&goto=%s", createdAt)
     }
+
 
     // Build body
     if notif.HasEvent(model.TensionEventCreated) { // Tension added
@@ -180,7 +186,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             title := m[0]["title"].(string)
             recv := strings.Replace(m[0]["receiverid"].(string), "#", "/", -1)
             message, _ = m[0]["message"].(string)
-            subject = fmt.Sprintf("[%s] %s", recv, title)
+            subject = fmt.Sprintf("[%s]%s %s", recv, type_hint, title)
         } else {
             return fmt.Errorf("tension %s not found.", notif.Tid)
         }
@@ -210,7 +216,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             title := m[0]["title"].(string)
             recv := strings.Replace(m[0]["receiverid"].(string), "#", "/", -1)
             message, _ = m[0]["message"].(string)
-            subject = fmt.Sprintf("Re: [%s] %s", recv, title)
+            subject = fmt.Sprintf("Re: [%s]%s %s", recv, type_hint, title)
         } else {
             return fmt.Errorf("tension %s not found.", notif.Tid)
         }
@@ -368,6 +374,10 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         A vote is requested to process the following contract:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
     }
 
+    comment_subject := func(e model.TensionEvent) string {
+        return fmt.Sprintf("[%s][%s] You have a new comment", recv, e.ToContractText())
+    }
+
     closed_subject := func(e model.TensionEvent) string {
         return fmt.Sprintf("[%s][%s] contract accepted", recv, e.ToContractText())
     }
@@ -385,35 +395,43 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
 
     // Build body
-    e := notif.Contract.Event.EventType
-    switch notif.Contract.Status {
-    case model.ContractStatusOpen:
-        if ui.Reason == model.ReasonIsCandidate || ui.Reason == model.ReasonIsPendingCandidate {
-            subject = candidate_subject(e)
-            payload = candidate_payload(e)
-        } else {
-            subject = default_subject(e)
-            payload = default_payload(e)
-        }
-    case model.ContractStatusClosed:
-        // notify only if event has no email notification
-        if !notif.IsEmailable() {
-            subject = closed_subject(e)
-            payload = closed_payload(e)
-        } else {
+    switch notif.ContractEvent {
+    case model.NewContract:
+        e := notif.Contract.Event.EventType
+        switch notif.Contract.Status {
+        case model.ContractStatusOpen:
+            if ui.Reason == model.ReasonIsCandidate || ui.Reason == model.ReasonIsPendingCandidate {
+                subject = candidate_subject(e)
+                payload = candidate_payload(e)
+            } else {
+                subject = default_subject(e)
+                payload = default_payload(e)
+            }
+        case model.ContractStatusClosed:
+            // notify only if event has no email notification
+            if !notif.IsEmailable() {
+                subject = closed_subject(e)
+                payload = closed_payload(e)
+            } else {
+                return nil
+            }
+        case model.ContractStatusCanceled:
+            // notify only participant
+            if ui.Reason == model.ReasonIsParticipant {
+                subject = canceled_subject(e)
+                payload = canceled_payload(e)
+            } else {
+                return nil
+            }
+        default:
+            // no notification
             return nil
         }
-    case model.ContractStatusCanceled:
-        // notify only participant
-        if ui.Reason == model.ReasonIsParticipant {
-            subject = canceled_subject(e)
-            payload = canceled_payload(e)
-        } else {
-            return nil
+        if message != "" {
+            payload += "<br><br>—<br>"
         }
-    default:
-        // no notification
-        return nil
+    case model.NewComment:
+        subject = comment_subject(notif.Contract.Event.EventType)
     }
 
     // Add eventual comment
@@ -423,7 +441,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         if err = goldmark.Convert([]byte(message), &buf); err != nil {
             return err
         }
-        payload += "<br><br>—<br>" + bluemonday.UGCPolicy().Sanitize(buf.String())
+        payload += bluemonday.UGCPolicy().Sanitize(buf.String())
+    }
+
+    if notif.ContractEvent == model.NewComment {
+        payload += "<br>" + fmt.Sprintf(`—
+        <div style="color:#666;font-size:small">You are receiving this because %s. <a href="%s">View it on Fractale</a>.</div>
+        `, ui.Reason.ToText(), url_redirect)
     }
 
     // Buid email

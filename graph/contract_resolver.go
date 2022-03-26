@@ -86,7 +86,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
         // Add pending Nodes
         for _, c := range input.Candidates {
             pendingNodeCreated, err = MaybeAddPendingNode(*c.Username, &model.Tension{ID: *input.Tension.ID})
-            if err != nil { return false, err }
+            if err != nil { return nil, err }
         }
     }
 
@@ -113,14 +113,21 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
             // Delete pending Nodes
             for _, c := range contract.Candidates {
                 err = MaybeDeletePendingNode(c.Username, contract.Tension)
-                if err != nil { return false, err }
+                if err != nil { return nil, err }
             }
         }
-    }
-    if ok || err != nil {
+
+        if err != nil { return nil, err }
+    } else if ok {
+        // Push Notifications
+        if contract != nil {
+            PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: tid, Contract: contract, ContractEvent: model.NewContract})
+        }
+
         return data, err
     }
-    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+
+    return data, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 }
 
 // Update Contract hook
@@ -154,8 +161,12 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
                 }
             }
         }
-        if ok { // Execute query
-            // @todo: notify users by email
+        if ok {
+            // Notify users by email
+            if input.Set.Comments != nil && len(input.Set.Comments) > 0 {
+                PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: contract.Tension.ID, Contract: contract, ContractEvent: model.NewComment})
+            }
+            // Execute query
             return next(ctx)
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("You're not authorized to access this ressource."))
@@ -227,10 +238,6 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
     var d model.DeleteContractPayload
     d.Contract = []*model.Contract{&model.Contract{ID: ids[0]}}
     return &d, err
-
-    //data, err := next(ctx)
-    //if err != nil { return nil, err }
-    //return data, err
 }
 
 // ------------------------------------------------------------------- Contracts
@@ -302,7 +309,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     }
 
     // Post process vote
-    ok, contract, err := processVote(uctx, cid)
+    ok, contract, err := voteEventHook(uctx, cid)
     if !ok || err != nil {
         id := data.Vote[0].ID
         e := db.GetDB().Delete(*uctx, "vote", model.VoteFilter{ID:[]string{id}})

@@ -126,9 +126,10 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             return
         } else if pending.UpdatedAt != nil &&
         TimeDelta(Now(), *pending.UpdatedAt) > time.Hour * 24 {
-            http.Error(w, "The session has exprired, sorry.", 500)
+            http.Error(w, "The session has expired.", 500)
             return
         }
+        // Overwrite creds
         StructMap(pending, &creds)
     } else if creds.Puid != nil {
         // User has not been registered in UserPending
@@ -146,7 +147,6 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
                     http.Error(w, err.Error(), 500)
                     return
                 }
-                uctx.Password = ""
             } else {
                 http.Error(w, "Token not found.", 400)
                 return
@@ -476,7 +476,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 		return
 	}
     if mail == "" {
-        w.Write([]byte("false"))
+        http.Error(w, "Session expired, please try again.", 500)
         return
     }
 
@@ -491,7 +491,33 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
     err = cache.Del(ctx, data.Token).Err()
 	if err != nil { panic(err) }
 
-    w.Write([]byte("true"))
+    // Get the userctx to return
+    uctx, err := auth.GetAuthUserCtx(model.UserCreds{Username:mail, Password:data.Password})
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
+
+	// Create a new cookie with token
+    httpCookie, err := auth.NewUserCookie(*uctx)
+	if err != nil {
+		// Token issuing error
+		//w.WriteHeader(http.StatusInternalServerError)
+        http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Finally, we set the client cookie for "token" as the JWT we just generated
+	// we also set an expiry time which is the same as the token itself
+	http.SetCookie(w, httpCookie)
+
+    data_out, err := json.Marshal(uctx)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    w.Write(data_out)
 }
 
 // Check that the cache contains the given token

@@ -62,23 +62,16 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
 
     // Process event
     ok, contract, err = processEvent(uctx, tension, event, nil, contract, true, true)
-    if err != nil { return false, contract, err }
-    ok = ok || contract != nil
-    if contract == nil { return ok, contract, err }
-
-    // Push Notifications
-    PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: tid, Contract: contract})
-
-    return ok, contract, err
+    return (ok || contract != nil), contract, err
 }
 
-func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error) {
+func voteEventHook(uctx *model.UserCtx, cid string) (bool, *model.Contract, error) {
     var ok bool = false
 
     // Fetch the contract
     contract, err := db.GetDB().GetContractHook(cid)
     if err != nil { return ok, contract, err }
-    if contract == nil { return  ok, contract, fmt.Errorf("contract not found.") }
+    if contract == nil { return ok, contract, fmt.Errorf("contract not found.") }
 
     // Fetch linked tension
     // @DEBUG: blob is not always needed (Moving non node tension, Invite, etc)
@@ -89,9 +82,7 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     var event model.EventRef
     StructMap(contract.Event, &event)
     ok, contract, err = processEvent(uctx, tension, &event, nil, contract, true, true)
-    if err != nil { return false, contract, err }
-    ok = ok || contract != nil
-    if contract == nil { return ok, contract, err }
+    if contract == nil || err != nil { return false, contract, err }
 
     // Mark contract as read
     _, err = db.GetDB().Meta("markContractAsRead", map[string]string{
@@ -100,12 +91,11 @@ func processVote(uctx *model.UserCtx, cid string) (bool, *model.Contract, error)
     })
     if err != nil { return false, contract, err }
 
+    // Push Event History and Notifications
     if contract.Status == model.ContractStatusClosed {
         now := Now()
         event.CreatedAt = &now
         event.CreatedBy = &model.UserRef{Username: &uctx.Username}
-
-        // Push Event History and Notifications
         PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tension.ID, History: []*model.EventRef{&event}})
     }
 
@@ -122,8 +112,7 @@ func hasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, erro
     if err != nil { return false, err }
 
     ok, c, err := processEvent(uctx, tension, &event, nil, nil, true, false)
-    ok = ok || c != nil
-    return ok, err
+    return ok || c != nil, err
 }
 
 

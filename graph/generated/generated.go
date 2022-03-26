@@ -1011,7 +1011,6 @@ type ComplexityRoot struct {
 		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
 		CreatedAt                 func(childComplexity int) int
 		Email                     func(childComplexity int) int
-		EmailValidated            func(childComplexity int) int
 		Events                    func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		EventsAggregate           func(childComplexity int, filter *model.UserEventFilter) int
 		ID                        func(childComplexity int) int
@@ -6691,13 +6690,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Email(childComplexity), true
 
-	case "User.emailValidated":
-		if e.complexity.User.EmailValidated == nil {
-			break
-		}
-
-		return e.complexity.User.EmailValidated(childComplexity), true
-
 	case "User.events":
 		if e.complexity.User.Events == nil {
 			break
@@ -7685,7 +7677,6 @@ type User {
   name: String
   password: String! @hidden
   email: String! @hidden
-  emailValidated: Boolean! @hidden
   bio: String
   utc: String
   notifyByEmail: Boolean!
@@ -7890,35 +7881,35 @@ enum UserType {
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @lambda on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8192,8 +8183,7 @@ input AddUserInput {
   username: String! @w_add(a:"lower")
   name: String
   password: String!
-  email: String! @w_alter(a:"lower")
-  emailValidated: Boolean!
+  email: String! @w_add(a:"lower")
   bio: String
   utc: String
   notifyByEmail: Boolean!
@@ -10245,7 +10235,6 @@ enum UserHasFilter {
   name
   password
   email
-  emailValidated
   bio
   utc
   notifyByEmail
@@ -10284,8 +10273,7 @@ input UserPatch {
   username: String @x_patch_ro
   name: String @x_patch
   password: String @x_patch_ro
-  email: String @w_alter(a:"lower")
-  emailValidated: Boolean @x_patch_ro
+  email: String @x_patch_ro
   bio: String @x_patch
   utc: String @x_patch
   notifyByEmail: Boolean @x_patch
@@ -10307,8 +10295,7 @@ input UserRef {
   username: String @w_add(a:"lower")
   name: String @x_patch
   password: String
-  email: String @w_alter(a:"lower")
-  emailValidated: Boolean
+  email: String @w_add(a:"lower")
   bio: String @x_patch
   utc: String @x_patch
   notifyByEmail: Boolean @x_patch
@@ -38695,58 +38682,6 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_emailValidated(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.EmailValidated, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Hidden == nil {
-				return nil, errors.New("directive hidden is not implemented")
-			}
-			return ec.directives.Hidden(ctx, obj, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _User_bio(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -44339,10 +44274,10 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.W_alter == nil {
-					return nil, errors.New("directive w_alter is not implemented")
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
 				}
-				return ec.directives.W_alter(ctx, obj, directive0, a)
+				return ec.directives.W_add(ctx, obj, directive0, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -44354,14 +44289,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "emailValidated":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailValidated"))
-			it.EmailValidated, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		case "bio":
 			var err error
@@ -56107,14 +56034,10 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				a, err := ec.unmarshalNString2string(ctx, "lower")
-				if err != nil {
-					return nil, err
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
 				}
-				if ec.directives.W_alter == nil {
-					return nil, errors.New("directive w_alter is not implemented")
-				}
-				return ec.directives.W_alter(ctx, obj, directive0, a)
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
 			}
 
 			tmp, err := directive1(ctx)
@@ -56127,30 +56050,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				it.Email = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "emailValidated":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailValidated"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*bool); ok {
-				it.EmailValidated = data
-			} else if tmp == nil {
-				it.EmailValidated = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "bio":
@@ -56590,10 +56489,10 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				if err != nil {
 					return nil, err
 				}
-				if ec.directives.W_alter == nil {
-					return nil, errors.New("directive w_alter is not implemented")
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
 				}
-				return ec.directives.W_alter(ctx, obj, directive0, a)
+				return ec.directives.W_add(ctx, obj, directive0, a)
 			}
 
 			tmp, err := directive1(ctx)
@@ -56607,14 +56506,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "emailValidated":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailValidated"))
-			it.EmailValidated, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		case "bio":
 			var err error
@@ -64897,16 +64788,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "email":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._User_email(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "emailValidated":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._User_emailValidated(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

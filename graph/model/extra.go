@@ -28,6 +28,7 @@ const (
     ReasonIsFirstLink
     ReasonIsAssignee
     ReasonIsSubscriber
+    ReasonIsAlert
 )
 
 func (n NotifReason) ToText() string {
@@ -42,6 +43,10 @@ func (n NotifReason) ToText() string {
         return "you are assigned to this tension"
     case ReasonIsSubscriber:
         return "you are subscribed to this tension"
+    case ReasonIsParticipant:
+        return "you voted to this contract"
+    case ReasonIsAlert:
+        return "you are a member of this circle"
     default:
         return "unknown reason"
     }
@@ -54,6 +59,13 @@ type UserNotifInfo struct {
     Eid string
 }
 
+// @future: move in schema ?
+type ContractEvent int
+const (
+    NewContract ContractEvent = iota
+    NewComment
+)
+
 
 type EventNotif struct {
     Uctx *UserCtx        `json:"uctx"`
@@ -62,9 +74,10 @@ type EventNotif struct {
 }
 
 type ContractNotif struct {
-    Uctx *UserCtx       `json:"uctx"`
-    Tid string          `json:"tid"`
-    Contract *Contract  `json:"contract"`
+    Uctx *UserCtx               `json:"uctx"`
+    Tid string                  `json:"tid"`
+    Contract *Contract          `json:"contract"`
+    ContractEvent ContractEvent `json:"contract_event"`
 }
 
 type NotifNotif struct {

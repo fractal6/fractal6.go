@@ -12,6 +12,7 @@ import (
 	webauth "fractale/fractal6.go/web/auth"
 )
 
+
 var FieldAuthorizationFunc map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error)
 
 func init() {
@@ -28,7 +29,6 @@ func init() {
     }
 
 }
-
 
 
 //isOwner Check that object is own by the user.
@@ -266,3 +266,35 @@ func maxLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *s
     }
     return data, err
 }
+
+////////////////////////////////////////////////
+// Auth utility functions
+// * (could be done in Dgraph Lambda ?)
+////////////////////////////////////////////////
+
+// Check if an user owns the given object
+func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj interface{}) (bool, error) {
+    // Get user ID
+    var username string
+    var err error
+    user := userObj.(model.JsonAtom)[userField]
+    if user == nil || user.(model.JsonAtom)["username"] == nil  {
+        // Non user type here (userField/createdBy must be present)
+        id := ctx.Value("id")
+        if id == nil || id .(string) == "" {
+            return false, fmt.Errorf("object target unknown(id), see setContextWithID...")
+        }
+        // Request the database to get the field
+        // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
+        username_, err := db.GetDB().GetSubFieldById(id.(string), "Post."+userField, "User.username")
+        if err != nil { return false, err }
+        username = username_.(string)
+    } else {
+        // User here
+        username = user.(model.JsonAtom)["username"].(string)
+    }
+
+    // Check user ID match
+    return uctx.Username == username, err
+}
+

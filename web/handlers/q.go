@@ -53,7 +53,7 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Get sub members
-    data, err := db.GetDB().GetSubMembers("nameid", q)
+    data, err := db.GetDB().GetSubMembers("nameid", q, "User.name User.username")
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return

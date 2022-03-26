@@ -87,7 +87,7 @@ var contractHookPayload string = `{
   }
   Contract.candidates { User.username }
   Contract.pending_candidates { PendingUser.email }
-  Contract.participants { Vote.data Vote.node { Node.nameid Node.first_link {User.username} } }
+  Contract.participants { Vote.data Vote.node { Node.nameid Node.first_link {User.username User.notifyByEmail} } }
 }`
 
 type QueryMut struct {
@@ -412,15 +412,12 @@ var dqlQueries map[string]string = map[string]string{
             o as Node.children
         }
 
-        all(func: uid(o)) @filter(has(Node.role_type) AND eq(Node.isArchived, false)) {
+        all(func: uid(o)) @filter(has(Node.first_link) AND has(Node.role_type) AND eq(Node.isArchived, false)) {
             Node.createdAt
             Node.name
             Node.nameid
             Node.role_type
-            Node.first_link {
-                User.username
-                User.name
-            }
+            Node.first_link { {{.user_payload}} }
             Node.parent {
                 Node.nameid
             }
@@ -577,6 +574,15 @@ var dqlQueries map[string]string = map[string]string{
         }
         all2(func: uid(tensions_in)) @filter(eq(Tension.status, "Closed")) {
             count: count(uid)
+        }
+    }`,
+    "getMembers": `{
+        all(func: eq(Node.nameid, "{{.nameid}}")) @filter({{.nameids}}) @normalize {
+            Node.children @filter(eq(Node.role_type, "Owner") OR eq(Node.role_type, "Member") OR eq(Node.role_type, "Guest")) {
+                Node.first_link {
+                    username: User.username
+                }
+            }
         }
     }`,
     // Deletion
@@ -1370,11 +1376,12 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error)
 }
 
 // Get all sub members
-func (dg Dgraph) GetSubMembers(fieldid string, objid string) ([]model.Node, error) {
+func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string) ([]model.Node, error) {
     // Format Query
     maps := map[string]string{
         "fieldid": fieldid,
         "objid": objid,
+        "user_payload": user_payload,
     }
     // Send request
     res, err := dg.QueryDql("getSubMembers", maps)

@@ -2,8 +2,6 @@ package graph
 
 import (
     "fmt"
-    "context"
-
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/graph/auth"
@@ -37,7 +35,7 @@ type EventsMap = map[model.TensionEvent]EventMap
 
 // Validation ~ Contract
 // Validation function return a triplet:
-// ok bool -> ok means the contract has been validated and can be closed.
+// ok bool -> ok means the contract has been validated and the event can be processed.
 // contract -> returns the updated contract if is has been altered else nil
 // err -> is something got wrong
 var validationMap map[model.ContractType]func(EventMap, *model.UserCtx, *model.Tension, *model.EventRef, *model.Contract) (bool, *model.Contract, error)
@@ -105,6 +103,7 @@ func init() {
     }
 }
 
+// Returns a triple following the ValidationMap function semantics.
 func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     var ok bool
     var err error
@@ -126,7 +125,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
     if contract != nil {
         // Exit if contract is not open
         if contract.Status != "" && contract.Status != model.ContractStatusOpen {
-            return ok, contract, fmt.Errorf("Contract status is closed or missing.")
+            return false, nil, fmt.Errorf("Contract status is closed or missing.")
         }
     }
 
@@ -227,15 +226,12 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 
 func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     ok, err := em.checkTensionAuth(uctx, tension, event, contract)
-    if err != nil { return false, nil, err }
-    if !ok {
-        return false, contract, err
-    }
+    if !ok || err != nil { return false, nil, err }
 
     if contract == nil {
         if uctx.Username == *event.New {
             // If user is participant and have rights,
-            // return true whitout a contract
+            // return true whitout a contract => self invitation
             ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
             return ok, nil, err
         } else {
@@ -361,10 +357,11 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
             contract.Status = model.ContractStatusCanceled
             return true, contract, err
         } else {
-            return false, contract, err
+            // @future: Agile mode: any user can create a contract ?
+            return false, nil, err
         }
     } else {
-        return false, contract, err
+        return false, nil, err
     }
 }
 
@@ -376,34 +373,4 @@ func AnyCoordoTarget(em EventMap, uctx *model.UserCtx, tension *model.Tension, e
     panic("not implemented.")
 }
 
-
-////////////////////////////////////////////////
-// With Ctx method (used in graph/resolver.go) -- (could be done in Dgraph Lamba)
-////////////////////////////////////////////////
-
-// Check if an user owns the given object
-func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj interface{}) (bool, error) {
-    // Get user ID
-    var username string
-    var err error
-    user := userObj.(model.JsonAtom)[userField]
-    if user == nil || user.(model.JsonAtom)["username"] == nil  {
-        // Non user type here (userField/createdBy must be present)
-        id := ctx.Value("id")
-        if id == nil || id .(string) == "" {
-            return false, fmt.Errorf("object target unknown(id), see setContextWithID...")
-        }
-        // Request the database to get the field
-        // @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
-        username_, err := db.GetDB().GetSubFieldById(id.(string), "Post."+userField, "User.username")
-        if err != nil { return false, err }
-        username = username_.(string)
-    } else {
-        // User here
-        username = user.(model.JsonAtom)["username"].(string)
-    }
-
-    // Check user ID match
-    return uctx.Username == username, err
-}
 

@@ -259,13 +259,13 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     canCreateRoot := false
     maxPublicOrga := 5
     userType := model.UserTypeRegular
+    hasEmailNotifications := true
 
     userInput := model.AddUserInput{
         CreatedAt:      now,
         LastAck:        now,
         Username:       creds.Username,
         Email:          creds.Email,
-        EmailValidated: true,
         NotifyByEmail: true,
         Name:           creds.Name,
         Password:       creds.Password,
@@ -274,6 +274,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
             CanCreateRoot: &canCreateRoot,
             MaxPublicOrga: &maxPublicOrga,
             Type: &userType,
+            HasEmailNotifications: &hasEmailNotifications,
         },
     }
 

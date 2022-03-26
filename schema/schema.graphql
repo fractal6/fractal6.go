@@ -321,7 +321,6 @@ type User {
   name: String
   password: String! @hidden
   email: String! @hidden
-  emailValidated: Boolean! @hidden
   bio: String
   utc: String
   notifyByEmail: Boolean!
@@ -526,35 +525,35 @@ enum UserType {
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @lambda on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -828,8 +827,7 @@ input AddUserInput {
   username: String! @w_add(a:"lower")
   name: String
   password: String!
-  email: String! @w_alter(a:"lower")
-  emailValidated: Boolean!
+  email: String! @w_add(a:"lower")
   bio: String
   utc: String
   notifyByEmail: Boolean!
@@ -2881,7 +2879,6 @@ enum UserHasFilter {
   name
   password
   email
-  emailValidated
   bio
   utc
   notifyByEmail
@@ -2920,8 +2917,7 @@ input UserPatch {
   username: String @x_patch_ro
   name: String @x_patch
   password: String @x_patch_ro
-  email: String @w_alter(a:"lower")
-  emailValidated: Boolean @x_patch_ro
+  email: String @x_patch_ro
   bio: String @x_patch
   utc: String @x_patch
   notifyByEmail: Boolean @x_patch
@@ -2943,8 +2939,7 @@ input UserRef {
   username: String @w_add(a:"lower")
   name: String @x_patch
   password: String
-  email: String @w_alter(a:"lower")
-  emailValidated: Boolean
+  email: String @w_add(a:"lower")
   bio: String @x_patch
   utc: String @x_patch
   notifyByEmail: Boolean @x_patch

@@ -51,7 +51,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
     parentid := tension.Receiver.Nameid
 
     // Get References
-    _, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
     if err != nil { return false, err }
 
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
@@ -71,6 +71,12 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
             }
         }
         archiveFlag = strconv.FormatBool(true)
+
+        // Eventually Unlink first-link
+        if node.FirstLink != nil {
+            err = UnlinkUser(rootnameid, nameid, *node.FirstLink)
+            if err != nil { return ok, err }
+        }
     } else if eventType == model.TensionEventBlobUnarchived {
         // Unarchive
         // --
@@ -138,7 +144,6 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
 
     // Change all role direct children
     err = db.DB.SetChildrenRoleVisibility(nameid, value)
-
     return ok, err
 }
 
@@ -169,9 +174,9 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
         err = UnlinkUser(rootnameid, nameid, *event.Old)
         if err != nil { return false, err }
     }
+
     // Update NodeFragment
     err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
-
     return ok, err
 }
 
