@@ -10,7 +10,7 @@ import (
     "net/http"
     "github.com/go-chi/jwtauth/v5"
     "github.com/lestrrat-go/jwx/jwt"
-    //"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 
     . "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/graph/model"
@@ -34,10 +34,13 @@ func init () {
     cache = sessions.GetCache()
 
     // Get Jwt private key
-    jwtSecret = os.Getenv("JWT_SECRET")
+    jwtSecret = viper.GetString("server.jwt_secret")
     if jwtSecret == "" {
-        fmt.Println("JWT_SECRET not found. JWT token disabled.")
-        return
+        jwtSecret = os.Getenv("JWT_SECRET")
+        if jwtSecret == "" {
+            fmt.Println("JWT_SECRET not found. JWT token disabled.")
+            return
+        }
     }
 
     // Init token master

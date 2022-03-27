@@ -20,8 +20,14 @@ var emailUrl string
 var maintainerEmail string
 
 func init() {
-    emailUrl = os.Getenv("EMAIL_API_URL")
-    emailSecret = os.Getenv("EMAIL_API_KEY")
+    emailUrl = viper.GetString("server.email_api_url")
+    emailSecret = viper.GetString("server.email_api_key")
+    if emailUrl == "" {
+        emailUrl = os.Getenv("EMAIL_API_URL")
+    }
+    if emailSecret == "" {
+        emailSecret = os.Getenv("EMAIL_API_KEY")
+    }
     if emailUrl == "" || emailSecret == "" {
         fmt.Println("EMAIL_API_URL/KEY not found. email notifications disabled.")
     }

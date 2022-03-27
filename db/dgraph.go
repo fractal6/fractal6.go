@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"text/template"
 	"crypto/rsa"
+    "io/ioutil"
 
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/mitchellh/mapstructure"
@@ -113,16 +114,39 @@ func (q QueryString) Format(maps map[string]string) string {
 var DB *Dgraph
 
 func init () {
+    InitViper()
     // Get env mode
     if buildMode != "PROD" {
         buildMode = "DEV"
     }
 
     // @DEBUG: how to integrate it with cobra to execute other command without error ?
-    if os.Getenv("DGRAPH_PRIVATE_KEY") != "" || os.Getenv("DGRAPH_PUBLIC_KEY") != ""{
-        // Get Jwt private key
-        dgraphPrivateKey = ParseRsaPrivate(os.Getenv("DGRAPH_PRIVATE_KEY"))
-        dgraphPublicKey = ParseRsaPublic(os.Getenv("DGRAPH_PUBLIC_KEY"))
+    var pub_key string
+    var priv_key string
+    // Get Jwt public key
+    if fn := viper.GetString("db.dgraph_public_key"); fn != "" {
+        if content, err := ioutil.ReadFile(fn); err != nil {
+            log.Fatal(err)
+        } else {
+            pub_key = string(content)
+        }
+    } else if os.Getenv("DGRAPH_PUBLIC_KEY") != ""{
+        pub_key = os.Getenv("DGRAPH_PUBLIC_KEY")
+    }
+    // Get Jwt private key
+    if fn := viper.GetString("db.dgraph_private_key"); fn != "" {
+        if content, err := ioutil.ReadFile(fn); err != nil {
+            log.Fatal(err)
+        } else {
+            priv_key = string(content)
+        }
+    } else if os.Getenv("DGRAPH_PRIVATE_KEY") != ""{
+        priv_key = os.Getenv("DGRAPH_PRIVATE_KEY")
+    }
+
+    if pub_key != "" && priv_key != "" {
+        dgraphPublicKey = ParseRsaPublic(pub_key)
+        dgraphPrivateKey = ParseRsaPrivate(priv_key)
     } else {
         log.Fatal("DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found")
     }
@@ -135,7 +159,6 @@ func GetDB() *Dgraph {
 }
 
 func initDB() *Dgraph {
-    InitViper()
     HOSTDB := viper.GetString("db.host")
     PORTDB := viper.GetString("db.port_graphql")
     PORTGRPC := viper.GetString("db.port_grpc")
