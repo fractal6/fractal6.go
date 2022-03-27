@@ -85,7 +85,7 @@ var contractHookPayload string = `{
     EventFragment.old
     EventFragment.new
   }
-  Contract.candidates { User.username }
+  Contract.candidates { User.username User.notifyByEmail }
   Contract.pending_candidates { PendingUser.email }
   Contract.participants { Vote.data Vote.node { Node.nameid Node.first_link {User.username User.notifyByEmail} } }
 }`
