@@ -307,7 +307,6 @@ func PushContractNotifications(notif model.ContractNotif) error {
         ui.Reason == model.ReasonIsParticipant ||
         ui.Reason == model.ReasonIsCoordo ||
         ui.Reason == model.ReasonIsAssignee ) {
-        fmt.Println(2)
              ui.Eid = eid
              err = email.SendContractNotificationEmail(ui, notif)
              if err != nil { return err }

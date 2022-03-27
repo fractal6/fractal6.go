@@ -297,7 +297,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
     // Ensure that user own the vote
     rid, _ := codec.Nid2rootid(nameid)
     if nameid != codec.MemberIdCodec(rid, uctx.Username) {
-        return nil, LogErr("add vote", fmt.Errorf("You should own your vote."))
+        return nil, LogErr("add vote", fmt.Errorf("You must own your vote."))
     }
 
     // Try to add vote

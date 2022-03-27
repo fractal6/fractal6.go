@@ -200,7 +200,7 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
         if nodeType == model.NodeTypeRole {
             // Validate input
             if roleType == nil {
-                err = fmt.Errorf("role should have a RoleType.")
+                err = fmt.Errorf("role must have a RoleType.")
             }
         } else if nodeType == model.NodeTypeCircle {
             //pass
