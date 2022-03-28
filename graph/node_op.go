@@ -170,7 +170,8 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     } else if *event.EventType == model.TensionEventMemberUnlinked {
         // UnLink user
         // --
-        if firstLink != uctx.Username {return false, fmt.Errorf("You do not play this role.")}
+        // @future: contract to unlink too ?...
+        //if firstLink != uctx.Username {return false, fmt.Errorf("You do not play this role.")}
         err = UnlinkUser(rootnameid, nameid, *event.Old)
         if err != nil { return false, err }
     }

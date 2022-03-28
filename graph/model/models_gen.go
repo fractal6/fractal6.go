@@ -283,8 +283,8 @@ type AddUserInput struct {
 	LastAck          string          `json:"lastAck,omitempty"`
 	Username         string          `json:"username,omitempty"`
 	Name             *string         `json:"name,omitempty"`
-	Password         string          `json:"password,omitempty"`
 	Email            string          `json:"email,omitempty"`
+	Password         string          `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	NotifyByEmail    bool            `json:"notifyByEmail"`
@@ -2024,8 +2024,8 @@ type User struct {
 	LastAck                   string                    `json:"lastAck,omitempty"`
 	Username                  string                    `json:"username,omitempty"`
 	Name                      *string                   `json:"name,omitempty"`
-	Password                  string                    `json:"password,omitempty"`
 	Email                     string                    `json:"email,omitempty"`
+	Password                  string                    `json:"password,omitempty"`
 	Bio                       *string                   `json:"bio,omitempty"`
 	Utc                       *string                   `json:"utc,omitempty"`
 	NotifyByEmail             bool                      `json:"notifyByEmail"`
@@ -2057,10 +2057,10 @@ type UserAggregateResult struct {
 	UsernameMax      *string `json:"usernameMax,omitempty"`
 	NameMin          *string `json:"nameMin,omitempty"`
 	NameMax          *string `json:"nameMax,omitempty"`
-	PasswordMin      *string `json:"passwordMin,omitempty"`
-	PasswordMax      *string `json:"passwordMax,omitempty"`
 	EmailMin         *string `json:"emailMin,omitempty"`
 	EmailMax         *string `json:"emailMax,omitempty"`
+	PasswordMin      *string `json:"passwordMin,omitempty"`
+	PasswordMax      *string `json:"passwordMax,omitempty"`
 	BioMin           *string `json:"bioMin,omitempty"`
 	BioMax           *string `json:"bioMax,omitempty"`
 	UtcMin           *string `json:"utcMin,omitempty"`
@@ -2136,8 +2136,8 @@ type UserPatch struct {
 	LastAck          *string         `json:"lastAck,omitempty"`
 	Username         *string         `json:"username,omitempty"`
 	Name             *string         `json:"name,omitempty"`
-	Password         *string         `json:"password,omitempty"`
 	Email            *string         `json:"email,omitempty"`
+	Password         *string         `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
@@ -2158,8 +2158,8 @@ type UserRef struct {
 	LastAck          *string         `json:"lastAck,omitempty"`
 	Username         *string         `json:"username,omitempty"`
 	Name             *string         `json:"name,omitempty"`
-	Password         *string         `json:"password,omitempty"`
 	Email            *string         `json:"email,omitempty"`
+	Password         *string         `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
@@ -4653,8 +4653,8 @@ const (
 	UserHasFilterLastAck          UserHasFilter = "lastAck"
 	UserHasFilterUsername         UserHasFilter = "username"
 	UserHasFilterName             UserHasFilter = "name"
-	UserHasFilterPassword         UserHasFilter = "password"
 	UserHasFilterEmail            UserHasFilter = "email"
+	UserHasFilterPassword         UserHasFilter = "password"
 	UserHasFilterBio              UserHasFilter = "bio"
 	UserHasFilterUtc              UserHasFilter = "utc"
 	UserHasFilterNotifyByEmail    UserHasFilter = "notifyByEmail"
@@ -4674,8 +4674,8 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterLastAck,
 	UserHasFilterUsername,
 	UserHasFilterName,
-	UserHasFilterPassword,
 	UserHasFilterEmail,
+	UserHasFilterPassword,
 	UserHasFilterBio,
 	UserHasFilterUtc,
 	UserHasFilterNotifyByEmail,
@@ -4692,7 +4692,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterPassword, UserHasFilterEmail, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
 		return true
 	}
 	return false
@@ -4726,8 +4726,8 @@ const (
 	UserOrderableLastAck       UserOrderable = "lastAck"
 	UserOrderableUsername      UserOrderable = "username"
 	UserOrderableName          UserOrderable = "name"
-	UserOrderablePassword      UserOrderable = "password"
 	UserOrderableEmail         UserOrderable = "email"
+	UserOrderablePassword      UserOrderable = "password"
 	UserOrderableBio           UserOrderable = "bio"
 	UserOrderableUtc           UserOrderable = "utc"
 	UserOrderableMarkAllAsRead UserOrderable = "markAllAsRead"
@@ -4738,8 +4738,8 @@ var AllUserOrderable = []UserOrderable{
 	UserOrderableLastAck,
 	UserOrderableUsername,
 	UserOrderableName,
-	UserOrderablePassword,
 	UserOrderableEmail,
+	UserOrderablePassword,
 	UserOrderableBio,
 	UserOrderableUtc,
 	UserOrderableMarkAllAsRead,
@@ -4747,7 +4747,7 @@ var AllUserOrderable = []UserOrderable{
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderablePassword, UserOrderableEmail, UserOrderableBio, UserOrderableUtc, UserOrderableMarkAllAsRead:
+	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderableEmail, UserOrderablePassword, UserOrderableBio, UserOrderableUtc, UserOrderableMarkAllAsRead:
 		return true
 	}
 	return false

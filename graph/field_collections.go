@@ -45,7 +45,16 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
     var err error
     var filter model.JsonAtom
 
-    if obj.(model.JsonAtom)["input"] != nil {
+    if obj.(model.JsonAtom)[n] != nil {
+        // won't work since input directive apply on one argument only :S
+        if val, ok := obj.(model.JsonAtom)[n].(string); ok {
+            ctx = context.WithValue(ctx, n, val)
+            return ctx, val, err
+
+        } else {
+            return ctx, val, err
+        }
+    } else if obj.(model.JsonAtom)["input"] != nil {
         if obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"] == nil { panic("add mutation not supported here.") }
         // Update mutation
         filter = obj.(model.JsonAtom)["input"].(model.JsonAtom)["filter"].(model.JsonAtom)

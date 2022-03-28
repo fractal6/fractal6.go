@@ -41,6 +41,7 @@ func Init() gen.Config {
 
     // Fields directives
     c.Directives.Hidden = hidden
+    c.Directives.Private = private
     c.Directives.Meta = meta
     c.Directives.IsContractValidator = isContractValidator
 
@@ -74,10 +75,10 @@ func Init() gen.Config {
     //
 
     //User
-    c.Directives.Hook_getUserInput = nothing
-    c.Directives.Hook_queryUserInput = nothing
+    c.Directives.Hook_getUserInput = setContextWithID // used by @private
+    c.Directives.Hook_queryUserInput = setContextWithID // used by @private
     c.Directives.Hook_addUserInput = nothing
-    c.Directives.Hook_updateUserInput = setContextWithID // used by meta_patch
+    c.Directives.Hook_updateUserInput = setContextWithID // used by @meta_patch
     c.Directives.Hook_deleteUserInput = nothing
     // --
     c.Directives.Hook_addUser = nothing
@@ -87,7 +88,7 @@ func Init() gen.Config {
     c.Directives.Hook_getRoleExtInput = nothing
     c.Directives.Hook_queryRoleExtInput = nothing
     c.Directives.Hook_addRoleExtInput = nothing
-    c.Directives.Hook_updateRoleExtInput = setContextWithID // used by the unique directive
+    c.Directives.Hook_updateRoleExtInput = setContextWithID // used by @unique
     c.Directives.Hook_deleteRoleExtInput = nothing
     // --
     c.Directives.Hook_addRoleExt = addNodeArtefactHook
@@ -97,7 +98,7 @@ func Init() gen.Config {
     c.Directives.Hook_getLabelInput = nothing
     c.Directives.Hook_queryLabelInput = nothing
     c.Directives.Hook_addLabelInput = nothing
-    c.Directives.Hook_updateLabelInput = setContextWithID // used by the unique directive
+    c.Directives.Hook_updateLabelInput = setContextWithID // used by the @unique
     c.Directives.Hook_deleteLabelInput = nothing
     // --
     c.Directives.Hook_addLabel = addNodeArtefactHook
@@ -107,7 +108,7 @@ func Init() gen.Config {
     c.Directives.Hook_getTensionInput = nothing
     c.Directives.Hook_queryTensionInput = nothing
     c.Directives.Hook_addTensionInput = nothing
-    c.Directives.Hook_updateTensionInput = setUpdateContextInfo // for hasEvent+isOwner field auth
+    c.Directives.Hook_updateTensionInput = setUpdateContextInfo // for @hasEvent+@isOwner
     c.Directives.Hook_deleteTensionInput = nothing
     // --
     c.Directives.Hook_addTension = addTensionHook
@@ -117,7 +118,7 @@ func Init() gen.Config {
     c.Directives.Hook_getCommentInput = nothing
     c.Directives.Hook_queryCommentInput = nothing
     c.Directives.Hook_addCommentInput = nothing
-    c.Directives.Hook_updateCommentInput = setContextWithID // used by isOwner auth rule
+    c.Directives.Hook_updateCommentInput = setContextWithID // used by @isOwner
     c.Directives.Hook_deleteCommentInput = nothing
     // --
     c.Directives.Hook_addComment = nothing
@@ -127,7 +128,7 @@ func Init() gen.Config {
     c.Directives.Hook_getContractInput = nothing
     c.Directives.Hook_queryContractInput = nothing
     c.Directives.Hook_addContractInput = addContractInputHook
-    c.Directives.Hook_updateContractInput = setContextWithID // used by isOwner auth rule
+    c.Directives.Hook_updateContractInput = setContextWithID // used by @isOwner
     c.Directives.Hook_deleteContractInput = nothing
     // --
     c.Directives.Hook_addContract = addContractHook
@@ -169,6 +170,32 @@ func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interf
     rc := graphql.GetResolverContext(ctx)
     fieldName := rc.Field.Name
     return nil, fmt.Errorf("`%s' field is hidden", fieldName)
+}
+
+func private(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    ctx, uctx, err := webauth.GetUserContext(ctx)
+    if err != nil { return nil, LogErr("Access denied", err) }
+
+    rc := graphql.GetResolverContext(ctx)
+    fieldName := rc.Field.Name
+
+    // @debug: context do not propagage value here, why, gqlgen !
+    // todo: if uid is given, or other @id...
+    if username, ok := ctx.Value("username").(string); ok && username == uctx.Username {
+        return next(ctx)
+    }
+
+    switch v :=  obj.(type) {
+    case *model.User:
+        // @debug: username field required in graph
+        if v.Username == uctx.Username  {
+            return next(ctx)
+        }
+    default:
+        return nil, fmt.Errorf("Private directive not implemented for this field: %s", fieldName)
+    }
+
+    return nil, fmt.Errorf("`%s' field is private", fieldName)
 }
 
 func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
