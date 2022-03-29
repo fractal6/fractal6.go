@@ -21,7 +21,7 @@ func CheckBearer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         val := r.Header.Get("Authorization")
         fmt.Println("@check me:", CREDENTIAL_PROM, "=?", val)
-        if val == CREDENTIAL_PROM {
+        if val == CREDENTIAL_PROM || "Bearer " + val == CREDENTIAL_PROM {
             next.ServeHTTP(w, r.WithContext(r.Context()))
         }
     })
