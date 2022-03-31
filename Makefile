@@ -4,7 +4,6 @@ GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
 MOD := "fractale/fractal6.go"
-LANGS := en fr
 
 # TODO: versioning
 # LDFLAGS see versioning, hash etc...
@@ -74,15 +73,8 @@ generate:
 # Generate Data
 #
 
-docs: $(LANGS)
-
-$(LANGS):
-	# requirements:
-	# pip install wildq
-	# apt install jq
-	wildq -M -i toml -o json '.[] | {name:.name, tasks:.tasks[]|flatten }' ../doc/shorts/doc.$@.toml > data/quickdoc.$@.json_
-	jq -s "." data/quickdoc.$@.json_ > data/quickdoc.$@.json
-	rm -f data/quickdoc.$@.json_
+docs:
+	cp ../doc/data/* data
 
 # Utils
 
