@@ -1,8 +1,10 @@
 package handlers
 
 import (
-    "fractale/fractal6.go/db"
+    "net/http"
     "github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
+    "fractale/fractal6.go/db"
 )
 
 
@@ -28,12 +30,23 @@ var (
 	})
 )
 
-func init() {
+func InstruHandler() http.Handler {
+    // Create Handler from scratch
+    r := prometheus.NewRegistry()
+
 	// Metrics have to be registered to be exposed:
-	prometheus.MustRegister(userCount)
-	prometheus.MustRegister(openTensionCount)
-	prometheus.MustRegister(circleCount)
-	prometheus.MustRegister(labelCount)
+	r.MustRegister(userCount)
+	r.MustRegister(openTensionCount)
+	r.MustRegister(circleCount)
+	r.MustRegister(labelCount)
+
+    // More metrics
+    //MustRegister(
+    //    promcollectors.NewProcessCollector(promcollectors.ProcessCollectorOpts{}),
+    //    promcollectors.NewGoCollector(),
+    //)
+
+    return promhttp.HandlerFor(r, promhttp.HandlerOpts{})
 }
 
 
@@ -52,3 +65,4 @@ func InstrumentationMeasures() {
     count = db.GetDB().CountHas("Label.name")
 	labelCount.Set(float64(count))
 }
+

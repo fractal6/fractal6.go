@@ -9,7 +9,6 @@ import (
     "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
     "github.com/spf13/viper"
-    "github.com/prometheus/client_golang/prometheus/promhttp"
 
     "fractale/fractal6.go/web"
     "fractale/fractal6.go/web/auth"
@@ -137,6 +136,7 @@ func RunServer() {
     // Serve Prometheus instrumentation
 	if instrumentation {
         go func() {
+            // Update metrics in a goroutine
             for {
                 handle6.InstrumentationMeasures()
                 time.Sleep(time.Duration(time.Second * 500))
@@ -144,7 +144,8 @@ func RunServer() {
         }()
         secured := r.Group(nil)
         secured.Use(middle6.CheckBearer)
-		secured.Handle("/metrics", promhttp.Handler())
+		//secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
+        secured.Handle("/metrics", handle6.InstruHandler())
 	}
 
 
