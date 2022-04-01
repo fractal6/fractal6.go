@@ -98,6 +98,7 @@ func (notif EventNotif) IsEmailable() bool {
         TensionEventCommentPushed == *e.EventType ||
         TensionEventReopened == *e.EventType ||
         TensionEventClosed == *e.EventType ||
+        TensionEventBlobPushed == *e.EventType ||
         TensionEventMemberUnlinked == *e.EventType ||
         TensionEventUserLeft == *e.EventType {
             return true
@@ -106,12 +107,14 @@ func (notif EventNotif) IsEmailable() bool {
     return false
 }
 
+// @debug: duplicat
 func (notif ContractNotif) IsEmailable() bool {
     e := notif.Contract.Event
     if TensionEventCreated == e.EventType ||
     TensionEventCommentPushed == e.EventType ||
     TensionEventReopened == e.EventType ||
     TensionEventClosed == e.EventType ||
+    TensionEventBlobPushed == e.EventType ||
     TensionEventMemberUnlinked == e.EventType ||
     TensionEventUserLeft == e.EventType {
         return true

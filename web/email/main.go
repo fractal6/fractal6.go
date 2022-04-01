@@ -232,6 +232,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             payload = fmt.Sprintf(`Closed <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventReopened) {
             payload = fmt.Sprintf(`Reopened <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+        } else if notif.HasEvent(model.TensionEventBlobPushed) {
+            payload = fmt.Sprintf(`Mandate updated <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventUserLeft) || notif.HasEvent(model.TensionEventMemberUnlinked) {
             u := notif.GetExUser()
             payload = fmt.Sprintf(`User %s left or was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)

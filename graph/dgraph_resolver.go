@@ -118,6 +118,9 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
         v, _ := cache.GetDel(ctx, uctx.Username + "meta_patch_v").Result()
         maps := map[string]string{k: v}
         db.Meta(f, maps)
+    } else if err != nil {
+        // ignore "redis: nil" error as it is always return because we call Result() ..
+        //fmt.Println("Redis error: ", err)
     }
 
     return err
