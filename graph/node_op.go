@@ -464,9 +464,8 @@ func MaybeDeletePendingNode(username string, tension *model.Tension) error {
     rootid, err := codec.Nid2rootid(tension.Receiverid)
     if err != nil { return err }
     nid := codec.MemberIdCodec(rootid, username)
-    fn := "Node.role_type"
-    fv := "Pending"
-    ex, err :=  db.GetDB().Exists("Node.nameid", nid, &fn, &fv)
+    filter := fmt.Sprintf(`eq(%s, "%s")`, "Node.role_type", "Pending")
+    ex, err :=  db.GetDB().Exists("Node.nameid", nid, &filter)
     if err != nil { return err }
     if ex {
         // REMOVING node have unattended effect (emitter missing)

@@ -360,31 +360,17 @@ var dqlQueries map[string]string = map[string]string{
             Node.nameid
         }
     }`,
-    // @debug: why message is in Post.message and not Comment.message !!!?
-    "getFirstComment": `{
-        all(func: uid({{.tid}})) @normalize {
-            title: Tension.title
-            receiverid: Tension.receiverid
-            Post.createdBy {
-                author_name: User.name
-            }
-            Tension.comments(first:1, orderasc: Post.createdAt) {
-                message: Post.message
-            }
-        }
-    }`,
+    // @debug sub filter comments on username/author...
     "getLastComment": `{
         all(func: uid({{.tid}})) @normalize {
             title: Tension.title
             receiverid: Tension.receiverid
             Tension.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message
-                Post.createdBy @filter(eq(User.username, "{{.username}}")) {
-                    author_name: User.name
-                }
             }
         }
     }`,
+    // @debug sub filter comments on username/author...
     "getLastContractComment": `{
         all(func: uid({{.cid}})) @normalize {
             Contract.tension {
@@ -392,9 +378,6 @@ var dqlQueries map[string]string = map[string]string{
             }
             Contract.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message
-                Post.createdBy @filter(eq(User.username, "{{.username}}")) {
-                    author_name: User.name
-                }
             }
         }
     }`,
@@ -804,15 +787,15 @@ func (dg Dgraph) Meta1(f string, maps map[string]string, data interface{}) (erro
 }
 
 // Probe if an object exists.
-func (dg Dgraph) Exists(fieldName string, value string, filterName, filterValue *string) (bool, error) {
+func (dg Dgraph) Exists(fieldName string, value string, filter *string) (bool, error) {
     // Format Query
     maps := map[string]string{
         "fieldName": fieldName,
         "value": value,
         "filter": "",
     }
-    if filterName != nil {
-        maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, *filterName, *filterValue )
+    if filter != nil {
+        maps["filter"] = fmt.Sprintf(`@filter(%s)`, *filter )
     }
     // Send request
     res, err := dg.QueryDql("exists", maps)

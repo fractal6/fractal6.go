@@ -1,17 +1,21 @@
 package graph
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
+	"context"
+    "strings"
+    re "regexp"
+	"encoding/json"
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/auth"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/graph/codec"
 	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/email"
 )
 
 var ctx context.Context = context.Background()
+var user_selection string = "User.username User.email User.name User.notifyByEmail"
 
 //
 // Publisher functions (Redis)
@@ -60,7 +64,6 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 // GetUserToNotify returns a list of user should receive notifications uponf tension updates.
 func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
-    user_selection := "User.username User.email User.name User.notifyByEmail"
 
     {
         // Get Coordos
@@ -118,6 +121,35 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
 
     return users, nil
+}
+
+// Update the users map with notified users.
+// Note: only add user that are member of the given rootnameid
+// @debug: user inside block code will be notified here...
+func UpdateWithMentionnedUser(msg string, nid string, users map[string]model.UserNotifInfo) error {
+    rootnameid, err := codec.Nid2rootid(nid)
+    if err != nil { return err}
+    r := re.MustCompile(`(^|\s|[^\w\[\` + "`" + `])@([\w\-\.]+)\b`)
+    for i, U := range r.FindStringSubmatch(msg) {
+        u := strings.ToLower(U)
+        if _, ex := users[u]; ex { continue }
+        // Check that user is a member
+        filter := `has(Node.first_link) AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")`
+        if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex { continue }
+        res, err := db.GetDB().GetFieldByEq("User.username", u, user_selection)
+        if err != nil { return err }
+        if res != nil {
+            var user model.User
+            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                fmt.Println("=== 3")
+                users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
+            }
+        }
+        if i > 100 {
+            return fmt.Errorf("Too many user memtioned. Please consider using an Alert tension to notify group of users.")
+        }
+    }
+    return nil
 }
 
 
@@ -182,10 +214,9 @@ func PushEventNotifications(notif model.EventNotif) error {
             receiverid = tension["receiverid"].(string)
         }
     }
-    // --
+    // Handle Alert tension
     if isAlert {
         // Alert tension created: Notify everyone
-        user_selection := "User.username User.email User.name User.notifyByEmail"
         if data, err := db.GetDB().GetSubMembers("nameid", receiverid, user_selection); err != nil {
             return err
         } else {
@@ -199,6 +230,20 @@ func PushEventNotifications(notif model.EventNotif) error {
         // Notify only suscribers and relative.
         users, err = GetUsersToNotify(notif.Tid, true, true)
         if err != nil { return err }
+    }
+
+    // Add mentionned and **set tension data**
+    if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid}); err != nil {
+        return err
+    } else if len(m) > 0 {
+        notif.Receiverid = m[0]["receiverid"].(string)
+        notif.Msg, _ = m[0]["message"].(string)
+        notif.Title = m[0]["title"].(string)
+        if notif.Msg != "" {
+            UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
+        }
+    } else {
+        return fmt.Errorf("tension %s not found.", notif.Tid)
     }
 
     // Push user event notification
@@ -219,6 +264,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 
         // Email
          if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail {
+             fmt.Println("send event notif: ",  u)
              ui.Eid = eid
              err = email.SendEventNotificationEmail(ui, notif)
              if err != nil { return err }
@@ -258,6 +304,19 @@ func PushContractNotifications(notif model.ContractNotif) error {
     for _, p := range notif.Contract.Participants {
         if _, ex := users[p.Node.FirstLink.Username]; ex { continue }
         users[p.Node.FirstLink.Username] = model.UserNotifInfo{User: *p.Node.FirstLink, Reason: model.ReasonIsParticipant}
+    }
+    // +
+    // Add mentionned and **set tension data**
+    if m, err := db.GetDB().Meta("getLastContractComment", map[string]string{"cid":notif.Contract.ID}); err != nil {
+        return err
+    } else if len(m) > 0 {
+        notif.Receiverid = m[0]["receiverid"].(string)
+        notif.Msg, _ = m[0]["message"].(string)
+        if notif.Msg != "" {
+            UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
+        }
+    } else {
+        return fmt.Errorf("contract %s not found.", notif.Tid)
     }
 
     // Push user event notification
@@ -306,7 +365,8 @@ func PushContractNotifications(notif model.ContractNotif) error {
         ui.Reason == model.ReasonIsPendingCandidate ||
         ui.Reason == model.ReasonIsParticipant ||
         ui.Reason == model.ReasonIsCoordo ||
-        ui.Reason == model.ReasonIsAssignee ) {
+        ui.Reason == model.ReasonIsAssignee ||
+        ui.Reason == model.ReasonIsMentionned) {
              ui.Eid = eid
              err = email.SendContractNotificationEmail(ui, notif)
              if err != nil { return err }

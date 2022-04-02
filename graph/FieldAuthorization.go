@@ -90,7 +90,8 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
         filterValue := s.(string)
 
         // Check existence
-        ex, err :=  db.GetDB().Exists(fieldName, v, &filterName, &filterValue)
+        filter := fmt.Sprintf(`eq(%s, "%s")`, filterName, filterValue)
+        ex, err :=  db.GetDB().Exists(fieldName, v, &filter)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ex {
             return data, err

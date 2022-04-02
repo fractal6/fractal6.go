@@ -28,6 +28,7 @@ const (
     ReasonIsFirstLink
     ReasonIsAssignee
     ReasonIsSubscriber
+    ReasonIsMentionned
     ReasonIsAlert
 )
 
@@ -45,6 +46,8 @@ func (n NotifReason) ToText() string {
         return "you are subscribed to this tension"
     case ReasonIsParticipant:
         return "you voted to this contract"
+    case ReasonIsMentionned:
+        return "you have been mentionned"
     case ReasonIsAlert:
         return "you are a member of this circle"
     default:
@@ -71,6 +74,9 @@ type EventNotif struct {
     Uctx *UserCtx        `json:"uctx"`
     Tid string           `json:"tid"`
     History []*EventRef  `json:"history"`
+    Receiverid string    `json:"receiverid"`
+    Title string         `json:"title"`
+    Msg string           `json:"msg"`
 }
 
 type ContractNotif struct {
@@ -78,6 +84,8 @@ type ContractNotif struct {
     Tid string                  `json:"tid"`
     Contract *Contract          `json:"contract"`
     ContractEvent ContractEvent `json:"contract_event"`
+    Receiverid string           `json:"receiverid"`
+    Msg string                  `json:"msg"`
 }
 
 type NotifNotif struct {
@@ -107,7 +115,7 @@ func (notif EventNotif) IsEmailable() bool {
     return false
 }
 
-// @debug: duplicat
+// @debug: duplicate
 func (notif ContractNotif) IsEmailable() bool {
     e := notif.Contract.Event
     if TensionEventCreated == e.EventType ||

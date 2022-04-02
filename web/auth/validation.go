@@ -230,7 +230,7 @@ func ValidateNewUser(creds model.UserCreds) error {
     // TODO: password complexity check
 
     // Chech username existence
-    ex1, err1 := db.DB.Exists("User.username", username, nil, nil)
+    ex1, err1 := db.DB.Exists("User.username", username, nil)
     if err1 != nil {
         return err1
     }
@@ -238,7 +238,7 @@ func ValidateNewUser(creds model.UserCreds) error {
         return ErrUsernameExist
     }
     // Chech email existence
-    ex2, err2 := db.DB.Exists("User.email", email, nil, nil)
+    ex2, err2 := db.DB.Exists("User.email", email, nil)
     if err2 != nil {
         return err2
     }

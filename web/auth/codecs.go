@@ -12,6 +12,7 @@ var specialSoftReg *re.Regexp
 var reservedURIReg *re.Regexp
 var numReg *re.Regexp
 var letterReg *re.Regexp
+var safeWordReg *re.Regexp
 
 func init() {
     //special := "@!#<>{}`'\"" + `%\\`
@@ -25,6 +26,7 @@ func init() {
     specialReg = re.MustCompile(`[`+special+`]`)
     specialSoftReg = re.MustCompile(`[`+specialSoft+`]`)
     reservedURIReg = re.MustCompile(`[`+reservedURI+`]`)
+    safeWordReg = re.MustCompile(`[\w\.\-]+`)
 }
 
 //
@@ -68,17 +70,16 @@ func ValidateUsername(u string) error {
     if hasStrip(u)  {
         return ErrBadUsernameFormat
     }
-    if hasSpecial(u) {
-        return ErrBadUsernameFormat
-    }
-    if hasReservedURI(u) {
+    if !isSafeWord(u) {
         return ErrBadUsernameFormat
     }
 
-    l := u[len(u) -1]
-    if l == '.' || l == '-' {
-        return ErrBadUsernameFormat
+    for _, l := range []byte{u[0], u[len(u)-1]} {
+        if l == '.' || l == '-' || l == '_'{
+            return ErrBadUsernameFormat
+        }
     }
+
     return nil
 }
 
@@ -169,6 +170,10 @@ func ValidateSimplePassword(p string) error {
 //
 // String utils
 //
+
+func isSafeWord(s string) bool {
+    return safeWordReg.MatchString(s)
+}
 
 func hasStrip(s string) bool {
     return stripReg.MatchString(s)

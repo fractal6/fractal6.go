@@ -138,7 +138,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             return
         } else if pending.Email == "" {
             // If user exists, set uctx
-            if ex, err := db.DB.Exists("User.username", creds.Username, nil, nil); err != nil {
+            if ex, err := db.DB.Exists("User.username", creds.Username, nil); err != nil {
                 http.Error(w, err.Error(), 500)
                 return
             } else if ex {
@@ -417,7 +417,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
     // Return true after here in any case, to prevent
     // the email database to be probe.
-    ex, _ := db.GetDB().Exists("User.email", data.Email, nil, nil)
+    ex, _ := db.GetDB().Exists("User.email", data.Email, nil)
     if ex {
         // Actual send the reset email
         //

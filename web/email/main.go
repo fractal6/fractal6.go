@@ -151,11 +151,13 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     var url_redirect string
     var subject string
     var body string
-    var email string = ui.User.Email
     var author string
     var payload string
-    var message string
-    var type_hint string
+    var recv string = strings.Replace(notif.Receiverid, "#", "/", -1)
+    var title string = notif.Title
+    var message string = notif.Msg
+    // Recipient email
+    var email string = ui.User.Email
     if email == "" {
         if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
             return err
@@ -163,6 +165,14 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             email = x.(string)
         }
     }
+    // Author
+    if notif.Uctx.Name == nil {
+        author = "@" + notif.Uctx.Username
+    } else {
+        author = *notif.Uctx.Name
+    }
+
+    var type_hint string
     if ui.Reason == model.ReasonIsAlert {
         type_hint = "[Alert]"
     }
@@ -180,22 +190,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
     // Build body
     if notif.HasEvent(model.TensionEventCreated) { // Tension added
-        // Fetch tension data
-        if m, err := db.GetDB().Meta("getFirstComment", map[string]string{"tid": notif.Tid}); err != nil {
-            return err
-        } else if len(m) > 0 {
-            if a, ok := m[0]["author_name"].(string); a != "" && ok {
-                author = a
-            } else {
-                author = "@" + notif.Uctx.Username
-            }
-            title := m[0]["title"].(string)
-            recv := strings.Replace(m[0]["receiverid"].(string), "#", "/", -1)
-            message, _ = m[0]["message"].(string)
-            subject = fmt.Sprintf("[%s]%s %s", recv, type_hint, title)
-        } else {
-            return fmt.Errorf("tension %s not found.", notif.Tid)
-        }
+        subject = fmt.Sprintf("[%s]%s %s", recv, type_hint, title)
 
         // Add eventual comment
         if message == "" {
@@ -210,22 +205,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         }
 
     } else { // Tension updated
-        // Fetch tension data
-        if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid, "username": notif.Uctx.Username}); err != nil {
-            return err
-        } else if len(m) > 0 {
-            if a, ok := m[0]["author_name"].(string); a != "" && ok {
-                author = a
-            } else {
-                author = "@" + notif.Uctx.Username
-            }
-            title := m[0]["title"].(string)
-            recv := strings.Replace(m[0]["receiverid"].(string), "#", "/", -1)
-            message, _ = m[0]["message"].(string)
-            subject = fmt.Sprintf("Re: [%s]%s %s", recv, type_hint, title)
-        } else {
-            return fmt.Errorf("tension %s not found.", notif.Tid)
-        }
+        subject = fmt.Sprintf("Re: [%s]%s %s", recv, type_hint, title)
 
         // Add automatic message
         if notif.HasEvent(model.TensionEventClosed) {
@@ -237,6 +217,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         } else if notif.HasEvent(model.TensionEventUserLeft) || notif.HasEvent(model.TensionEventMemberUnlinked) {
             u := notif.GetExUser()
             payload = fmt.Sprintf(`User %s left or was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+        } else if ui.Reason == model.ReasonIsCoordo {
+            // Avoid flooding coordinator with email
+            // for every tensions comments, if they havent suscribed or participated.
+            return nil
         }
 
         // Add eventual comment
@@ -301,12 +285,12 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     var url_redirect string
     var subject string
     var body string
-    var email string = ui.User.Email
     var rcpt_name string
     var author string
     var payload string
-    var recv string
-    var message string
+    var recv string = strings.Replace(notif.Receiverid, "#", "/", -1)
+    // Recipient email
+    var email string = ui.User.Email
     if email == "" {
         if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
             return err
@@ -314,12 +298,19 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
             email = x.(string)
         }
     }
+    // Recipient name
     if ui.User.Name != nil {
         rcpt_name = " " + *ui.User.Name
     } else if ui.User.Username != "" {
 		rcpt_name = " @" + ui.User.Username
 	} else {
         rcpt_name = ""
+    }
+    // Author
+    if notif.Uctx.Name == nil {
+        author = "@" + notif.Uctx.Username
+    } else {
+        author = *notif.Uctx.Name
     }
 
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
@@ -329,21 +320,6 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
         if err != nil { return err }
         url_redirect += fmt.Sprintf("?puid=%s", token)
-    }
-
-    // Fetch tension data
-    if m, err := db.GetDB().Meta("getLastContractComment", map[string]string{"cid":notif.Contract.ID, "username": notif.Uctx.Username}); err != nil {
-        return err
-    } else if len(m) > 0 {
-        if a, ok := m[0]["author_name"].(string); a != "" && ok {
-            author = a
-        } else {
-            author = "@" + notif.Uctx.Username
-        }
-        recv = strings.Replace(m[0]["receiverid"].(string), "#", "/", -1)
-        message, _ = m[0]["message"].(string)
-    } else {
-        return fmt.Errorf("contract %s not found.", notif.Tid)
     }
 
     // Candidate text for open contract
@@ -358,7 +334,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         }
         return
     }
-    candidate_payload := func(e model.TensionEvent	) (t string) {
+    candidate_payload := func(e model.TensionEvent) (t string) {
         switch  e {
         case model.TensionEventUserJoined:
             t = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited as a new member by %s.<br><br>
@@ -435,7 +411,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
             // no notification
             return nil
         }
-        if message != "" {
+        if notif.Msg != "" {
             payload += "<br><br>—<br>"
         }
     case model.NewComment:
@@ -443,10 +419,10 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
 
     // Add eventual comment
-    if message != "" {
+    if notif.Msg != "" {
         // Convert markdown to Html
         var buf bytes.Buffer
-        if err = goldmark.Convert([]byte(message), &buf); err != nil {
+        if err = goldmark.Convert([]byte(notif.Msg), &buf); err != nil {
             return err
         }
         payload += bluemonday.UGCPolicy().Sanitize(buf.String())
