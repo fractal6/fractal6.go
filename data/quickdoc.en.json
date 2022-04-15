@@ -36,8 +36,8 @@
     "name": "Tensions",
     "tasks": [
       {
-        "header": "Add tension",
-        "content": "In the **overview panel*, click on the plus (+) button on the right of the search bar. In the windows that opens, click on the **new tension** button. The receiver of the tension will be the current focused circle.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organisation map.\n"
+        "header": "Create a tension",
+        "content": "In the **overview panel**, click on the plus (+) button on the right of the search bar. In the windows that opens, click on the **new tension** button. The receiver of the tension will be the current focused circle.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organisation map.\n"
       },
       {
         "header": "Close/Reopen tension",
@@ -87,7 +87,7 @@
       },
       {
         "header": "Edit circle",
-        "content": "If you have sufficient rights, you can edit the following properties of a circle:\n\n* its name\n* its mandate\n* its governance process\n* its visibility\n\nTo can edit those properties from the panel accessible either by clicking in the tooltip (the triple dot on the right) that appear above each circle, or from the side pane of the tension related to this circle.\n"
+        "content": "If you have sufficient rights, you can edit the following properties of a circle:\n\n* its name\n* its mandate\n* its governance process\n* its visibility\n\nTo edit those properties open the panel by either clicking in the tooltip (the triple dot on the right) that appear above each circle, or from the side pane of the tension related to this circle.\n"
       },
       {
         "header": "Archive circle",
