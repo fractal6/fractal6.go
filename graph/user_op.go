@@ -119,57 +119,59 @@ func SyncPendingUser(username, email string) error {
 
     // Build inputs
     var inputs []model.AddUserEventInput
-    for _, c := range contracts.([]interface{}) {
-        // Aggregate event inputs
-        con := c.(model.JsonAtom)
-        cid := con["id"].(string)
-        createdAt, ok := con["createdAt"].(string)
-        if !ok { continue } // If a contract gets deletes, the uid only will subsits in the list.
-        inputs = append(inputs, model.AddUserEventInput{
-            User: &model.UserRef{Email: &email},
-            IsRead: false,
-            CreatedAt: createdAt,
-            Event: []*model.EventKindRef{&model.EventKindRef{ContractRef: &model.ContractRef{ID: &cid}}},
-        })
+    if contracts != nil {
+        for _, c := range contracts.([]interface{}) {
+            // Aggregate event inputs
+            con := c.(model.JsonAtom)
+            cid := con["id"].(string)
+            createdAt, ok := con["createdAt"].(string)
+            if !ok { continue } // If a contract gets deletes, the uid only will subsits in the list.
+            inputs = append(inputs, model.AddUserEventInput{
+                User: &model.UserRef{Email: &email},
+                IsRead: false,
+                CreatedAt: createdAt,
+                Event: []*model.EventKindRef{&model.EventKindRef{ContractRef: &model.ContractRef{ID: &cid}}},
+            })
 
-        // Fetch contract
-        contract, err := db.GetDB().GetContractHook(cid)
-        if err != nil { return err }
+            // Fetch contract
+            contract, err := db.GetDB().GetContractHook(cid)
+            if err != nil { return err }
 
-        // Update contract
-        // --
-        var contractPatch model.ContractPatch
-        // Set event type
-        StructMap(contract.Event, &contractPatch.Event)
-        // Set candidate
-        contractPatch.Candidates = []*model.UserRef{&model.UserRef{Email: &email}}
-        emailPart := strings.Split(email, "@")[0]
-        if contract.Event.Old != nil && strings.HasPrefix(*contract.Event.Old, emailPart) {
-            contractPatch.Event.Old = &username
-        }
-        if contract.Event.New != nil && strings.HasPrefix(*contract.Event.New, emailPart) {
-            contractPatch.Event.New = &username
-        }
-        contractid := codec.ContractIdCodec(
-            contract.Tension.ID,
-            *contractPatch.Event.EventType,
-            *contractPatch.Event.Old,
-            *contractPatch.Event.New,
-        )
-        contractPatch.Contractid = &contractid
-        err = db.DB.Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
-            Filter: &model.ContractFilter{ID: []string{cid}},
-            Set: &contractPatch,
-        })
-        if err != nil { return err }
+            // Update contract
+            // --
+            var contractPatch model.ContractPatch
+            // Set event type
+            StructMap(contract.Event, &contractPatch.Event)
+            // Set candidate
+            contractPatch.Candidates = []*model.UserRef{&model.UserRef{Email: &email}}
+            emailPart := strings.Split(email, "@")[0]
+            if contract.Event.Old != nil && strings.HasPrefix(*contract.Event.Old, emailPart) {
+                contractPatch.Event.Old = &username
+            }
+            if contract.Event.New != nil && strings.HasPrefix(*contract.Event.New, emailPart) {
+                contractPatch.Event.New = &username
+            }
+            contractid := codec.ContractIdCodec(
+                contract.Tension.ID,
+                *contractPatch.Event.EventType,
+                *contractPatch.Event.Old,
+                *contractPatch.Event.New,
+            )
+            contractPatch.Contractid = &contractid
+            err = db.DB.Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
+                Filter: &model.ContractFilter{ID: []string{cid}},
+                Set: &contractPatch,
+            })
+            if err != nil { return err }
 
-        // Do MaybeAddPendingNode for each invitation.
-        if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
-            // Add pending Nodes
-            for _, pc := range contract.PendingCandidates {
-                if *pc.Email == email {
-                    _, err = MaybeAddPendingNode(username, &model.Tension{ID: contract.Tension.ID})
-                    if err != nil { return err }
+            // Do MaybeAddPendingNode for each invitation.
+            if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
+                // Add pending Nodes
+                for _, pc := range contract.PendingCandidates {
+                    if *pc.Email == email {
+                        _, err = MaybeAddPendingNode(username, &model.Tension{ID: contract.Tension.ID})
+                        if err != nil { return err }
+                    }
                 }
             }
         }
