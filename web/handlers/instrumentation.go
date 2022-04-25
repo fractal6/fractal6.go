@@ -16,7 +16,12 @@ var (
 
 	openTensionCount = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "open_tension_count",
-		Help: "Current number of tensions.",
+		Help: "Current number of open tensions.",
+	})
+
+	closeTensionCount = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "close_tension_count",
+		Help: "Current number of close tensions.",
 	})
 
 	circleCount = prometheus.NewGauge(prometheus.GaugeOpts{
@@ -37,6 +42,7 @@ func InstruHandler() http.Handler {
 	// Metrics have to be registered to be exposed:
 	r.MustRegister(userCount)
 	r.MustRegister(openTensionCount)
+	r.MustRegister(closeTensionCount)
 	r.MustRegister(circleCount)
 	r.MustRegister(labelCount)
 
@@ -58,6 +64,9 @@ func InstrumentationMeasures() {
 
     count = db.GetDB().CountHas2("Tension.title", "Tension.status", "Open")
 	openTensionCount.Set(float64(count))
+
+    count = db.GetDB().CountHas2("Tension.title", "Tension.status", "Closed")
+	closeTensionCount.Set(float64(count))
 
     count = db.GetDB().CountHas("Node.name")
 	circleCount.Set(float64(count))
