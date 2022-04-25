@@ -11,7 +11,7 @@ require (
 	github.com/gofrs/uuid v4.1.0+incompatible
 	github.com/lestrrat-go/jwx v1.2.18
 	github.com/microcosm-cc/bluemonday v1.0.18
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/rs/cors v1.8.2
 	github.com/spf13/cobra v1.0.0
