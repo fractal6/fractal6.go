@@ -264,7 +264,6 @@ func PushEventNotifications(notif model.EventNotif) error {
 
         // Email
          if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail {
-             fmt.Println("send event notif: ",  u)
              ui.Eid = eid
              err = email.SendEventNotificationEmail(ui, notif)
              if err != nil { return err }
