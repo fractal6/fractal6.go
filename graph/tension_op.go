@@ -20,7 +20,7 @@ func init() {
             Auth: MemberHook,
         },
         model.TensionEventCommentPushed: EventMap{
-            Auth: MemberHook,
+            Auth: MemberHook | AuthorHook,
         },
         model.TensionEventBlobCreated: EventMap{
             Auth: MemberHook,
@@ -51,10 +51,10 @@ func init() {
             Auth: TargetCoordoHook | AuthorHook | AssigneeHook,
         },
         model.TensionEventAssigneeAdded: EventMap{
-            Auth: TargetCoordoHook | AssigneeHook,
+            Auth: TargetCoordoHook,
         },
         model.TensionEventAssigneeRemoved: EventMap{
-            Auth: TargetCoordoHook | AssigneeHook,
+            Auth: TargetCoordoHook,
         },
         // --- Trigger Action ---
         model.TensionEventBlobPushed: EventMap{

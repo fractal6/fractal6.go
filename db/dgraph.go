@@ -295,10 +295,17 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
             //continue
         }
         if _, v := check[rid]; !v {
-            check[rid] = true
-            rootids = append(rootids, rid)
+            // @DEBUG: if pending is not included here, invited user, or author of tension created with BOT
+            // won't be able to see on tensins. But, authorizing it, make give a visibity hole for private circle
+            // that can be seen by **self-invited** user.
+            //if *d.RoleType != model.RoleTypePending && *d.RoleType != model.RoleTypeRetired {
+            if *d.RoleType != model.RoleTypeRetired {
+                check[rid] = true
+                rootids = append(rootids, rid)
+            }
         }
     }
+
     // Dgraph failed to run the @auth query if the variable is null
     // see https://discuss.dgraph.io/t/auth-rule-with-or-condition-fail-if-an-empty-list-is-given-as-variable/16251
     if len(rootids) == 0 { rootids = append(rootids, "") }

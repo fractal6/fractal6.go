@@ -228,6 +228,15 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+    // Filter the nameids according to the @auth directives
+    uctx := webauth.GetUserContextOrEmpty(r.Context())
+    newNameids, err := db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+    q.Nameids = newNameids
+
     // Get Ext Tensions
     data, err := db.GetDB().GetTensions(q, "ext")
     if err != nil {

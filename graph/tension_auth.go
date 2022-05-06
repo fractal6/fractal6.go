@@ -19,16 +19,18 @@ import (
 //     has been validated by any participants (the one that satisfy the given authorization).
 //
 type EventMap struct {
-    // Validation defined how the tension should be validated. Typically, what kind of contract
-    // is used to validated the tension. If Validation is nil, no contract are create and the tension
-    // and we just check if the Authorization hook. Else the validations are defined in the function mapped
-    // to it. see the validationMap map.
+    // Validation defined how the tension should be validated according to corresponding event.
+    // It is implemented by the kind of contract used to validated the tension.
+    // - If Validation is nil, no contract are create and the tension  and we just check if the Authorization hook.
+    // - Else the validations are defined in the function mapped to it. see the validationMap map.
     Validation model.ContractType
-    // Auth defined a set of authorization hooks that can be satisfied by a user to process the event.
+    // Auth defined rules that restrict the users that can create the corresponding event.
     Auth AuthHookValue
+    // Restrict defined rules to be respected acording the event values
+    Restrict RestrictValue
     // Defined a propertie/variable the should be updated by the event (taking value from the event old/new attributes)
     Propagate string
-    // Action definfed the fonction that should be executed if the user has been authorized.
+    // Action defined the fonction that should be executed if the user has been authorized.
     Action func(*model.UserCtx, *model.Tension, *model.EventRef, *model.BlobRef) (bool, error)
 }
 type EventsMap = map[model.TensionEvent]EventMap
@@ -64,6 +66,13 @@ const (
     AssigneeHook AuthHookValue     = 1 << 7
     // Contract based
     CandidateHook AuthHookValue    = 1 << 8
+)
+
+
+// RestrictValue defined condition to be validated based on event values.
+type RestrictValue int
+const (
+    UserIsMemberRestrict RestrictValue = 1 // the new user should be a member of the receiver circle
 )
 
 // Node Action **Rights** Enum.
@@ -115,7 +124,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         return false, nil, fmt.Errorf("non existing tension or event not allowed")
     }
 
-    // Exception Hook Authorization
+    // Exception Hook Authorization (EventMap:Auth)
     // --
     if hookEnabled {
         ok, err = em.checkTensionAuth(uctx, tension, event, contract)
@@ -129,7 +138,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
         }
     }
 
-    // Contract Authorization
+    // Contract Authorization (EventMap:Validation)
     // --
     f := validationMap[em.Validation]
     if f == nil { return false, nil, LogErr("Contract not implemened", fmt.Errorf("Contact a coordinator to access this ressource.")) }
