@@ -219,7 +219,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             payload = fmt.Sprintf(`User %s left or was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
         } else if ui.Reason == model.ReasonIsCoordo {
             // Avoid flooding coordinator with email
-            // for every tensions comments, if they havent suscribed or participated.
+            // for every tensions comments, if they havent subscribed or participated.
             return nil
         }
 

@@ -478,7 +478,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+        all(func: uid(tensions), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
             uid
             Post.createdAt
             Post.createdBy { User.username }
@@ -506,7 +506,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+        all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
             uid
             Post.createdAt
             Post.createdBy { User.username }
@@ -529,7 +529,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions_in), first:{{.first}}, offset:{{.offset}}, orderdesc: Post.createdAt) {
+        all(func: uid(tensions_in), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
             uid
             Post.createdAt
             Post.createdBy { User.username }

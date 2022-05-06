@@ -15,6 +15,7 @@ type TensionQuery struct {
     First int                   `json:"first"`
     Offset int                  `json:"offset"`
     Query *string               `json:"query"`
+    Sort *string                `json:"sort"`
     Status *model.TensionStatus `json:"status"`
     Type *model.TensionType     `json:"type_"`
     Authors []string            `json:"authors"`
@@ -73,6 +74,14 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
         )
     }
 
+    /* sorting */
+    var sortFilter string = "orderdesc"
+    if q.Sort != nil {
+        if *q.Sort == "oldest" {
+            sortFilter = "orderasc"
+        }
+    }
+
     /* Sub Tension filter */
     var authorsFilter string
     var labelsFilter string
@@ -92,6 +101,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
         )
     }
 
+    /* Build template map */
     maps := &map[string]string{
         "first": strconv.Itoa(q.First),
         "offset": strconv.Itoa(q.Offset),
@@ -100,6 +110,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
         "tensionFilter" : tensionFilter,
         "authorsFilter": authorsFilter,
         "labelsFilter": labelsFilter,
+        "order": sortFilter,
     }
 
     return maps, nil
