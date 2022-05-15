@@ -79,6 +79,46 @@ var gqlQueries map[string]string = map[string]string{
 // Graphql requests
 //
 
+//Query data using GQL dgraph API. @auth rules will apply.
+func (dg Dgraph) Query(uctx model.UserCtx, vertex string, k string, values []string, queryGraph string) ([]map[string]string, error) {
+    Vertex := strings.Title(vertex)
+    queryName := "query" + Vertex
+
+    var i int
+    var n, args string
+    var res []map[string]string
+
+    // Build query arguments
+    if k == "id" {
+        ids_formated, _ := json.Marshal(values)
+        args = fmt.Sprintf(`id: %s`, ids_formated)
+    } else {
+        for i, n = range values {
+            if i == 0 {
+                args += fmt.Sprintf(`%s: {eq:"%s"},`, k, n)
+            } else {
+                args += fmt.Sprintf(`or: {%s: {eq: "%s"},`, k, n)
+            }
+        }
+        args += strings.Repeat("},", i)
+    }
+
+    // Build query
+    input := map[string]string{
+        "QueryName": queryName,
+        "QueryGraph": queryGraph,
+        "Args": CleanString("filter: {"+args+"}", true),
+    }
+
+    // send query
+    err := dg.QueryGql(uctx, "query", input, &res)
+    if err != nil { return res, err }
+
+    return res, nil
+}
+
+
+
 // Get a new vertex (NOT USED YET...)
 func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string, graph string) (interface{}, error) {
     Vertex := strings.Title(vertex)
@@ -293,48 +333,6 @@ func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, 
     // Send request
     err := dg.QueryGql(uctx, "addExtra", reqInput, data)
     return err
-}
-
-//
-// @auth
-//
-
-//QueryAuthFilter Get only the authorized node
-func (dg Dgraph) QueryAuthFilter(uctx model.UserCtx, vertex string, k string, values []string) ([]string, error) {
-    Vertex := strings.Title(vertex)
-    queryName := "query" + Vertex
-    queryGraph := k
-
-    var i int
-    var n, args string
-    var res []map[string]string
-    final := []string{}
-
-    // Build query arguments
-    for i, n = range values {
-        if i == 0 {
-            args += fmt.Sprintf(`%s: {eq:"%s"},`, k, n)
-        } else {
-            args += fmt.Sprintf(`or: {%s: {eq: "%s"},`, k, n)
-        }
-    }
-    args += strings.Repeat("},", i)
-
-    // Build query
-    input := map[string]string{
-        "QueryName": queryName,
-        "QueryGraph": queryGraph,
-        "Args": CleanString("filter: {"+args+"}", true),
-    }
-
-    // send query
-    err := dg.QueryGql(uctx, "query", input, &res)
-    if err != nil { return final, err }
-
-    for _, x := range res {
-        final = append(final, x[k])
-    }
-    return final, nil
 }
 
 //

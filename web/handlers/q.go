@@ -6,6 +6,7 @@ import (
     "encoding/json"
 
     "fractale/fractal6.go/db"
+    "fractale/fractal6.go/graph/auth"
     webauth "fractale/fractal6.go/web/auth"
 )
 
@@ -194,12 +195,11 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
 
     // Filter the nameids according to the @auth directives
     uctx := webauth.GetUserContextOrEmpty(r.Context())
-    newNameids, err := db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
+    err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
     }
-    q.Nameids = newNameids
 
     // Get Int Tensions
     data, err := db.GetDB().GetTensions(q, "int")
@@ -207,6 +207,22 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 500)
 		return
     }
+
+    // Filter authorized tension
+    //final := []model.Tension{}
+    //ids := []string{}
+    //for _, t := range data {
+    //    ids = append(ids, t.ID)
+    //}
+    //newIds, err := db.GetDB().Query(uctx, "tension", "id", ids, "id")
+    //if err != nil {
+    //    http.Error(w, err.Error(), 500)
+    //    return
+    //}
+    //if len(ids) != len(newIds) {
+    //    // What to do ?
+    //    // It is prompt to breaks the "LoadMore" functionality
+    //}
 
     // Return the user context
     jsonData, err := json.Marshal(data)
@@ -230,12 +246,11 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 
     // Filter the nameids according to the @auth directives
     uctx := webauth.GetUserContextOrEmpty(r.Context())
-    newNameids, err := db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
+    err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
     }
-    q.Nameids = newNameids
 
     // Get Ext Tensions
     data, err := db.GetDB().GetTensions(q, "ext")
@@ -266,12 +281,11 @@ func TensionsAll(w http.ResponseWriter, r *http.Request) {
 
     // Filter the nameids according to the @auth directives
     uctx := webauth.GetUserContextOrEmpty(r.Context())
-    newNameids, err := db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
+    err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
     }
-    q.Nameids = newNameids
 
     // Get all tensions
     data, err := db.GetDB().GetTensions(q, "all")
@@ -299,6 +313,14 @@ func TensionsCount(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 400)
 		return
 	}
+
+    // Filter the nameids according to the @auth directives
+    uctx := webauth.GetUserContextOrEmpty(r.Context())
+    err = auth.QueryAuthFilter(uctx, &q)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
 
     // Get tension counts
     data, err := db.GetDB().GetTensionsCount(q)

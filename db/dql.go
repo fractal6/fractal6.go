@@ -157,7 +157,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(h), first:25, orderdesc: Post.createdAt) {
+        all(func: uid(h), first:25, orderdesc: Post.createdAt) @filter(NOT eq(Event.event_type, "BlobCreated")) {
             Post.createdAt
             Post.createdBy { User.username }
             Event.event_type
@@ -395,7 +395,9 @@ var dqlQueries map[string]string = map[string]string{
             o as Node.children
         }
 
-        all(func: uid(o)) @filter(has(Node.first_link) AND has(Node.role_type) AND eq(Node.isArchived, false)) {
+        all(func: uid(o)) @filter(has(Node.first_link) AND has(Node.role_type) AND eq(Node.isArchived, false)
+                           AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")
+            ) {
             Node.createdAt
             Node.name
             Node.nameid
@@ -478,7 +480,14 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
+        var(func: eq(Node.rootnameid, "{{.rootnameidProtected}}")) @filter({{.nameidsProtected}}) {
+            tensionsProtected as Node.tensions_in {{.tensionFilter}} @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")),
+                {{.labelsFilter}}
+            }
+        }
+
+        all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
             uid
             Post.createdAt
             Post.createdBy { User.username }
@@ -522,14 +531,20 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     "getTensionAll": `{
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
-            tensions_in as Node.tensions_in {{.tensionFilter}} @cascade {
-                uid
+            tensions as Node.tensions_in {{.tensionFilter}} @cascade {
                 {{.authorsFilter}}
                 {{.labelsFilter}}
             }
         }
 
-        all(func: uid(tensions_in), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
+        var(func: eq(Node.rootnameid, "{{.rootnameidProtected}}")) @filter({{.nameidsProtected}}) {
+            tensionsProtected as Node.tensions_in {{.tensionFilter}} @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")),
+                {{.labelsFilter}}
+            }
+        }
+
+        all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
             uid
             Post.createdAt
             Post.createdBy { User.username }
@@ -545,17 +560,23 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     "getTensionCount": `{
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
-            tensions_in as Node.tensions_in {{.tensionFilter}} @cascade {
-                uid
+            tensions as Node.tensions_in {{.tensionFilter}} @cascade {
                 {{.authorsFilter}}
                 {{.labelsFilter}}
             }
         }
 
-        all(func: uid(tensions_in)) @filter(eq(Tension.status, "Open")) {
+        var(func: eq(Node.rootnameid, "{{.rootnameidProtected}}")) @filter({{.nameidsProtected}}) {
+            tensionsProtected as Node.tensions_in {{.tensionFilter}} @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")),
+                {{.labelsFilter}}
+            }
+        }
+
+        all(func: uid(tensions, tensionsProtected)) @filter(eq(Tension.status, "Open")) {
             count: count(uid)
         }
-        all2(func: uid(tensions_in)) @filter(eq(Tension.status, "Closed")) {
+        all2(func: uid(tensions, tensionsProtected)) @filter(eq(Tension.status, "Closed")) {
             count: count(uid)
         }
     }`,
@@ -1165,6 +1186,7 @@ func (dg Dgraph) GetUserRoles(userid string) ([]*model.Node, error) {
 func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) {
     user, err := dg.GetUctxFull(fieldid, userid)
     if err != nil { return user, nil }
+    // @deprecated: special role are processed in graph/auth
     // Filter special roles
     //for i := 0; i < len(user.Roles); i++ {
     //    if *user.Roles[i].RoleType == model.RoleTypeRetired ||

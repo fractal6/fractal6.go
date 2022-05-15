@@ -6,6 +6,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/graph/codec"
 	. "fractale/fractal6.go/tools"
 )
 
@@ -41,6 +42,12 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     switch contract.Event.EventType {
     case model.TensionEventUserJoined:
         for _, c := range contract.Candidates {
+            rootid, err := codec.Nid2rootid(contract.Tension.Receiverid)
+            if err != nil { return false, contract,  err }
+            if rootid != contract.Tension.Receiverid {
+                return false, contract, fmt.Errorf("Only the root circle can be joined.")
+            }
+
             if i := auth.IsMember("username", c.Username, contract.Tension.Receiverid); i >= 0 {
                 return false, contract, fmt.Errorf("Candidate '%s' is already member.", c.Username)
             }

@@ -66,7 +66,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
     var uctxFs *model.UserCtx
     var err error
     DB := db.GetDB()
-    uctxFs, err = DB.GetUctxFull("username", username)
+    uctxFs, err = DB.GetUctx("username", username)
     if err != nil { return err }
 
     // Don't touch owner state

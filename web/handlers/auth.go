@@ -125,7 +125,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             http.Error(w, err.Error(), 500)
             return
         } else if pending.UpdatedAt != nil &&
-        TimeDelta(Now(), *pending.UpdatedAt) > time.Hour * 24 {
+        TimeDelta(Now(), *pending.UpdatedAt) > time.Hour * 48 {
             http.Error(w, "The session has expired.", 500)
             return
         }

@@ -20,16 +20,28 @@ type TensionQuery struct {
     Type *model.TensionType     `json:"type_"`
     Authors []string            `json:"authors"`
     Labels []string             `json:"labels"`
+    // Protected tensions @auth
+    NameidsProtected []string
+    Username string
 }
 
 // Note: We assumes here all nameids have the same rootnameid.
 func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
+    var err error
     /* list format */
 
     // Nameids
     var nameids []string
+    var nameidsString string
     for _, v := range(q.Nameids) {
         nameids = append(nameids, fmt.Sprintf("eq(Node.nameid, \"%s\")", v))
+    }
+
+    // Protected Nameids
+    var nameidsProtected []string
+    var nameidsProtectedString string
+    for _, v := range(q.NameidsProtected) {
+        nameidsProtected = append(nameidsProtected, fmt.Sprintf("eq(Node.nameid, \"%s\")", v))
     }
 
     // Authors
@@ -43,10 +55,6 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
     for _, v := range(q.Labels) {
         labels = append(labels, fmt.Sprintf("eq(Label.name, \"%s\")", v))
     }
-
-    // Rootnameid
-    rootnameid, err := codec.Nid2rootid(q.Nameids[0])
-    if err != nil { return nil, err }
 
     /* Tension filter */
     var tf []string
@@ -101,17 +109,43 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
         )
     }
 
+    // Rootnameid
+    var rootnameid string
+    if len(q.Nameids) > 0 {
+        rootnameid, err = codec.Nid2rootid(q.Nameids[0])
+        if err != nil { return nil, err }
+        nameidsString = strings.Join(nameids, " OR ")
+    } else if len(q.NameidsProtected) > 0 {
+        nameidsString = ""
+    }
+    // -- Protected circles
+    var rootnameidProtected string
+    var hasSelf bool
+    for _, u := range authors { // @reduce: with generics
+        if u == q.Username { hasSelf = true }
+    }
+    if len(q.NameidsProtected) > 0 && (hasSelf || len(q.Authors) == 0) {
+        rootnameidProtected, err = codec.Nid2rootid(q.NameidsProtected[0])
+        if err != nil { return nil, err }
+        nameidsProtectedString = strings.Join(nameidsProtected, " OR ")
+    }
+
     /* Build template map */
     maps := &map[string]string{
         "first": strconv.Itoa(q.First),
         "offset": strconv.Itoa(q.Offset),
         "rootnameid": rootnameid,
-        "nameids": strings.Join(nameids, " OR "),
+        "nameids": nameidsString,
         "tensionFilter" : tensionFilter,
         "authorsFilter": authorsFilter,
         "labelsFilter": labelsFilter,
         "order": sortFilter,
+        // Protected
+        "rootnameidProtected": rootnameidProtected,
+        "nameidsProtected": nameidsProtectedString,
+        "username": q.Username,
     }
 
     return maps, nil
 }
+

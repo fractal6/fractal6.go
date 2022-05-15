@@ -12,8 +12,10 @@ type UserCtx struct {
     Password       string     `json:"password"` // hash
     Rights         UserRights `json:"rights"`
 	Roles          []*Node    `json:"roles"`
-    // Used to reload to actualize the client version if outdated
+    // Used to refresh the client version if outdated
     ClientVersion string      `json:"client_version"`
+    // Used to refresh the token if outdated
+    ExpiresAt string          `json:"expiresAt"`
     // fot token iat (empty when uctx is got from DB)
     // limit the DB hit by keeping nodes checked for iat
     // number of time the userctx iat is checked

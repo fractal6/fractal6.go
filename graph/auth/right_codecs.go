@@ -14,9 +14,11 @@ import (
  */
 
 
-// GetRoles returns the list of the users roles below the given node
-func GetRoles(uctx *model.UserCtx, rootnameid string) []*model.Node {
+// GetRoles returns a list of the users roles inside an organisation
+func GetRoles(uctx *model.UserCtx, nameid string) []*model.Node {
     uctx, e := webauth.MaybeRefresh(uctx)
+    if e != nil { panic(e) }
+    rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
 
     var roles []*model.Node
@@ -36,6 +38,10 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
+    if !codec.IsRole(nameid) {
+        panic("nameid is ambigous. Only role's nameid are supported.")
+    }
+
     for i, r := range uctx.Roles {
         if r.Nameid == nameid  {
             return i
@@ -44,9 +50,11 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-// UserIsMember return true if the user belongs to the given root
-func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
+// UserIsMember return true if the user belongs to an organisation
+func UserIsMember(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
+    if e != nil { panic(e) }
+    rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -63,9 +71,11 @@ func UserIsMember(uctx *model.UserCtx, rootnameid string) int {
     return -1
 }
 
-// UserIsGuest return true if the user is a guest (has only one role) in the given organisation
-func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
+// UserIsGuest return true if the user is a guest of an organisation
+func UserIsGuest(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
+    if e != nil { panic(e) }
+    rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -83,11 +93,15 @@ func UserIsGuest(uctx *model.UserCtx, rootnameid string) int {
     return -1
 }
 
-// UserHasRole return true if the user has at least one role in the given node
+// UserHasRole return true if the user has at least one role in below the given node
 // other than a Guest role.
 func UserHasRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
+
+    if codec.IsRole(nameid) {
+        panic("nameid is ambigous. Only circle's nameid are supported.")
+    }
 
     for i, r := range uctx.Roles {
         if *r.RoleType == model.RoleTypeGuest || *r.RoleType == model.RoleTypePending || *r.RoleType == model.RoleTypeRetired {
@@ -108,6 +122,10 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
+    if codec.IsRole(nameid) {
+        panic("nameid is ambigous. Only circle's nameid are supported.")
+    }
+
     for i, r := range uctx.Roles {
         if *r.RoleType != model.RoleTypeCoordinator && *r.RoleType != model.RoleTypeOwner {
             continue
@@ -127,7 +145,6 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
 func IsCoordo(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
-
     rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
 
@@ -146,8 +163,10 @@ func IsCoordo(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
+func UserIsOwner(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
+    if e != nil { panic(e) }
+    rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
@@ -169,9 +188,10 @@ func UserIsOwner(uctx *model.UserCtx, rootnameid string) int {
 // Wrapper when uctx is unknown
 //
 
-func IsMember(fieldname, username, rootnameid string) int {
-    uctx, e := db.GetDB().GetUctxFull(fieldname, username)
+// IsMember check is user is a member of an organisation from
+// its email or username {fieldname}.
+func IsMember(fieldname, username, nameid string) int {
+    uctx, e := db.GetDB().GetUctx(fieldname, username)
     if e != nil { panic(e) }
-    return UserIsMember(uctx, rootnameid)
-
+    return UserIsMember(uctx, nameid)
 }

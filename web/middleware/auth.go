@@ -6,9 +6,9 @@ import (
     "bytes"
     "io/ioutil"
     "encoding/json"
-    "fractale/fractal6.go/db"
-    webauth "fractale/fractal6.go/web/auth"
     "github.com/spf13/viper"
+    //"fractale/fractal6.go/db"
+    //webauth "fractale/fractal6.go/web/auth"
 )
 
 var CREDENTIAL_PROM string
@@ -69,7 +69,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 func CheckTensionQueryRights(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         ctx := r.Context()
-        uctx := webauth.GetUserContextOrEmpty(r.Context())
+        //uctx := webauth.GetUserContextOrEmpty(r.Context())
         var q struct{Nameids []string}
 
         // Keep this to reset the body reader later
@@ -87,7 +87,7 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
         // reset the body reader agin
         r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
-        _, err = db.GetDB().QueryAuthFilter(uctx, "node", "nameid", q.Nameids)
+        // Authentification tasks...
         // to be completed, rewrite body !?
 
 

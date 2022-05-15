@@ -141,7 +141,6 @@ func UpdateWithMentionnedUser(msg string, nid string, users map[string]model.Use
         if res != nil {
             var user model.User
             if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
-                fmt.Println("=== 3")
                 users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
             }
         }
@@ -216,7 +215,7 @@ func PushEventNotifications(notif model.EventNotif) error {
     }
     // Handle Alert tension
     if isAlert {
-        // Alert tension created: Notify everyone
+        // Alert tension created: Notify every members (including Guest)
         if data, err := db.GetDB().GetSubMembers("nameid", receiverid, user_selection); err != nil {
             return err
         } else {

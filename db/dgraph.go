@@ -47,9 +47,9 @@ type Dgraph struct {
 type DgraphClaims struct {
     Username string          `json:"USERNAME"`
     UserType model.UserType  `json:"USERTYPE"`
-    // Rootnameid Where user is Member
+    // Rootnameid where user is Member
     Rootids []string        `json:"ROOTIDS"`
-    // Rootnameid Where user is Owner
+    // Rootnameid where user is Owner
     Ownids []string         `json:"OWNIDS"`
 }
 
@@ -288,7 +288,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
     var ownids []string
     check := make(map[string]bool)
     for _, d := range uctx.Roles {
-        rid, _ := codec.Nid2pid(d.Nameid)
+        rid, _ := codec.Nid2rootid(d.Nameid)
         if *d.RoleType == model.RoleTypeOwner {
             ownids = append(ownids, rid)
             // Owner is also a member !

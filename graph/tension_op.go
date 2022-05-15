@@ -52,6 +52,9 @@ func init() {
         },
         model.TensionEventAssigneeAdded: EventMap{
             Auth: TargetCoordoHook,
+            Restrict: []RestrictValue{
+                UserNewIsMemberRestrict,
+            },
         },
         model.TensionEventAssigneeRemoved: EventMap{
             Auth: TargetCoordoHook,
@@ -81,9 +84,14 @@ func init() {
             Validation: model.ContractTypeAnyCoordoDual,
             Auth: AuthorHook | SourceCoordoHook | TargetCoordoHook | AssigneeHook,
             Action: MoveTension,
+            Restrict: []RestrictValue{
+                UserIsMemberRestrict,
+            },
         },
         model.TensionEventMemberLinked: EventMap{
             Validation: model.ContractTypeAnyCandidates,
+            // @DEBUG: auth, can a user open a contract in a private Circle ???
+            // if yes, constraint the candidateHook to Public circle only.
             Auth: TargetCoordoHook | AssigneeHook | CandidateHook,
             Action: ChangeFirstLink,
         },
@@ -94,7 +102,7 @@ func init() {
         model.TensionEventUserJoined: EventMap{
             // @FIXFEAT: Either Check Receiver NodeCharac or contract value to check that user has been invited !
             Validation: model.ContractTypeAnyCandidates,
-            Auth: TargetCoordoHook |  AssigneeHook | CandidateHook,
+            Auth: TargetCoordoHook | AssigneeHook | CandidateHook,
             Action: UserJoin,
         },
         model.TensionEventUserLeft: EventMap{
@@ -469,10 +477,8 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     role_type := model.RoleType(*event.New)
 
     if role_type == model.RoleTypeGuest {
-        rootid, e := codec.Nid2rootid(tension.Emitter.Nameid)
-        if e != nil { return ok, e }
         uctx.NoCache = true
-        i := auth.UserIsGuest(uctx, rootid)
+        i := auth.UserIsGuest(uctx, tension.Emitter.Nameid)
         if i < 0 {
             return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation."))
         }

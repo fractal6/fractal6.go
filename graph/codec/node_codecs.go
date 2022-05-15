@@ -7,6 +7,13 @@ import (
     "fractale/fractal6.go/graph/model"
 )
 
+/*
+* Extract data properties from the "nameid" string.
+* "Nameid" are encoded in various way to contains information
+* such has the rootnameid of a role. This is usefull the reduce the amount of DB requests.
+*
+*/
+
 // Format the nameid id from its parts
 func NodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, string, error) {
     var nameid string

@@ -27,7 +27,7 @@ type EventMap struct {
     // Auth defined rules that restrict the users that can create the corresponding event.
     Auth AuthHookValue
     // Restrict defined rules to be respected acording the event values
-    Restrict RestrictValue
+    Restrict []RestrictValue
     // Defined a propertie/variable the should be updated by the event (taking value from the event old/new attributes)
     Propagate string
     // Action defined the fonction that should be executed if the user has been authorized.
@@ -72,7 +72,9 @@ const (
 // RestrictValue defined condition to be validated based on event values.
 type RestrictValue int
 const (
-    UserIsMemberRestrict RestrictValue = 1 // the new user should be a member of the receiver circle
+    NoRestriction                      = 1 // default
+    UserIsMemberRestrict RestrictValue = 1 << 1 // the user (asking) should be a member of the receiver circle
+    UserNewIsMemberRestrict RestrictValue = 1 << 1 // the new user (event.new) should be a member of the receiver circle
 )
 
 // Node Action **Rights** Enum.
@@ -112,6 +114,7 @@ func init() {
     }
 }
 
+// Check if a tension event can be processed.
 // Returns a triple following the ValidationMap function semantics.
 func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     var ok bool
@@ -123,6 +126,11 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
     if tension == nil || event == nil {
         return false, nil, fmt.Errorf("non existing tension or event not allowed")
     }
+
+    // Restriction check for authorizsation
+    // --
+    ok, err = em.checkTensionRestriction(uctx, tension, event, contract)
+    if !ok || err != nil { return ok, contract, err }
 
     // Exception Hook Authorization (EventMap:Auth)
     // --
@@ -147,13 +155,42 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
 }
 
 
-/*
- *
- * Tension Event Authorization implementation
- *
- */
+// checkTensionRestriction checks the tension can be processed based specific restriction
+func (em EventMap) checkTensionRestriction(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, error) {
+    var ok bool = true
+    var err error
+    if len(em.Restrict) == 0 { return ok, err }
+
+    // Each member of the list is a OR RestrictValue,
+    // the list is an AND of the RestrictValue.
+    for _, restrict := range em.Restrict {
+        if restrict == NoRestriction {
+            continue
+        }
+
+        if restrict & UserIsMemberRestrict > 0 {
+            if i := auth.UserIsMember(uctx, tension.Receiver.Nameid); i > 0 {
+                continue
+            }
+        }
+
+        if restrict & UserNewIsMemberRestrict > 0 {
+            if event.New != nil {
+                if i := auth.IsMember("username", *event.New, tension.Receiver.Nameid); i > 0 {
+                    continue
+                }
+            }
+        }
+
+        ok = false
+        break
+    }
+
+    return ok, err
+}
 
 
+// checkTensionAuth checks the tension can be processed based on graph based properties of the user asking.
 func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, error) {
     var err error
 
@@ -185,8 +222,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     }
 
     if MemberHook & em.Auth > 0 {
-        rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
-        if auth.UserIsMember(uctx, rootid) >= 0 { return true, err }
+        if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 { return true, err }
     }
 
     if TargetCoordoHook & em.Auth > 0 {

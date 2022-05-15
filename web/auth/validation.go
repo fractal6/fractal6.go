@@ -2,9 +2,9 @@ package auth
 
 import (
     "fmt"
+    "time"
     "errors"
     "strings"
-    //"strconv"
 	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
@@ -28,7 +28,7 @@ var (
     }`)
     ErrBadUsernameFormat = errors.New(`{
         "errors":[{
-            "message":"Please enter a valid username.",
+            "message":"Please enter a valid username. Special characters (@:!,?%. etc) are not allowed.",
             "location": "username"
         }]
     }`)
@@ -131,6 +131,8 @@ func regularizeUctx(uctx *model.UserCtx) {
     uctx.Password = ""
     // Set the client version
     uctx.ClientVersion = clientVersion
+    // Set the date of expiration (based on the jwt token validity)
+    uctx.ExpiresAt = time.Now().Add(tokenValidityTime).UTC().Format(time.RFC3339)
 }
 
 //

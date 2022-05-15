@@ -1,7 +1,7 @@
 package auth
 
 import (
-    //"fmt"
+    "fmt"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/db"
@@ -116,18 +116,16 @@ func CheckUserRights(uctx *model.UserCtx, nameid string, mode model.NodeMode) (b
     var err error
 
     // Get the nearest circle
-    if codec.IsRole(nameid) {
-        nameid, _ = codec.Nid2pid(nameid)
-    }
+    nid, err := codec.Nid2pid(nameid)
+    if err != nil { return ok, err }
 
     // Escape if the user is an owner
-    rootnameid, _ := codec.Nid2rootid(nameid)
-    if UserIsOwner(uctx, rootnameid) >= 0 { return true, err }
+    if UserIsOwner(uctx, nid) >= 0 { return true, err }
 
     if mode == model.NodeModeAgile {
-        ok = UserHasRole(uctx, nameid) >= 0
+        ok = UserHasRole(uctx, nid) >= 0
     } else if mode == model.NodeModeCoordinated {
-        ok = UserIsCoordo(uctx, nameid) >= 0
+        ok = UserIsCoordo(uctx, nid) >= 0
     }
 
     return ok, err
@@ -146,4 +144,50 @@ func CheckUpperRights(uctx *model.UserCtx, nameid string, mode model.NodeMode) (
     }
 
     return ok, err
+}
+
+//
+// Sanitize TensionQuery
+//
+
+func QueryAuthFilter(uctx model.UserCtx, q *db.TensionQuery) error {
+    if q == nil { return fmt.Errorf("Empty query") }
+
+    res, err := db.GetDB().Query(uctx, "node", "nameid", q.Nameids, "nameid visibility")
+    if err != nil { return err }
+
+    // For circle with visibility right
+    var nameids []string
+    // For circle with restricted visibility right
+    var nameidsProtected []string
+
+    for _, r := range res {
+        nameid := r["nameid"]
+        visibility := r["visibility"]
+
+        // Get the nearest circle
+        nid, err := codec.Nid2pid(r["nameid"])
+        if err != nil { return err }
+
+        if visibility == string(model.NodeVisibilityPrivate) && UserIsMember(&uctx, nid) < 0 {
+            // If Private & non Member
+            nameidsProtected = append(nameidsProtected, nameid)
+        } else if visibility == string(model.NodeVisibilitySecret) && UserHasRole(&uctx, nid) < 0 {
+            // If Secret & non Peer
+            nameidsProtected = append(nameidsProtected, nameid)
+        } else {
+            // else (Public or with right)
+            nameids = append(nameids, nameid)
+        }
+    }
+
+    q.Nameids = nameids
+    q.NameidsProtected = nameidsProtected
+    q.Username = uctx.Username
+    // add NameidsProtected attribute in TensionQuery
+    if len(nameids) + len(nameidsProtected) == 0 {
+		return fmt.Errorf("error: no node name given (nameid empty)")
+    }
+
+    return nil
 }

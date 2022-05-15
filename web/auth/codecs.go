@@ -26,7 +26,7 @@ func init() {
     specialReg = re.MustCompile(`[`+special+`]`)
     specialSoftReg = re.MustCompile(`[`+specialSoft+`]`)
     reservedURIReg = re.MustCompile(`[`+reservedURI+`]`)
-    safeWordReg = re.MustCompile(`[\w\.\-]+`)
+    safeWordReg = re.MustCompile(`^[\w\.\-]+$`)
 }
 
 //

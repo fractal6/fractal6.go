@@ -189,13 +189,13 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
             return nil, err
         }
 
-        return nil, fmt.Errorf("Only coordinator can create Alert tension.")
+        return nil, fmt.Errorf("Only coordinators can create Alert tension.")
     }
 
     return data, err
 }
 
-//ref ensure the given objects are just link to an existing one. (@weak: by testing that its size if not equal to one.)
+//ref ensure the given objects are just linked to an existing one, no more. (@weak: by testing that its size if not equal to one.)
 func ref(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     data, err := next(ctx)
     if err != nil { return nil, err }

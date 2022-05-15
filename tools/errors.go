@@ -14,7 +14,6 @@ func LogErr(reason string, err error) error {
     fname := f.Name()
     //file, line := f.FileLine(pc[0])
 
-
     log.Printf("[@%s] %s: %s", fname, reason, err.Error())
     return fmt.Errorf("%s: %s", reason, err.Error())
 }

@@ -23,11 +23,19 @@ var buildMode string
 var cache *sessions.Session
 var tkMaster *Jwt
 var jwtSecret string
+var tokenValidityTime time.Duration
 
 func init () {
     // Get env mode
     if buildMode != "PROD" {
         buildMode = "DEV"
+    }
+
+    if buildMode == "PROD" {
+        tokenValidityTime = time.Hour*24*30
+    } else {
+        //tokenValidityTime = time.Hour*12
+        tokenValidityTime = time.Second*60
     }
 
     // Initializa cache
@@ -65,15 +73,13 @@ func (Jwt) New() *Jwt {
 
     if buildMode == "DEV" {
         // Api debug token
-
-        uctx := db.DB.GetRootUctx()
-        //uctx := db.DB.GetRegularUctx()
-
+        uctx := db.DB.GetRegularUctx()
         o := model.RoleTypeOwner
         uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
         apiToken, _ := tk.issue(uctx, time.Hour*48)
 
         // Dgraph token
+        uctx = db.DB.GetRootUctx()
         dgraphToken := db.GetDB().BuildGqlToken(uctx, time.Hour*48)
 
         // Log
@@ -109,12 +115,7 @@ func GetTokenMaster() *Jwt {
 func NewUserToken(userCtx model.UserCtx) (string, error) {
     var token string
     var err error
-    if buildMode == "PROD" {
-        token, err = tkMaster.issue(userCtx, time.Hour*24*30)
-    } else {
-        token, err = tkMaster.issue(userCtx, time.Hour*12)
-        //token, err = tkMaster.issue(userCtx, time.Second*60)
-    }
+    token, err = tkMaster.issue(userCtx, tokenValidityTime)
     return token, err
 }
 
@@ -199,7 +200,7 @@ func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
 
 func GetUserContext(ctx context.Context) (context.Context, *model.UserCtx, error) {
     uctx, err := GetUserContextLight(ctx)
-    if err != nil { return ctx,  uctx, err }
+    if err != nil { return ctx, uctx, err }
 
     // Set the roles and report.
     if uctx.Hit == 0 {
@@ -232,9 +233,9 @@ func GetUserContextOrEmptyLight(ctx context.Context) model.UserCtx {
     return *uctx
 }
 
+// @deprecated: has been replaced by MaybeRefresh in resolvers
 // CheckUserCtxIat update the user token if the given
 // node has been updated after that the token's iat.
-// @deprecated: has been replaced by MaybeRefresh in resolvers
 func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
     var u *model.UserCtx
     var e error
@@ -298,7 +299,7 @@ func MaybeRefresh(uctx *model.UserCtx) (*model.UserCtx, error) {
         roles, err = db.GetDB().GetUserRoles(uctx.Username)
         if err != nil { return nil, err }
         d, _ := json.Marshal(roles)
-        err = cache.SetEX(ctx, key, d, time.Second * 10).Err()
+        err = cache.SetEX(ctx, key, d, time.Second * 12).Err()
         if err != nil { return nil, err }
     }
 
