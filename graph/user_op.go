@@ -42,6 +42,11 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     // Get References
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
 
+    // If user don't play role, return error
+    if i := auth.UserPlayRole(uctx, nameid); i < 0 {
+        return false, fmt.Errorf("Role already leaved or not played.")
+    }
+
     switch *node.RoleType {
     case model.RoleTypeOwner:
         return false, fmt.Errorf("Doh, organisation destruction is not yet implemented.")
