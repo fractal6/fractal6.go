@@ -36,9 +36,8 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
     // for now...
     if len(contract.Candidates) > 1 {
         return false, contract, fmt.Errorf("Candidate need to be singleton for security reason.")
-    } else {
-        // Is a pending candidates (email given) existes, move it to candidates.
     }
+
     switch contract.Event.EventType {
     case model.TensionEventUserJoined:
         for _, c := range contract.Candidates {

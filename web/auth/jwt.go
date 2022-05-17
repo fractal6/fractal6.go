@@ -32,10 +32,10 @@ func init () {
     }
 
     if buildMode == "PROD" {
-        tokenValidityTime = time.Hour*24*30
+        tokenValidityTime = time.Hour*24*30*2
     } else {
-        //tokenValidityTime = time.Hour*12
-        tokenValidityTime = time.Second*60
+        tokenValidityTime = time.Hour*12
+        //tokenValidityTime = time.Second*60
     }
 
     // Initializa cache

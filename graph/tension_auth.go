@@ -72,9 +72,9 @@ const (
 // RestrictValue defined condition to be validated based on event values.
 type RestrictValue int
 const (
-    NoRestriction                      = 1 // default
+    NoRestriction RestrictValue = 1 // default
     UserIsMemberRestrict RestrictValue = 1 << 1 // the user (asking) should be a member of the receiver circle
-    UserNewIsMemberRestrict RestrictValue = 1 << 1 // the new user (event.new) should be a member of the receiver circle
+    UserNewIsMemberRestrict RestrictValue = 1 << 2 // the new user (event.new) should be a member of the receiver circle
 )
 
 // Node Action **Rights** Enum.
@@ -169,14 +169,14 @@ func (em EventMap) checkTensionRestriction(uctx *model.UserCtx, tension *model.T
         }
 
         if restrict & UserIsMemberRestrict > 0 {
-            if i := auth.UserIsMember(uctx, tension.Receiver.Nameid); i > 0 {
+            if i := auth.UserIsMember(uctx, tension.Receiver.Nameid); i >= 0 {
                 continue
             }
         }
 
         if restrict & UserNewIsMemberRestrict > 0 {
             if event.New != nil {
-                if i := auth.IsMember("username", *event.New, tension.Receiver.Nameid); i > 0 {
+                if i := auth.IsMember("username", *event.New, tension.Receiver.Nameid); i >= 0 {
                     continue
                 }
             }
