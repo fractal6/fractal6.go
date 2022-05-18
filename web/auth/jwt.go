@@ -156,6 +156,15 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
     return &httpCookie, nil
 }
 
+func ClearUserCookie() *http.Cookie {
+    return &http.Cookie {
+        Name: "jwt",
+        Path: "/",
+        HttpOnly: true,
+        MaxAge: -1,
+    }
+}
+
 func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
     token, claims, err := jwtauth.FromContext(ctx)
     if err != nil {

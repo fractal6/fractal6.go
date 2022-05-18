@@ -85,6 +85,7 @@ func RunServer() {
             r.Post("/signup", handle6.Signup)
             r.Post("/validate", handle6.SignupValidate)
             r.Post("/login", handle6.Login)
+            r.Get("/logout", handle6.Logout)
             r.Post("/tokenack", handle6.TokenAck)
             r.Post("/resetpasswordchallenge", handle6.ResetPasswordChallenge)
             r.Post("/resetpassword", handle6.ResetPassword)

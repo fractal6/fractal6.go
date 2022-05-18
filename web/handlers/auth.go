@@ -1,5 +1,6 @@
 package handlers
 
+
 import (
 	//"fmt"
 	"encoding/json"
@@ -268,6 +269,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
 
     w.Write(data)
+}
+
+// Logout reset the jwt cookie.
+func Logout(w http.ResponseWriter, r *http.Request) {
+	// Finally, we set the client cookie for "token" as the JWT we just generated
+	// we also set an expiry time which is the same as the token itself
+	http.SetCookie(w, auth.ClearUserCookie())
+    w.Write(nil)
 }
 
 // TokenAck update the user token.
