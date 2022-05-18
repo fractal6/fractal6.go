@@ -434,7 +434,7 @@ func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) 
     rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
     if err != nil { return ok, err }
     nid := codec.MemberIdCodec(rootid, username)
-    n, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.role_type Node.first_link {User.username}")
+    n, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.role_type Node.first_link{User.username}")
     if err != nil { return ok, err }
     node, _ := n.(model.JsonAtom)
     if node["role_type"] == nil {
@@ -453,6 +453,7 @@ func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) 
         ok = true
     } else if node["first_link"] == nil {
         err = db.GetDB().AddUserRole(username, nid)
+        err = db.GetDB().UpgradeMember(nid, model.RoleTypePending)
     } else if node["role_type"].(string) == string(model.RoleTypeRetired) {
         err = db.GetDB().UpgradeMember(nid, model.RoleTypePending)
     }

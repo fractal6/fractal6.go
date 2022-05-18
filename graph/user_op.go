@@ -104,6 +104,8 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
         return err
     }
 
+    // @TODO: The uctx cache (.Roles) maybe out of date here for few seconds...
+
     return fmt.Errorf("role upgrade not implemented: %s", rt)
 }
 
