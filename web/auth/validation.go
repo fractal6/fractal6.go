@@ -5,6 +5,8 @@ import (
     "time"
     "errors"
     "strings"
+    "context"
+    "encoding/json"
 	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
@@ -194,6 +196,13 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     if err != nil {
         return nil, err
     }
+
+    // Update the user roles cache.
+    ctx := context.Background()
+    var key string = userCtx.Username + "roles"
+    d, _ := json.Marshal(userCtx.Roles)
+    err = cache.SetEX(ctx, key, d, time.Second * 12).Err()
+    if err != nil { return nil, err }
 
     regularizeUctx(userCtx)
     return userCtx, nil
