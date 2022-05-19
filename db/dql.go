@@ -344,6 +344,22 @@ var dqlQueries map[string]string = map[string]string{
             User.notifyByEmail
         }
     }`,
+    "getPeersFromTid": `{
+        var(func: uid({{.tid}})) {
+            Tension.receiver {
+                Node.children @filter(eq(Node.role_type, "Peer") AND eq(Node.isArchived, false)) {
+                    u as Node.first_link
+                }
+            }
+        }
+
+        all(func: uid(u)) {
+            User.username
+            User.email
+            User.name
+            User.notifyByEmail
+        }
+    }`,
     "getParents": `{
         all(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
             Node.parent @normalize

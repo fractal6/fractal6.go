@@ -161,6 +161,8 @@ func ClearUserCookie() *http.Cookie {
         Name: "jwt",
         Path: "/",
         HttpOnly: true,
+        Secure: true,
+        SameSite: 2,
         MaxAge: -1,
     }
 }

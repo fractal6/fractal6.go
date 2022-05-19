@@ -25,6 +25,7 @@ const (
     ReasonIsPendingCandidate
     ReasonIsParticipant
     ReasonIsCoordo
+    ReasonIsPeer
     ReasonIsFirstLink
     ReasonIsAssignee
     ReasonIsSubscriber
@@ -37,7 +38,9 @@ func (n NotifReason) ToText() string {
     case ReasonIsCandidate:
         return "you are invited"
     case ReasonIsCoordo:
-        return "you are coordinator"
+        return "you are coordinator in this circle"
+    case ReasonIsPeer:
+        return "you have role in this circle"
     case ReasonIsFirstLink:
         return "you are first-link"
     case ReasonIsAssignee:

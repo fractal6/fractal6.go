@@ -85,7 +85,6 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
             }
         }
     }
-
     for _, nameid := range parents {
         res, err := db.GetDB().Meta("getCoordos2", map[string]string{"nameid": nameid})
         if err != nil { return coordos, LogErr("Internal error", err) }
@@ -104,6 +103,25 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
     }
 
     return coordos, err
+}
+
+func GetPeersFromTid(tid string) ([]model.User, error) {
+    var peers []model.User
+
+    // Check user rights
+    nodes, err := db.GetDB().Meta("getPeersFromTid", map[string]string{"tid":tid})
+    if err != nil { return peers, LogErr("Internal error", err) }
+
+    // Return direct peers
+    for _, c := range nodes {
+        var peer model.User
+        if err := Map2Struct(c, &peer); err != nil {
+            return peers, err
+        }
+        peers = append(peers, peer)
+    }
+
+    return peers, err
 }
 
 //

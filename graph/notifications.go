@@ -76,6 +76,16 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
     }
 
     {
+        // Get Peers
+        peers, err := auth.GetPeersFromTid(tid)
+        if err != nil { return users, err }
+        for _, user := range peers {
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsPeer}
+        }
+    }
+
+    {
         // Get First-link
         res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
         if err != nil { return users, err }
@@ -226,7 +236,7 @@ func PushEventNotifications(notif model.EventNotif) error {
             }
         }
     } else {
-        // Notify only suscribers and relative.
+        // Get relevant users for the tension.
         users, err = GetUsersToNotify(notif.Tid, true, true)
         if err != nil { return err }
     }
@@ -283,7 +293,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
     createdAt = notif.Contract.CreatedAt
     eventBatch = append(eventBatch, &model.EventKindRef{ContractRef: &model.ContractRef{ID: &notif.Contract.ID}})
 
-    // Get people to notify
+    //Get relevant users for the contract
     users, err := GetUsersToNotify(notif.Tid, true, false)
     if err != nil { return err }
     // +
