@@ -164,6 +164,7 @@ func ClearUserCookie() *http.Cookie {
         HttpOnly: true,
         Secure: true,
         SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
+        Expires: time.Now(),
         MaxAge: -1,
     }
 }
