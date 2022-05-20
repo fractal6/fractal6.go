@@ -65,40 +65,6 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
 
-    {
-        // Get Coordos
-        coordos, err := auth.GetCoordosFromTid(tid)
-        if err != nil { return users, err }
-        for _, user := range coordos {
-            if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsCoordo}
-        }
-    }
-
-    {
-        // Get Peers
-        peers, err := auth.GetPeersFromTid(tid)
-        if err != nil { return users, err }
-        for _, user := range peers {
-            if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsPeer}
-        }
-    }
-
-    {
-        // Get First-link
-        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
-        if err != nil { return users, err }
-        if res != nil {
-            var user model.User
-            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
-                if _, ex := users[user.Username]; !ex {
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
-                }
-            }
-        }
-    }
-
     if withAssignees {
         // Get Assignees
         res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", user_selection)
@@ -129,6 +95,39 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         }
     }
 
+    {
+        // Get First-link
+        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
+        if err != nil { return users, err }
+        if res != nil {
+            var user model.User
+            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                if _, ex := users[user.Username]; !ex {
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
+                }
+            }
+        }
+    }
+
+    {
+        // Get Coordos
+        coordos, err := auth.GetCoordosFromTid(tid)
+        if err != nil { return users, err }
+        for _, user := range coordos {
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsCoordo}
+        }
+    }
+
+    {
+        // Get Peers
+        peers, err := auth.GetPeersFromTid(tid)
+        if err != nil { return users, err }
+        for _, user := range peers {
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsPeer}
+        }
+    }
 
     return users, nil
 }
@@ -214,13 +213,15 @@ func PushEventNotifications(notif model.EventNotif) error {
 	var err error
     var isAlert bool
     var receiverid string
+    var isClosed bool
     if notif.HasEvent(model.TensionEventCreated) {
-        if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid"); err != nil {
+        if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
             return err
         } else if t != nil {
             tension := t.(model.JsonAtom)
             isAlert = tension["type_"].(string) == string(model.TensionTypeAlert)
             receiverid = tension["receiverid"].(string)
+            isClosed = tension["status"].(string) == string(model.TensionStatusClosed)
         }
     }
     // Handle Alert tension
@@ -261,6 +262,11 @@ func PushEventNotifications(notif model.EventNotif) error {
         if u == notif.Uctx.Username { continue }
         // Pending user has no history yet
         if ui.Reason == model.ReasonIsPendingCandidate { continue }
+
+        // Do not publish already closed tension (e.g. role and circle creation)
+        if isClosed {
+            continue
+        }
 
         // User Event
         eid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{

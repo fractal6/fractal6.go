@@ -208,18 +208,28 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         subject = fmt.Sprintf("Re: [%s]%s %s", recv, type_hint, title)
 
         // Add automatic message
+        coordoPass := true
+        peerPass := false
         if notif.HasEvent(model.TensionEventClosed) {
             payload = fmt.Sprintf(`Closed <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventReopened) {
             payload = fmt.Sprintf(`Reopened <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventBlobPushed) {
             payload = fmt.Sprintf(`Mandate updated <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+            peerPass = true
         } else if notif.HasEvent(model.TensionEventUserLeft) || notif.HasEvent(model.TensionEventMemberUnlinked) {
             u := notif.GetExUser()
             payload = fmt.Sprintf(`User %s left or was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
-        } else if ui.Reason == model.ReasonIsCoordo {
-            // Avoid flooding coordinator with email
-            // for every tensions comments, if they havent subscribed or participated.
+        } else {
+            // Comments added
+            coordoPass = false
+        }
+
+        // Avoid flooding user with email if they havent susbcribed or are first-link...
+        if ui.Reason == model.ReasonIsCoordo && !coordoPass {
+            return nil
+        }
+        if ui.Reason == model.ReasonIsPeer && !peerPass {
             return nil
         }
 
