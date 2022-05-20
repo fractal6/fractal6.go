@@ -24,6 +24,7 @@ var cache *sessions.Session
 var tkMaster *Jwt
 var jwtSecret string
 var tokenValidityTime time.Duration
+var isCookieSecured bool
 
 func init () {
     // Get env mode
@@ -32,8 +33,10 @@ func init () {
     }
 
     if buildMode == "PROD" {
+        isCookieSecured = true
         tokenValidityTime = time.Hour*24*30*2
     } else {
+        isCookieSecured = false
         tokenValidityTime = time.Hour*12
         //tokenValidityTime = time.Second*60
     }
@@ -131,41 +134,31 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
     if err != nil {
         return nil, err
     }
-    var httpCookie http.Cookie
-    if buildMode == "PROD" {
-        httpCookie = http.Cookie{
-            Name: "jwt",
-            Value: token,
-            Path: "/",
-            HttpOnly: true,
-            Secure: true,
-            SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
-            //Expires: expirationTime,
-            //MaxAge: 90000,
-        }
-    } else {
-        httpCookie = http.Cookie{
-            Name: "jwt",
-            Value: token,
-            Path: "/",
-            Secure: false,
-            SameSite: http.SameSiteLaxMode,
-        }
+
+    httpCookie := http.Cookie{
+        Name: "jwt",
+        Value: token,
+        Path: "/",
+        HttpOnly: true,
+        Secure: isCookieSecured,
+        SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
+        //Expires: expirationTime,
+        //MaxAge: 90000,
     }
 
     return &httpCookie, nil
 }
 
 func ClearUserCookie() *http.Cookie {
-    return &http.Cookie {
+    return &http.Cookie{
         Name: "jwt",
         Value: "",
         Path: "/",
         HttpOnly: true,
-        Secure: true,
-        SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
-        Expires: time.Now(),
-        MaxAge: -1,
+        Secure: isCookieSecured,
+        SameSite: http.SameSiteLaxMode,
+        Expires: time.Unix(0,0),
+        MaxAge: 0,
     }
 }
 

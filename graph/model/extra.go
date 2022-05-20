@@ -52,7 +52,7 @@ func (n NotifReason) ToText() string {
     case ReasonIsMentionned:
         return "you have been mentionned"
     case ReasonIsAlert:
-        return "you are a member of this circle"
+        return "you are a member of this organisation"
     default:
         return "unknown reason"
     }

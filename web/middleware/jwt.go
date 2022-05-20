@@ -36,7 +36,7 @@ func JwtVerifier(ja *jwtauth.JWTAuth) func(http.Handler) http.Handler {
 // EDIT: Uncompress the cookie token.
 func TokenFromCookie(r *http.Request) string {
 	cookie, err := r.Cookie("jwt")
-	if err != nil { return "" }
+	if err != nil || cookie.Value == "" { return "" }
 	return tools.Unpack64(cookie.Value)
 }
 
