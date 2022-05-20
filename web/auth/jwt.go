@@ -139,7 +139,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
             Path: "/",
             HttpOnly: true,
             Secure: true,
-            SameSite: 2, // https://golang.org/src/net/http/cookie.go
+            SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
             //Expires: expirationTime,
             //MaxAge: 90000,
         }
@@ -149,7 +149,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
             Value: token,
             Path: "/",
             Secure: false,
-            SameSite: 2,
+            SameSite: http.SameSiteLaxMode,
         }
     }
 
@@ -163,7 +163,7 @@ func ClearUserCookie() *http.Cookie {
         Path: "/",
         HttpOnly: true,
         Secure: true,
-        SameSite: 2,
+        SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
         MaxAge: -1,
     }
 }

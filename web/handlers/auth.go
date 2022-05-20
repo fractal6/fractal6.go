@@ -121,6 +121,8 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
         UpdatedAt *string
     }{}
     if creds.EmailToken != nil {
+        // User signup parcour
+        // --
         // User has already been validated and saved in UserPending
         if err = db.DB.Meta1("getPendingUser", map[string]string{"k":"email_token", "v":*creds.EmailToken}, &pending); err != nil {
             http.Error(w, err.Error(), 500)
@@ -130,9 +132,11 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             http.Error(w, "The session has expired.", 500)
             return
         }
-        // Overwrite creds
+        // Overwrite creds to prevent CSRF
         StructMap(pending, &creds)
     } else if creds.Puid != nil {
+        // User invitation parcour
+        // --
         // User has not been registered in UserPending
         if err = db.DB.Meta1("getPendingUser", map[string]string{"k":"token", "v":*creds.Puid}, &pending); err != nil {
             http.Error(w, err.Error(), 500)
