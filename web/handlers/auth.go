@@ -328,12 +328,6 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
     w.Write(data)
 }
 
-// Logout deletes the user token.
-//func Logout(w http.ResponseWriter, r *http.Request) {
-//    // The client deletes the cookies or session.
-//}
-
-
 func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
     ctx := r.Context()
     var token string

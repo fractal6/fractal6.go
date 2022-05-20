@@ -159,6 +159,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
 func ClearUserCookie() *http.Cookie {
     return &http.Cookie {
         Name: "jwt",
+        Value: "",
         Path: "/",
         HttpOnly: true,
         Secure: true,
