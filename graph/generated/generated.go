@@ -584,6 +584,7 @@ type ComplexityRoot struct {
 		EventsHistory          func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		EventsHistoryAggregate func(childComplexity int, filter *model.EventFilter) int
 		FirstLink              func(childComplexity int, filter *model.UserFilter) int
+		GuestCanCreateTension  func(childComplexity int) int
 		ID                     func(childComplexity int) int
 		IsArchived             func(childComplexity int) int
 		IsPersonal             func(childComplexity int) int
@@ -3903,6 +3904,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.FirstLink(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "Node.guestCanCreateTension":
+		if e.complexity.Node.GuestCanCreateTension == nil {
+			break
+		}
+
+		return e.complexity.Node.GuestCanCreateTension(childComplexity), true
 
 	case "Node.id":
 		if e.complexity.Node.ID == nil {
@@ -7470,6 +7478,7 @@ type Node {
   isArchived: Boolean!
   isPersonal: Boolean
   userCanJoin: Boolean
+  guestCanCreateTension: Boolean
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
@@ -7683,14 +7692,14 @@ type User {
   bio: String
   utc: String
   notifyByEmail: Boolean!
-  subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-  tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
-  events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
+  tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
+  tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
+  contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @private
+  events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!] @private
   markAllAsRead: String
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
@@ -7882,17 +7891,9 @@ enum UserType {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
@@ -7902,17 +7903,25 @@ directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8064,6 +8073,7 @@ input AddNodeInput {
   isArchived: Boolean!
   isPersonal: Boolean
   userCanJoin: Boolean
+  guestCanCreateTension: Boolean
   children: [NodeRef!]
   docs: [BlobRef]
   labels: [LabelRef!]
@@ -8155,7 +8165,7 @@ input AddTensionInput {
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
+  blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!]
@@ -9232,6 +9242,7 @@ enum NodeHasFilter {
   isArchived
   isPersonal
   userCanJoin
+  guestCanCreateTension
   children
   docs
   labels
@@ -9290,6 +9301,7 @@ input NodePatch {
   isArchived: Boolean @x_patch_ro
   isPersonal: Boolean @x_patch_ro
   userCanJoin: Boolean @x_patch_ro
+  guestCanCreateTension: Boolean @x_patch_ro
   children: [NodeRef!] @x_patch_ro
   docs: [BlobRef] @x_patch_ro
   labels: [LabelRef!] @x_patch_ro
@@ -9327,6 +9339,7 @@ input NodeRef {
   isArchived: Boolean
   isPersonal: Boolean
   userCanJoin: Boolean
+  guestCanCreateTension: Boolean
   children: [NodeRef!]
   docs: [BlobRef]
   labels: [LabelRef!]
@@ -9898,7 +9911,7 @@ input TensionPatch {
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
+  blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_patch_ro
   subscribers: [UserRef!] @x_patch_ro
@@ -9923,7 +9936,7 @@ input TensionRef {
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
-  blobs: [BlobRef!] @x_alter(r:"oneByOne") @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted])
+  blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
   contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!]
@@ -28707,6 +28720,35 @@ func (ec *executionContext) _Node_userCanJoin(ctx context.Context, field graphql
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Node_guestCanCreateTension(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GuestCanCreateTension, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Node_children(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -38799,8 +38841,28 @@ func (ec *executionContext) _User_subscriptions(ctx context.Context, field graph
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Subscriptions, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Subscriptions, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Private == nil {
+				return nil, errors.New("directive private is not implemented")
+			}
+			return ec.directives.Private(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -38946,8 +39008,28 @@ func (ec *executionContext) _User_tensions_created(ctx context.Context, field gr
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TensionsCreated, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.TensionsCreated, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Private == nil {
+				return nil, errors.New("directive private is not implemented")
+			}
+			return ec.directives.Private(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -38982,8 +39064,28 @@ func (ec *executionContext) _User_tensions_assigned(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TensionsAssigned, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.TensionsAssigned, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Private == nil {
+				return nil, errors.New("directive private is not implemented")
+			}
+			return ec.directives.Private(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Tension); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Tension`, tmp)
 	})
 
 	if resTmp == nil {
@@ -39018,8 +39120,28 @@ func (ec *executionContext) _User_contracts(ctx context.Context, field graphql.C
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Contracts, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Contracts, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Private == nil {
+				return nil, errors.New("directive private is not implemented")
+			}
+			return ec.directives.Private(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Contract); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Contract`, tmp)
 	})
 
 	if resTmp == nil {
@@ -39054,8 +39176,28 @@ func (ec *executionContext) _User_events(ctx context.Context, field graphql.Coll
 	}
 	fc.Args = args
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Events, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Events, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Private == nil {
+				return nil, errors.New("directive private is not implemented")
+			}
+			return ec.directives.Private(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.UserEvent); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserEvent`, tmp)
 	})
 
 	if resTmp == nil {
@@ -43218,6 +43360,14 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "guestCanCreateTension":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanCreateTension"))
+			it.GuestCanCreateTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "children":
 			var err error
 
@@ -44027,16 +44177,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -44048,7 +44188,17 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -50355,6 +50505,30 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "guestCanCreateTension":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanCreateTension"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.GuestCanCreateTension = data
+			} else if tmp == nil {
+				it.GuestCanCreateTension = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "children":
 			var err error
 
@@ -50869,6 +51043,14 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
 			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "guestCanCreateTension":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanCreateTension"))
+			it.GuestCanCreateTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -54074,16 +54256,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -54095,7 +54267,17 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -54541,16 +54723,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "hasEvent")
 				if err != nil {
 					return nil, err
@@ -54562,7 +54734,17 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, e, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
 
 			tmp, err := directive2(ctx)
@@ -61033,6 +61215,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		case "userCanJoin":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Node_userCanJoin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "guestCanCreateTension":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Node_guestCanCreateTension(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

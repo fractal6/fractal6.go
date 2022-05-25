@@ -179,8 +179,9 @@ func private(ctx context.Context, obj interface{}, next graphql.Resolver) (inter
     rc := graphql.GetResolverContext(ctx)
     fieldName := rc.Field.Name
 
-    // @debug: context do not propagage value here, why, gqlgen !
-    // todo: if uid is given, or other @id...
+    // @DEBUG: not workng; ContextWith do not propagage value here, why, gqlgen !
+    //         Probably because directive for returned value are not in the same context as of before ?
+    // @AFTER_DEBUG: if uid is given, or other @id...
     if username, ok := ctx.Value("username").(string); ok && username == uctx.Username {
         return next(ctx)
     }
