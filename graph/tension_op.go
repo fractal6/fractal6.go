@@ -17,16 +17,16 @@ var SubscribingEvents map[model.TensionEvent]bool
 func init() {
     EMAP = EventsMap{
         model.TensionEventCreated: EventMap{
-            Auth: MemberHook,
+            Auth: MemberStrictHook,
         },
         model.TensionEventCommentPushed: EventMap{
             Auth: MemberHook | AuthorHook,
         },
         model.TensionEventBlobCreated: EventMap{
-            Auth: MemberHook,
+            Auth: MemberStrictHook,
         },
         model.TensionEventBlobCommitted: EventMap{
-            Auth: MemberHook,
+            Auth: MemberStrictHook,
         },
         model.TensionEventTitleUpdated: EventMap{
             Auth: SourceCoordoHook | TargetCoordoHook | AuthorHook | AssigneeHook,

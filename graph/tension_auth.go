@@ -58,14 +58,15 @@ const (
     // Graph Role based
     OwnerHook AuthHookValue        = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
     MemberHook AuthHookValue       = 1 << 2
-    MemberActiveHook AuthHookValue = 1 << 3
-    SourceCoordoHook AuthHookValue = 1 << 4
-    TargetCoordoHook AuthHookValue = 1 << 5
+    MemberStrictHook AuthHookValue = 1 << 3
+    MemberActiveHook AuthHookValue = 1 << 4
+    SourceCoordoHook AuthHookValue = 1 << 5
+    TargetCoordoHook AuthHookValue = 1 << 6
     // Granted based
-    AuthorHook AuthHookValue       = 1 << 6
-    AssigneeHook AuthHookValue     = 1 << 7
+    AuthorHook AuthHookValue       = 1 << 7
+    AssigneeHook AuthHookValue     = 1 << 8
     // Contract based
-    CandidateHook AuthHookValue    = 1 << 8
+    CandidateHook AuthHookValue    = 1 << 9
 )
 
 
@@ -223,6 +224,22 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 
     if MemberHook & em.Auth > 0 {
         if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 { return true, err }
+    }
+
+    if MemberStrictHook & em.Auth > 0 {
+        // Check guest right or membership
+        if auth.UserIsGuest(uctx, tension.Receiver.Nameid) >= 0 {
+            rid, _ := codec.Nid2rootid(tension.Receiver.Nameid)
+            r, err := db.GetDB().GetFieldByEq("Node.nameid", rid, "Node.guestCanCreateTension")
+            if err != nil { return false, err }
+            if r != nil && r.(bool) {
+                return true, err
+            } else {
+                return false, fmt.Errorf("Sorry, Guest can not create tension in this organisation at the moment.")
+            }
+        } else if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 {
+            return true, err
+        }
     }
 
     if TargetCoordoHook & em.Auth > 0 {

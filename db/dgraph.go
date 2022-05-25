@@ -93,9 +93,10 @@ type QueryString struct {
 }
 
 // Init clean the query to be compatible in application/json format.
-func (q *QueryString) Init() {
-    d := q.Q
-    q.Q = CleanString(d, false)
+func (q *QueryString) Init(clean bool) {
+    if clean {
+        q.Q = CleanString(q.Q, false)
+    }
     // Load the template @DEBUG: Do we need a template name ?
     q.Template = template.Must(template.New("graphql").Parse(q.Q))
 }
@@ -179,17 +180,17 @@ func initDB() *Dgraph {
 
     for op, q := range(dqlQueries) {
         dqlT[op] = &QueryString{Q:q}
-        dqlT[op].Init()
+        dqlT[op].Init(true)
     }
     for op, q := range(dqlMutations) {
         dqlT[op] = &QueryString{Q:q.Q}
-        dqlT[op].Init()
+        dqlT[op].Init(true)
         dqlMutT[op] = &QueryString{Q:q.M}
-        dqlMutT[op].Init()
+        dqlMutT[op].Init(false)
     }
     for op, q := range(gqlQueries) {
         gqlT[op] = &QueryString{Q:q}
-        gqlT[op].Init()
+        gqlT[op].Init(true)
     }
 
     return &Dgraph{

@@ -244,6 +244,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
     // Check if the user has login right
     if !uctx.Rights.CanLogin  {
         http.Error(w, auth.ErrCantLogin.Error(), 401)
+        return
     }
 
 	// Create a new cookie with token

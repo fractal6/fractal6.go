@@ -645,8 +645,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                     UserEvent.event @filter(NOT type(Contract))
                 }
             }
-        }
-        `,
+        }`,
         M: `uid(uids) <UserEvent.isRead> "true" .`,
     },
     "markContractAsRead": QueryMut{
@@ -656,18 +655,31 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                     UserEvent.event @filter(uid({{.id}}))
                 }
             }
-        }
-        `,
+        }`,
         M: `uid(uids) <UserEvent.isRead> "true" .`,
     },
+    // @TODO: A generic setNodeSetting (e.g "field":"visibility" ) (update node_op.go operation)...
     "setPendingUserToken": QueryMut{
         Q: `query {
             var(func: eq(PendingUser.email, "{{.email}}")) @filter(NOT has(PendingUser.token)) {
                 u as uid
             }
-        }
-        `,
+        }`,
         M: `uid(u) <PendingUser.token> "{{.token}}" .`,
+    },
+    "setNodeVisibility": QueryMut{
+        Q: `query {
+            var(func: eq(Node.nameid, "{{.nameid}}")) {
+                n as uid
+                Node.source {
+                    nf as Blob.node
+                }
+            }
+        }`,
+        M: `
+        uid(n) <Node.visibility> "{{.value}}" .
+        uid(nf) <NodeFragment.visibility> "{{.value}}" .
+        `,
     },
 }
 

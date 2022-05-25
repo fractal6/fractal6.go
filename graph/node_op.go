@@ -134,13 +134,18 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
     ok, err := NodeCheck(uctx, node, nameid, tension.Action)
     if err != nil || !ok { return ok, err }
 
-    if !model.NodeVisibility(value).IsValid() { return false, fmt.Errorf("Bad value for visibility.") }
+    visibility := model.NodeVisibility(value)
+    if !visibility.IsValid() { return false, fmt.Errorf("Bad value for visibility.") }
     // Update Node
-    err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.visibility", value)
+    _, err = db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid":nameid, "value":value})
     if err != nil { return false, err }
-    // Update NodeFragmet
-    err = db.DB.SetFieldById(node.ID, "NodeFragment.visibility", value)
-    if err != nil { return false, err }
+
+    // If nameid is the root, fix the organisation config.
+    rootid, _ := codec.Nid2rootid(nameid)
+    if visibility != model.NodeVisibilityPublic && nameid == rootid {
+        err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.userCanJoin", strconv.FormatBool(false))
+        if err != nil { return false, err }
+    }
 
     // Change all role direct children
     err = db.DB.SetChildrenRoleVisibility(nameid, value)
@@ -378,7 +383,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     createdBy := *node.CreatedBy
     emitter := model.NodeRef{Nameid: &rootnameid}
     receiver := model.NodeRef{Nameid: &rootnameid}
-    action := model.TensionActionEditRole
+    action := model.TensionActionEditCircle
     evt1 := model.TensionEventCreated
     evt2 := model.TensionEventBlobCreated
     evt3 := model.TensionEventBlobPushed

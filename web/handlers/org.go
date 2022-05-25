@@ -1,17 +1,18 @@
 package handlers
 
 import (
-    //"fmt"
-    "net/http"
-    "encoding/json"
+	//"fmt"
+	"encoding/json"
+	"net/http"
+	"strconv"
 
-    "fractale/fractal6.go/db"
-    "fractale/fractal6.go/web/auth"
-    "fractale/fractal6.go/graph"
-    "fractale/fractal6.go/graph/model"
-    . "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph"
+	ga "fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/graph/model"
+	. "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/auth"
 )
-
 
 // Signup register a new user and gives it a token.
 func CreateOrga(w http.ResponseWriter, r *http.Request) {
@@ -35,10 +36,16 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if err != nil || !ok { http.Error(w, err.Error(), 400); return }
 
     // @TODO
-    userCanJoin := true
+    var userCanJoin bool
     isPersonal := true
     visibility := model.NodeVisibilityPublic
     mode := model.NodeModeCoordinated
+    guestCanCreateTension := true
+    if visibility == model.NodeVisibilityPublic {
+        userCanJoin = true
+    } else {
+        userCanJoin = false
+    }
 
     // Create the new node
     nodeInput := model.AddNodeInput{
@@ -53,11 +60,12 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
         IsPersonal: &isPersonal,
         Mandate: &model.MandateRef{ Purpose: form.Purpose },
         // Permission
-        UserCanJoin: &userCanJoin,
         Visibility: visibility,
         Mode: mode,
         Rights: 0,
         IsArchived: false,
+        UserCanJoin: &userCanJoin,
+        GuestCanCreateTension: &guestCanCreateTension,
         // Common
         CreatedAt: Now(),
         CreatedBy: &model.UserRef{Username: &uctx.Username},
@@ -99,3 +107,65 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     w.Write(data)
 }
 
+
+func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
+    // Get form data
+    form := struct {
+        Nameid string
+        Val bool
+    }{}
+    err := json.NewDecoder(r.Body).Decode(&form)
+	if err != nil { http.Error(w, err.Error(), 400); return }
+
+    // Check if uctx has rights in nameid (is coordo)
+    _, uctx, err := auth.GetUserContext(r.Context())
+    if err != nil { http.Error(w, err.Error(), 500); return }
+    if i := ga.UserIsCoordo(uctx, form.Nameid); i < 0 {
+        http.Error(w, "Only coordinators of the root circle can do this.", 400)
+        return
+    }
+
+    // Set the value
+    val := strconv.FormatBool(form.Val)
+    err = db.GetDB().SetFieldByEq("Node.nameid", form.Nameid, "Node.userCanJoin", val)
+    if err != nil { http.Error(w, err.Error(), 500); return }
+
+    // Maybe Update the circle visibility if userCanJoin is set to True
+    if form.Val {
+        visibility, err := db.GetDB().GetFieldByEq("Node.nameid", form.Nameid, "Node.visibility")
+        if err != nil { http.Error(w, err.Error(), 500); return }
+        if visibility.(string) != string(model.NodeVisibilityPublic) {
+            // Update Node
+            _, err := db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid":form.Nameid, "value":string(model.NodeVisibilityPublic)})
+            if err != nil { http.Error(w, err.Error(), 500); return }
+        }
+    }
+
+    w.Write([]byte(val))
+}
+
+
+func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
+    // Get form data
+    form := struct {
+        Nameid string
+        Val bool
+    }{}
+    err := json.NewDecoder(r.Body).Decode(&form)
+	if err != nil { http.Error(w, err.Error(), 400); return }
+
+    // Check if uctx has rights in nameid (is coordo)
+    _, uctx, err := auth.GetUserContext(r.Context())
+    if err != nil { http.Error(w, err.Error(), 500); return }
+    if i := ga.UserIsCoordo(uctx, form.Nameid); i < 0 {
+        http.Error(w, "Only coordinators of the root circle can do this.", 400)
+        return
+    }
+
+    // Set the value
+    val := strconv.FormatBool(form.Val)
+    err = db.GetDB().SetFieldByEq("Node.nameid", form.Nameid, "Node.guestCanCreateTension", val)
+    if err != nil { http.Error(w, err.Error(), 500); return }
+
+    w.Write([]byte(val))
+}

@@ -12,7 +12,7 @@
       },
       {
         "header": "Governance process",
-        "content": "The governance process of a **circle** allows you to define the scope of rights associated with roles in an organisation circle. There are two governance process:\n\n###### Coordinated\n\nIn the coordinated mode, the coordinator roles have the following rights within their circles:\n\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNormal roles have the following rights within their circles : \n\n* creation of tensions and comments \n* close your own tensions\n\n###### Agile\n\nIn the agile mode, all roles have the following rights within their circles:\n\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNote: the rights of a role associated with a circle are inherited in sub-circles that do not have roles.\n"
+        "content": "The governance process of a **circle** allows you to define the scope of rights associated with roles inside this circle. There are two governance processes:\n\n###### Coordinated\n\nIn the coordinated mode, the coordinator roles have the following rights within their circles:\n\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNormal roles have the following rights within their circles : \n\n* creation of tensions and comments \n* close your own tensions\n\n###### Agile\n\nIn the agile mode, all roles have the following rights within their circles:\n\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNote: the rights of a role associated with a circle are inherited in sub-circles that do not have roles.\n"
       },
       {
         "header": "Organisation navigation",
@@ -36,7 +36,7 @@
     "name": "Tensions",
     "tasks": [
       {
-        "header": "Create a tension",
+        "header": "Create tension",
         "content": "In the **overview panel**, click on the plus (+) button on the right of the search bar. In the windows that opens, click on the **new tension** button. The receiver of the tension will be the current focused circle.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organisation map.\n"
       },
       {
@@ -44,7 +44,7 @@
         "content": "A Tension can be closed or reopen at any time by members with **sufficient rights**, when they considered it as solved. Closed tension are not shown be default but can still be consulted by using the right filters in the tensions page..\n"
       },
       {
-        "header": "Add a comment",
+        "header": "Add comment",
         "content": "In a tension page, you can add a comment to a tension in the *conversation sub-tab*."
       },
       {
@@ -61,7 +61,7 @@
     "name": "Roles",
     "tasks": [
       {
-        "header": "Add role",
+        "header": "Create role",
         "content": "In the **overview panel**, click on the plus (+) button on the right of the search bar. In the window that opens, click on the **New Role** button. You can enter the role information in the form, then click on \"Create Role\" to add the role.\n\nNote1: The role will be created inside the current focused circle.  \nNote2: For each role created, there is a governance tension that is co-created automatically and that allows to consult and edit the history of modifications of the role.  \nNote3: If you click **Submit tension** instead of **Create Role**, only a governance tension will be created but the role won't be added to your organisation. You can still edit and add it later.  \n"
       },
       {
@@ -82,7 +82,7 @@
     "name": "Circles",
     "tasks": [
       {
-        "header": "Add circle",
+        "header": "Create circle",
         "content": "In the Overview panel, click on the plus (+) button on the right of the search bar. In the window that opens, click on the **New Sub-Circle** button. You can enter the circle information in the form, then click on \"Create Circle\" to add the circle.\n\nNote1: The circle will be created inside the current focused circle.  \nNote2: For each circle created, there is a governance tension that is co-created automatically and that allows to consult and edit the history of modifications of the circle.  \nNote3: If you click **Submit tension** instead of **Create Circle**, only a governance tension will be created but the circle won't be added to your organisation. You can still edit and add it later.  \n"
       },
       {
