@@ -8,8 +8,8 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
-	ga "fractale/fractal6.go/graph/auth"
 	"fractale/fractal6.go/graph/model"
+	ga "fractale/fractal6.go/graph/auth"
 	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
 )
@@ -35,12 +35,16 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     ok, err := auth.CanNewOrga(*uctx, form)
     if err != nil || !ok { http.Error(w, err.Error(), 400); return }
 
-    // @TODO
-    var userCanJoin bool
     isPersonal := true
+    var userCanJoin bool
+    var guestCanCreateTension bool = true
     visibility := model.NodeVisibilityPublic
     mode := model.NodeModeCoordinated
-    guestCanCreateTension := true
+
+    if form.Visibility != nil && form.Visibility.IsValid() {
+        visibility = *form.Visibility
+    }
+
     if visibility == model.NodeVisibilityPublic {
         userCanJoin = true
     } else {
@@ -107,7 +111,6 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     w.Write(data)
 }
 
-
 func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
     // Get form data
     form := struct {
@@ -143,7 +146,6 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
 
     w.Write([]byte(val))
 }
-
 
 func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
     // Get form data

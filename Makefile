@@ -36,7 +36,9 @@ build:
 	go build $(GOFLAGS) -o $(GOBIN)/$(RELEASE) main.go
 
 prod:
-	go build -trimpath $(GOFLAGS_PROD) -ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD"  -o $(GOBIN)/$(RELEASE) main.go
+	go build -trimpath $(GOFLAGS_PROD) \
+		-ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD -X $(MOD)/db.buildMode=PROD" \
+		-o $(GOBIN)/$(RELEASE) main.go
 
 vendor:
 	go mod vendor

@@ -42,10 +42,11 @@ type UserCreds struct {
 
 // OrgaForm are data sink/form for creating new organisation
 type OrgaForm struct {
-    Name    string  `json:"name"`
-    Nameid  string  `json:"nameid"`
-    About   *string `json:"about"`
-    Purpose *string `json:"purpose"`
+    Name    string              `json:"name"`
+    Nameid  string              `json:"nameid"`
+    About   *string             `json:"about"`
+    Purpose *string             `json:"purpose"`
+    Visibility *NodeVisibility  `json:"visibility"`
 }
 
 //

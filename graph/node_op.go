@@ -378,6 +378,8 @@ func makeNewChildTension(username string, emitterid string, receiverid string, c
     return tension
 }
 
+// MakeNewRootTension build the tension that manage a root node.
+// Authors will be suscribed.
 func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTensionInput {
     now := Now()
     createdBy := *node.CreatedBy
@@ -402,7 +404,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     tension := model.AddTensionInput{
         CreatedAt: now,
         CreatedBy : &createdBy,
-        Title: "[Circle] Anchor node",
+        Title: "[Anchor Circle] Welcome",
         Type: model.TensionTypeGovernance,
         Status: model.TensionStatusClosed,
         Emitter: &emitter,
@@ -416,7 +418,8 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
             &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
         },
         Blobs: []*model.BlobRef{&blob},
-        Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil }},
+        Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil}},
+        Subscribers: []*model.UserRef{&createdBy},
     }
     return tension
 }
