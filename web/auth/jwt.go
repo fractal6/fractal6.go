@@ -127,6 +127,7 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
 
     // Erase growing value
     userCtx.Roles = nil
+    userCtx.Name = nil
     // Ignore internal Hit value
     userCtx.Hit = 0
 

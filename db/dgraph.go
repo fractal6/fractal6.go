@@ -366,7 +366,7 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.getDqlQuery(op, maps)
     // Send Request
-    if !strings.HasPrefix(op, "countHas") && buildMode == "DEV" {
+    if !strings.HasPrefix(op, "count") && buildMode == "DEV" {
         fmt.Println(op)
     }
     //fmt.Println(string(q))
