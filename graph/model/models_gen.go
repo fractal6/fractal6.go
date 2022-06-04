@@ -287,8 +287,12 @@ type AddUserInput struct {
 	Email            string          `json:"email,omitempty"`
 	Password         string          `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
+	Location         *string         `json:"location,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
+	Links            []string        `json:"links,omitempty"`
+	Skills           []string        `json:"skills,omitempty"`
 	NotifyByEmail    bool            `json:"notifyByEmail"`
+	Lang             Lang            `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
@@ -2031,8 +2035,12 @@ type User struct {
 	Email                     string                    `json:"email,omitempty"`
 	Password                  string                    `json:"password,omitempty"`
 	Bio                       *string                   `json:"bio,omitempty"`
+	Location                  *string                   `json:"location,omitempty"`
 	Utc                       *string                   `json:"utc,omitempty"`
+	Links                     []string                  `json:"links,omitempty"`
+	Skills                    []string                  `json:"skills,omitempty"`
 	NotifyByEmail             bool                      `json:"notifyByEmail"`
+	Lang                      Lang                      `json:"lang,omitempty"`
 	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
 	Rights                    *UserRights               `json:"rights,omitempty"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
@@ -2067,6 +2075,8 @@ type UserAggregateResult struct {
 	PasswordMax      *string `json:"passwordMax,omitempty"`
 	BioMin           *string `json:"bioMin,omitempty"`
 	BioMax           *string `json:"bioMax,omitempty"`
+	LocationMin      *string `json:"locationMin,omitempty"`
+	LocationMax      *string `json:"locationMax,omitempty"`
 	UtcMin           *string `json:"utcMin,omitempty"`
 	UtcMax           *string `json:"utcMax,omitempty"`
 	MarkAllAsReadMin *string `json:"markAllAsReadMin,omitempty"`
@@ -2143,8 +2153,12 @@ type UserPatch struct {
 	Email            *string         `json:"email,omitempty"`
 	Password         *string         `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
+	Location         *string         `json:"location,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
+	Links            []string        `json:"links,omitempty"`
+	Skills           []string        `json:"skills,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Lang             *Lang           `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
@@ -2165,8 +2179,12 @@ type UserRef struct {
 	Email            *string         `json:"email,omitempty"`
 	Password         *string         `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
+	Location         *string         `json:"location,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
+	Links            []string        `json:"links,omitempty"`
+	Skills           []string        `json:"skills,omitempty"`
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	Lang             *Lang           `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
@@ -3168,6 +3186,49 @@ func (e *LabelOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e LabelOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Lang string
+
+const (
+	LangEn Lang = "EN"
+	LangFr Lang = "FR"
+	LangIt Lang = "IT"
+)
+
+var AllLang = []Lang{
+	LangEn,
+	LangFr,
+	LangIt,
+}
+
+func (e Lang) IsValid() bool {
+	switch e {
+	case LangEn, LangFr, LangIt:
+		return true
+	}
+	return false
+}
+
+func (e Lang) String() string {
+	return string(e)
+}
+
+func (e *Lang) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Lang(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Lang", str)
+	}
+	return nil
+}
+
+func (e Lang) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -4662,8 +4723,12 @@ const (
 	UserHasFilterEmail            UserHasFilter = "email"
 	UserHasFilterPassword         UserHasFilter = "password"
 	UserHasFilterBio              UserHasFilter = "bio"
+	UserHasFilterLocation         UserHasFilter = "location"
 	UserHasFilterUtc              UserHasFilter = "utc"
+	UserHasFilterLinks            UserHasFilter = "links"
+	UserHasFilterSkills           UserHasFilter = "skills"
 	UserHasFilterNotifyByEmail    UserHasFilter = "notifyByEmail"
+	UserHasFilterLang             UserHasFilter = "lang"
 	UserHasFilterSubscriptions    UserHasFilter = "subscriptions"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
@@ -4683,8 +4748,12 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterEmail,
 	UserHasFilterPassword,
 	UserHasFilterBio,
+	UserHasFilterLocation,
 	UserHasFilterUtc,
+	UserHasFilterLinks,
+	UserHasFilterSkills,
 	UserHasFilterNotifyByEmail,
+	UserHasFilterLang,
 	UserHasFilterSubscriptions,
 	UserHasFilterRights,
 	UserHasFilterRoles,
@@ -4698,7 +4767,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterUtc, UserHasFilterNotifyByEmail, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
 		return true
 	}
 	return false
@@ -4735,6 +4804,7 @@ const (
 	UserOrderableEmail         UserOrderable = "email"
 	UserOrderablePassword      UserOrderable = "password"
 	UserOrderableBio           UserOrderable = "bio"
+	UserOrderableLocation      UserOrderable = "location"
 	UserOrderableUtc           UserOrderable = "utc"
 	UserOrderableMarkAllAsRead UserOrderable = "markAllAsRead"
 )
@@ -4747,13 +4817,14 @@ var AllUserOrderable = []UserOrderable{
 	UserOrderableEmail,
 	UserOrderablePassword,
 	UserOrderableBio,
+	UserOrderableLocation,
 	UserOrderableUtc,
 	UserOrderableMarkAllAsRead,
 }
 
 func (e UserOrderable) IsValid() bool {
 	switch e {
-	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderableEmail, UserOrderablePassword, UserOrderableBio, UserOrderableUtc, UserOrderableMarkAllAsRead:
+	case UserOrderableCreatedAt, UserOrderableLastAck, UserOrderableUsername, UserOrderableName, UserOrderableEmail, UserOrderablePassword, UserOrderableBio, UserOrderableLocation, UserOrderableUtc, UserOrderableMarkAllAsRead:
 		return true
 	}
 	return false

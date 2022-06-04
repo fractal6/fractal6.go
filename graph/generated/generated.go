@@ -1016,7 +1016,10 @@ type ComplexityRoot struct {
 		Events                    func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		EventsAggregate           func(childComplexity int, filter *model.UserEventFilter) int
 		ID                        func(childComplexity int) int
+		Lang                      func(childComplexity int) int
 		LastAck                   func(childComplexity int) int
+		Links                     func(childComplexity int) int
+		Location                  func(childComplexity int) int
 		MarkAllAsRead             func(childComplexity int) int
 		Name                      func(childComplexity int) int
 		NotifyByEmail             func(childComplexity int) int
@@ -1024,6 +1027,7 @@ type ComplexityRoot struct {
 		Rights                    func(childComplexity int, filter *model.UserRightsFilter) int
 		Roles                     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		RolesAggregate            func(childComplexity int, filter *model.NodeFilter) int
+		Skills                    func(childComplexity int) int
 		Subscriptions             func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		SubscriptionsAggregate    func(childComplexity int, filter *model.TensionFilter) int
 		TensionsAssigned          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -1044,6 +1048,8 @@ type ComplexityRoot struct {
 		EmailMin         func(childComplexity int) int
 		LastAckMax       func(childComplexity int) int
 		LastAckMin       func(childComplexity int) int
+		LocationMax      func(childComplexity int) int
+		LocationMin      func(childComplexity int) int
 		MarkAllAsReadMax func(childComplexity int) int
 		MarkAllAsReadMin func(childComplexity int) int
 		NameMax          func(childComplexity int) int
@@ -6730,12 +6736,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
+	case "User.lang":
+		if e.complexity.User.Lang == nil {
+			break
+		}
+
+		return e.complexity.User.Lang(childComplexity), true
+
 	case "User.lastAck":
 		if e.complexity.User.LastAck == nil {
 			break
 		}
 
 		return e.complexity.User.LastAck(childComplexity), true
+
+	case "User.links":
+		if e.complexity.User.Links == nil {
+			break
+		}
+
+		return e.complexity.User.Links(childComplexity), true
+
+	case "User.location":
+		if e.complexity.User.Location == nil {
+			break
+		}
+
+		return e.complexity.User.Location(childComplexity), true
 
 	case "User.markAllAsRead":
 		if e.complexity.User.MarkAllAsRead == nil {
@@ -6800,6 +6827,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.RolesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "User.skills":
+		if e.complexity.User.Skills == nil {
+			break
+		}
+
+		return e.complexity.User.Skills(childComplexity), true
 
 	case "User.subscriptions":
 		if e.complexity.User.Subscriptions == nil {
@@ -6949,6 +6983,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserAggregateResult.LastAckMin(childComplexity), true
+
+	case "UserAggregateResult.locationMax":
+		if e.complexity.UserAggregateResult.LocationMax == nil {
+			break
+		}
+
+		return e.complexity.UserAggregateResult.LocationMax(childComplexity), true
+
+	case "UserAggregateResult.locationMin":
+		if e.complexity.UserAggregateResult.LocationMin == nil {
+			break
+		}
+
+		return e.complexity.UserAggregateResult.LocationMin(childComplexity), true
 
 	case "UserAggregateResult.markAllAsReadMax":
 		if e.complexity.UserAggregateResult.MarkAllAsReadMax == nil {
@@ -7690,8 +7738,12 @@ type User {
   email: String! @private
   password: String! @hidden
   bio: String
+  location: String
   utc: String
+  links: [String!]
+  skills: [String!]
   notifyByEmail: Boolean!
+  lang: Lang!
   subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -7889,39 +7941,45 @@ enum UserType {
 
 }
 
+enum Lang {
+  EN
+  FR
+  IT
+}
+
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8198,8 +8256,12 @@ input AddUserInput {
   email: String! @w_add(a:"lower")
   password: String!
   bio: String
+  location: String
   utc: String
+  links: [String!]
+  skills: [String!]
   notifyByEmail: Boolean!
+  lang: Lang!
   subscriptions: [TensionRef!] @x_alter(r:"ref")
   rights: UserRightsRef!
   roles: [NodeRef!] @x_add(r:"ref")
@@ -10179,6 +10241,8 @@ type UserAggregateResult {
   passwordMax: String
   bioMin: String
   bioMax: String
+  locationMin: String
+  locationMax: String
   utcMin: String
   utcMax: String
   markAllAsReadMin: String
@@ -10252,8 +10316,12 @@ enum UserHasFilter {
   email
   password
   bio
+  location
   utc
+  links
+  skills
   notifyByEmail
+  lang
   subscriptions
   rights
   roles
@@ -10279,6 +10347,7 @@ enum UserOrderable {
   email
   password
   bio
+  location
   utc
   markAllAsRead
 }
@@ -10291,8 +10360,12 @@ input UserPatch {
   email: String @x_patch_ro
   password: String @x_patch_ro
   bio: String @x_patch
+  location: String @x_patch
   utc: String @x_patch
+  links: [String!] @x_patch
+  skills: [String!] @x_patch
   notifyByEmail: Boolean @x_patch
+  lang: Lang @x_patch
   subscriptions: [TensionRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
@@ -10313,8 +10386,12 @@ input UserRef {
   email: String @w_add(a:"lower")
   password: String
   bio: String @x_patch
+  location: String @x_patch
   utc: String @x_patch
+  links: [String!] @x_patch
+  skills: [String!] @x_patch
   notifyByEmail: Boolean @x_patch
+  lang: Lang @x_patch
   subscriptions: [TensionRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef
   roles: [NodeRef!] @x_add(r:"ref")
@@ -38756,6 +38833,35 @@ func (ec *executionContext) _User_bio(ctx context.Context, field graphql.Collect
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_location(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_utc(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -38783,6 +38889,64 @@ func (ec *executionContext) _User_utc(ctx context.Context, field graphql.Collect
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_links(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Links, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_skills(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Skills, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_notifyByEmail(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -38815,6 +38979,38 @@ func (ec *executionContext) _User_notifyByEmail(ctx context.Context, field graph
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_lang(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lang, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.Lang)
+	fc.Result = res
+	return ec.marshalNLang2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_subscriptions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -39914,6 +40110,64 @@ func (ec *executionContext) _UserAggregateResult_bioMax(ctx context.Context, fie
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.BioMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserAggregateResult_locationMin(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LocationMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserAggregateResult_locationMax(ctx context.Context, field graphql.CollectedField, obj *model.UserAggregateResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserAggregateResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LocationMax, nil
 	})
 
 	if resTmp == nil {
@@ -44451,6 +44705,14 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "utc":
 			var err error
 
@@ -44459,11 +44721,35 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "links":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
+			it.Links, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "notifyByEmail":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
 			it.NotifyByEmail, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lang":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
+			it.Lang, err = ec.unmarshalNLang2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -56261,6 +56547,30 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Location = data
+			} else if tmp == nil {
+				it.Location = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "utc":
 			var err error
 
@@ -56285,6 +56595,54 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "links":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Links = data
+			} else if tmp == nil {
+				it.Links = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Skills = data
+			} else if tmp == nil {
+				it.Skills = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "notifyByEmail":
 			var err error
 
@@ -56307,6 +56665,32 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				it.NotifyByEmail = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "lang":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.Lang); ok {
+				it.Lang = data
+			} else if tmp == nil {
+				it.Lang = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.Lang`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscriptions":
@@ -56716,6 +57100,30 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Location = data
+			} else if tmp == nil {
+				it.Location = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "utc":
 			var err error
 
@@ -56740,6 +57148,54 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "links":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Links = data
+			} else if tmp == nil {
+				it.Links = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Skills = data
+			} else if tmp == nil {
+				it.Skills = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "notifyByEmail":
 			var err error
 
@@ -56762,6 +57218,32 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				it.NotifyByEmail = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "lang":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.Lang); ok {
+				it.Lang = data
+			} else if tmp == nil {
+				it.Lang = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.Lang`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscriptions":
@@ -64994,6 +65476,13 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = innerFunc(ctx)
 
+		case "location":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_location(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "utc":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._User_utc(ctx, field, obj)
@@ -65001,9 +65490,33 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = innerFunc(ctx)
 
+		case "links":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_links(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "skills":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_skills(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "notifyByEmail":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._User_notifyByEmail(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lang":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_lang(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -65248,6 +65761,20 @@ func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.Se
 		case "bioMax":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._UserAggregateResult_bioMax(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "locationMin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_locationMin(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "locationMax":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UserAggregateResult_locationMax(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -66867,6 +67394,16 @@ func (ec *executionContext) unmarshalNLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋ
 func (ec *executionContext) unmarshalNLabelRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRef(ctx context.Context, v interface{}) (*model.LabelRef, error) {
 	res, err := ec.unmarshalInputLabelRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNLang2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx context.Context, v interface{}) (model.Lang, error) {
+	var res model.Lang
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLang2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx context.Context, sel ast.SelectionSet, v model.Lang) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNMandateFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx context.Context, v interface{}) (model.MandateFilter, error) {
@@ -70552,6 +71089,22 @@ func (ec *executionContext) unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋ
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx context.Context, v interface{}) (*model.Lang, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.Lang)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx context.Context, sel ast.SelectionSet, v *model.Lang) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOMandate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx context.Context, sel ast.SelectionSet, v []*model.Mandate) graphql.Marshaler {

@@ -78,7 +78,7 @@ func processTensionNotification(msg *redis.Message) {
         log.Printf("PushEventNotifications error: %v", err)
     }
 
-    fmt.Printf(".")
+    fmt.Printf("e")
 }
 
 func processContractNotification(msg *redis.Message) {
@@ -98,7 +98,7 @@ func processContractNotification(msg *redis.Message) {
         log.Printf("PushContractNotification error: %v: ", err)
     }
 
-    fmt.Printf(".")
+    fmt.Printf("c")
 }
 
 func processNotifNotification(msg *redis.Message) {
@@ -118,5 +118,5 @@ func processNotifNotification(msg *redis.Message) {
         log.Printf("PushEventNotifications error: %v", err)
     }
 
-    fmt.Printf(".")
+    fmt.Printf("n")
 }
