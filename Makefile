@@ -76,7 +76,7 @@ generate:
 #
 
 docs:
-	cp ../doc/data/* data
+	cp ../doc/_data/* data
 
 # Utils
 

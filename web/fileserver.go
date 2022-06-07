@@ -39,7 +39,7 @@ func FileServer(r chi.Router, public string, static string) {
         //fmt.Println(lang)
 
         // Set Headers
-        w.Header().Set("Cache-Control", "max-age=91200")
+        w.Header().Set("Cache-Control", "max-age=3600")
 
 		if _, err := os.Stat(root + file); os.IsNotExist(err) {
 			http.ServeFile(w, r, path.Join(root, "index.html"))
