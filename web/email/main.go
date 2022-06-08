@@ -166,11 +166,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         }
     }
     // Author
-    if notif.Uctx.Name == nil {
-        author = "@" + notif.Uctx.Username
-    } else {
-        author = *notif.Uctx.Name
-    }
+    // @debug: get name
+    author = "@" + notif.Uctx.Username
 
     var type_hint string
     if ui.Reason == model.ReasonIsAlert {
@@ -317,11 +314,8 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         rcpt_name = ""
     }
     // Author
-    if notif.Uctx.Name == nil {
-        author = "@" + notif.Uctx.Username
-    } else {
-        author = *notif.Uctx.Name
-    }
+    // @debug: get name
+    author = "@" + notif.Uctx.Username
 
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
 

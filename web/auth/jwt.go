@@ -127,7 +127,6 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
 
     // Erase growing value
     userCtx.Roles = nil
-    userCtx.Name = nil
     // Ignore internal Hit value
     userCtx.Hit = 0
 
@@ -275,7 +274,6 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
         u, e = DB.GetUctx("username", uctx.Username)
         // @DEBUG: UserCtx is update from their fields for propagation
         uctx.Username = u.Username
-        uctx.Name     = u.Name
         uctx.Password = u.Password
         uctx.Rights   = u.Rights
         uctx.Roles    = u.Roles

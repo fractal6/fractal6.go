@@ -20,7 +20,6 @@ import (
 
 var userCtxPayload string = `{
     User.username
-    User.name
     User.password
     User.rights {expand(_all_)}
     User.roles {

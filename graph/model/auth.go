@@ -8,7 +8,6 @@ package model
 // @DEBUG: see emcapsulation issue: https://github.com/golang/go/issues/9859
 type UserCtx struct {
     Username       string     `json:"username"`
-    Name           *string    `json:"name"`
     Password       string     `json:"password"` // hash
     Rights         UserRights `json:"rights"`
 	Roles          []*Node    `json:"roles"`

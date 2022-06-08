@@ -20,6 +20,9 @@ prometheus_instrumention = true
 prometheus_credentials = my_secret
 client_version = "1c555fa"
 maintainer_email = "admin@email.com"
+jwt_secret = "my_secret"
+email_api_url = "url_api_email"
+email_api_key = "url_api_key"
 
 
 [db]
@@ -28,6 +31,8 @@ port_graphql = "8080"
 port_grpc = "9080"
 api = "graphql"
 admin = "admin"
+dgraph_public_key = ""
+dgraph_private_key = ""
 
 [graphql]
 complexity_limit = 200 # 50
