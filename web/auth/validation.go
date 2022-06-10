@@ -273,13 +273,14 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     hasEmailNotifications := true
 
     userInput := model.AddUserInput{
-        CreatedAt:      now,
-        LastAck:        now,
-        Username:       creds.Username,
-        Email:          creds.Email,
+        CreatedAt: now,
+        LastAck: now,
         NotifyByEmail: true,
-        Name:           creds.Name,
-        Password:       creds.Password,
+        Lang: model.LangEn,
+        Username: creds.Username,
+        Email: creds.Email,
+        Name: creds.Name,
+        Password: creds.Password,
         Rights: &model.UserRightsRef{
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,
