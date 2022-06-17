@@ -16,14 +16,13 @@ The server need a `config.toml` config file. You can use the folowing template:
 [server]
 host = "localhost"
 port = "8888"
-prometheus_instrumention = true
+prometheus_instrumentation = true
 prometheus_credentials = my_secret
 client_version = "1c555fa"
 maintainer_email = "admin@email.com"
 jwt_secret = "my_secret"
 email_api_url = "url_api_email"
 email_api_key = "url_api_key"
-
 
 [db]
 host = "localhost"

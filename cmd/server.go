@@ -130,11 +130,11 @@ func RunServer() {
         })
     })
 
-    // Notifications endpoint
-    r.Post("/notifications", handle6.Notifications)
-
     // Graphql API
     r.Post("/api", handle6.GraphqlHandler(gqlConfig))
+
+    // Notifications endpoint
+    r.Post("/notifications", handle6.Notifications)
 
     // Serve static files
     web.FileServer(r, "/data/", "./data")

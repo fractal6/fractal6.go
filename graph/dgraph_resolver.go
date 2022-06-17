@@ -1,7 +1,7 @@
 package graph
 
 import (
-    //"fmt"
+    "fmt"
 	"context"
     "regexp"
     "strings"
@@ -100,6 +100,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
             // otherwise, fail silently.
             return err
         }
+        fmt.Println("Dgraph Error Ignored: ", err.Error())
         return nil
     } else if err != nil || data == nil {
         return err

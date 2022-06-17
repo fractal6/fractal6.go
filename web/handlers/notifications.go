@@ -13,7 +13,7 @@ import (
 )
 
 
-// Signup register a new user and gives it a token.
+// Handle email responses.
 func Notifications(w http.ResponseWriter, r *http.Request) {
 
     // Get request form
@@ -22,7 +22,5 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
 
     // return result on success
-    data, _ := json.Marshal(form)
     fmt.Println(form)
-    w.Write(data)
 }
