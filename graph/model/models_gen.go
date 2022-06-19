@@ -4941,17 +4941,19 @@ type UserType string
 
 const (
 	UserTypeRegular UserType = "Regular"
+	UserTypePro     UserType = "Pro"
 	UserTypeRoot    UserType = "Root"
 )
 
 var AllUserType = []UserType{
 	UserTypeRegular,
+	UserTypePro,
 	UserTypeRoot,
 }
 
 func (e UserType) IsValid() bool {
 	switch e {
-	case UserTypeRegular, UserTypeRoot:
+	case UserTypeRegular, UserTypePro, UserTypeRoot:
 		return true
 	}
 	return false
