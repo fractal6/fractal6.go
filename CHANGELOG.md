@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unrealeased]
 
+## v0.6
+
 ### New
 - This changelog file
 - [major] add the reset password feature.

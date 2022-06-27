@@ -26,7 +26,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Check format
-    nameid := form.Nameid + "@" + uctx.Username // is personal namespace
+    nameid := form.Nameid
     err = auth.ValidateNameid(nameid, nameid)
 	if err != nil { http.Error(w, err.Error(), 400); return }
     nidOwner := nameid + "##" + "@" + uctx.Username

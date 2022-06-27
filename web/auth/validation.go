@@ -317,8 +317,20 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
     nodes, err := db.GetDB().GetNodes(regex, true)
     if err != nil {return ok, err}
 
-    if len(nodes) >= uctx.Rights.MaxPublicOrga {
-        return ok, fmt.Errorf("Number of personnal organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
+    switch uctx.Rights.Type {
+    case model.UserTypeRegular:
+        if len(nodes) >= uctx.Rights.MaxPublicOrga {
+            return ok, fmt.Errorf("Number of personnal organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
+        }
+
+    case model.UserTypePro:
+        if len(nodes) >= 100 {
+            return ok, fmt.Errorf("You own too many organisation, please contact us to create more.")
+        }
+
+    case model.UserTypeRoot:
+        // pass
+
     }
 
     ok = true
