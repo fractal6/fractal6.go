@@ -12,10 +12,10 @@ import (
 )
 
 type EmailForm struct {
-    Email string    `json:"mail_from"`
-    Title string    `json:"subject"`
-    Msg string  `json:"plain_body"`
-    References []string `json:"references"`
+    Email string            `json:"mail_from"`
+    Title string            `json:"subject"`
+    Msg string              `json:"plain_body"`
+    References string       `json:"references"`
     //AttachmentQuantity int  `json:"attachment_quantity"`
     //Attachments []string    `json:"attachments"`
 }
@@ -31,7 +31,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
     // Determine where from and to where it goes
     var isTid string
     var isCid string
-    for _, r := range form.References {
+    for _, r := range strings.Split(form.References, " ") {
         l := strings.TrimPrefix(r, "<")
         if strings.HasPrefix(l, "tension/") {
             isTid = l[8:strings.Index(l, "@")]
