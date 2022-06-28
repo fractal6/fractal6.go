@@ -90,10 +90,10 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
         if err := graph.PushContractNotifications(notif); err != nil {
             http.Error(w, "PushContractNotification error: " + err.Error(), 500); return
         }
+    } else {
+        // In every other case, it returns an error.
+        http.Error(w, "Unknown references", 500)
+        return
     }
-
-    // In every other case, it returns an error.
-    http.Error(w, "Unknown references", 500)
-    return
 
 }
