@@ -77,6 +77,8 @@ type EventNotif struct {
     Uctx *UserCtx        `json:"uctx"`
     Tid string           `json:"tid"`
     History []*EventRef  `json:"history"`
+    // The following are get after the the cache publication
+    // to keep the messaging system as fast as possible.
     Receiverid string    `json:"receiverid"`
     Title string         `json:"title"`
     Msg string           `json:"msg"`
@@ -87,6 +89,8 @@ type ContractNotif struct {
     Tid string                  `json:"tid"`
     Contract *Contract          `json:"contract"`
     ContractEvent ContractEvent `json:"contract_event"`
+    // The following are get after the the cache publication
+    // to keep the messaging system as fast as possible.
     Receiverid string           `json:"receiverid"`
     Msg string                  `json:"msg"`
 }
