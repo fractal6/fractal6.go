@@ -8112,15 +8112,7 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
@@ -8128,21 +8120,29 @@ directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -57890,7 +57890,12 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "blob_type", "pushedFlag", "archivedFlag", "node", "md"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -58031,7 +58036,12 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "_VOID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -58110,7 +58120,12 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "contractid", "tension", "status", "contract_type", "closedAt", "event", "participants", "candidates", "pending_candidates", "comments", "isValidator"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -58313,7 +58328,12 @@ func (ec *executionContext) unmarshalInputAddEventFragmentInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"event_type", "old", "new"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "event_type":
 			var err error
@@ -58352,7 +58372,12 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "old", "new"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -58477,7 +58502,12 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"rootnameid", "name", "description", "color", "tensions", "nodes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "rootnameid":
 			var err error
@@ -58642,7 +58672,12 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"purpose", "responsabilities", "domains", "policies"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "purpose":
 			var err error
@@ -58689,7 +58724,12 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "children", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "nameid":
 			var err error
@@ -58884,7 +58924,12 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "orga_agg", "events_history"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -59171,7 +59216,12 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension_", "contract"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -59258,7 +59308,12 @@ func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"n_members", "n_guests"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "n_members":
 			var err error
@@ -59289,7 +59344,12 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "updatedAt":
 			var err error
@@ -59400,7 +59460,12 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"rootnameid", "name", "about", "role_type", "color", "mandate", "roles", "nodes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "rootnameid":
 			var err error
@@ -59581,7 +59646,12 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "contracts", "subscribers", "n_comments", "n_open_contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -59974,7 +60044,12 @@ func (ec *executionContext) unmarshalInputAddUserEventInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdAt", "isRead", "user", "event"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdAt":
 			var err error
@@ -60043,7 +60118,12 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdAt":
 			var err error
@@ -60426,7 +60506,12 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "hasEmailNotifications"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type_":
 			var err error
@@ -60481,7 +60566,12 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "voteid", "contract", "node", "data"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -60628,7 +60718,12 @@ func (ec *executionContext) unmarshalInputAuthRule(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"and", "or", "not", "rule"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "and":
 			var err error
@@ -60675,7 +60770,12 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "blob_type", "pushedFlag", "archivedFlag", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -60770,7 +60870,12 @@ func (ec *executionContext) unmarshalInputBlobOrder(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -60809,7 +60914,12 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "blob_type", "pushedFlag", "archivedFlag", "node", "md"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -61080,7 +61190,12 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension", "blob_type", "pushedFlag", "archivedFlag", "node", "md"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -61229,7 +61344,12 @@ func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -61260,7 +61380,12 @@ func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -61331,7 +61456,12 @@ func (ec *executionContext) unmarshalInputCommentOrder(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -61370,7 +61500,12 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "_VOID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -61499,7 +61634,12 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "_VOID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -61602,7 +61742,12 @@ func (ec *executionContext) unmarshalInputContainsFilter(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"point", "polygon"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "point":
 			var err error
@@ -61633,7 +61778,12 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "contractid", "status", "contract_type", "closedAt", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -61736,7 +61886,12 @@ func (ec *executionContext) unmarshalInputContractOrder(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -61775,7 +61930,12 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "contractid", "tension", "status", "contract_type", "closedAt", "event", "participants", "candidates", "pending_candidates", "comments", "isValidator"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -62180,7 +62340,12 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "contractid", "tension", "status", "contract_type", "closedAt", "event", "participants", "candidates", "pending_candidates", "comments", "isValidator"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -62391,7 +62556,12 @@ func (ec *executionContext) unmarshalInputContractStatus_hash(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -62422,7 +62592,12 @@ func (ec *executionContext) unmarshalInputContractType_hash(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -62453,7 +62628,12 @@ func (ec *executionContext) unmarshalInputCustomHTTP(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"url", "method", "body", "graphql", "mode", "forwardHeaders", "secretHeaders", "introspectionHeaders", "skipIntrospection"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "url":
 			var err error
@@ -62540,7 +62720,12 @@ func (ec *executionContext) unmarshalInputDateTimeFilter(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "le", "lt", "ge", "gt", "between"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -62611,7 +62796,12 @@ func (ec *executionContext) unmarshalInputDateTimeRange(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"min", "max"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "min":
 			var err error
@@ -62642,7 +62832,12 @@ func (ec *executionContext) unmarshalInputDgraphDefault(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"value"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "value":
 			var err error
@@ -62665,7 +62860,12 @@ func (ec *executionContext) unmarshalInputEventFilter(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "event_type", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -62744,7 +62944,12 @@ func (ec *executionContext) unmarshalInputEventFragmentFilter(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"event_type", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "event_type":
 			var err error
@@ -62799,7 +63004,12 @@ func (ec *executionContext) unmarshalInputEventFragmentOrder(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -62838,7 +63048,12 @@ func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"event_type", "old", "new"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "event_type":
 			var err error
@@ -62927,7 +63142,12 @@ func (ec *executionContext) unmarshalInputEventFragmentRef(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"event_type", "old", "new"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "event_type":
 			var err error
@@ -62966,7 +63186,12 @@ func (ec *executionContext) unmarshalInputEventKindFilter(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"memberTypes", "eventFilter", "contractFilter", "notifFilter"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "memberTypes":
 			var err error
@@ -63013,7 +63238,12 @@ func (ec *executionContext) unmarshalInputEventKindRef(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eventRef", "contractRef", "notifRef"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eventRef":
 			var err error
@@ -63052,7 +63282,12 @@ func (ec *executionContext) unmarshalInputEventOrder(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -63091,7 +63326,12 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "old", "new"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -63312,7 +63552,12 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "old", "new"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -63445,7 +63690,12 @@ func (ec *executionContext) unmarshalInputFloatFilter(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "le", "lt", "ge", "gt", "between"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -63516,7 +63766,12 @@ func (ec *executionContext) unmarshalInputFloatRange(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"min", "max"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "min":
 			var err error
@@ -63547,7 +63802,12 @@ func (ec *executionContext) unmarshalInputGenerateMutationParams(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"add", "update", "delete"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "add":
 			var err error
@@ -63586,7 +63846,12 @@ func (ec *executionContext) unmarshalInputGenerateQueryParams(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"get", "query", "password", "aggregate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "get":
 			var err error
@@ -63633,7 +63898,12 @@ func (ec *executionContext) unmarshalInputInt64Filter(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "le", "lt", "ge", "gt", "between"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -63704,7 +63974,12 @@ func (ec *executionContext) unmarshalInputInt64Range(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"min", "max"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "min":
 			var err error
@@ -63735,7 +64010,12 @@ func (ec *executionContext) unmarshalInputIntFilter(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "le", "lt", "ge", "gt", "between"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -63806,7 +64086,12 @@ func (ec *executionContext) unmarshalInputIntRange(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"min", "max"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "min":
 			var err error
@@ -63837,7 +64122,12 @@ func (ec *executionContext) unmarshalInputIntersectsFilter(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"polygon", "multiPolygon"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "polygon":
 			var err error
@@ -63868,7 +64158,12 @@ func (ec *executionContext) unmarshalInputLabelFilter(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -63939,7 +64234,12 @@ func (ec *executionContext) unmarshalInputLabelOrder(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -63978,7 +64278,12 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"rootnameid", "name", "description", "color", "tensions", "nodes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "rootnameid":
 			var err error
@@ -64195,7 +64500,12 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "description", "color", "tensions", "nodes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -64404,7 +64714,12 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "purpose", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -64467,7 +64782,12 @@ func (ec *executionContext) unmarshalInputMandateOrder(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -64506,7 +64826,12 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"purpose", "responsabilities", "domains", "policies"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "purpose":
 			var err error
@@ -64617,7 +64942,12 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "purpose", "responsabilities", "domains", "policies"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -64736,7 +65066,12 @@ func (ec *executionContext) unmarshalInputMultiPolygonRef(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"polygons"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "polygons":
 			var err error
@@ -64759,7 +65094,12 @@ func (ec *executionContext) unmarshalInputNearFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"distance", "coordinate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "distance":
 			var err error
@@ -64790,7 +65130,12 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "name", "nameid", "rootnameid", "isRoot", "type_", "about", "visibility", "mode", "isArchived", "isPersonal", "role_type", "skills", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -64949,7 +65294,12 @@ func (ec *executionContext) unmarshalInputNodeFragmentFilter(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -65004,7 +65354,12 @@ func (ec *executionContext) unmarshalInputNodeFragmentOrder(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -65043,7 +65398,12 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "children", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "nameid":
 			var err error
@@ -65422,7 +65782,12 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "nameid", "name", "about", "mandate", "skills", "children", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -65677,7 +66042,12 @@ func (ec *executionContext) unmarshalInputNodeMode_hash(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -65708,7 +66078,12 @@ func (ec *executionContext) unmarshalInputNodeOrder(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -65747,7 +66122,12 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "orga_agg", "events_history"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -66618,7 +66998,12 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "orga_agg", "events_history"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -66913,7 +67298,12 @@ func (ec *executionContext) unmarshalInputNodeType_hash(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -66944,7 +67334,12 @@ func (ec *executionContext) unmarshalInputNodeVisibility_hash(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -66975,7 +67370,12 @@ func (ec *executionContext) unmarshalInputNotifFilter(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -67046,7 +67446,12 @@ func (ec *executionContext) unmarshalInputNotifOrder(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -67085,7 +67490,12 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension_", "contract"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -67258,7 +67668,12 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension_", "contract"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -67353,7 +67768,12 @@ func (ec *executionContext) unmarshalInputOrgaAggFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "has":
 			var err error
@@ -67400,7 +67820,12 @@ func (ec *executionContext) unmarshalInputOrgaAggOrder(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -67439,7 +67864,12 @@ func (ec *executionContext) unmarshalInputOrgaAggPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"n_members", "n_guests"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "n_members":
 			var err error
@@ -67502,7 +67932,12 @@ func (ec *executionContext) unmarshalInputOrgaAggRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"n_members", "n_guests"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "n_members":
 			var err error
@@ -67533,7 +67968,12 @@ func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "username", "email", "email_token", "token", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -67620,7 +68060,12 @@ func (ec *executionContext) unmarshalInputPendingUserOrder(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -67659,7 +68104,12 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "updatedAt":
 			var err error
@@ -67852,7 +68302,12 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "updatedAt", "username", "password", "email", "email_token", "token", "contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -67971,7 +68426,12 @@ func (ec *executionContext) unmarshalInputPointGeoFilter(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"near", "within"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "near":
 			var err error
@@ -68002,7 +68462,12 @@ func (ec *executionContext) unmarshalInputPointListRef(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"points"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "points":
 			var err error
@@ -68025,7 +68490,12 @@ func (ec *executionContext) unmarshalInputPointRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"longitude", "latitude"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "longitude":
 			var err error
@@ -68056,7 +68526,12 @@ func (ec *executionContext) unmarshalInputPolygonGeoFilter(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"near", "within", "contains", "intersects"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "near":
 			var err error
@@ -68103,7 +68578,12 @@ func (ec *executionContext) unmarshalInputPolygonRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"coordinates"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "coordinates":
 			var err error
@@ -68126,7 +68606,12 @@ func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -68197,7 +68682,12 @@ func (ec *executionContext) unmarshalInputPostOrder(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -68236,7 +68726,12 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -68365,7 +68860,12 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -68388,7 +68888,12 @@ func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -68459,7 +68964,12 @@ func (ec *executionContext) unmarshalInputRoleExtOrder(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -68498,7 +69008,12 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"rootnameid", "name", "about", "role_type", "color", "mandate", "roles", "nodes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "rootnameid":
 			var err error
@@ -68767,7 +69282,12 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "about", "role_type", "color", "mandate", "roles", "nodes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -69028,7 +69548,12 @@ func (ec *executionContext) unmarshalInputRoleType_hash(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -69059,7 +69584,12 @@ func (ec *executionContext) unmarshalInputStringExactFilter(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "le", "lt", "ge", "gt", "between"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -69130,7 +69660,12 @@ func (ec *executionContext) unmarshalInputStringFullTextFilter(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"alloftext", "anyoftext"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "alloftext":
 			var err error
@@ -69161,7 +69696,12 @@ func (ec *executionContext) unmarshalInputStringHashFilter(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -69192,7 +69732,12 @@ func (ec *executionContext) unmarshalInputStringHashFilter_StringRegExpFilter(ct
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "regexp"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -69231,7 +69776,12 @@ func (ec *executionContext) unmarshalInputStringHashFilter_StringTermFilter(ctx 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in", "allofterms", "anyofterms"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -69278,7 +69828,12 @@ func (ec *executionContext) unmarshalInputStringRange(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"min", "max"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "min":
 			var err error
@@ -69309,7 +69864,12 @@ func (ec *executionContext) unmarshalInputStringRegExpFilter(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"regexp"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "regexp":
 			var err error
@@ -69332,7 +69892,12 @@ func (ec *executionContext) unmarshalInputStringTermFilter(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"allofterms", "anyofterms"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "allofterms":
 			var err error
@@ -69363,7 +69928,12 @@ func (ec *executionContext) unmarshalInputTensionEvent_hash(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -69394,7 +69964,12 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "emitterid", "receiverid", "title", "type_", "status", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -69505,7 +70080,12 @@ func (ec *executionContext) unmarshalInputTensionOrder(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -69544,7 +70124,12 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "contracts", "subscribers", "n_comments", "n_open_contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -70173,7 +70758,12 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "contracts", "subscribers", "n_comments", "n_open_contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -70594,7 +71184,12 @@ func (ec *executionContext) unmarshalInputTensionStatus_hash(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -70625,7 +71220,12 @@ func (ec *executionContext) unmarshalInputTensionType_hash(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "eq":
 			var err error
@@ -70656,7 +71256,12 @@ func (ec *executionContext) unmarshalInputUpdateBlobInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70695,7 +71300,12 @@ func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70734,7 +71344,12 @@ func (ec *executionContext) unmarshalInputUpdateContractInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70773,7 +71388,12 @@ func (ec *executionContext) unmarshalInputUpdateEventFragmentInput(ctx context.C
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70812,7 +71432,12 @@ func (ec *executionContext) unmarshalInputUpdateEventInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70851,7 +71476,12 @@ func (ec *executionContext) unmarshalInputUpdateLabelInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70890,7 +71520,12 @@ func (ec *executionContext) unmarshalInputUpdateMandateInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70929,7 +71564,12 @@ func (ec *executionContext) unmarshalInputUpdateNodeFragmentInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -70968,7 +71608,12 @@ func (ec *executionContext) unmarshalInputUpdateNodeInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71007,7 +71652,12 @@ func (ec *executionContext) unmarshalInputUpdateNotifInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71046,7 +71696,12 @@ func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71085,7 +71740,12 @@ func (ec *executionContext) unmarshalInputUpdatePendingUserInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71124,7 +71784,12 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71163,7 +71828,12 @@ func (ec *executionContext) unmarshalInputUpdateRoleExtInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71202,7 +71872,12 @@ func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71241,7 +71916,12 @@ func (ec *executionContext) unmarshalInputUpdateUserEventInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71280,7 +71960,12 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71319,7 +72004,12 @@ func (ec *executionContext) unmarshalInputUpdateUserRightsInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71358,7 +72048,12 @@ func (ec *executionContext) unmarshalInputUpdateVoteInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "filter":
 			var err error
@@ -71397,7 +72092,12 @@ func (ec *executionContext) unmarshalInputUserEventFilter(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "isRead", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -71468,7 +72168,12 @@ func (ec *executionContext) unmarshalInputUserEventOrder(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -71507,7 +72212,12 @@ func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdAt", "isRead", "user", "event"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdAt":
 			var err error
@@ -71622,7 +72332,12 @@ func (ec *executionContext) unmarshalInputUserEventRef(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "isRead", "user", "event"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -71715,7 +72430,12 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "username", "name", "email", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -71794,7 +72514,12 @@ func (ec *executionContext) unmarshalInputUserOrder(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -71833,7 +72558,12 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdAt":
 			var err error
@@ -72432,7 +73162,12 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -73001,7 +73736,12 @@ func (ec *executionContext) unmarshalInputUserRightsFilter(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "has":
 			var err error
@@ -73048,7 +73788,12 @@ func (ec *executionContext) unmarshalInputUserRightsOrder(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -73087,7 +73832,12 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "hasEmailNotifications"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type_":
 			var err error
@@ -73224,7 +73974,12 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "hasEmailNotifications"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type_":
 			var err error
@@ -73279,7 +74034,12 @@ func (ec *executionContext) unmarshalInputVoteFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "voteid", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -73358,7 +74118,12 @@ func (ec *executionContext) unmarshalInputVoteOrder(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "asc":
 			var err error
@@ -73397,7 +74162,12 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "voteid", "contract", "node", "data"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "createdBy":
 			var err error
@@ -73618,7 +74388,12 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "voteid", "contract", "node", "data"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -73773,7 +74548,12 @@ func (ec *executionContext) unmarshalInputWithinFilter(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"polygon"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "polygon":
 			var err error
