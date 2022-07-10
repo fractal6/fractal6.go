@@ -123,7 +123,7 @@ func init() {
 // tensionEventHook is applied for addTension and updateTension query directives.
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload) with
 // All events in History must pass.
-func tensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, blob *model.BlobRef) (bool, *model.Contract, error) {
+func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef, blob *model.BlobRef) (bool, *model.Contract, error) {
     var ok bool = true
     var addSubscriber bool
     var err error

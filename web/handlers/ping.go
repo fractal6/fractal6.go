@@ -8,6 +8,5 @@ import (
 func Ping(w http.ResponseWriter, r *http.Request) {
     //user := r.Context().Value("user").(string)
     w.Write([]byte("OK"))
-
 }
 

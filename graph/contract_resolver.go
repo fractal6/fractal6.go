@@ -150,7 +150,7 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
         contract, err := db.GetDB().GetContractHook(ids[0])
         if err != nil  { return nil, err }
         // Check if user has admin right
-        ok, err = hasContractRight(uctx, contract)
+        ok, err = HasContractRight(uctx, contract)
         if err != nil  { return nil, err }
         if !ok {
             // Check if user is candidate
@@ -262,7 +262,7 @@ func isContractValidator(ctx context.Context, obj interface{}, next graphql.Reso
     // NOT CHECKING, user can change its vote.
 
     // Check rights
-    data, err = hasContractRight(uctx, d)
+    data, err = HasContractRight(uctx, d)
 
     return &data, err
 }

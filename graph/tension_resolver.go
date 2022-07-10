@@ -46,7 +46,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     id := tension.ID
 
     // Validate and process Blob Event
-    ok, _,  err := tensionEventHook(uctx, id, input.History, nil)
+    ok, _,  err := TensionEventHook(uctx, id, input.History, nil)
     if !ok || err != nil {
         // Delete the tension just added
         e := db.GetDB().DeepDelete("tension", id)
@@ -83,7 +83,7 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
         if len(input.Set.Blobs) > 0 {
             blob = input.Set.Blobs[0]
         }
-        ok, contract, err = tensionEventHook(uctx, ids[0], input.Set.History, blob)
+        ok, contract, err = TensionEventHook(uctx, ids[0], input.Set.History, blob)
         if err != nil { return nil, err }
         if ok {
             // History and notification Logics --

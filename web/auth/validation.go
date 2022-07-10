@@ -123,9 +123,41 @@ var (
 )
 
 var clientVersion string
+var reservedUsername map[string]bool
 
 func init() {
     clientVersion = viper.GetString("server.client_version")
+    reservedUsername = map[string]bool{
+        // Reserved email endpoint
+        "admin": true,
+        "sysadmin": true,
+        "alert": true,
+        "contact": true,
+        "notifications": true,
+        "noreply": true,
+        "dmarc-reports": true,
+        // Reserved URI
+        // --
+        // back
+        "ping": true,
+        "playground": true,
+        "metrics": true,
+        "mailing": true,
+        "api": true,
+        "auth": true,
+        "data": true,
+        "static": true,
+        "index": true,
+        "index.html": true,
+        // front
+        "new": true, // tension, orga, networks
+        "explore": true, // orgas, networks, users
+        "login": true,
+        "logout": true,
+        "signup": true,
+        "verification": true,
+        "password-reset": true,
+    }
 }
 
 func regularizeUctx(uctx *model.UserCtx) {
@@ -220,6 +252,8 @@ func ValidateNewUser(creds model.UserCreds) error {
     err := ValidateUsername(username)
     if err != nil {
         return err
+    } else if reservedUsername[username] {
+        return ErrUsernameExist
     }
     // Email validation
     err = ValidateEmail(email)
@@ -240,7 +274,7 @@ func ValidateNewUser(creds model.UserCreds) error {
     }
     // TODO: password complexity check
 
-    // Chech username existence
+    // Check username existence
     ex1, err1 := db.DB.Exists("User.username", username, nil)
     if err1 != nil {
         return err1
@@ -248,7 +282,7 @@ func ValidateNewUser(creds model.UserCreds) error {
     if ex1 {
         return ErrUsernameExist
     }
-    // Chech email existence
+    // Check email existence
     ex2, err2 := db.DB.Exists("User.email", email, nil)
     if err2 != nil {
         return err2
