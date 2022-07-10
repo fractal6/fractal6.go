@@ -1,7 +1,7 @@
 package handlers
 
 import (
-    "net"
+    //"net"
     "net/http"
     "encoding/json"
     "strings"
@@ -15,10 +15,10 @@ import (
 // Handle email responses.
 func Notifications(w http.ResponseWriter, r *http.Request) {
     // Temporary solution while Postal can't be identify
-    if ip, _, err := net.SplitHostPort(r.RemoteAddr);
-    err != nil || (ip != "5.196.4.6" && ip != "2001:41d0:401:3200::3be6") {
-        http.Error(w, "IP NOT AUTHORIZED", 400)
-    }
+    //if ip, _, err := net.SplitHostPort(r.RemoteAddr);
+    //err != nil || (ip != "5.196.4.6" && ip != "2001:41d0:401:3200::3be6") {
+    //    http.Error(w, "IP NOT AUTHORIZED", 400); return
+    //}
 
     // Get request form
     var form EmailForm
@@ -44,8 +44,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
     uctx, err := db.GetDB().GetUctx("email", form.From)
 	if err != nil { http.Error(w, err.Error(), 500); return }
     if uctx == nil || uctx.Username == "" {
-        http.Error(w, "Unknown user (spam ?)", 400)
-        return
+        http.Error(w, "Unknown user (spam ?)", 400); return
     }
 
     createdAt := tools.Now()
@@ -64,10 +63,22 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
             Tid: isTid,
             History: history,
         }
-        // Check and publish event
+        // Check event
         ok, _, err := graph.TensionEventHook(uctx, isTid, history, nil)
         if err != nil { http.Error(w, err.Error(), 500); return }
         if !ok { http.Error(w, "access denied", 400); return }
+        // Publish  event
+        db.GetDB().Update(db.DB.GetRootUctx(), "tension", model.UpdateTensionInput{
+            Filter: &model.TensionFilter{ID:[]string{isTid}},
+            Set: &model.TensionPatch{
+                Comments: []*model.CommentRef{&model.CommentRef{
+                    CreatedAt: &createdAt,
+                    CreatedBy: &createdBy,
+                    Message: &form.Msg,
+                }},
+            },
+        })
+
         // Publish Notification
         // --
         // Push event in tension event history
@@ -88,7 +99,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
             Contract: contract,
             ContractEvent: model.NewComment,
         }
-        // Check and publish event
+        // Check  event
         ok, err := graph.HasContractRight(uctx, contract)
         if err != nil { http.Error(w, err.Error(), 500); return }
         if !ok {
@@ -101,6 +112,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
             }
             if !ok { http.Error(w, "access denied", 400); return }
         }
+        // Publish  event
         db.GetDB().Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
             Filter: &model.ContractFilter{ID:[]string{isCid}},
             Set: &model.ContractPatch{
@@ -120,8 +132,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
         }
     } else {
         // In every other case, it returns an error.
-        http.Error(w, "Unknown references", 400)
-        return
+        http.Error(w, "Unknown references", 400); return
     }
 
 }

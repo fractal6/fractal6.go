@@ -28,7 +28,8 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     // Temporary solution while Postal can't be identify
     if ip, _, err := net.SplitHostPort(r.RemoteAddr);
     err != nil || (ip != "5.196.4.6" && ip != "2001:41d0:401:3200::3be6") {
-        http.Error(w, "IP NOT AUTHORIZED", 400)
+        fmt.Println("IP error: ", ip, err)
+        http.Error(w, "IP NOT AUTHORIZED", 400); return
     }
 
     // Get request form
@@ -40,7 +41,6 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
         fmt.Sprintf("Got mailing mail from: %s to: %s ", form.From, form.To),
     )
 
-    http.Error(w, "not implemented", 400)
-    return
+    http.Error(w, "not implemented", 400); return
 
 }
