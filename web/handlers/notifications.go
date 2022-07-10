@@ -48,9 +48,17 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    createdAt := tools.Now()
+    createdBy := model.UserRef{Username: &uctx.Username}
+
     if isTid != "" { // Is a tension reply/comment
         // Build Event
-        history := []*model.EventRef{&model.EventRef{}}
+        e := model.TensionEventCommentPushed
+        history := []*model.EventRef{&model.EventRef{
+            CreatedAt: &createdAt,
+            CreatedBy: &createdBy,
+            EventType: &e,
+        }}
         notif := model.EventNotif{
             Uctx: uctx,
             Tid: isTid,
@@ -93,13 +101,12 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
             }
             if !ok { http.Error(w, "access denied", 400); return }
         }
-        createdAt := tools.Now()
         db.GetDB().Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
             Filter: &model.ContractFilter{ID:[]string{isCid}},
             Set: &model.ContractPatch{
                 Comments: []*model.CommentRef{&model.CommentRef{
                     CreatedAt: &createdAt,
-                    CreatedBy: &model.UserRef{Username: &uctx.Username},
+                    CreatedBy: &createdBy,
                     Message: &form.Msg,
                 }},
             },
