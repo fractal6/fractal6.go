@@ -4,6 +4,7 @@ GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
 MOD := "fractale/fractal6.go"
+LANGS := $(shell ls public/index.* | sed -n  "s/.*index\.\([a-z]*\)\.html/\1/p" )
 
 # TODO: versioning
 # LDFLAGS see versioning, hash etc...
@@ -35,13 +36,27 @@ run_notifier:
 build:
 	go build $(GOFLAGS) -o $(GOBIN)/$(RELEASE) main.go
 
+build_all: genall build
+
 prod:
 	go build -trimpath $(GOFLAGS_PROD) \
 		-ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD -X $(MOD)/db.buildMode=PROD" \
+		-ldflags "-X $(MOD)/web.langsAvailable=$(LANGS)" \
 		-o $(GOBIN)/$(RELEASE) main.go
 
 vendor:
 	go mod vendor
+
+fetch_client:
+	# Fetch client code
+	rm -rf public/
+	git clone --depth 1 ssh://git@code.skusku.site:29418/fluid-fractal/public-build.git public/
+	rm -rf public/.git
+	# Prevent path exploration, copy dragons
+	cp data/index.html public/static/
+	# Set client_version
+	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml
+
 
 #
 # Generate Graphql code and schema

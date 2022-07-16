@@ -130,15 +130,6 @@ func RunServer() {
         })
     })
 
-    // Graphql API
-    r.Post("/api", handle6.GraphqlHandler(gqlConfig))
-
-    // Notifications endpoint
-    r.Post("/notifications", handle6.Notifications)
-
-    // Serve static files
-    web.FileServer(r, "/data/", "./data")
-
     // Serve Prometheus instrumentation
 	if instrumentation {
         go func() {
@@ -154,18 +145,33 @@ func RunServer() {
         secured.Handle("/metrics", handle6.InstruHandler())
 	}
 
-
     // Serve Graphql Playground & introspection
     if buildMode == "DEV" {
         r.Get("/playground", handle6.PlaygroundHandler("/api"))
         r.Get("/ping", handle6.Ping)
 
-        // Serve frontend static files
-        //web.FileServer(r, "/", "./public")
-
         // Overwrite gql config
         gqlConfig["introspection"] = true
     }
+
+    ///// @TODO: CHECK TOKEN
+    // --
+    // Notifications endpoint
+    r.Post("/notifications", handle6.Notifications)
+    // Mailing-list endpoint
+    r.Post("/mailing", handle6.Mailing)
+    // Postal webhook endpoint
+    r.Post("/postal_webhook", handle6.PostalWebhook)
+
+    // Graphql API
+    r.Post("/api", handle6.GraphqlHandler(gqlConfig))
+
+    // Serve static data files
+    web.FileServer(r, "/data/", "./data", "3600")
+
+    // Serve static frontend files
+    web.FileServer(r, "/", "./public", "")
+
 
     address := HOST + ":" + PORT
     log.Printf("Running (%s) @ http://%s", buildMode, address)
