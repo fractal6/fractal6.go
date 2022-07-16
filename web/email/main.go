@@ -248,7 +248,9 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
     // Add footer
     payload += fmt.Sprintf(`—
-    <div style="color:#666;font-size:small">You are receiving this because %s. <a href="%s">View it on Fractale</a>.</div>
+    <div style="color:#666;font-size:small">You are receiving this because %s.<br>
+    <a href="%s">View it on Fractale</a>, reply to this email directly, or <a href="">unsubscribe</a>.
+    </div>
     `, ui.Reason.ToText(), url_redirect)
 
     // Buid email
@@ -434,7 +436,9 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 
     if notif.ContractEvent == model.NewComment {
         payload += "<br>" + fmt.Sprintf(`—
-        <div style="color:#666;font-size:small">You are receiving this because %s. <a href="%s">View it on Fractale</a>.</div>
+        <div style="color:#666;font-size:small">You are receiving this because %s.<br>
+        <a href="%s">View it on Fractale</a> or reply to this email directly.
+        </div>
         `, ui.Reason.ToText(), url_redirect)
     }
 

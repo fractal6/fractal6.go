@@ -305,7 +305,14 @@ func PushContractNotifications(notif model.ContractNotif) error {
     // +
     // Add Candidates
     for _, c := range notif.Contract.Candidates {
-        users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsCandidate}
+        switch notif.Contract.Event.EventType {
+        case model.TensionEventUserJoined:
+            users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsInvited}
+        case model.TensionEventMemberLinked:
+            users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsLinkCandidate}
+        default:
+            users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsCandidate}
+        }
     }
     // +
     // Add Pending Candidates

@@ -21,6 +21,8 @@ type GqlError struct {
 type NotifReason int
 const (
     ReasonUnknown NotifReason = iota
+    ReasonIsInvited
+    ReasonIsLinkCandidate
     ReasonIsCandidate
     ReasonIsPendingCandidate
     ReasonIsParticipant
@@ -35,14 +37,18 @@ const (
 
 func (n NotifReason) ToText() string {
     switch n {
+    case ReasonIsInvited:
+        return "you are invited to this organization"
+    case ReasonIsLinkCandidate:
+        return "you are invited to play this role"
     case ReasonIsCandidate:
-        return "you are invited"
+        return "you are candidate"
     case ReasonIsCoordo:
         return "you are coordinator in this circle"
     case ReasonIsPeer:
         return "you have role in this circle"
     case ReasonIsFirstLink:
-        return "you are first-link"
+        return "you are first-link of this role"
     case ReasonIsAssignee:
         return "you are assigned to this tension"
     case ReasonIsSubscriber:
