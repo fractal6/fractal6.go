@@ -175,13 +175,18 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     }
 
     // Redirect Url
+    url_unsubscribe := fmt.Sprintf("https://fractale.co/tension//%s?unsubscribe=email", notif.Tid)
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s", notif.Tid)
+    vars := []string{}
     if ui.Eid != "" {
         // Eid var is used to mark the event as read from the client.
-        url_redirect += fmt.Sprintf("?eid=%s", ui.Eid)
+        vars = append(vars, fmt.Sprintf("eid=%s", ui.Eid))
     }
     if createdAt := notif.GetCreatedAt(); createdAt != "" {
-        url_redirect += fmt.Sprintf("&goto=%s", createdAt)
+        vars = append(vars, fmt.Sprintf("goto=%s", createdAt))
+    }
+    if len(vars) > 0 {
+        url_redirect += "?" + strings.Join(vars, "&")
     }
 
 
@@ -249,9 +254,12 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     // Add footer
     payload += fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.<br>
-    <a href="%s">View it on Fractale</a>, reply to this email directly, or <a href="">unsubscribe</a>.
-    </div>
-    `, ui.Reason.ToText(), url_redirect)
+    <a href="%s">View it on Fractale</a>, reply to this email directly`, ui.Reason.ToText(), url_redirect)
+    if ui.Reason == model.ReasonIsSubscriber {
+        payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
+    } else {
+        payload += ".</div>"
+    }
 
     // Buid email
     content := fmt.Sprintf(`<html>
@@ -320,12 +328,15 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     author = "@" + notif.Uctx.Username
 
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
-
+    vars := []string{}
     if ui.Reason == model.ReasonIsPendingCandidate {
         // Puid var is used to identify the pending users from client.
         token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
         if err != nil { return err }
-        url_redirect += fmt.Sprintf("?puid=%s", token)
+        vars = append(vars, fmt.Sprintf("puid=%s", token))
+    }
+    if len(vars) > 0 {
+        url_redirect += "?" + strings.Join(vars, "&")
     }
 
     // Candidate text for open contract

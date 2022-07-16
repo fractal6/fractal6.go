@@ -65,20 +65,7 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
 
-    if withAssignees {
-        // Get Assignees
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", user_selection)
-        if err != nil { return users, err }
-        if assignees, ok := InterfaceSlice(res); ok {
-            for _, u := range assignees {
-                var user model.User
-                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
-                    if _, ex := users[user.Username]; ex { continue }
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
-                }
-            }
-        }
-    }
+    {
 
     if withSubscribers {
         // Get Subscribers
@@ -95,7 +82,21 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         }
     }
 
-    {
+    if withAssignees {
+        // Get Assignees
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", user_selection)
+        if err != nil { return users, err }
+        if assignees, ok := InterfaceSlice(res); ok {
+            for _, u := range assignees {
+                var user model.User
+                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+                    if _, ex := users[user.Username]; ex { continue }
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
+                }
+            }
+        }
+    }
+
         // Get First-link
         res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
         if err != nil { return users, err }
