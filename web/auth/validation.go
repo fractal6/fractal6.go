@@ -136,6 +136,7 @@ func init() {
         "notifications": true,
         "noreply": true,
         "dmarc-reports": true,
+        "postmaster": true,
         // Reserved URI
         // --
         // back

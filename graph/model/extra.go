@@ -43,6 +43,10 @@ func (n NotifReason) ToText() string {
         return "you are invited to play this role"
     case ReasonIsCandidate:
         return "you are candidate"
+    case ReasonIsPendingCandidate:
+        return "you are candidate"
+    case ReasonIsParticipant:
+        return "you voted to this contract"
     case ReasonIsCoordo:
         return "you are coordinator in this circle"
     case ReasonIsPeer:
@@ -53,8 +57,6 @@ func (n NotifReason) ToText() string {
         return "you are assigned to this tension"
     case ReasonIsSubscriber:
         return "you are subscribed to this tension"
-    case ReasonIsParticipant:
-        return "you voted to this contract"
     case ReasonIsMentionned:
         return "you have been mentionned"
     case ReasonIsAlert:
