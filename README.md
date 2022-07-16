@@ -56,7 +56,8 @@ Open a second terminal and run (message passing that manage event notifications)
 
 ## Generate files
 
-If schema change, you could generate the GraphQL server
+The GraphQL schema represent the single source of truth to generate the GraphQL server.
+
 
 Generate only the gqlgen code
 
@@ -71,9 +72,9 @@ Note: Warning, it depends on files located in the separated repository `schema` 
 
 ## Environment variable (deprecated)
 
-export EMAIL_API_URL=https://postal/api/v1/send/message
-export EMAIL_API_KEY=
-export JWT_SECRET=
-export DGRAPH_PUBLIC_KEY=$(cat public.pem)      # fish: set DGRAPH_PUBLIC_KEY (cat public.pem | string split0)
-export DGRAPH_PRIVATE_KEY=$(cat private.pem)    # fish: set DGRAPH_PRIVATE_KEY (cat private.pem | string split0)
-environement variable
+    export EMAIL_API_URL=https://postal/api/v1/send/message
+    export EMAIL_API_KEY=
+    export JWT_SECRET=
+    export DGRAPH_PUBLIC_KEY=$(cat public.pem)      # fish: set DGRAPH_PUBLIC_KEY (cat public.pem | string split0)
+    export DGRAPH_PRIVATE_KEY=$(cat private.pem)    # fish: set DGRAPH_PRIVATE_KEY (cat private.pem | string split0)
+    environement variable
