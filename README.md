@@ -78,3 +78,7 @@ Note: Warning, it depends on files located in the separated repository `schema` 
     export DGRAPH_PUBLIC_KEY=$(cat public.pem)      # fish: set DGRAPH_PUBLIC_KEY (cat public.pem | string split0)
     export DGRAPH_PRIVATE_KEY=$(cat private.pem)    # fish: set DGRAPH_PRIVATE_KEY (cat private.pem | string split0)
     environement variable
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
