@@ -26,6 +26,7 @@ var userCtxPayload string = `{
         Node.nameid
         Node.name
         Node.role_type
+        Node.color
     }
 }`
 
@@ -417,6 +418,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.name
             Node.nameid
             Node.role_type
+            Node.color
             Node.first_link { {{.user_payload}} }
             Node.parent {
                 Node.nameid

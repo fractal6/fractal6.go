@@ -15,6 +15,52 @@ import (
 // Tension Resolver
 ////////////////////////////////////////////////
 
+func tensionInputHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    data, err := setUpdateContextInfo(ctx, obj, next)  // for @hasEvent+@isOwner
+    if err != nil {
+        return data, err
+    }
+
+    //newData := data.([]*model.AddContractInput)
+
+    // Set BlobType -- based on Blob.
+    b2i := map[bool]int{false:0, true:1}
+    switch newData := data.(type) {
+    case model.UpdateTensionInput:
+        if newData.Set == nil { break }
+        input := newData.Set
+        if len(input.Blobs) == 0 { break }
+        // Blob are update OneByOne
+        blob := input.Blobs[0]
+        if blob.Node == nil { break }
+        // Blob are update OneByOne
+        blob_type_lvl := b2i[blob.Node.About != nil] + b2i[blob.Node.Mandate != nil]*2
+        var bt model.BlobType
+        switch blob_type_lvl {
+        case 1:
+            bt = model.BlobTypeOnAbout
+        case 2:
+            bt = model.BlobTypeOnMandate
+        case 3:
+            bt = model.BlobTypeOnAboutAndMandate
+        }
+        blob.BlobType = &bt
+        return newData, err
+    case []*model.AddTensionInput:
+        for _, input := range newData {
+            if len(input.Blobs) == 0 { break }
+            // Blob are update OneByOne
+            blob := input.Blobs[0]
+            if blob.Node == nil { break }
+            bt := model.BlobTypeOnNode
+            blob.BlobType = &bt
+        }
+        return newData, err
+    }
+
+    return data, err
+}
+
 // Add Tension - Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context

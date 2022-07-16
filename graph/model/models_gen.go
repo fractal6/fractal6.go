@@ -2418,22 +2418,24 @@ func (e BlobOrderable) MarshalGQL(w io.Writer) {
 type BlobType string
 
 const (
-	BlobTypeOnNode    BlobType = "OnNode"
-	BlobTypeOnAbout   BlobType = "OnAbout"
-	BlobTypeOnMandate BlobType = "OnMandate"
-	BlobTypeOnDoc     BlobType = "OnDoc"
+	BlobTypeOnNode            BlobType = "OnNode"
+	BlobTypeOnAbout           BlobType = "OnAbout"
+	BlobTypeOnMandate         BlobType = "OnMandate"
+	BlobTypeOnAboutAndMandate BlobType = "OnAboutAndMandate"
+	BlobTypeOnDoc             BlobType = "OnDoc"
 )
 
 var AllBlobType = []BlobType{
 	BlobTypeOnNode,
 	BlobTypeOnAbout,
 	BlobTypeOnMandate,
+	BlobTypeOnAboutAndMandate,
 	BlobTypeOnDoc,
 }
 
 func (e BlobType) IsValid() bool {
 	switch e {
-	case BlobTypeOnNode, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnDoc:
+	case BlobTypeOnNode, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnAboutAndMandate, BlobTypeOnDoc:
 		return true
 	}
 	return false

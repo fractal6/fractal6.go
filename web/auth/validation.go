@@ -143,6 +143,7 @@ func init() {
         "playground": true,
         "metrics": true,
         "mailing": true,
+        "postal_webhook": true,
         "api": true,
         "auth": true,
         "data": true,
@@ -157,6 +158,12 @@ func init() {
         "signup": true,
         "verification": true,
         "password-reset": true,
+        "user": true,
+        "users": true,
+        "tension": true,
+        "tensions": true,
+        "org": true,
+        "network": true,
     }
 }
 

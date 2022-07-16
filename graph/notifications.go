@@ -134,7 +134,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
 
 // Update the users map with notified users.
 // Note: only add user that are member of the given rootnameid
-// @debug: user inside block code will be notified here...
+// @FIX: user inside block code will be notified here...
 func UpdateWithMentionnedUser(msg string, nid string, users map[string]model.UserNotifInfo) error {
     rootnameid, err := codec.Nid2rootid(nid)
     if err != nil { return err}

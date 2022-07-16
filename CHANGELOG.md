@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unrealeased]
 
+### New
+- empty handler new `emailing` http endpoint for postal
+- [MAJOR] handle root request trought fileserver to serve frontend and manage i18n preference
+- Makefile rules to build frontend with i18n versions
+- add restricted usernames to prevent URI unintended effects.
+### Changed
+- cache-control max-age is passed as argument for fileserver
+- [uctx] user roles has now color attribute  
+### Fixed
+- authorization check and publication in notification endpoint (web/handlers/notification.go)
+- IP restriction to access postal http endpoint
+
+
 ## v0.6
 
 ### New
@@ -30,8 +43,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [schema] hook directive renamed with Input suffix for argumants directive and without suffix {query}{Type} for field query/mutation.
 - [schema] introduce the @meta directive on field to aggregate count data with DQL requests.
 
-### Removed
-- isPrivate extra field for request validation is no longer with @auth schema directives.
 
 ### Fixed
 - [gqlast.py] gram/graphql.ebnf to handle new directives (@auth and @custom).
@@ -40,6 +51,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [auth]improve and strenghen the query authorization for Node Post and Tension through @auth directive and resolver hooks.
 - [api] go api now handle graphql variables in queries
 - [api] private organisation can now create they label (the one with the "@" in the url (nameid)). Quote was missing inside the DQL eq filter.
-- [api] int type in schema are not set with omitempty anymore to prevent losing 0 value (aka false value for bool types). Prior to follow request to the backend, Null value are filtered out after Marshall operation, prior 
+- [api] int type in schema are not set with omitempty anymore to prevent losing 0 value (aka false value for bool types). Prior to follow request to the backend, Null value are filtered out after Marshall operation, prior
 - [schema/resolver] directive operating on input object (add/alter/patch) don't need the name of the field anymore in schema.
 - [resolver] @unique directive know work on all types.
+
+### Removed
+- isPrivate extra field for request validation is no longer with @auth schema directives.

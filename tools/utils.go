@@ -289,3 +289,4 @@ func ToUnionHookFunc() mapstructure.DecodeHookFunc {
 		}
 	}
 }
+

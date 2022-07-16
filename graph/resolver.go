@@ -107,6 +107,9 @@ func Init() gen.Config {
     //Tension
     c.Directives.Hook_getTensionInput = nothing
     c.Directives.Hook_queryTensionInput = nothing
+    // @DEBUG: input rawQuery isssue (input modification not propagated with rawQuery whil rawQuery loose field with argument) !!!
+    //c.Directives.Hook_addTensionInput = tensionInputHook
+    //c.Directives.Hook_updateTensionInput = tensionInputHook
     c.Directives.Hook_addTensionInput = nothing
     c.Directives.Hook_updateTensionInput = setUpdateContextInfo // for @hasEvent+@isOwner
     c.Directives.Hook_deleteTensionInput = nothing
@@ -148,6 +151,19 @@ func Init() gen.Config {
     return c
 }
 
+// https://stackoverflow.com/questions/58468134/how-to-compose-functions-in-go
+// @generics
+// @debug: do not workd with resolvers
+func compose(manyv ...func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error)) func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+    return func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+        var err error
+        for _, v := range manyv {
+            obj, err = v(ctx, obj, next)
+			if err != nil { return obj, err }
+        }
+        return obj, err
+    }
+}
 
 /*
 *

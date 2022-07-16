@@ -47,6 +47,7 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
             return i
         }
     }
+
     return -1
 }
 
@@ -68,6 +69,7 @@ func UserIsMember(uctx *model.UserCtx, nameid string) int {
             panic(err.Error())
         }
     }
+
     return -1
 }
 
