@@ -25,3 +25,5 @@ example: `fix/schema: Add color property to roles.`
 - Issue on the versioning system platform for bug and low-level issues (technical).
 
 - Tension on [Fractale](https://fractale.co/o/f6) for all the rest.
+
+- Chat on Matrix: https://matrix.to/#/#fractal6:matrix.org

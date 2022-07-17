@@ -51,16 +51,16 @@ genall: dgraph schema generate
 gen: schema generate
 
 dgraph:
-	cd ../schema
+	cd ../fractal6-schema
 	make dgraph # Do alter Dgraph
 	cd -
 
 schema:
-	cd ../schema
+	cd ../fractal6-schema
 	make schema # Do not alter Dgraph
 	cd -
 	mkdir -p schema/
-	cp ../schema/gen/*.graphql schema/
+	cp ../fractal6-schema/gen/*.graphql schema/
 
 generate:
 	# We add "omitempty" for each generate type's literal except for Bool and Int to prevent

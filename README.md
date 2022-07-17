@@ -1,3 +1,33 @@
+# Fractal6.go
+
+Business-logic layer, API, backend for [Fractale](https;//fractale.co).
+
+The Fractal6 data structures are defined in the **Fractal6 schema**, used as the single source of truth for GraphQL data relations and queries, located in the separate repository (https://code.skusku.site/fractal6/fractal6-schema/-/tree/master/graphql). See the [generate files](#generate-files) section to see how to re-generate code.
+
+
+## Install and run databases
+
+#### Dgraph
+
+The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and query data.
+
+    git clone ssh://git@code.skusku.site:29418/fractal6/fractal6-db.git
+    cd fractal6-db
+    make bootstrap
+    ./bin/dgraph zero --config config-zero.yml
+    # Open a new terminal and run
+    ./bin/dgraph alpha --config config-alpha.yml
+
+
+
+#### Redis
+
+Redis is used as a KV cache store.
+
+    sudo apt-get install redis
+    sudo systemctl restart redis-server
+
+
 ## Configure
 
 The server need a `config.toml` config file to run.
@@ -56,14 +86,11 @@ Open a second terminal and run (message passing that manage event notifications)
 
 ## Generate files
 
-The GraphQL schema represent the single source of truth to generate the GraphQL server.
-
-
-Generate only the gqlgen code
+Generate the gqlgen server:
 
     make generate
 
-Generate all from the initial schema definition
+Generate the gqlgen server as well as complete schema completed by Dgraph types and queries:
 
     make genall
 
