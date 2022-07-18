@@ -13,7 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - add restricted usernames to prevent URI unintended effects.
 ### Changed
 - cache-control max-age is passed as argument for fileserver
-- [uctx] user roles has now color attribute  
+- [uctx] user roles has now color attribute.
+- Improve email notifications policies and text.
 ### Fixed
 - authorization check and publication in notification endpoint (web/handlers/notification.go)
 - IP restriction to access postal http endpoint
