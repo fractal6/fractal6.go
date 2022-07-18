@@ -1,5 +1,22 @@
 package model
 
+import "encoding/json"
+
+
+//
+// General
+//
+
+// JsonAtom is a general interface
+// for decoding unknonw structure
+type JsonAtom = map[string]interface{}
+
+// StructMap convert/copy a interface to another
+func StructMap(in interface{}, out interface{}) {
+    raw, _ := json.Marshal(in)
+    json.Unmarshal(raw, &out)
+}
+
 //
 // Errors
 //
@@ -24,7 +41,6 @@ const (
     ReasonIsInvited
     ReasonIsLinkCandidate
     ReasonIsCandidate
-    ReasonIsPendingCandidate
     ReasonIsParticipant
     ReasonIsCoordo
     ReasonIsPeer
@@ -38,12 +54,10 @@ const (
 func (n NotifReason) ToText() string {
     switch n {
     case ReasonIsInvited:
-        return "you are invited to this organization"
+        return "you are invited to an organization"
     case ReasonIsLinkCandidate:
-        return "you are invited to play this role"
+        return "you are invited to play a role"
     case ReasonIsCandidate:
-        return "you are candidate"
-    case ReasonIsPendingCandidate:
         return "you are candidate"
     case ReasonIsParticipant:
         return "you voted to this contract"
@@ -52,7 +66,7 @@ func (n NotifReason) ToText() string {
     case ReasonIsPeer:
         return "you have role in this circle"
     case ReasonIsFirstLink:
-        return "you are first-link of this role"
+        return "you are lead link of this role"
     case ReasonIsAssignee:
         return "you are assigned to this tension"
     case ReasonIsSubscriber:
@@ -71,6 +85,7 @@ type UserNotifInfo struct {
     User User
     Reason NotifReason
     Eid string
+    IsPending bool
 }
 
 // @future: move in schema ?
@@ -79,7 +94,6 @@ const (
     NewContract ContractEvent = iota
     NewComment
 )
-
 
 type EventNotif struct {
     Uctx *UserCtx        `json:"uctx"`
@@ -112,39 +126,46 @@ type NotifNotif struct {
 }
 
 //
-// Object methods
+// EventNotif methods
 //
 
-func (notif EventNotif) IsEmailable() bool {
+
+func (notif EventNotif) IsEmailable(ui UserNotifInfo) bool {
+    var ok bool = false
+
+    // Mailable events
     for _, e := range notif.History {
         if TensionEventCreated == *e.EventType ||
-        TensionEventCommentPushed == *e.EventType ||
         TensionEventReopened == *e.EventType ||
         TensionEventClosed == *e.EventType ||
         TensionEventBlobPushed == *e.EventType ||
-        TensionEventMemberUnlinked == *e.EventType ||
-        TensionEventUserLeft == *e.EventType {
-            return true
+        TensionEventCommentPushed == *e.EventType ||
+        TensionEventUserJoined == *e.EventType ||
+        TensionEventUserLeft == *e.EventType ||
+        TensionEventMemberLinked == *e.EventType ||
+        TensionEventMemberUnlinked == *e.EventType {
+            ok = true
         }
     }
-    return false
-}
 
-// @debug: duplicate
-func (notif ContractNotif) IsEmailable() bool {
-    e := notif.Contract.Event
-    if TensionEventCreated == e.EventType ||
-    TensionEventCommentPushed == e.EventType ||
-    TensionEventReopened == e.EventType ||
-    TensionEventClosed == e.EventType ||
-    TensionEventBlobPushed == e.EventType ||
-    TensionEventMemberUnlinked == e.EventType ||
-    TensionEventUserLeft == e.EventType {
-        return true
+    // Emailing Policy
+    if ok {
+        // PeerReason only for Created tension and Updated mandate.
+        if ui.Reason == ReasonIsPeer &&
+        !notif.HasEvent(TensionEventCreated) &&
+        !notif.HasEvent(TensionEventBlobPushed) {
+            ok = false
+        }
+
+        // Coordo not for Pushed comment only event.
+        if ui.Reason == ReasonIsCoordo && len(notif.History) == 1 &&
+        notif.HasEvent(TensionEventCommentPushed) {
+            ok = false
+        }
     }
-    return false
-}
 
+    return ok
+}
 
 func (notif EventNotif) HasEvent(ev TensionEvent) bool {
     for _, e := range notif.History {
@@ -164,6 +185,17 @@ func (notif EventNotif) GetCreatedAt() string {
     return ""
 }
 
+func (notif EventNotif) GetNewUser() string {
+    for _, e := range notif.History {
+        if *e.EventType == TensionEventUserJoined || *e.EventType == TensionEventMemberLinked {
+            if e.New != nil {
+                return *e.New
+            }
+        }
+    }
+    return ""
+}
+
 func (notif EventNotif) GetExUser() string {
     for _, e := range notif.History {
         if *e.EventType == TensionEventUserLeft || *e.EventType == TensionEventMemberUnlinked {
@@ -175,22 +207,40 @@ func (notif EventNotif) GetExUser() string {
     return ""
 }
 
-// Event methods
+//
+// ContractNotif methods
+//
+
+func (notif ContractNotif) IsEventEmailable(ui UserNotifInfo) bool {
+    ev := EventRef{}
+    StructMap(notif.Contract.Event, &ev)
+    en := EventNotif{
+        Uctx: notif.Uctx,
+        Tid: notif.Tid,
+        Receiverid: notif.Receiverid,
+        History:[]*EventRef{&ev},
+    }
+    return en.IsEmailable(ui)
+}
+
+func (notif ContractNotif) IsEmailable(ui UserNotifInfo) bool {
+    return true
+}
+
+//
+// TensionEvent methods
+//
 
 func (e TensionEvent) ToContractText() (t string) {
     switch e {
+	case TensionEventUserJoined:
+		t = "Invitation"
+	case TensionEventMemberLinked:
+		t = "Lead link invitation"
 	case TensionEventMoved:
 		t = "Move tension"
-
-	case TensionEventMemberLinked:
-		t = "New first-link"
-
 	case TensionEventMemberUnlinked:
 		t = "Retired first-link"
-
-	case TensionEventUserJoined:
-		t = "New member"
-
 	default:
         // Humanize (@debug: cannot import tools because of cycle error.)
 		t = string(e)
@@ -198,7 +248,16 @@ func (e TensionEvent) ToContractText() (t string) {
     return
 }
 
+func (e TensionEvent) ToContractReason() (r NotifReason) {
+    switch e {
+    case TensionEventUserJoined:
+        r = ReasonIsInvited
+    case TensionEventMemberLinked:
+        r = ReasonIsLinkCandidate
+    default:
+        r = ReasonIsCandidate
+    }
+    return r
+}
 
-// JsonAtom is a general interface
-// for decoding unknonw structure
-type JsonAtom = map[string]interface{}
+

@@ -142,10 +142,6 @@ func SendResetEmail(email, token string) error {
 }
 
 func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) error {
-    if !notif.IsEmailable() {
-        return nil
-    }
-
     // Get inputs
     var err error
     var url_redirect string
@@ -210,29 +206,24 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         subject = fmt.Sprintf("Re: [%s]%s %s", recv, type_hint, title)
 
         // Add automatic message
-        coordoPass := true
-        peerPass := false
         if notif.HasEvent(model.TensionEventClosed) {
             payload = fmt.Sprintf(`Closed <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventReopened) {
             payload = fmt.Sprintf(`Reopened <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventBlobPushed) {
             payload = fmt.Sprintf(`Mandate updated <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
-            peerPass = true
-        } else if notif.HasEvent(model.TensionEventUserLeft) || notif.HasEvent(model.TensionEventMemberUnlinked) {
+        } else if notif.HasEvent(model.TensionEventUserJoined) {
+            u := notif.GetNewUser()
+            payload = fmt.Sprintf(`@%s joined this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+        } else if notif.HasEvent(model.TensionEventUserLeft) {
             u := notif.GetExUser()
-            payload = fmt.Sprintf(`User %s left or was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
-        } else {
-            // Comments added
-            coordoPass = false
-        }
-
-        // Avoid flooding user with email if they havent susbcribed or are first-link...
-        if ui.Reason == model.ReasonIsCoordo && !coordoPass {
-            return nil
-        }
-        if ui.Reason == model.ReasonIsPeer && !peerPass {
-            return nil
+            payload = fmt.Sprintf(`@%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+        } else if notif.HasEvent(model.TensionEventMemberLinked) {
+            u := notif.GetNewUser()
+            payload = fmt.Sprintf(`@%s is lead link in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+        } else if notif.HasEvent(model.TensionEventMemberUnlinked) {
+            u := notif.GetExUser()
+            payload = fmt.Sprintf(`@%s was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
         }
 
         // Add eventual comment
@@ -254,11 +245,11 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     // Add footer
     payload += fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.<br>
-    <a href="%s">View it on Fractale</a>, reply to this email directly`, ui.Reason.ToText(), url_redirect)
+    <a href="%s">View it on Fractale</a>`, ui.Reason.ToText(), url_redirect)
     if ui.Reason == model.ReasonIsSubscriber {
-        payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
+        payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
     } else {
-        payload += ".</div>"
+        payload += " or reply to this email directly.</div>"
     }
 
     // Buid email
@@ -327,9 +318,10 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     // @debug: get name
     author = "@" + notif.Uctx.Username
 
+    url_unsubscribe := fmt.Sprintf("https://fractale.co/user/%s/settings?m=email", ui.User.Username)
     url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
     vars := []string{}
-    if ui.Reason == model.ReasonIsPendingCandidate {
+    if ui.IsPending {
         // Puid var is used to identify the pending users from client.
         token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
         if err != nil { return err }
@@ -339,88 +331,40 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         url_redirect += "?" + strings.Join(vars, "&")
     }
 
-    // Candidate text for open contract
-    candidate_subject := func(e model.TensionEvent) (t string) {
-        switch  e {
-        case model.TensionEventUserJoined:
-            t = fmt.Sprintf("[%s] You have a new membership invitation", recv)
-        case model.TensionEventMemberLinked:
-            t = fmt.Sprintf("[%s] You have a new role invitation", recv)
-        default:
-            t = fmt.Sprintf("[%s] You have a new invitation", recv)
-        }
-        return
-    }
-    candidate_payload := func(e model.TensionEvent) (t string) {
-        switch  e {
-        case model.TensionEventUserJoined:
-            t = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited as a new member by %s.<br><br>
-            You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
-        case model.TensionEventMemberLinked:
-            t = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited to take a new role by %s.<br><br>
-            You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
-        default:
-            t = fmt.Sprintf(`Hi%s,<br><br> Your have a new invitation from %s.<br><br>
-            You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
-        }
-        return
-    }
-
-    // Other than candidate text for open contract
-    default_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())
-    }
-    default_payload := func(e model.TensionEvent) string {
-        return fmt.Sprintf(`Hi%s,<br><br>
-        A vote is requested to process the following contract:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
-    }
-
-    comment_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s][%s] You have a new comment", recv, e.ToContractText())
-    }
-
-    closed_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s][%s] contract accepted", recv, e.ToContractText())
-    }
-    closed_payload := func(e model.TensionEvent) string {
-        return fmt.Sprintf(`Hi%s,<br><br>
-        The following contract has been accepted:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
-    }
-
-    canceled_subject := func(e model.TensionEvent) string {
-        return fmt.Sprintf("[%s][%s] contract canceled", recv, e.ToContractText())
-    }
-    canceled_payload := func(e model.TensionEvent) string {
-        return fmt.Sprintf(`Hi%s,<br><br>
-        The following contract has been canceled:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
-    }
-
     // Build body
+    e := notif.Contract.Event.EventType
     switch notif.ContractEvent {
     case model.NewContract:
-        e := notif.Contract.Event.EventType
         switch notif.Contract.Status {
         case model.ContractStatusOpen:
-            if ui.Reason == model.ReasonIsCandidate || ui.Reason == model.ReasonIsPendingCandidate {
-                subject = candidate_subject(e)
-                payload = candidate_payload(e)
+            if ui.Reason == model.ReasonIsInvited {
+                subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
+                payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited in the organisation <a style="color:#002e62;" href="https://fractale.co/o/%s">%s</a> by %s.<br><br>
+                You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, recv, recv, author, url_redirect, url_redirect)
+            } else if ui.Reason == model.ReasonIsLinkCandidate {
+                subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
+                payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited to take a new role by %s.<br><br>
+                You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
             } else {
-                subject = default_subject(e)
-                payload = default_payload(e)
+                subject = fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())
+                payload = fmt.Sprintf(`Hi%s,<br><br>
+                A vote is requested to process the following contract:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
             }
         case model.ContractStatusClosed:
-            // notify only if event has no email notification
-            if !notif.IsEmailable() {
-                subject = closed_subject(e)
-                payload = closed_payload(e)
+            if !notif.IsEventEmailable(ui) {
+                // notify only the if event has no email notification
+                subject = fmt.Sprintf("[%s][%s] Contract accepted", recv, e.ToContractText())
+                payload = fmt.Sprintf(`Hi%s,<br><br>
+                The following contract has been accepted:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
             } else {
                 return nil
             }
         case model.ContractStatusCanceled:
             // notify only participant
             if ui.Reason == model.ReasonIsParticipant {
-                subject = canceled_subject(e)
-                payload = canceled_payload(e)
+                subject = fmt.Sprintf("[%s][%s] Contract canceled", recv, e.ToContractText())
+                payload = fmt.Sprintf(`Hi%s,<br><br>
+                The following contract has been canceled:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
             } else {
                 return nil
             }
@@ -432,7 +376,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
             payload += "<br><br>—<br>"
         }
     case model.NewComment:
-        subject = comment_subject(notif.Contract.Event.EventType)
+        subject = fmt.Sprintf("[%s][%s] You have a new comment", recv, e.ToContractText())
     }
 
     // Add eventual comment
@@ -445,12 +389,12 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         payload += bluemonday.UGCPolicy().Sanitize(buf.String())
     }
 
-    if notif.ContractEvent == model.NewComment {
-        payload += "<br>" + fmt.Sprintf(`—
-        <div style="color:#666;font-size:small">You are receiving this because %s.<br>
-        <a href="%s">View it on Fractale</a> or reply to this email directly.
-        </div>
-        `, ui.Reason.ToText(), url_redirect)
+    payload += "<br>" + fmt.Sprintf(`—
+    <div style="color:#666;font-size:small">You are receiving this because %s.`, ui.Reason.ToText())
+    if !ui.IsPending  {
+        payload += "<br>" + fmt.Sprintf(`<br>
+        <a href="%s">View it on Fractale</a>, reply to this email directly or <a href="%s">disable</a> email notifications.
+        </div>`, url_redirect, url_unsubscribe)
     }
 
     // Buid email

@@ -14,6 +14,14 @@ import (
 	"fractale/fractal6.go/web/email"
 )
 
+
+/*
+ *
+ * This code manage sending notification
+ *
+ */
+
+
 var ctx context.Context = context.Background()
 var user_selection string = "User.username User.email User.name User.notifyByEmail"
 
@@ -62,10 +70,8 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 //
 
 // GetUserToNotify returns a list of user should receive notifications uponf tension updates.
-func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[string]model.UserNotifInfo, error) {
+func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
-
-    {
 
     if withSubscribers {
         // Get Subscribers
@@ -97,6 +103,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         }
     }
 
+    {
         // Get First-link
         res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
         if err != nil { return users, err }
@@ -120,7 +127,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers bool) (map[stri
         }
     }
 
-    {
+    if withPeers {
         // Get Peers
         peers, err := auth.GetPeersFromTid(tid)
         if err != nil { return users, err }
@@ -225,9 +232,8 @@ func PushEventNotifications(notif model.EventNotif) error {
             isClosed = tension["status"].(string) == string(model.TensionStatusClosed)
         }
     }
-    // Handle Alert tension
     if isAlert {
-        // Alert tension created: Notify every members (including Guest)
+        // Alert tension Notify every members (including Guest) (only for created tension)
         if data, err := db.GetDB().GetSubMembers("nameid", receiverid, user_selection); err != nil {
             return err
         } else {
@@ -239,10 +245,10 @@ func PushEventNotifications(notif model.EventNotif) error {
         }
     } else {
         // Get relevant users for the tension.
-        users, err = GetUsersToNotify(notif.Tid, true, true)
+        users, err = GetUsersToNotify(notif.Tid, true, true, true)
         if err != nil { return err }
     }
-
+    // +
     // Add mentionned and **set tension data**
     if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid}); err != nil {
         return err
@@ -262,7 +268,7 @@ func PushEventNotifications(notif model.EventNotif) error {
         // Don't self notify.
         if u == notif.Uctx.Username { continue }
         // Pending user has no history yet
-        if ui.Reason == model.ReasonIsPendingCandidate { continue }
+        if ui.IsPending { continue }
 
         // Do not publish already closed tension (e.g. role and circle creation)
         if isClosed {
@@ -279,7 +285,7 @@ func PushEventNotifications(notif model.EventNotif) error {
         if err != nil { return err }
 
         // Email
-         if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail {
+         if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
              ui.Eid = eid
              err = email.SendEventNotificationEmail(ui, notif)
              if err != nil { return err }
@@ -300,26 +306,26 @@ func PushContractNotifications(notif model.ContractNotif) error {
     createdAt = notif.Contract.CreatedAt
     eventBatch = append(eventBatch, &model.EventKindRef{ContractRef: &model.ContractRef{ID: &notif.Contract.ID}})
 
-    //Get relevant users for the contract
-    users, err := GetUsersToNotify(notif.Tid, true, false)
+    // Get relevant users for the contract
+    users, err := GetUsersToNotify(notif.Tid, true, false, false)
     if err != nil { return err }
     // +
     // Add Candidates
     for _, c := range notif.Contract.Candidates {
-        switch notif.Contract.Event.EventType {
-        case model.TensionEventUserJoined:
-            users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsInvited}
-        case model.TensionEventMemberLinked:
-            users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsLinkCandidate}
-        default:
-            users[c.Username] = model.UserNotifInfo{User: *c, Reason: model.ReasonIsCandidate}
+        users[c.Username] = model.UserNotifInfo{
+            User: *c,
+            Reason: notif.Contract.Event.EventType.ToContractReason(),
         }
     }
     // +
     // Add Pending Candidates
     for _, c := range notif.Contract.PendingCandidates {
         if c.Email == nil { continue }
-        users[*c.Email] = model.UserNotifInfo{User: model.User{Email: *c.Email}, Reason: model.ReasonIsPendingCandidate}
+        users[*c.Email] = model.UserNotifInfo{
+            User: model.User{Email: *c.Email},
+            Reason: notif.Contract.Event.EventType.ToContractReason(),
+            IsPending: true,
+        }
     }
     // +
     // Add Participants
@@ -348,11 +354,11 @@ func PushContractNotifications(notif model.ContractNotif) error {
 
         // User Event
         var eid string
-        if ui.Reason == model.ReasonIsPendingCandidate {
+        if ui.IsPending {
             // Update pending users
             err = MaybeSetPendingUserToken(u)
             if err != nil { return err }
-            // Link contract
+            // Link contract for future push
             err = db.GetDB().Update(db.GetDB().GetRootUctx(), "pendingUser", &model.UpdatePendingUserInput{
                 Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &u}},
                 Set: &model.PendingUserPatch{Contracts: []*model.ContractRef{&model.ContractRef{ID: &notif.Contract.ID}}},
@@ -382,13 +388,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
         }
 
         // Email
-        if notif.Uctx.Rights.HasEmailNotifications && (ui.User.NotifyByEmail || ui.Reason == model.ReasonIsPendingCandidate) &&
-        (ui.Reason == model.ReasonIsCandidate ||
-        ui.Reason == model.ReasonIsPendingCandidate ||
-        ui.Reason == model.ReasonIsParticipant ||
-        ui.Reason == model.ReasonIsCoordo ||
-        ui.Reason == model.ReasonIsAssignee ||
-        ui.Reason == model.ReasonIsMentionned) {
+        if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
              ui.Eid = eid
              err = email.SendContractNotificationEmail(ui, notif)
              if err != nil { return err }

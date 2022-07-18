@@ -4,7 +4,7 @@
     "tasks": [
       {
         "header": "Definitions",
-        "content": "**Organisation** (fractal): a group of humans sharing a common purpose (the root circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member with a given mandate.\n\n**Circle**: a set of roles and sub-circles (team, group etc.).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: A communication thread in Fractale. A tension can be used for example to track and keep record of tasks, issues or ideas. It has a destination which can be either a **role** or **circle**. Each newly created tension will notify users according to where its destination.\n\nA tension belong to a type according to its topic. There are four different types:\n\n* **Operational**: A general category of tension which can be a task, an issue or whatever that need to be share in the organisation.\n* **Governance**: concerning the structure of the organisation its mandates etc.\n* **Help**: for help requests, questions or clarifications.\n* **Alert**: for alert requests, this are used for global announcement. All the member behind the circle alerted will be notified (Coordinator level to trigger).\n"
+        "content": "**Organisation** (fractal): a group of humans sharing a common purpose (the root or anchor circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member with a given mandate.\n\n**Circle**: a set of roles and sub-circles (team, group etc.).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: A communication thread in Fractale. A tension can be used for example to track and keep record of tasks, issues, questions, propositions and so on. It has a destination which can be either a **role** or **circle**. Each newly created tension will notify users according to its destination.\n\nA tension belong to a type according to its topic. There are four different types:\n\n* **Operational**: A general category of tension which can be a task, an issue or whatever that need to be share in the organisation.\n* **Governance**: concerning the structure of the organisation its mandates etc.\n* **Help**: for help requests, questions or clarifications.\n* **Alert**: for alert requests, this are used for global announcement. All the member behind the circle alerted will be notified (Coordinator level to trigger).\n"
       },
       {
         "header": "Create organisation",
@@ -37,7 +37,7 @@
     "tasks": [
       {
         "header": "Create tension",
-        "content": "In the **overview panel**, click on the plus (+) button on the right of the search bar. In the windows that opens, click on the **new tension** button. The receiver of the tension will be the current focused circle.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organisation map.\n"
+        "content": "Click on the plus button located in the right bottom corner of the screen.\nOr in the togglable tree menu, click on the plus(+) button that appear when hovering a line.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organisation map.\n"
       },
       {
         "header": "Close/Reopen tension",
@@ -66,7 +66,7 @@
       },
       {
         "header": "Edit role",
-        "content": "If you have sufficient rights, you can edit the following properties of a role:\n\n* its name\n* its mandate\n* its authority\n* its first-link (invite or leave)\n\nTo edit those properties, open the panel by clicking on either the tooltip (the triple dot on the right) that appear above each circle in the organisation map (**overview tab**), or from the side pane of the tension related to this role.\n"
+        "content": "If you have sufficient rights, you can edit the following properties of a role:\n\n* its name\n* its mandate\n* its authority\n* its lead link (invite or leave)\n\nTo edit those properties, open the panel by clicking on either the tooltip (the triple dot on the right) that appear above each circle in the organisation map (**overview tab**), or from the side pane of the tension related to this role.\n"
       },
       {
         "header": "Archive role",

@@ -404,7 +404,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     tension := model.AddTensionInput{
         CreatedAt: now,
         CreatedBy : &createdBy,
-        Title: "[Anchor Circle] Welcome",
+        Title: "Anchor Circle",
         Type: model.TensionTypeGovernance,
         Status: model.TensionStatusClosed,
         Emitter: &emitter,

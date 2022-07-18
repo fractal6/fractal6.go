@@ -12,6 +12,14 @@ import (
     "fractale/fractal6.go/tools"
 )
 
+
+/*
+ *
+ * This code manage receiving email response from email notification
+ *
+ */
+
+
 // Handle email responses.
 func Notifications(w http.ResponseWriter, r *http.Request) {
     // Temporary solution while Postal can't be identify
