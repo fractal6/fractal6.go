@@ -392,7 +392,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     payload += "<br>" + fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.`, ui.Reason.ToText())
     if !ui.IsPending  {
-        payload += "<br>" + fmt.Sprintf(`<br>
+        payload += fmt.Sprintf(`<br>
         <a href="%s">View it on Fractale</a>, reply to this email directly or <a href="%s">disable</a> email notifications.
         </div>`, url_redirect, url_unsubscribe)
     }
