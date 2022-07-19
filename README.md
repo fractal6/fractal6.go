@@ -17,7 +17,8 @@ The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and q
     ./bin/dgraph zero --config config-zero.yml
     # Open a new terminal and run
     ./bin/dgraph alpha --config config-alpha.yml
-
+    # Setup Dgraph with the GQL schema
+    make send_schema
 
 
 #### Redis
@@ -59,6 +60,7 @@ complexity_limit = 200 # 50
 introspection = false
 ```
 
+
 You can generate the key pairs for dgraph as follows
 
     openssl genrsa -out private.pem 2048
@@ -72,6 +74,7 @@ Build for production
     go mod vendor
     # Can take a while
     make prod
+
 
 ## Launch
 
@@ -105,6 +108,7 @@ Note: Warning, it depends on files located in the separated repository `schema` 
     export DGRAPH_PUBLIC_KEY=$(cat public.pem)      # fish: set DGRAPH_PUBLIC_KEY (cat public.pem | string split0)
     export DGRAPH_PRIVATE_KEY=$(cat private.pem)    # fish: set DGRAPH_PRIVATE_KEY (cat private.pem | string split0)
     environement variable
+
 
 ## Contributing
 

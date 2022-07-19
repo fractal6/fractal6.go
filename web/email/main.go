@@ -387,9 +387,11 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
             return err
         }
         payload += bluemonday.UGCPolicy().Sanitize(buf.String())
+    } else {
+            payload += "<br><br>"
     }
 
-    payload += "<br>" + fmt.Sprintf(`—
+    payload += fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.`, ui.Reason.ToText())
     if !ui.IsPending  {
         payload += fmt.Sprintf(`<br>
