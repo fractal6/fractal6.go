@@ -223,7 +223,9 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     }
 
     if MemberHook & em.Auth > 0 {
-        if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 { return true, err }
+        if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 {
+            return true, err
+        }
     }
 
     if MemberStrictHook & em.Auth > 0 {
@@ -249,7 +251,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 
     if SourceCoordoHook & em.Auth > 0 {
         ok, err := auth.HasCoordoRole(uctx, tension.Emitter.Nameid, &tension.Emitter.Mode)
-        if ok { return ok,  err }
+        if ok { return ok, err }
     }
 
     if AssigneeHook & em.Auth > 0 {

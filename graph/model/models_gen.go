@@ -3196,18 +3196,16 @@ type Lang string
 const (
 	LangEn Lang = "EN"
 	LangFr Lang = "FR"
-	LangIt Lang = "IT"
 )
 
 var AllLang = []Lang{
 	LangEn,
 	LangFr,
-	LangIt,
 }
 
 func (e Lang) IsValid() bool {
 	switch e {
-	case LangEn, LangFr, LangIt:
+	case LangEn, LangFr:
 		return true
 	}
 	return false

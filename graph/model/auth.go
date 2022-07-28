@@ -9,6 +9,7 @@ package model
 type UserCtx struct {
     Username       string     `json:"username"`
     Password       string     `json:"password"` // hash
+    Lang           Lang       `json:"lang"`
     Rights         UserRights `json:"rights"`
 	Roles          []*Node    `json:"roles"`
     // Used to refresh the client version if outdated

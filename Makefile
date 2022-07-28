@@ -17,20 +17,9 @@ default: build
 #
 
 run_api:
-	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
-	# * EMAIL_API_URL
-	# * EMAIL_API_KEY
-	# * JWT_SECRET
-	# * DGRAPH_PUBLIC_KEY
-	# * DGRAPH_PRIVATE_KEY
 	go run main.go api
 
 run_notifier:
-	# DO NOT FORGET TO SET THE FOLLOWING ENV VARIABLE
-	# * EMAIL_API_URL
-	# * EMAIL_API_KEY
-	# * DGRAPH_PUBLIC_KEY
-	# * DGRAPH_PRIVATE_KEY
 	go run main.go notifier
 
 build:

@@ -21,6 +21,7 @@ import (
 var userCtxPayload string = `{
     User.username
     User.password
+    User.lang
     User.rights {expand(_all_)}
     User.roles {
         Node.nameid
