@@ -12,6 +12,7 @@ import (
     "github.com/microcosm-cc/bluemonday"
     "fractale/fractal6.go/tools"
     "fractale/fractal6.go/graph/model"
+    "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/db"
 )
 
@@ -185,6 +186,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         url_redirect += "?" + strings.Join(vars, "&")
     }
 
+    rootnameid, err := codec.Nid2rootid(notif.Receiverid)
+    if err != nil { return err }
 
     // Build body
     if notif.HasEvent(model.TensionEventCreated) { // Tension added
@@ -217,7 +220,11 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             payload = fmt.Sprintf(`@%s joined this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventUserLeft) {
             u := notif.GetExUser()
-            payload = fmt.Sprintf(`@%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+            if notif.Receiverid == rootnameid {
+                payload = fmt.Sprintf(`@%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+            } else {
+                payload = fmt.Sprintf(`@%s left this role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+            }
         } else if notif.HasEvent(model.TensionEventMemberLinked) {
             u := notif.GetNewUser()
             payload = fmt.Sprintf(`@%s is lead link in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
