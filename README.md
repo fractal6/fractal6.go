@@ -26,12 +26,12 @@ The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and q
 Redis is used as a KV cache store.
 
     sudo apt-get install redis
-    sudo systemctl restart redis-server
+    sudo systemctl restart redis-server  # or "systemctl restart redis" depending on your version
 
 
 ## Configure
 
-The server need a `config.toml` config file to run.
+The server need a `config.toml` config file to run (in the project's root folder).
 You can use the following template:
 
 ```
@@ -67,16 +67,19 @@ You can generate the key pairs for dgraph as follows
     openssl rsa -in private.pem -pubout -out public.pem
 
 
-## build
+## Launch for dev
 
-Build for production
+    make build
+    make run_api
+
+
+## Launch for production
+
+Build
 
     go mod vendor
     # Can take a while
     make prod
-
-
-## Launch
 
 Open a terminal and run (main server)
 
