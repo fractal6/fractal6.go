@@ -4,7 +4,8 @@ GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := "fractal6"
 MOD := "fractale/fractal6.go"
-LANGS := $(shell ls public/index.* | sed -n  "s/.*index\.\([a-z]*\)\.html/\1/p" )
+#LANGS := $(shell ls public/index.* | sed -n  "s/.*index\.\([a-z]*\)\.html/\1/p" )
+LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n')
 
 # TODO: versioning
 # LDFLAGS see versioning, hash etc...
@@ -41,8 +42,6 @@ fetch_client:
 	rm -rf public/
 	git clone --depth 1 ssh://git@code.skusku.site:29418/fluid-fractal/public-build.git public/
 	rm -rf public/.git
-	# Prevent path exploration, copy dragons
-	cp data/index.html public/static/
 	# Set client_version
 	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml
 
@@ -75,13 +74,11 @@ generate:
 
 
 #
-# Generate Data
+# Utils
 #
 
 docs:
 	cp ../doc/_data/* data
-
-# Utils
 
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort

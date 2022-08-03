@@ -1,22 +1,27 @@
 package web
 
 import (
-    "fmt"
-    "os"
+	"fmt"
+	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/web/auth"
+	"net/http"
+	"os"
 	"path"
-    "path/filepath"
-    "strings"
-    "net/http"
-    "golang.org/x/text/language"
-    "github.com/go-chi/chi/v5"
+	"path/filepath"
+	"strings"
+
+	"github.com/go-chi/chi/v5"
+	"golang.org/x/text/language"
 )
 
-var langsAvailable string
+var DEFAULT_LANG string = "en"
+var langsAvailable string = "en fr"// Replaced at build time. See Makefile
 var langsD map[string]bool
 
 func init() {
     langsD = make(map[string]bool)
     for _, l := range strings.Split(langsAvailable, " ") {
+        if l == "" { continue }
         langsD[l] = true
     }
 }
@@ -24,61 +29,88 @@ func init() {
 // FileServer conveniently sets up a http.FileServer handler to serve
 // static files from a http.FileSystem.
 // FileServer is serving static files
-func FileServer(r chi.Router, public string, static string, maxage string) {
+func FileServer(r chi.Router, publicUri string, location string, maxage string) {
 
-	if strings.ContainsAny(public, "{}*") {
+	if strings.ContainsAny(publicUri, "{}*") {
 		panic("FileServer does not permit URL parameters.")
 	}
 
-	root, _ := filepath.Abs(static)
+	root, _ := filepath.Abs(location)
 	if _, err := os.Stat(root); os.IsNotExist(err) {
-		panic("Static Documents Directory Not Found")
+		panic("Public Documents Directory Not Found")
 	}
 
-	fs := http.StripPrefix(public, http.FileServer(http.Dir(root)))
+	fs := http.StripPrefix(publicUri, http.FileServer(http.Dir(root)))
 
-    // Ensure public path is a directory
-	if public != "/" && public[len(public)-1] != '/' {
-		r.Get(public, http.RedirectHandler(public+"/", 301).ServeHTTP)
-		public += "/"
+    // Ensure the given publicUri given is a directory
+	if publicUri != "/" && publicUri[len(publicUri)-1] != '/' {
+		r.Get(publicUri, http.RedirectHandler(publicUri+"/", 301).ServeHTTP)
+		publicUri += "/"
 	}
 
-	r.Get(public+"*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	r.Get(publicUri+"*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         // Headers
         // --
-        var lang string
-        var fn string
-        // Cache control
+        // Set Cache control
         if maxage != "" {
             w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", maxage))
         }
-        // Langugage
-        if langs, _, err := language.ParseAcceptLanguage(r.Header.Get("Accept-Language")); err != nil {
-            // Use default lang
-            fmt.Println("Accept-Languge parsing error:, ", err.Error())
-        } else if len(langs) > 0 {
-            for _, l := range langs {
-                b, _ := l.Base()
-                lg := b.String()
-                if langsD[lg] {
-                    lang = lg
-                    break
+
+        // Redirect to appropriate Language
+        // Check file existence, and redirect to index if file not exists
+        var lang string = DEFAULT_LANG // Default language
+        fn := strings.Replace(r.RequestURI, publicUri, "/", 1)
+        fmt.Println(fn)
+        if fi, err := os.Stat(root + fn); err == nil && !fi.IsDir() {
+            // Serve requested file if path exists on filesystel and is not dir.
+            fs.ServeHTTP(w, r)
+        } else if p := strings.Split(fn, "/"); len(p) > 1 && langsD[p[1]] {
+            // Redirect to URI with Lang set in Cookie
+            lang = p[1]
+            http.SetCookie(w, &http.Cookie{
+                Name: "lang",
+                Value: lang,
+                Path: "/",
+                MaxAge: 7776000,
+            })
+            http.Redirect(w, r, strings.TrimPrefix(r.RequestURI, "/"+lang ), 301)
+        } else {
+            // Serve the index.html from asked or preferred Lang
+            // 1. use user setting if logged.
+            // 2. use cookie seting if present.
+            // 3. user browser preference if present.
+            // 4. use default language.
+            if _, uctx, err := auth.GetUserContext(r.Context()); err == nil {
+                // Lang may not be updated
+                if l, err := db.GetDB().GetFieldByEq("User.username", uctx.Username, "User.lang"); err != nil {
+                    lang = string(uctx.Lang)
+                } else {
+                    lang = l.(string)
+                }
+                lang = strings.ToLower(lang)
+            } else if c, err := r.Cookie("lang"); err == nil && langsD[c.Value] {
+                lang = c.Value
+            } else if langs, _, err := language.ParseAcceptLanguage(r.Header.Get("Accept-Language")); err != nil {
+                fmt.Println("Accept-Languge parsing error:, ", err.Error())
+            } else if len(langs) > 0 { // Try to get the preferred language
+                for _, l := range langs {
+                    b, _ := l.Base()
+                    lg := b.String()
+                    if langsD[lg] {
+                        lang = lg
+                        break
+                    }
                 }
             }
+            // -- Lang to Path
+            if strings.HasPrefix(fn, "/static/") {
+                fn = fmt.Sprintf("%s/%s", lang, fn)
+            } else {
+                fn = fmt.Sprintf("%s/index.html", lang)
+            }
+
+            http.ServeFile(w, r, path.Join(root, fn))
         }
 
-        // Check file existence, and redicrect to index if file not exists
-        file := strings.Replace(r.RequestURI, public, "/", 1)
-        if _, err := os.Stat(root + file); os.IsNotExist(err) {
-            if lang == "" {
-                fn = "index.html"
-            } else {
-                fn = fmt.Sprintf("index.%s.html", lang)
-            }
-            http.ServeFile(w, r, path.Join(root, fn))
-			return
-		}
-
-		fs.ServeHTTP(w, r)
 	}))
 }
