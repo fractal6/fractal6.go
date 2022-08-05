@@ -30,8 +30,8 @@ build_all: genall build
 
 prod:
 	go build -trimpath $(GOFLAGS_PROD) \
-		-ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD -X $(MOD)/db.buildMode=PROD" \
-		-ldflags "-X $(MOD)/web.langsAvailable=$(LANGS)" \
+		-ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD -X $(MOD)/db.buildMode=PROD \
+		-X $(MOD)/web.langsAvailable=$(LANGS)" \
 		-o $(GOBIN)/$(RELEASE) main.go
 
 vendor:
