@@ -2,10 +2,10 @@
 GOFLAGS ?= $(GOFLAGS:) -v
 GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
-RELEASE := "fractal6"
-MOD := "fractale/fractal6.go"
+RELEASE := fractal6
+MOD := fractale/fractal6.go
 #LANGS := $(shell ls public/index.* | sed -n  "s/.*index\.\([a-z]*\)\.html/\1/p" )
-LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n')
+LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
 
 # TODO: versioning
 # LDFLAGS see versioning, hash etc...

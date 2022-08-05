@@ -15,12 +15,12 @@ import (
 )
 
 var DEFAULT_LANG string = "en"
-var langsAvailable string = "en fr"// Replaced at build time. See Makefile
+var langsAvailable string = "en_fr"// Replaced at build time. See Makefile
 var langsD map[string]bool
 
 func init() {
     langsD = make(map[string]bool)
-    for _, l := range strings.Split(langsAvailable, " ") {
+    for _, l := range strings.Split(langsAvailable, "_") {
         if l == "" { continue }
         langsD[l] = true
     }
