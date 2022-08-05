@@ -60,7 +60,6 @@ func FileServer(r chi.Router, publicUri string, location string, maxage string) 
         // Check file existence, and redirect to index if file not exists
         var lang string = DEFAULT_LANG // Default language
         fn := strings.Replace(r.RequestURI, publicUri, "/", 1)
-        fmt.Println(fn)
         if fi, err := os.Stat(root + fn); err == nil && !fi.IsDir() {
             // Serve requested file if path exists on filesystel and is not dir.
             fs.ServeHTTP(w, r)

@@ -322,7 +322,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
     for _, c := range notif.Contract.PendingCandidates {
         if c.Email == nil { continue }
         users[*c.Email] = model.UserNotifInfo{
-            User: model.User{Email: *c.Email},
+            User: model.User{Email: *c.Email, NotifyByEmail: true},
             Reason: notif.Contract.Event.EventType.ToContractReason(),
             IsPending: true,
         }

@@ -6,18 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unrealeased]
 
+
+## [0.6.4]
+
 ### New
-- empty handler new `emailing` http endpoint for postal
 - [MAJOR] handle root request trought fileserver to serve frontend and manage i18n preference
 - Makefile rules to build frontend with i18n versions
 - add restricted usernames to prevent URI unintended effects.
+- empty handler `emailing` for http endpoint for postal
 ### Changed
 - cache-control max-age is passed as argument for fileserver
 - [uctx] user roles has now color attribute.
 - Improve email notifications policies and text.
 ### Fixed
 - authorization check and publication in notification endpoint (web/handlers/notification.go)
-- IP restriction to access postal http endpoint
+- IP restriction to access postal http endpoint.
+- Emain invintatino for pending user is now sent.
 
 
 ## v0.6
