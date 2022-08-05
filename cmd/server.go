@@ -42,7 +42,7 @@ func RunServer() {
 
     var allowedOrigins []string
     if buildMode == "PROD" {
-        allowedOrigins = append(allowedOrigins, "https://fractale.co")
+        allowedOrigins = append(allowedOrigins, "https://fractale.co", "https://api.fractale.co")
     } else {
         allowedOrigins = append(allowedOrigins, "http://localhost:8000")
     }

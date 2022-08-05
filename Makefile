@@ -37,13 +37,15 @@ prod:
 vendor:
 	go mod vendor
 
+install_client: fetch_client
+	# Set the client version in config.toml
+	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml
+
 fetch_client:
 	# Fetch client code
-	rm -rf public/
-	git clone --depth 1 ssh://git@code.skusku.site:29418/fluid-fractal/public-build.git public/
-	rm -rf public/.git
-	# Set client_version
-	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml
+	rm -rf public/ && \
+		git clone --depth 1 ssh://git@code.skusku.site:29418/fluid-fractal/public-build.git public/ && \
+		rm -rf public/.git
 
 
 #
