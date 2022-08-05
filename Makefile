@@ -80,7 +80,10 @@ generate:
 #
 
 docs:
-	cp ../doc/_data/* data
+	cd ../doc && \
+		make quickdoc && \
+		cd - && \
+		cp ../doc/_data/* data
 
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort

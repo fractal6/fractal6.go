@@ -1,22 +1,22 @@
 [
   {
-    "name": "Organisations",
+    "name": "Organizations",
     "tasks": [
       {
         "header": "Definitions",
-        "content": "**Organisation** (fractal): a group of humans sharing a common purpose (the root or anchor circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member with a given mandate.\n\n**Circle**: a set of roles and sub-circles (team, group etc.).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: A communication thread in Fractale. A tension can be used for example to track and keep record of tasks, issues, questions, propositions and so on. It has a destination which can be either a **role** or **circle**. Each newly created tension will notify users according to its destination.\n\nA tension belong to a type according to its topic. There are four different types:\n\n* **Operational**: A general category of tension which can be a task, an issue or whatever that need to be share in the organisation.\n* **Governance**: concerning the structure of the organisation its mandates etc.\n* **Help**: for help requests, questions or clarifications.\n* **Alert**: for alert requests, this are used for global announcement. All the member behind the circle alerted will be notified (Coordinator level to trigger).\n"
+        "content": "**Organization** (fractal): a group of humans sharing a common purpose (the root or anchor circle) organised in autonomous roles and sub-circles.\n\n**Role**: a function that can be linked to a member with a given mandate.\n\n**Circle**: a set of roles and sub-circles (team, group etc.).  \n\n**Mandate**: a document that defines the function of a role or a circle by making explicit:\n\n* its purpose: why it exists.\n* its responsibilities (optional): what are the expectations of this role/circle.\n* its domains (optional): what properties/resources it controls.\n* its policies (optional): the rules of access to its resources.\n\n**Tension**: A communication thread in Fractale. A tension can be used for example to track and keep record of tasks, issues, questions, propositions and so on. It has a destination which can be either a **role** or **circle**. Each newly created tension will notify users according to its destination.\n\nA tension belong to a type according to its topic. There are four different types:\n\n* **Operational**: A general category of tension which can be a task, an issue or whatever that need to be share in the organization.\n* **Governance**: concerning the structure of the organization its mandates etc.\n* **Help**: for help requests, questions or clarifications.\n* **Alert**: for alert requests, this are used for global announcement. All the member behind the circle alerted will be notified (Coordinator level to trigger).\n"
       },
       {
-        "header": "Create organisation",
-        "content": "Click on the plus (+) button in the top right corner of the page. Then click on the **Create new organisation** button."
+        "header": "Create organization",
+        "content": "Click on the plus (+) button in the top right corner of the page. Then click on the **Create new organization** button."
       },
       {
         "header": "Governance process",
         "content": "The governance process of a **circle** allows you to define the scope of rights associated with roles inside this circle. There are two governance processes:\n\n###### Coordinated\n\nIn the coordinated mode, the coordinator roles have the following rights within their circles:\n\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNormal roles have the following rights within their circles : \n\n* creation of tensions and comments \n* close your own tensions\n\n###### Agile\n\nIn the agile mode, all roles have the following rights within their circles:\n\n* creation of roles and sub-circles\n* modification of roles and sub-circles\n* creation of tensions and comments\n* modification of tensions (title, labels, assigned)\n* move tensions\n\nNote: the rights of a role associated with a circle are inherited in sub-circles that do not have roles.\n"
       },
       {
-        "header": "Organisation navigation",
-        "content": "On the organisation overview tab, you can navigate in your organisation by clicking a role or circle. The **focus** will be refreshed as well as:\n\n* the organisation path in the header of the page indicating your current localisation\n* the mandate in the current circle\n* the recent activities of the circle\n"
+        "header": "Organization navigation",
+        "content": "On the organization overview tab, you can navigate in your organization by clicking a role or circle. The **focus** will be refreshed as well as:\n\n* the organization path in the header of the page indicating your current localisation\n* the mandate in the current circle\n* the recent activities of the circle\n"
       },
       {
         "header": "Create and edit labels",
@@ -24,11 +24,11 @@
       },
       {
         "header": "Create and edit template roles",
-        "content": "In the **settings panel**, the *roles menu* allow you to create, edit and remove roles.\n\nOnce a template role is created, you will be able to use it when you create a new role in your organisation\n\nThis is useful when you want to create multiple identical roles in different circles, that share the same mandate.\n\nNote that template roles are defined at the circle level. When you create a role you will be able to use the template roles that are defined in this circle or any other in the parent circles..\n"
+        "content": "In the **settings panel**, the *roles menu* allow you to create, edit and remove roles.\n\nOnce a template role is created, you will be able to use it when you create a new role in your organization\n\nThis is useful when you want to create multiple identical roles in different circles, that share the same mandate.\n\nNote that template roles are defined at the circle level. When you create a role you will be able to use the template roles that are defined in this circle or any other in the parent circles..\n"
       },
       {
         "header": "Invite member",
-        "content": "New member can be invite to join your organisation. You can invite either from the **members** tab, by clicking the invite button, or from the invite button in the **overview** organisation map. You can also invite a new member to join a role you have created, although you can invite people that are already member of your organisation to join a role "
+        "content": "New member can be invite to join your organization. You can invite either from the **members** tab, by clicking the invite button, or from the invite button in the **overview** organization map. You can also invite a new member to join a role you have created, although you can invite people that are already member of your organization to join a role "
       }
     ]
   },
@@ -37,7 +37,7 @@
     "tasks": [
       {
         "header": "Create tension",
-        "content": "Click on the plus button located in the right bottom corner of the screen.\nOr in the togglable tree menu, click on the plus(+) button that appear when hovering a line.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organisation map.\n"
+        "content": "Click on the plus button located in the right bottom corner of the screen.\nOr in the togglable tree menu, click on the plus(+) button that appear when hovering a line.\n\nYou can also create a tension by clicking on the tooltip that appear when you hover a role/circle in the organization map.\n"
       },
       {
         "header": "Close/Reopen tension",
@@ -62,11 +62,11 @@
     "tasks": [
       {
         "header": "Create role",
-        "content": "In the **overview panel**, click on the plus (+) button on the right of the search bar. In the window that opens, click on the **New Role** button. You can enter the role information in the form, then click on \"Create Role\" to add the role.\n\nNote1: The role will be created inside the current focused circle.  \nNote2: For each role created, there is a governance tension that is co-created automatically and that allows to consult and edit the history of modifications of the role.  \nNote3: If you click **Submit tension** instead of **Create Role**, only a governance tension will be created but the role won't be added to your organisation. You can still edit and add it later.  \n"
+        "content": "In the **overview panel**, click on the plus (+) button on the right of the search bar. In the window that opens, click on the **New Role** button. You can enter the role information in the form, then click on \"Create Role\" to add the role.\n\nNote1: The role will be created inside the current focused circle.  \nNote2: For each role created, there is a governance tension that is co-created automatically and that allows to consult and edit the history of modifications of the role.  \nNote3: If you click **Submit tension** instead of **Create Role**, only a governance tension will be created but the role won't be added to your organization. You can still edit and add it later.  \n"
       },
       {
         "header": "Edit role",
-        "content": "If you have sufficient rights, you can edit the following properties of a role:\n\n* its name\n* its mandate\n* its authority\n* its lead link (invite or leave)\n\nTo edit those properties, open the panel by clicking on either the tooltip (the triple dot on the right) that appear above each circle in the organisation map (**overview tab**), or from the side pane of the tension related to this role.\n"
+        "content": "If you have sufficient rights, you can edit the following properties of a role:\n\n* its name\n* its mandate\n* its authority\n* its lead link (invite or leave)\n\nTo edit those properties, open the panel by clicking on either the tooltip (the triple dot on the right) that appear above each circle in the organization map (**overview tab**), or from the side pane of the tension related to this role.\n"
       },
       {
         "header": "Archive role",
@@ -83,7 +83,7 @@
     "tasks": [
       {
         "header": "Create circle",
-        "content": "In the Overview panel, click on the plus (+) button on the right of the search bar. In the window that opens, click on the **New Sub-Circle** button. You can enter the circle information in the form, then click on \"Create Circle\" to add the circle.\n\nNote1: The circle will be created inside the current focused circle.  \nNote2: For each circle created, there is a governance tension that is co-created automatically and that allows to consult and edit the history of modifications of the circle.  \nNote3: If you click **Submit tension** instead of **Create Circle**, only a governance tension will be created but the circle won't be added to your organisation. You can still edit and add it later.  \n"
+        "content": "In the Overview panel, click on the plus (+) button on the right of the search bar. In the window that opens, click on the **New Sub-Circle** button. You can enter the circle information in the form, then click on \"Create Circle\" to add the circle.\n\nNote1: The circle will be created inside the current focused circle.  \nNote2: For each circle created, there is a governance tension that is co-created automatically and that allows to consult and edit the history of modifications of the circle.  \nNote3: If you click **Submit tension** instead of **Create Circle**, only a governance tension will be created but the circle won't be added to your organization. You can still edit and add it later.  \n"
       },
       {
         "header": "Edit circle",
