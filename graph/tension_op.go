@@ -491,7 +491,9 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     } else if role_type == model.RoleTypeRetired ||
     role_type == model.RoleTypeMember ||
     role_type == model.RoleTypePending {
-        return false, fmt.Errorf("You can not leave this role.")
+        return false, fmt.Errorf("You cannot leave this role.")
+    } else if role_type == model.RoleTypeOwner {
+        return false, fmt.Errorf("Owner cannot leave organisation. Please contact us if you need to transfer ownership.")
     }
 
     ok, err := LeaveRole(uctx, tension, node)
