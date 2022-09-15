@@ -97,14 +97,6 @@ func voteEventHook(uctx *model.UserCtx, cid string) (bool, *model.Contract, erro
     })
     if err != nil { return false, contract, err }
 
-    // Push Event History and Notifications
-    if contract.Status == model.ContractStatusClosed {
-        now := Now()
-        event.CreatedAt = &now
-        event.CreatedBy = &model.UserRef{Username: &uctx.Username}
-        PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tension.ID, History: []*model.EventRef{&event}})
-    }
-
     return ok, contract, err
 }
 

@@ -169,7 +169,7 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
             // Execute query
             return next(ctx)
         } else {
-            return nil, LogErr("Access denied", fmt.Errorf("You're not authorized to access this ressource."))
+            return nil, LogErr("Access denied", fmt.Errorf("You are not authorized to access this ressource."))
         }
     }
 
@@ -333,6 +333,8 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
             to = append(to, p.Node.FirstLink.Username)
         }
         PublishNotifEvent(model.NotifNotif{Uctx: uctx, Tid: &contract.Tension.ID, Cid: &contract.ID, Msg: msg, To: to})
+    } else if contract.Status == model.ContractStatusClosed {
+        PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: contract.Tension.ID, Contract: contract, ContractEvent: model.CloseContract})
     }
 
     data.Vote[0].Contract = contract

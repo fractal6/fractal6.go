@@ -175,14 +175,15 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     } else if *event.EventType == model.TensionEventMemberUnlinked {
         // UnLink user
         // --
-        // @future: contract to unlink too ?...
-        //if firstLink != uctx.Username {return false, fmt.Errorf("You do not play this role.")}
         err = UnlinkUser(rootnameid, nameid, *event.Old)
         if err != nil { return false, err }
     }
 
     // Update NodeFragment
-    err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
+    // @debug: should delete instead...
+    if node.ID != "" {
+        err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
+    }
     return ok, err
 }
 

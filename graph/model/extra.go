@@ -93,13 +93,14 @@ type ContractEvent int
 const (
     NewContract ContractEvent = iota
     NewComment
+    CloseContract
 )
 
 type EventNotif struct {
     Uctx *UserCtx        `json:"uctx"`
     Tid string           `json:"tid"`
     History []*EventRef  `json:"history"`
-    // The following are get after the the cache publication
+    // The following are get after the cache publication
     // to keep the messaging system as fast as possible.
     Receiverid string    `json:"receiverid"`
     Title string         `json:"title"`
@@ -123,6 +124,7 @@ type NotifNotif struct {
     Tid *string    `json:"tid"`
     Cid *string    `json:"cid"`
     To []string    `json:"to"`
+    IsRead bool    `json:"isRead"`
 }
 
 //

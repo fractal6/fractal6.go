@@ -135,7 +135,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 
     for _, event := range(events) {
         if tension == nil { // don't fetch if there is no events (Comment updated...)
-            // Fetch Tension, target Node and blob charac (last if bid undefined)
+            // Fetch Tension, target Node and blob charac (last if blob is nil)
             var bid *string
             if blob != nil { bid = blob.ID }
             tension, err = db.GetDB().GetTensionHook(tid, true, bid)
@@ -258,7 +258,7 @@ func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     var ok bool
 
     blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    if blob == nil { return false, fmt.Errorf("blob not found.") }
 
     // Extract tension blob characteristic
     tensionCharac, err := codec.TensionCharac{}.New(*tension.Action)
@@ -300,7 +300,7 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
     var ok bool
 
     blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    if blob == nil { return false, fmt.Errorf("blob not found.") }
 
     // Extract tension blob characteristic
     tensionCharac, err := codec.TensionCharac{}.New(*tension.Action)
@@ -337,7 +337,7 @@ func ChangeAuhtority(uctx *model.UserCtx, tension *model.Tension, event *model.E
     var ok bool
 
     blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    if blob == nil { return false, fmt.Errorf("blob not found.") }
 
     ok, err := TryChangeAuthority(uctx, tension, blob.Node, *event.New)
 
@@ -352,7 +352,7 @@ func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.
     var ok bool
 
     blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    if blob == nil { return false, fmt.Errorf("blob not found.") }
 
     ok, err := TryChangeVisibility(uctx, tension, blob.Node, *event.New)
 
@@ -366,9 +366,26 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
     var ok bool
 
     blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    if blob == nil { return false, fmt.Errorf("blob not found.") }
+    node := blob.Node
 
-    ok, err := TryUpdateLink(uctx, tension, blob.Node, event)
+    if node != nil && node.Type != nil && *node.Type == model.NodeTypeCircle {
+        // Get membership node node
+        rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
+        if err != nil { return ok, err }
+        nid := codec.MemberIdCodec(rootid, *event.Old)
+        n, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.name Node.nameid Node.type_ Node.role_type")
+        if err != nil { return ok, err }
+        var nf model.NodeFragment
+        StructMap(n, &nf)
+        if *nf.RoleType != model.RoleTypeGuest {
+            return false, LogErr("Value error", fmt.Errorf("You cannot detach this role like this."))
+        }
+        nf.FirstLink = event.Old
+        node = &nf
+    }
+
+    ok, err := TryUpdateLink(uctx, tension, node, event)
 
     return ok, err
 }
@@ -472,7 +489,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     var ok bool
 
     blob := GetBlob(tension)
-    if blob == nil { return false, fmt.Errorf("blob not found.")}
+    if blob == nil { return false, fmt.Errorf("blob not found.") }
     node := blob.Node
     role_type := model.RoleType(*event.New)
 
@@ -491,7 +508,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     } else if role_type == model.RoleTypeRetired ||
     role_type == model.RoleTypeMember ||
     role_type == model.RoleTypePending {
-        return false, fmt.Errorf("You cannot leave this role.")
+        return false, fmt.Errorf("You cannot leave this role like this.")
     } else if role_type == model.RoleTypeOwner {
         return false, fmt.Errorf("Owner cannot leave organisation. Please contact us if you need to transfer ownership.")
     }
@@ -505,8 +522,8 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
 // Utilities
 //
 
-// Check event before propagation. Should be definde in directive, those are
-// transactionned from event.
+// Check event before propagation. Should be defined in directives,
+// those are transactionned from event.
 func CheckEvent(t *model.Tension, e *model.EventRef) (string, error) {
     if e.New == nil || *e.New == "" {
         return "", fmt.Errorf("Event new field must be given.")

@@ -289,6 +289,10 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
     var ownids []string
     check := make(map[string]bool)
     for _, d := range uctx.Roles {
+        if d.RoleType == nil {
+        // Happens if a user get assigned first link of a circle...
+            continue
+        }
         rid, _ := codec.Nid2rootid(d.Nameid)
         if *d.RoleType == model.RoleTypeOwner {
             ownids = append(ownids, rid)

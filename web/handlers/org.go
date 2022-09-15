@@ -136,10 +136,14 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
     // Maybe Update the circle visibility if userCanJoin is set to True
     if form.Val {
         visibility, err := db.GetDB().GetFieldByEq("Node.nameid", form.Nameid, "Node.visibility")
+        visibilityPublic := string(model.NodeVisibilityPublic)
         if err != nil { http.Error(w, err.Error(), 500); return }
-        if visibility.(string) != string(model.NodeVisibilityPublic) {
+        if visibility.(string) != visibilityPublic {
             // Update Node
-            _, err := db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid":form.Nameid, "value":string(model.NodeVisibilityPublic)})
+            _, err := db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid":form.Nameid, "value":visibilityPublic})
+            if err != nil { http.Error(w, err.Error(), 500); return }
+            // Change all role direct children
+            err = db.DB.SetChildrenRoleVisibility(form.Nameid, visibilityPublic)
             if err != nil { http.Error(w, err.Error(), 500); return }
         }
     }

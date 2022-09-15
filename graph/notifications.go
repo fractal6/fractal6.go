@@ -70,19 +70,28 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 //
 
 // GetUserToNotify returns a list of user should receive notifications uponf tension updates.
+// Note: order is important as for priority and emailing policy.
 func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
 
-    if withSubscribers {
-        // Get Subscribers
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", user_selection)
+    // Data needed to get the first-link
+    m, err := db.GetDB().Meta("getLastBlobTarget", map[string]string{"tid":tid})
+    if err != nil { return users, err }
+    if len(m) > 0 && m[0]["receiverid"] != nil && m[0]["nameid"] != nil && m[0]["type_"] != nil {
+        // Get First-link
+        _, nameid, err := codec.NodeIdCodec(
+            m[0]["receiverid"].(string),
+            m[0]["nameid"].(string),
+            model.NodeType(m[0]["type_"].(string)),
+        )
         if err != nil { return users, err }
-        if subscribers, ok := InterfaceSlice(res); ok {
-            for _, u := range subscribers {
-                var user model.User
-                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
-                    if _, ex := users[user.Username]; ex { continue }
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
+        res, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", user_selection)
+        if err != nil { return users, err }
+        if res != nil {
+            var user model.User
+            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                if _, ex := users[user.Username]; !ex {
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
                 }
             }
         }
@@ -103,15 +112,16 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
         }
     }
 
-    {
-        // Get First-link
-        res, err := db.GetDB().GetSubSubFieldById(tid, "Tension.receiver", "Node.first_link", user_selection)
+    if withSubscribers {
+        // Get Subscribers
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", user_selection)
         if err != nil { return users, err }
-        if res != nil {
-            var user model.User
-            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
-                if _, ex := users[user.Username]; !ex {
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
+        if subscribers, ok := InterfaceSlice(res); ok {
+            for _, u := range subscribers {
+                var user model.User
+                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+                    if _, ex := users[user.Username]; ex { continue }
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
                 }
             }
         }
@@ -201,6 +211,10 @@ func PushHistory(notif *model.EventNotif) error {
 
 // Notify users for Event events, where events can be batch of event.
 func PushEventNotifications(notif model.EventNotif) error {
+    // Push event in tension event history
+    err := PushHistory(&notif)
+    if err != nil { return err }
+
     // Only the event with an ID will be notified.
     var eventBatch []*model.EventKindRef
     var createdAt string
@@ -218,7 +232,6 @@ func PushEventNotifications(notif model.EventNotif) error {
 
     // Get people to notify
     users := make(map[string]model.UserNotifInfo)
-	var err error
     var isAlert bool
     var receiverid string
     var isClosed bool
@@ -261,6 +274,22 @@ func PushEventNotifications(notif model.EventNotif) error {
         }
     } else {
         return fmt.Errorf("tension %s not found.", notif.Tid)
+    }
+
+    // Special notifications
+    // --
+    // User has been kick-out from an organisation
+    if notif.HasEvent(model.TensionEventMemberUnlinked) && codec.IsCircle(notif.Receiverid) {
+        u := notif.GetExUser()
+        if _, ex := users[u]; !ex {
+            PushNotifNotifications(model.NotifNotif{
+                Uctx: notif.Uctx,
+                Tid: &notif.Tid,
+                Cid: nil,
+                Msg: "You have been removed from this organization",
+                To: []string{u},
+            }, false)
+        }
     }
 
     // Push user event notification
@@ -312,6 +341,9 @@ func PushContractNotifications(notif model.ContractNotif) error {
     // +
     // Add Candidates
     for _, c := range notif.Contract.Candidates {
+        if x, _ := db.GetDB().GetFieldByEq("User.username", c.Username, "User.name"); x != nil {
+            n := x.(string); c.Name = &n
+        }
         users[c.Username] = model.UserNotifInfo{
             User: *c,
             Reason: notif.Contract.Event.EventType.ToContractReason(),
@@ -383,7 +415,36 @@ func PushContractNotifications(notif model.ContractNotif) error {
                     Cid: &notif.Contract.ID,
                     Msg: "You have a new comment",
                     To: []string{u},
-                })
+                }, false)
+
+            case model.CloseContract:
+                // Push Event History and Notifications
+                var event model.EventRef
+                StructMap(notif.Contract.Event, &event)
+                now := Now()
+                event.CreatedAt = &now
+                event.CreatedBy = &model.UserRef{Username: &notif.Uctx.Username}
+                PushEventNotifications(model.EventNotif{Uctx: notif.Uctx, Tid: notif.Tid, History: []*model.EventRef{&event}})
+
+                // Add a user notif  to the candidate user with link to the accepted contract
+                // has it won't be notify automatically (not subscrided to the tension yet).
+                if *event.EventType == model.TensionEventUserJoined {
+                    for _, u := range notif.Contract.Candidates {
+                        isRead := false
+                        if u.Username == notif.Uctx.Username {
+                            isRead = true
+                        }
+                        PushNotifNotifications(model.NotifNotif{
+                            Uctx: notif.Uctx,
+                            Tid: &notif.Tid,
+                            Cid: &notif.Contract.ID,
+                            Msg: "You've joined a new organization.",
+                            To: []string{u.Username},
+                            IsRead: isRead,
+                        }, true)
+                    }
+                }
+
             }
         }
 
@@ -399,37 +460,37 @@ func PushContractNotifications(notif model.ContractNotif) error {
 }
 
 // Notify users for Notif events.
-func PushNotifNotifications(notif model.NotifNotif) error {
+func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
     // Only the event with an ID will be notified.
     var eventBatch []*model.EventKindRef
     var createdAt string = Now()
-    var tensionRef model.TensionRef
-    var contractRef model.ContractRef
+    var tensionRef *model.TensionRef
+    var contractRef *model.ContractRef
     if notif.Tid != nil {
-        tensionRef = model.TensionRef{ID: notif.Tid}
+        tensionRef = &model.TensionRef{ID: notif.Tid}
     }
     if notif.Cid != nil {
-        contractRef = model.ContractRef{ID: notif.Cid}
+        contractRef = &model.ContractRef{ID: notif.Cid}
     }
 
     eventBatch = append(eventBatch, &model.EventKindRef{NotifRef: &model.NotifRef{
         CreatedAt: &createdAt,
         CreatedBy: &model.UserRef{Username: &notif.Uctx.Username},
         Message: &notif.Msg,
-        Tension: &tensionRef,
-        Contract: &contractRef,
+        Tension: tensionRef,
+        Contract: contractRef,
     }})
 
 
     // Push user event notification
     for _, u := range notif.To {
-        // Don't self notify.
-        if u == notif.Uctx.Username { continue }
+        // Notif notification can self-notify !
+        if u == notif.Uctx.Username && !selfNotify { continue }
 
         // User Event
         _, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
             User: &model.UserRef{Username: &u},
-            IsRead: false,
+            IsRead: notif.IsRead,
             CreatedAt: createdAt,
             Event: eventBatch,
         })

@@ -5,8 +5,9 @@ package model
 //
 
 // UserCtx are data encoded in the token (e.g Jwt claims)
-// @DEBUG: see emcapsulation issue: https://github.com/golang/go/issues/9859
+// @DEBUG: see encapsulation issue: https://github.com/golang/go/issues/9859
 type UserCtx struct {
+    Name           *string    `json:"name"`
     Username       string     `json:"username"`
     Password       string     `json:"password"` // hash
     Lang           Lang       `json:"lang"`

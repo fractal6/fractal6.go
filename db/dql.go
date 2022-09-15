@@ -1,9 +1,10 @@
 package db
 
 import (
+	"fmt"
+    "log"
 	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -19,6 +20,7 @@ import (
 //  Use Meta() for all other queries... (return []interface{})
 
 var userCtxPayload string = `{
+    User.name
     User.username
     User.password
     User.lang
@@ -312,7 +314,8 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     "getCoordos": `{
         all(func: eq(Node.nameid, "{{.nameid}}")) {
-            Node.children @filter((eq(Node.role_type, "Coordinator") OR eq(Node.role_type, "Owner")) AND eq(Node.isArchived, false)) { uid }
+            Node.children @filter((eq(Node.role_type, "Coordinator") OR eq(Node.role_type, "Owner"))
+                AND eq(Node.isArchived, false) AND has(Node.first_link)) { uid }
         }
     }`,
     "getCoordos2": `{
@@ -396,6 +399,18 @@ var dqlQueries map[string]string = map[string]string{
             Contract.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message
             }
+        }
+    }`,
+    "getLastBlobTarget": `{
+        all(func: uid({{.tid}})) @normalize {
+            receiverid: Tension.receiverid
+            Tension.blobs(first:1, orderdesc: Post.createdAt) @filter(has(Blob.pushedFlag)) {
+                Blob.node {
+                    nameid: NodeFragment.nameid
+                    type_: NodeFragment.type_
+                }
+            }
+
         }
     }`,
     "getSubNodes": `{
@@ -698,12 +713,12 @@ func (dg Dgraph) Count(id string, fieldName string) int {
     }
     // Send request
     res, err := dg.QueryDql("count", maps)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.Count: %v", err); return -1 }
 
     // Decode response
     var r DqlRespCount
     err = json.Unmarshal(res.Json, &r)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.Count: %v", err); return -1 }
 
     // Extract result
     if len(r.All) == 0 { return -1 }
@@ -726,12 +741,12 @@ func (dg Dgraph) Count2(f1, v1, f2, v2, fieldName string) int {
     }
     // Send request
     res, err := dg.QueryDql("count2", maps)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.Count2: %v", err); return -1 }
 
     // Decode response
     var r DqlRespCount
     err = json.Unmarshal(res.Json, &r)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.Count2: %v", err); return -1 }
 
     // Extract result
     if len(r.All) == 0 { return -1 }
@@ -751,12 +766,12 @@ func (dg Dgraph) CountHas(fieldName string) int {
     }
     // Send request
     res, err := dg.QueryDql("countHas", maps)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.CountHas: %v", err); return -1 }
 
     // Decode response
     var r DqlRespCount
     err = json.Unmarshal(res.Json, &r)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.CountHas: %v", err); return -1 }
 
     // Extract result
     if len(r.All) == 0 { return -1 }
@@ -777,12 +792,12 @@ func (dg Dgraph) CountHas2(fieldName, f2, v2 string) int {
     }
     // Send request
     res, err := dg.QueryDql("countHas2", maps)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.CountHas2: %v", err); return -1 }
 
     // Decode response
     var r DqlRespCount
     err = json.Unmarshal(res.Json, &r)
-    if err != nil { panic(err) }
+    if err != nil { log.Printf("Error in db.CountHas2: %v", err); return -1 }
 
     // Extract result
     if len(r.All) == 0 { return -1 }

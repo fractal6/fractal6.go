@@ -51,7 +51,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     case model.RoleTypeOwner:
         return false, fmt.Errorf("Doh, organisation destruction is not yet implemented.")
     case model.RoleTypeMember:
-        return false, fmt.Errorf("Doh, you ave active role in this organisation. Please leave your roles first.")
+        return false, fmt.Errorf("Doh, you have active role in this organisation. Please leave your roles first.")
     case model.RoleTypePending:
         return false, fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation.")
     case model.RoleTypeRetired:
@@ -65,7 +65,9 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 
     // Update NodeFragment
     // @debug: should delete instead...
-    err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
+    if node.ID != "" {
+        err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
+    }
 
     return true, err
 }
