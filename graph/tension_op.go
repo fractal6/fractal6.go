@@ -2,7 +2,6 @@ package graph
 
 import (
 	"fmt"
-
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/auth"
 	"fractale/fractal6.go/graph/codec"
@@ -135,7 +134,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 
     for _, event := range(events) {
         if tension == nil { // don't fetch if there is no events (Comment updated...)
-            // Fetch Tension, target Node and blob charac (last if blob is nil)
+            // Fetch Tension, target Node and blob charac (last if blob if nil)
             var bid *string
             if blob != nil { bid = blob.ID }
             tension, err = db.GetDB().GetTensionHook(tid, true, bid)
@@ -145,7 +144,6 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         // Process event
         ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true)
         if !ok || err != nil { break }
-
 
         // Check if event make a new subscriber
         addSubscriber = addSubscriber || SubscribingEvents[*event.EventType]

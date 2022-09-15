@@ -3,8 +3,6 @@ package graph
 import (
     "fmt"
     "strconv"
-    "strings"
-
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/graph/auth"
@@ -44,6 +42,10 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     if err != nil || !ok { return ok, err }
 
     err = UpdateNode(uctx, bid, node, emitterid, nameid)
+    if err == nil {
+        // Update tension title
+        err = db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(*node.Type, *node.Nameid == "", *node.Name))
+    }
     return ok, err
 }
 
@@ -266,25 +268,6 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
     _, err := db.GetDB().Add(db.DB.GetRootUctx(), "node", nodeInput)
     if err != nil { return err }
 
-    // Change Guest to member if user got its first role.
-    // Add tension and child for existing children.
-    //switch *node.Type {
-    //case model.NodeTypeRole:
-    //    if node.FirstLink != nil && *node.RoleType != model.RoleTypeGuest {
-    //        err = maybeUpdateMembership(rootnameid, *node.FirstLink, model.RoleTypeMember)
-    //    }
-    //case model.NodeTypeCircle:
-    //    for _, child := range(children) {
-    //        // Add the child tension
-    //        tensionInput := makeNewChildTension(username, emitterid, nameid, child)
-    //        tid_c, err := db.GetDB().Add(db.DB.GetRootUctx(), "tension", tensionInput)
-    //        if err != nil { return err }
-    //        // Push child
-    //        bid_c := db.GetDB().GetLastBlobId(tid_c)
-    //        err = PushNode(username, bid_c, &child, emitterid, *child.Nameid, nameid)
-    //    }
-    //}
-
     return err
 }
 
@@ -336,49 +319,6 @@ func makeNewChild(i int, username string, parentid string, roleType model.RoleTy
     return child
 }
 
-func makeNewChildTension(username string, emitterid string, receiverid string, child model.NodeFragment) model.AddTensionInput {
-    now := Now()
-    createdBy := model.UserRef{Username: &username}
-    emitter := model.NodeRef{Nameid: &emitterid}
-    receiver := model.NodeRef{Nameid: &receiverid}
-    action := model.TensionActionEditRole
-    evt1 := model.TensionEventCreated
-    evt2 := model.TensionEventBlobCreated
-    evt3 := model.TensionEventBlobPushed
-    blob_type := model.BlobTypeOnNode
-    var childref model.NodeFragmentRef
-    StructMap(child, &childref)
-    parts := strings.Split(*child.Nameid, "#")
-    childref.Nameid = &parts[len(parts)-1]
-    blob := model.BlobRef{
-        CreatedAt: &now,
-        CreatedBy : &createdBy,
-        BlobType: &blob_type,
-        Node: &childref,
-        PushedFlag: &now,
-    }
-    tension := model.AddTensionInput{
-        CreatedAt: now,
-        CreatedBy : &createdBy,
-        Title: "[Role] "+ *child.Name,
-        Type: model.TensionTypeGovernance,
-        Status: model.TensionStatusClosed,
-        Emitter: &emitter,
-        Receiver: &receiver,
-        Emitterid: emitterid,
-        Receiverid: receiverid,
-        Action: &action,
-        History : []*model.EventRef{
-            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
-            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
-            &model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
-        },
-        Blobs: []*model.BlobRef{&blob},
-        Comments:  []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil }},
-    }
-    return tension
-}
-
 // MakeNewRootTension build the tension that manage a root node.
 // Authors will be suscribed.
 func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTensionInput {
@@ -405,7 +345,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     tension := model.AddTensionInput{
         CreatedAt: now,
         CreatedBy : &createdBy,
-        Title: "Anchor Circle",
+        Title: codec.UpdateTensionTitle(model.NodeTypeCircle, true, node.Name),
         Type: model.TensionTypeGovernance,
         Status: model.TensionStatusClosed,
         Emitter: &emitter,

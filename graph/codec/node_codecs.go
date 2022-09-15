@@ -100,3 +100,19 @@ func IsRole(nid string) (bool) {
     parts := strings.Split(nid, "#")
     return len(parts) == 3
 }
+
+// Set the tension title that govern **node**
+func UpdateTensionTitle(type_ model.NodeType, isAnchor bool, title string) string {
+    var suffix string
+    switch type_ {
+    case model.NodeTypeCircle:
+        if isAnchor {
+            suffix =  "[Anchor Circle]"
+        } else {
+            suffix = "[Circle]"
+        }
+    case model.NodeTypeRole:
+        suffix = "[Role]"
+    }
+    return suffix + " " + title
+}
