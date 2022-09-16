@@ -27,6 +27,10 @@ func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFra
     if err != nil || !ok { return ok, err }
 
     err = PushNode(uctx.Username, bid, node, emitterid, nameid, parentid)
+    if err == nil {
+        // Update tension title
+        err = db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(*node.Type, *node.Nameid == "", *node.Name))
+    }
     return ok, err
 }
 

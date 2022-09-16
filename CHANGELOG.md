@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### New
 - Special notification when user join an organisation (with link to contract) or is removed from an organisation.
+- Tension node get title automatically updated according to node type and name.
 
 ### Changed
 - pushHistory is done in the notifications daemon, in the PushEventNotification function.
