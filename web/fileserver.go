@@ -2,16 +2,18 @@ package web
 
 import (
 	"fmt"
-	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/web/auth"
-	"net/http"
+    "time"
+    "strconv"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
-
+	"net/http"
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/text/language"
+	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/web/auth"
+
 )
 
 var DEFAULT_LANG string = "en"
@@ -61,7 +63,7 @@ func FileServer(r chi.Router, publicUri string, location string, maxage string) 
         var lang string = DEFAULT_LANG // Default language
         fn := strings.Replace(r.RequestURI, publicUri, "/", 1)
         if fi, err := os.Stat(root + fn); err == nil && !fi.IsDir() {
-            // Serve requested file if path exists on filesystel and is not dir.
+            // Serve requested file if path exists on filesystem and is not dir.
             fs.ServeHTTP(w, r)
         } else if p := strings.Split(fn, "/"); len(p) > 1 && langsD[p[1]] {
             // Redirect to URI with Lang set in Cookie
@@ -72,7 +74,9 @@ func FileServer(r chi.Router, publicUri string, location string, maxage string) 
                 Path: "/",
                 MaxAge: 7776000,
             })
-            http.Redirect(w, r, strings.TrimPrefix(r.RequestURI, "/"+lang ), 301)
+            // Hack to by bypass (301 - Not Modified) state.
+            rand := strconv.FormatInt(time.Now().Unix(), 10)
+            http.Redirect(w, r, strings.TrimPrefix(r.RequestURI + "?" + rand, "/"+lang ), 301)
         } else {
             // Serve the index.html from asked or preferred Lang
             // 1. use user setting if logged.
