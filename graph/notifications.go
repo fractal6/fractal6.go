@@ -418,33 +418,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
                 }, false)
 
             case model.CloseContract:
-                // Push Event History and Notifications
-                var event model.EventRef
-                StructMap(notif.Contract.Event, &event)
-                now := Now()
-                event.CreatedAt = &now
-                event.CreatedBy = &model.UserRef{Username: &notif.Uctx.Username}
-                PushEventNotifications(model.EventNotif{Uctx: notif.Uctx, Tid: notif.Tid, History: []*model.EventRef{&event}})
-
-                // Add a user notif  to the candidate user with link to the accepted contract
-                // has it won't be notify automatically (not subscrided to the tension yet).
-                if *event.EventType == model.TensionEventUserJoined {
-                    for _, u := range notif.Contract.Candidates {
-                        isRead := false
-                        if u.Username == notif.Uctx.Username {
-                            isRead = true
-                        }
-                        PushNotifNotifications(model.NotifNotif{
-                            Uctx: notif.Uctx,
-                            Tid: &notif.Tid,
-                            Cid: &notif.Contract.ID,
-                            Msg: "You've joined a new organization.",
-                            To: []string{u.Username},
-                            IsRead: isRead,
-                        }, true)
-                    }
-                }
-
+                // processed outside the loop, below
             }
         }
 
@@ -453,6 +427,36 @@ func PushContractNotifications(notif model.ContractNotif) error {
              ui.Eid = eid
              err = email.SendContractNotificationEmail(ui, notif)
              if err != nil { return err }
+        }
+    }
+
+    if notif.ContractEvent == model.CloseContract {
+        // Push Event History and Notifications
+        // Only once because this do not depend
+        var event model.EventRef
+        StructMap(notif.Contract.Event, &event)
+        now := Now()
+        event.CreatedAt = &now
+        event.CreatedBy = &model.UserRef{Username: &notif.Uctx.Username}
+        PushEventNotifications(model.EventNotif{Uctx: notif.Uctx, Tid: notif.Tid, History: []*model.EventRef{&event}})
+
+        // Add a user notif to the candidate user with link to the accepted contract
+        // has it won't be notify automatically (not subscrided to the tension yet).
+        if *event.EventType == model.TensionEventUserJoined {
+            for _, c := range notif.Contract.Candidates {
+                isRead := false
+                if c.Username == notif.Uctx.Username {
+                    isRead = true
+                }
+                PushNotifNotifications(model.NotifNotif{
+                    Uctx: notif.Uctx,
+                    Tid: &notif.Tid,
+                    Cid: &notif.Contract.ID,
+                    Msg: "You've joined a new organization.",
+                    To: []string{c.Username},
+                    IsRead: isRead,
+                }, true)
+            }
         }
     }
 
