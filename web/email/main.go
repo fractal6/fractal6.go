@@ -295,9 +295,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         "html_body": "%s",
         "headers": {
             "In-Reply-To": "<tension/%s@fractale.co>",
-            "References": "<tension/%s@fractale.co>"
+            "References": "<tension/%s@fractale.co>",
+            "List-Unsubscribe": "<%s>"
         }
-    }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid)
+    }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid, url_unsubscribe)
     // Other fields: http://apiv1.postalserver.io/controllers/send/message
 
     req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
