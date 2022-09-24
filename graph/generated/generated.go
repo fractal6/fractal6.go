@@ -680,6 +680,7 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		ID        func(childComplexity int) int
+		Link      func(childComplexity int) int
 		Message   func(childComplexity int) int
 		Tension   func(childComplexity int, filter *model.TensionFilter) int
 		UpdatedAt func(childComplexity int) int
@@ -689,6 +690,8 @@ type ComplexityRoot struct {
 		Count        func(childComplexity int) int
 		CreatedAtMax func(childComplexity int) int
 		CreatedAtMin func(childComplexity int) int
+		LinkMax      func(childComplexity int) int
+		LinkMin      func(childComplexity int) int
 		MessageMax   func(childComplexity int) int
 		MessageMin   func(childComplexity int) int
 		UpdatedAtMax func(childComplexity int) int
@@ -4594,6 +4597,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Notif.ID(childComplexity), true
 
+	case "Notif.link":
+		if e.complexity.Notif.Link == nil {
+			break
+		}
+
+		return e.complexity.Notif.Link(childComplexity), true
+
 	case "Notif.message":
 		if e.complexity.Notif.Message == nil {
 			break
@@ -4640,6 +4650,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NotifAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "NotifAggregateResult.linkMax":
+		if e.complexity.NotifAggregateResult.LinkMax == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.LinkMax(childComplexity), true
+
+	case "NotifAggregateResult.linkMin":
+		if e.complexity.NotifAggregateResult.LinkMin == nil {
+			break
+		}
+
+		return e.complexity.NotifAggregateResult.LinkMin(childComplexity), true
 
 	case "NotifAggregateResult.messageMax":
 		if e.complexity.NotifAggregateResult.MessageMax == nil {
@@ -7957,6 +7981,7 @@ union EventKind= Event| Contract| Notif
 type Notif {
   tension_(filter: TensionFilter): Tension
   contract(filter: ContractFilter): Contract
+  link: String
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -8112,9 +8137,11 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
@@ -8122,27 +8149,25 @@ directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @cascade(fields: [String]) on FIELD
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8322,6 +8347,7 @@ input AddNotifInput {
   message: String
   tension_: TensionRef
   contract: ContractRef
+  link: String
 }
 
 type AddNotifPayload {
@@ -9598,6 +9624,8 @@ type NotifAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
+  linkMin: String
+  linkMax: String
 }
 
 input NotifFilter {
@@ -9617,6 +9645,7 @@ enum NotifHasFilter {
   message
   tension_
   contract
+  link
 }
 
 input NotifOrder {
@@ -9629,6 +9658,7 @@ enum NotifOrderable {
   createdAt
   updatedAt
   message
+  link
 }
 
 input NotifPatch {
@@ -9638,6 +9668,7 @@ input NotifPatch {
   message: String @x_patch_ro
   tension_: TensionRef @x_patch_ro
   contract: ContractRef @x_patch_ro
+  link: String @x_patch_ro
 }
 
 input NotifRef {
@@ -9648,6 +9679,7 @@ input NotifRef {
   message: String
   tension_: TensionRef
   contract: ContractRef
+  link: String
 }
 
 type OrgaAggAggregateResult {
@@ -19919,6 +19951,8 @@ func (ec *executionContext) fieldContext_AddNotifPayload_notif(ctx context.Conte
 				return ec.fieldContext_Notif_tension_(ctx, field)
 			case "contract":
 				return ec.fieldContext_Notif_contract(ctx, field)
+			case "link":
+				return ec.fieldContext_Notif_link(ctx, field)
 			case "id":
 				return ec.fieldContext_Notif_id(ctx, field)
 			case "createdBy":
@@ -25754,6 +25788,8 @@ func (ec *executionContext) fieldContext_DeleteNotifPayload_notif(ctx context.Co
 				return ec.fieldContext_Notif_tension_(ctx, field)
 			case "contract":
 				return ec.fieldContext_Notif_contract(ctx, field)
+			case "link":
+				return ec.fieldContext_Notif_link(ctx, field)
 			case "id":
 				return ec.fieldContext_Notif_id(ctx, field)
 			case "createdBy":
@@ -38627,6 +38663,44 @@ func (ec *executionContext) fieldContext_Notif_contract(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Notif_link(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Notif_link(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Link, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Notif_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Notif",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Notif_id(ctx context.Context, field graphql.CollectedField, obj *model.Notif) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Notif_id(ctx, field)
 	if err != nil {
@@ -39153,6 +39227,82 @@ func (ec *executionContext) _NotifAggregateResult_messageMax(ctx context.Context
 }
 
 func (ec *executionContext) fieldContext_NotifAggregateResult_messageMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NotifAggregateResult_linkMin(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NotifAggregateResult_linkMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LinkMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NotifAggregateResult_linkMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NotifAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NotifAggregateResult_linkMax(ctx context.Context, field graphql.CollectedField, obj *model.NotifAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NotifAggregateResult_linkMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LinkMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NotifAggregateResult_linkMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "NotifAggregateResult",
 		Field:      field,
@@ -45220,6 +45370,8 @@ func (ec *executionContext) fieldContext_Query_getNotif(ctx context.Context, fie
 				return ec.fieldContext_Notif_tension_(ctx, field)
 			case "contract":
 				return ec.fieldContext_Notif_contract(ctx, field)
+			case "link":
+				return ec.fieldContext_Notif_link(ctx, field)
 			case "id":
 				return ec.fieldContext_Notif_id(ctx, field)
 			case "createdBy":
@@ -45285,6 +45437,8 @@ func (ec *executionContext) fieldContext_Query_queryNotif(ctx context.Context, f
 				return ec.fieldContext_Notif_tension_(ctx, field)
 			case "contract":
 				return ec.fieldContext_Notif_contract(ctx, field)
+			case "link":
+				return ec.fieldContext_Notif_link(ctx, field)
 			case "id":
 				return ec.fieldContext_Notif_id(ctx, field)
 			case "createdBy":
@@ -45360,6 +45514,10 @@ func (ec *executionContext) fieldContext_Query_aggregateNotif(ctx context.Contex
 				return ec.fieldContext_NotifAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_NotifAggregateResult_messageMax(ctx, field)
+			case "linkMin":
+				return ec.fieldContext_NotifAggregateResult_linkMin(ctx, field)
+			case "linkMax":
+				return ec.fieldContext_NotifAggregateResult_linkMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NotifAggregateResult", field.Name)
 		},
@@ -50477,6 +50635,8 @@ func (ec *executionContext) fieldContext_UpdateNotifPayload_notif(ctx context.Co
 				return ec.fieldContext_Notif_tension_(ctx, field)
 			case "contract":
 				return ec.fieldContext_Notif_contract(ctx, field)
+			case "link":
+				return ec.fieldContext_Notif_link(ctx, field)
 			case "id":
 				return ec.fieldContext_Notif_id(ctx, field)
 			case "createdBy":
@@ -59216,7 +59376,7 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension_", "contract"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension_", "contract", "link"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -59292,6 +59452,14 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
 			it.Contract, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "link":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
+			it.Link, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -67490,7 +67658,7 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension_", "contract"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension_", "contract", "link"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -67655,6 +67823,30 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "link":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Link = data
+			} else if tmp == nil {
+				it.Link = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -67668,7 +67860,7 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension_", "contract"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension_", "contract", "link"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -67752,6 +67944,14 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
 			it.Contract, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "link":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
+			it.Link, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -77560,6 +77760,10 @@ func (ec *executionContext) _Notif(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Notif_contract(ctx, field, obj)
 
+		case "link":
+
+			out.Values[i] = ec._Notif_link(ctx, field, obj)
+
 		case "id":
 
 			out.Values[i] = ec._Notif_id(ctx, field, obj)
@@ -77637,6 +77841,14 @@ func (ec *executionContext) _NotifAggregateResult(ctx context.Context, sel ast.S
 		case "messageMax":
 
 			out.Values[i] = ec._NotifAggregateResult_messageMax(ctx, field, obj)
+
+		case "linkMin":
+
+			out.Values[i] = ec._NotifAggregateResult_linkMin(ctx, field, obj)
+
+		case "linkMax":
+
+			out.Values[i] = ec._NotifAggregateResult_linkMax(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

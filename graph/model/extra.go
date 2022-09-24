@@ -54,7 +54,7 @@ const (
 func (n NotifReason) ToText() string {
     switch n {
     case ReasonIsInvited:
-        return "you are invited to an organization"
+        return `you are invited to join an organization on <a href="https://fractale.co">Fractale</a>`
     case ReasonIsLinkCandidate:
         return "you are invited to play a role"
     case ReasonIsCandidate:
@@ -123,6 +123,7 @@ type NotifNotif struct {
     Msg string     `json:"msg"`
     Tid *string    `json:"tid"`
     Cid *string    `json:"cid"`
+    Link *string   `json:"link"`
     To []string    `json:"to"`
     IsRead bool    `json:"isRead"`
 }

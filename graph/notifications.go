@@ -483,6 +483,7 @@ func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
         Message: &notif.Msg,
         Tension: tensionRef,
         Contract: contractRef,
+        Link: notif.Link,
     }})
 
 

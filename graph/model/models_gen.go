@@ -190,6 +190,7 @@ type AddNotifInput struct {
 	Message   *string      `json:"message,omitempty"`
 	Tension   *TensionRef  `json:"tension_,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
+	Link      *string      `json:"link,omitempty"`
 }
 
 type AddNotifPayload struct {
@@ -1315,6 +1316,7 @@ type NodeVisibilityHash struct {
 type Notif struct {
 	Tension   *Tension  `json:"tension_,omitempty"`
 	Contract  *Contract `json:"contract,omitempty"`
+	Link      *string   `json:"link,omitempty"`
 	ID        string    `json:"id,omitempty"`
 	CreatedBy *User     `json:"createdBy,omitempty"`
 	CreatedAt string    `json:"createdAt,omitempty"`
@@ -1332,6 +1334,8 @@ type NotifAggregateResult struct {
 	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
 	MessageMin   *string `json:"messageMin,omitempty"`
 	MessageMax   *string `json:"messageMax,omitempty"`
+	LinkMin      *string `json:"linkMin,omitempty"`
+	LinkMax      *string `json:"linkMax,omitempty"`
 }
 
 type NotifFilter struct {
@@ -1357,6 +1361,7 @@ type NotifPatch struct {
 	Message   *string      `json:"message,omitempty"`
 	Tension   *TensionRef  `json:"tension_,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
+	Link      *string      `json:"link,omitempty"`
 }
 
 type NotifRef struct {
@@ -1367,6 +1372,7 @@ type NotifRef struct {
 	Message   *string      `json:"message,omitempty"`
 	Tension   *TensionRef  `json:"tension_,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
+	Link      *string      `json:"link,omitempty"`
 }
 
 type OrgaAgg struct {
@@ -3771,6 +3777,7 @@ const (
 	NotifHasFilterMessage   NotifHasFilter = "message"
 	NotifHasFilterTension   NotifHasFilter = "tension_"
 	NotifHasFilterContract  NotifHasFilter = "contract"
+	NotifHasFilterLink      NotifHasFilter = "link"
 )
 
 var AllNotifHasFilter = []NotifHasFilter{
@@ -3780,11 +3787,12 @@ var AllNotifHasFilter = []NotifHasFilter{
 	NotifHasFilterMessage,
 	NotifHasFilterTension,
 	NotifHasFilterContract,
+	NotifHasFilterLink,
 }
 
 func (e NotifHasFilter) IsValid() bool {
 	switch e {
-	case NotifHasFilterCreatedBy, NotifHasFilterCreatedAt, NotifHasFilterUpdatedAt, NotifHasFilterMessage, NotifHasFilterTension, NotifHasFilterContract:
+	case NotifHasFilterCreatedBy, NotifHasFilterCreatedAt, NotifHasFilterUpdatedAt, NotifHasFilterMessage, NotifHasFilterTension, NotifHasFilterContract, NotifHasFilterLink:
 		return true
 	}
 	return false
@@ -3817,17 +3825,19 @@ const (
 	NotifOrderableCreatedAt NotifOrderable = "createdAt"
 	NotifOrderableUpdatedAt NotifOrderable = "updatedAt"
 	NotifOrderableMessage   NotifOrderable = "message"
+	NotifOrderableLink      NotifOrderable = "link"
 )
 
 var AllNotifOrderable = []NotifOrderable{
 	NotifOrderableCreatedAt,
 	NotifOrderableUpdatedAt,
 	NotifOrderableMessage,
+	NotifOrderableLink,
 }
 
 func (e NotifOrderable) IsValid() bool {
 	switch e {
-	case NotifOrderableCreatedAt, NotifOrderableUpdatedAt, NotifOrderableMessage:
+	case NotifOrderableCreatedAt, NotifOrderableUpdatedAt, NotifOrderableMessage, NotifOrderableLink:
 		return true
 	}
 	return false

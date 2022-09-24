@@ -194,6 +194,24 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
             http.Error(w, err.Error(), 500)
             return
         }
+
+        // Add welcome user notification
+        anchorTid, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", "f6", "Node.source", "Blob.tension", "uid" )
+        if err != nil {
+            http.Error(w, err.Error(), 500); return
+        } else if anchorTid != nil {
+            tid := anchorTid.(string)
+            link := "/verification"
+            graph.PushNotifNotifications(model.NotifNotif{
+                Uctx: uctx,
+                Tid: &tid,
+                Cid: nil,
+                Link: &link,
+                Msg: "Welcome to Fractale",
+                To: []string{uctx.Username},
+                IsRead: true,
+            }, true)
+        }
     }
 
 	// Create a new cookie with token
