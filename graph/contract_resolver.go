@@ -310,11 +310,13 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
 
     // Post process vote
     ok, contract, err := voteEventHook(uctx, cid)
-    if !ok || err != nil {
+    if err != nil {
         id := data.Vote[0].ID
         e := db.GetDB().Delete(*uctx, "vote", model.VoteFilter{ID:[]string{id}})
         if e != nil { panic(e) }
         return nil, err
+    } else if !ok {
+        return d, err
     }
 
     if contract.Status == model.ContractStatusCanceled {
