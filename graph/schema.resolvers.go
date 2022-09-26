@@ -311,6 +311,21 @@ func (r *mutationResolver) DeleteNotif(ctx context.Context, filter model.NotifFi
 	panic(fmt.Errorf("not implemented"))
 }
 
+// AddEventCount is the resolver for the addEventCount field.
+func (r *mutationResolver) AddEventCount(ctx context.Context, input []*model.AddEventCountInput) (data *model.AddEventCountPayload, errors error) {
+	panic(fmt.Errorf("not implemented: AddEventCount - addEventCount"))
+}
+
+// UpdateEventCount is the resolver for the updateEventCount field.
+func (r *mutationResolver) UpdateEventCount(ctx context.Context, input model.UpdateEventCountInput) (data *model.UpdateEventCountPayload, errors error) {
+	panic(fmt.Errorf("not implemented: UpdateEventCount - updateEventCount"))
+}
+
+// DeleteEventCount is the resolver for the deleteEventCount field.
+func (r *mutationResolver) DeleteEventCount(ctx context.Context, filter model.EventCountFilter) (data *model.DeleteEventCountPayload, errors error) {
+	panic(fmt.Errorf("not implemented: DeleteEventCount - deleteEventCount"))
+}
+
 // GetNode is the resolver for the getNode field.
 func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data *model.Node, errors error) {
 	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
@@ -587,6 +602,16 @@ func (r *queryResolver) QueryNotif(ctx context.Context, filter *model.NotifFilte
 // AggregateNotif is the resolver for the aggregateNotif field.
 func (r *queryResolver) AggregateNotif(ctx context.Context, filter *model.NotifFilter) (data *model.NotifAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// QueryEventCount is the resolver for the queryEventCount field.
+func (r *queryResolver) QueryEventCount(ctx context.Context, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) (data []*model.EventCount, errors error) {
+	panic(fmt.Errorf("not implemented: QueryEventCount - queryEventCount"))
+}
+
+// AggregateEventCount is the resolver for the aggregateEventCount field.
+func (r *queryResolver) AggregateEventCount(ctx context.Context, filter *model.EventCountFilter) (data *model.EventCountAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented: AggregateEventCount - aggregateEventCount"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

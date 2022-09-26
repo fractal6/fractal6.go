@@ -147,6 +147,11 @@ type ComplexityRoot struct {
 		NumUids  func(childComplexity int) int
 	}
 
+	AddEventCountPayload struct {
+		EventCount func(childComplexity int, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) int
+		NumUids    func(childComplexity int) int
+	}
+
 	AddEventFragmentPayload struct {
 		EventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
 		NumUids       func(childComplexity int) int
@@ -327,6 +332,12 @@ type ComplexityRoot struct {
 		NumUids  func(childComplexity int) int
 	}
 
+	DeleteEventCountPayload struct {
+		EventCount func(childComplexity int, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) int
+		Msg        func(childComplexity int) int
+		NumUids    func(childComplexity int) int
+	}
+
 	DeleteEventFragmentPayload struct {
 		EventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
 		Msg           func(childComplexity int) int
@@ -449,6 +460,23 @@ type ComplexityRoot struct {
 		UpdatedAtMin func(childComplexity int) int
 	}
 
+	EventCount struct {
+		PendingContracts func(childComplexity int) int
+		UnreadEvents     func(childComplexity int) int
+	}
+
+	EventCountAggregateResult struct {
+		Count               func(childComplexity int) int
+		PendingContractsAvg func(childComplexity int) int
+		PendingContractsMax func(childComplexity int) int
+		PendingContractsMin func(childComplexity int) int
+		PendingContractsSum func(childComplexity int) int
+		UnreadEventsAvg     func(childComplexity int) int
+		UnreadEventsMax     func(childComplexity int) int
+		UnreadEventsMin     func(childComplexity int) int
+		UnreadEventsSum     func(childComplexity int) int
+	}
+
 	EventFragment struct {
 		EventType func(childComplexity int) int
 		New       func(childComplexity int) int
@@ -516,6 +544,7 @@ type ComplexityRoot struct {
 		AddComment          func(childComplexity int, input []*model.AddCommentInput) int
 		AddContract         func(childComplexity int, input []*model.AddContractInput, upsert *bool) int
 		AddEvent            func(childComplexity int, input []*model.AddEventInput) int
+		AddEventCount       func(childComplexity int, input []*model.AddEventCountInput) int
 		AddEventFragment    func(childComplexity int, input []*model.AddEventFragmentInput) int
 		AddLabel            func(childComplexity int, input []*model.AddLabelInput) int
 		AddMandate          func(childComplexity int, input []*model.AddMandateInput) int
@@ -534,6 +563,7 @@ type ComplexityRoot struct {
 		DeleteComment       func(childComplexity int, filter model.CommentFilter) int
 		DeleteContract      func(childComplexity int, filter model.ContractFilter) int
 		DeleteEvent         func(childComplexity int, filter model.EventFilter) int
+		DeleteEventCount    func(childComplexity int, filter model.EventCountFilter) int
 		DeleteEventFragment func(childComplexity int, filter model.EventFragmentFilter) int
 		DeleteLabel         func(childComplexity int, filter model.LabelFilter) int
 		DeleteMandate       func(childComplexity int, filter model.MandateFilter) int
@@ -553,6 +583,7 @@ type ComplexityRoot struct {
 		UpdateComment       func(childComplexity int, input model.UpdateCommentInput) int
 		UpdateContract      func(childComplexity int, input model.UpdateContractInput) int
 		UpdateEvent         func(childComplexity int, input model.UpdateEventInput) int
+		UpdateEventCount    func(childComplexity int, input model.UpdateEventCountInput) int
 		UpdateEventFragment func(childComplexity int, input model.UpdateEventFragmentInput) int
 		UpdateLabel         func(childComplexity int, input model.UpdateLabelInput) int
 		UpdateMandate       func(childComplexity int, input model.UpdateMandateInput) int
@@ -779,6 +810,7 @@ type ComplexityRoot struct {
 		AggregateComment       func(childComplexity int, filter *model.CommentFilter) int
 		AggregateContract      func(childComplexity int, filter *model.ContractFilter) int
 		AggregateEvent         func(childComplexity int, filter *model.EventFilter) int
+		AggregateEventCount    func(childComplexity int, filter *model.EventCountFilter) int
 		AggregateEventFragment func(childComplexity int, filter *model.EventFragmentFilter) int
 		AggregateLabel         func(childComplexity int, filter *model.LabelFilter) int
 		AggregateMandate       func(childComplexity int, filter *model.MandateFilter) int
@@ -814,6 +846,7 @@ type ComplexityRoot struct {
 		QueryComment           func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
 		QueryContract          func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		QueryEvent             func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		QueryEventCount        func(childComplexity int, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) int
 		QueryEventFragment     func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
 		QueryLabel             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		QueryMandate           func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
@@ -928,6 +961,11 @@ type ComplexityRoot struct {
 		NumUids  func(childComplexity int) int
 	}
 
+	UpdateEventCountPayload struct {
+		EventCount func(childComplexity int, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) int
+		NumUids    func(childComplexity int) int
+	}
+
 	UpdateEventFragmentPayload struct {
 		EventFragment func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
 		NumUids       func(childComplexity int) int
@@ -1016,6 +1054,7 @@ type ComplexityRoot struct {
 		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
 		CreatedAt                 func(childComplexity int) int
 		Email                     func(childComplexity int) int
+		EventCount                func(childComplexity int, filter *model.EventCountFilter) int
 		Events                    func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		EventsAggregate           func(childComplexity int, filter *model.UserEventFilter) int
 		ID                        func(childComplexity int) int
@@ -1177,6 +1216,9 @@ type MutationResolver interface {
 	AddNotif(ctx context.Context, input []*model.AddNotifInput) (*model.AddNotifPayload, error)
 	UpdateNotif(ctx context.Context, input model.UpdateNotifInput) (*model.UpdateNotifPayload, error)
 	DeleteNotif(ctx context.Context, filter model.NotifFilter) (*model.DeleteNotifPayload, error)
+	AddEventCount(ctx context.Context, input []*model.AddEventCountInput) (*model.AddEventCountPayload, error)
+	UpdateEventCount(ctx context.Context, input model.UpdateEventCountInput) (*model.UpdateEventCountPayload, error)
+	DeleteEventCount(ctx context.Context, filter model.EventCountFilter) (*model.DeleteEventCountPayload, error)
 }
 type QueryResolver interface {
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
@@ -1233,6 +1275,8 @@ type QueryResolver interface {
 	GetNotif(ctx context.Context, id string) (*model.Notif, error)
 	QueryNotif(ctx context.Context, filter *model.NotifFilter, order *model.NotifOrder, first *int, offset *int) ([]*model.Notif, error)
 	AggregateNotif(ctx context.Context, filter *model.NotifFilter) (*model.NotifAggregateResult, error)
+	QueryEventCount(ctx context.Context, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) ([]*model.EventCount, error)
+	AggregateEventCount(ctx context.Context, filter *model.EventCountFilter) (*model.EventCountAggregateResult, error)
 }
 
 type executableSchema struct {
@@ -1306,6 +1350,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddContractPayload.NumUids(childComplexity), true
+
+	case "AddEventCountPayload.eventCount":
+		if e.complexity.AddEventCountPayload.EventCount == nil {
+			break
+		}
+
+		args, err := ec.field_AddEventCountPayload_eventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddEventCountPayload.EventCount(childComplexity, args["filter"].(*model.EventCountFilter), args["order"].(*model.EventCountOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddEventCountPayload.numUids":
+		if e.complexity.AddEventCountPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddEventCountPayload.NumUids(childComplexity), true
 
 	case "AddEventFragmentPayload.eventFragment":
 		if e.complexity.AddEventFragmentPayload.EventFragment == nil {
@@ -2228,6 +2291,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteContractPayload.NumUids(childComplexity), true
 
+	case "DeleteEventCountPayload.eventCount":
+		if e.complexity.DeleteEventCountPayload.EventCount == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteEventCountPayload_eventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteEventCountPayload.EventCount(childComplexity, args["filter"].(*model.EventCountFilter), args["order"].(*model.EventCountOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeleteEventCountPayload.msg":
+		if e.complexity.DeleteEventCountPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteEventCountPayload.Msg(childComplexity), true
+
+	case "DeleteEventCountPayload.numUids":
+		if e.complexity.DeleteEventCountPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteEventCountPayload.NumUids(childComplexity), true
+
 	case "DeleteEventFragmentPayload.eventFragment":
 		if e.complexity.DeleteEventFragmentPayload.EventFragment == nil {
 			break
@@ -2794,6 +2883,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EventAggregateResult.UpdatedAtMin(childComplexity), true
 
+	case "EventCount.pending_contracts":
+		if e.complexity.EventCount.PendingContracts == nil {
+			break
+		}
+
+		return e.complexity.EventCount.PendingContracts(childComplexity), true
+
+	case "EventCount.unread_events":
+		if e.complexity.EventCount.UnreadEvents == nil {
+			break
+		}
+
+		return e.complexity.EventCount.UnreadEvents(childComplexity), true
+
+	case "EventCountAggregateResult.count":
+		if e.complexity.EventCountAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.Count(childComplexity), true
+
+	case "EventCountAggregateResult.pending_contractsAvg":
+		if e.complexity.EventCountAggregateResult.PendingContractsAvg == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.PendingContractsAvg(childComplexity), true
+
+	case "EventCountAggregateResult.pending_contractsMax":
+		if e.complexity.EventCountAggregateResult.PendingContractsMax == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.PendingContractsMax(childComplexity), true
+
+	case "EventCountAggregateResult.pending_contractsMin":
+		if e.complexity.EventCountAggregateResult.PendingContractsMin == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.PendingContractsMin(childComplexity), true
+
+	case "EventCountAggregateResult.pending_contractsSum":
+		if e.complexity.EventCountAggregateResult.PendingContractsSum == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.PendingContractsSum(childComplexity), true
+
+	case "EventCountAggregateResult.unread_eventsAvg":
+		if e.complexity.EventCountAggregateResult.UnreadEventsAvg == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.UnreadEventsAvg(childComplexity), true
+
+	case "EventCountAggregateResult.unread_eventsMax":
+		if e.complexity.EventCountAggregateResult.UnreadEventsMax == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.UnreadEventsMax(childComplexity), true
+
+	case "EventCountAggregateResult.unread_eventsMin":
+		if e.complexity.EventCountAggregateResult.UnreadEventsMin == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.UnreadEventsMin(childComplexity), true
+
+	case "EventCountAggregateResult.unread_eventsSum":
+		if e.complexity.EventCountAggregateResult.UnreadEventsSum == nil {
+			break
+		}
+
+		return e.complexity.EventCountAggregateResult.UnreadEventsSum(childComplexity), true
+
 	case "EventFragment.event_type":
 		if e.complexity.EventFragment.EventType == nil {
 			break
@@ -3149,6 +3315,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddEvent(childComplexity, args["input"].([]*model.AddEventInput)), true
 
+	case "Mutation.addEventCount":
+		if e.complexity.Mutation.AddEventCount == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addEventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddEventCount(childComplexity, args["input"].([]*model.AddEventCountInput)), true
+
 	case "Mutation.addEventFragment":
 		if e.complexity.Mutation.AddEventFragment == nil {
 			break
@@ -3364,6 +3542,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteEvent(childComplexity, args["filter"].(model.EventFilter)), true
+
+	case "Mutation.deleteEventCount":
+		if e.complexity.Mutation.DeleteEventCount == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteEventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteEventCount(childComplexity, args["filter"].(model.EventCountFilter)), true
 
 	case "Mutation.deleteEventFragment":
 		if e.complexity.Mutation.DeleteEventFragment == nil {
@@ -3592,6 +3782,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEvent(childComplexity, args["input"].(model.UpdateEventInput)), true
+
+	case "Mutation.updateEventCount":
+		if e.complexity.Mutation.UpdateEventCount == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateEventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateEventCount(childComplexity, args["input"].(model.UpdateEventCountInput)), true
 
 	case "Mutation.updateEventFragment":
 		if e.complexity.Mutation.UpdateEventFragment == nil {
@@ -5099,6 +5301,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateEvent(childComplexity, args["filter"].(*model.EventFilter)), true
 
+	case "Query.aggregateEventCount":
+		if e.complexity.Query.AggregateEventCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateEventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateEventCount(childComplexity, args["filter"].(*model.EventCountFilter)), true
+
 	case "Query.aggregateEventFragment":
 		if e.complexity.Query.AggregateEventFragment == nil {
 			break
@@ -5518,6 +5732,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryEvent(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryEventCount":
+		if e.complexity.Query.QueryEventCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryEventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryEventCount(childComplexity, args["filter"].(*model.EventCountFilter), args["order"].(*model.EventCountOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryEventFragment":
 		if e.complexity.Query.QueryEventFragment == nil {
@@ -6356,6 +6582,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateContractPayload.NumUids(childComplexity), true
 
+	case "UpdateEventCountPayload.eventCount":
+		if e.complexity.UpdateEventCountPayload.EventCount == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateEventCountPayload_eventCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateEventCountPayload.EventCount(childComplexity, args["filter"].(*model.EventCountFilter), args["order"].(*model.EventCountOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateEventCountPayload.numUids":
+		if e.complexity.UpdateEventCountPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateEventCountPayload.NumUids(childComplexity), true
+
 	case "UpdateEventFragmentPayload.eventFragment":
 		if e.complexity.UpdateEventFragmentPayload.EventFragment == nil {
 			break
@@ -6728,6 +6973,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Email(childComplexity), true
+
+	case "User.event_count":
+		if e.complexity.User.EventCount == nil {
+			break
+		}
+
+		args, err := ec.field_User_event_count_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.EventCount(childComplexity, args["filter"].(*model.EventCountFilter)), true
 
 	case "User.events":
 		if e.complexity.User.Events == nil {
@@ -7380,6 +7637,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddBlobInput,
 		ec.unmarshalInputAddCommentInput,
 		ec.unmarshalInputAddContractInput,
+		ec.unmarshalInputAddEventCountInput,
 		ec.unmarshalInputAddEventFragmentInput,
 		ec.unmarshalInputAddEventInput,
 		ec.unmarshalInputAddLabelInput,
@@ -7416,6 +7674,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDateTimeFilter,
 		ec.unmarshalInputDateTimeRange,
 		ec.unmarshalInputDgraphDefault,
+		ec.unmarshalInputEventCountFilter,
+		ec.unmarshalInputEventCountOrder,
+		ec.unmarshalInputEventCountPatch,
+		ec.unmarshalInputEventCountRef,
 		ec.unmarshalInputEventFilter,
 		ec.unmarshalInputEventFragmentFilter,
 		ec.unmarshalInputEventFragmentOrder,
@@ -7500,6 +7762,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateBlobInput,
 		ec.unmarshalInputUpdateCommentInput,
 		ec.unmarshalInputUpdateContractInput,
+		ec.unmarshalInputUpdateEventCountInput,
 		ec.unmarshalInputUpdateEventFragmentInput,
 		ec.unmarshalInputUpdateEventInput,
 		ec.unmarshalInputUpdateLabelInput,
@@ -7937,6 +8200,7 @@ type User {
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @private
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!] @private
   markAllAsRead: String
+  event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:"username")
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
@@ -7987,6 +8251,11 @@ type Notif {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
+}
+
+type EventCount {
+  unread_events: Int
+  pending_contracts: Int
 }
 
 enum NodeType {
@@ -8137,13 +8406,17 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
@@ -8151,23 +8424,19 @@ directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8220,6 +8489,16 @@ input AddContractInput {
 
 type AddContractPayload {
   contract(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract]
+  numUids: Int
+}
+
+input AddEventCountInput {
+  unread_events: Int
+  pending_contracts: Int
+}
+
+type AddEventCountPayload {
+  eventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
   numUids: Int
 }
 
@@ -8460,6 +8739,7 @@ input AddUserInput {
   contracts: [ContractRef!] @x_add(r:"ref")
   events: [UserEventRef!]
   markAllAsRead: String
+  event_count: EventCountRef
 }
 
 type AddUserPayload {
@@ -8811,6 +9091,12 @@ type DeleteContractPayload {
   numUids: Int
 }
 
+type DeleteEventCountPayload {
+  eventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
+  msg: String
+  numUids: Int
+}
+
 type DeleteEventFragmentPayload {
   eventFragment(filter: EventFragmentFilter, order: EventFragmentOrder, first: Int, offset: Int): [EventFragment]
   msg: String
@@ -8941,6 +9227,51 @@ type EventAggregateResult {
   oldMax: String
   newMin: String
   newMax: String
+}
+
+type EventCountAggregateResult {
+  count: Int
+  unread_eventsMin: Int
+  unread_eventsMax: Int
+  unread_eventsSum: Int
+  unread_eventsAvg: Float
+  pending_contractsMin: Int
+  pending_contractsMax: Int
+  pending_contractsSum: Int
+  pending_contractsAvg: Float
+}
+
+input EventCountFilter {
+  has: [EventCountHasFilter]
+  and: [EventCountFilter]
+  or: [EventCountFilter]
+  not: EventCountFilter
+}
+
+enum EventCountHasFilter {
+  unread_events
+  pending_contracts
+}
+
+input EventCountOrder {
+  asc: EventCountOrderable
+  desc: EventCountOrderable
+  then: EventCountOrder
+}
+
+enum EventCountOrderable {
+  unread_events
+  pending_contracts
+}
+
+input EventCountPatch {
+  unread_events: Int @x_patch_ro
+  pending_contracts: Int @x_patch_ro
+}
+
+input EventCountRef {
+  unread_events: Int
+  pending_contracts: Int
 }
 
 input EventFilter {
@@ -9328,6 +9659,9 @@ type Mutation {
   addNotif(input: [AddNotifInput!]!): AddNotifPayload
   updateNotif(input: UpdateNotifInput!): UpdateNotifPayload
   deleteNotif(filter: NotifFilter!): DeleteNotifPayload
+  addEventCount(input: [AddEventCountInput!]!): AddEventCountPayload
+  updateEventCount(input: UpdateEventCountInput!): UpdateEventCountPayload
+  deleteEventCount(filter: EventCountFilter!): DeleteEventCountPayload
 }
 
 input NearFilter {
@@ -9944,6 +10278,8 @@ type Query {
   getNotif(id: ID!): Notif
   queryNotif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
   aggregateNotif(filter: NotifFilter): NotifAggregateResult
+  queryEventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
+  aggregateEventCount(filter: EventCountFilter): EventCountAggregateResult
 }
 
 type RoleExtAggregateResult {
@@ -10244,6 +10580,17 @@ type UpdateContractPayload {
   numUids: Int
 }
 
+input UpdateEventCountInput {
+  filter: EventCountFilter!
+  set: EventCountPatch
+  remove: EventCountPatch
+}
+
+type UpdateEventCountPayload {
+  eventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
+  numUids: Int
+}
+
 input UpdateEventFragmentInput {
   filter: EventFragmentFilter!
   set: EventFragmentPatch
@@ -10526,6 +10873,7 @@ enum UserHasFilter {
   contracts
   events
   markAllAsRead
+  event_count
 }
 
 input UserOrder {
@@ -10570,6 +10918,7 @@ input UserPatch {
   contracts: [ContractRef!] @x_patch_ro
   events: [UserEventRef!] @x_alter
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
+  event_count: EventCountRef @x_patch_ro
 }
 
 input UserRef {
@@ -10596,6 +10945,7 @@ input UserRef {
   contracts: [ContractRef!] @x_add(r:"ref")
   events: [UserEventRef!] @x_alter
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
+  event_count: EventCountRef
 }
 
 type UserRightsAggregateResult {
@@ -11464,6 +11814,48 @@ func (ec *executionContext) field_AddContractPayload_contract_args(ctx context.C
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOContractOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_AddEventCountPayload_eventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventCountOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -12579,6 +12971,48 @@ func (ec *executionContext) field_DeleteContractPayload_contract_args(ctx contex
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteEventCountPayload_eventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventCountOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteEventFragmentPayload_eventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13483,6 +13917,21 @@ func (ec *executionContext) field_Mutation_addContract_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addEventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddEventCountInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddEventCountInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventCountInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -13904,6 +14353,21 @@ func (ec *executionContext) field_Mutation_deleteContract_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteEventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNEventCountFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14288,6 +14752,21 @@ func (ec *executionContext) field_Mutation_updateContract_args(ctx context.Conte
 			arg0 = data
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateContractInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateEventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateEventCountInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateEventCountInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventCountInput(ctx, tmp)
+		if err != nil {
+			return nil, err
 		}
 	}
 	args["input"] = arg0
@@ -15434,6 +15913,21 @@ func (ec *executionContext) field_Query_aggregateContract_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateEventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateEventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -16111,6 +16605,48 @@ func (ec *executionContext) field_Query_queryContract_args(ctx context.Context, 
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOContractOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryEventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventCountOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -17593,6 +18129,48 @@ func (ec *executionContext) field_UpdateContractPayload_contract_args(ctx contex
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateEventCountPayload_eventCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventCountOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateEventFragmentPayload_eventFragment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -18427,6 +19005,21 @@ func (ec *executionContext) field_User_contracts_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_User_event_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventCountFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_User_eventsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -19200,6 +19793,99 @@ func (ec *executionContext) _AddContractPayload_numUids(ctx context.Context, fie
 func (ec *executionContext) fieldContext_AddContractPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AddContractPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddEventCountPayload_eventCount(ctx context.Context, field graphql.CollectedField, obj *model.AddEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddEventCountPayload_eventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventCount, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventCount)
+	fc.Result = res
+	return ec.marshalOEventCount2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddEventCountPayload_eventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddEventCountPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "unread_events":
+				return ec.fieldContext_EventCount_unread_events(ctx, field)
+			case "pending_contracts":
+				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddEventCountPayload_eventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddEventCountPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddEventCountPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddEventCountPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddEventCountPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -20655,6 +21341,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -21404,6 +22092,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -22211,6 +22901,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -23148,6 +23840,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -23491,6 +24185,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -24809,6 +25505,137 @@ func (ec *executionContext) _DeleteContractPayload_numUids(ctx context.Context, 
 func (ec *executionContext) fieldContext_DeleteContractPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteContractPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteEventCountPayload_eventCount(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteEventCountPayload_eventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventCount, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventCount)
+	fc.Result = res
+	return ec.marshalOEventCount2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteEventCountPayload_eventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteEventCountPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "unread_events":
+				return ec.fieldContext_EventCount_unread_events(ctx, field)
+			case "pending_contracts":
+				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteEventCountPayload_eventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteEventCountPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteEventCountPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteEventCountPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteEventCountPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteEventCountPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteEventCountPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteEventCountPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteEventCountPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -26857,6 +27684,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -27599,6 +28428,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -28161,6 +28992,424 @@ func (ec *executionContext) fieldContext_EventAggregateResult_newMax(ctx context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCount_unread_events(ctx context.Context, field graphql.CollectedField, obj *model.EventCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCount_unread_events(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnreadEvents, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCount_unread_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCount_pending_contracts(ctx context.Context, field graphql.CollectedField, obj *model.EventCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCount_pending_contracts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingContracts, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCount_pending_contracts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_unread_eventsMin(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_unread_eventsMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnreadEventsMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_unread_eventsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_unread_eventsMax(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_unread_eventsMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnreadEventsMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_unread_eventsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_unread_eventsSum(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_unread_eventsSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnreadEventsSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_unread_eventsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_unread_eventsAvg(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_unread_eventsAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnreadEventsAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_unread_eventsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_pending_contractsMin(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_pending_contractsMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingContractsMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_pending_contractsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_pending_contractsMax(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_pending_contractsMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingContractsMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_pending_contractsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_pending_contractsSum(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_pending_contractsSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingContractsSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_pending_contractsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_pending_contractsAvg(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_pending_contractsAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PendingContractsAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_pending_contractsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -33563,6 +34812,173 @@ func (ec *executionContext) fieldContext_Mutation_deleteNotif(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addEventCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addEventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddEventCount(rctx, fc.Args["input"].([]*model.AddEventCountInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddEventCountPayload)
+	fc.Result = res
+	return ec.marshalOAddEventCountPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventCountPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addEventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "eventCount":
+				return ec.fieldContext_AddEventCountPayload_eventCount(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddEventCountPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddEventCountPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateEventCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateEventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEventCount(rctx, fc.Args["input"].(model.UpdateEventCountInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateEventCountPayload)
+	fc.Result = res
+	return ec.marshalOUpdateEventCountPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventCountPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateEventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "eventCount":
+				return ec.fieldContext_UpdateEventCountPayload_eventCount(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateEventCountPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateEventCountPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteEventCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteEventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteEventCount(rctx, fc.Args["filter"].(model.EventCountFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteEventCountPayload)
+	fc.Result = res
+	return ec.marshalODeleteEventCountPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventCountPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteEventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "eventCount":
+				return ec.fieldContext_DeleteEventCountPayload_eventCount(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteEventCountPayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteEventCountPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteEventCountPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Node_id(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_id(ctx, field)
 	if err != nil {
@@ -33686,6 +35102,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -35387,6 +36805,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -35498,6 +36918,8 @@ func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, f
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -38824,6 +40246,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -41037,6 +42461,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -44581,6 +46007,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -44692,6 +46120,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -45530,6 +46960,130 @@ func (ec *executionContext) fieldContext_Query_aggregateNotif(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryEventCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryEventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryEventCount(rctx, fc.Args["filter"].(*model.EventCountFilter), fc.Args["order"].(*model.EventCountOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventCount)
+	fc.Result = res
+	return ec.marshalOEventCount2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryEventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "unread_events":
+				return ec.fieldContext_EventCount_unread_events(ctx, field)
+			case "pending_contracts":
+				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateEventCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateEventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateEventCount(rctx, fc.Args["filter"].(*model.EventCountFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventCountAggregateResult)
+	fc.Result = res
+	return ec.marshalOEventCountAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateEventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_EventCountAggregateResult_count(ctx, field)
+			case "unread_eventsMin":
+				return ec.fieldContext_EventCountAggregateResult_unread_eventsMin(ctx, field)
+			case "unread_eventsMax":
+				return ec.fieldContext_EventCountAggregateResult_unread_eventsMax(ctx, field)
+			case "unread_eventsSum":
+				return ec.fieldContext_EventCountAggregateResult_unread_eventsSum(ctx, field)
+			case "unread_eventsAvg":
+				return ec.fieldContext_EventCountAggregateResult_unread_eventsAvg(ctx, field)
+			case "pending_contractsMin":
+				return ec.fieldContext_EventCountAggregateResult_pending_contractsMin(ctx, field)
+			case "pending_contractsMax":
+				return ec.fieldContext_EventCountAggregateResult_pending_contractsMax(ctx, field)
+			case "pending_contractsSum":
+				return ec.fieldContext_EventCountAggregateResult_pending_contractsSum(ctx, field)
+			case "pending_contractsAvg":
+				return ec.fieldContext_EventCountAggregateResult_pending_contractsAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventCountAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -47417,6 +48971,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -47830,6 +49386,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -48061,6 +49619,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -49894,6 +51454,99 @@ func (ec *executionContext) fieldContext_UpdateContractPayload_numUids(ctx conte
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateEventCountPayload_eventCount(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateEventCountPayload_eventCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventCount, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.EventCount)
+	fc.Result = res
+	return ec.marshalOEventCount2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateEventCountPayload_eventCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateEventCountPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "unread_events":
+				return ec.fieldContext_EventCount_unread_events(ctx, field)
+			case "pending_contracts":
+				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateEventCountPayload_eventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateEventCountPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEventCountPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateEventCountPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateEventCountPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateEventCountPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateEventFragmentPayload_eventFragment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateEventFragmentPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateEventFragmentPayload_eventFragment(ctx, field)
 	if err != nil {
@@ -51438,6 +53091,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -53265,6 +54920,89 @@ func (ec *executionContext) fieldContext_User_markAllAsRead(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _User_event_count(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_event_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.EventCount, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "getEventCount")
+			if err != nil {
+				return nil, err
+			}
+			k, err := ec.unmarshalOString2ᚖstring(ctx, "username")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Meta == nil {
+				return nil, errors.New("directive meta is not implemented")
+			}
+			return ec.directives.Meta(ctx, obj, directive0, f, k)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.EventCount); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.EventCount`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventCount)
+	fc.Result = res
+	return ec.marshalOEventCount2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_event_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "unread_events":
+				return ec.fieldContext_EventCount_unread_events(ctx, field)
+			case "pending_contracts":
+				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_event_count_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_subscriptionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 	if err != nil {
@@ -54855,6 +56593,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -55884,6 +57624,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -58481,6 +60223,42 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddEventCountInput(ctx context.Context, obj interface{}) (model.AddEventCountInput, error) {
+	var it model.AddEventCountInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"unread_events", "pending_contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "unread_events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unread_events"))
+			it.UnreadEvents, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pending_contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
+			it.PendingContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddEventFragmentInput(ctx context.Context, obj interface{}) (model.AddEventFragmentInput, error) {
 	var it model.AddEventFragmentInput
 	asMap := map[string]interface{}{}
@@ -60286,7 +62064,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -60658,6 +62436,14 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
 			it.MarkAllAsRead, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "event_count":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_count"))
+			it.EventCount, err = ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -63012,6 +64798,206 @@ func (ec *executionContext) unmarshalInputDgraphDefault(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
 			it.Value, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventCountFilter(ctx context.Context, obj interface{}) (model.EventCountFilter, error) {
+	var it model.EventCountFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOEventCountHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventCountOrder(ctx context.Context, obj interface{}) (model.EventCountOrder, error) {
+	var it model.EventCountOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventCountPatch(ctx context.Context, obj interface{}) (model.EventCountPatch, error) {
+	var it model.EventCountPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"unread_events", "pending_contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "unread_events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unread_events"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.UnreadEvents = data
+			} else if tmp == nil {
+				it.UnreadEvents = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "pending_contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.PendingContracts = data
+			} else if tmp == nil {
+				it.PendingContracts = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEventCountRef(ctx context.Context, obj interface{}) (model.EventCountRef, error) {
+	var it model.EventCountRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"unread_events", "pending_contracts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "unread_events":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unread_events"))
+			it.UnreadEvents, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pending_contracts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
+			it.PendingContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -71581,6 +73567,50 @@ func (ec *executionContext) unmarshalInputUpdateContractInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateEventCountInput(ctx context.Context, obj interface{}) (model.UpdateEventCountInput, error) {
+	var it model.UpdateEventCountInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateEventFragmentInput(ctx context.Context, obj interface{}) (model.UpdateEventFragmentInput, error) {
 	var it model.UpdateEventFragmentInput
 	asMap := map[string]interface{}{}
@@ -72758,7 +74788,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73349,6 +75379,32 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "event_count":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_count"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.EventCountRef); ok {
+				it.EventCount = data
+			} else if tmp == nil {
+				it.EventCount = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.EventCountRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -73362,7 +75418,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead"}
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73922,6 +75978,14 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "event_count":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_count"))
+			it.EventCount, err = ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		}
 	}
@@ -74882,6 +76946,35 @@ func (ec *executionContext) _AddContractPayload(ctx context.Context, sel ast.Sel
 		case "numUids":
 
 			out.Values[i] = ec._AddContractPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addEventCountPayloadImplementors = []string{"AddEventCountPayload"}
+
+func (ec *executionContext) _AddEventCountPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventCountPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addEventCountPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddEventCountPayload")
+		case "eventCount":
+
+			out.Values[i] = ec._AddEventCountPayload_eventCount(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._AddEventCountPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -75884,6 +77977,39 @@ func (ec *executionContext) _DeleteContractPayload(ctx context.Context, sel ast.
 	return out
 }
 
+var deleteEventCountPayloadImplementors = []string{"DeleteEventCountPayload"}
+
+func (ec *executionContext) _DeleteEventCountPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventCountPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventCountPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteEventCountPayload")
+		case "eventCount":
+
+			out.Values[i] = ec._DeleteEventCountPayload_eventCount(ctx, field, obj)
+
+		case "msg":
+
+			out.Values[i] = ec._DeleteEventCountPayload_msg(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._DeleteEventCountPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteEventFragmentPayloadImplementors = []string{"DeleteEventFragmentPayload"}
 
 func (ec *executionContext) _DeleteEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventFragmentPayload) graphql.Marshaler {
@@ -76537,6 +78663,92 @@ func (ec *executionContext) _EventAggregateResult(ctx context.Context, sel ast.S
 		case "newMax":
 
 			out.Values[i] = ec._EventAggregateResult_newMax(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var eventCountImplementors = []string{"EventCount"}
+
+func (ec *executionContext) _EventCount(ctx context.Context, sel ast.SelectionSet, obj *model.EventCount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, eventCountImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EventCount")
+		case "unread_events":
+
+			out.Values[i] = ec._EventCount_unread_events(ctx, field, obj)
+
+		case "pending_contracts":
+
+			out.Values[i] = ec._EventCount_pending_contracts(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var eventCountAggregateResultImplementors = []string{"EventCountAggregateResult"}
+
+func (ec *executionContext) _EventCountAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.EventCountAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, eventCountAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EventCountAggregateResult")
+		case "count":
+
+			out.Values[i] = ec._EventCountAggregateResult_count(ctx, field, obj)
+
+		case "unread_eventsMin":
+
+			out.Values[i] = ec._EventCountAggregateResult_unread_eventsMin(ctx, field, obj)
+
+		case "unread_eventsMax":
+
+			out.Values[i] = ec._EventCountAggregateResult_unread_eventsMax(ctx, field, obj)
+
+		case "unread_eventsSum":
+
+			out.Values[i] = ec._EventCountAggregateResult_unread_eventsSum(ctx, field, obj)
+
+		case "unread_eventsAvg":
+
+			out.Values[i] = ec._EventCountAggregateResult_unread_eventsAvg(ctx, field, obj)
+
+		case "pending_contractsMin":
+
+			out.Values[i] = ec._EventCountAggregateResult_pending_contractsMin(ctx, field, obj)
+
+		case "pending_contractsMax":
+
+			out.Values[i] = ec._EventCountAggregateResult_pending_contractsMax(ctx, field, obj)
+
+		case "pending_contractsSum":
+
+			out.Values[i] = ec._EventCountAggregateResult_pending_contractsSum(ctx, field, obj)
+
+		case "pending_contractsAvg":
+
+			out.Values[i] = ec._EventCountAggregateResult_pending_contractsAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -77234,6 +79446,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteNotif(ctx, field)
+			})
+
+		case "addEventCount":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addEventCount(ctx, field)
+			})
+
+		case "updateEventCount":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateEventCount(ctx, field)
+			})
+
+		case "deleteEventCount":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteEventCount(ctx, field)
 			})
 
 		default:
@@ -79369,6 +81599,46 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "queryEventCount":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryEventCount(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateEventCount":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateEventCount(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -79873,6 +82143,35 @@ func (ec *executionContext) _UpdateContractPayload(ctx context.Context, sel ast.
 		case "numUids":
 
 			out.Values[i] = ec._UpdateContractPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateEventCountPayloadImplementors = []string{"UpdateEventCountPayload"}
+
+func (ec *executionContext) _UpdateEventCountPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventCountPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventCountPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEventCountPayload")
+		case "eventCount":
+
+			out.Values[i] = ec._UpdateEventCountPayload_eventCount(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._UpdateEventCountPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -80477,6 +82776,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "markAllAsRead":
 
 			out.Values[i] = ec._User_markAllAsRead(ctx, field, obj)
+
+		case "event_count":
+
+			out.Values[i] = ec._User_event_count(ctx, field, obj)
 
 		case "subscriptionsAggregate":
 
@@ -81324,6 +83627,28 @@ func (ec *executionContext) unmarshalNAddContractInput2ᚖfractaleᚋfractal6ᚗ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddEventCountInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventCountInputᚄ(ctx context.Context, v interface{}) ([]*model.AddEventCountInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddEventCountInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddEventCountInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventCountInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddEventCountInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventCountInput(ctx context.Context, v interface{}) (*model.AddEventCountInput, error) {
+	res, err := ec.unmarshalInputAddEventCountInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddEventFragmentInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddEventFragmentInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -81807,6 +84132,16 @@ func (ec *executionContext) marshalNEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋ
 		return graphql.Null
 	}
 	return ec._Event(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNEventCountFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx context.Context, v interface{}) (model.EventCountFilter, error) {
+	res, err := ec.unmarshalInputEventCountFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx context.Context, v interface{}) (*model.EventCountFilter, error) {
+	res, err := ec.unmarshalInputEventCountFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNEventFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx context.Context, v interface{}) (model.EventFilter, error) {
@@ -82504,6 +84839,11 @@ func (ec *executionContext) unmarshalNUpdateContractInput2fractaleᚋfractal6ᚗ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateEventCountInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventCountInput(ctx context.Context, v interface{}) (model.UpdateEventCountInput, error) {
+	res, err := ec.unmarshalInputUpdateEventCountInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateEventFragmentInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventFragmentInput(ctx context.Context, v interface{}) (model.UpdateEventFragmentInput, error) {
 	res, err := ec.unmarshalInputUpdateEventFragmentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -83027,6 +85367,13 @@ func (ec *executionContext) marshalOAddContractPayload2ᚖfractaleᚋfractal6ᚗ
 		return graphql.Null
 	}
 	return ec._AddContractPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddEventCountPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventCountPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddEventCountPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddEventCountPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddEventFragmentPayload) graphql.Marshaler {
@@ -84357,6 +86704,13 @@ func (ec *executionContext) marshalODeleteContractPayload2ᚖfractaleᚋfractal6
 	return ec._DeleteContractPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalODeleteEventCountPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventCountPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteEventCountPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteEventCountPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalODeleteEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteEventFragmentPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -84644,6 +86998,206 @@ func (ec *executionContext) marshalOEventAggregateResult2ᚖfractaleᚋfractal6�
 		return graphql.Null
 	}
 	return ec._EventAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOEventCount2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx context.Context, sel ast.SelectionSet, v []*model.EventCount) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOEventCount2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOEventCount2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCount(ctx context.Context, sel ast.SelectionSet, v *model.EventCount) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._EventCount(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOEventCountAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.EventCountAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._EventCountAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx context.Context, v interface{}) ([]*model.EventCountFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.EventCountFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx context.Context, v interface{}) (*model.EventCountFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventCountFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventCountHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx context.Context, v interface{}) ([]*model.EventCountHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.EventCountHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOEventCountHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOEventCountHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.EventCountHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOEventCountHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOEventCountHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx context.Context, v interface{}) (*model.EventCountHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.EventCountHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEventCountHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.EventCountHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx context.Context, v interface{}) (*model.EventCountOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventCountOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx context.Context, v interface{}) (*model.EventCountOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.EventCountOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx context.Context, sel ast.SelectionSet, v *model.EventCountOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx context.Context, v interface{}) (*model.EventCountPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventCountPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx context.Context, v interface{}) (*model.EventCountRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEventCountRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx context.Context, v interface{}) ([]*model.EventFilter, error) {
@@ -88718,6 +91272,13 @@ func (ec *executionContext) marshalOUpdateContractPayload2ᚖfractaleᚋfractal6
 		return graphql.Null
 	}
 	return ec._UpdateContractPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateEventCountPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventCountPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateEventCountPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateEventCountPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateEventFragmentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateEventFragmentPayload) graphql.Marshaler {

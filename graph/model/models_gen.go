@@ -66,6 +66,16 @@ type AddContractPayload struct {
 	NumUids  *int        `json:"numUids"`
 }
 
+type AddEventCountInput struct {
+	UnreadEvents     *int `json:"unread_events"`
+	PendingContracts *int `json:"pending_contracts"`
+}
+
+type AddEventCountPayload struct {
+	EventCount []*EventCount `json:"eventCount,omitempty"`
+	NumUids    *int          `json:"numUids"`
+}
+
 type AddEventFragmentInput struct {
 	EventType TensionEvent `json:"event_type,omitempty"`
 	Old       *string      `json:"old,omitempty"`
@@ -303,6 +313,7 @@ type AddUserInput struct {
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
+	EventCount       *EventCountRef  `json:"event_count,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -636,6 +647,12 @@ type DeleteContractPayload struct {
 	NumUids  *int        `json:"numUids"`
 }
 
+type DeleteEventCountPayload struct {
+	EventCount []*EventCount `json:"eventCount,omitempty"`
+	Msg        *string       `json:"msg,omitempty"`
+	NumUids    *int          `json:"numUids"`
+}
+
 type DeleteEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
 	Msg           *string          `json:"msg,omitempty"`
@@ -762,6 +779,46 @@ type EventAggregateResult struct {
 	OldMax       *string `json:"oldMax,omitempty"`
 	NewMin       *string `json:"newMin,omitempty"`
 	NewMax       *string `json:"newMax,omitempty"`
+}
+
+type EventCount struct {
+	UnreadEvents     *int `json:"unread_events"`
+	PendingContracts *int `json:"pending_contracts"`
+}
+
+type EventCountAggregateResult struct {
+	Count               *int     `json:"count"`
+	UnreadEventsMin     *int     `json:"unread_eventsMin"`
+	UnreadEventsMax     *int     `json:"unread_eventsMax"`
+	UnreadEventsSum     *int     `json:"unread_eventsSum"`
+	UnreadEventsAvg     *float64 `json:"unread_eventsAvg,omitempty"`
+	PendingContractsMin *int     `json:"pending_contractsMin"`
+	PendingContractsMax *int     `json:"pending_contractsMax"`
+	PendingContractsSum *int     `json:"pending_contractsSum"`
+	PendingContractsAvg *float64 `json:"pending_contractsAvg,omitempty"`
+}
+
+type EventCountFilter struct {
+	Has []*EventCountHasFilter `json:"has,omitempty"`
+	And []*EventCountFilter    `json:"and,omitempty"`
+	Or  []*EventCountFilter    `json:"or,omitempty"`
+	Not *EventCountFilter      `json:"not,omitempty"`
+}
+
+type EventCountOrder struct {
+	Asc  *EventCountOrderable `json:"asc,omitempty"`
+	Desc *EventCountOrderable `json:"desc,omitempty"`
+	Then *EventCountOrder     `json:"then,omitempty"`
+}
+
+type EventCountPatch struct {
+	UnreadEvents     *int `json:"unread_events"`
+	PendingContracts *int `json:"pending_contracts"`
+}
+
+type EventCountRef struct {
+	UnreadEvents     *int `json:"unread_events"`
+	PendingContracts *int `json:"pending_contracts"`
 }
 
 type EventFilter struct {
@@ -1856,6 +1913,17 @@ type UpdateContractPayload struct {
 	NumUids  *int        `json:"numUids"`
 }
 
+type UpdateEventCountInput struct {
+	Filter *EventCountFilter `json:"filter,omitempty"`
+	Set    *EventCountPatch  `json:"set,omitempty"`
+	Remove *EventCountPatch  `json:"remove,omitempty"`
+}
+
+type UpdateEventCountPayload struct {
+	EventCount []*EventCount `json:"eventCount,omitempty"`
+	NumUids    *int          `json:"numUids"`
+}
+
 type UpdateEventFragmentInput struct {
 	Filter *EventFragmentFilter `json:"filter,omitempty"`
 	Set    *EventFragmentPatch  `json:"set,omitempty"`
@@ -2056,6 +2124,7 @@ type User struct {
 	Contracts                 []*Contract               `json:"contracts,omitempty"`
 	Events                    []*UserEvent              `json:"events,omitempty"`
 	MarkAllAsRead             *string                   `json:"markAllAsRead,omitempty"`
+	EventCount                *EventCount               `json:"event_count,omitempty"`
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
 	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
@@ -2174,6 +2243,7 @@ type UserPatch struct {
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
+	EventCount       *EventCountRef  `json:"event_count,omitempty"`
 }
 
 type UserRef struct {
@@ -2200,6 +2270,7 @@ type UserRef struct {
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
+	EventCount       *EventCountRef  `json:"event_count,omitempty"`
 }
 
 type UserRights struct {
@@ -2826,6 +2897,88 @@ func (e *DgraphIndex) UnmarshalGQL(v interface{}) error {
 }
 
 func (e DgraphIndex) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventCountHasFilter string
+
+const (
+	EventCountHasFilterUnreadEvents     EventCountHasFilter = "unread_events"
+	EventCountHasFilterPendingContracts EventCountHasFilter = "pending_contracts"
+)
+
+var AllEventCountHasFilter = []EventCountHasFilter{
+	EventCountHasFilterUnreadEvents,
+	EventCountHasFilterPendingContracts,
+}
+
+func (e EventCountHasFilter) IsValid() bool {
+	switch e {
+	case EventCountHasFilterUnreadEvents, EventCountHasFilterPendingContracts:
+		return true
+	}
+	return false
+}
+
+func (e EventCountHasFilter) String() string {
+	return string(e)
+}
+
+func (e *EventCountHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventCountHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventCountHasFilter", str)
+	}
+	return nil
+}
+
+func (e EventCountHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventCountOrderable string
+
+const (
+	EventCountOrderableUnreadEvents     EventCountOrderable = "unread_events"
+	EventCountOrderablePendingContracts EventCountOrderable = "pending_contracts"
+)
+
+var AllEventCountOrderable = []EventCountOrderable{
+	EventCountOrderableUnreadEvents,
+	EventCountOrderablePendingContracts,
+}
+
+func (e EventCountOrderable) IsValid() bool {
+	switch e {
+	case EventCountOrderableUnreadEvents, EventCountOrderablePendingContracts:
+		return true
+	}
+	return false
+}
+
+func (e EventCountOrderable) String() string {
+	return string(e)
+}
+
+func (e *EventCountOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventCountOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventCountOrderable", str)
+	}
+	return nil
+}
+
+func (e EventCountOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -4748,6 +4901,7 @@ const (
 	UserHasFilterContracts        UserHasFilter = "contracts"
 	UserHasFilterEvents           UserHasFilter = "events"
 	UserHasFilterMarkAllAsRead    UserHasFilter = "markAllAsRead"
+	UserHasFilterEventCount       UserHasFilter = "event_count"
 )
 
 var AllUserHasFilter = []UserHasFilter{
@@ -4773,11 +4927,12 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterContracts,
 	UserHasFilterEvents,
 	UserHasFilterMarkAllAsRead,
+	UserHasFilterEventCount,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
 		return true
 	}
 	return false
