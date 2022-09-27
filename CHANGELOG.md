@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unrealeased]
 
+## [0.6.6]
+
+### New
+- user welcome notification
+- email have List-Unsubscrive header (one-click link)
+- [schema] add new meta user attribute to count unread notification
+
+### Changed
+- upgrade go.mod
+
+### Fixded
+- fix double email sent on close contract regression
+
+
 ## [0.6.5]
 
 ### New
