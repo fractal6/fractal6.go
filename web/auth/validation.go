@@ -254,6 +254,7 @@ func ValidateNewUser(creds model.UserCreds) error {
     username := creds.Username
     email := creds.Email
     name := creds.Name
+    lang := creds.Lang
     password := creds.Password
 
     // Username validation
@@ -265,16 +266,17 @@ func ValidateNewUser(creds model.UserCreds) error {
     }
     // Email validation
     err = ValidateEmail(email)
-    if err != nil {
-        return err
-    }
+    if err != nil { return err }
     // Name validation
     if name != nil {
         err = ValidateName(*name)
-        if err != nil {
-            return err
-        }
+        if err != nil { return err }
     }
+    // Lang validation
+    if lang != nil {
+        if !model.Lang(*lang).IsValid() { return fmt.Errorf("Bad value for lang.") }
+    }
+
     // Password validation
     err = ValidatePassword(password)
     if err != nil {
@@ -313,12 +315,18 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     maxPublicOrga := 5
     userType := model.UserTypeRegular
     hasEmailNotifications := true
+    var lang model.Lang
+    if creds.Lang == nil {
+        lang = model.LangEn
+    } else {
+        lang = model.Lang(*creds.Lang)
+    }
 
     userInput := model.AddUserInput{
         CreatedAt: now,
         LastAck: now,
         NotifyByEmail: true,
-        Lang: model.LangEn,
+        Lang: lang,
         Username: creds.Username,
         Email: creds.Email,
         Name: creds.Name,

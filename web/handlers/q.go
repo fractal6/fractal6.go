@@ -18,7 +18,7 @@ import (
 func SubNodes(w http.ResponseWriter, r *http.Request) {
 	var q string
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -45,7 +45,7 @@ func SubNodes(w http.ResponseWriter, r *http.Request) {
 func SubMembers(w http.ResponseWriter, r *http.Request) {
 	var q string
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -72,7 +72,7 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 func TopLabels(w http.ResponseWriter, r *http.Request) {
 	var q string
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode into it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -99,7 +99,7 @@ func TopLabels(w http.ResponseWriter, r *http.Request) {
 func SubLabels(w http.ResponseWriter, r *http.Request) {
 	var q string
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -126,7 +126,7 @@ func SubLabels(w http.ResponseWriter, r *http.Request) {
 func TopRoles(w http.ResponseWriter, r *http.Request) {
 	var q string
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -153,7 +153,7 @@ func TopRoles(w http.ResponseWriter, r *http.Request) {
 func SubRoles(w http.ResponseWriter, r *http.Request) {
 	var q string
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -185,7 +185,7 @@ func SubRoles(w http.ResponseWriter, r *http.Request) {
 func TensionsInt(w http.ResponseWriter, r *http.Request) {
 	var q db.TensionQuery
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -236,7 +236,7 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
 func TensionsExt(w http.ResponseWriter, r *http.Request) {
 	var q db.TensionQuery
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -271,7 +271,7 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 func TensionsAll(w http.ResponseWriter, r *http.Request) {
 	var q db.TensionQuery
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error
@@ -306,7 +306,7 @@ func TensionsAll(w http.ResponseWriter, r *http.Request) {
 func TensionsCount(w http.ResponseWriter, r *http.Request) {
 	var q db.TensionQuery
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
 		// Body structure error

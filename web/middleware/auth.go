@@ -39,7 +39,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 
         //// reset the body reader
         //r.Body = ioutil.NopCloser(bytes.NewReader(body))
-        //// Get the JSON body and decode into UserCreds
+        //// Get the JSON body and decode it
         //err := json.NewDecoder(r.Body).Decode(&q)
         //if err != nil {
         //    // Body structure error
@@ -77,7 +77,7 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
 
         // reset the body reader
         r.Body = ioutil.NopCloser(bytes.NewReader(body))
-        // Get the JSON body and decode into UserCreds
+        // Get the JSON body and decode it
         err := json.NewDecoder(r.Body).Decode(&q)
         if err != nil {
             // Body structure error
