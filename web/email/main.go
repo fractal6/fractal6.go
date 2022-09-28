@@ -9,10 +9,19 @@ import (
     "crypto/tls"
 	"github.com/spf13/viper"
     "github.com/yuin/goldmark"
+    "github.com/yuin/goldmark/extension"
+    "github.com/yuin/goldmark/renderer/html"
     "github.com/microcosm-cc/bluemonday"
     "fractale/fractal6.go/tools"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/db"
+)
+
+var md goldmark.Markdown = goldmark.New(
+	goldmark.WithExtensions(extension.GFM),
+	goldmark.WithRendererOptions(
+		html.WithHardWraps(),
+	),
 )
 
 var emailSecret string
@@ -198,7 +207,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         } else {
             // Convert markdown to Html
             var buf bytes.Buffer
-            if err = goldmark.Convert([]byte(message), &buf); err != nil {
+            if err = md.Convert([]byte(message), &buf); err != nil {
                 return err
             }
             payload = bluemonday.UGCPolicy().Sanitize(buf.String())
@@ -260,7 +269,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         if notif.HasEvent(model.TensionEventCommentPushed) && message != "" {
             // Convert markdown to Html
             var buf bytes.Buffer
-            if err = goldmark.Convert([]byte(message), &buf); err != nil {
+            if err = md.Convert([]byte(message), &buf); err != nil {
                 return err
             }
             if payload != "" {
@@ -423,7 +432,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     if notif.Msg != "" {
         // Convert markdown to Html
         var buf bytes.Buffer
-        if err = goldmark.Convert([]byte(notif.Msg), &buf); err != nil {
+        if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
             return err
         }
         payload += bluemonday.UGCPolicy().Sanitize(buf.String())
