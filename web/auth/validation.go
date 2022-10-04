@@ -100,6 +100,12 @@ var (
             "location": "password"
         }]
     }`)
+    ErrReserverdNamed = errors.New(`{
+        "errors":[{
+            "message":"This name already exists, please use another one.",
+            "location": "name"
+        }]
+    }`)
     // Upsert error
     ErrUsernameExist = errors.New(`{
         "errors":[{

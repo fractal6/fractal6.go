@@ -17,8 +17,8 @@ var safeWordReg *re.Regexp
 func init() {
     //special := "@!#<>{}`'\"" + `%\\`
     //reservedURI := "&=+'/[]" + `\s`
-    special :=   `\@\!\#\<\>\{\}\%\'\"\\` + "`" + `\*\^\%\;\~¨:,$£§` // username
-    specialSoft := `\!\#\<\>\{\}\%\'\"\\` + "`" + `\*\^\%\;¨`        // nameid
+    special :=     `\@\#\<\>\{\}\%\"\'\!\\` + "`" + `\*\^\%\;\~¨:,$£§` // nameid
+    specialSoft := `\@\#\<\>\{\}\%\"\\` + "`" + `\^\%\;¨`            // name
     reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
     numReg = re.MustCompile(`[0-9]`)
     letterReg = re.MustCompile(`[a-zA-Z]`)
@@ -26,7 +26,7 @@ func init() {
     specialReg = re.MustCompile(`[`+special+`]`)
     specialSoftReg = re.MustCompile(`[`+specialSoft+`]`)
     reservedURIReg = re.MustCompile(`[`+reservedURI+`]`)
-    safeWordReg = re.MustCompile(`^[\w\.\-]+$`)
+    safeWordReg = re.MustCompile(`^[\w\.\-]+$`) // username
 }
 
 //
@@ -48,7 +48,7 @@ func ValidateName(n string) error {
     if hasStrip(n) {
         return ErrBadNameFormat
     }
-    if hasSpecial(n) {
+    if hasSpecialSoft(n) {
         return ErrBadNameFormat
     }
     return nil
@@ -109,11 +109,11 @@ func ValidateNameid(nameid string, rootnameid string) error {
             if hasStrip(n) {
                 return ErrBadNameidFormat
             }
-            if hasSpecialSoft(n) {
+            if hasSpecial(n) {
                 return ErrBadNameidFormat
             }
             if hasReservedURI(n) {
-                return ErrBadNameidFormat
+                return ErrReserverdNamed
             }
         }
     }
@@ -121,16 +121,34 @@ func ValidateNameid(nameid string, rootnameid string) error {
 }
 
 func ValidateEmail(e string) error {
+    // Size control
+    if len(e) > 100 {
+        return ErrUsernameTooLong
+    }
+    if len(e) < 3 {
+        return ErrUsernameTooShort
+    }
+
     ns := strings.Split(e, "@")
     if len(ns) == 2 {
         for i, n := range ns {
             if i == len(ns)-1 && !strings.Contains(n, ".")  {
                 return ErrBadEmailFormat
             }
-            err := ValidateName(n)
-            if err != nil || hasReservedURI(n) {
-                return ErrBadEmailFormat
+
+            if i == 0  {
+                // Character control
+                // * do not contains space at begining or end.
+                // * unsafe character.
+                // * avoid URI special character and spaces.
+                if hasStrip(n)  {
+                    return ErrBadUsernameFormat
+                }
+                if !isSafeWord(n) {
+                    return ErrBadUsernameFormat
+                }
             }
+
         }
     } else {
         return ErrBadEmailFormat
