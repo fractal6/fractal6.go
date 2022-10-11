@@ -1246,9 +1246,13 @@ func (dg Dgraph) GetUserRoles(userid string) ([]*model.Node, error) {
     return data, err
 }
 
+// Returns matching User. Never return nil user without an error.
 func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) {
     user, err := dg.GetUctxFull(fieldid, userid)
     if err != nil { return user, nil }
+    if user == nil || user.Username == "" {
+        return nil, fmt.Errorf("User not found error for '%s': %s", fieldid, userid)
+    }
     // @deprecated: special role are processed in graph/auth
     // Filter special roles
     //for i := 0; i < len(user.Roles); i++ {

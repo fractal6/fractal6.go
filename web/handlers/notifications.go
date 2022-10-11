@@ -51,9 +51,6 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
     uctx, err := db.GetDB().GetUctx("email", form.From)
 	if err != nil { http.Error(w, err.Error(), 500); return }
-    if uctx == nil || uctx.Username == "" {
-        http.Error(w, "Unknown user (spam ?)", 400); return
-    }
 
     createdAt := tools.Now()
     createdBy := model.UserRef{Username: &uctx.Username}
