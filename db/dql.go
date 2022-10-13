@@ -455,6 +455,7 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Label.name
             Label.color
+            Label.nodes { Node.nameid }
         }
     }`,
     "getSubLabels": `{
@@ -470,6 +471,7 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Label.name
             Label.color
+            Label.nodes { Node.nameid }
         }
     }`,
     "getTopRoles": `{
@@ -487,6 +489,7 @@ var dqlQueries map[string]string = map[string]string{
             RoleExt.name
             RoleExt.color
             RoleExt.role_type
+            RoleExt.nodes { Node.nameid }
         }
     }`,
     "getSubRoles": `{
@@ -503,6 +506,7 @@ var dqlQueries map[string]string = map[string]string{
             RoleExt.name
             RoleExt.color
             RoleExt.role_type
+            RoleExt.nodes { Node.nameid }
         }
     }`,
     "getTensionInt": `{
