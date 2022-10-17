@@ -1,10 +1,15 @@
 package tools
 
 import (
-    "golang.org/x/crypto/bcrypt"
+    "net/http"
+    "io/ioutil"
+    "encoding/base64"
+    "encoding/pem"
+    "crypto"
     "crypto/rsa"
     "crypto/x509"
-    "encoding/pem"
+    "crypto/sha1"
+    "golang.org/x/crypto/bcrypt"
 )
 
 //
@@ -49,3 +54,57 @@ func ParseRsaPublic(key string) *rsa.PublicKey {
     return key_pub
 }
 
+//
+// Signature Check
+// --
+// For Postal, see https://github.com/postalserver/postal/issues/432
+//
+
+func ValidatePostalSignature(r *http.Request) error {
+    postalWebhookPK := "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQClPnCZ+8y6rO/zvNwsKF4vYKnEU4urIAzeOfnn8DoADtUP91UhsGkWvlludEBIa9xWtI+tXptadf7MYVqwXxKfTdj4H2tQXGdHnvSxLAK6jDEYTNVmed2y6XXwCMql87JLoDOiYXl9BiIyNbmWZfGmzAO5pt1qQFO5+1m77VC4rwIDAQAB" // Just the p=... part of the TXT record (without the semicolon at the end)
+
+	// convert postal public key to PEM (X.509) format
+    publicKeyPem :=  "-----BEGIN PUBLIC KEY-----\r\n" +
+	ChunkSplit(postalWebhookPK, 64, "\r\n") +
+	"-----END PUBLIC KEY-----"
+    publicKey := ParseRsaPublic(publicKeyPem)
+
+    rawSignature := r.Header.Get("X-Postal-Signature")
+    signature, err := base64.StdEncoding.DecodeString(rawSignature)
+    if err != nil { return err }
+
+    body, err := ioutil.ReadAll(r.Body)
+    if err != nil { return err }
+    hash := sha1.Sum(body)
+
+    err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hash[:], signature);
+    return err
+}
+
+func ChunkSplit(body string, limit int, end string) string {
+    if limit < 1 { return body }
+
+	var charSlice []rune
+
+	// push characters to slice
+	for _, char := range body {
+		charSlice = append(charSlice, char)
+	}
+
+	var result string = ""
+
+	for len(charSlice) >= 1 {
+		// Convert slice/array back to string but insert end at specified limit
+		result = result + string(charSlice[:limit]) + end
+
+		// Discard the elements that were copied over to result
+		charSlice = charSlice[limit:]
+
+		// Change the limit to cater for the last few words in charSlice
+		if len(charSlice) < limit {
+			limit = len(charSlice)
+		}
+	}
+
+	return result
+}

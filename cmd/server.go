@@ -154,7 +154,8 @@ func RunServer() {
         gqlConfig["introspection"] = true
     }
 
-    ///// @TODO: CHECK TOKEN
+    // MTA communication Endpoints
+    // @TODO: CHECK TOKEN
     // --
     // Notifications endpoint
     r.Post("/notifications", handle6.Notifications)

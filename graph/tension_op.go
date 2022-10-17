@@ -142,7 +142,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
         }
 
         // Process event
-        ok, contract, err = processEvent(uctx, tension, event, blob, nil, true, true)
+        ok, contract, err = ProcessEvent(uctx, tension, event, blob, nil, true, true)
         if !ok || err != nil { break }
 
         // Check if event make a new subscriber
@@ -161,7 +161,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
     return ok, contract, err
 }
 
-func processEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, blob *model.BlobRef, contract *model.Contract,
+func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, blob *model.BlobRef, contract *model.Contract,
                     doCheck, doProcess bool) (bool, *model.Contract, error) {
     var ok bool
     var err error

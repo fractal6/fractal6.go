@@ -1,13 +1,14 @@
 package handlers
 
 import (
-    //"net"
+    "fmt"
     "net/http"
     "encoding/json"
     "strings"
 
     "fractale/fractal6.go/db"
     "fractale/fractal6.go/graph"
+    "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/tools"
 )
@@ -15,12 +16,21 @@ import (
 
 /*
  *
- * This code manage receiving email response from email notification
+ * This code manage receiving email as HTTP requests from the MTA
  *
  */
 
+type EmailForm struct {
+    From string            `json:"mail_from"`
+    To string              `json:"rcpt_to"`
+    Title string           `json:"subject"`
+    Msg string             `json:"plain_body"`
+    References string      `json:"references"`
+    //AttachmentQuantity int  `json:"attachment_quantity"`
+    //Attachments []string    `json:"attachments"`
+}
 
-// Handle email responses.
+// Handle email responses. Receiving email response from email notifications.
 func Notifications(w http.ResponseWriter, r *http.Request) {
     // Temporary solution while Postal can't be identify
     //if ip, _, err := net.SplitHostPort(r.RemoteAddr);
@@ -49,9 +59,9 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
     }
 
+    // Get author
     uctx, err := db.GetDB().GetUctx("email", form.From)
 	if err != nil { http.Error(w, err.Error(), 500); return }
-
     createdAt := tools.Now()
     createdBy := model.UserRef{Username: &uctx.Username}
 
@@ -138,6 +148,84 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
     } else {
         // In every other case, it returns an error.
         http.Error(w, "Unknown references", 400); return
+    }
+
+}
+
+// Handle eemail sent to orga. Convert email to tension.
+func Mailing(w http.ResponseWriter, r *http.Request) {
+    // Validate WebHook identity
+    xp := r.Header.Get("X-Postal-Signature")
+    fmt.Println("X-Postal-Sign", xp)
+    if err := tools.ValidatePostalSignature(r); err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
+
+    // Get request form
+    var form EmailForm
+    err := json.NewDecoder(r.Body).Decode(&form)
+	if err != nil { http.Error(w, err.Error(), 500); return }
+
+    fmt.Println(
+        fmt.Sprintf("Got mailing mail from: %s to: %s ", form.From, form.To),
+    )
+
+    // Get the nameid of the targeted circle
+    receiverid := form.To
+    filter := `eq(Node.isArchived, false)`
+    if ex, _ := db.GetDB().Exists("Node.nameid", receiverid, &filter); !ex {
+        http.Error(w, "NAMEID NOT FOUND", 500); return
+    }
+
+    // Get author
+    uctx, err := db.GetDB().GetUctx("email", form.From)
+	if err != nil { http.Error(w, err.Error(), 500); return }
+    createdAt := tools.Now()
+    createdBy := model.UserRef{Username: &uctx.Username}
+
+    // Build the tension
+    et := model.TensionEventCreated
+    rootnameid, _ := codec.Nid2rootid(receiverid)
+    emitterid := codec.MemberIdCodec(rootnameid, uctx.Username)
+    event := model.EventRef{
+        CreatedAt: &createdAt,
+        CreatedBy: &createdBy,
+        EventType: &et,
+    }
+    var ev model.Event
+    tools.StructMap(event, &ev)
+    tension := model.Tension{
+        CreatedAt: createdAt,
+        CreatedBy: &model.User{Username: uctx.Username},
+        Emitterid: emitterid,
+        Emitter: &model.Node{Nameid: emitterid},
+        Receiverid: receiverid,
+        Receiver: &model.Node{Nameid: receiverid},
+        Type: model.TensionTypeOperational,
+        Status: model.TensionStatusOpen,
+        Title: "",
+        Comments:[]*model.Comment{
+            &model.Comment{
+                CreatedAt: createdAt,
+                CreatedBy: &model.User{Username: uctx.Username},
+                Message: "",
+            },
+        },
+        History:[]*model.Event{&ev},
+        Subscribers:[]*model.User{&model.User{Username: uctx.Username}},
+    }
+
+    // Verify author can create tension
+    ok, _, err := graph.ProcessEvent(uctx, &tension, &event, nil, nil, true, false)
+    if !ok || err != nil {
+        http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 500); return
+    }
+
+    // Create tension
+    var tensionInput  model.AddTensionInput
+    tools.StructMap(tension, &tensionInput)
+    if _, err = db.GetDB().Add(*uctx, "tension", tensionInput); err != nil {
+        http.Error(w, err.Error(), 400); return
     }
 
 }
