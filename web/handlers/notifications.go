@@ -203,12 +203,12 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
         Receiver: &model.Node{Nameid: receiverid},
         Type: model.TensionTypeOperational,
         Status: model.TensionStatusOpen,
-        Title: "",
+        Title: form.Title,
         Comments:[]*model.Comment{
             &model.Comment{
                 CreatedAt: createdAt,
                 CreatedBy: &model.User{Username: uctx.Username},
-                Message: "",
+                Message: form.Msg,
             },
         },
         History:[]*model.Event{&ev},
