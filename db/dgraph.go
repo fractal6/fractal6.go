@@ -31,6 +31,9 @@ import (
 var dgraphPrivateKey *rsa.PrivateKey
 var dgraphPublicKey *rsa.PublicKey
 var buildMode string
+var DOMAIN string
+// Database client
+var DB *Dgraph
 
 // Draph database clients
 type Dgraph struct {
@@ -111,11 +114,9 @@ func (q QueryString) Format(maps map[string]string) string {
 // Initialization
 //
 
-// Database client
-var DB *Dgraph
-
 func init () {
     InitViper()
+    DOMAIN = viper.GetString("server.domain")
     // Get env mode
     if buildMode != "PROD" {
         buildMode = "DEV"
@@ -160,7 +161,7 @@ func GetDB() *Dgraph {
 }
 
 func initDB() *Dgraph {
-    HOSTDB := viper.GetString("db.host")
+    HOSTDB := viper.GetString("db.hostname")
     PORTDB := viper.GetString("db.port_graphql")
     PORTGRPC := viper.GetString("db.port_grpc")
     APIDB := viper.GetString("db.api")
@@ -324,7 +325,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
         Ownids: ownids,
     }
     claims := map[string]interface{}{
-        "https://fractale.co/jwt/claims": dgClaims,
+        "https://"+DOMAIN+"/jwt/claims": dgClaims,
     }
     jwtauth.SetIssuedNow(claims)
     jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))

@@ -2,12 +2,14 @@
 
 Business-logic layer, API, backend for [Fractale](https;//fractale.co).
 
-The Fractal6 data structures are defined in the **Fractal6 schema**, used as the single source of truth for GraphQL data relations and queries, located in the separate repository (https://code.skusku.site/fractal6/fractal6-schema/-/tree/master/graphql). See the [generate files](#generate-files) section to see how to re-generate code.
+The Fractal6 data structures are defined in the **Fractal6 schema** and represent the single source of truth for GraphQL data relations and queries.
+It is located in the separate repository (https://code.skusku.site/fractal6/fractal6-schema/-/tree/master/graphql).
+See the [Generate files](#generate-files) section to see how to re-generate code.
 
 
 ## Install and run databases
 
-#### Dgraph
+#### 1) DB - Dgraph
 
 The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and query data.
 
@@ -17,37 +19,47 @@ The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and q
     ./bin/dgraph zero --config config-zero.yml
     # Open a new terminal and run
     ./bin/dgraph alpha --config config-alpha.yml
-    # Setup Dgraph with the GQL schema
+    # Populate the schema
     make send_schema
+    cd -
 
 
-#### Redis
+#### 2) KV Cache - Redis
 
 Redis is used as a KV cache store.
 
     sudo apt-get install redis
     sudo systemctl restart redis-server  # or "systemctl restart redis" depending on your version
 
+## Install client
+
+Copy the client code to the `public/` folder:
+
+    make install_client
 
 ## Configure
 
-The server need a `config.toml` config file to run (in the project's root folder).
+The server need a `config.toml` config file to run (in the project's root folder, i.e `fractal6.go/`).
 You can use the following template:
 
-```
+```config.toml
 [server]
-host = "localhost"
+instance_name = "Fractale"
+domain = "fractale.co"
+hostname = "localhost"
 port = "8888"
+jwt_secret = "my_jwt_secret"
 prometheus_instrumentation = true
-prometheus_credentials = "my_secret"
+prometheus_credentials = "my_prom_secret"
 client_version = "git hash used to build the client"
+
+[emailing]
 maintainer_email = "admin@mydomain.com"
-jwt_secret = "my_secret"
 email_api_url = "url_api_email"
 email_api_key = "url_api_key"
 
 [db]
-host = "localhost"
+hostname = "localhost"
 port_graphql = "8080"
 port_grpc = "9080"
 api = "graphql"
@@ -61,10 +73,18 @@ introspection = false
 ```
 
 
-You can generate the key pairs for dgraph as follows
+Finally, generate the certificate for dgraph authorization, and populate the schema:
 
-    openssl genrsa -out private.pem 2048
-    openssl rsa -in private.pem -pubout -out public.pem
+    # Generate certs
+    make certs
+
+	# Copy public key for the Dgraph authorization in the schema
+    sed -i '$ d' fractal6-db/schema/schema_in.graphql
+	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read my; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> fractal6-db/schema/schema_in.graphql
+    
+    # Setup Dgraph with the GQL schema
+    cd fractal6-db/
+    make send_schema
 
 
 ## Launch for dev
@@ -90,7 +110,7 @@ Open a second terminal and run (message passing that manage event notifications)
     ./bin/fractal6 notifier
 
 
-## Generate files
+## (Re)Generate files
 
 Generate the gqlgen server:
 
@@ -100,7 +120,7 @@ Generate the gqlgen server as well as complete schema completed by Dgraph types 
 
     make genall
 
-Note: Warning, it depends on files located in the separated repository `schema` who contains all the graphql schemas.
+Note: Warning, it depends on files located in the separated repository `fractal6-schema` who contains all the graphql schemas.
 
 
 ## Environment variable (deprecated)

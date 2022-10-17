@@ -99,11 +99,11 @@ install:
 	sudo apt-get install redis
 
 
-rsa:
+certs:
 	# Dgraph Authorization
-	#ssh-keygen -t rsa -P "" -b 2048 -m PEM -f jwtRS256.key
-	#ssh-keygen -e -m PEM -f jwtRS256.key > jwtRS256.key.pub
+	#ssh-keygen -t rsa -P "" -b 2048 -m PEM -f private.pem
+	#ssh-keygen -e -m PEM -f jwtRS256.key > public.pem
 	openssl genrsa -out private.pem 2048
 	openssl rsa -in private.pem -pubout -out public.pem
-	# Copy public key to the Dgraph authorization object
-	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" |  xclip -selection clipboard;
+	# Copy public key for the Dgraph authorization in the schema
+	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 |  xclip -selection clipboard;

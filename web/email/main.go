@@ -27,10 +27,11 @@ var md goldmark.Markdown = goldmark.New(
 var emailSecret string
 var emailUrl string
 var maintainerEmail string
+var DOMAIN string
 
 func init() {
-    emailUrl = viper.GetString("server.email_api_url")
-    emailSecret = viper.GetString("server.email_api_key")
+    emailUrl = viper.GetString("emailing.email_api_url")
+    emailSecret = viper.GetString("emailing.email_api_key")
     if emailUrl == "" {
         emailUrl = os.Getenv("EMAIL_API_URL")
     }
@@ -41,7 +42,8 @@ func init() {
         fmt.Println("EMAIL_API_URL/KEY not found. email notifications disabled.")
     }
 
-    maintainerEmail = viper.GetString("server.maintainer_email")
+    DOMAIN = viper.GetString("server.domain")
+    maintainerEmail = viper.GetString("emailing.maintainer_email")
 }
 
 // Send an email with a http request to the email server API to the admin email.
@@ -49,7 +51,7 @@ func SendMaintainerEmail(subject, body string) error {
     if maintainerEmail == "" { return nil }
 
     body = fmt.Sprintf(`{
-        "from": "%s <alert@fractale.co>",
+        "from": "%s <alert@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "%s",
         "plain_body": "%s"
@@ -75,7 +77,7 @@ func SendMaintainerEmail(subject, body string) error {
 
 // Send an verification email for signup
 func SendVerificationEmail(email, token string) error {
-    url_redirect := fmt.Sprintf("https://fractale.co/verification?email_token=%s", token)
+    url_redirect := fmt.Sprintf("https://"+DOMAIN+"/verification?email_token=%s", token)
 
     content := fmt.Sprintf(`<html>
 	<head>
@@ -83,7 +85,7 @@ func SendVerificationEmail(email, token string) error {
 	<meta charset="utf-8">
 	</head>
 	<body>
-	<p>To activate your account at <b>fractale.co</b>, click the link below (valid one hour):</p>
+	<p>To activate your account at <b>`+DOMAIN+`</b>, click the link below (valid one hour):</p>
 	<a href="%s">%s</a>
 	<br><br>—<br>
 	<small>If you are not at the origin of this request, please ignore this mail.</small>
@@ -91,9 +93,9 @@ func SendVerificationEmail(email, token string) error {
     </html>`, url_redirect, url_redirect)
 
     body := fmt.Sprintf(`{
-        "from": "Fractale <noreply@fractale.co>",
+        "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
-        "subject": "Activate your account at fractale.co",
+        "subject": "Activate your account at `+DOMAIN+`",
         "html_body": "%s"
     }`, email, tools.CleanString(content, true))
 
@@ -113,7 +115,7 @@ func SendVerificationEmail(email, token string) error {
 
 // Send an email to reset a user password
 func SendResetEmail(email, token string) error {
-    url_redirect := fmt.Sprintf("https://fractale.co/password-reset?x=%s", token)
+    url_redirect := fmt.Sprintf("https://"+DOMAIN+"/password-reset?x=%s", token)
 
     content := fmt.Sprintf(`<html>
 	<head>
@@ -122,7 +124,7 @@ func SendResetEmail(email, token string) error {
 	</head>
 	<body>
 	<h2>Forgot your password?</h2>
-	<p>To reset your password at <b>fractale.co</b>, click the link below (valid one hour):</p>
+	<p>To reset your password at <b>`+DOMAIN+`</b>, click the link below (valid one hour):</p>
 	<a href="%s">%s</a>
 	<br><br>—<br>
 	<small>If you are not at the origin of this request, please ignore this mail.</small>
@@ -130,9 +132,9 @@ func SendResetEmail(email, token string) error {
     </html>`, url_redirect, url_redirect)
 
     body := fmt.Sprintf(`{
-        "from": "Fractale <noreply@fractale.co>",
+        "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
-        "subject": "Reset your password at fractale.co",
+        "subject": "Reset your password at `+DOMAIN+`",
         "html_body": "%s"
     }`, email, tools.CleanString(content, true))
 
@@ -183,8 +185,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     }
 
     // Redirect Url
-    url_unsubscribe := fmt.Sprintf("https://fractale.co/tension//%s?unsubscribe=email", notif.Tid)
-    url_redirect = fmt.Sprintf("https://fractale.co/tension//%s", notif.Tid)
+    url_unsubscribe := fmt.Sprintf("https://"+DOMAIN+"/tension//%s?unsubscribe=email", notif.Tid)
+    url_redirect = fmt.Sprintf("https://"+DOMAIN+"/tension//%s", notif.Tid)
     vars := []string{}
     if ui.Eid != "" {
         // Eid var is used to mark the event as read from the client.
@@ -298,13 +300,13 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     </html>`, payload)
 
     body = fmt.Sprintf(`{
-        "from": "%s <notifications@fractale.co>",
+        "from": "%s <notifications@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "%s",
         "html_body": "%s",
         "headers": {
-            "In-Reply-To": "<tension/%s@fractale.co>",
-            "References": "<tension/%s@fractale.co>",
+            "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
+            "References": "<tension/%s@`+DOMAIN+`>",
             "List-Unsubscribe": "<%s>"
         }
     }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid, url_unsubscribe)
@@ -361,8 +363,8 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         author = "@" + notif.Uctx.Username
     }
 
-    url_unsubscribe := fmt.Sprintf("https://fractale.co/user/%s/settings?m=email", ui.User.Username)
-    url_redirect = fmt.Sprintf("https://fractale.co/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
+    url_unsubscribe := fmt.Sprintf("https://"+DOMAIN+"/user/%s/settings?m=email", ui.User.Username)
+    url_redirect = fmt.Sprintf("https://"+DOMAIN+"/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
     vars := []string{}
     if ui.IsPending {
         // Puid var is used to identify the pending users from client.
@@ -382,7 +384,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         case model.ContractStatusOpen:
             if ui.Reason == model.ReasonIsInvited {
                 subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
-                payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited in the organisation <a style="color:#002e62;" href="https://fractale.co/o/%s">%s</a> by %s.<br><br>
+                payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited in the organisation <a style="color:#002e62;" href="https://`+DOMAIN+`/o/%s">%s</a> by %s.<br><br>
                 You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, recv, recv, author, url_redirect, url_redirect)
             } else if ui.Reason == model.ReasonIsLinkCandidate {
                 subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
@@ -455,13 +457,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     </html>`, payload)
 
     body = fmt.Sprintf(`{
-        "from": "%s <notifications@fractale.co>",
+        "from": "%s <notifications@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "%s",
         "html_body": "%s",
         "headers": {
-            "In-Reply-To": "<contract/%s@fractale.co>",
-            "References": "<contract/%s@fractale.co>"
+            "In-Reply-To": "<contract/%s@`+DOMAIN+`>",
+            "References": "<contract/%s@`+DOMAIN+`>"
         }
     }`, author, email, subject, tools.CleanString(content, true), notif.Contract.ID, notif.Contract.ID)
 

@@ -33,7 +33,8 @@ func init() {
 
 // RunServer launch the server
 func RunServer() {
-    HOST := viper.GetString("server.host")
+    DOMAIN := viper.GetString("server.domain")
+    HOST := viper.GetString("server.hostname")
     PORT := viper.GetString("server.port")
     gqlConfig := viper.GetStringMap("graphql")
     instrumentation := viper.GetBool("server.prometheus_instrumentation")
@@ -42,7 +43,7 @@ func RunServer() {
 
     var allowedOrigins []string
     if buildMode == "PROD" {
-        allowedOrigins = append(allowedOrigins, "https://fractale.co", "https://api.fractale.co")
+        allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN)
     } else {
         allowedOrigins = append(allowedOrigins, "http://localhost:8000")
     }
