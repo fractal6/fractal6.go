@@ -5,6 +5,7 @@ import (
     "net/http"
     "encoding/json"
     "strings"
+	"io/ioutil"
 	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
@@ -164,6 +165,8 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     // Validate WebHook identity
     xp := r.Header.Get("X-Postal-Signature")
     fmt.Println("X-Postal-Sign", xp)
+    body, _ := ioutil.ReadAll(r.Body)
+    fmt.Println(body)
 
     if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
         http.Error(w, err.Error(), 400); return
