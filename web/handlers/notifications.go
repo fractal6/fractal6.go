@@ -67,7 +67,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
     // Get author
     uctx, err := db.GetDB().GetUctx("email", form.From)
-	if err != nil { http.Error(w, err.Error(), 500); return }
+	if err != nil { http.Error(w, err.Error(), 400); return }
     createdAt := tools.Now()
     createdBy := model.UserRef{Username: &uctx.Username}
 
@@ -122,7 +122,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
         }
         // Check  event
         ok, err := graph.HasContractRight(uctx, contract)
-        if err != nil { http.Error(w, err.Error(), 500); return }
+        if err != nil { http.Error(w, err.Error(), 400); return }
         if !ok {
             // Check if user is candidate
             for _, c := range contract.Candidates {
@@ -173,17 +173,17 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     // Get author
     uctx, err := db.GetDB().GetUctx("email", form.From)
 	if err != nil {
-        http.Error(w, "You need an account on Fractale to send email to organisation, please visit https://fractale.co \n\n" + err.Error(), 500)
+        http.Error(w, "You need an account on Fractale to send email to organisation, please visit https://fractale.co \n\n" + err.Error(), 400)
         return
     }
     createdAt := tools.Now()
     createdBy := model.UserRef{Username: &uctx.Username}
 
     // Get the nameid of the targeted circle
-    receiverid := form.To
+    receiverid := strings.Split(form.To, "@")[0]
     filter := `eq(Node.isArchived, false)`
     if ex, _ := db.GetDB().Exists("Node.nameid", receiverid, &filter); !ex {
-        http.Error(w, "NAMEID NOT FOUND", 500); return
+        http.Error(w, "NAMEID NOT FOUND", 400); return
     }
 
     // Build the tension
@@ -221,7 +221,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     // Verify author can create tension
     ok, _, err := graph.ProcessEvent(uctx, &tension, &event, nil, nil, true, false)
     if !ok || err != nil {
-        http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 500); return
+        http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400); return
     }
 
     // Create tension
