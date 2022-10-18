@@ -102,10 +102,6 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
             Tid: isTid,
             History: history,
         }
-        // Push event in tension event history
-        if err := graph.PushHistory(&notif); err != nil {
-            http.Error(w, "PushHistory error: " + err.Error(), 500); return
-        }
         // Push notification
         if err := graph.PushEventNotifications(notif); err != nil {
             http.Error(w, "PushEventNotifications error: " + err.Error(), 500); return
@@ -187,17 +183,14 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     }
 
     // Build the tension
-    et := model.TensionEventCreated
+    e := model.TensionEventCreated
     rootnameid, _ := codec.Nid2rootid(receiverid)
     emitterid := codec.MemberIdCodec(rootnameid, uctx.Username)
     event := model.Event{
         CreatedAt: createdAt,
         CreatedBy: &createdBy,
-        EventType: et,
+        EventType: e,
     }
-    history := []*model.Event{&event}
-    var eventRef model.EventRef
-    tools.StructMap(event, &eventRef)
     tension := model.Tension{
         CreatedAt: createdAt,
         CreatedBy: &model.User{Username: uctx.Username},
@@ -215,11 +208,12 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
                 Message: form.Msg,
             },
         },
-        History: history,
         Subscribers: []*model.User{&model.User{Username: uctx.Username}},
     }
 
     // Verify author can create tension
+    var eventRef model.EventRef
+    tools.StructMap(event, &eventRef)
     ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, nil, true, false)
     if !ok || err != nil {
         http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400); return
@@ -239,10 +233,6 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
         Uctx: uctx,
         Tid: tid,
         History: []*model.EventRef{&eventRef},
-    }
-    // Push event in tension event history
-    if err := graph.PushHistory(&notif); err != nil {
-        http.Error(w, "PushHistory error: " + err.Error(), 500); return
     }
     // Push notification
     if err := graph.PushEventNotifications(notif); err != nil {
