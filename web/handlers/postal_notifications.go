@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    "fmt"
     "net/http"
     "encoding/json"
     "strings"
@@ -36,13 +37,12 @@ type EmailForm struct {
     //Attachments []string    `json:"attachments"`
 }
 
-// Handle email responses. Receiving email response from email notifications.
+// Handle user email responses. Receiving email response from email notifications.
 func Notifications(w http.ResponseWriter, r *http.Request) {
-    // Temporary solution while Postal can't be identify
-    //if ip, _, err := net.SplitHostPort(r.RemoteAddr);
-    //err != nil || (ip != "5.196.4.6" && ip != "2001:41d0:401:3200::3be6") {
-    //    http.Error(w, "IP NOT AUTHORIZED", 400); return
-    //}
+    // Validate WebHook identity
+    if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
 
     // Get request form
     var form EmailForm
@@ -79,11 +79,6 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
             CreatedBy: &createdBy,
             EventType: &e,
         }}
-        notif := model.EventNotif{
-            Uctx: uctx,
-            Tid: isTid,
-            History: history,
-        }
         // Check event
         ok, _, err := graph.TensionEventHook(uctx, isTid, history, nil)
         if err != nil { http.Error(w, err.Error(), 500); return }
@@ -102,6 +97,11 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
         // Publish Notification
         // --
+        notif := model.EventNotif{
+            Uctx: uctx,
+            Tid: isTid,
+            History: history,
+        }
         // Push event in tension event history
         if err := graph.PushHistory(&notif); err != nil {
             http.Error(w, "PushHistory error: " + err.Error(), 500); return
@@ -114,12 +114,6 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
         // Build Event
         contract, err := db.GetDB().GetContractHook(isCid)
         if err != nil { http.Error(w, err.Error(), 500); return }
-        notif := model.ContractNotif{
-            Uctx: uctx,
-            Tid: contract.Tension.ID,
-            Contract: contract,
-            ContractEvent: model.NewComment,
-        }
         // Check  event
         ok, err := graph.HasContractRight(uctx, contract)
         if err != nil { http.Error(w, err.Error(), 400); return }
@@ -147,6 +141,12 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
         // Publish Notification
         // --
+        notif := model.ContractNotif{
+            Uctx: uctx,
+            Tid: contract.Tension.ID,
+            Contract: contract,
+            ContractEvent: model.NewComment,
+        }
         // Push notification
         if err := graph.PushContractNotifications(notif); err != nil {
             http.Error(w, "PushContractNotification error: " + err.Error(), 500); return
@@ -177,7 +177,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
         return
     }
     createdAt := tools.Now()
-    createdBy := model.UserRef{Username: &uctx.Username}
+    createdBy := model.User{Username: uctx.Username}
 
     // Get the nameid of the targeted circle
     receiverid := strings.Split(form.To, "@")[0]
@@ -190,13 +190,14 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     et := model.TensionEventCreated
     rootnameid, _ := codec.Nid2rootid(receiverid)
     emitterid := codec.MemberIdCodec(rootnameid, uctx.Username)
-    event := model.EventRef{
-        CreatedAt: &createdAt,
+    event := model.Event{
+        CreatedAt: createdAt,
         CreatedBy: &createdBy,
-        EventType: &et,
+        EventType: et,
     }
-    var ev model.Event
-    tools.StructMap(event, &ev)
+    history := []*model.Event{&event}
+    var eventRef model.EventRef
+    tools.StructMap(event, &eventRef)
     tension := model.Tension{
         CreatedAt: createdAt,
         CreatedBy: &model.User{Username: uctx.Username},
@@ -207,19 +208,19 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
         Type: model.TensionTypeOperational,
         Status: model.TensionStatusOpen,
         Title: form.Title,
-        Comments:[]*model.Comment{
+        Comments: []*model.Comment{
             &model.Comment{
                 CreatedAt: createdAt,
-                CreatedBy: &model.User{Username: uctx.Username},
+                CreatedBy: &createdBy,
                 Message: form.Msg,
             },
         },
-        History:[]*model.Event{&ev},
-        Subscribers:[]*model.User{&model.User{Username: uctx.Username}},
+        History: history,
+        Subscribers: []*model.User{&model.User{Username: uctx.Username}},
     }
 
     // Verify author can create tension
-    ok, _, err := graph.ProcessEvent(uctx, &tension, &event, nil, nil, true, false)
+    ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, nil, true, false)
     if !ok || err != nil {
         http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400); return
     }
@@ -227,8 +228,47 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     // Create tension
     var tensionInput  model.AddTensionInput
     tools.StructMap(tension, &tensionInput)
-    if _, err = db.GetDB().Add(*uctx, "tension", tensionInput); err != nil {
+    tid, err := db.GetDB().Add(*uctx, "tension", tensionInput)
+    if err != nil {
         http.Error(w, err.Error(), 400); return
     }
+
+    // Publish Notification
+    // --
+    notif := model.EventNotif{
+        Uctx: uctx,
+        Tid: tid,
+        History: []*model.EventRef{&eventRef},
+    }
+    // Push event in tension event history
+    if err := graph.PushHistory(&notif); err != nil {
+        http.Error(w, "PushHistory error: " + err.Error(), 500); return
+    }
+    // Push notification
+    if err := graph.PushEventNotifications(notif); err != nil {
+        http.Error(w, "PushEventNotifications error: " + err.Error(), 500); return
+    }
+
+}
+
+// Handle Postal WebHook - redirect it a matrix channel
+func PostalWebhook(w http.ResponseWriter, r *http.Request) {
+    // Validate WebHook identity
+    if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
+
+    // Get request form
+    var form EmailForm
+    err := json.NewDecoder(r.Body).Decode(&form)
+	if err != nil { http.Error(w, err.Error(), 500); return }
+
+    fmt.Println(
+        fmt.Sprintf("Got mailing mail from: %s to: %s ", form.From, form.To),
+        fmt.Sprintf("title: %s", form.Title),
+        fmt.Sprintf("message: %s", form.Msg),
+    )
+
+    http.Error(w, "not implemented", 400); return
 
 }
