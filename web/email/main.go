@@ -69,7 +69,7 @@ func SendMaintainerEmail(subject, body string) error {
     if err != nil { return err }
     defer resp.Body.Close()
     if resp.StatusCode != 200 {
-        return fmt.Errorf("http error, see body. (code %s)", resp.Status)
+        return fmt.Errorf("http postal error, see body. (code %s)", resp.Status)
     }
 
     return nil
@@ -323,7 +323,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     if err != nil { return err }
     defer resp.Body.Close()
     if resp.StatusCode != 200 {
-        return fmt.Errorf("http error, see body. (code %s)", resp.Status)
+        return fmt.Errorf("http postal error, see body. (code %s)", resp.Status)
     }
 
     return nil
@@ -478,7 +478,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     if err != nil { return err }
     defer resp.Body.Close()
     if resp.StatusCode != 200 {
-        return fmt.Errorf("http error, see body. (code %s)", resp.Status)
+        return fmt.Errorf("http postal error, see body. (code %s)", resp.Status)
     }
 
     return nil

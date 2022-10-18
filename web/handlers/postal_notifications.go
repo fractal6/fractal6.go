@@ -1,9 +1,8 @@
 package handlers
 
 import (
-    "fmt"
+    //"fmt"
     "strings"
-    "bytes"
 	"io/ioutil"
     "net/http"
     "encoding/json"
@@ -247,7 +246,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Handle Postal WebHook - redirect it a matrix channel
+// Handle Postal WebHook - redirect it to a matrix channel
 func PostalWebhook(w http.ResponseWriter, r *http.Request) {
     // Validate WebHook identity
     if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
@@ -260,21 +259,8 @@ func PostalWebhook(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 400); return
     }
 
-    data, err := tools.PrettyString(string(body))
+    err = tools.MatrixJsonSend(string(body), matrixPostalRoom, matrixToken)
     if err != nil {
         http.Error(w, err.Error(), 400); return
     }
-
-    data = fmt.Sprintf(`{"msgtype":"m.text","body":"%s"}`,"```json\n" + tools.QuoteString(data) + "\n```")
-    matrix_url := fmt.Sprintf("https://matrix.org/_matrix/client/r0/rooms/%s/send/m.room.message/?access_token=%s", matrixPostalRoom, matrixToken)
-    req, err := http.NewRequest("PUT", matrix_url, bytes.NewBuffer([]byte(data)))
-    if err != nil {
-        http.Error(w, err.Error(), 400); return
-    }
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        http.Error(w, err.Error(), 400); return
-    }
-    defer resp.Body.Close()
 }

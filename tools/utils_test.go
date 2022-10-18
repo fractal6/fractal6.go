@@ -1,9 +1,9 @@
 package tools
 
 import (
-	"fractale/fractal6.go/graph/model"
-	"reflect"
 	"testing"
+	"reflect"
+	"fractale/fractal6.go/graph/model"
 )
 
 func TestStructMap(t *testing.T) {
