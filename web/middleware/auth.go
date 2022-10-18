@@ -74,7 +74,6 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
 
         // Keep this to reset the body reader later
         body, _ := ioutil.ReadAll(r.Body)
-
         // reset the body reader
         r.Body = ioutil.NopCloser(bytes.NewReader(body))
         // Get the JSON body and decode it
@@ -84,8 +83,8 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
             http.Error(w, err.Error(), 400)
             return
         }
-        // reset the body reader agin
-        r.Body = ioutil.NopCloser(bytes.NewReader(body))
+        // Restore the io.ReadCloser to its original state
+        r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
         // Authentification tasks...
         // to be completed, rewrite body !?

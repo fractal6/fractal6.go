@@ -1,6 +1,7 @@
 package tools
 
 import (
+    "bytes"
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -85,6 +86,8 @@ func ValidatePostalSignature(r *http.Request, pk string) error {
     body, err := ioutil.ReadAll(r.Body)
     if err != nil { return err }
     hash := sha1.Sum(body)
+    // Restore the io.ReadCloser to its original state
+    r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
     err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hash[:], signature)
     return err
