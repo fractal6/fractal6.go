@@ -2,9 +2,11 @@ package handlers
 
 import (
     "fmt"
+    "strings"
+    "bytes"
+	"io/ioutil"
     "net/http"
     "encoding/json"
-    "strings"
 	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
@@ -22,9 +24,13 @@ import (
  */
 
 var postalWebhookPK string
+var matrixPostalRoom string
+var matrixToken string
 
 func init() {
     postalWebhookPK = viper.GetString("emailing.dkim_key")
+    matrixPostalRoom = viper.GetString("emailing.matrix_postal_room")
+    matrixToken = viper.GetString("emailing.matrix_token")
 }
 
 type EmailForm struct {
@@ -248,17 +254,25 @@ func PostalWebhook(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 400); return
     }
 
-    // Get request form
-    var form EmailForm
-    err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil { http.Error(w, err.Error(), 500); return }
+    // Get request string
+    body, err := ioutil.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
 
     fmt.Println(
-        fmt.Sprintf("Got mailing mail from: %s to: %s ", form.From, form.To),
-        fmt.Sprintf("title: %s", form.Title),
-        fmt.Sprintf("message: %s", form.Msg),
+        fmt.Sprintf("body: %s", body ),
     )
 
-    http.Error(w, "not implemented", 400); return
-
+    matrix_url := fmt.Sprintf("https://matrix.org/_matrix/client/r0/rooms/%s/send/m.room.message/?access_token=%s", matrixPostalRoom, matrixToken)
+    req, err := http.NewRequest("PUT", matrix_url, bytes.NewBuffer(body))
+    if err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
+    defer resp.Body.Close()
 }
