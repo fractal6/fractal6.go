@@ -1,15 +1,17 @@
 package tools
 
 import (
-    "net/http"
-    "io/ioutil"
-    "encoding/base64"
-    "encoding/pem"
-    "crypto"
-    "crypto/rsa"
-    "crypto/x509"
-    "crypto/sha1"
-    "golang.org/x/crypto/bcrypt"
+	"crypto"
+	"crypto/rsa"
+	"crypto/sha1"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/pem"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 //
@@ -43,15 +45,24 @@ func VerifyPassword(hash string, password string) bool {
 func ParseRsaPrivate(key string) *rsa.PrivateKey {
     block, _ := pem.Decode([]byte(key))
     if block == nil { panic("failed to parse PEM block for private key.") }
-    key_priv, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
+    key_priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+    if err != nil { panic(err.Error()) }
     return key_priv
 }
 
-func ParseRsaPublic(key string) *rsa.PublicKey {
+func ParseRsaPublic(key string) (key_pub *rsa.PublicKey) {
+    var err error
     block, _ := pem.Decode([]byte(key))
     if block == nil { panic("failed to parse PEM block for public key") }
-    key_pub, _ := x509.ParsePKCS1PublicKey(block.Bytes)
-    return key_pub
+    if strings.HasPrefix(key, "-----BEGIN PUBLIC KEY") {
+        key_pub_, err := x509.ParsePKIXPublicKey(block.Bytes)
+        if err != nil { panic(err.Error()) }
+        key_pub = key_pub_.(*rsa.PublicKey)
+    } else {
+        key_pub, err = x509.ParsePKCS1PublicKey(block.Bytes)
+        if err != nil { panic(err.Error()) }
+    }
+    return
 }
 
 //
@@ -60,12 +71,10 @@ func ParseRsaPublic(key string) *rsa.PublicKey {
 // For Postal, see https://github.com/postalserver/postal/issues/432
 //
 
-func ValidatePostalSignature(r *http.Request) error {
-    postalWebhookPK := "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQClPnCZ+8y6rO/zvNwsKF4vYKnEU4urIAzeOfnn8DoADtUP91UhsGkWvlludEBIa9xWtI+tXptadf7MYVqwXxKfTdj4H2tQXGdHnvSxLAK6jDEYTNVmed2y6XXwCMql87JLoDOiYXl9BiIyNbmWZfGmzAO5pt1qQFO5+1m77VC4rwIDAQAB" // Just the p=... part of the TXT record (without the semicolon at the end)
-
+func ValidatePostalSignature(r *http.Request, pk string) error {
 	// convert postal public key to PEM (X.509) format
     publicKeyPem :=  "-----BEGIN PUBLIC KEY-----\r\n" +
-	ChunkSplit(postalWebhookPK, 64, "\r\n") +
+	ChunkSplit(pk, 64, "\r\n") +
 	"-----END PUBLIC KEY-----"
     publicKey := ParseRsaPublic(publicKeyPem)
 
@@ -77,7 +86,7 @@ func ValidatePostalSignature(r *http.Request) error {
     if err != nil { return err }
     hash := sha1.Sum(body)
 
-    err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hash[:], signature);
+    err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hash[:], signature)
     return err
 }
 

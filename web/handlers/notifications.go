@@ -5,6 +5,7 @@ import (
     "net/http"
     "encoding/json"
     "strings"
+	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
     "fractale/fractal6.go/graph"
@@ -19,6 +20,12 @@ import (
  * This code manage receiving email as HTTP requests from the MTA
  *
  */
+
+var postalWebhookPK string
+
+func init() {
+    postalWebhookPK = viper.GetString("emailing.dkim_key")
+}
 
 type EmailForm struct {
     From string            `json:"mail_from"`
@@ -152,12 +159,13 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Handle eemail sent to orga. Convert email to tension.
+// Handle email sent to orga. Convert email to tension.
 func Mailing(w http.ResponseWriter, r *http.Request) {
     // Validate WebHook identity
     xp := r.Header.Get("X-Postal-Signature")
     fmt.Println("X-Postal-Sign", xp)
-    if err := tools.ValidatePostalSignature(r); err != nil {
+
+    if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
         http.Error(w, err.Error(), 400); return
     }
 
