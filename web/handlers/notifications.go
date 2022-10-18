@@ -170,18 +170,21 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
         fmt.Sprintf("Got mailing mail from: %s to: %s ", form.From, form.To),
     )
 
+    // Get author
+    uctx, err := db.GetDB().GetUctx("email", form.From)
+	if err != nil {
+        http.Error(w, "You need an account on Fractale to send email to organisation, please visit https://fractale.co \n\n" + err.Error(), 500)
+        return
+    }
+    createdAt := tools.Now()
+    createdBy := model.UserRef{Username: &uctx.Username}
+
     // Get the nameid of the targeted circle
     receiverid := form.To
     filter := `eq(Node.isArchived, false)`
     if ex, _ := db.GetDB().Exists("Node.nameid", receiverid, &filter); !ex {
         http.Error(w, "NAMEID NOT FOUND", 500); return
     }
-
-    // Get author
-    uctx, err := db.GetDB().GetUctx("email", form.From)
-	if err != nil { http.Error(w, err.Error(), 500); return }
-    createdAt := tools.Now()
-    createdBy := model.UserRef{Username: &uctx.Username}
 
     // Build the tension
     et := model.TensionEventCreated
