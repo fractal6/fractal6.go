@@ -1,11 +1,9 @@
 package handlers
 
 import (
-    "fmt"
     "net/http"
     "encoding/json"
     "strings"
-	"io/ioutil"
 	"github.com/spf13/viper"
 
     "fractale/fractal6.go/db"
@@ -163,11 +161,6 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 // Handle email sent to orga. Convert email to tension.
 func Mailing(w http.ResponseWriter, r *http.Request) {
     // Validate WebHook identity
-    xp := r.Header.Get("X-Postal-Signature")
-    fmt.Println("X-Postal-Sign", xp)
-    body, _ := ioutil.ReadAll(r.Body)
-    fmt.Println(body)
-
     if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
         http.Error(w, err.Error(), 400); return
     }
@@ -176,10 +169,6 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     var form EmailForm
     err := json.NewDecoder(r.Body).Decode(&form)
 	if err != nil { http.Error(w, err.Error(), 500); return }
-
-    fmt.Println(
-        fmt.Sprintf("Got mailing mail from: %s to: %s ", form.From, form.To),
-    )
 
     // Get author
     uctx, err := db.GetDB().GetUctx("email", form.From)
