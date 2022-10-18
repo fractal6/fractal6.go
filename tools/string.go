@@ -7,6 +7,7 @@ import (
     "unicode"
     "regexp"
     "io/ioutil"
+	"encoding/json"
 	"unicode/utf8"
     "compress/gzip"
     "encoding/base64"
@@ -35,6 +36,14 @@ func QuoteString(data string) string {
     // remove surrounding quote !
     d = d[1:len(d)-1]
     return d
+}
+
+func PrettyString(str string) (string, error) {
+    var prettyJSON bytes.Buffer
+    if err := json.Indent(&prettyJSON, []byte(str), "", "    "); err != nil {
+        return "", err
+    }
+    return prettyJSON.String(), nil
 }
 
 func ToGoNameFormat(name string) string {

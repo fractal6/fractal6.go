@@ -260,12 +260,14 @@ func PostalWebhook(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), 400); return
     }
 
-    fmt.Println(
-        fmt.Sprintf("body: %s", body ),
-    )
+    data, err := tools.PrettyString(string(body))
+    if err != nil {
+        http.Error(w, err.Error(), 400); return
+    }
 
+    data = fmt.Sprintf(`{"msgtype":"m.text","body":"%s"}`,"```json\n" + tools.QuoteString(data) + "\n```")
     matrix_url := fmt.Sprintf("https://matrix.org/_matrix/client/r0/rooms/%s/send/m.room.message/?access_token=%s", matrixPostalRoom, matrixToken)
-    req, err := http.NewRequest("PUT", matrix_url, bytes.NewBuffer(body))
+    req, err := http.NewRequest("PUT", matrix_url, bytes.NewBuffer([]byte(data)))
     if err != nil {
         http.Error(w, err.Error(), 400); return
     }
