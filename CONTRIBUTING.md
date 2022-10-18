@@ -4,9 +4,8 @@ Please read this file before contributing.
 
 ### Git Branches
 
-- `master`: Tag tracking (see also [CHANGELOG.md](CHANGELOG.md)).
 - `dev`: The current development branch. Should only be merged via merge requests.
-- `release-*`: A Production release (no more features added).
+- `prod`: Tag tracking, production ready (see also [CHANGELOG.md](CHANGELOG.md)).
 - `hotfix/*`: A bug fix for production release.
 - `fix/*`: A fix an identified bug or issue.
 - `feat/*`: A new feature.
