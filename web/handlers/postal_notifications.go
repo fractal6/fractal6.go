@@ -181,7 +181,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     createdBy := model.User{Username: uctx.Username}
 
     // Get the nameid of the targeted circle
-    receiverid := strings.Split(form.To, "@")[0]
+    receiverid := strings.Replace(strings.Split(form.To, "@")[0], "/", "#", -1)
     filter := `eq(Node.isArchived, false)`
     if ex, _ := db.GetDB().Exists("Node.nameid", receiverid, &filter); !ex {
         http.Error(w, "NAMEID NOT FOUND", 400); return
