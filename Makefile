@@ -37,6 +37,9 @@ prod:
 vendor:
 	go mod vendor
 
+test:
+	go test ./...
+
 install_client: fetch_client
 	# Set the client version in config.toml
 	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml

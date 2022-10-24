@@ -101,7 +101,7 @@ type EventNotif struct {
     Tid string           `json:"tid"`
     History []*EventRef  `json:"history"`
     // The following are get after the cache publication
-    // to keep the messaging system as fast as possible.
+    // to keep the messaging system light and as fast as possible.
     Receiverid string    `json:"receiverid"`
     Title string         `json:"title"`
     Msg string           `json:"msg"`

@@ -94,6 +94,7 @@ type AddEventInput struct {
 	Message   *string      `json:"message,omitempty"`
 	Tension   *TensionRef  `json:"tension,omitempty"`
 	EventType TensionEvent `json:"event_type,omitempty"`
+	Mentioned *TensionRef  `json:"mentioned,omitempty"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
 }
@@ -267,6 +268,7 @@ type AddTensionInput struct {
 	Labels         []*LabelRef    `json:"labels,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
+	Mentions       []*EventRef    `json:"mentions,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
@@ -756,6 +758,7 @@ type DgraphDefault struct {
 type Event struct {
 	Tension   *Tension     `json:"tension,omitempty"`
 	EventType TensionEvent `json:"event_type,omitempty"`
+	Mentioned *Tension     `json:"mentioned,omitempty"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
 	ID        string       `json:"id,omitempty"`
@@ -898,6 +901,7 @@ type EventPatch struct {
 	Message   *string       `json:"message,omitempty"`
 	Tension   *TensionRef   `json:"tension,omitempty"`
 	EventType *TensionEvent `json:"event_type,omitempty"`
+	Mentioned *TensionRef   `json:"mentioned,omitempty"`
 	Old       *string       `json:"old,omitempty"`
 	New       *string       `json:"new,omitempty"`
 }
@@ -910,6 +914,7 @@ type EventRef struct {
 	Message   *string       `json:"message,omitempty"`
 	Tension   *TensionRef   `json:"tension,omitempty"`
 	EventType *TensionEvent `json:"event_type,omitempty"`
+	Mentioned *TensionRef   `json:"mentioned,omitempty"`
 	Old       *string       `json:"old,omitempty"`
 	New       *string       `json:"new,omitempty"`
 }
@@ -1753,6 +1758,7 @@ type Tension struct {
 	Labels               []*Label                 `json:"labels,omitempty"`
 	Blobs                []*Blob                  `json:"blobs,omitempty"`
 	History              []*Event                 `json:"history,omitempty"`
+	Mentions             []*Event                 `json:"mentions,omitempty"`
 	Contracts            []*Contract              `json:"contracts,omitempty"`
 	Subscribers          []*User                  `json:"subscribers,omitempty"`
 	NComments            *int                     `json:"n_comments"`
@@ -1767,6 +1773,7 @@ type Tension struct {
 	LabelsAggregate      *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
 	BlobsAggregate       *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
 	HistoryAggregate     *EventAggregateResult    `json:"historyAggregate,omitempty"`
+	MentionsAggregate    *EventAggregateResult    `json:"mentionsAggregate,omitempty"`
 	ContractsAggregate   *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 	SubscribersAggregate *UserAggregateResult     `json:"subscribersAggregate,omitempty"`
 }
@@ -1839,6 +1846,7 @@ type TensionPatch struct {
 	Labels         []*LabelRef    `json:"labels,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
+	Mentions       []*EventRef    `json:"mentions,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
@@ -1864,6 +1872,7 @@ type TensionRef struct {
 	Labels         []*LabelRef    `json:"labels,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
+	Mentions       []*EventRef    `json:"mentions,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
 	NComments      *int           `json:"n_comments"`
@@ -2900,6 +2909,45 @@ func (e DgraphIndex) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ErrorBla string
+
+const (
+	ErrorBlaContactCoordo ErrorBla = "ContactCoordo"
+)
+
+var AllErrorBla = []ErrorBla{
+	ErrorBlaContactCoordo,
+}
+
+func (e ErrorBla) IsValid() bool {
+	switch e {
+	case ErrorBlaContactCoordo:
+		return true
+	}
+	return false
+}
+
+func (e ErrorBla) String() string {
+	return string(e)
+}
+
+func (e *ErrorBla) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ErrorBla(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ErrorBla", str)
+	}
+	return nil
+}
+
+func (e ErrorBla) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type EventCountHasFilter string
 
 const (
@@ -3075,6 +3123,7 @@ const (
 	EventHasFilterMessage   EventHasFilter = "message"
 	EventHasFilterTension   EventHasFilter = "tension"
 	EventHasFilterEventType EventHasFilter = "event_type"
+	EventHasFilterMentioned EventHasFilter = "mentioned"
 	EventHasFilterOld       EventHasFilter = "old"
 	EventHasFilterNew       EventHasFilter = "new"
 )
@@ -3086,13 +3135,14 @@ var AllEventHasFilter = []EventHasFilter{
 	EventHasFilterMessage,
 	EventHasFilterTension,
 	EventHasFilterEventType,
+	EventHasFilterMentioned,
 	EventHasFilterOld,
 	EventHasFilterNew,
 }
 
 func (e EventHasFilter) IsValid() bool {
 	switch e {
-	case EventHasFilterCreatedBy, EventHasFilterCreatedAt, EventHasFilterUpdatedAt, EventHasFilterMessage, EventHasFilterTension, EventHasFilterEventType, EventHasFilterOld, EventHasFilterNew:
+	case EventHasFilterCreatedBy, EventHasFilterCreatedAt, EventHasFilterUpdatedAt, EventHasFilterMessage, EventHasFilterTension, EventHasFilterEventType, EventHasFilterMentioned, EventHasFilterOld, EventHasFilterNew:
 		return true
 	}
 	return false
@@ -4508,6 +4558,7 @@ const (
 	TensionEventLabelRemoved    TensionEvent = "LabelRemoved"
 	TensionEventBlobCreated     TensionEvent = "BlobCreated"
 	TensionEventBlobCommitted   TensionEvent = "BlobCommitted"
+	TensionEventMentioned       TensionEvent = "Mentioned"
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
@@ -4533,6 +4584,7 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventLabelRemoved,
 	TensionEventBlobCreated,
 	TensionEventBlobCommitted,
+	TensionEventMentioned,
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
@@ -4547,7 +4599,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
 		return true
 	}
 	return false
@@ -4594,6 +4646,7 @@ const (
 	TensionHasFilterLabels         TensionHasFilter = "labels"
 	TensionHasFilterBlobs          TensionHasFilter = "blobs"
 	TensionHasFilterHistory        TensionHasFilter = "history"
+	TensionHasFilterMentions       TensionHasFilter = "mentions"
 	TensionHasFilterContracts      TensionHasFilter = "contracts"
 	TensionHasFilterSubscribers    TensionHasFilter = "subscribers"
 	TensionHasFilterNComments      TensionHasFilter = "n_comments"
@@ -4618,6 +4671,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterLabels,
 	TensionHasFilterBlobs,
 	TensionHasFilterHistory,
+	TensionHasFilterMentions,
 	TensionHasFilterContracts,
 	TensionHasFilterSubscribers,
 	TensionHasFilterNComments,
@@ -4626,7 +4680,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false

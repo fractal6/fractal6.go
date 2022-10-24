@@ -15,6 +15,7 @@ type MatrixError struct {
 }
 
 // Send a JSON formatted string to a matrix room
+// @TODO: encryption: https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide
 func MatrixJsonSend(body, roomid, access_token string) error {
     // Pretiffy JSON string
     data, err := PrettyString(string(body))

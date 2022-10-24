@@ -439,6 +439,7 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int, filter *model.UserFilter) int
 		EventType func(childComplexity int) int
 		ID        func(childComplexity int) int
+		Mentioned func(childComplexity int, filter *model.TensionFilter) int
 		Message   func(childComplexity int) int
 		New       func(childComplexity int) int
 		Old       func(childComplexity int) int
@@ -909,6 +910,8 @@ type ComplexityRoot struct {
 		ID                   func(childComplexity int) int
 		Labels               func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		LabelsAggregate      func(childComplexity int, filter *model.LabelFilter) int
+		Mentions             func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		MentionsAggregate    func(childComplexity int, filter *model.EventFilter) int
 		Message              func(childComplexity int) int
 		NComments            func(childComplexity int) int
 		NOpenContracts       func(childComplexity int) int
@@ -2765,6 +2768,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Event.ID(childComplexity), true
+
+	case "Event.mentioned":
+		if e.complexity.Event.Mentioned == nil {
+			break
+		}
+
+		args, err := ec.field_Event_mentioned_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Event.Mentioned(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "Event.message":
 		if e.complexity.Event.Message == nil {
@@ -6286,6 +6301,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
 
+	case "Tension.mentions":
+		if e.complexity.Tension.Mentions == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_mentions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.Mentions(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Tension.mentionsAggregate":
+		if e.complexity.Tension.MentionsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_mentionsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.MentionsAggregate(childComplexity, args["filter"].(*model.EventFilter)), true
+
 	case "Tension.message":
 		if e.complexity.Tension.Message == nil {
 			break
@@ -8081,6 +8120,7 @@ type Tension {
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
+  mentions(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   subscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   n_comments: Int
@@ -8096,6 +8136,7 @@ type Tension {
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
+  mentionsAggregate(filter: EventFilter): EventAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
   subscribersAggregate(filter: UserFilter): UserAggregateResult
 }
@@ -8125,6 +8166,7 @@ type Blob {
 type Event {
   tension(filter: TensionFilter): Tension!
   event_type: TensionEvent!
+  mentioned(filter: TensionFilter): Tension
   old: String
   new: String
   id: ID!
@@ -8347,6 +8389,7 @@ enum TensionEvent {
   LabelRemoved
   BlobCreated
   BlobCommitted
+  Mentioned
 
   BlobPushed
   BlobArchived
@@ -8406,37 +8449,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @cascade(fields: [String]) on FIELD
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @lambda on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8520,6 +8563,7 @@ input AddEventInput {
   message: String
   tension: TensionRef! @x_add(r:"ref")
   event_type: TensionEvent!
+  mentioned: TensionRef @x_add(r:"ref")
   old: String
   new: String
 }
@@ -8693,6 +8737,7 @@ input AddTensionInput {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!]
+  mentions: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!]
   n_comments: Int
@@ -9215,6 +9260,10 @@ enum DgraphIndex {
   geo
 }
 
+enum ErrorBla {
+  ContactCoordo
+}
+
 type EventAggregateResult {
   count: Int
   createdAtMin: DateTime
@@ -9337,6 +9386,7 @@ enum EventHasFilter {
   message
   tension
   event_type
+  mentioned
   old
   new
 }
@@ -9381,6 +9431,7 @@ input EventPatch {
   message: String @x_patch_ro
   tension: TensionRef @x_patch_ro
   event_type: TensionEvent @x_patch_ro
+  mentioned: TensionRef @x_patch_ro
   old: String @x_patch_ro
   new: String @x_patch_ro
 }
@@ -9393,6 +9444,7 @@ input EventRef {
   message: String
   tension: TensionRef @x_add(r:"ref")
   event_type: TensionEvent
+  mentioned: TensionRef @x_add(r:"ref")
   old: String
   new: String
 }
@@ -10465,6 +10517,7 @@ enum TensionHasFilter {
   labels
   blobs
   history
+  mentions
   contracts
   subscribers
   n_comments
@@ -10506,6 +10559,7 @@ input TensionPatch {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
+  mentions: [EventRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
   subscribers: [UserRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
@@ -10531,6 +10585,7 @@ input TensionRef {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
+  mentions: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!]
   n_comments: Int
@@ -13692,6 +13747,21 @@ func (ec *executionContext) field_Event_createdBy_args(ctx context.Context, rawA
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Event_mentioned_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -17931,6 +18001,63 @@ func (ec *executionContext) field_Tension_labels_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Tension_mentionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Tension_mentions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EventFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.EventOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Tension_receiver_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -20028,6 +20155,8 @@ func (ec *executionContext) fieldContext_AddEventPayload_event(ctx context.Conte
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -21075,6 +21204,8 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -21103,6 +21234,8 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -21681,6 +21814,8 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -21709,6 +21844,8 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -23459,6 +23596,8 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -23487,6 +23626,8 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -25816,6 +25957,8 @@ func (ec *executionContext) fieldContext_DeleteEventPayload_event(ctx context.Co
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -27342,6 +27485,8 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -27370,6 +27515,8 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -28138,6 +28285,8 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -28166,6 +28315,8 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -28225,6 +28376,119 @@ func (ec *executionContext) fieldContext_Event_event_type(ctx context.Context, f
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type TensionEvent does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Event_mentioned(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Event_mentioned(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mentioned, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Event_mentioned(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Event",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "emitter":
+				return ec.fieldContext_Tension_emitter(ctx, field)
+			case "emitterid":
+				return ec.fieldContext_Tension_emitterid(ctx, field)
+			case "receiver":
+				return ec.fieldContext_Tension_receiver(ctx, field)
+			case "receiverid":
+				return ec.fieldContext_Tension_receiverid(ctx, field)
+			case "title":
+				return ec.fieldContext_Tension_title(ctx, field)
+			case "type_":
+				return ec.fieldContext_Tension_type_(ctx, field)
+			case "status":
+				return ec.fieldContext_Tension_status(ctx, field)
+			case "action":
+				return ec.fieldContext_Tension_action(ctx, field)
+			case "comments":
+				return ec.fieldContext_Tension_comments(ctx, field)
+			case "assignees":
+				return ec.fieldContext_Tension_assignees(ctx, field)
+			case "labels":
+				return ec.fieldContext_Tension_labels(ctx, field)
+			case "blobs":
+				return ec.fieldContext_Tension_blobs(ctx, field)
+			case "history":
+				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Tension_contracts(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_Tension_subscribers(ctx, field)
+			case "n_comments":
+				return ec.fieldContext_Tension_n_comments(ctx, field)
+			case "n_open_contracts":
+				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
+			case "id":
+				return ec.fieldContext_Tension_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Tension_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Tension_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Tension_updatedAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Tension_message(ctx, field)
+			case "commentsAggregate":
+				return ec.fieldContext_Tension_commentsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_Tension_assigneesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Tension_labelsAggregate(ctx, field)
+			case "blobsAggregate":
+				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
+			case "historyAggregate":
+				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
+			case "subscribersAggregate":
+				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Event_mentioned_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -29980,6 +30244,8 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -30008,6 +30274,8 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -35616,6 +35884,8 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -35644,6 +35914,8 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -35725,6 +35997,8 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -35753,6 +36027,8 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -37207,6 +37483,8 @@ func (ec *executionContext) fieldContext_Node_events_history(ctx context.Context
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -39944,6 +40222,8 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -39972,6 +40252,8 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -44471,6 +44753,8 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -44499,6 +44783,8 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -44580,6 +44866,8 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -44608,6 +44896,8 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -45174,6 +45464,8 @@ func (ec *executionContext) fieldContext_Query_getEvent(ctx context.Context, fie
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -45243,6 +45535,8 @@ func (ec *executionContext) fieldContext_Query_queryEvent(ctx context.Context, f
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -49184,6 +49478,8 @@ func (ec *executionContext) fieldContext_Tension_history(ctx context.Context, fi
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -49210,6 +49506,77 @@ func (ec *executionContext) fieldContext_Tension_history(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_history_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tension_mentions(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tension_mentions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mentions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Event)
+	fc.Result = res
+	return ec.marshalOEvent2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tension_mentions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tension":
+				return ec.fieldContext_Event_tension(ctx, field)
+			case "event_type":
+				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
+			case "old":
+				return ec.fieldContext_Event_old(ctx, field)
+			case "new":
+				return ec.fieldContext_Event_new(ctx, field)
+			case "id":
+				return ec.fieldContext_Event_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Event_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Event_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Event_updatedAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Event_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Event", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Tension_mentions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -50145,6 +50512,79 @@ func (ec *executionContext) fieldContext_Tension_historyAggregate(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_historyAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tension_mentionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tension_mentionsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MentionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventAggregateResult)
+	fc.Result = res
+	return ec.marshalOEventAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tension_mentionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tension",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_EventAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_EventAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_EventAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_EventAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_EventAggregateResult_updatedAtMax(ctx, field)
+			case "messageMin":
+				return ec.fieldContext_EventAggregateResult_messageMin(ctx, field)
+			case "messageMax":
+				return ec.fieldContext_EventAggregateResult_messageMax(ctx, field)
+			case "oldMin":
+				return ec.fieldContext_EventAggregateResult_oldMin(ctx, field)
+			case "oldMax":
+				return ec.fieldContext_EventAggregateResult_oldMax(ctx, field)
+			case "newMin":
+				return ec.fieldContext_EventAggregateResult_newMin(ctx, field)
+			case "newMax":
+				return ec.fieldContext_EventAggregateResult_newMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Tension_mentionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -51679,6 +52119,8 @@ func (ec *executionContext) fieldContext_UpdateEventPayload_event(ctx context.Co
 				return ec.fieldContext_Event_tension(ctx, field)
 			case "event_type":
 				return ec.fieldContext_Event_event_type(ctx, field)
+			case "mentioned":
+				return ec.fieldContext_Event_mentioned(ctx, field)
 			case "old":
 				return ec.fieldContext_Event_old(ctx, field)
 			case "new":
@@ -52825,6 +53267,8 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -52853,6 +53297,8 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -54044,6 +54490,8 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -54072,6 +54520,8 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -54511,6 +54961,8 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -54539,6 +54991,8 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -54640,6 +55094,8 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 				return ec.fieldContext_Tension_blobs(ctx, field)
 			case "history":
 				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
@@ -54668,6 +55124,8 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
 			case "historyAggregate":
 				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
@@ -60310,7 +60768,7 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "old", "new"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "mentioned", "old", "new"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -60410,6 +60868,36 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 			it.EventType, err = ec.unmarshalNTensionEvent2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
+			}
+		case "mentioned":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentioned"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.TensionRef); ok {
+				it.Mentioned = data
+			} else if tmp == nil {
+				it.Mentioned = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "old":
 			var err error
@@ -61592,7 +62080,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "contracts", "subscribers", "n_comments", "n_open_contracts"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "mentions", "contracts", "subscribers", "n_comments", "n_open_contracts"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -61920,6 +62408,14 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
 			it.History, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "mentions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentions"))
+			it.Mentions, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -65480,7 +65976,7 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "old", "new"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "mentioned", "old", "new"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65645,6 +66141,32 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionEvent`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "mentioned":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentioned"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.TensionRef); ok {
+				it.Mentioned = data
+			} else if tmp == nil {
+				it.Mentioned = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "old":
 			var err error
 
@@ -65706,7 +66228,7 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "old", "new"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension", "event_type", "mentioned", "old", "new"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65814,6 +66336,36 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 			it.EventType, err = ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
+			}
+		case "mentioned":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentioned"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.TensionRef); ok {
+				it.Mentioned = data
+			} else if tmp == nil {
+				it.Mentioned = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "old":
 			var err error
@@ -72310,7 +72862,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "contracts", "subscribers", "n_comments", "n_open_contracts"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "mentions", "contracts", "subscribers", "n_comments", "n_open_contracts"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72831,6 +73383,32 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "mentions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.EventRef); ok {
+				it.Mentions = data
+			} else if tmp == nil {
+				it.Mentions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "contracts":
 			var err error
 
@@ -72944,7 +73522,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "contracts", "subscribers", "n_comments", "n_open_contracts"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "comments", "assignees", "labels", "blobs", "history", "mentions", "contracts", "subscribers", "n_comments", "n_open_contracts"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73302,6 +73880,14 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "mentions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentions"))
+			it.Mentions, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		case "contracts":
 			var err error
@@ -78562,6 +79148,10 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "mentioned":
+
+			out.Values[i] = ec._Event_mentioned(ctx, field, obj)
+
 		case "old":
 
 			out.Values[i] = ec._Event_old(ctx, field, obj)
@@ -81879,6 +82469,10 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Tension_history(ctx, field, obj)
 
+		case "mentions":
+
+			out.Values[i] = ec._Tension_mentions(ctx, field, obj)
+
 		case "contracts":
 
 			out.Values[i] = ec._Tension_contracts(ctx, field, obj)
@@ -81943,6 +82537,10 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 		case "historyAggregate":
 
 			out.Values[i] = ec._Tension_historyAggregate(ctx, field, obj)
+
+		case "mentionsAggregate":
+
+			out.Values[i] = ec._Tension_mentionsAggregate(ctx, field, obj)
 
 		case "contractsAggregate":
 

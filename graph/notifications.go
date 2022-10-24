@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"context"
     "strings"
-    re "regexp"
 	"encoding/json"
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/auth"
@@ -153,11 +152,14 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 // Update the users map with notified users.
 // Note: only add user that are member of the given rootnameid
 // @FIX: user inside block code will be notified here...
-func UpdateWithMentionnedUser(msg string, nid string, users map[string]model.UserNotifInfo) error {
-    rootnameid, err := codec.Nid2rootid(nid)
+func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]model.UserNotifInfo) error {
+	// Remove code block
+    msg = RemoveCodeBlocks(msg)
+
+    rootnameid, err := codec.Nid2rootid(receiverid)
     if err != nil { return err}
-    r := re.MustCompile(`(^|\s|[^\w\[\` + "`" + `])@([\w\-\.]+)\b`)
-    for i, U := range r.FindStringSubmatch(msg) {
+
+    for i, U := range FindUsernames(msg) {
         u := strings.ToLower(U)
         if _, ex := users[u]; ex { continue }
         // Check that user is a member
@@ -174,6 +176,43 @@ func UpdateWithMentionnedUser(msg string, nid string, users map[string]model.Use
         if i > 100 {
             return fmt.Errorf("Too many user memtioned. Please consider using an Alert tension to notify group of users.")
         }
+    }
+    return nil
+}
+
+// Push mentioned tension event
+func PushMentionedTension(notif model.EventNotif) error {
+	// Remove code block
+    msg := RemoveCodeBlocks(notif.Msg)
+
+    rootnameid, err := codec.Nid2rootid(notif.Receiverid)
+    if err != nil { return err}
+
+    createdAt := Now()
+    createdBy := model.UserRef{Username: &notif.Uctx.Username}
+    var goto_ string
+    for _, e := range notif.History {
+        goto_ = *e.CreatedAt
+        break
+    }
+
+    for _, tid := range FindTensions(msg) {
+        rid, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.rootnameid")
+        if err != nil { return err}
+        if rid != nil && rid.(string) == rootnameid && tid != notif.Tid {
+            // Push new event...
+            _, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "event", &model.AddEventInput{
+                CreatedAt: createdAt,
+                CreatedBy: &createdBy,
+                Tension: &model.TensionRef{ID: &tid},
+                EventType: model.TensionEventMentioned,
+                Mentioned: &model.TensionRef{ID: &notif.Tid},
+                New: &goto_,
+            })
+            if err != nil { return err }
+
+        }
+
     }
     return nil
 }
@@ -215,21 +254,6 @@ func PushEventNotifications(notif model.EventNotif) error {
     err := PushHistory(&notif)
     if err != nil { return err }
 
-    // Only the event with an ID will be notified.
-    var eventBatch []*model.EventKindRef
-    var createdAt string
-    for i, e := range notif.History {
-        if i == 0 {
-            createdAt = *e.CreatedAt
-        }
-        if *e.ID != "" {
-            eventBatch = append(eventBatch, &model.EventKindRef{EventRef: &model.EventRef{ID: e.ID}})
-        }
-    }
-    if len(eventBatch) == 0 {
-        return nil
-    }
-
     // Get people to notify
     users := make(map[string]model.UserNotifInfo)
     var isAlert bool
@@ -262,16 +286,24 @@ func PushEventNotifications(notif model.EventNotif) error {
         if err != nil { return err }
     }
     // +
-    // Add mentionned and **set tension data**
+    // Add mentions and **set tension data**
     if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid}); err != nil {
         return err
     } else if len(m) > 0 {
         notif.Receiverid = m[0]["receiverid"].(string)
         notif.Msg, _ = m[0]["message"].(string)
         notif.Title = m[0]["title"].(string)
+
         if notif.Msg != "" {
-            UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
+            // Mentioned users
+            err = UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
+            if err != nil { return err }
+
+            // Mentioned tensions
+           err = PushMentionedTension(notif)
+           if err != nil { return err }
         }
+
     } else {
         return fmt.Errorf("tension %s not found.", notif.Tid)
     }
@@ -290,6 +322,21 @@ func PushEventNotifications(notif model.EventNotif) error {
                 To: []string{u},
             }, false)
         }
+    }
+
+    // Only the event with an ID will be notified.
+    var eventBatch []*model.EventKindRef
+    var createdAt string
+    for i, e := range notif.History {
+        if i == 0 {
+            createdAt = *e.CreatedAt
+        }
+        if *e.ID != "" {
+            eventBatch = append(eventBatch, &model.EventKindRef{EventRef: &model.EventRef{ID: e.ID}})
+        }
+    }
+    if len(eventBatch) == 0 {
+        return nil
     }
 
     // Push user event notification
@@ -373,7 +420,8 @@ func PushContractNotifications(notif model.ContractNotif) error {
         notif.Receiverid = m[0]["receiverid"].(string)
         notif.Msg, _ = m[0]["message"].(string)
         if notif.Msg != "" {
-            UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
+            err = UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
+            if err != nil { return err }
         }
     } else {
         return fmt.Errorf("contract %s not found.", notif.Tid)

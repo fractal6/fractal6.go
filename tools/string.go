@@ -3,6 +3,7 @@ package tools
 import (
     "bytes"
     "strings"
+    re "regexp"
     "strconv"
     "unicode"
     "regexp"
@@ -44,6 +45,51 @@ func PrettyString(str string) (string, error) {
         return "", err
     }
     return prettyJSON.String(), nil
+}
+
+func RemoveCodeBlocks(msg string) string {
+    var split []string
+
+    split = strings.Split(msg, "```")
+    if len(split) % 2 == 1 {
+        var subsplit []string
+        for i:= 0; i < len(split); i+=2 {
+            subsplit = append(subsplit, split[i])
+        }
+        msg = strings.Join(subsplit, " ")
+    }
+
+    split = strings.Split(msg, "`")
+    if len(split) % 2 == 1 {
+        var subsplit []string
+        for i:= 0; i < len(split); i+=2 {
+            subsplit = append(subsplit, split[i])
+        }
+        msg = strings.Join(subsplit, " ")
+    }
+
+    return msg
+}
+
+func FindUsernames(msg string) []string {
+    //r := re.MustCompile(`(^|\s|[^\w\[\` + "`" + `])@([\w\-\.]+)\b`)
+    r := re.MustCompile(`(^|\s|[^\w\[])@([\w\-\.]+)\b`)
+    all := r.FindAllStringSubmatch(msg, -1)
+    match := []string{}
+    for _, m := range all {
+       match = append(match, m[2])
+    }
+    return match
+}
+
+func FindTensions(msg string) []string {
+    r := re.MustCompile(`(^|\s|[^\w\[])(0x[0-9a-f]+)\b`)
+    all := r.FindAllStringSubmatch(msg, -1)
+    match := []string{}
+    for _, m := range all {
+       match = append(match, m[2])
+    }
+    return match
 }
 
 func ToGoNameFormat(name string) string {
