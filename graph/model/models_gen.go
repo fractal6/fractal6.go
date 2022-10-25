@@ -2912,16 +2912,22 @@ func (e DgraphIndex) MarshalGQL(w io.Writer) {
 type ErrorBla string
 
 const (
-	ErrorBlaContactCoordo ErrorBla = "ContactCoordo"
+	ErrorBlaContactCoordo       ErrorBla = "ContactCoordo"
+	ErrorBlaOrgaLimitReached    ErrorBla = "OrgaLimitReached"
+	ErrorBlaUserLimitReached    ErrorBla = "UserLimitReached"
+	ErrorBlaStorageLimitReached ErrorBla = "StorageLimitReached"
 )
 
 var AllErrorBla = []ErrorBla{
 	ErrorBlaContactCoordo,
+	ErrorBlaOrgaLimitReached,
+	ErrorBlaUserLimitReached,
+	ErrorBlaStorageLimitReached,
 }
 
 func (e ErrorBla) IsValid() bool {
 	switch e {
-	case ErrorBlaContactCoordo:
+	case ErrorBlaContactCoordo, ErrorBlaOrgaLimitReached, ErrorBlaUserLimitReached, ErrorBlaStorageLimitReached:
 		return true
 	}
 	return false
