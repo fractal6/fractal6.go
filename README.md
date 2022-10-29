@@ -55,8 +55,12 @@ client_version = "git hash used to build the client"
 
 [emailing]
 maintainer_email = "admin@mydomain.com"
-email_api_url = "url_api_email"
-email_api_key = "url_api_key"
+email_api_url = "https://..."
+email_api_key = "..."
+# postal default-dkim-record: Just the p=... part of the TXT record (without the semicolon at the end)
+dkim_key = "..."
+matrix_postal_room = "!...:matrix.org"
+matrix_token = "..."
 
 [db]
 hostname = "localhost"
@@ -123,7 +127,7 @@ Generate the gqlgen server as well as complete schema completed by Dgraph types 
 Note: Warning, it depends on files located in the separated repository `fractal6-schema` who contains all the graphql schemas.
 
 
-## Environment variable (deprecated)
+## Environment variable (@deprecated)
 
     export EMAIL_API_URL=https://postal/api/v1/send/message
     export EMAIL_API_KEY=

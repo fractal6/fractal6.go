@@ -9,7 +9,7 @@ Please read this file before contributing.
 - `hotfix/*`: A bug fix for production release.
 - `fix/*`: A fix an identified bug or issue.
 - `feat/*`: A new feature.
-- `codefactor/*`: Refactoring/Improvements of existing features.
+- `refactor/*`: Refactoring/Improvements of existing features.
 
 
 ### Git commits
@@ -32,8 +32,8 @@ Here are some common used for so called semantic commit message:
 
 ## Reporting issues, Questions, Feedback
 
-- Issue on the versioning system platform for bug and low-level issues (technical).
+- Create an issue on the versioning system platform for bug and low-level issues (technical).
 
-- Tension on [Fractale](https://fractale.co/o/f6) for all the rest.
+- Create a tension on [Fractale](https://fractale.co/o/f6) for questions, feedback and feature requests.
 
-- Chat on Matrix: https://matrix.to/#/#fractal6:matrix.org
+- Chat on Matrix: https://matrix.to/#/#fractal6:matrix.org for support and talking.
