@@ -194,6 +194,8 @@ func UserIsOwner(uctx *model.UserCtx, nameid string) int {
 // its email or username {fieldname}.
 func IsMember(fieldname, username, nameid string) int {
     uctx, e := db.GetDB().GetUctx(fieldname, username)
-    if e != nil { panic(e) }
+    // We do not panic here, because user, maybe just does no exits.
+    // Which is the case when a new user is invented !
+    if e != nil { return -1 }
     return UserIsMember(uctx, nameid)
 }

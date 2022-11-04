@@ -16,8 +16,8 @@ func init() {
         panic(err)
     }
     InitViper()
-    matrixPostalRoom = viper.GetString("emailing.matrix_postal_room")
-    matrixToken = viper.GetString("emailing.matrix_token")
+    matrixPostalRoom = viper.GetString("mailer.matrix_postal_room")
+    matrixToken = viper.GetString("mailer.matrix_token")
     DOMAIN = viper.GetString("server.domain")
 }
 

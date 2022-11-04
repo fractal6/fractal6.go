@@ -30,8 +30,8 @@ var maintainerEmail string
 var DOMAIN string
 
 func init() {
-    emailUrl = viper.GetString("emailing.email_api_url")
-    emailSecret = viper.GetString("emailing.email_api_key")
+    emailUrl = viper.GetString("mailer.email_api_url")
+    emailSecret = viper.GetString("mailer.email_api_key")
     if emailUrl == "" {
         emailUrl = os.Getenv("EMAIL_API_URL")
     }
@@ -43,7 +43,7 @@ func init() {
     }
 
     DOMAIN = viper.GetString("server.domain")
-    maintainerEmail = viper.GetString("emailing.maintainer_email")
+    maintainerEmail = viper.GetString("mailer.admin_email")
 }
 
 // Send an email with a http request to the email server API to the admin email.

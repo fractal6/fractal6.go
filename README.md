@@ -53,12 +53,17 @@ prometheus_instrumentation = true
 prometheus_credentials = "my_prom_secret"
 client_version = "git hash used to build the client"
 
-[emailing]
-maintainer_email = "admin@mydomain.com"
+[mailer]
+admin_email = "admin@mydomain.com"
+# URL API
 email_api_url = "https://..."
 email_api_key = "..."
+# SMTP api
+# ...todo...
+# Postal validation creds
 # postal default-dkim-record: Just the p=... part of the TXT record (without the semicolon at the end)
 dkim_key = "..."
+# webhook redirection for Postal alert.
 matrix_postal_room = "!...:matrix.org"
 matrix_token = "..."
 
@@ -82,7 +87,7 @@ Finally, generate the certificate for dgraph authorization, and populate the sch
     # Generate certs
     make certs
 
-	# Copy public key for the Dgraph authorization in the schema
+	# Copy public key for the Dgraph authorization at the end of the schema
     sed -i '$ d' fractal6-db/schema/schema_in.graphql
 	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read my; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> fractal6-db/schema/schema_in.graphql
     

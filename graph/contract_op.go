@@ -105,6 +105,9 @@ func HasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, erro
     var event model.EventRef
     StructMap(contract.Event, &event)
 
+    if contract == nil { return false, fmt.Errorf("Contract not found") }
+    if contract.Tension == nil { return false, fmt.Errorf("Tension not found in contract") }
+
     // Get linked tension
     tension, err := db.GetDB().GetTensionHook(contract.Tension.ID, false, nil)
     if err != nil { return false, err }

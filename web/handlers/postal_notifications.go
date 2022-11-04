@@ -27,9 +27,9 @@ var matrixPostalRoom string
 var matrixToken string
 
 func init() {
-    postalWebhookPK = viper.GetString("emailing.dkim_key")
-    matrixPostalRoom = viper.GetString("emailing.matrix_postal_room")
-    matrixToken = viper.GetString("emailing.matrix_token")
+    postalWebhookPK = viper.GetString("mailer.dkim_key")
+    matrixPostalRoom = viper.GetString("mailer.matrix_postal_room")
+    matrixToken = viper.GetString("mailer.matrix_token")
 }
 
 type EmailForm struct {
