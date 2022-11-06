@@ -78,7 +78,7 @@ dgraph: # Do alter Dgraph
 	mkdir -p schema/
 	cp ../fractal6-schema/gen_dgraph_in/schema.graphql schema/dgraph_schema.graphql
 	# Used by the `schema` rule, to generate the gqlgen input schema
-	get-graphql-schema http://localhost:8080/graphql/graphql > schema/dgraph_out.graphql
+	get-graphql-schema http://localhost:8080/graphql > schema/dgraph_out.graphql
 	# Alternative: gq http://localhost:8080/graphql -H "Content-Type: application/json" --introspect > schema/schema_out.graphql
 
 schema: # Do not alter Dgraph
