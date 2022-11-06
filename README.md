@@ -1,12 +1,13 @@
 # Fractal6.go
 
-Business-logic layer, API, backend for [Fractale](https://fractale.co).
+Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-Fractale is platform for self-organization. It provides a secure space shared by the members of any organisation that features:
-* Tree and graph-packing organisation navigation.
-* ACL based on members role in a oganization.
-* Ticketing management trough [tensions](https://doc.fractale.co/tension/).
-* Journal history of events.
+Fractale is a platform for self-organization. It provides a secure space shared by the members of any organisation that features:
+* Tree and graph-packing organisation navigation (Circle are branches, Roles are leaves).
+* Circle mandate, governance and visibility 
+* ACL based on member Role,
+* Ticketing management through [tensions](https://doc.fractale.co/tension/).
+* Journal history of events (including mandate updates)
 * Email notifications.
 * GraphQL API.
 
