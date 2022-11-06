@@ -1,6 +1,17 @@
 All contribution, through issues, tensions and merge request are welcome.
 Please read this file before contributing.
 
+### Updating Schema
+
+(this will be simplified)
+
+    cd ..  # behind this repository
+    git clone https://github.com/fractal6/fractal6-schema
+    git clone https://github.com/fractal6/fractal6-db
+    # Make your change in fractal6/fractal6-schema/graphql/
+    # Propagate changes
+    make genall
+
 
 ### Git Branches
 
@@ -30,7 +41,7 @@ Here are some common used for so called semantic commit message:
 - docs: Documentation only changes
 
 
-## Reporting issues, Questions, Feedback
+### Reporting issues, Questions, Feedback
 
 - Create an issue on the versioning system platform for bug and low-level issues (technical).
 
