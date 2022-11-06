@@ -3,11 +3,10 @@ Please read this file before contributing.
 
 ### Updating Schema
 
-(this will be simplified)
+Procedure to update the single source of truth schema:
 
     cd ..  # behind this repository
     git clone https://github.com/fractal6/fractal6-schema
-    git clone https://github.com/fractal6/fractal6-db
     # Make your change in fractal6/fractal6-schema/graphql/
     # Propagate changes
     make genall

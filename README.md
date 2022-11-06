@@ -2,40 +2,41 @@
 
 Business-logic layer, API, backend for [Fractale](https;//fractale.co).
 
-The Fractal6 data structures are defined in the **Fractal6 schema** and represent the single source of truth for GraphQL data relations and queries.
-It is located in the separate repository (https://code.skusku.site/fractal6/fractal6-schema/-/tree/master/graphql).
-See the [Generate files](#generate-files) section to see how to re-generate code.
+Fractale is platform for self-organization. It provides a secure space shared by the members of any organisation that features:
+* Tree and graph-packing organisation navigation.
+* ACL based on members role in a oganization.
+* Ticketing management trough [tensions](https://doc.fractale.co/tension/).
+* Journal history of events.
+* Email notifications.
+* GraphQL API.
 
 
-## Install and run databases
+## Requirements
 
-#### 1) DB - Dgraph
-
-The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and query data.
-
-    git clone ssh://git@code.skusku.site:29418/fractal6/fractal6-db.git
-    cd fractal6-db
-    make bootstrap
-    ./bin/dgraph zero --config config-zero.yml
-    # Open a new terminal and run
-    ./bin/dgraph alpha --config config-alpha.yml
-    cd -
+* Redis 4+
 
 
-#### 2) KV Cache - Redis
+## Install
 
-Redis is used as a KV cache store.
+#### From source
 
-    sudo apt-get install redis
-    sudo systemctl restart redis-server  # or "systemctl restart redis" depending on your version
+**Setup**
 
-## Install client
+    git clone https://github.com/fractal6/fractal6.go
+    cd fractal6.go
 
-Copy the client code to the `public/` folder:
-
+    # Install the client UI
     make install_client
 
-## Configure
+    # Start Redis (KV cache store)
+    sudo systemctl restart redis-server  # or "systemctl restart redis" depending on your version
+    # Setup Dgraph (database)
+    make bootstrap
+    ./bin/dgraph zero --config contrib/dgraph/config-zero.yml
+    # Open a new terminal and run
+    ./bin/dgraph alpha --config contrib/dgraph/config-alpha.yml
+
+**Configure**
 
 The server need a `config.toml` config file to run (in the project's root folder, i.e `fractal6.go/`).
 You can use the following template:
@@ -79,67 +80,43 @@ complexity_limit = 200 # 50
 introspection = false
 ```
 
-
 Finally, generate the certificate for dgraph authorization, and populate the schema:
 
     # Generate certs
     make certs
 
 	# Copy public key for the Dgraph authorization at the end of the schema
-    sed -i '$ d' fractal6-db/schema/schema_in.graphql
-	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read my; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> fractal6-db/schema/schema_in.graphql
-    
-    # Setup Dgraph with the GQL schema
-    cd fractal6-db/
-    make send_schema
+    sed -i '$ d' schema/dgraph_schema.graphql
+	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read my; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> schema/dgraph_schema.graphql
+
+    # Update Dgraph schema
+    curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
 
 
-## Launch for dev
+**Launch for production**
 
-    make build
-    make run_api
-
-
-## Launch for production
-
-Build
-
+    # Build
     go mod vendor
-    # Can take a while
     make prod
 
-Open a terminal and run (main server)
-
+    # Open a terminal and run (main server)
     ./bin/fractal6 api
-
-Open a second terminal and run (message passing that manage event notifications)
-
+    # Open a second terminal and run (message passing that manage event notifications)
     ./bin/fractal6 notifier
 
 
-## (Re)Generate files
+**Launch for development**
 
-Generate the gqlgen server:
-
-    make generate
-
-Generate the gqlgen server as well as complete schema completed by Dgraph types and queries:
-
-    make genall
-
-Note: Warning, it depends on files located in the separated repository `fractal6-schema` who contains all the graphql schemas.
-
-
-## Environment variable (@deprecated)
-
-    export EMAIL_API_URL=https://postal/api/v1/send/message
-    export EMAIL_API_KEY=
-    export JWT_SECRET=
-    export DGRAPH_PUBLIC_KEY=$(cat public.pem)      # fish: set DGRAPH_PUBLIC_KEY (cat public.pem | string split0)
-    export DGRAPH_PRIVATE_KEY=$(cat private.pem)    # fish: set DGRAPH_PRIVATE_KEY (cat private.pem | string split0)
-    environement variable
+	go run main.go api
+	go run main.go notifier
 
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Fractale is free, open-source software licensed under AGPLv3.
+
+You can open issues for bugs you've found or features you think are missing. You can also submit pull requests to this repository. To get started, take a look at [CONTRIBUTING.md](CONTRIBUTING.md).
+
+You can follow Fractale organisation and roadmap at [o/f6](https://fractale.co/o/f6).
+
+IRC channel: #fractal6 on matrix.org

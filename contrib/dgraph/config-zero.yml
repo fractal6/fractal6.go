@@ -1,0 +1,6 @@
+my: localhost:5080
+wal: data/_data/zw
+
+telemetry:
+  sentry: false
+  reports: false

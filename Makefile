@@ -3,6 +3,8 @@ GOFLAGS ?= $(GOFLAGS:) -v
 GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 GOBIN := $(PWD)/bin
 RELEASE := fractal6
+DGRAPH_RELEASE := v21.12.0
+#DGRAPH_RELEASE := v21.03.1
 MOD := fractale/fractal6.go
 #LANGS := $(shell ls public/index.* | sed -n  "s/.*index\.\([a-z]*\)\.html/\1/p" )
 LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
@@ -26,8 +28,6 @@ run_notifier:
 build:
 	go build $(GOFLAGS) -o $(GOBIN)/$(RELEASE) main.go
 
-build_all: genall build
-
 prod:
 	go build -trimpath $(GOFLAGS_PROD) \
 		-ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD -X $(MOD)/db.buildMode=PROD \
@@ -50,6 +50,15 @@ fetch_client:
 		git clone --depth 1 ssh://git@code.skusku.site:29418/fluid-fractal/public-build.git public/ && \
 		rm -rf public/.git
 
+bootstrap:
+	# Dgraph
+	wget https://github.com/dgraph-io/dgraph/releases/download/$(DGRAPH_RELEASE)/dgraph-linux-amd64.tar.gz
+	mkdir -p bin/
+	mv dgraph-linux-amd64.tar.gz bin/ && \
+		cd bin/ && \
+		tar zxvf dgraph-linux-amd64.tar.gz && \
+		cd ..
+
 
 #
 # Generate Graphql code and schema
@@ -58,17 +67,26 @@ fetch_client:
 genall: dgraph schema generate
 gen: schema generate
 
-dgraph:
+dgraph: # Do alter Dgraph
+	# Requirements:
+	# npm install -g get-graphql-schema
+	# Alternative: npm install -g graphqurl
 	cd ../fractal6-schema
-	make dgraph # Do alter Dgraph
+	make dgraph_in
 	cd -
+	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
+	mkdir -p schema/
+	cp ../fractal6-schema/gen_dgraph_in/schema.graphql schema/dgraph_schema.graphql
+	# Used by the `schema` rule, to generate the gqlgen input schema
+	get-graphql-schema http://localhost:8080/graphql/graphql > schema/dgraph_out.graphql
+	# Alternative: gq http://localhost:8080/graphql -H "Content-Type: application/json" --introspect > schema/schema_out.graphql
 
-schema:
+schema: # Do not alter Dgraph
 	cd ../fractal6-schema
-	make schema # Do not alter Dgraph
+	make gqlgen_in
 	cd -
 	mkdir -p schema/
-	cp ../fractal6-schema/gen/*.graphql schema/
+	cp ../fractal6-schema/gen/schema.graphql schema/
 
 generate:
 	# We add "omitempty" for each generate type's literal except for Bool and Int to prevent

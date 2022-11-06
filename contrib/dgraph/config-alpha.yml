@@ -1,0 +1,30 @@
+my: localhost:7080
+zero: localhost:5080
+postings: data/_data/p
+wal: data/_data/w
+tmp: data/tmp
+
+cache:
+  # 4096
+  size-mb: 1024 
+  percentage: 50,30,20
+
+graphql:
+  # Use to fetch schema during generation.
+  introspection: true
+  debug: true
+  extensions: false
+  poll-interval: 10s
+
+limit:
+  mutations: strict
+  query-timeout: 1m
+
+lambda: 
+  num: 0
+
+
+telemetry:
+  sentry: false
+  reports: false
+
