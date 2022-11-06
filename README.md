@@ -19,8 +19,6 @@ The backend rely on [Dgraph](https://github.com/dgraph-io/dgraph) to store and q
     ./bin/dgraph zero --config config-zero.yml
     # Open a new terminal and run
     ./bin/dgraph alpha --config config-alpha.yml
-    # Populate the schema
-    make send_schema
     cd -
 
 
