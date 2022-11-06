@@ -1,6 +1,6 @@
 # Fractal6.go
 
-Business-logic layer, API, backend for [Fractale](https;//fractale.co).
+Business-logic layer, API, backend for [Fractale](https://fractale.co).
 
 Fractale is platform for self-organization. It provides a secure space shared by the members of any organisation that features:
 * Tree and graph-packing organisation navigation.
