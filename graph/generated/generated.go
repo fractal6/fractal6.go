@@ -1125,16 +1125,21 @@ type ComplexityRoot struct {
 		CanCreateRoot         func(childComplexity int) int
 		CanLogin              func(childComplexity int) int
 		HasEmailNotifications func(childComplexity int) int
+		MaxPrivateOrga        func(childComplexity int) int
 		MaxPublicOrga         func(childComplexity int) int
 		Type                  func(childComplexity int) int
 	}
 
 	UserRightsAggregateResult struct {
-		Count            func(childComplexity int) int
-		MaxPublicOrgaAvg func(childComplexity int) int
-		MaxPublicOrgaMax func(childComplexity int) int
-		MaxPublicOrgaMin func(childComplexity int) int
-		MaxPublicOrgaSum func(childComplexity int) int
+		Count             func(childComplexity int) int
+		MaxPrivateOrgaAvg func(childComplexity int) int
+		MaxPrivateOrgaMax func(childComplexity int) int
+		MaxPrivateOrgaMin func(childComplexity int) int
+		MaxPrivateOrgaSum func(childComplexity int) int
+		MaxPublicOrgaAvg  func(childComplexity int) int
+		MaxPublicOrgaMax  func(childComplexity int) int
+		MaxPublicOrgaMin  func(childComplexity int) int
+		MaxPublicOrgaSum  func(childComplexity int) int
 	}
 
 	Vote struct {
@@ -7475,6 +7480,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserRights.HasEmailNotifications(childComplexity), true
 
+	case "UserRights.maxPrivateOrga":
+		if e.complexity.UserRights.MaxPrivateOrga == nil {
+			break
+		}
+
+		return e.complexity.UserRights.MaxPrivateOrga(childComplexity), true
+
 	case "UserRights.maxPublicOrga":
 		if e.complexity.UserRights.MaxPublicOrga == nil {
 			break
@@ -7495,6 +7507,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserRightsAggregateResult.Count(childComplexity), true
+
+	case "UserRightsAggregateResult.maxPrivateOrgaAvg":
+		if e.complexity.UserRightsAggregateResult.MaxPrivateOrgaAvg == nil {
+			break
+		}
+
+		return e.complexity.UserRightsAggregateResult.MaxPrivateOrgaAvg(childComplexity), true
+
+	case "UserRightsAggregateResult.maxPrivateOrgaMax":
+		if e.complexity.UserRightsAggregateResult.MaxPrivateOrgaMax == nil {
+			break
+		}
+
+		return e.complexity.UserRightsAggregateResult.MaxPrivateOrgaMax(childComplexity), true
+
+	case "UserRightsAggregateResult.maxPrivateOrgaMin":
+		if e.complexity.UserRightsAggregateResult.MaxPrivateOrgaMin == nil {
+			break
+		}
+
+		return e.complexity.UserRightsAggregateResult.MaxPrivateOrgaMin(childComplexity), true
+
+	case "UserRightsAggregateResult.maxPrivateOrgaSum":
+		if e.complexity.UserRightsAggregateResult.MaxPrivateOrgaSum == nil {
+			break
+		}
+
+		return e.complexity.UserRightsAggregateResult.MaxPrivateOrgaSum(childComplexity), true
 
 	case "UserRightsAggregateResult.maxPublicOrgaAvg":
 		if e.complexity.UserRightsAggregateResult.MaxPublicOrgaAvg == nil {
@@ -8271,6 +8311,7 @@ type UserRights {
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
+  maxPrivateOrga: Int!
   hasEmailNotifications: Boolean!
 }
 
@@ -8449,37 +8490,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8797,6 +8838,7 @@ input AddUserRightsInput {
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
+  maxPrivateOrga: Int!
   hasEmailNotifications: Boolean!
 }
 
@@ -9263,7 +9305,8 @@ enum DgraphIndex {
 enum ErrorBla {
   ContactCoordo
   OrgaLimitReached
-  UserLimitReached
+  MemberLimitReached
+  EmailLimitReached
   StorageLimitReached
 }
 
@@ -11012,6 +11055,10 @@ type UserRightsAggregateResult {
   maxPublicOrgaMax: Int
   maxPublicOrgaSum: Int
   maxPublicOrgaAvg: Float
+  maxPrivateOrgaMin: Int
+  maxPrivateOrgaMax: Int
+  maxPrivateOrgaSum: Int
+  maxPrivateOrgaAvg: Float
 }
 
 input UserRightsFilter {
@@ -11026,6 +11073,7 @@ enum UserRightsHasFilter {
   canLogin
   canCreateRoot
   maxPublicOrga
+  maxPrivateOrga
   hasEmailNotifications
 }
 
@@ -11037,6 +11085,7 @@ input UserRightsOrder {
 
 enum UserRightsOrderable {
   maxPublicOrga
+  maxPrivateOrga
 }
 
 input UserRightsPatch {
@@ -11044,6 +11093,7 @@ input UserRightsPatch {
   canLogin: Boolean @x_patch_ro
   canCreateRoot: Boolean @x_patch_ro
   maxPublicOrga: Int @x_patch_ro
+  maxPrivateOrga: Int @x_patch_ro
   hasEmailNotifications: Boolean @x_patch_ro
 }
 
@@ -11052,6 +11102,7 @@ input UserRightsRef {
   canLogin: Boolean
   canCreateRoot: Boolean
   maxPublicOrga: Int
+  maxPrivateOrga: Int
   hasEmailNotifications: Boolean
 }
 
@@ -21590,6 +21641,8 @@ func (ec *executionContext) fieldContext_AddUserRightsPayload_userRights(ctx con
 				return ec.fieldContext_UserRights_canCreateRoot(ctx, field)
 			case "maxPublicOrga":
 				return ec.fieldContext_UserRights_maxPublicOrga(ctx, field)
+			case "maxPrivateOrga":
+				return ec.fieldContext_UserRights_maxPrivateOrga(ctx, field)
 			case "hasEmailNotifications":
 				return ec.fieldContext_UserRights_hasEmailNotifications(ctx, field)
 			}
@@ -27985,6 +28038,8 @@ func (ec *executionContext) fieldContext_DeleteUserRightsPayload_userRights(ctx 
 				return ec.fieldContext_UserRights_canCreateRoot(ctx, field)
 			case "maxPublicOrga":
 				return ec.fieldContext_UserRights_maxPublicOrga(ctx, field)
+			case "maxPrivateOrga":
+				return ec.fieldContext_UserRights_maxPrivateOrga(ctx, field)
 			case "hasEmailNotifications":
 				return ec.fieldContext_UserRights_hasEmailNotifications(ctx, field)
 			}
@@ -46800,6 +46855,8 @@ func (ec *executionContext) fieldContext_Query_queryUserRights(ctx context.Conte
 				return ec.fieldContext_UserRights_canCreateRoot(ctx, field)
 			case "maxPublicOrga":
 				return ec.fieldContext_UserRights_maxPublicOrga(ctx, field)
+			case "maxPrivateOrga":
+				return ec.fieldContext_UserRights_maxPrivateOrga(ctx, field)
 			case "hasEmailNotifications":
 				return ec.fieldContext_UserRights_hasEmailNotifications(ctx, field)
 			}
@@ -46863,6 +46920,14 @@ func (ec *executionContext) fieldContext_Query_aggregateUserRights(ctx context.C
 				return ec.fieldContext_UserRightsAggregateResult_maxPublicOrgaSum(ctx, field)
 			case "maxPublicOrgaAvg":
 				return ec.fieldContext_UserRightsAggregateResult_maxPublicOrgaAvg(ctx, field)
+			case "maxPrivateOrgaMin":
+				return ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaMin(ctx, field)
+			case "maxPrivateOrgaMax":
+				return ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaMax(ctx, field)
+			case "maxPrivateOrgaSum":
+				return ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaSum(ctx, field)
+			case "maxPrivateOrgaAvg":
+				return ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserRightsAggregateResult", field.Name)
 		},
@@ -53653,6 +53718,8 @@ func (ec *executionContext) fieldContext_UpdateUserRightsPayload_userRights(ctx 
 				return ec.fieldContext_UserRights_canCreateRoot(ctx, field)
 			case "maxPublicOrga":
 				return ec.fieldContext_UserRights_maxPublicOrga(ctx, field)
+			case "maxPrivateOrga":
+				return ec.fieldContext_UserRights_maxPrivateOrga(ctx, field)
 			case "hasEmailNotifications":
 				return ec.fieldContext_UserRights_hasEmailNotifications(ctx, field)
 			}
@@ -54591,6 +54658,8 @@ func (ec *executionContext) fieldContext_User_rights(ctx context.Context, field 
 				return ec.fieldContext_UserRights_canCreateRoot(ctx, field)
 			case "maxPublicOrga":
 				return ec.fieldContext_UserRights_maxPublicOrga(ctx, field)
+			case "maxPrivateOrga":
+				return ec.fieldContext_UserRights_maxPrivateOrga(ctx, field)
 			case "hasEmailNotifications":
 				return ec.fieldContext_UserRights_hasEmailNotifications(ctx, field)
 			}
@@ -57415,6 +57484,47 @@ func (ec *executionContext) fieldContext_UserRights_maxPublicOrga(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _UserRights_maxPrivateOrga(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserRights_maxPrivateOrga(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxPrivateOrga, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserRights_maxPrivateOrga(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserRights",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UserRights_hasEmailNotifications(ctx context.Context, field graphql.CollectedField, obj *model.UserRights) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UserRights_hasEmailNotifications(ctx, field)
 	if err != nil {
@@ -57634,6 +57744,158 @@ func (ec *executionContext) _UserRightsAggregateResult_maxPublicOrgaAvg(ctx cont
 }
 
 func (ec *executionContext) fieldContext_UserRightsAggregateResult_maxPublicOrgaAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserRightsAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserRightsAggregateResult_maxPrivateOrgaMin(ctx context.Context, field graphql.CollectedField, obj *model.UserRightsAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxPrivateOrgaMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserRightsAggregateResult_maxPrivateOrgaMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserRightsAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserRightsAggregateResult_maxPrivateOrgaMax(ctx context.Context, field graphql.CollectedField, obj *model.UserRightsAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxPrivateOrgaMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserRightsAggregateResult_maxPrivateOrgaMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserRightsAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserRightsAggregateResult_maxPrivateOrgaSum(ctx context.Context, field graphql.CollectedField, obj *model.UserRightsAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxPrivateOrgaSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserRightsAggregateResult_maxPrivateOrgaSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserRightsAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserRightsAggregateResult_maxPrivateOrgaAvg(ctx context.Context, field graphql.CollectedField, obj *model.UserRightsAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserRightsAggregateResult_maxPrivateOrgaAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxPrivateOrgaAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserRightsAggregateResult_maxPrivateOrgaAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserRightsAggregateResult",
 		Field:      field,
@@ -62959,7 +63221,7 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "hasEmailNotifications"}
+	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "maxPrivateOrga", "hasEmailNotifications"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -62995,6 +63257,14 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPublicOrga"))
 			it.MaxPublicOrga, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "maxPrivateOrga":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrivateOrga"))
+			it.MaxPrivateOrga, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -76685,7 +76955,7 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "hasEmailNotifications"}
+	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "maxPrivateOrga", "hasEmailNotifications"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76790,6 +77060,30 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "maxPrivateOrga":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrivateOrga"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.MaxPrivateOrga = data
+			} else if tmp == nil {
+				it.MaxPrivateOrga = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "hasEmailNotifications":
 			var err error
 
@@ -76827,7 +77121,7 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "hasEmailNotifications"}
+	fieldsInOrder := [...]string{"type_", "canLogin", "canCreateRoot", "maxPublicOrga", "maxPrivateOrga", "hasEmailNotifications"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76863,6 +77157,14 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPublicOrga"))
 			it.MaxPublicOrga, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "maxPrivateOrga":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrivateOrga"))
+			it.MaxPrivateOrga, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -83650,6 +83952,13 @@ func (ec *executionContext) _UserRights(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "maxPrivateOrga":
+
+			out.Values[i] = ec._UserRights_maxPrivateOrga(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "hasEmailNotifications":
 
 			out.Values[i] = ec._UserRights_hasEmailNotifications(ctx, field, obj)
@@ -83697,6 +84006,22 @@ func (ec *executionContext) _UserRightsAggregateResult(ctx context.Context, sel 
 		case "maxPublicOrgaAvg":
 
 			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaAvg(ctx, field, obj)
+
+		case "maxPrivateOrgaMin":
+
+			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaMin(ctx, field, obj)
+
+		case "maxPrivateOrgaMax":
+
+			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaMax(ctx, field, obj)
+
+		case "maxPrivateOrgaSum":
+
+			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaSum(ctx, field, obj)
+
+		case "maxPrivateOrgaAvg":
+
+			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

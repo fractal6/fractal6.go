@@ -275,7 +275,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
     uctx, err = auth.GetAuthUserCtx(creds)
     if err != nil {
 		// Credentials validation error
-        http.Error(w, err.Error(), 401)
+        http.Error(w, auth.FormatError(err, ""), 401)
 		return
     }
 

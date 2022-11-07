@@ -328,6 +328,7 @@ type AddUserRightsInput struct {
 	CanLogin              bool     `json:"canLogin"`
 	CanCreateRoot         bool     `json:"canCreateRoot"`
 	MaxPublicOrga         int      `json:"maxPublicOrga"`
+	MaxPrivateOrga        int      `json:"maxPrivateOrga"`
 	HasEmailNotifications bool     `json:"hasEmailNotifications"`
 }
 
@@ -2287,15 +2288,20 @@ type UserRights struct {
 	CanLogin              bool     `json:"canLogin"`
 	CanCreateRoot         bool     `json:"canCreateRoot"`
 	MaxPublicOrga         int      `json:"maxPublicOrga"`
+	MaxPrivateOrga        int      `json:"maxPrivateOrga"`
 	HasEmailNotifications bool     `json:"hasEmailNotifications"`
 }
 
 type UserRightsAggregateResult struct {
-	Count            *int     `json:"count"`
-	MaxPublicOrgaMin *int     `json:"maxPublicOrgaMin"`
-	MaxPublicOrgaMax *int     `json:"maxPublicOrgaMax"`
-	MaxPublicOrgaSum *int     `json:"maxPublicOrgaSum"`
-	MaxPublicOrgaAvg *float64 `json:"maxPublicOrgaAvg,omitempty"`
+	Count             *int     `json:"count"`
+	MaxPublicOrgaMin  *int     `json:"maxPublicOrgaMin"`
+	MaxPublicOrgaMax  *int     `json:"maxPublicOrgaMax"`
+	MaxPublicOrgaSum  *int     `json:"maxPublicOrgaSum"`
+	MaxPublicOrgaAvg  *float64 `json:"maxPublicOrgaAvg,omitempty"`
+	MaxPrivateOrgaMin *int     `json:"maxPrivateOrgaMin"`
+	MaxPrivateOrgaMax *int     `json:"maxPrivateOrgaMax"`
+	MaxPrivateOrgaSum *int     `json:"maxPrivateOrgaSum"`
+	MaxPrivateOrgaAvg *float64 `json:"maxPrivateOrgaAvg,omitempty"`
 }
 
 type UserRightsFilter struct {
@@ -2316,6 +2322,7 @@ type UserRightsPatch struct {
 	CanLogin              *bool     `json:"canLogin"`
 	CanCreateRoot         *bool     `json:"canCreateRoot"`
 	MaxPublicOrga         *int      `json:"maxPublicOrga"`
+	MaxPrivateOrga        *int      `json:"maxPrivateOrga"`
 	HasEmailNotifications *bool     `json:"hasEmailNotifications"`
 }
 
@@ -2324,6 +2331,7 @@ type UserRightsRef struct {
 	CanLogin              *bool     `json:"canLogin"`
 	CanCreateRoot         *bool     `json:"canCreateRoot"`
 	MaxPublicOrga         *int      `json:"maxPublicOrga"`
+	MaxPrivateOrga        *int      `json:"maxPrivateOrga"`
 	HasEmailNotifications *bool     `json:"hasEmailNotifications"`
 }
 
@@ -2914,20 +2922,22 @@ type ErrorBla string
 const (
 	ErrorBlaContactCoordo       ErrorBla = "ContactCoordo"
 	ErrorBlaOrgaLimitReached    ErrorBla = "OrgaLimitReached"
-	ErrorBlaUserLimitReached    ErrorBla = "UserLimitReached"
+	ErrorBlaMemberLimitReached  ErrorBla = "MemberLimitReached"
+	ErrorBlaEmailLimitReached   ErrorBla = "EmailLimitReached"
 	ErrorBlaStorageLimitReached ErrorBla = "StorageLimitReached"
 )
 
 var AllErrorBla = []ErrorBla{
 	ErrorBlaContactCoordo,
 	ErrorBlaOrgaLimitReached,
-	ErrorBlaUserLimitReached,
+	ErrorBlaMemberLimitReached,
+	ErrorBlaEmailLimitReached,
 	ErrorBlaStorageLimitReached,
 }
 
 func (e ErrorBla) IsValid() bool {
 	switch e {
-	case ErrorBlaContactCoordo, ErrorBlaOrgaLimitReached, ErrorBlaUserLimitReached, ErrorBlaStorageLimitReached:
+	case ErrorBlaContactCoordo, ErrorBlaOrgaLimitReached, ErrorBlaMemberLimitReached, ErrorBlaEmailLimitReached, ErrorBlaStorageLimitReached:
 		return true
 	}
 	return false
@@ -5083,6 +5093,7 @@ const (
 	UserRightsHasFilterCanLogin              UserRightsHasFilter = "canLogin"
 	UserRightsHasFilterCanCreateRoot         UserRightsHasFilter = "canCreateRoot"
 	UserRightsHasFilterMaxPublicOrga         UserRightsHasFilter = "maxPublicOrga"
+	UserRightsHasFilterMaxPrivateOrga        UserRightsHasFilter = "maxPrivateOrga"
 	UserRightsHasFilterHasEmailNotifications UserRightsHasFilter = "hasEmailNotifications"
 )
 
@@ -5091,12 +5102,13 @@ var AllUserRightsHasFilter = []UserRightsHasFilter{
 	UserRightsHasFilterCanLogin,
 	UserRightsHasFilterCanCreateRoot,
 	UserRightsHasFilterMaxPublicOrga,
+	UserRightsHasFilterMaxPrivateOrga,
 	UserRightsHasFilterHasEmailNotifications,
 }
 
 func (e UserRightsHasFilter) IsValid() bool {
 	switch e {
-	case UserRightsHasFilterType, UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga, UserRightsHasFilterHasEmailNotifications:
+	case UserRightsHasFilterType, UserRightsHasFilterCanLogin, UserRightsHasFilterCanCreateRoot, UserRightsHasFilterMaxPublicOrga, UserRightsHasFilterMaxPrivateOrga, UserRightsHasFilterHasEmailNotifications:
 		return true
 	}
 	return false
@@ -5126,16 +5138,18 @@ func (e UserRightsHasFilter) MarshalGQL(w io.Writer) {
 type UserRightsOrderable string
 
 const (
-	UserRightsOrderableMaxPublicOrga UserRightsOrderable = "maxPublicOrga"
+	UserRightsOrderableMaxPublicOrga  UserRightsOrderable = "maxPublicOrga"
+	UserRightsOrderableMaxPrivateOrga UserRightsOrderable = "maxPrivateOrga"
 )
 
 var AllUserRightsOrderable = []UserRightsOrderable{
 	UserRightsOrderableMaxPublicOrga,
+	UserRightsOrderableMaxPrivateOrga,
 }
 
 func (e UserRightsOrderable) IsValid() bool {
 	switch e {
-	case UserRightsOrderableMaxPublicOrga:
+	case UserRightsOrderableMaxPublicOrga, UserRightsOrderableMaxPrivateOrga:
 		return true
 	}
 	return false

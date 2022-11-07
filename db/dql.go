@@ -1275,7 +1275,7 @@ func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) 
     user, err := dg.GetUctxFull(fieldid, userid)
     if err != nil { return user, nil }
     if user == nil || user.Username == "" {
-        return nil, fmt.Errorf("User not found error for '%s': %s", fieldid, userid)
+        return nil, fmt.Errorf("User not found for '%s': %s", fieldid, userid)
     }
     // @deprecated: special role are processed in graph/auth
     // Filter special roles
@@ -1297,6 +1297,7 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
         "regex": regex,
         "payload": `{
             Node.nameid
+            Node.visibility
         }`,
     }
 

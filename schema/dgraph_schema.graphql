@@ -403,6 +403,7 @@ type UserRights {
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
+  maxPrivateOrga: Int!
   hasEmailNotifications: Boolean!
 }
 

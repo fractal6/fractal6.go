@@ -51,10 +51,6 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
     nidOwner := nameid + "##" + "@" + uctx.Username
 
-    // Check plan
-    ok, err := auth.CanNewOrga(*uctx, form)
-    if err != nil || !ok { http.Error(w, err.Error(), 400); return }
-
     isPersonal := true
     var userCanJoin bool
     var guestCanCreateTension bool = true
@@ -64,12 +60,17 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if form.Visibility != nil && form.Visibility.IsValid() {
         visibility = *form.Visibility
     }
+    form.Visibility = &visibility
 
     if visibility == model.NodeVisibilityPublic {
         userCanJoin = true
     } else {
         userCanJoin = false
     }
+
+    // Check plan
+    ok, err := auth.CanNewOrga(*uctx, form)
+    if err != nil || !ok { http.Error(w, err.Error(), 400); return }
 
     // Create the new node
     nodeInput := model.AddNodeInput{

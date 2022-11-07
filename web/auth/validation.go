@@ -25,6 +25,7 @@ import (
     "time"
     "errors"
     "strings"
+    "strconv"
     "context"
     "encoding/json"
 	"github.com/spf13/viper"
@@ -142,11 +143,45 @@ var (
     }`)
 )
 
+func FormatError(err error, loc string) string {
+    return fmt.Sprintf(`{
+        "errors":[{
+            "message": "%s",
+            "location": "%s"
+        }]
+    }`, err.Error(), loc)
+}
+
 var clientVersion string
 var reservedUsername map[string]bool
+var MAX_PUBLIC_ORGA int
+var MAX_PRIVATE_ORGA int
+var MAX_ORGA_REG int
+var MAX_ORGA_PRO int
 
 func init() {
+    var err error
     clientVersion = viper.GetString("server.client_version")
+    MAX_PUBLIC_ORGA, err = strconv.Atoi(viper.GetString("admin.max_public_orgas"))
+    if err != nil {
+        fmt.Println("max_public_orgas conf not found, setting to 100")
+        MAX_PUBLIC_ORGA = 100
+    }
+    MAX_PRIVATE_ORGA, err = strconv.Atoi(viper.GetString("admin.max_private_orgas"))
+    if err != nil {
+        fmt.Println("max_private_orgas conf not found, setting to 100")
+        MAX_PRIVATE_ORGA = 100
+    }
+    MAX_ORGA_REG, err = strconv.Atoi(viper.GetString("admin.max_orga_reg"))
+    if err != nil {
+        fmt.Println("max_orga_reg conf not found, setting to 100")
+        MAX_ORGA_REG = 100
+    }
+    MAX_ORGA_PRO, err = strconv.Atoi(viper.GetString("admin.max_orga_pro"))
+    if err != nil {
+        fmt.Println("max_orga_pro conf not found, setting to 100")
+        MAX_ORGA_PRO = 100
+    }
     reservedUsername = map[string]bool{
         // Reserved email endpoint
         "admin": true,
@@ -331,8 +366,9 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     // Rights
     canLogin := true
     canCreateRoot := false
-    maxPublicOrga := 5
     userType := model.UserTypeRegular
+    maxPublicOrga := MAX_PUBLIC_ORGA
+    maxPrivateOrga := MAX_PRIVATE_ORGA
     hasEmailNotifications := true
     var lang model.Lang
     if creds.Lang == nil {
@@ -354,6 +390,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
             CanLogin: &canLogin,
             CanCreateRoot: &canCreateRoot,
             MaxPublicOrga: &maxPublicOrga,
+            MaxPrivateOrga: &maxPrivateOrga,
             Type: &userType,
             HasEmailNotifications: &hasEmailNotifications,
         },
@@ -385,17 +422,34 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
     regex := fmt.Sprintf("@%s$", uctx.Username)
     nodes, err := db.GetDB().GetNodes(regex, true)
     if err != nil {return ok, err}
+    n_public := 0
+    n_private := 0
+    for _, n := range nodes {
+        if n.Visibility == model.NodeVisibilityPublic {
+            n_public += 1
+        } else if n.Visibility == model.NodeVisibilityPrivate {
+            n_private += 1
+        }
+    }
+    n_orgs := len(nodes)
 
     switch uctx.Rights.Type {
     case model.UserTypeRegular:
-        if len(nodes) >= uctx.Rights.MaxPublicOrga {
-            return ok, fmt.Errorf("Number of personnal organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
+        if n_orgs >= MAX_ORGA_REG {
+            return ok, fmt.Errorf("Number of organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
+        } else if *form.Visibility == model.NodeVisibilityPublic &&
+        n_public >= uctx.Rights.MaxPublicOrga && uctx.Rights.MaxPublicOrga >= 0 {
+            return ok, fmt.Errorf("Number of public organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
+        } else if *form.Visibility == model.NodeVisibilityPrivate &&
+        n_private >= uctx.Rights.MaxPrivateOrga && uctx.Rights.MaxPrivateOrga >= 0 {
+            return ok, fmt.Errorf("Number of private organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPrivateOrga)
         }
 
     case model.UserTypePro:
-        if len(nodes) >= 100 {
+        if n_orgs >= MAX_ORGA_PRO && MAX_ORGA_PRO >= 0 {
             return ok, fmt.Errorf("You own too many organisation, please contact us to create more.")
         }
+
 
     case model.UserTypeRoot:
         // pass

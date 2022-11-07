@@ -1,34 +1,34 @@
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
-directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+directive @lambda on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -346,6 +346,7 @@ input AddUserRightsInput {
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
+  maxPrivateOrga: Int!
   hasEmailNotifications: Boolean!
 }
 
@@ -2956,6 +2957,7 @@ type UserRights {
   canLogin: Boolean!
   canCreateRoot: Boolean!
   maxPublicOrga: Int!
+  maxPrivateOrga: Int!
   hasEmailNotifications: Boolean!
 }
 
@@ -2965,6 +2967,10 @@ type UserRightsAggregateResult {
   maxPublicOrgaMax: Int
   maxPublicOrgaSum: Int
   maxPublicOrgaAvg: Float
+  maxPrivateOrgaMin: Int
+  maxPrivateOrgaMax: Int
+  maxPrivateOrgaSum: Int
+  maxPrivateOrgaAvg: Float
 }
 
 input UserRightsFilter {
@@ -2979,6 +2985,7 @@ enum UserRightsHasFilter {
   canLogin
   canCreateRoot
   maxPublicOrga
+  maxPrivateOrga
   hasEmailNotifications
 }
 
@@ -2990,6 +2997,7 @@ input UserRightsOrder {
 
 enum UserRightsOrderable {
   maxPublicOrga
+  maxPrivateOrga
 }
 
 input UserRightsPatch {
@@ -2997,6 +3005,7 @@ input UserRightsPatch {
   canLogin: Boolean
   canCreateRoot: Boolean
   maxPublicOrga: Int
+  maxPrivateOrga: Int
   hasEmailNotifications: Boolean
 }
 
@@ -3005,6 +3014,7 @@ input UserRightsRef {
   canLogin: Boolean
   canCreateRoot: Boolean
   maxPublicOrga: Int
+  maxPrivateOrga: Int
   hasEmailNotifications: Boolean
 }
 
