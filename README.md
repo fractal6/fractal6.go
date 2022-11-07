@@ -1,13 +1,13 @@
-# Fractal6.go
+# fractal6.go
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-Fractale is a platform for self-organization. It provides a secure space shared by the members of any organisation that features:
-* Tree and graph-packing organisation navigation (Circle are branches, Roles are leaves).
-* Circle mandate, governance and visibility 
-* ACL based on member Role,
-* Ticketing management through [tensions](https://doc.fractale.co/tension/).
-* Journal history of events (including mandate updates)
+**Fractale** is a platform for self-organization. It provides a secure space shared by the members of any organisation that features:
+* Tree and Graph-Packing organisation navigation (Circle are branches, Roles are leaves).
+* Circle mandate, governance and visibility.
+* ACL based on member Role.
+* Ticketing management through [Tensions](https://doc.fractale.co/tension/).
+* Journal history of events (including mandate updates).
 * Email notifications.
 * GraphQL API.
 
@@ -23,7 +23,7 @@ Fractale is a platform for self-organization. It provides a secure space shared 
 
 **Setup**
 
-    git clone https://github.com/fractal6/fractal6.go
+    git clone -b prod https://github.com/fractal6/fractal6.go
     cd fractal6.go
 
     # Install the client UI
@@ -31,6 +31,7 @@ Fractale is a platform for self-organization. It provides a secure space shared 
 
     # Start Redis (KV cache store)
     sudo systemctl restart redis-server  # or "systemctl restart redis" depending on your version
+
     # Setup Dgraph (database)
     make bootstrap
     ./bin/dgraph zero --config contrib/dgraph/config-zero.yml
