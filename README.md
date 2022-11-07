@@ -80,6 +80,12 @@ dgraph_private_key = "private.pem"
 [graphql]
 complexity_limit = 200 # 50
 introspection = false
+
+[admin]
+max_public_orgas = -1    # Maximum public organnization per user, -1 for unlimited
+max_private_orgas = -1   # Maximum private organnization per user, -1 for unlimited
+max_orga_reg = -1        # Maximum organnization per regular user, -1 for unlimited
+max_orga_pro = -1        # Maximum organnization per pro user, -1 for unlimited
 ```
 
 Finally, generate the certificate for dgraph authorization, and populate the schema:
@@ -111,6 +117,14 @@ Finally, generate the certificate for dgraph authorization, and populate the sch
 
 	go run main.go api
 	go run main.go notifier
+
+
+You can add users in Fractale with the following sub-command :
+
+    ./bin/fractal6 adduser 
+
+
+Note that this command would be required to add users if the mailer is not enabled as the sign-up process has an email validation step. Once the mailer is setup, new users can be invited to organizations and roles from their email, or from their username if they have already sign-up.
 
 
 ## Contributing

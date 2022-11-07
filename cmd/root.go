@@ -18,7 +18,6 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package cmd
 
 import (
@@ -27,42 +26,60 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/auth"
 )
 
 var (
-	rootCmd = &cobra.Command{
-		Use:   "fractal6",
-		Short: "Self organisation platform for humans.",
-		Long:  `Self organisation platform for humans.`,
-	}
+    rootCmd = &cobra.Command{
+        Use:   "fractal6",
+        Short: "Self-organisation for humans.",
+        Long:  `Self-organisation for humans.`,
+    }
+
+    apiCmd = &cobra.Command{
+        Use:   "api",
+        Short: "run server.",
+        Long:  `run server.`,
+        Run: func(cmd *cobra.Command, args []string) {
+            RunServer()
+        },
+        PreRun: func(cmd *cobra.Command, args []string) {
+            viper.SetDefault("rootCmd", "api")
+        },
+    }
+
+    notifierCmd = &cobra.Command{
+        Use:   "notifier",
+        Short: "run notifier daemon.",
+        Long:  `run notifier daemon.`,
+        Run: func(cmd *cobra.Command, args []string) {
+            RunNotifier()
+        },
+    }
+
+    genToken = &cobra.Command{
+        Use:   "token",
+        Short: "Generate JWT tokens.",
+        Long:  `Generate JWT tokens.`,
+        Run: func(cmd *cobra.Command, args []string) {
+            auth.GenToken()
+        },
+    }
+
 )
-
-var apiCmd = &cobra.Command{
-    Use:   "api",
-    Short: "run server.",
-    Long:  `run server.`,
-    Run: func(cmd *cobra.Command, args []string) {
-        RunServer()
-    },
-}
-
-var notifierCmd = &cobra.Command{
-    Use:   "notifier",
-    Short: "run notifier daemon.",
-    Long:  `run notifier daemon.`,
-    Run: func(cmd *cobra.Command, args []string) {
-        RunNotifier()
-    },
-}
 
 func init() {
 	cobra.OnInitialize(tools.InitViper)
     rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	viper.BindPFlag("rootCmd", rootCmd.PersistentFlags().Lookup("verbose"))
 
     // Cli init
     rootCmd.AddCommand(apiCmd)
     rootCmd.AddCommand(notifierCmd)
+    rootCmd.AddCommand(genToken)
+    // --
+    rootCmd.AddCommand(addUser)
 }
 
 // Run the root command.

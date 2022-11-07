@@ -143,8 +143,8 @@ var (
     }`)
 )
 
-func FormatError(err error, loc string) string {
-    return fmt.Sprintf(`{
+func FormatError(err error, loc string) error {
+    return fmt.Errorf(`{
         "errors":[{
             "message": "%s",
             "location": "%s"
@@ -269,7 +269,7 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     // Try getting usetCtx
     userCtx, err := db.GetDB().GetUctx(fieldId, userId)
     if err != nil {
-        return nil, err
+        return nil, FormatError(err, "fieldid")
     }
 
     // Compare hashed password.
@@ -288,7 +288,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     // Try getting userCtx
     userCtx, err := db.GetDB().GetUctx("username", uctx.Username)
     if err != nil {
-        return nil, err
+        return nil, FormatError(err, "username")
     }
 
     // Update the user roles cache.
@@ -296,7 +296,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
     var key string = userCtx.Username + "roles"
     d, _ := json.Marshal(userCtx.Roles)
     err = cache.SetEX(ctx, key, d, time.Second * 12).Err()
-    if err != nil { return nil, err }
+    if err != nil { return nil, FormatError(err, "") }
 
     regularizeUctx(userCtx)
     return userCtx, nil

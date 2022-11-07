@@ -52,6 +52,7 @@ var dgraphPrivateKey *rsa.PrivateKey
 var dgraphPublicKey *rsa.PublicKey
 var buildMode string
 var DOMAIN string
+
 // Database client
 var DB *Dgraph
 
@@ -191,8 +192,9 @@ func initDB() *Dgraph {
     if HOSTDB == "" {
         panic("Viper error: not host found")
     } else {
-        fmt.Println("Dgraph Graphql addr:", dgraphApiAddr)
-        fmt.Println("Dgraph Grpc addr:", grpcAddr)
+        // @DEBUG: log level, Viper!
+        //fmt.Println("Dgraph Graphql addr:", dgraphApiAddr)
+        //fmt.Println("Dgraph Grpc addr:", grpcAddr)
     }
 
     gqlT := map[string]*QueryString{}
@@ -391,7 +393,8 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
     // Get the Query
     q := dg.getDqlQuery(op, maps)
     // Send Request
-    if !strings.HasPrefix(op, "count") && buildMode == "DEV" {
+    if viper.GetString("rootCmd") == "api" && !strings.HasPrefix(op, "count") && buildMode == "DEV" {
+        // @DEBUG LEVEL
         fmt.Println(op)
     }
     //fmt.Println(string(q))

@@ -94,23 +94,26 @@ func (Jwt) New() *Jwt {
 		tokenAuth: jwtauth.New("HS256", []byte(jwtSecret), nil),
 	}
 
-    if buildMode == "DEV" {
-        // Api debug token
-        uctx := db.DB.GetRegularUctx()
-        o := model.RoleTypeOwner
-        uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
-        apiToken, _ := tk.issue(uctx, time.Hour*48)
-
-        // Dgraph token
-        uctx = db.DB.GetRootUctx()
-        dgraphToken := db.GetDB().BuildGqlToken(uctx, time.Hour*48)
-
-        // Log
-        fmt.Println("Api token:", Unpack64(apiToken))
-        fmt.Println("Dgraph token:", dgraphToken)
-    }
-
 	return tk
+}
+
+// Generate Api and Dgraph JWT token for debug purpose
+func GenToken() {
+    tk := tkMaster
+    // Api debug token
+    uctx := db.DB.GetRegularUctx()
+    o := model.RoleTypeOwner
+    uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
+    apiToken, _ := tk.issue(uctx, time.Hour*48)
+
+    // Dgraph token
+    uctx = db.DB.GetRootUctx()
+    dgraphToken := db.GetDB().BuildGqlToken(uctx, time.Hour*48)
+
+    // Log
+    fmt.Println("Api token:", Unpack64(apiToken))
+    fmt.Println("Dgraph token:", dgraphToken)
+
 }
 
 func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
