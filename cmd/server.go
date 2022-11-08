@@ -176,7 +176,6 @@ func RunServer() {
     }
 
     // MTA communication Endpoints
-    // @TODO: CHECK TOKEN
     // --
     // Notifications endpoint
     r.Post("/notifications", handle6.Notifications)

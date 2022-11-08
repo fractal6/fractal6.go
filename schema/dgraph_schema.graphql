@@ -98,6 +98,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   second_link: User
   skills: [String!] @search(by:[term])
   contracts: [Vote!] @hasInverse(field: node)
+  watchers: [User!] @hasInverse(field: watching)
   orga_agg: OrgaAgg
   events_history: [Event!]
 }
@@ -376,6 +377,7 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions: [Tension!] @hasInverse(field: subscribers)
+  watching: [Node!] @hasInverse(field: watchers)
   rights: UserRights!
   roles: [Node!] @hasInverse(field: first_link)
   backed_roles: [Node!] @hasInverse(field: second_link)
@@ -495,6 +497,7 @@ enum TensionType {
   Governance
   Help
   Alert
+  Annoucement
 
 }
 

@@ -125,6 +125,7 @@ type Node {
   second_link(filter: UserFilter): User
   skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
+  watchers: [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
@@ -335,6 +336,7 @@ type User {
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
+  watching: [Node!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -455,6 +457,7 @@ enum TensionType {
   Governance
   Help
   Alert
+  Annoucement
 
 }
 
@@ -559,10 +562,6 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
@@ -573,15 +572,19 @@ directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!

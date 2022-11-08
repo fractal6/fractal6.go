@@ -646,6 +646,7 @@ type ComplexityRoot struct {
 		UpdatedAt              func(childComplexity int) int
 		UserCanJoin            func(childComplexity int) int
 		Visibility             func(childComplexity int) int
+		Watchers               func(childComplexity int) int
 	}
 
 	NodeAggregateResult struct {
@@ -1081,6 +1082,7 @@ type ComplexityRoot struct {
 		TensionsCreatedAggregate  func(childComplexity int, filter *model.TensionFilter) int
 		Username                  func(childComplexity int) int
 		Utc                       func(childComplexity int) int
+		Watching                  func(childComplexity int) int
 	}
 
 	UserAggregateResult struct {
@@ -4416,6 +4418,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Visibility(childComplexity), true
 
+	case "Node.watchers":
+		if e.complexity.Node.Watchers == nil {
+			break
+		}
+
+		return e.complexity.Node.Watchers(childComplexity), true
+
 	case "NodeAggregateResult.aboutMax":
 		if e.complexity.NodeAggregateResult.AboutMax == nil {
 			break
@@ -7246,6 +7255,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Utc(childComplexity), true
 
+	case "User.watching":
+		if e.complexity.User.Watching == nil {
+			break
+		}
+
+		return e.complexity.User.Watching(childComplexity), true
+
 	case "UserAggregateResult.bioMax":
 		if e.complexity.UserAggregateResult.BioMax == nil {
 			break
@@ -8064,6 +8080,7 @@ type Node {
   second_link(filter: UserFilter): User
   skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
+  watchers: [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
@@ -8274,6 +8291,7 @@ type User {
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
+  watching: [Node!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -8394,6 +8412,7 @@ enum TensionType {
   Governance
   Help
   Alert
+  Annoucement
 
 }
 
@@ -8498,10 +8517,6 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
@@ -8512,15 +8527,19 @@ directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -20707,6 +20726,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -21512,6 +21533,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -22269,6 +22292,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -23078,6 +23103,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -24021,6 +24048,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -24366,6 +24395,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -26663,6 +26694,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -27871,6 +27904,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -28734,6 +28769,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -30455,6 +30492,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -35412,6 +35451,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -35804,6 +35845,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -36658,6 +36701,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -37123,6 +37168,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -37236,6 +37283,8 @@ func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, f
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -37389,6 +37438,110 @@ func (ec *executionContext) fieldContext_Node_contracts(ctx context.Context, fie
 	if fc.Args, err = ec.field_Node_contracts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_watchers(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_watchers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Watchers, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "lastAck":
+				return ec.fieldContext_User_lastAck(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "bio":
+				return ec.fieldContext_User_bio(ctx, field)
+			case "location":
+				return ec.fieldContext_User_location(ctx, field)
+			case "utc":
+				return ec.fieldContext_User_utc(ctx, field)
+			case "links":
+				return ec.fieldContext_User_links(ctx, field)
+			case "skills":
+				return ec.fieldContext_User_skills(ctx, field)
+			case "notifyByEmail":
+				return ec.fieldContext_User_notifyByEmail(ctx, field)
+			case "lang":
+				return ec.fieldContext_User_lang(ctx, field)
+			case "subscriptions":
+				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
+			case "rights":
+				return ec.fieldContext_User_rights(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "backed_roles":
+				return ec.fieldContext_User_backed_roles(ctx, field)
+			case "tensions_created":
+				return ec.fieldContext_User_tensions_created(ctx, field)
+			case "tensions_assigned":
+				return ec.fieldContext_User_tensions_assigned(ctx, field)
+			case "contracts":
+				return ec.fieldContext_User_contracts(ctx, field)
+			case "events":
+				return ec.fieldContext_User_events(ctx, field)
+			case "markAllAsRead":
+				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
+			case "subscriptionsAggregate":
+				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_User_rolesAggregate(ctx, field)
+			case "backed_rolesAggregate":
+				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
+			case "tensions_createdAggregate":
+				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
+			case "tensions_assignedAggregate":
+				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "eventsAggregate":
+				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -40570,6 +40723,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -42785,6 +42940,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -43317,6 +43474,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -43454,6 +43613,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -46343,6 +46504,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -46456,6 +46619,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -47975,6 +48140,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -48112,6 +48279,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -48772,6 +48941,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -48953,6 +49124,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -49317,6 +49490,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -49805,6 +49980,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -50038,6 +50215,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -52685,6 +52864,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -53589,6 +53770,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -54614,6 +54797,154 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _User_watching(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_watching(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Watching, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Private == nil {
+				return nil, errors.New("directive private is not implemented")
+			}
+			return ec.directives.Private(ctx, obj, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Node); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Node`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_watching(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Node_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Node_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Node_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Node_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "nameid":
+				return ec.fieldContext_Node_nameid(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "isRoot":
+				return ec.fieldContext_Node_isRoot(ctx, field)
+			case "parent":
+				return ec.fieldContext_Node_parent(ctx, field)
+			case "type_":
+				return ec.fieldContext_Node_type_(ctx, field)
+			case "tensions_out":
+				return ec.fieldContext_Node_tensions_out(ctx, field)
+			case "tensions_in":
+				return ec.fieldContext_Node_tensions_in(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "mandate":
+				return ec.fieldContext_Node_mandate(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "visibility":
+				return ec.fieldContext_Node_visibility(ctx, field)
+			case "mode":
+				return ec.fieldContext_Node_mode(ctx, field)
+			case "rights":
+				return ec.fieldContext_Node_rights(ctx, field)
+			case "isArchived":
+				return ec.fieldContext_Node_isArchived(ctx, field)
+			case "isPersonal":
+				return ec.fieldContext_Node_isPersonal(ctx, field)
+			case "userCanJoin":
+				return ec.fieldContext_Node_userCanJoin(ctx, field)
+			case "guestCanCreateTension":
+				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "children":
+				return ec.fieldContext_Node_children(ctx, field)
+			case "docs":
+				return ec.fieldContext_Node_docs(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "role_ext":
+				return ec.fieldContext_Node_role_ext(ctx, field)
+			case "role_type":
+				return ec.fieldContext_Node_role_type(ctx, field)
+			case "color":
+				return ec.fieldContext_Node_color(ctx, field)
+			case "first_link":
+				return ec.fieldContext_Node_first_link(ctx, field)
+			case "second_link":
+				return ec.fieldContext_Node_second_link(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
+			case "orga_agg":
+				return ec.fieldContext_Node_orga_agg(ctx, field)
+			case "events_history":
+				return ec.fieldContext_Node_events_history(ctx, field)
+			case "tensions_outAggregate":
+				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
+			case "tensions_inAggregate":
+				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
+			case "childrenAggregate":
+				return ec.fieldContext_Node_childrenAggregate(ctx, field)
+			case "docsAggregate":
+				return ec.fieldContext_Node_docsAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "events_historyAggregate":
+				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_rights(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_rights(ctx, field)
 	if err != nil {
@@ -54779,6 +55110,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -54916,6 +55249,8 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -57107,6 +57442,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -58145,6 +58482,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
 			case "orga_agg":
 				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
@@ -58331,6 +58670,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_lang(ctx, field)
 			case "subscriptions":
 				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
 			case "rights":
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
@@ -80550,6 +80891,10 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
 
+		case "watchers":
+
+			out.Values[i] = ec._Node_watchers(ctx, field, obj)
+
 		case "orga_agg":
 
 			out.Values[i] = ec._Node_orga_agg(ctx, field, obj)
@@ -83644,6 +83989,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "subscriptions":
 
 			out.Values[i] = ec._User_subscriptions(ctx, field, obj)
+
+		case "watching":
+
+			out.Values[i] = ec._User_watching(ctx, field, obj)
 
 		case "rights":
 

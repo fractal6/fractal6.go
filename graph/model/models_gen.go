@@ -1139,6 +1139,7 @@ type Node struct {
 	SecondLink             *User                   `json:"second_link,omitempty"`
 	Skills                 []string                `json:"skills,omitempty"`
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
+	Watchers               []*User                 `json:"watchers,omitempty"`
 	OrgaAgg                *OrgaAgg                `json:"orga_agg,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
@@ -2126,6 +2127,7 @@ type User struct {
 	NotifyByEmail             bool                      `json:"notifyByEmail"`
 	Lang                      Lang                      `json:"lang,omitempty"`
 	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
+	Watching                  []*Node                   `json:"watching,omitempty"`
 	Rights                    *UserRights               `json:"rights,omitempty"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
 	BackedRoles               []*Node                   `json:"backed_roles,omitempty"`
@@ -4824,6 +4826,7 @@ const (
 	TensionTypeGovernance  TensionType = "Governance"
 	TensionTypeHelp        TensionType = "Help"
 	TensionTypeAlert       TensionType = "Alert"
+	TensionTypeAnnoucement TensionType = "Annoucement"
 )
 
 var AllTensionType = []TensionType{
@@ -4831,11 +4834,12 @@ var AllTensionType = []TensionType{
 	TensionTypeGovernance,
 	TensionTypeHelp,
 	TensionTypeAlert,
+	TensionTypeAnnoucement,
 }
 
 func (e TensionType) IsValid() bool {
 	switch e {
-	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypeAlert:
+	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypeAlert, TensionTypeAnnoucement:
 		return true
 	}
 	return false
