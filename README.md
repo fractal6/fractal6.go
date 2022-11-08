@@ -2,13 +2,18 @@
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-**Fractale** is a platform for self-organization. It provides a secure space shared by the members of any organisation that features:
-* Tree and Graph-Packing organisation navigation (Circle are branches, Roles are leaves).
-* Circle mandate, governance and visibility.
-* ACL based on member Role.
-* Ticketing management through [Tensions](https://doc.fractale.co/tension/).
+**Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree, and the principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done trough **Tensions**, and make the link between users and organizations. You can think of it as an email, but more structured and more powerful.
+
+Using Fractale for your organization offers the following capabilities and feature:
+* Tree and Graph-Packing organisation navigation.
+* Organization visibility define at circles level.
+* ACL based on member role and circle governance rules.
+* Ticketing management through Tensions.
+* Discussion thread and subscription per tension.
 * Journal history of events (including mandate updates).
-* Email notifications.
+* Email notifications and response.
+* Labels system.
+* Role templates system.
 * GraphQL API.
 
 
@@ -26,7 +31,10 @@ Backend, API, Business-logic layer for [Fractale](https://fractale.co).
     git clone -b prod https://github.com/fractal6/fractal6.go
     cd fractal6.go
 
-    # Install the client UI
+    # Install the client UI (Optional)
+    # NOTE: This will install the client build for fractale.co.
+    #       To point to your own instance, you need to rebuild it (see https://github.com/fractal6/fractal6-ui.elm/)
+    #       Otherwise it will point to api.fractale.co
     make install_client
 
     # Start Redis (KV cache store)
@@ -60,7 +68,7 @@ admin_email = "admin@mydomain.com"
 email_api_url = "https://..."
 email_api_key = "..."
 # SMTP api
-# ...todo...
+# ...TODO...
 # Postal validation creds
 # postal default-dkim-record: Just the p=... part of the TXT record (without the semicolon at the end)
 dkim_key = "..."
@@ -121,7 +129,7 @@ Finally, generate the certificate for dgraph authorization, and populate the sch
 
 You can add users in Fractale with the following sub-command :
 
-    ./bin/fractal6 adduser 
+    ./bin/fractal6 adduser
 
 
 Note that this command would be required to add users if the mailer is not enabled as the sign-up process has an email validation step. Once the mailer is setup, new users can be invited to organizations and roles from their email, or from their username if they have already sign-up.
@@ -129,10 +137,12 @@ Note that this command would be required to add users if the mailer is not enabl
 
 ## Contributing
 
-Fractale is free, open-source software licensed under AGPLv3.
-
 You can open issues for bugs you've found or features you think are missing. You can also submit pull requests to this repository. To get started, take a look at [CONTRIBUTING.md](CONTRIBUTING.md).
 
-You can follow Fractale organisation and roadmap at [o/f6](https://fractale.co/o/f6).
+You can follow Fractale organisation and roadmap at [o/f6](https://fractale.co/o/f6) and espacially [t/f6/tech](https://fractale.co/t/f6/tech).
 
 IRC channel: #fractal6 on matrix.org
+
+## License
+
+Fractale is free, open-source software licensed under AGPLv3.

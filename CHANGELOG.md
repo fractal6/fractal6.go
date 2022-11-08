@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
 ## [Unrealeased]
+...
+
+## [0.7]
+
+### New
+- Add AGPLv3 License
+- mailer: Mail can be send to organisation to create tension
+- test: add some go test
+- webhook: add matrix webhook
+- tension: mentioned tensions event capability
+- cmd: adduser command to add user from command line
+- cmd: gentoken to print usable JWT token for the API + Dgraph
+
+### Changed
+- dql: returns node attributes along with labels and template roles queries.
+- mailer: refactor code that write email title and body.
+
+### Fixed
+- mailer: postal signature validation
+- build: fix schema and build instructions
+- errors: improve error formating in handlers/auth.
 
 ## [0.6.6]
 
