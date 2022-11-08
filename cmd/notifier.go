@@ -32,9 +32,10 @@ import (
     "fractale/fractal6.go/web/middleware"
     //. "fractale/fractal6.go/tools"
 )
+var REDIS_ADDRESS string = "localhost:6379"
 
 var cache *redis.Client = redis.NewClient(&redis.Options{
-    Addr:     "localhost:6379",
+    Addr:     REDIS_ADDRESS,
     //Password: "", // no password set
     //DB:       0,  // use default DB
 })
@@ -62,6 +63,8 @@ func RunNotifier() {
         log.Fatal("Failed to receive from suscriber: ", err)
         return
     }
+
+    log.Printf("Listening Redis channel @ http://%s", REDIS_ADDRESS)
 
     for msg := range subscriber.Channel() {
         switch msg.Channel {

@@ -194,9 +194,8 @@ func RunServer() {
     // Serve static frontend files
     web.FileServer(r, "/", "./public", "")
 
-
     address := HOST + ":" + PORT
-    log.Printf("Running (%s) @ http://%s", buildMode, address)
+    log.Printf("Running API (%s) @ http://%s", buildMode, address)
     http.ListenAndServe(address, r)
 }
 
