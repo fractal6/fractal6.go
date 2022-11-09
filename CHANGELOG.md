@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unrealeased]
 ...
 
-## [0.7]
+## [0.6.9]
 
 ### New
 - Add AGPLv3 License.
@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - tension: mentioned tensions event capability.
 - cmd: adduser command to add user from command line.
 - cmd: gentoken to print usable JWT token for the API + Dgraph.
-- build: add some go test.
+- build: add some go tests.
 - build: Makefile rule to build and publish release
 
 ### Changed
