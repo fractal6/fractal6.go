@@ -28,7 +28,7 @@ Using Fractale for your organization offers the following capabilities and featu
 
 Download and extract the given release
 
-    curl -H "Authorization: token $F6_TOKEN" -k https://code.fractale.co/api/packages/fractale/generic/fractal6.go/0.6.9/fractal6-amd64.zip -o fractal6-amd64.zip
+    wget https://github.com/fractal6/fractal6.go/releases/download/0.6.9/fractal6-amd64.zip
     unzip fractal6-adm64.zip
 	mv fractal6-amd64 fractal6 && cd fractal6
 
