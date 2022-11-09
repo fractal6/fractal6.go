@@ -32,6 +32,8 @@ Download and extract the given release
     unzip fractal6-adm64.zip
 	mv fractal6-amd64 fractal6 && cd fractal6
 
+> This will install the client built for fractale.co. To point to your own instance, you need to rebuild it (see [fractal6-ui.elm](https://github.com/fractal6/fractal6-ui.elm/) and [fractal6-ui.elm#3](https://github.com/fractal6/fractal6-ui.elm/issues/3) ) Otherwise it will query api.fractale.co
+
 Copy the config file template
 
     cp templates/config.toml .
