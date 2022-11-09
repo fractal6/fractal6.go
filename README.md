@@ -5,26 +5,26 @@ Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 **Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree, and the principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done trough **Tensions**, and make the link between users and organizations. You can think of it as an email, but more structured and more powerful.
 
 Using Fractale for your organization offers the following capabilities and feature:
-* Tree and Graph-Packing organisation navigation.
-* Organization visibility define at circles level.
-* ACL based on member role and circle governance rules.
-* Ticketing management through Tensions.
-* Discussion thread and subscription per tension.
-* Journal history of events (including mandate updates).
-* Email notifications and response.
-* Labels system.
-* Role templates system.
-* GraphQL API.
+* Tree and Graph-Packing organisation navigation
+* Organization visibility define at circles level
+* ACL based on member role and circle governance rules
+* Ticketing management through Tensions
+* Discussion thread and subscription per tension
+* Journal history of events (including mandate updates!)
+* Email notifications and response
+* Labels system
+* Role templates system
+* GraphQL API
 
 
-### Install
+## Install
 
-##### Requirements
+#### Requirements
 
 * Redis 4+
 
 
-##### Setup
+#### Setup
 
 Download and extract the given release
 
@@ -52,16 +52,16 @@ Copy public key for the Dgraph authorization at the end of the schema
     cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read PUBKEY; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> schema/dgraph_schema.graphql
 
 
-##### Run
+#### Run
 
 >  Redis needs to be listening at localhost:6379
 
 Launch the following processes:
 
-* ./dgraph zero --config contrib/dgraph/config-zero.yml
-* ./bin/dgraph alpha --config contrib/dgraph/config-alpha.yml
-* ./f6 api
-* ./f6 notifier
+* `./dgraph zero --config contrib/dgraph/config-zero.yml`
+* `./bin/dgraph alpha --config contrib/dgraph/config-alpha.yml`
+* `./f6 api`
+* `./f6 notifier`
 
 Load up the data schema to Dgraph
 
@@ -74,7 +74,7 @@ If it is your first go, you might want to login. But as user registration needs 
     ./f6 adduser 
 
 
-##### Deploy
+#### Deploy
 
 * setup a reverse proxy to secure connections
 * systemd unit files are available at [[contrib/systemd]]
