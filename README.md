@@ -2,7 +2,7 @@
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-**Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree, and the principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done trough **Tensions**, and make the link between users and organizations. You can think of it as an email, but more structured and more powerful.
+**Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree, and sould follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done trough **Tensions**, and make the link between users and organizations. You can think of a tension as an email, but more structured and more powerful.
 
 Using Fractale for your organization offers the following capabilities and feature:
 * Tree and Graph-Packing organisation navigation
@@ -77,7 +77,7 @@ If it is your first go, you might want to login. But as user registration needs 
 #### Deploy
 
 * setup a reverse proxy to secure connections
-* systemd unit files are available at [[contrib/systemd]]
+* systemd unit files are available in [[contrib/systemd]]
 
 
 ## Contributing

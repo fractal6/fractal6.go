@@ -5,6 +5,8 @@ MOD := fractale/fractal6.go
 BINARY := f6
 DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
+$(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
+$(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
 NAME := fractal6.go
 RELEASE_NAME := fractal6-amd64
@@ -79,38 +81,52 @@ generate:
 		sed -i '/\W\(bool\|int\)\W/I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
 
 #
-# Publish builds in gh releases
+# Publish builds for prod releases
+#
 #
 
-install_client_source: fetch_client_source
-	# Set the client version in config.toml
-	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml
+publish_prod: build_release_op
+	git push origin prod
+	@echo "-- Please upload your release to github: $(RELEASE_DIR)/$(RELEASE_NAME)"
 
-fetch_client_source:
-	# Fetch client code
-	rm -rf public/ && \
-		git clone --depth 1 ssh://git@code.skusku.site:29418/fluid-fractal/public-build.git public/ && \
-		rm -rf public/.git
+build_release_prod: pre_build_prod install_client_prod extract_client install_dgraph \
+	prod copy_config compress_release
+	@echo "-- prod release built"
 
-bootstrap_deprecated:
-	# Dgraph
-	wget https://github.com/dgraph-io/dgraph/releases/download/$(DGRAPH_RELEASE)/dgraph-linux-amd64.tar.gz
-	mkdir -p bin/
-	mv dgraph-linux-amd64.tar.gz bin/ && \
-		cd bin/ && \
-		tar zxvf dgraph-linux-amd64.tar.gz && \
-		cd ..
+pre_build_prod:
+	@if [ "$(BRANCH_NAME)" != "prod" ]; then
+		echo "You should be on the 'prod' branch to use this rule."
+		exit 1
+	fi
+	@if [ -d "$(RELEASE_DIR)" ]; then
+		echo "$(RELEASE_DIR) does exist, please remove it manually to rebuild this release."
+		exit 1
+	fi
+	echo "Building (or Re-building) release: $(RELEASE_NAME)"
+	mkdir -p $(RELEASE_DIR)/$(RELEASE_NAME)
+
+install_client_prod:
+	@curl -f https://github.com/fractal6/fractal6-ui.elm/releases/download/0.6.9/fractal6-ui.zip \
+		-o $(RELEASE_DIR)/$(RELEASE_NAME)/fractal6-ui.zip
+
 
 #
-# Publish builds in op releases
+# Publish builds for op releases
 #
 
-publish_op: pre_build_op install_client_op extract_client \
-	install_dgraph prod copy_config \
-	compress_release upload_release
-	@echo "-- done"
+publish_op: build_release_op upload_release_op
+	git push f6 op
+	@echo "-- op release published"
+
+build_release_op: pre_build_op install_client_op extract_client install_dgraph \
+	prod copy_config compress_release
+	@echo "-- op release built"
 
 pre_build_op:
+	@if [ "$(BRANCH_NAME)" != "op" ]; then
+		@echo "You should be on the 'op' branch to use this rule."
+		exit 1
+	fi
 	@if [ -d "$(RELEASE_DIR)" ]; then
 		@echo "$(RELEASE_DIR) does exist, please remove it manually to rebuild this release."
 		exit 1
@@ -123,12 +139,14 @@ install_client_op:
 		https://code.fractale.co/api/packages/fractale/generic/fractal6-ui.elm/0.6.9/fractal6-ui.zip \
 		-o $(RELEASE_DIR)/$(RELEASE_NAME)/fractal6-ui.zip
 
-extract_client:
-	@cd $(RELEASE_DIR)/$(RELEASE_NAME) && \
-		unzip fractal6-ui.zip && \
-		mv fractal6-ui public && \
-		rm -f fractal6-ui.zip && \
-		cd -
+upload_release_op:
+	@curl -f -k -H "Authorization: token $(F6_TOKEN)" --progress-bar \
+		--upload-file $(RELEASE_DIR)/$(RELEASE_NAME).zip \
+		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
+
+#
+# Share release build rules
+#
 
 install_dgraph:
 	@wget https://github.com/dgraph-io/dgraph/releases/download/$(DGRAPH_RELEASE)/dgraph-linux-amd64.tar.gz \
@@ -152,10 +170,26 @@ compress_release:
 	@(cd $(RELEASE_DIR) && zip -q -r - $(RELEASE_NAME)) > $(RELEASE_NAME).zip && \
 		mv $(RELEASE_NAME).zip $(RELEASE_DIR)
 
-upload_release:
-	@curl -f -k -H "Authorization: token $(F6_TOKEN)" --progress-bar \
-		--upload-file $(RELEASE_DIR)/$(RELEASE_NAME).zip \
-		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
+extract_client:
+	@cd $(RELEASE_DIR)/$(RELEASE_NAME) && \
+		unzip fractal6-ui.zip && \
+		mv fractal6-ui public && \
+		rm -f fractal6-ui.zip && \
+		cd -
+
+#
+# Install client from source
+#
+
+install_client_source: fetch_client_source
+	# Set the client version in config.toml
+	sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat public/client_version)\"/" config.toml
+
+fetch_client_source:
+	# Fetch client code
+	rm -rf public/ && \
+		git clone --depth 1 ssh://git@github.com/fractal6/public-build.git public/ && \
+		rm -rf public/.git
 
 #
 # Utils
