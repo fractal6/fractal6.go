@@ -17,73 +17,67 @@ Using Fractale for your organization offers the following capabilities and featu
 * GraphQL API.
 
 
-## Requirements
+### Install
+
+##### Requirements
 
 * Redis 4+
 
 
-## Install
+##### Setup
 
-#### From source
+Download and extract the given release
 
-**Setup**
+    curl -H "Authorization: token $F6_TOKEN" -k https://code.fractale.co/api/packages/fractale/generic/fractal6.go/0.6.9/fractal6-amd64.zip -o fractal6-amd64.zip
+    unzip fractal6-adm64.zip
+	mv fractal6-amd64 fractal6 && cd fractal6
 
-    git clone -b prod https://github.com/fractal6/fractal6.go
-    cd fractal6.go/
+Copy the config file template
 
-    # Install the client UI (Optional)
-    # NOTE: This will install the client built for fractale.co.
-    #       To point to your own instance, you need to rebuild it (see https://github.com/fractal6/fractal6-ui.elm/)
-    #       Otherwise it will query api.fractale.co
-    make install_client
+    cp templates/config.toml .
 
-    # Setup Dgraph (database)
-    make bootstrap
-    ./bin/dgraph zero --config contrib/dgraph/config-zero.yml
-    # Open a new terminal and run
-    ./bin/dgraph alpha --config contrib/dgraph/config-alpha.yml
+>
+> Edit the config file with your settings.
+> Update the `client_version` field if you already have a config file.
+>
 
-**Configure**
+Generate the certificates to communicate with Dgraph
 
-The server need a `config.toml` config file to run (in the working directory). You can use the following template [templates/config.toml](templates/config.toml)
+    openssl genrsa -out private.pem 2048
+    openssl rsa -in private.pem -pubout -out public.pem
 
-Finally, generate the certificate for dgraph authorization, and populate the schema:
+Copy public key for the Dgraph authorization at the end of the schema
 
-    # Generate certs
-    make certs
-
-	# Copy public key for the Dgraph authorization at the end of the schema
     sed -i '$ d' schema/dgraph_schema.graphql
-	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read PUBKEY; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> schema/dgraph_schema.graphql
-
-    # Update Dgraph schema
-    curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
+    cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read PUBKEY; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> schema/dgraph_schema.graphql
 
 
-**Launch for production**
+##### Run
 
-    # Build
-    go mod vendor
-    make prod
+>  Redis needs to be listening at localhost:6379
 
-    # Open a terminal and run (main server)
-    ./f6 api
-    # Open a second terminal and run (message passing that manage event notifications)
-    ./f6 notifier
+Launch the following processes:
+
+* ./dgraph zero --config contrib/dgraph/config-zero.yml
+* ./bin/dgraph alpha --config contrib/dgraph/config-alpha.yml
+* ./f6 api
+* ./f6 notifier
+
+Load up the data schema to Dgraph
+
+    curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql"
+
+That's it, Fractale is running \o/ and waiting for connection at the `http://localhost:8888` address.
+
+If it is your first go, you might want to login. But as user registration needs email validation and might not be working if you did not set it up, you can add new user with the CLI:
+
+    ./f6 adduser 
 
 
-**Launch for development**
+##### Deploy
 
-	go run main.go api
-	go run main.go notifier
-
-
-You can add users in Fractale with the following sub-command :
-
-    ./f6 adduser
-
-
-Note that this command would be required to add users if the mailer is not enabled as the sign-up process has an email validation step. Once the mailer is setup, new users can be invited to organizations and roles from their email, or from their username if they have already sign-up.
+* setup a reverse proxy to secure connections
+* systemd unit files are available at [[contrib/systemd]]
 
 
 ## Contributing
