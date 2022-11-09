@@ -1,0 +1,42 @@
+[server]
+instance_name = "Fractale"
+domain = "fractale.co"
+hostname = "localhost"
+port = "8888"
+jwt_secret = "my_jwt_secret"
+prometheus_instrumentation = true
+prometheus_credentials = "my_prom_secret"
+client_version = "git hash used to build the client"
+
+[mailer]
+admin_email = "admin@mydomain.com"
+# URL API
+email_api_url = "https://..."
+email_api_key = "..."
+# SMTP API
+# ...TODO...
+# Postal validation creds
+# postal default-dkim-record: Just the p=... part of the TXT record (without the semicolon at the end)
+dkim_key = "..."
+# webhook redirection for Postal alert.
+matrix_postal_room = "!...:matrix.org"
+matrix_token = "..."
+
+[db]
+hostname = "localhost"
+port_graphql = "8080"
+port_grpc = "9080"
+api = "graphql"
+admin = "admin"
+dgraph_public_key = "public.pem"
+dgraph_private_key = "private.pem"
+
+[graphql]
+complexity_limit = 200 # 50
+introspection = false
+
+[admin]
+max_public_orgas = -1    # Maximum public organnization per user, -1 for unlimited
+max_private_orgas = -1   # Maximum private organnization per user, -1 for unlimited
+max_orga_reg = -1        # Maximum organnization per regular user, -1 for unlimited
+max_orga_pro = -1        # Maximum organnization per pro user, -1 for unlimited

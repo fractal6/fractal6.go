@@ -34,7 +34,7 @@ var creds model.UserCreds
 
 var addUser = &cobra.Command{
     Use:   "adduser USERNAME EMAIL PASSWORD [--lang LANG]",
-    Short: "Add an user to the database.",
+    Short: "Add an user to the database",
     Long:  `Add an user to the databse.`,
     Args: cobra.MatchAll(
         cobra.MinimumNArgs(3),

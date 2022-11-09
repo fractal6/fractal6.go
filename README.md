@@ -29,16 +29,13 @@ Using Fractale for your organization offers the following capabilities and featu
 **Setup**
 
     git clone -b prod https://github.com/fractal6/fractal6.go
-    cd fractal6.go
+    cd fractal6.go/
 
     # Install the client UI (Optional)
-    # NOTE: This will install the client build for fractale.co.
+    # NOTE: This will install the client built for fractale.co.
     #       To point to your own instance, you need to rebuild it (see https://github.com/fractal6/fractal6-ui.elm/)
-    #       Otherwise it will point to api.fractale.co
+    #       Otherwise it will query api.fractale.co
     make install_client
-
-    # Start Redis (KV cache store)
-    sudo systemctl restart redis-server  # or "systemctl restart redis" depending on your version
 
     # Setup Dgraph (database)
     make bootstrap
@@ -48,53 +45,7 @@ Using Fractale for your organization offers the following capabilities and featu
 
 **Configure**
 
-The server need a `config.toml` config file to run (in the project's root folder, i.e `fractal6.go/`).
-You can use the following template:
-
-```config.toml
-[server]
-instance_name = "Fractale"
-domain = "fractale.co"
-hostname = "localhost"
-port = "8888"
-jwt_secret = "my_jwt_secret"
-prometheus_instrumentation = true
-prometheus_credentials = "my_prom_secret"
-client_version = "git hash used to build the client"
-
-[mailer]
-admin_email = "admin@mydomain.com"
-# URL API
-email_api_url = "https://..."
-email_api_key = "..."
-# SMTP api
-# ...TODO...
-# Postal validation creds
-# postal default-dkim-record: Just the p=... part of the TXT record (without the semicolon at the end)
-dkim_key = "..."
-# webhook redirection for Postal alert.
-matrix_postal_room = "!...:matrix.org"
-matrix_token = "..."
-
-[db]
-hostname = "localhost"
-port_graphql = "8080"
-port_grpc = "9080"
-api = "graphql"
-admin = "admin"
-dgraph_public_key = "public.pem"
-dgraph_private_key = "private.pem"
-
-[graphql]
-complexity_limit = 200 # 50
-introspection = false
-
-[admin]
-max_public_orgas = -1    # Maximum public organnization per user, -1 for unlimited
-max_private_orgas = -1   # Maximum private organnization per user, -1 for unlimited
-max_orga_reg = -1        # Maximum organnization per regular user, -1 for unlimited
-max_orga_pro = -1        # Maximum organnization per pro user, -1 for unlimited
-```
+The server need a `config.toml` config file to run (in the working directory). You can use the following template [templates/config.toml](templates/config.toml)
 
 Finally, generate the certificate for dgraph authorization, and populate the schema:
 
@@ -103,7 +54,7 @@ Finally, generate the certificate for dgraph authorization, and populate the sch
 
 	# Copy public key for the Dgraph authorization at the end of the schema
     sed -i '$ d' schema/dgraph_schema.graphql
-	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read my; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> schema/dgraph_schema.graphql
+	cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 | { read PUBKEY; echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}"; }  >> schema/dgraph_schema.graphql
 
     # Update Dgraph schema
     curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
@@ -116,9 +67,9 @@ Finally, generate the certificate for dgraph authorization, and populate the sch
     make prod
 
     # Open a terminal and run (main server)
-    ./bin/fractal6 api
+    ./f6 api
     # Open a second terminal and run (message passing that manage event notifications)
-    ./bin/fractal6 notifier
+    ./f6 notifier
 
 
 **Launch for development**
@@ -129,7 +80,7 @@ Finally, generate the certificate for dgraph authorization, and populate the sch
 
 You can add users in Fractale with the following sub-command :
 
-    ./bin/fractal6 adduser
+    ./f6 adduser
 
 
 Note that this command would be required to add users if the mailer is not enabled as the sign-up process has an email validation step. Once the mailer is setup, new users can be invited to organizations and roles from their email, or from their username if they have already sign-up.

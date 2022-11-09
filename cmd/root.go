@@ -31,14 +31,14 @@ import (
 
 var (
     rootCmd = &cobra.Command{
-        Use:   "fractal6",
-        Short: "Self-organisation for humans.",
-        Long:  `Self-organisation for humans.`,
+        Use:   "f6",
+        Short: "Fractale - Self-organisation for humans",
+        Long:  `Fractale - Self-organisation for humans.`,
     }
 
     apiCmd = &cobra.Command{
         Use:   "api",
-        Short: "run server.",
+        Short: "run server",
         Long:  `run server.`,
         Run: func(cmd *cobra.Command, args []string) {
             RunServer()
@@ -50,7 +50,7 @@ var (
 
     notifierCmd = &cobra.Command{
         Use:   "notifier",
-        Short: "run notifier daemon.",
+        Short: "run notifier daemon",
         Long:  `run notifier daemon.`,
         Run: func(cmd *cobra.Command, args []string) {
             RunNotifier()
@@ -59,7 +59,7 @@ var (
 
     genToken = &cobra.Command{
         Use:   "token",
-        Short: "Generate JWT tokens.",
+        Short: "Generate JWT tokens",
         Long:  `Generate JWT tokens.`,
         Run: func(cmd *cobra.Command, args []string) {
             auth.GenToken()

@@ -1,0 +1,21 @@
+[Unit]
+Description=Fractal6 API server
+ConditionPathExists=/home/admin/fractal6
+After=network.target
+
+[Service]
+Type=simple
+User=admin
+Group=admin
+
+WorkingDirectory=/home/admin/fractal6
+ExecStart=/home/admin/fractal6/f6 api
+
+Restart=always
+RestartSec=5s
+
+StandardOutput=append:/var/log/fractal6/api.log
+StandardError=append:/var/log/fractal6/err.log
+
+[Install]
+WantedBy=multi-user.target

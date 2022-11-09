@@ -27,11 +27,19 @@ import (
     "strconv"
     "net/http"
     "io/ioutil"
+	"github.com/spf13/viper"
 )
 
 type MatrixError struct {
     Errcode string `json:"errcode"`
     Error string   `json:"error"`
+}
+
+var MATRIX_DOMAIN string
+
+func init() {
+    InitViper()
+    MATRIX_DOMAIN = viper.GetString("mailer.matrix_domain")
 }
 
 // Send a JSON formatted string to a matrix room
@@ -53,7 +61,8 @@ func MatrixJsonSend(body, roomid, access_token string) error {
     }`, data, data)
     txnId := strconv.FormatInt(time.Now().UnixNano() / 1000000, 10)
     matrix_url := fmt.Sprintf(
-        "https://matrix.org/_matrix/client/r0/rooms/%s/send/m.room.message/%s?access_token=%s",
+        "https://%s/_matrix/client/r0/rooms/%s/send/m.room.message/%s?access_token=%s",
+        MATRIX_DOMAIN,
         roomid,
         txnId,
         access_token)

@@ -1,6 +1,9 @@
-_data/
+f6
+releases/
 public/
+_data/
 .secret
 private.pem
 public.pem
 config.toml
+!templates/*
