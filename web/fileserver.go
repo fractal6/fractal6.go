@@ -59,7 +59,7 @@ func FileServer(r chi.Router, publicUri string, location string, maxage string) 
 
 	root, _ := filepath.Abs(location)
 	if _, err := os.Stat(root); os.IsNotExist(err) {
-		panic("Public Documents Directory Not Found")
+        panic("Public Documents Directory Not Found: "+location)
 	}
 
 	fs := http.StripPrefix(publicUri, http.FileServer(http.Dir(root)))

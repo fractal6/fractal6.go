@@ -1,5 +1,5 @@
 [Unit]
-Description=Fractal6 API server
+Description=Fractal6 Notifier (MP)
 ConditionPathExists=/home/admin/fractal6
 After=network.target
 

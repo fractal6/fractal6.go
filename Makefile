@@ -140,7 +140,7 @@ install_dgraph:
 		cd -
 
 copy_config:
-	@mkdir -p $(addprefix $(RELEASE_DIR)/$(RELEASE_NAME)/, templates schema) && \
+	@mkdir -p $(addprefix $(RELEASE_DIR)/$(RELEASE_NAME)/, templates schema data) && \
 		cp templates/config.toml $(RELEASE_DIR)/$(RELEASE_NAME)/templates && \
 		sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat $(RELEASE_DIR)/$(RELEASE_NAME)/public/client_version)\"/" $(RELEASE_DIR)/$(RELEASE_NAME)/templates/config.toml && \
 		cp -r contrib/ $(RELEASE_DIR)/$(RELEASE_NAME) && \
