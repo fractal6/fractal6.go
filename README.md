@@ -2,12 +2,12 @@
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-**Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree, and sould follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done trough **Tensions**, and make the link between users and organizations. You can think of a tension as an email, but more structured and more powerful.
+**Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree and should follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done trough **Tensions**, and make the link between users and organizations. You can think of a tension as an email, but more structured and more powerful.
 
 Using Fractale for your organization offers the following capabilities and feature:
 * Tree and Graph-Packing organisation navigation
-* Organization visibility define at circles level
-* ACL based on member role and circle governance rules
+* Organization visibility defined at circles level
+* ACL based on member roles and circle governance rules
 * Ticketing management through Tensions
 * Discussion thread and subscription per tension
 * Journal history of events (including mandate updates!)
@@ -30,7 +30,8 @@ Download and extract the given release
 
     wget https://github.com/fractal6/fractal6.go/releases/download/0.6.9/fractal6-amd64.zip
     unzip fractal6-adm64.zip
-	mv fractal6-amd64 fractal6 && cd fractal6
+	mv fractal6-amd64 fractal6
+    cd fractal6
 
 > This will install the client built for fractale.co. To point to your own instance, you need to rebuild it (see [fractal6-ui.elm](https://github.com/fractal6/fractal6-ui.elm/) and [fractal6-ui.elm#3](https://github.com/fractal6/fractal6-ui.elm/issues/3) ) Otherwise it will query api.fractale.co
 
@@ -61,7 +62,7 @@ Copy public key for the Dgraph authorization at the end of the schema
 Launch the following processes:
 
 * `./dgraph zero --config contrib/dgraph/config-zero.yml`
-* `./bin/dgraph alpha --config contrib/dgraph/config-alpha.yml`
+* `./dgraph alpha --config contrib/dgraph/config-alpha.yml`
 * `./f6 api`
 * `./f6 notifier`
 
@@ -79,7 +80,7 @@ If it is your first go, you might want to login. But as user registration needs 
 #### Deploy
 
 * setup a reverse proxy to secure connections
-* systemd unit files are available in [[contrib/systemd]]
+* systemd unit files are available in [contrib/systemd](contrib/systemd)
 
 
 ## Contributing
@@ -88,7 +89,7 @@ You can open issues for bugs you've found or features you think are missing. You
 
 You can follow Fractale organisation and roadmap at [o/f6](https://fractale.co/o/f6) and espacially [t/f6/tech](https://fractale.co/t/f6/tech).
 
-IRC channel: #fractal6 on matrix.org
+**IRC channel**: #fractal6 on matrix.org
 
 ## License
 
