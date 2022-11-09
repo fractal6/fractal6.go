@@ -58,6 +58,8 @@ func TimeDelta(d1, d2 string) time.Duration {
 //InitViper Read the config file
 func InitViper() {
 	viper.AddConfigPath("./")
+    viper.AddConfigPath("../") // `go test` change directory !
+    viper.AddConfigPath("./tools") // for use with `go test`
 	viper.SetConfigName("config") // name of config file (without extension)
 	//viper.AutomaticEnv() // read in environment variables that match
     if err := viper.ReadInConfig(); err != nil {
