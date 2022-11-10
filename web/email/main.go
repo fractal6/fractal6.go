@@ -237,14 +237,16 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
     } else { // Tension updated
         subject = fmt.Sprintf("Re: [%s]%s %s", recv, type_hint, title)
+        auto_msg := ""
+        comment := ""
 
         // Add automatic message
         if notif.HasEvent(model.TensionEventClosed) {
-            payload = fmt.Sprintf(`Closed <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+            auto_msg = fmt.Sprintf(`Closed <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventReopened) {
-            payload = fmt.Sprintf(`Reopened <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+            auto_msg = fmt.Sprintf(`Reopened <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventBlobPushed) {
-            payload = fmt.Sprintf(`Mandate updated <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+            auto_msg = fmt.Sprintf(`Mandate updated <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventUserJoined) {
             u := notif.GetNewUser()
             if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
@@ -255,7 +257,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
                 // (except if the user has subscrided to the anchor tensionn which is unlikelly).
                 return nil
             }  else {
-                payload = fmt.Sprintf(`%s joined this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`%s joined this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             }
 
         } else if notif.HasEvent(model.TensionEventUserLeft) {
@@ -265,9 +267,9 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             }
             anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid" )
             if anchorTid != nil && anchorTid.(string) == notif.Tid  {
-                payload = fmt.Sprintf(`%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             } else {
-                payload = fmt.Sprintf(`%s left this role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`%s left this role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             }
         } else if notif.HasEvent(model.TensionEventMemberLinked) {
             u := notif.GetNewUser()
@@ -275,16 +277,16 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
                 u = fmt.Sprintf("%s (@%s)", x.(string), u)
             }
             if u == ui.User.Username {
-                payload = fmt.Sprintf(`Hi %s,<br><br>Congratulation, your application has been accepted in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`Hi %s,<br><br>Congratulation, your application has been accepted in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             } else {
-                payload = fmt.Sprintf(`%s is lead link in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`%s is lead link in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             }
         } else if notif.HasEvent(model.TensionEventMemberUnlinked) {
             u := notif.GetExUser()
             if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
                 u = fmt.Sprintf("%s (@%s)", x.(string), u)
             }
-            payload = fmt.Sprintf(`%s was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+            auto_msg = fmt.Sprintf(`%s was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
         }
 
         // Add eventual comment
@@ -297,9 +299,19 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             if payload != "" {
                 payload += "<br>—<br>"
             }
-            payload += bluemonday.UGCPolicy().Sanitize(buf.String())
+            comment = bluemonday.UGCPolicy().Sanitize(buf.String())
         } else {
             payload += "<br>"
+        }
+
+        if comment != "" {
+            payload += comment + "<br>"
+        }
+        if auto_msg != "" {
+            if payload != "" {
+                payload += "<br>—<br>"
+            }
+            payload += auto_msg
         }
     }
 
