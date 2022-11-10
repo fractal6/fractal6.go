@@ -63,7 +63,7 @@ Load up the data schema to Dgraph if needed
     curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql"
 
 
-### Updating Schema
+### Updating the schema
 
 Procedure to update the single source of truth schema:
 
@@ -74,7 +74,7 @@ Procedure to update the single source of truth schema:
     make genall
 
 
-### Git Branches
+### Git branches
 
 - `prod`: Tag tracking release, main branch (see also [CHANGELOG.md](CHANGELOG.md)).
 - `dev`: The current development branch. Should only be merged via merge requests.
