@@ -25,6 +25,7 @@ import (
     "strings"
 	"io/ioutil"
     "net/http"
+    "net/mail"
     "encoding/json"
 	"github.com/spf13/viper"
 
@@ -201,7 +202,11 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
     createdBy := model.User{Username: uctx.Username}
 
     // Get the nameid of the targeted circle
-    receiverid := strings.Replace(strings.Split(form.To, "@")[0], "/", "#", -1)
+    toEmail, err := mail.ParseAddress(form.To)
+    if err != nil {
+        http.Error(w, "RECIPIENT EMAIL NOT FOUND", 400); return
+    }
+    receiverid := strings.Replace(strings.Split(toEmail.Address, "@")[0], "/", "#", -1)
     filter := `eq(Node.isArchived, false)`
     if ex, _ := db.GetDB().Exists("Node.nameid", receiverid, &filter); !ex {
         http.Error(w, "NAMEID NOT FOUND", 400); return
