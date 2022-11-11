@@ -71,7 +71,6 @@ func RunServer() {
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   allowedOrigins,
-		//AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		//AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		//AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		//ExposedHeaders:   []string{"Link"},
@@ -84,19 +83,44 @@ func RunServer() {
     r.Use(middleware.RealIP)
 	r.Use(cors.Handler)
     //r.Use(middle6.RequestContextMiddleware) // Set context info
-    // JWT
-    //r.Use(jwtauth.Verifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
+    // JWT   //r.Use(jwtauth.Verifier(tkMaster.GetAuth()))
     r.Use(middle6.JwtVerifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
     r.Use(middle6.JwtDecode) // Set user claims
     // Log request
     r.Use(middleware.Logger)
-    // Recover from panic
-    //r.Use(middleware.Recoverer)
+    // Recover from panic   //r.Use(middleware.Recoverer)
     r.Use(middle6.Recoverer)
     // Set a timeout value on the request context (ctx), that will signal
     // through ctx.Done() that the request has timed out and further
     // processing should be stopped.
     r.Use(middleware.Timeout(60 * time.Second))
+
+    // Serve Prometheus instrumentation
+	if instrumentation {
+        go func() {
+            // Update metrics in a goroutine
+            for {
+                handle6.InstrumentationMeasures()
+                time.Sleep(time.Duration(time.Second * 500))
+            }
+        }()
+        secured := r.Group(nil)
+        secured.Use(middle6.CheckBearer)
+		//secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
+        secured.Handle("/metrics", handle6.InstruHandler())
+	}
+
+    // Serve Graphql Playground & introspection
+    if buildMode == "DEV" {
+        r.Get("/playground", handle6.PlaygroundHandler("/api"))
+        r.Get("/ping", handle6.Ping)
+
+        // Overwrite gql config
+        gqlConfig["introspection"] = true
+    }
+
+    // Graphql API
+    r.Post("/api", handle6.GraphqlHandler(gqlConfig))
 
     // Auth API
     r.Group(func(r chi.Router) {
@@ -120,7 +144,7 @@ func RunServer() {
         })
     })
 
-    // Http/Rest API
+    // Rest API
     r.Group(func(r chi.Router) {
         r.Route("/q", func(r chi.Router) {
 
@@ -151,30 +175,6 @@ func RunServer() {
         })
     })
 
-    // Serve Prometheus instrumentation
-	if instrumentation {
-        go func() {
-            // Update metrics in a goroutine
-            for {
-                handle6.InstrumentationMeasures()
-                time.Sleep(time.Duration(time.Second * 500))
-            }
-        }()
-        secured := r.Group(nil)
-        secured.Use(middle6.CheckBearer)
-		//secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
-        secured.Handle("/metrics", handle6.InstruHandler())
-	}
-
-    // Serve Graphql Playground & introspection
-    if buildMode == "DEV" {
-        r.Get("/playground", handle6.PlaygroundHandler("/api"))
-        r.Get("/ping", handle6.Ping)
-
-        // Overwrite gql config
-        gqlConfig["introspection"] = true
-    }
-
     // MTA communication Endpoints
     // --
     // Notifications endpoint
@@ -184,12 +184,10 @@ func RunServer() {
     // Postal webhook endpoint
     r.Post("/postal_webhook", handle6.PostalWebhook)
 
-    // Graphql API
-    r.Post("/api", handle6.GraphqlHandler(gqlConfig))
-
-    // Serve static data files
+    // Static & Public files
+    // --
+    // Serve static files
     web.FileServer(r, "/data/", "./data", "3600")
-
     // Serve static frontend files
     web.FileServer(r, "/", "./public", "")
 

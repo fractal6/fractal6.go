@@ -24,10 +24,10 @@ import (
 	"fmt"
 	"context"
 	"github.com/99designs/gqlgen/graphql"
-
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/graph/codec"
+	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
 	webauth "fractale/fractal6.go/web/auth"
 )
@@ -187,29 +187,48 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
     data, err := next(ctx)
     if err != nil { return nil, err }
 
-    if data.(model.TensionType) == model.TensionTypeAlert {
-        ctx, uctx, err := webauth.GetUserContext(ctx)
+    // Handle Special Tension
+    for _, x := range []model.TensionType{model.TensionTypeAlert, model.TensionTypeAnnoucement} {
+        if data.(model.TensionType) == x {
+            ctx, uctx, err := webauth.GetUserContext(ctx)
+            if err != nil { return nil, err }
+            // Get receiverid
+            var receiverid string
+            if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
+                receiverid = v.(string)
+            } else if ctx.Value("id") != nil {
+                x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
+                if err != nil || x == nil { return nil, LogErr("Internal error", err) }
+                receiverid = x.(string)
+            } else {
+                return nil, LogErr("Value Error", fmt.Errorf("'%s' or id is required.", *f))
+            }
 
-        // Get receiverid
-        var receiverid string
-        if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
-            receiverid = v.(string)
-        } else if ctx.Value("id") != nil {
-            x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
-            if err != nil || x == nil { return nil, LogErr("Internal error", err) }
-            receiverid = x.(string)
-        } else {
-            return nil, LogErr("Value Error", fmt.Errorf("'%s' or id is required.", *f))
+            // Check auth
+            if x == model.TensionTypeAlert {
+                // User need authority
+                ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
+                if err != nil { return nil, err }
+                if ok {
+                    return data, err
+                }
+            } else if x == model.TensionTypeAnnoucement {
+                // User need authority + root only
+                if rid, err := codec.Nid2rootid(receiverid); err != nil {
+                    return nil, err
+                } else if rid != receiverid {
+                    return nil, fmt.Errorf("Annoucement can only be created a the root circle")
+                }
+
+                ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
+                if err != nil { return nil, err }
+                if ok {
+                    return data, err
+                }
+            }
+
+            return nil, fmt.Errorf("You need to be a coordinator of this circle to create an %s tensions.", string(x))
         }
-
-        // Check auth
-        if i := auth.IsCoordo(uctx, receiverid); i >=0 {
-            return data, err
-        } else if err != nil {
-            return nil, err
-        }
-
-        return nil, fmt.Errorf("Only coordinators can create Alert tension.")
     }
 
     return data, err

@@ -29,9 +29,12 @@ import (
 )
 
 
-/* Authorization function based on the UserCtx struct
- * got from the user token.
- */
+/*
+*
+* Authorization function based on the UserCtx struct
+* got from the user token.
+*
+*/
 
 
 // GetRoles returns a list of the users roles inside an organisation
@@ -53,8 +56,8 @@ func GetRoles(uctx *model.UserCtx, nameid string) []*model.Node {
     return roles
 }
 
-// userPlayRole return true if the user play the given role (Nameid)
-func UserPlayRole(uctx *model.UserCtx, nameid string) int {
+// UserPlaysRole return true if the user play the given role (Nameid)
+func UserPlaysRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
@@ -71,7 +74,29 @@ func UserPlayRole(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-// UserIsMember return true if the user belongs to an organisation
+// UserIsOwner returns true if user is Owner in the given organization
+func UserIsOwner(uctx *model.UserCtx, nameid string) int {
+    uctx, e := webauth.MaybeRefresh(uctx)
+    if e != nil { panic(e) }
+    rootnameid, e := codec.Nid2rootid(nameid)
+    if e != nil { panic(e) }
+
+    for i, r := range uctx.Roles {
+        if *r.RoleType != model.RoleTypeOwner {
+            continue
+        }
+
+        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
+            return i
+        } else if err != nil {
+            panic(err.Error())
+        }
+    }
+
+    return -1
+}
+
+// UserIsMember return true if the user belongs to an organisation.
 func UserIsMember(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
@@ -93,7 +118,7 @@ func UserIsMember(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-// UserIsGuest return true if the user is a guest of an organisation
+// UserIsGuest return true if the user is a guest in an organisation.
 func UserIsGuest(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
@@ -115,8 +140,8 @@ func UserIsGuest(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-// UserHasRole return true if the user has at least one role in below the given node
-// other than a Guest role.
+// UserHasRole return true if the user has at least one role other than guest
+// in the given circle.
 func UserHasRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
@@ -139,8 +164,9 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-// useIsCoordo return true if the user has at least one role of Coordinator in the given node
-func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
+// UserHasCoordoRole return true if the user has at least one Coordinator role
+// in the given circle.
+func UserHasCoordoRole(uctx *model.UserCtx, nameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
@@ -163,36 +189,16 @@ func UserIsCoordo(uctx *model.UserCtx, nameid string) int {
     return -1
 }
 
-// IsCoordo returns true if a user has at least one role with right coordinator in a organisation
-func IsCoordo(uctx *model.UserCtx, nameid string) int {
+// HasCoordo returns true if he user has at least one coordinator role
+// in the given organisation.
+func HasCoordo(uctx *model.UserCtx, rootnameid string) int {
     uctx, e := webauth.MaybeRefresh(uctx)
     if e != nil { panic(e) }
-    rootnameid, e := codec.Nid2rootid(nameid)
+    rootnameid, e = codec.Nid2rootid(rootnameid)
     if e != nil { panic(e) }
 
     for i, r := range uctx.Roles {
         if *r.RoleType != model.RoleTypeCoordinator && *r.RoleType != model.RoleTypeOwner {
-            continue
-        }
-
-        if rid, err := codec.Nid2rootid(r.Nameid); err == nil && rid == rootnameid {
-            return i
-        } else if err != nil {
-            panic(err.Error())
-        }
-    }
-
-    return -1
-}
-
-func UserIsOwner(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
-    if e != nil { panic(e) }
-    rootnameid, e := codec.Nid2rootid(nameid)
-    if e != nil { panic(e) }
-
-    for i, r := range uctx.Roles {
-        if *r.RoleType != model.RoleTypeOwner {
             continue
         }
 

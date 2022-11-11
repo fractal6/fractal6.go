@@ -40,11 +40,11 @@ var (
         Use:   "api",
         Short: "run server",
         Long:  `run server.`,
-        Run: func(cmd *cobra.Command, args []string) {
-            RunServer()
-        },
         PreRun: func(cmd *cobra.Command, args []string) {
             viper.SetDefault("rootCmd", "api")
+        },
+        Run: func(cmd *cobra.Command, args []string) {
+            RunServer()
         },
     }
 
@@ -78,7 +78,6 @@ func init() {
     rootCmd.AddCommand(apiCmd)
     rootCmd.AddCommand(notifierCmd)
     rootCmd.AddCommand(genToken)
-    // --
     rootCmd.AddCommand(addUser)
 }
 

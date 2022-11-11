@@ -144,8 +144,8 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
     // Check if uctx has rights in nameid (is coordo)
     _, uctx, err := auth.GetUserContext(r.Context())
     if err != nil { http.Error(w, err.Error(), 500); return }
-    if i := ga.UserIsCoordo(uctx, form.Nameid); i < 0 {
-        http.Error(w, "Only coordinators of the root circle can do this.", 400)
+    if i := ga.UserHasCoordoRole(uctx, form.Nameid); i < 0 {
+        http.Error(w, "Only coordinators of the circle can do this.", 400)
         return
     }
 
@@ -184,8 +184,8 @@ func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
     // Check if uctx has rights in nameid (is coordo)
     _, uctx, err := auth.GetUserContext(r.Context())
     if err != nil { http.Error(w, err.Error(), 500); return }
-    if i := ga.UserIsCoordo(uctx, form.Nameid); i < 0 {
-        http.Error(w, "Only coordinators of the root circle can do this.", 400)
+    if i := ga.UserHasCoordoRole(uctx, form.Nameid); i < 0 {
+        http.Error(w, "Only coordinators of the circle can do this.", 400)
         return
     }
 

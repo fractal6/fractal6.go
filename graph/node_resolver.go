@@ -87,7 +87,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
         node := input.Nodes[0]
         rid, _ := codec.Nid2rootid(*node.Nameid)
         if rid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
-        ok, err = auth.HasCoordoRole(uctx, *node.Nameid, &mode)
+        ok, err = auth.HasCoordoAuth(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -138,7 +138,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
     // Check that user satisfy strict condition (coordo roles on node linked)
     mode := model.NodeModeCoordinated
     for _, node := range nodes {
-        ok, err = auth.HasCoordoRole(uctx, *node.Nameid, &mode)
+        ok, err = auth.HasCoordoAuth(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))

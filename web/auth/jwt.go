@@ -147,7 +147,6 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
 
 // NexuserCookie create an http cookie that embed a token
 func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
-
     // Erase growing value
     userCtx.Roles = nil
     // Ignore internal Hit value

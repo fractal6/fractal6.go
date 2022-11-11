@@ -1773,7 +1773,7 @@ func (dg Dgraph) GetLastBlobId(tid string) (*string) {
     return &bid
 }
 
-// Get all coordo roles
+// Get all coordo roles in the given circle with an user linked.
 func (dg Dgraph) HasCoordos(nameid string) (bool) {
     // Format Query
     maps := map[string]string{

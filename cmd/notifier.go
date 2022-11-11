@@ -64,7 +64,7 @@ func RunNotifier() {
         return
     }
 
-    log.Printf("Listening Redis channel @ http://%s", REDIS_ADDRESS)
+    log.Printf("Listening Redis pubsub channels @ http://%s", REDIS_ADDRESS)
 
     for msg := range subscriber.Channel() {
         switch msg.Channel {

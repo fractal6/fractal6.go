@@ -43,11 +43,9 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 // @future: GBAC authorization with @auth directive (DGraph)
 ////////////////////////////////////////////////
 
-//
-// Getters
-//
 
-func HasCoordoRole(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {
+// HasCoordoAuth tells if the user has authority in the given node.
+func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {
     // Get the node mode eventually
     if mode == nil {
         mode_, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.mode")
@@ -56,20 +54,72 @@ func HasCoordoRole(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bo
     }
 
     // Check user rights
-    ok, err := CheckUserRights(uctx, nameid, *mode)
+    ok, err := CheckUserAuth(uctx, nameid, *mode)
     if err != nil { return ok, LogErr("Internal error", err) }
 
-    // Check if user has rights in any parents if the node has no Coordo role.
+    // If the node has no Coordo roles,
+    // check auhority in parent circles.
     if !ok && !db.GetDB().HasCoordos(nameid) {
-        ok, err = CheckUpperRights(uctx, nameid, *mode)
+        ok, err = CheckUpperAuth(uctx, nameid, *mode)
     }
     return ok, err
 }
 
+//
+// Checkers
+//
+
+// CheckUserAuth return true if the user has authority in the given circle.
+func CheckUserAuth(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bool, error) {
+    var ok bool = false
+    var err error
+
+    // Get the nearest circle
+    nid, err := codec.Nid2pid(nameid)
+    if err != nil { return ok, err }
+
+    // Escape if the user is an owner
+    if UserIsOwner(uctx, nid) >= 0 { return true, err }
+
+    if mode == model.NodeModeAgile {
+        ok = UserHasRole(uctx, nid) >= 0
+    } else if mode == model.NodeModeCoordinated {
+        ok = UserHasCoordoRole(uctx, nid) >= 0
+    }
+
+    return ok, err
+}
+
+// CheckUpperRights return true if the user has authority on any on the parents of the given circle.
+func CheckUpperAuth(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bool, error) {
+    var ok bool = false
+    parents, err := db.GetDB().GetParents(nameid)
+    if err != nil { return ok, LogErr("Internal Error", err) }
+
+    for _, p := range(parents) {
+        ok, err = CheckUserAuth(uctx, p, mode)
+        if err != nil { return ok, LogErr("Internal error", err) }
+        if ok {
+            break
+        } else if db.GetDB().HasCoordos(p) {
+            // Intermediate coordo prevent upper coordo
+            // to take authority.
+            return false, err
+        }
+    }
+
+    return ok, err
+}
+
+
+//
+// Getters
+//
+
 func GetCoordosFromTid(tid string) ([]model.User, error) {
     var coordos []model.User
 
-    // Check user rights
+    // Fetch Coordo users in receiver circle.
     nodes, err := db.GetDB().Meta("getCoordosFromTid", map[string]string{"tid":tid})
     if err != nil { return coordos, LogErr("Internal error", err) }
 
@@ -128,7 +178,7 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
 func GetPeersFromTid(tid string) ([]model.User, error) {
     var peers []model.User
 
-    // Check user rights
+    // Fetch Peer users in receiver circle.
     nodes, err := db.GetDB().Meta("getPeersFromTid", map[string]string{"tid":tid})
     if err != nil { return peers, LogErr("Internal error", err) }
 
@@ -142,46 +192,6 @@ func GetPeersFromTid(tid string) ([]model.User, error) {
     }
 
     return peers, err
-}
-
-//
-// Checkers
-//
-
-// ChechUserRight return true if the user has access right (e.g. Coordo) on the given node
-func CheckUserRights(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bool, error) {
-    var ok bool = false
-    var err error
-
-    // Get the nearest circle
-    nid, err := codec.Nid2pid(nameid)
-    if err != nil { return ok, err }
-
-    // Escape if the user is an owner
-    if UserIsOwner(uctx, nid) >= 0 { return true, err }
-
-    if mode == model.NodeModeAgile {
-        ok = UserHasRole(uctx, nid) >= 0
-    } else if mode == model.NodeModeCoordinated {
-        ok = UserIsCoordo(uctx, nid) >= 0
-    }
-
-    return ok, err
-}
-
-// chechUpperRight return true if the user has access right (e.g. Coordo) on any on its parents.
-func CheckUpperRights(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bool, error) {
-    var ok bool = false
-    parents, err := db.GetDB().GetParents(nameid)
-    if err != nil { return ok, LogErr("Internal Error", err) }
-
-    for _, p := range(parents) {
-        ok, err = CheckUserRights(uctx, p, mode)
-        if err != nil { return ok, LogErr("Internal error", err) }
-        if ok { break }
-    }
-
-    return ok, err
 }
 
 //

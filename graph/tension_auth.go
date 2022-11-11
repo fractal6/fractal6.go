@@ -76,7 +76,7 @@ type AuthHookValue int
 const (
     PassingHook AuthHookValue      = 1 // for public event
     // Graph Role based
-    OwnerHook AuthHookValue        = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserRights
+    OwnerHook AuthHookValue        = 1 << 1 // @DEBUG: Not used for now as the owner is implemented in CheckUserAuth
     MemberHook AuthHookValue       = 1 << 2
     MemberStrictHook AuthHookValue = 1 << 3
     MemberActiveHook AuthHookValue = 1 << 4
@@ -265,12 +265,12 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
     }
 
     if TargetCoordoHook & em.Auth > 0 {
-        ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
+        ok, err := auth.HasCoordoAuth(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
         if ok { return ok, err }
     }
 
     if SourceCoordoHook & em.Auth > 0 {
-        ok, err := auth.HasCoordoRole(uctx, tension.Emitter.Nameid, &tension.Emitter.Mode)
+        ok, err := auth.HasCoordoAuth(uctx, tension.Emitter.Nameid, &tension.Emitter.Mode)
         if ok { return ok, err }
     }
 
@@ -316,7 +316,7 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
         if uctx.Username == *event.New {
             // If user is participant and have rights,
             // return true whitout a contract => self invitation
-            ok, err := auth.HasCoordoRole(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
+            ok, err := auth.HasCoordoAuth(uctx, tension.Receiver.Nameid, &tension.Receiver.Mode)
             return ok, nil, err
         } else {
             // Futur: return the contract instead of using addContract ?

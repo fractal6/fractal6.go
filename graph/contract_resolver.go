@@ -224,7 +224,7 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
         if err != nil { return nil, err }
         if nameid == nil { panic("empty receiverid field") }
         mode := model.NodeModeCoordinated
-        ok, err = auth.HasCoordoRole(uctx, nameid.(string), &mode)
+        ok, err = auth.HasCoordoAuth(uctx, nameid.(string), &mode)
         if err != nil { return nil, err }
     }
     if !ok {
