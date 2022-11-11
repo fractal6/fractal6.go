@@ -42,7 +42,6 @@ import (
 
 
 var ctx context.Context = context.Background()
-var user_selection string = "User.username User.email User.name User.notifyByEmail"
 
 //
 // Publisher functions (Redis)
@@ -85,160 +84,6 @@ func PublishNotifEvent(notif model.NotifNotif) error {
 }
 
 //
-// User helpers
-//
-
-// GetUserToNotify returns a list of user should receive notifications uponf tension updates.
-// Note: order is important as for priority and emailing policy.
-func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool) (map[string]model.UserNotifInfo, error) {
-    users := make(map[string]model.UserNotifInfo)
-
-    // Data needed to get the first-link
-    m, err := db.GetDB().Meta("getLastBlobTarget", map[string]string{"tid":tid})
-    if err != nil { return users, err }
-    if len(m) > 0 && m[0]["receiverid"] != nil && m[0]["nameid"] != nil && m[0]["type_"] != nil {
-        // Get First-link
-        _, nameid, err := codec.NodeIdCodec(
-            m[0]["receiverid"].(string),
-            m[0]["nameid"].(string),
-            model.NodeType(m[0]["type_"].(string)),
-        )
-        if err != nil { return users, err }
-        res, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", user_selection)
-        if err != nil { return users, err }
-        if res != nil {
-            var user model.User
-            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
-                if _, ex := users[user.Username]; !ex {
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
-                }
-            }
-        }
-    }
-
-    if withAssignees {
-        // Get Assignees
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", user_selection)
-        if err != nil { return users, err }
-        if assignees, ok := InterfaceSlice(res); ok {
-            for _, u := range assignees {
-                var user model.User
-                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
-                    if _, ex := users[user.Username]; ex { continue }
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
-                }
-            }
-        }
-    }
-
-    if withSubscribers {
-        // Get Subscribers
-        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", user_selection)
-        if err != nil { return users, err }
-        if subscribers, ok := InterfaceSlice(res); ok {
-            for _, u := range subscribers {
-                var user model.User
-                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
-                    if _, ex := users[user.Username]; ex { continue }
-                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
-                }
-            }
-        }
-    }
-
-    {
-        // Get Coordos
-        coordos, err := auth.GetCoordosFromTid(tid)
-        if err != nil { return users, err }
-        for _, user := range coordos {
-            if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsCoordo}
-        }
-    }
-
-    if withPeers {
-        // Get Peers
-        peers, err := auth.GetPeersFromTid(tid)
-        if err != nil { return users, err }
-        for _, user := range peers {
-            if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsPeer}
-        }
-    }
-
-    return users, nil
-}
-
-// Update the users map with notified users.
-// Note: only add user that are member of the given rootnameid
-// @FIX: user inside block code will be notified here...
-func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]model.UserNotifInfo) error {
-	// Remove code block
-    msg = RemoveCodeBlocks(msg)
-
-    rootnameid, err := codec.Nid2rootid(receiverid)
-    if err != nil { return err}
-
-    for i, U := range FindUsernames(msg) {
-        u := strings.ToLower(U)
-        if _, ex := users[u]; ex { continue }
-        // Check that user is a member
-        filter := `has(Node.first_link) AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")`
-        if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex { continue }
-        res, err := db.GetDB().GetFieldByEq("User.username", u, user_selection)
-        if err != nil { return err }
-        if res != nil {
-            var user model.User
-            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
-                users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
-            }
-        }
-        if i > 100 {
-            return fmt.Errorf("Too many user memtioned. Please consider using an Alert tension to notify group of users.")
-        }
-    }
-    return nil
-}
-
-// Push mentioned tension event
-func PushMentionedTension(notif model.EventNotif) error {
-	// Remove code block
-    msg := RemoveCodeBlocks(notif.Msg)
-
-    rootnameid, err := codec.Nid2rootid(notif.Receiverid)
-    if err != nil { return err}
-
-    createdAt := Now()
-    createdBy := model.UserRef{Username: &notif.Uctx.Username}
-    var goto_ string
-    for _, e := range notif.History {
-        goto_ = *e.CreatedAt
-        break
-    }
-
-    for _, tid := range FindTensions(msg) {
-        rid, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.rootnameid")
-        if err != nil { return err}
-        if rid != nil && rid.(string) == rootnameid && tid != notif.Tid {
-            // Push new event...
-            _, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "event", &model.AddEventInput{
-                CreatedAt: createdAt,
-                CreatedBy: &createdBy,
-                Tension: &model.TensionRef{ID: &tid},
-                EventType: model.TensionEventMentioned,
-                Mentioned: &model.TensionRef{ID: &notif.Tid},
-                New: &goto_,
-            })
-            if err != nil { return err }
-
-        }
-
-    }
-    return nil
-}
-
-
-//
 // Notifiers functions
 //
 
@@ -274,34 +119,46 @@ func PushEventNotifications(notif model.EventNotif) error {
     err := PushHistory(&notif)
     if err != nil { return err }
 
-    // Get people to notify
-    users := make(map[string]model.UserNotifInfo)
-    var isAlert bool
+    // Handle special case Alert and Annoucement tensions.
     var receiverid string
+    var type_ model.TensionType
     var isClosed bool
     if notif.HasEvent(model.TensionEventCreated) {
         if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
             return err
         } else if t != nil {
             tension := t.(model.JsonAtom)
-            isAlert = tension["type_"].(string) == string(model.TensionTypeAlert)
+            type_ = model.TensionType(tension["type_"].(string))
             receiverid = tension["receiverid"].(string)
             isClosed = tension["status"].(string) == string(model.TensionStatusClosed)
         }
     }
-    if isAlert {
+
+    // Get people to notify
+    users := make(map[string]model.UserNotifInfo)
+    if type_ == model.TensionTypeAlert {
         // Alert tension Notify every members (including Guest) (only for created tension)
-        if data, err := db.GetDB().GetSubMembers("nameid", receiverid, user_selection); err != nil {
-            return err
-        } else {
+        if data, err := db.GetDB().GetSubMembers("nameid", receiverid, auth.UserSelection); err == nil {
             for _, n := range data {
                 user := *n.FirstLink
                 if _, ex := users[user.Username]; ex { continue }
                 users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAlert}
             }
+        } else { return err }
+    } else if type_ == model.TensionTypeAnnoucement {
+        // Annoucement tension Notify all watching users.
+        data, err := db.GetDB().Meta("getWatchers", map[string]string{"nameid":receiverid, "user_payload":auth.UserSelection})
+        if err != nil { return err }
+        for _, u := range data {
+            var user model.User
+            if err := Map2Struct(u, &user); err != nil {
+                return  err
+            }
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAnnoucement}
         }
     } else {
-        // Get relevant users for the tension.
+        // Get relevant users to notify for that event.
         users, err = GetUsersToNotify(notif.Tid, true, true, true)
         if err != nil { return err }
     }
@@ -573,5 +430,158 @@ func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
         // No email for this one
     }
 
+    return nil
+}
+
+//
+// User helpers
+//
+
+// GetUserToNotify returns a list of user should receive notifications uponf tension updates.
+// Note: order is important as for priority and emailing policy.
+func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool) (map[string]model.UserNotifInfo, error) {
+    users := make(map[string]model.UserNotifInfo)
+
+    // Data needed to get the first-link
+    m, err := db.GetDB().Meta("getLastBlobTarget", map[string]string{"tid":tid})
+    if err != nil { return users, err }
+    if len(m) > 0 && m[0]["receiverid"] != nil && m[0]["nameid"] != nil && m[0]["type_"] != nil {
+        // Get First-link
+        _, nameid, err := codec.NodeIdCodec(
+            m[0]["receiverid"].(string),
+            m[0]["nameid"].(string),
+            model.NodeType(m[0]["type_"].(string)),
+        )
+        if err != nil { return users, err }
+        res, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", auth.UserSelection)
+        if err != nil { return users, err }
+        if res != nil {
+            var user model.User
+            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                if _, ex := users[user.Username]; !ex {
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
+                }
+            }
+        }
+    }
+
+    if withAssignees {
+        // Get Assignees
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", auth.UserSelection)
+        if err != nil { return users, err }
+        if assignees, ok := InterfaceSlice(res); ok {
+            for _, u := range assignees {
+                var user model.User
+                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+                    if _, ex := users[user.Username]; ex { continue }
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAssignee}
+                }
+            }
+        }
+    }
+
+    if withSubscribers {
+        // Get Subscribers
+        res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", auth.UserSelection)
+        if err != nil { return users, err }
+        if subscribers, ok := InterfaceSlice(res); ok {
+            for _, u := range subscribers {
+                var user model.User
+                if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+                    if _, ex := users[user.Username]; ex { continue }
+                    users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsSubscriber}
+                }
+            }
+        }
+    }
+
+    {
+        // Get Coordos
+        coordos, err := auth.GetCoordosFromTid(tid)
+        if err != nil { return users, err }
+        for _, user := range coordos {
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsCoordo}
+        }
+    }
+
+    if withPeers {
+        // Get Peers
+        peers, err := auth.GetPeersFromTid(tid)
+        if err != nil { return users, err }
+        for _, user := range peers {
+            if _, ex := users[user.Username]; ex { continue }
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsPeer}
+        }
+    }
+
+    return users, nil
+}
+
+// Update the users map with notified users.
+// Note: only add user that are member of the given rootnameid
+// @FIX: user inside block code will be notified here...
+func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]model.UserNotifInfo) error {
+	// Remove code block
+    msg = RemoveCodeBlocks(msg)
+
+    rootnameid, err := codec.Nid2rootid(receiverid)
+    if err != nil { return err}
+
+    for i, U := range FindUsernames(msg) {
+        u := strings.ToLower(U)
+        if _, ex := users[u]; ex { continue }
+        // Check that user is a member
+        filter := `has(Node.first_link) AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")`
+        if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex { continue }
+        res, err := db.GetDB().GetFieldByEq("User.username", u, auth.UserSelection)
+        if err != nil { return err }
+        if res != nil {
+            var user model.User
+            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
+            }
+        }
+        if i > 100 {
+            return fmt.Errorf("Too many user memtioned. Please consider using an Alert tension to notify group of users.")
+        }
+    }
+    return nil
+}
+
+// Push mentioned tension event
+func PushMentionedTension(notif model.EventNotif) error {
+	// Remove code block
+    msg := RemoveCodeBlocks(notif.Msg)
+
+    rootnameid, err := codec.Nid2rootid(notif.Receiverid)
+    if err != nil { return err}
+
+    createdAt := Now()
+    createdBy := model.UserRef{Username: &notif.Uctx.Username}
+    var goto_ string
+    for _, e := range notif.History {
+        goto_ = *e.CreatedAt
+        break
+    }
+
+    for _, tid := range FindTensions(msg) {
+        rid, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.rootnameid")
+        if err != nil { return err}
+        if rid != nil && rid.(string) == rootnameid && tid != notif.Tid {
+            // Push new event...
+            _, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "event", &model.AddEventInput{
+                CreatedAt: createdAt,
+                CreatedBy: &createdBy,
+                Tension: &model.TensionRef{ID: &tid},
+                EventType: model.TensionEventMentioned,
+                Mentioned: &model.TensionRef{ID: &notif.Tid},
+                New: &goto_,
+            })
+            if err != nil { return err }
+
+        }
+
+    }
     return nil
 }

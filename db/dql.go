@@ -346,10 +346,7 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(u)) {
-            User.username
-            User.email
-            User.name
-            User.notifyByEmail
+            {{.user_payload}}
         }
     }`,
     "getCoordosFromTid": `{
@@ -362,10 +359,7 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(u)) {
-            User.username
-            User.email
-            User.name
-            User.notifyByEmail
+            {{.user_payload}}
         }
     }`,
     "getPeersFromTid": `{
@@ -378,10 +372,7 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(u)) {
-            User.username
-            User.email
-            User.name
-            User.notifyByEmail
+            {{.user_payload}}
         }
     }`,
     "getParents": `{
@@ -398,6 +389,15 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid(n)) @recurse {
             Node.parent @normalize
             Node.nameid
+        }
+    }`,
+    "getWatchers": `{
+        var(func: uid({{.nameid}})) {
+            u as Node.watchers
+        }
+
+        all(func: uid(u)) {
+            {{.user_payload}}
         }
     }`,
     // @debug sub filter comments on username/author...

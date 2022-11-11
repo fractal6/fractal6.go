@@ -206,14 +206,14 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
 
             // Check auth
             if x == model.TensionTypeAlert {
-                // User need authority
+                // User need circle authority
                 ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
                 if err != nil { return nil, err }
                 if ok {
                     return data, err
                 }
             } else if x == model.TensionTypeAnnoucement {
-                // User need authority + root only
+                // User need circle authority + root only
                 if rid, err := codec.Nid2rootid(receiverid); err != nil {
                     return nil, err
                 } else if rid != receiverid {

@@ -43,6 +43,7 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 // @future: GBAC authorization with @auth directive (DGraph)
 ////////////////////////////////////////////////
 
+var UserSelection string = "User.username User.email User.name User.notifyByEmail"
 
 // HasCoordoAuth tells if the user has authority in the given node.
 func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {
@@ -116,14 +117,15 @@ func CheckUpperAuth(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bo
 // Getters
 //
 
+// @REFACTOR: this is an DQL impementation of HasCoordoAuth
 func GetCoordosFromTid(tid string) ([]model.User, error) {
     var coordos []model.User
 
     // Fetch Coordo users in receiver circle.
-    nodes, err := db.GetDB().Meta("getCoordosFromTid", map[string]string{"tid":tid})
+    nodes, err := db.GetDB().Meta("getCoordosFromTid", map[string]string{"tid":tid, "user_payload":UserSelection})
     if err != nil { return coordos, LogErr("Internal error", err) }
 
-    // Return direct coordos
+    // Return direct coordos if present
     if len(nodes) > 0 {
         for _, c := range nodes {
             var coordo model.User
@@ -156,7 +158,7 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
         }
     }
     for _, nameid := range parents {
-        res, err := db.GetDB().Meta("getCoordos2", map[string]string{"nameid": nameid})
+        res, err := db.GetDB().Meta("getCoordos2", map[string]string{"nameid": nameid, "user_payload":UserSelection})
         if err != nil { return coordos, LogErr("Internal error", err) }
 
         // stop at the first circle with coordos
@@ -179,7 +181,7 @@ func GetPeersFromTid(tid string) ([]model.User, error) {
     var peers []model.User
 
     // Fetch Peer users in receiver circle.
-    nodes, err := db.GetDB().Meta("getPeersFromTid", map[string]string{"tid":tid})
+    nodes, err := db.GetDB().Meta("getPeersFromTid", map[string]string{"tid":tid, "user_payload":UserSelection})
     if err != nil { return peers, LogErr("Internal error", err) }
 
     // Return direct peers
