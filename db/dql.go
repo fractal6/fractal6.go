@@ -392,7 +392,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
     "getWatchers": `{
-        var(func: uid({{.nameid}})) {
+        var(func: eq(Node.nameid, "{{.nameid}}")) {
             u as Node.watchers
         }
 

@@ -119,10 +119,11 @@ func PushEventNotifications(notif model.EventNotif) error {
     err := PushHistory(&notif)
     if err != nil { return err }
 
-    // Handle special case Alert and Annoucement tensions.
+    //  Alert and Annoucement tensions notify only at tension creation.
     var receiverid string
     var type_ model.TensionType
     var isClosed bool
+    // --
     if notif.HasEvent(model.TensionEventCreated) {
         if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
             return err
@@ -238,10 +239,10 @@ func PushEventNotifications(notif model.EventNotif) error {
         if err != nil { return err }
 
         // Email
-         if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
-             ui.Eid = eid
-             err = email.SendEventNotificationEmail(ui, notif)
-             if err != nil { return err }
+        if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
+            ui.Eid = eid
+            err = email.SendEventNotificationEmail(ui, notif)
+            if err != nil { return err }
         }
     }
 
