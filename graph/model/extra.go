@@ -69,7 +69,7 @@ const (
     ReasonIsSubscriber
     ReasonIsMentionned
     ReasonIsAlert
-    ReasonIsAnnoucement
+    ReasonIsAnnouncement
 )
 
 func (n NotifReason) ToText() string {
@@ -96,7 +96,7 @@ func (n NotifReason) ToText() string {
         return "you have been mentionned"
     case ReasonIsAlert:
         return "you are a member of this organisation"
-    case ReasonIsAnnoucement:
+    case ReasonIsAnnouncement:
         return "you are a watching this organisation"
     default:
         return "unknown reason"

@@ -646,7 +646,8 @@ type ComplexityRoot struct {
 		UpdatedAt              func(childComplexity int) int
 		UserCanJoin            func(childComplexity int) int
 		Visibility             func(childComplexity int) int
-		Watchers               func(childComplexity int) int
+		Watchers               func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		WatchersAggregate      func(childComplexity int, filter *model.UserFilter) int
 	}
 
 	NodeAggregateResult struct {
@@ -1082,7 +1083,8 @@ type ComplexityRoot struct {
 		TensionsCreatedAggregate  func(childComplexity int, filter *model.TensionFilter) int
 		Username                  func(childComplexity int) int
 		Utc                       func(childComplexity int) int
-		Watching                  func(childComplexity int) int
+		Watching                  func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		WatchingAggregate         func(childComplexity int, filter *model.NodeFilter) int
 	}
 
 	UserAggregateResult struct {
@@ -4423,7 +4425,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Node.Watchers(childComplexity), true
+		args, err := ec.field_Node_watchers_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Watchers(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.watchersAggregate":
+		if e.complexity.Node.WatchersAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_watchersAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.WatchersAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "NodeAggregateResult.aboutMax":
 		if e.complexity.NodeAggregateResult.AboutMax == nil {
@@ -7260,7 +7279,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.User.Watching(childComplexity), true
+		args, err := ec.field_User_watching_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Watching(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.watchingAggregate":
+		if e.complexity.User.WatchingAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_watchingAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.WatchingAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
 
 	case "UserAggregateResult.bioMax":
 		if e.complexity.UserAggregateResult.BioMax == nil {
@@ -8080,7 +8116,7 @@ type Node {
   second_link(filter: UserFilter): User
   skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  watchers: [User!]
+  watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
@@ -8091,6 +8127,7 @@ type Node {
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
+  watchersAggregate(filter: UserFilter): UserAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
 }
 
@@ -8291,7 +8328,7 @@ type User {
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
-  watching: [Node!] @private
+  watching(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -8303,6 +8340,7 @@ type User {
   event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:"username")
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
+  watchingAggregate(filter: NodeFilter): NodeAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
   backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
@@ -8412,7 +8450,7 @@ enum TensionType {
   Governance
   Help
   Alert
-  Annoucement
+  Announcement
 
 }
 
@@ -8509,37 +8547,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @cascade(fields: [String]) on FIELD
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @lambda on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8714,6 +8752,7 @@ input AddNodeInput {
   second_link: UserRef
   skills: [String!]
   contracts: [VoteRef!]
+  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -8836,6 +8875,7 @@ input AddUserInput {
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions: [TensionRef!] @x_alter(r:"ref")
+  watching: [NodeRef!] @x_alter(r:"ref")
   rights: UserRightsRef!
   roles: [NodeRef!] @x_add(r:"ref")
   backed_roles: [NodeRef!] @x_add(r:"ref")
@@ -9956,6 +9996,7 @@ enum NodeHasFilter {
   second_link
   skills
   contracts
+  watchers
   orga_agg
   events_history
 }
@@ -10015,6 +10056,7 @@ input NodePatch {
   second_link: UserRef @x_patch_ro
   skills: [String!] @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
+  watchers: [UserRef!] @x_patch_ro
   orga_agg: OrgaAggRef @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
 }
@@ -10053,6 +10095,7 @@ input NodeRef {
   second_link: UserRef
   skills: [String!]
   contracts: [VoteRef!]
+  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -10985,6 +11028,7 @@ enum UserHasFilter {
   notifyByEmail
   lang
   subscriptions
+  watching
   rights
   roles
   backed_roles
@@ -11030,6 +11074,7 @@ input UserPatch {
   notifyByEmail: Boolean @x_patch
   lang: Lang @x_patch
   subscriptions: [TensionRef!] @x_patch @x_alter(r:"ref")
+  watching: [NodeRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
   backed_roles: [NodeRef!] @x_patch_ro
@@ -11057,6 +11102,7 @@ input UserRef {
   notifyByEmail: Boolean @x_patch
   lang: Lang @x_patch
   subscriptions: [TensionRef!] @x_patch @x_alter(r:"ref")
+  watching: [NodeRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef
   roles: [NodeRef!] @x_add(r:"ref")
   backed_roles: [NodeRef!] @x_add(r:"ref")
@@ -15879,6 +15925,63 @@ func (ec *executionContext) field_Node_tensions_out_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_watchersAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_watchers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Notif_contract_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -19520,6 +19623,63 @@ func (ec *executionContext) field_User_tensions_created_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_User_watchingAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_User_watching_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Vote_contract_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -20746,6 +20906,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -21555,6 +21717,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -22314,6 +22478,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -23125,6 +23291,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -24070,6 +24238,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -24417,6 +24587,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -26714,6 +26886,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -27926,6 +28100,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -28791,6 +28967,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -30512,6 +30690,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -35473,6 +35653,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -35865,6 +36047,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -36721,6 +36905,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -37190,6 +37376,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -37305,6 +37493,8 @@ func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, f
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -37527,6 +37717,8 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -37542,6 +37734,17 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_watchers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -38281,6 +38484,99 @@ func (ec *executionContext) fieldContext_Node_contractsAggregate(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_contractsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_watchersAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_watchersAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WatchersAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_watchersAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_UserAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_UserAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_UserAggregateResult_createdAtMax(ctx, field)
+			case "lastAckMin":
+				return ec.fieldContext_UserAggregateResult_lastAckMin(ctx, field)
+			case "lastAckMax":
+				return ec.fieldContext_UserAggregateResult_lastAckMax(ctx, field)
+			case "usernameMin":
+				return ec.fieldContext_UserAggregateResult_usernameMin(ctx, field)
+			case "usernameMax":
+				return ec.fieldContext_UserAggregateResult_usernameMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_UserAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_UserAggregateResult_nameMax(ctx, field)
+			case "emailMin":
+				return ec.fieldContext_UserAggregateResult_emailMin(ctx, field)
+			case "emailMax":
+				return ec.fieldContext_UserAggregateResult_emailMax(ctx, field)
+			case "passwordMin":
+				return ec.fieldContext_UserAggregateResult_passwordMin(ctx, field)
+			case "passwordMax":
+				return ec.fieldContext_UserAggregateResult_passwordMax(ctx, field)
+			case "bioMin":
+				return ec.fieldContext_UserAggregateResult_bioMin(ctx, field)
+			case "bioMax":
+				return ec.fieldContext_UserAggregateResult_bioMax(ctx, field)
+			case "locationMin":
+				return ec.fieldContext_UserAggregateResult_locationMin(ctx, field)
+			case "locationMax":
+				return ec.fieldContext_UserAggregateResult_locationMax(ctx, field)
+			case "utcMin":
+				return ec.fieldContext_UserAggregateResult_utcMin(ctx, field)
+			case "utcMax":
+				return ec.fieldContext_UserAggregateResult_utcMax(ctx, field)
+			case "markAllAsReadMin":
+				return ec.fieldContext_UserAggregateResult_markAllAsReadMin(ctx, field)
+			case "markAllAsReadMax":
+				return ec.fieldContext_UserAggregateResult_markAllAsReadMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_watchersAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -40745,6 +41041,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -42962,6 +43260,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -43494,6 +43794,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -43633,6 +43935,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -46526,6 +46830,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -46641,6 +46947,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -48160,6 +48468,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -48299,6 +48609,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -48961,6 +49273,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -49144,6 +49458,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -49512,6 +49828,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -50002,6 +50320,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -50237,6 +50557,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -52884,6 +53206,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -53792,6 +54116,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -54936,11 +55262,24 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_watching_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -55130,6 +55469,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -55269,6 +55610,8 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -55955,6 +56298,95 @@ func (ec *executionContext) fieldContext_User_subscriptionsAggregate(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_subscriptionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_watchingAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_watchingAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WatchingAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_NodeAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_NodeAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_NodeAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
+			case "nameidMin":
+				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
+			case "nameidMax":
+				return ec.fieldContext_NodeAggregateResult_nameidMax(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "aboutMin":
+				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
+			case "aboutMax":
+				return ec.fieldContext_NodeAggregateResult_aboutMax(ctx, field)
+			case "rightsMin":
+				return ec.fieldContext_NodeAggregateResult_rightsMin(ctx, field)
+			case "rightsMax":
+				return ec.fieldContext_NodeAggregateResult_rightsMax(ctx, field)
+			case "rightsSum":
+				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
+			case "rightsAvg":
+				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_watchingAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -57464,6 +57896,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -58502,6 +58936,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
 			}
@@ -58692,6 +59128,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
 			case "backed_rolesAggregate":
@@ -61956,7 +62394,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "watchers", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -62216,6 +62654,14 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "watchers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
+			it.Watchers, err = ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -63166,7 +63612,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -63365,6 +63811,36 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				it.Subscriptions = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "watching":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watching"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Watching = data
+			} else if tmp == nil {
+				it.Watching = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
@@ -69442,7 +69918,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "watchers", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -70253,6 +70729,32 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.VoteRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "watchers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserRef); ok {
+				it.Watchers = data
+			} else if tmp == nil {
+				it.Watchers = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "orga_agg":
 			var err error
 
@@ -70318,7 +70820,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "watchers", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -70586,6 +71088,14 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "watchers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
+			it.Watchers, err = ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -75988,7 +76498,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76359,6 +76869,42 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "watching":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watching"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Watching = data
+			} else if tmp == nil {
+				it.Watching = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "rights":
 			var err error
 
@@ -76618,7 +77164,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76955,6 +77501,42 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				it.Subscriptions = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "watching":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watching"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch == nil {
+					return nil, errors.New("directive x_patch is not implemented")
+				}
+				return ec.directives.X_patch(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Watching = data
+			} else if tmp == nil {
+				it.Watching = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
@@ -80931,6 +81513,10 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_contractsAggregate(ctx, field, obj)
 
+		case "watchersAggregate":
+
+			out.Values[i] = ec._Node_watchersAggregate(ctx, field, obj)
+
 		case "events_historyAggregate":
 
 			out.Values[i] = ec._Node_events_historyAggregate(ctx, field, obj)
@@ -84036,6 +84622,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "subscriptionsAggregate":
 
 			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
+
+		case "watchingAggregate":
+
+			out.Values[i] = ec._User_watchingAggregate(ctx, field, obj)
 
 		case "rolesAggregate":
 

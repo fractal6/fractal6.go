@@ -185,6 +185,7 @@ type AddNodeInput struct {
 	SecondLink            *UserRef       `json:"second_link,omitempty"`
 	Skills                []string       `json:"skills,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
+	Watchers              []*UserRef     `json:"watchers,omitempty"`
 	OrgaAgg               *OrgaAggRef    `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
 }
@@ -307,6 +308,7 @@ type AddUserInput struct {
 	NotifyByEmail    bool            `json:"notifyByEmail"`
 	Lang             Lang            `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
+	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
@@ -1149,6 +1151,7 @@ type Node struct {
 	LabelsAggregate        *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
 	RolesAggregate         *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
 	ContractsAggregate     *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
+	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
 	EventsHistoryAggregate *EventAggregateResult   `json:"events_historyAggregate,omitempty"`
 }
 
@@ -1325,6 +1328,7 @@ type NodePatch struct {
 	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Skills                []string        `json:"skills,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
+	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
@@ -1363,6 +1367,7 @@ type NodeRef struct {
 	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Skills                []string        `json:"skills,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
+	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
@@ -2138,6 +2143,7 @@ type User struct {
 	MarkAllAsRead             *string                   `json:"markAllAsRead,omitempty"`
 	EventCount                *EventCount               `json:"event_count,omitempty"`
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
+	WatchingAggregate         *NodeAggregateResult      `json:"watchingAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
 	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
 	TensionsCreatedAggregate  *TensionAggregateResult   `json:"tensions_createdAggregate,omitempty"`
@@ -2247,6 +2253,7 @@ type UserPatch struct {
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
 	Lang             *Lang           `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
+	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
@@ -2274,6 +2281,7 @@ type UserRef struct {
 	NotifyByEmail    *bool           `json:"notifyByEmail"`
 	Lang             *Lang           `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
+	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
@@ -3741,6 +3749,7 @@ const (
 	NodeHasFilterSecondLink            NodeHasFilter = "second_link"
 	NodeHasFilterSkills                NodeHasFilter = "skills"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
+	NodeHasFilterWatchers              NodeHasFilter = "watchers"
 	NodeHasFilterOrgaAgg               NodeHasFilter = "orga_agg"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
 )
@@ -3778,13 +3787,14 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterSecondLink,
 	NodeHasFilterSkills,
 	NodeHasFilterContracts,
+	NodeHasFilterWatchers,
 	NodeHasFilterOrgaAgg,
 	NodeHasFilterEventsHistory,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterName, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterAbout, NodeHasFilterMandate, NodeHasFilterSource, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterChildren, NodeHasFilterDocs, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterSkills, NodeHasFilterContracts, NodeHasFilterWatchers, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
 		return true
 	}
 	return false
@@ -4822,11 +4832,11 @@ func (e TensionStatus) MarshalGQL(w io.Writer) {
 type TensionType string
 
 const (
-	TensionTypeOperational TensionType = "Operational"
-	TensionTypeGovernance  TensionType = "Governance"
-	TensionTypeHelp        TensionType = "Help"
-	TensionTypeAlert       TensionType = "Alert"
-	TensionTypeAnnoucement TensionType = "Annoucement"
+	TensionTypeOperational  TensionType = "Operational"
+	TensionTypeGovernance   TensionType = "Governance"
+	TensionTypeHelp         TensionType = "Help"
+	TensionTypeAlert        TensionType = "Alert"
+	TensionTypeAnnouncement TensionType = "Announcement"
 )
 
 var AllTensionType = []TensionType{
@@ -4834,12 +4844,12 @@ var AllTensionType = []TensionType{
 	TensionTypeGovernance,
 	TensionTypeHelp,
 	TensionTypeAlert,
-	TensionTypeAnnoucement,
+	TensionTypeAnnouncement,
 }
 
 func (e TensionType) IsValid() bool {
 	switch e {
-	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypeAlert, TensionTypeAnnoucement:
+	case TensionTypeOperational, TensionTypeGovernance, TensionTypeHelp, TensionTypeAlert, TensionTypeAnnouncement:
 		return true
 	}
 	return false
@@ -4967,6 +4977,7 @@ const (
 	UserHasFilterNotifyByEmail    UserHasFilter = "notifyByEmail"
 	UserHasFilterLang             UserHasFilter = "lang"
 	UserHasFilterSubscriptions    UserHasFilter = "subscriptions"
+	UserHasFilterWatching         UserHasFilter = "watching"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
 	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
@@ -4993,6 +5004,7 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterNotifyByEmail,
 	UserHasFilterLang,
 	UserHasFilterSubscriptions,
+	UserHasFilterWatching,
 	UserHasFilterRights,
 	UserHasFilterRoles,
 	UserHasFilterBackedRoles,
@@ -5006,7 +5018,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
 		return true
 	}
 	return false

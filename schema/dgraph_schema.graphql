@@ -497,7 +497,7 @@ enum TensionType {
   Governance
   Help
   Alert
-  Annoucement
+  Announcement
 
 }
 

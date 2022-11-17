@@ -1,34 +1,34 @@
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @cascade(fields: [String]) on FIELD
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+
+directive @lambda on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -203,6 +203,7 @@ input AddNodeInput {
   second_link: UserRef
   skills: [String!]
   contracts: [VoteRef!]
+  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -325,6 +326,7 @@ input AddUserInput {
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions: [TensionRef!]
+  watching: [NodeRef!]
   rights: UserRightsRef!
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
@@ -1436,6 +1438,7 @@ type Node {
   second_link(filter: UserFilter): User
   skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
+  watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -1445,6 +1448,7 @@ type Node {
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
+  watchersAggregate(filter: UserFilter): UserAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
 }
 
@@ -1637,6 +1641,7 @@ enum NodeHasFilter {
   second_link
   skills
   contracts
+  watchers
   orga_agg
   events_history
 }
@@ -1701,6 +1706,7 @@ input NodePatch {
   second_link: UserRef
   skills: [String!]
   contracts: [VoteRef!]
+  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -1739,6 +1745,7 @@ input NodeRef {
   second_link: UserRef
   skills: [String!]
   contracts: [VoteRef!]
+  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -2502,6 +2509,7 @@ enum TensionType {
   Governance
   Help
   Alert
+  Announcement
 }
 
 input TensionType_hash {
@@ -2745,6 +2753,7 @@ type User {
   notifyByEmail: Boolean!
   lang: Lang!
   subscriptions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  watching(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -2755,6 +2764,7 @@ type User {
   markAllAsRead: String
   event_count(filter: EventCountFilter): EventCount
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
+  watchingAggregate(filter: NodeFilter): NodeAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
   backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
@@ -2869,6 +2879,7 @@ enum UserHasFilter {
   notifyByEmail
   lang
   subscriptions
+  watching
   rights
   roles
   backed_roles
@@ -2914,6 +2925,7 @@ input UserPatch {
   notifyByEmail: Boolean
   lang: Lang
   subscriptions: [TensionRef!]
+  watching: [NodeRef!]
   rights: UserRightsRef
   roles: [NodeRef!]
   backed_roles: [NodeRef!]
@@ -2941,6 +2953,7 @@ input UserRef {
   notifyByEmail: Boolean
   lang: Lang
   subscriptions: [TensionRef!]
+  watching: [NodeRef!]
   rights: UserRightsRef
   roles: [NodeRef!]
   backed_roles: [NodeRef!]

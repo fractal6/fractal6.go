@@ -51,7 +51,8 @@ func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bo
     if mode == nil {
         mode_, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.mode")
         if err != nil { return false, LogErr("Internal error", err) }
-        mode = mode_.(*model.NodeMode)
+        m := model.NodeMode(mode_.(string))
+        mode = &m
     }
 
     // Check user rights

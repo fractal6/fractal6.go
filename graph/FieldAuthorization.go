@@ -188,7 +188,7 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
     if err != nil { return nil, err }
 
     // Handle Special Tension
-    for _, x := range []model.TensionType{model.TensionTypeAlert, model.TensionTypeAnnoucement} {
+    for _, x := range []model.TensionType{model.TensionTypeAlert, model.TensionTypeAnnouncement} {
         if data.(model.TensionType) == x {
             ctx, uctx, err := webauth.GetUserContext(ctx)
             if err != nil { return nil, err }
@@ -212,12 +212,12 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
                 if ok {
                     return data, err
                 }
-            } else if x == model.TensionTypeAnnoucement {
+            } else if x == model.TensionTypeAnnouncement {
                 // User need circle authority + root only
                 if rid, err := codec.Nid2rootid(receiverid); err != nil {
                     return nil, err
                 } else if rid != receiverid {
-                    return nil, fmt.Errorf("Annoucement can only be created a the root circle")
+                    return nil, fmt.Errorf("Announcement can only be created a the root circle")
                 }
 
                 ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)

@@ -119,7 +119,7 @@ func PushEventNotifications(notif model.EventNotif) error {
     err := PushHistory(&notif)
     if err != nil { return err }
 
-    //  Alert and Annoucement tensions notify only at tension creation.
+    //  Alert and Announcement tensions notify only at tension creation.
     var receiverid string
     var type_ model.TensionType
     var isClosed bool
@@ -138,7 +138,7 @@ func PushEventNotifications(notif model.EventNotif) error {
     // Get people to notify
     users := make(map[string]model.UserNotifInfo)
     if type_ == model.TensionTypeAlert {
-        // Alert tension Notify every members (including Guest) (only for created tension)
+        // Alert tension Notify every members (including Guest)
         if data, err := db.GetDB().GetSubMembers("nameid", receiverid, auth.UserSelection); err == nil {
             for _, n := range data {
                 user := *n.FirstLink
@@ -146,8 +146,8 @@ func PushEventNotifications(notif model.EventNotif) error {
                 users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAlert}
             }
         } else { return err }
-    } else if type_ == model.TensionTypeAnnoucement {
-        // Annoucement tension Notify all watching users.
+    } else if type_ == model.TensionTypeAnnouncement {
+        // Announcement tension Notify all watching users.
         data, err := db.GetDB().Meta("getWatchers", map[string]string{"nameid":receiverid, "user_payload":auth.UserSelection})
         if err != nil { return err }
         for _, u := range data {
@@ -156,7 +156,7 @@ func PushEventNotifications(notif model.EventNotif) error {
                 return  err
             }
             if _, ex := users[user.Username]; ex { continue }
-            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAnnoucement}
+            users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsAnnouncement}
         }
     } else {
         // Get relevant users to notify for that event.
