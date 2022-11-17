@@ -184,10 +184,12 @@ func init() {
     }
     reservedUsername = map[string]bool{
         // Reserved email endpoint
+        "root": true,
         "admin": true,
         "sysadmin": true,
         "alert": true,
         "contact": true,
+        "security": true,
         "notifications": true,
         "noreply": true,
         "dmarc-reports": true,

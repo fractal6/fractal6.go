@@ -23,6 +23,7 @@ package cmd
 import (
 	//"fmt"
 	"os"
+    "strings"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"fractale/fractal6.go/tools"
@@ -58,11 +59,12 @@ var (
     }
 
     genToken = &cobra.Command{
-        Use:   "token",
+        Use:   "token [username]",
         Short: "Generate JWT tokens",
         Long:  `Generate JWT tokens.`,
+        Args: cobra.MaximumNArgs(1),
         Run: func(cmd *cobra.Command, args []string) {
-            auth.GenToken()
+            auth.GenToken(strings.Join(args, ""))
         },
     }
 

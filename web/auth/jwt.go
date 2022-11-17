@@ -98,10 +98,18 @@ func (Jwt) New() *Jwt {
 }
 
 // Generate Api and Dgraph JWT token for debug purpose
-func GenToken() {
+func GenToken(username string) {
+    if username == "" {
+        username = "root"
+    }
+
     tk := tkMaster
     // Api debug token
-    uctx := db.DB.GetRegularUctx()
+    uctx := model.UserCtx{
+        Username: username,
+        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRegular},
+        Hit: 1,
+    }
     o := model.RoleTypeOwner
     uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
     apiToken, _ := tk.issue(uctx, time.Hour*48)
@@ -112,6 +120,7 @@ func GenToken() {
 
     // Log
     fmt.Println("Api token:", Unpack64(apiToken))
+    fmt.Println("---")
     fmt.Println("Dgraph token:", dgraphToken)
 
 }

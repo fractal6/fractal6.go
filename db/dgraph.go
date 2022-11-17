@@ -298,13 +298,6 @@ func (dg Dgraph) GetRootUctx() model.UserCtx {
         Hit: 1,
     }
 }
-func (dg Dgraph) GetRegularUctx() model.UserCtx {
-    return model.UserCtx{
-        Username: "root",
-        Rights: model.UserRights{CanLogin:false, CanCreateRoot:true, Type:model.UserTypeRegular},
-        Hit: 1,
-    }
-}
 
 func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
     // Get unique rootnameid
