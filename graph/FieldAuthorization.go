@@ -187,48 +187,55 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
     data, err := next(ctx)
     if err != nil { return nil, err }
 
+    type_, ok := data.(model.TensionType)
+    if !ok { // Happend if tension type is optional => when referenced...
+        return data, err
+    }
+
     // Handle Special Tension
     for _, x := range []model.TensionType{model.TensionTypeAlert, model.TensionTypeAnnouncement} {
-        if data.(model.TensionType) == x {
-            ctx, uctx, err := webauth.GetUserContext(ctx)
-            if err != nil { return nil, err }
-            // Get receiverid
-            var receiverid string
-            if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
-                receiverid = v.(string)
-            } else if ctx.Value("id") != nil {
-                x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
-                if err != nil || x == nil { return nil, LogErr("Internal error", err) }
-                receiverid = x.(string)
-            } else {
-                return nil, LogErr("Value Error", fmt.Errorf("'%s' or id is required.", *f))
-            }
-
-            // Check auth
-            if x == model.TensionTypeAlert {
-                // User need circle authority
-                ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
-                if err != nil { return nil, err }
-                if ok {
-                    return data, err
-                }
-            } else if x == model.TensionTypeAnnouncement {
-                // User need circle authority + root only
-                if rid, err := codec.Nid2rootid(receiverid); err != nil {
-                    return nil, err
-                } else if rid != receiverid {
-                    return nil, fmt.Errorf("Announcement can only be created a the root circle")
-                }
-
-                ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
-                if err != nil { return nil, err }
-                if ok {
-                    return data, err
-                }
-            }
-
-            return nil, fmt.Errorf("You need to be a coordinator of this circle to create an %s tensions.", string(x))
+        if type_ != x {
+            continue
         }
+
+        ctx, uctx, err := webauth.GetUserContext(ctx)
+        if err != nil { return nil, err }
+        // Get receiverid
+        var receiverid string
+        if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
+            receiverid = v.(string)
+        } else if ctx.Value("id") != nil {
+            x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
+            if err != nil || x == nil { return nil, LogErr("Internal error", err) }
+            receiverid = x.(string)
+        } else {
+            return nil, LogErr("Value Error", fmt.Errorf("'%s' or id is required.", *f))
+        }
+
+        // Check auth
+        if x == model.TensionTypeAlert {
+            // User need circle authority
+            ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
+            if err != nil { return nil, err }
+            if ok {
+                return data, err
+            }
+        } else if x == model.TensionTypeAnnouncement {
+            // User need circle authority + root only
+            if rid, err := codec.Nid2rootid(receiverid); err != nil {
+                return nil, err
+            } else if rid != receiverid {
+                return nil, fmt.Errorf("Announcement can only be created a the root circle")
+            }
+
+            ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
+            if err != nil { return nil, err }
+            if ok {
+                return data, err
+            }
+        }
+
+        return nil, fmt.Errorf("You need to be a coordinator of this circle to create an %s tensions.", string(x))
     }
 
     return data, err

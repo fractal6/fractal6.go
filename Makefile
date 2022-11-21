@@ -67,7 +67,7 @@ dgraph: # Do alter Dgraph
 	# Used by gqlgen_in rule
 	cp schema/dgraph_out.graphql ../fractal6-schema/gen_dgraph_out/schema.graphql
 
-schema: # Do not alter Dgraph
+schema: # Do not alter Dgraph, just merge schemas...
 	cd ../fractal6-schema
 	make gqlgen_in
 	cd -
