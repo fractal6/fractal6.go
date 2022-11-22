@@ -404,7 +404,10 @@ var dqlQueries map[string]string = map[string]string{
     "getLastComment": `{
         all(func: uid({{.tid}})) @normalize {
             title: Tension.title
-            receiverid: Tension.receiverid
+            Tension.receiver {
+                rootnameid: Node.rootnameid
+                receiverid: Node.nameid
+            }
             Tension.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message
             }
@@ -414,7 +417,10 @@ var dqlQueries map[string]string = map[string]string{
     "getLastContractComment": `{
         all(func: uid({{.cid}})) @normalize {
             Contract.tension {
-                receiverid: Tension.receiverid
+                Tension.receiver {
+                    rootnameid: Node.rootnameid
+                    receiverid: Node.nameid
+                }
             }
             Contract.comments(first:1, orderdesc: Post.createdAt) {
                 message: Post.message

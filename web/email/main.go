@@ -205,8 +205,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     }
 
     // Redirect Url
-    url_unsubscribe := fmt.Sprintf("https://"+DOMAIN+"/tension//%s?unsubscribe=email", notif.Tid)
-    url_redirect = fmt.Sprintf("https://"+DOMAIN+"/tension//%s", notif.Tid)
+    url_redirect = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s", notif.Rootnameid, notif.Tid)
     vars := []string{}
     if ui.Eid != "" {
         // Eid var is used to mark the event as read from the client.
@@ -296,31 +295,34 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             if err = md.Convert([]byte(message), &buf); err != nil {
                 return err
             }
-            if payload != "" {
-                payload += "<br>—<br>"
-            }
             comment = bluemonday.UGCPolicy().Sanitize(buf.String())
-        } else {
-            payload += "<br>"
         }
 
         if comment != "" {
-            payload += comment + "<br>"
+            payload += comment
         }
+
         if auto_msg != "" {
             if payload != "" {
-                payload += "<br>—<br>"
+                payload += "—<br>"
             }
-            payload += auto_msg
+            payload += auto_msg + "<br>"
         }
     }
 
     // Add footer
+    var url_unsubscribe string
     payload += fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.<br>
     <a href="%s">View it on Fractale</a>`, ui.Reason.ToText(), url_redirect)
     if ui.Reason == model.ReasonIsSubscriber {
+        url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unsubscribe=email", notif.Rootnameid, notif.Tid)
         payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
+    } else if ui.Reason == model.ReasonIsAnnouncement {
+        url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unwatch=email", notif.Rootnameid, notif.Tid)
+        payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a> from announcements for this organization.</div>`, url_unsubscribe)
+    } else if ui.Reason == model.ReasonIsAlert {
+        payload += ", reply to this email directly or leave this organization to stop receiving these alerts.</div>"
     } else {
         payload += " or reply to this email directly.</div>"
     }
@@ -338,10 +340,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         "html_body": "%s",
         "headers": {
             "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
-            "References": "<tension/%s@`+DOMAIN+`>",
-            "List-Unsubscribe": "<%s>"
+            "References": "<tension/%s@`+DOMAIN+`>"
         }
-    }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid, url_unsubscribe)
+    }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid)
+    // @TODO; "List-Unsubscribe": "<%s>"
     // Other fields: http://apiv1.postalserver.io/controllers/send/message
 
     req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
@@ -396,7 +398,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     }
 
     url_unsubscribe := fmt.Sprintf("https://"+DOMAIN+"/user/%s/settings?m=email", ui.User.Username)
-    url_redirect = fmt.Sprintf("https://"+DOMAIN+"/tension//%s/contract/%s", notif.Tid, notif.Contract.ID)
+    url_redirect = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s/contract/%s", notif.Rootnameid, notif.Tid, notif.Contract.ID)
     vars := []string{}
     if ui.IsPending {
         // Puid var is used to identify the pending users from client.

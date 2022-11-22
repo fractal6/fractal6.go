@@ -168,6 +168,7 @@ func PushEventNotifications(notif model.EventNotif) error {
     if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid}); err != nil {
         return err
     } else if len(m) > 0 {
+        notif.Rootnameid = m[0]["rootnameid"].(string)
         notif.Receiverid = m[0]["receiverid"].(string)
         notif.Msg, _ = m[0]["message"].(string)
         notif.Title = m[0]["title"].(string)
@@ -295,6 +296,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
     if m, err := db.GetDB().Meta("getLastContractComment", map[string]string{"cid":notif.Contract.ID}); err != nil {
         return err
     } else if len(m) > 0 {
+        notif.Rootnameid = m[0]["rootnameid"].(string)
         notif.Receiverid = m[0]["receiverid"].(string)
         notif.Msg, _ = m[0]["message"].(string)
         if notif.Msg != "" {

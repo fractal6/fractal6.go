@@ -97,7 +97,7 @@ func (n NotifReason) ToText() string {
     case ReasonIsAlert:
         return "you are a member of this organisation"
     case ReasonIsAnnouncement:
-        return "you are a watching this organisation"
+        return "you are watching this organisation"
     default:
         return "unknown reason"
     }
@@ -125,6 +125,7 @@ type EventNotif struct {
     History []*EventRef  `json:"history"`
     // The following are get after the cache publication
     // to keep the messaging system light and as fast as possible.
+    Rootnameid string    `json:"rootnameid"`
     Receiverid string    `json:"receiverid"`
     Title string         `json:"title"`
     Msg string           `json:"msg"`
@@ -137,6 +138,7 @@ type ContractNotif struct {
     ContractEvent ContractEvent `json:"contract_event"`
     // The following are get after the the cache publication
     // to keep the messaging system as fast as possible.
+    Rootnameid string           `json:"rootnameid"`
     Receiverid string           `json:"receiverid"`
     Msg string                  `json:"msg"`
 }
