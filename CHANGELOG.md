@@ -7,6 +7,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unrealeased]
 ...
 
+
+## [0.7]
+
+### New
+- schema: new announcement tension type.
+- mailer: handle user to notify for announcement tension + queries to get watchers.
+- auth: authorization for special tension type (Alert & Announcement).
+- cmd: pas optional username argument fort token gen command.
+
+## Changed
+- mailer: send valid unsubscribe/unwatch email notifications + email typo fix
+
+### Fixed
+- mailer: email formating.
+- mailer: email decoding when receiving email in a circle (create a tension).
+- auth: panic for isMember check case for non existant user/username.
+
+
 ## [0.6.9]
 
 ### New
@@ -27,6 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - mailer: postal signature validation.
 - build: fix schema and build instructions.
 - errors: improve error formating in handlers/auth.
+
 
 ## [0.6.6]
 
