@@ -29,7 +29,7 @@ import (
     "encoding/json"
     "net/http"
     "github.com/go-chi/jwtauth/v5"
-    "github.com/lestrrat-go/jwx/jwt"
+    "github.com/lestrrat-go/jwx/v2/jwt"
 	"github.com/spf13/viper"
 
     . "fractale/fractal6.go/tools"
@@ -54,7 +54,7 @@ func init () {
 
     if buildMode == "PROD" {
         isCookieSecured = true
-        tokenValidityTime = time.Hour*24*30*2
+        tokenValidityTime = time.Hour*24*30*3
     } else {
         isCookieSecured = false
         tokenValidityTime = time.Hour*12
