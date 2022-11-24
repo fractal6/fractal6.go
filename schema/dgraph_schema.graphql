@@ -58,7 +58,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         }
     }"""
 },{ rule:"""query {
-        queryNode(filter: {role_type: {eq: Bot}}) { id }
+        queryNode(filter: {role_type: {eq: Bot}, not: {visibility: {eq: Secret}}}) { id }
     }"""
 }]
 }, add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

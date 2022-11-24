@@ -320,7 +320,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
     } else if ui.Reason == model.ReasonIsAnnouncement {
         url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unwatch=email", notif.Rootnameid, notif.Tid)
-        payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a> from announcements for this organization.</div>`, url_unsubscribe)
+        payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a> from all announcements for this organization.</div>`, url_unsubscribe)
     } else if ui.Reason == model.ReasonIsAlert {
         payload += ", reply to this email directly or leave this organization to stop receiving these alerts.</div>"
     } else {
