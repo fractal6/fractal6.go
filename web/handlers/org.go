@@ -84,6 +84,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
         IsRoot: true,
         IsPersonal: &isPersonal,
         Mandate: &model.MandateRef{ Purpose: form.Purpose },
+        Watchers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}},
         // Permission
         Visibility: visibility,
         Mode: mode,
