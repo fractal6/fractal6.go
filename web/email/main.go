@@ -248,10 +248,11 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             auto_msg = fmt.Sprintf(`Mandate updated <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
         } else if notif.HasEvent(model.TensionEventUserJoined) {
             u := notif.GetNewUser()
+            itsYou := u == ui.User.Username
             if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
                 u = fmt.Sprintf("%s (@%s)", x.(string), u)
             }
-            if u == ui.User.Username {
+            if itsYou {
                 // Notification happens in contract_op.VoteEventHook function since we never go here
                 // (except if the user has subscrided to the anchor tensionn which is unlikelly).
                 return nil
@@ -266,26 +267,41 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             }
             anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid" )
             if anchorTid != nil && anchorTid.(string) == notif.Tid  {
-                auto_msg = fmt.Sprintf(`%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`%s left this organization in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             } else {
-                auto_msg = fmt.Sprintf(`%s left this role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                auto_msg = fmt.Sprintf(`%s left his role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             }
         } else if notif.HasEvent(model.TensionEventMemberLinked) {
             u := notif.GetNewUser()
+            itsYou := u == ui.User.Username
             if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
                 u = fmt.Sprintf("%s (@%s)", x.(string), u)
             }
-            if u == ui.User.Username {
+            if itsYou {
                 auto_msg = fmt.Sprintf(`Hi %s,<br><br>Congratulation, your application has been accepted in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             } else {
                 auto_msg = fmt.Sprintf(`%s is lead link in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
             }
         } else if notif.HasEvent(model.TensionEventMemberUnlinked) {
             u := notif.GetExUser()
+            itsYou := u == ui.User.Username
             if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
                 u = fmt.Sprintf("%s (@%s)", x.(string), u)
             }
-            auto_msg = fmt.Sprintf(`%s was unlinked in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+            anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid" )
+            if anchorTid != nil && anchorTid.(string) == notif.Tid  {
+                if itsYou {
+                    auto_msg = fmt.Sprintf(`You have been removed from this organization in <a href="%s">%s</a>.<br>`,  url_redirect, notif.Tid)
+                } else {
+                    auto_msg = fmt.Sprintf(`%s has been removed from this organization in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                }
+            } else {
+                if itsYou {
+                    auto_msg = fmt.Sprintf(`You have has been unlinked from this role in <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+                } else {
+                    auto_msg = fmt.Sprintf(`%s has been unlinked from this role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+                }
+            }
         }
 
         // Add eventual comment
@@ -418,7 +434,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
         case model.ContractStatusOpen:
             if ui.Reason == model.ReasonIsInvited {
                 subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
-                payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited in the organisation <a style="color:#002e62;" href="https://`+DOMAIN+`/o/%s">%s</a> by %s.<br><br>
+                payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited in the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a> by %s.<br><br>
                 You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, recv, recv, author, url_redirect, url_redirect)
             } else if ui.Reason == model.ReasonIsLinkCandidate {
                 subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
