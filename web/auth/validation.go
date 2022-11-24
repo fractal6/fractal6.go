@@ -37,12 +37,6 @@ import (
 
 // Library errors
 var (
-    ErrBadNameidFormat = errors.New(`{
-        "errors":[{
-            "message":"Please enter a valid name.",
-            "location": "nameid"
-        }]
-    }`)
     ErrBadUsernameFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid username. Special characters (@:!,?%. etc) are not allowed.",
@@ -59,6 +53,12 @@ var (
         "errors":[{
             "message":"Username too short.",
             "location": "username"
+        }]
+    }`)
+    ErrBadNameidFormat = errors.New(`{
+        "errors":[{
+            "message":"Please enter a valid name.",
+            "location": "nameid"
         }]
     }`)
     ErrBadNameFormat = errors.New(`{

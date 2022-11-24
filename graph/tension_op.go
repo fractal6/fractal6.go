@@ -382,6 +382,7 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
     // * ensure first_link is free on link
     // * Link/unlink user
     var ok bool
+    var unsafe bool = false
 
     blob := GetBlob(tension)
     if blob == nil { return false, fmt.Errorf("blob not found.") }
@@ -397,13 +398,14 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
         var nf model.NodeFragment
         StructMap(n, &nf)
         if *nf.RoleType != model.RoleTypeGuest {
-            return false, LogErr("Value error", fmt.Errorf("You cannot detach this role like this."))
+            return false, LogErr("Value error", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
         }
         nf.FirstLink = event.Old
         node = &nf
+        unsafe = true
     }
 
-    ok, err := TryUpdateLink(uctx, tension, node, event)
+    ok, err := TryUpdateLink(uctx, tension, node, event, unsafe)
 
     return ok, err
 }

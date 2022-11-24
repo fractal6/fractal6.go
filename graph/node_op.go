@@ -178,31 +178,38 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
     return ok, err
 }
 
-func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, event *model.EventRef) (bool, error) {
+func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, event *model.EventRef, unsafe bool) (bool, error) {
+    var ok bool
     parentid := tension.Receiver.Nameid
 
     // Get References
     rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
-    if err != nil { return false, err }
+    if err != nil { return ok, err }
 
-    ok, err := NodeCheck(uctx, node, nameid, tension.Action)
-    if err != nil || !ok { return ok, err }
+    // unsafe is used to Guest user to be unlink,
+    // as the nameid include a "@" char.
+    if !unsafe {
+        ok, err = NodeCheck(uctx, node, nameid, tension.Action)
+        if err != nil || !ok { return ok, err }
+    } else {
+        ok = true
+    }
 
     // Get the current first link
     firstLink, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
-    if err != nil { return false, err }
+    if err != nil { return ok, err }
 
     if *event.EventType == model.TensionEventMemberLinked {
         // Link user
         // --
-        if firstLink != nil {return false, fmt.Errorf("Role is already linked.")}
+        if firstLink != nil {return ok, fmt.Errorf("Role is already linked.")}
         err = LinkUser(rootnameid, nameid, *event.New)
-        if err != nil { return false, err }
+        if err != nil { return ok, err }
     } else if *event.EventType == model.TensionEventMemberUnlinked {
         // UnLink user
         // --
         err = UnlinkUser(rootnameid, nameid, *event.Old)
-        if err != nil { return false, err }
+        if err != nil { return ok, err }
     }
 
     // Update NodeFragment
@@ -210,6 +217,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
     if node.ID != "" {
         err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
     }
+
     return ok, err
 }
 
