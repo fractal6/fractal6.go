@@ -228,6 +228,7 @@ type AddPendingUserInput struct {
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
+	Subscribe  *bool          `json:"subscribe"`
 }
 
 type AddPendingUserPayload struct {
@@ -1493,6 +1494,7 @@ type PendingUser struct {
 	EmailToken         *string                  `json:"email_token,omitempty"`
 	Token              *string                  `json:"token,omitempty"`
 	Contracts          []*Contract              `json:"contracts,omitempty"`
+	Subscribe          *bool                    `json:"subscribe"`
 	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 }
 
@@ -1538,6 +1540,7 @@ type PendingUserPatch struct {
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
+	Subscribe  *bool          `json:"subscribe"`
 }
 
 type PendingUserRef struct {
@@ -1549,6 +1552,7 @@ type PendingUserRef struct {
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
+	Subscribe  *bool          `json:"subscribe"`
 }
 
 type Point struct {
@@ -4187,6 +4191,7 @@ const (
 	PendingUserHasFilterEmailToken PendingUserHasFilter = "email_token"
 	PendingUserHasFilterToken      PendingUserHasFilter = "token"
 	PendingUserHasFilterContracts  PendingUserHasFilter = "contracts"
+	PendingUserHasFilterSubscribe  PendingUserHasFilter = "subscribe"
 )
 
 var AllPendingUserHasFilter = []PendingUserHasFilter{
@@ -4197,11 +4202,12 @@ var AllPendingUserHasFilter = []PendingUserHasFilter{
 	PendingUserHasFilterEmailToken,
 	PendingUserHasFilterToken,
 	PendingUserHasFilterContracts,
+	PendingUserHasFilterSubscribe,
 }
 
 func (e PendingUserHasFilter) IsValid() bool {
 	switch e {
-	case PendingUserHasFilterUpdatedAt, PendingUserHasFilterUsername, PendingUserHasFilterPassword, PendingUserHasFilterEmail, PendingUserHasFilterEmailToken, PendingUserHasFilterToken, PendingUserHasFilterContracts:
+	case PendingUserHasFilterUpdatedAt, PendingUserHasFilterUsername, PendingUserHasFilterPassword, PendingUserHasFilterEmail, PendingUserHasFilterEmailToken, PendingUserHasFilterToken, PendingUserHasFilterContracts, PendingUserHasFilterSubscribe:
 		return true
 	}
 	return false

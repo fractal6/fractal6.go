@@ -59,6 +59,7 @@ type UserCreds struct {
     Password   string  `json:"password"`
     Puid       *string `json:"puid"`
     EmailToken *string `json:"email_token"`
+    Subscribe  Boolean `json:"subscribe"`
 }
 
 

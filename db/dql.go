@@ -277,6 +277,7 @@ var dqlQueries map[string]string = map[string]string{
             PendingUser.email
             PendingUser.password
             PendingUser.updatedAt
+            PendingUser.subscribe
         }
     }`,
     "getNode": `{

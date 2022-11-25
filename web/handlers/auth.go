@@ -70,7 +70,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
     pending_, err := db.DB.GetFieldByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
     pending, _ := pending_.(model.JsonAtom)
 
-    // Delay to prevent attack and uiser creation hijacking
+    // Delay to prevent attack and user creation hijacking
     now := Now()
     if pending["updatedAt"] != nil &&
     TimeDelta(now, pending["updatedAt"].(string)) < time.Minute * 5 {
@@ -88,6 +88,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
                 Password: &passwd,
                 EmailToken: &email_token,
                 UpdatedAt: &now,
+                Subscribe: creds.Subscribe.ToBoolPtr(),
             },
         })
         if err != nil {
@@ -104,6 +105,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
             Password: &passwd,
             EmailToken: &email_token,
             UpdatedAt: &now,
+            Subscribe: creds.Subscribe.ToBoolPtr(),
         })
     }
     if err != nil {
@@ -139,6 +141,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
         Email string
         Password string
         UpdatedAt *string
+        Subscribe  bool
     }{}
     if creds.EmailToken != nil {
         // User signup parcour
@@ -420,7 +423,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
         Challenge string
     }
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		// Body structure error
@@ -496,7 +499,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
         Token string
     }
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		// Body structure error
@@ -573,7 +576,7 @@ func UuidCheck(w http.ResponseWriter, r *http.Request) {
         Token string
     }
 
-	// Get the JSON body and decode into UserCreds
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		// Body structure error

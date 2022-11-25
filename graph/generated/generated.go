@@ -756,6 +756,7 @@ type ComplexityRoot struct {
 		EmailToken         func(childComplexity int) int
 		ID                 func(childComplexity int) int
 		Password           func(childComplexity int) int
+		Subscribe          func(childComplexity int) int
 		Token              func(childComplexity int) int
 		UpdatedAt          func(childComplexity int) int
 		Username           func(childComplexity int) int
@@ -5072,6 +5073,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PendingUser.Password(childComplexity), true
 
+	case "PendingUser.subscribe":
+		if e.complexity.PendingUser.Subscribe == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.Subscribe(childComplexity), true
+
 	case "PendingUser.token":
 		if e.complexity.PendingUser.Token == nil {
 			break
@@ -8358,6 +8366,7 @@ type PendingUser {
   email_token: String @hidden
   token: String @hidden
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  subscribe: Boolean
 
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
 }
@@ -8547,37 +8556,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8795,6 +8804,7 @@ input AddPendingUserInput {
   email_token: String
   token: String
   contracts: [ContractRef!]
+  subscribe: Boolean
 }
 
 type AddPendingUserPayload {
@@ -10257,6 +10267,7 @@ enum PendingUserHasFilter {
   email_token
   token
   contracts
+  subscribe
 }
 
 input PendingUserOrder {
@@ -10282,6 +10293,7 @@ input PendingUserPatch {
   email_token: String @x_patch_ro
   token: String @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
+  subscribe: Boolean @x_patch_ro
 }
 
 input PendingUserRef {
@@ -10293,6 +10305,7 @@ input PendingUserRef {
   email_token: String
   token: String
   contracts: [ContractRef!]
+  subscribe: Boolean
 }
 
 type Point {
@@ -21213,6 +21226,8 @@ func (ec *executionContext) fieldContext_AddPendingUserPayload_pendingUser(ctx c
 				return ec.fieldContext_PendingUser_token(ctx, field)
 			case "contracts":
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
+			case "subscribe":
+				return ec.fieldContext_PendingUser_subscribe(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -24319,6 +24334,8 @@ func (ec *executionContext) fieldContext_Contract_pending_candidates(ctx context
 				return ec.fieldContext_PendingUser_token(ctx, field)
 			case "contracts":
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
+			case "subscribe":
+				return ec.fieldContext_PendingUser_subscribe(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -27307,6 +27324,8 @@ func (ec *executionContext) fieldContext_DeletePendingUserPayload_pendingUser(ct
 				return ec.fieldContext_PendingUser_token(ctx, field)
 			case "contracts":
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
+			case "subscribe":
+				return ec.fieldContext_PendingUser_subscribe(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -42390,6 +42409,44 @@ func (ec *executionContext) fieldContext_PendingUser_contracts(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _PendingUser_subscribe(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PendingUser_subscribe(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subscribe, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PendingUser_subscribe(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PendingUser_contractsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 	if err != nil {
@@ -47121,6 +47178,8 @@ func (ec *executionContext) fieldContext_Query_getPendingUser(ctx context.Contex
 				return ec.fieldContext_PendingUser_token(ctx, field)
 			case "contracts":
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
+			case "subscribe":
+				return ec.fieldContext_PendingUser_subscribe(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -47190,6 +47249,8 @@ func (ec *executionContext) fieldContext_Query_queryPendingUser(ctx context.Cont
 				return ec.fieldContext_PendingUser_token(ctx, field)
 			case "contracts":
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
+			case "subscribe":
+				return ec.fieldContext_PendingUser_subscribe(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -53513,6 +53574,8 @@ func (ec *executionContext) fieldContext_UpdatePendingUserPayload_pendingUser(ct
 				return ec.fieldContext_PendingUser_token(ctx, field)
 			case "contracts":
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
+			case "subscribe":
+				return ec.fieldContext_PendingUser_subscribe(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -62830,7 +62893,7 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts"}
+	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -62930,6 +62993,14 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subscribe":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribe"))
+			it.Subscribe, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -71966,7 +72037,7 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts"}
+	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72151,6 +72222,30 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "subscribe":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribe"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.Subscribe = data
+			} else if tmp == nil {
+				it.Subscribe = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -72164,7 +72259,7 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "updatedAt", "username", "password", "email", "email_token", "token", "contracts"}
+	fieldsInOrder := [...]string{"id", "updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72272,6 +72367,14 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subscribe":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribe"))
+			it.Subscribe, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -82047,6 +82150,10 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 		case "contracts":
 
 			out.Values[i] = ec._PendingUser_contracts(ctx, field, obj)
+
+		case "subscribe":
+
+			out.Values[i] = ec._PendingUser_subscribe(ctx, field, obj)
 
 		case "contractsAggregate":
 

@@ -398,6 +398,7 @@ type PendingUser {
   email_token: String @search(by:[hash])
   token: String @search(by:[hash])
   contracts: [Contract!]
+  subscribe: Boolean
 }
 
 type UserRights {
