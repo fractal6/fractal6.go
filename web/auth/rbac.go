@@ -25,21 +25,20 @@ import (
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/db"
-    webauth "fractale/fractal6.go/web/auth"
 )
 
 
 /*
-*
-* Authorization function based on the UserCtx struct
-* got from the user token.
-*
-*/
+ *
+ * Authorization function based on the UserCtx struct
+ * got from the user token.
+ *
+ */
 
 
 // GetRoles returns a list of the users roles inside an organisation
 func GetRoles(uctx *model.UserCtx, nameid string) []*model.Node {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
     rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
@@ -58,7 +57,7 @@ func GetRoles(uctx *model.UserCtx, nameid string) []*model.Node {
 
 // UserPlaysRole return true if the user play the given role (Nameid)
 func UserPlaysRole(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     if !codec.IsRole(nameid) {
@@ -76,7 +75,7 @@ func UserPlaysRole(uctx *model.UserCtx, nameid string) int {
 
 // UserIsOwner returns true if user is Owner in the given organization
 func UserIsOwner(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
     rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
@@ -98,7 +97,7 @@ func UserIsOwner(uctx *model.UserCtx, nameid string) int {
 
 // UserIsMember return true if the user belongs to an organisation.
 func UserIsMember(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
     rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
@@ -120,7 +119,7 @@ func UserIsMember(uctx *model.UserCtx, nameid string) int {
 
 // UserIsGuest return true if the user is a guest in an organisation.
 func UserIsGuest(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
     rootnameid, e := codec.Nid2rootid(nameid)
     if e != nil { panic(e) }
@@ -143,7 +142,7 @@ func UserIsGuest(uctx *model.UserCtx, nameid string) int {
 // UserHasRole return true if the user has at least one role other than guest
 // in the given circle.
 func UserHasRole(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     if codec.IsRole(nameid) {
@@ -167,7 +166,7 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
 // UserHasCoordoRole return true if the user has at least one Coordinator role
 // in the given circle.
 func UserHasCoordoRole(uctx *model.UserCtx, nameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
 
     if codec.IsRole(nameid) {
@@ -192,7 +191,7 @@ func UserHasCoordoRole(uctx *model.UserCtx, nameid string) int {
 // HasCoordo returns true if he user has at least one coordinator role
 // in the given organisation.
 func HasCoordo(uctx *model.UserCtx, rootnameid string) int {
-    uctx, e := webauth.MaybeRefresh(uctx)
+    uctx, e := MaybeRefresh(uctx)
     if e != nil { panic(e) }
     rootnameid, e = codec.Nid2rootid(rootnameid)
     if e != nil { panic(e) }

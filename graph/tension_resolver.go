@@ -26,7 +26,7 @@ import (
     "github.com/99designs/gqlgen/graphql"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/db"
-    webauth"fractale/fractal6.go/web/auth"
+    "fractale/fractal6.go/web/auth"
     . "fractale/fractal6.go/tools"
 )
 
@@ -84,7 +84,7 @@ func tensionInputHook(ctx context.Context, obj interface{}, next graphql.Resolve
 // Add Tension - Hook
 func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input
@@ -131,7 +131,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 // Update Tension - Hook
 func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input

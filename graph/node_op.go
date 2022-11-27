@@ -25,8 +25,7 @@ import (
     "strconv"
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
-    "fractale/fractal6.go/graph/auth"
-    webauth "fractale/fractal6.go/web/auth"
+    "fractale/fractal6.go/web/auth"
     "fractale/fractal6.go/db"
     "fractale/fractal6.go/text/en"
     . "fractale/fractal6.go/tools"
@@ -229,9 +228,9 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
     name := *node.Name
     rootnameid, _ := codec.Nid2rootid(nameid)
 
-    err = webauth.ValidateNameid(nameid, rootnameid)
+    err = auth.ValidateNameid(nameid, rootnameid)
     if err != nil { return ok, err }
-    err = webauth.ValidateName(name)
+    err = auth.ValidateName(name)
     if err != nil { return ok, err }
 
     if *action == model.TensionActionNewRole {

@@ -23,7 +23,6 @@ package codec
 import (
     "fmt"
     "strings"
-
     "fractale/fractal6.go/graph/model"
 )
 
@@ -35,23 +34,31 @@ import (
 */
 
 // Format the nameid id from its parts
-func NodeIdCodec(parentid, targetid string, nodeType model.NodeType) (string, string, error) {
+func NodeIdCodec(parentid, targetid string, type_ model.NodeType) (string, string, error) {
     var nameid string
     rootnameid, err := Nid2rootid(parentid)
-    if len(strings.Split(targetid, "#")) > 1 {
-        return rootnameid, targetid, err
+    if err != nil { return "", "", err }
+
+    if strings.Contains(targetid, "#") {
+        return "", "", fmt.Errorf("Illegal character '#' in nameid")
     }
-    if nodeType == model.NodeTypeRole {
+
+    switch type_ {
+    case model.NodeTypeCircle:
+        nameid = strings.Join([]string{rootnameid, targetid}, "#")
+    case model.NodeTypeRole:
         if rootnameid == parentid {
             nameid = strings.Join([]string{rootnameid, "", targetid}, "#")
         } else {
             nameid = strings.Join([]string{parentid, targetid}, "#")
         }
-    } else if nodeType == model.NodeTypeCircle {
-        nameid = strings.Join([]string{rootnameid, targetid}, "#")
+    default:
+        return "", "", fmt.Errorf("Unknown node type codec")
     }
+
+
     nameid = strings.TrimSuffix(nameid, "#")
-    return rootnameid, nameid, err
+    return rootnameid, nameid, nil
 }
 
 func MemberIdCodec(rootnameid, username string) (string) {

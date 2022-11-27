@@ -26,8 +26,7 @@ import (
     "encoding/json"
 
     "fractale/fractal6.go/db"
-    "fractale/fractal6.go/graph/auth"
-    webauth "fractale/fractal6.go/web/auth"
+    "fractale/fractal6.go/web/auth"
 )
 
 //
@@ -214,7 +213,7 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Filter the nameids according to the @auth directives
-    uctx := webauth.GetUserContextOrEmpty(r.Context())
+    uctx := auth.GetUserContextOrEmpty(r.Context())
     err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)
@@ -265,7 +264,7 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Filter the nameids according to the @auth directives
-    uctx := webauth.GetUserContextOrEmpty(r.Context())
+    uctx := auth.GetUserContextOrEmpty(r.Context())
     err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)
@@ -300,7 +299,7 @@ func TensionsAll(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Filter the nameids according to the @auth directives
-    uctx := webauth.GetUserContextOrEmpty(r.Context())
+    uctx := auth.GetUserContextOrEmpty(r.Context())
     err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)
@@ -335,7 +334,7 @@ func TensionsCount(w http.ResponseWriter, r *http.Request) {
 	}
 
     // Filter the nameids according to the @auth directives
-    uctx := webauth.GetUserContextOrEmpty(r.Context())
+    uctx := auth.GetUserContextOrEmpty(r.Context())
     err = auth.QueryAuthFilter(uctx, &q)
     if err != nil {
         http.Error(w, err.Error(), 500)

@@ -31,7 +31,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/sessions"
-    webauth "fractale/fractal6.go/web/auth"
+    "fractale/fractal6.go/web/auth"
 )
 
 var cache *sessions.Session
@@ -70,7 +70,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
 
     // Return error if jwt token error (particurly when has expired)
     if queryType == "add" || queryType == "update" || queryType == "delete" {
-        _, _, err := webauth.GetUserContext(ctx)
+        _, _, err := auth.GetUserContext(ctx)
         if err != nil { return tools.LogErr("Access denied", err) }
     }
 
@@ -103,7 +103,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     }
 
     // Send request
-    uctx := webauth.GetUserContextOrEmpty(ctx)
+    uctx := auth.GetUserContextOrEmpty(ctx)
     err = db.QueryGql(uctx, "rawQuery", reqInput, data)
     if data != nil && err != nil {
         // Gqlgen ignore the data if there is an error returned
@@ -188,7 +188,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
 //    op := string(mutCtx.type_)
 //
 //    // Send request
-//    uctx := webauth.GetUserContextOrEmpty(ctx)
+//    uctx := auth.GetUserContextOrEmpty(ctx)
 //    err = db.QueryGql(uctx, op, reqInput, data)
 //    return err
 //}

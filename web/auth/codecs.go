@@ -21,9 +21,128 @@
 package auth
 
 import (
-    //"fmt"
+    "fmt"
     "strings"
+    "errors"
     re "regexp"
+)
+
+
+func FormatError(err error, loc string) error {
+    return fmt.Errorf(`{
+        "errors":[{
+            "message": "%s",
+            "location": "%s"
+        }]
+    }`, err.Error(), loc)
+}
+
+// Library errors
+var (
+    ErrBadUsernameFormat = errors.New(`{
+        "errors":[{
+            "message":"Please enter a valid username. Special characters (@:!,?%. etc) are not allowed.",
+            "location": "username"
+        }]
+    }`)
+    ErrUsernameTooLong = errors.New(`{
+        "errors":[{
+            "message":"Username too long.",
+            "location": "username"
+        }]
+    }`)
+    ErrUsernameTooShort = errors.New(`{
+        "errors":[{
+            "message":"Username too short.",
+            "location": "username"
+        }]
+    }`)
+    ErrBadNameidFormat = errors.New(`{
+        "errors":[{
+            "message":"Please enter a valid name.",
+            "location": "nameid"
+        }]
+    }`)
+    ErrBadNameFormat = errors.New(`{
+        "errors":[{
+            "message":"Please enter a valid name.",
+            "location": "name"
+        }]
+    }`)
+    ErrNameTooLong = errors.New(`{
+        "errors":[{
+            "message":"Name too long.",
+            "location": "name"
+        }]
+    }`)
+    ErrNameTooShort = errors.New(`{
+        "errors":[{
+            "message":"Name too short.",
+            "location": "name"
+        }]
+    }`)
+    ErrBadEmailFormat = errors.New(`{
+        "errors":[{
+            "message":"Please enter a valid email.",
+            "location": "email"
+        }]
+    }`)
+    ErrEmailTooLong = errors.New(`{
+        "errors":[{
+            "message":"Email too long.",
+            "location": "name"
+        }]
+    }`)
+    ErrWrongPassword = errors.New(`{
+        "errors":[{
+            "message":"Wrong Password.",
+            "location": "password"
+        }]
+    }`)
+    ErrPasswordTooShort = errors.New(`{
+        "errors":[{
+            "message":"Password too short.",
+            "location": "password"
+        }]
+    }`)
+    ErrPasswordTooLong = errors.New(`{
+        "errors":[{
+            "message":"Password too long.",
+            "location": "password"
+        }]
+    }`)
+    ErrPasswordRequirements = errors.New(`{
+        "errors":[{
+            "message":"Password need to contains at least one number and one letter.",
+            "location": "password"
+        }]
+    }`)
+    ErrReserverdNamed = errors.New(`{
+        "errors":[{
+            "message":"This name already exists, please use another one.",
+            "location": "name"
+        }]
+    }`)
+    // Upsert error
+    ErrUsernameExist = errors.New(`{
+        "errors":[{
+            "message":"Username already exists.",
+            "location": "username"
+        }]
+    }`)
+    ErrEmailExist = errors.New(`{
+        "errors":[{
+            "message":"Email already exists.",
+            "location": "email"
+        }]
+    }`)
+    // User Rights
+    ErrCantLogin = errors.New(`{
+        "errors":[{
+            "message": "You are not authorized to login.",
+            "location": ""
+        }]
+    }`)
 )
 
 var stripReg *re.Regexp
@@ -33,20 +152,23 @@ var reservedURIReg *re.Regexp
 var numReg *re.Regexp
 var letterReg *re.Regexp
 var safeWordReg *re.Regexp
+var emailReg *re.Regexp
 
 func init() {
-    //special := "@!#<>{}`'\"" + `%\\`
-    //reservedURI := "&=+'/[]" + `\s`
-    special :=     `\@\#\<\>\{\}\%\"\'\!\\` + "`" + `\*\^\%\;\~¨:,$£§` // nameid
-    specialSoft := `\@\#\<\>\{\}\%\"\\` + "`" + `\^\%\;¨`            // name
     reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
+    special :=     `\@\#\<\>\{\}\%\"\'\!\\` + "`" + `\*\^\%\;\~¨:,$£§`
+    specialSoft := `\{\}\%\"\^\;¨\\` + "`"
+    // --
+    reservedURIReg = re.MustCompile(`[`+reservedURI+`]`) // nameid
+    specialReg = re.MustCompile(`[`+special+`]`)         // nameid
+    specialSoftReg = re.MustCompile(`[`+specialSoft+`]`) // name
+    // --
+    stripReg = re.MustCompile(`^\s|\s$`)
     numReg = re.MustCompile(`[0-9]`)
     letterReg = re.MustCompile(`[a-zA-Z]`)
-    stripReg = re.MustCompile(`^\s|\s$`)
-    specialReg = re.MustCompile(`[`+special+`]`)
-    specialSoftReg = re.MustCompile(`[`+specialSoft+`]`)
-    reservedURIReg = re.MustCompile(`[`+reservedURI+`]`)
+    // --
     safeWordReg = re.MustCompile(`^[\w\.\-]+$`) // username
+    emailReg = re.MustCompile(`^[\w\.\-\+]+@[\w\.\-]+\.[\w\-]+$`) // email
 }
 
 //
@@ -63,12 +185,10 @@ func ValidateName(n string) error {
     }
 
     // Character control
-    // * do not contains space at begining or end.
-    // * unsafe character.
-    if hasStrip(n) {
+    if matchReg(n, stripReg) {
         return ErrBadNameFormat
     }
-    if hasSpecialSoft(n) {
+    if matchReg(n, specialSoftReg) {
         return ErrBadNameFormat
     }
     return nil
@@ -84,13 +204,10 @@ func ValidateUsername(u string) error {
     }
 
     // Character control
-    // * do not contains space at begining or end.
-    // * unsafe character.
-    // * avoid URI special character and spaces.
-    if hasStrip(u)  {
+    if matchReg(u, stripReg)  {
         return ErrBadUsernameFormat
     }
-    if !isSafeWord(u) {
+    if !matchReg(u, safeWordReg) {
         return ErrBadUsernameFormat
     }
 
@@ -107,72 +224,57 @@ func ValidateNameid(nameid string, rootnameid string) error {
     ns := strings.Split(nameid, "#")
     if len(ns) == 0 {
         return ErrBadNameidFormat
-    } else {
-        for i, n := range ns {
-            if i == 0 && n != rootnameid {
-                return ErrBadNameidFormat
-            }
-            if i==1 && len(ns) == 3 &&  n == "" {
-                // assume role under root node
-                continue
-            }
+    }
 
-            // Size control
-            if len(n) > 42 {
-                return ErrNameTooLong
-            }
-            if len(n) < 2 {
-                return ErrNameTooShort
-            }
+    for i, n := range ns {
+        if i == 0 && n != rootnameid {
+            return ErrBadNameidFormat
+        }
+        if i==1 && len(ns) == 3 &&  n == "" {
+            // assume role under root node
+            continue
+        }
 
-            // character control
-            if hasStrip(n) {
-                return ErrBadNameidFormat
-            }
-            if hasSpecial(n) {
-                return ErrBadNameidFormat
-            }
-            if hasReservedURI(n) {
-                return ErrReserverdNamed
-            }
+        // Size control
+        if len(n) > 42 {
+            return ErrNameTooLong
+        }
+        if len(n) < 2 {
+            return ErrNameTooShort
+        }
+
+        // character control
+        if matchReg(n, stripReg) {
+            return ErrBadNameidFormat
+        }
+        if matchReg(n, specialReg) {
+            return ErrBadNameidFormat
+        }
+        if matchReg(n, reservedURIReg) {
+            return ErrReserverdNamed
         }
     }
+
     return nil
 }
 
-func ValidateEmail(e string) error {
+func ValidateEmail(s string) error {
     // Size control
-    if len(e) > 100 {
+    if len(s) > 100 {
         return ErrUsernameTooLong
     }
-    if len(e) < 3 {
+    if len(s) < 3 {
         return ErrUsernameTooShort
     }
 
-    ns := strings.Split(e, "@")
-    if len(ns) == 2 {
-        for i, n := range ns {
-            if i == len(ns)-1 && !strings.Contains(n, ".")  {
-                return ErrBadEmailFormat
-            }
-
-            if i == 0  {
-                // Character control
-                // * do not contains space at begining or end.
-                // * unsafe character.
-                // * avoid URI special character and spaces.
-                if hasStrip(n)  {
-                    return ErrBadUsernameFormat
-                }
-                if !isSafeWord(n) {
-                    return ErrBadUsernameFormat
-                }
-            }
-
-        }
-    } else {
+    // Character control
+    if matchReg(s, stripReg)  {
         return ErrBadEmailFormat
     }
+    if !matchReg(s, emailReg) {
+        return ErrBadEmailFormat
+    }
+
     return nil
 }
 
@@ -185,7 +287,7 @@ func ValidatePassword(p string) error {
     if len(p) > 100 {
         return ErrPasswordTooLong
     }
-    if (numReg.MatchString(p) && letterReg.MatchString(p)) == false {
+    if !(numReg.MatchString(p) && letterReg.MatchString(p)) {
         return ErrPasswordRequirements
     }
     return nil
@@ -209,22 +311,7 @@ func ValidateSimplePassword(p string) error {
 // String utils
 //
 
-func isSafeWord(s string) bool {
-    return safeWordReg.MatchString(s)
+func matchReg(s string, regexp *re.Regexp) bool {
+    return regexp.MatchString(s)
 }
 
-func hasStrip(s string) bool {
-    return stripReg.MatchString(s)
-}
-
-func hasSpecial(s string) bool {
-    return specialReg.MatchString(s)
-}
-
-func hasSpecialSoft(s string) bool {
-    return specialSoftReg.MatchString(s)
-}
-
-func hasReservedURI(s string) bool {
-    return reservedURIReg.MatchString(s)
-}

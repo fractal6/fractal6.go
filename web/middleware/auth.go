@@ -28,7 +28,7 @@ import (
     "encoding/json"
     "github.com/spf13/viper"
     //"fractale/fractal6.go/db"
-    //webauth "fractale/fractal6.go/web/auth"
+    //"fractale/fractal6.go/web/auth"
 )
 
 var CREDENTIAL_PROM string
@@ -51,7 +51,7 @@ func CheckBearer(next http.Handler) http.Handler {
 func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         //ctx := r.Context()
-        //uctx := webauth.GetUserContextOrEmpty(r.Context())
+        //uctx := auth.GetUserContextOrEmpty(r.Context())
         //var q string
 
         //// Keep this to reset the body reader later
@@ -89,7 +89,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 func CheckTensionQueryRights(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         ctx := r.Context()
-        //uctx := webauth.GetUserContextOrEmpty(r.Context())
+        //uctx := auth.GetUserContextOrEmpty(r.Context())
         var q struct{Nameids []string}
 
         // Keep this to reset the body reader later

@@ -23,7 +23,6 @@ package auth
 import (
     "fmt"
     "time"
-    "errors"
     "strings"
     "strconv"
     "context"
@@ -35,122 +34,6 @@ import (
     "fractale/fractal6.go/graph/model"
 )
 
-// Library errors
-var (
-    ErrBadUsernameFormat = errors.New(`{
-        "errors":[{
-            "message":"Please enter a valid username. Special characters (@:!,?%. etc) are not allowed.",
-            "location": "username"
-        }]
-    }`)
-    ErrUsernameTooLong = errors.New(`{
-        "errors":[{
-            "message":"Username too long.",
-            "location": "username"
-        }]
-    }`)
-    ErrUsernameTooShort = errors.New(`{
-        "errors":[{
-            "message":"Username too short.",
-            "location": "username"
-        }]
-    }`)
-    ErrBadNameidFormat = errors.New(`{
-        "errors":[{
-            "message":"Please enter a valid name.",
-            "location": "nameid"
-        }]
-    }`)
-    ErrBadNameFormat = errors.New(`{
-        "errors":[{
-            "message":"Please enter a valid name.",
-            "location": "name"
-        }]
-    }`)
-    ErrNameTooLong = errors.New(`{
-        "errors":[{
-            "message":"Name too long.",
-            "location": "name"
-        }]
-    }`)
-    ErrNameTooShort = errors.New(`{
-        "errors":[{
-            "message":"Name too short.",
-            "location": "name"
-        }]
-    }`)
-    ErrBadEmailFormat = errors.New(`{
-        "errors":[{
-            "message":"Please enter a valid email.",
-            "location": "email"
-        }]
-    }`)
-    ErrEmailTooLong = errors.New(`{
-        "errors":[{
-            "message":"Email too long.",
-            "location": "name"
-        }]
-    }`)
-    ErrWrongPassword = errors.New(`{
-        "errors":[{
-            "message":"Wrong Password.",
-            "location": "password"
-        }]
-    }`)
-    ErrPasswordTooShort = errors.New(`{
-        "errors":[{
-            "message":"Password too short.",
-            "location": "password"
-        }]
-    }`)
-    ErrPasswordTooLong = errors.New(`{
-        "errors":[{
-            "message":"Password too long.",
-            "location": "password"
-        }]
-    }`)
-    ErrPasswordRequirements = errors.New(`{
-        "errors":[{
-            "message":"Password need to contains at least one number and one letter.",
-            "location": "password"
-        }]
-    }`)
-    ErrReserverdNamed = errors.New(`{
-        "errors":[{
-            "message":"This name already exists, please use another one.",
-            "location": "name"
-        }]
-    }`)
-    // Upsert error
-    ErrUsernameExist = errors.New(`{
-        "errors":[{
-            "message":"Username already exists.",
-            "location": "username"
-        }]
-    }`)
-    ErrEmailExist = errors.New(`{
-        "errors":[{
-            "message":"Email already exists.",
-            "location": "email"
-        }]
-    }`)
-    // User Rights
-    ErrCantLogin = errors.New(`{
-        "errors":[{
-            "message": "You are not authorized to login.",
-            "location": ""
-        }]
-    }`)
-)
-
-func FormatError(err error, loc string) error {
-    return fmt.Errorf(`{
-        "errors":[{
-            "message": "%s",
-            "location": "%s"
-        }]
-    }`, err.Error(), loc)
-}
 
 var clientVersion string
 var reservedUsername map[string]bool

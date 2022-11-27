@@ -25,13 +25,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+    "strings"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
-	ga "fractale/fractal6.go/graph/auth"
-	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
+	. "fractale/fractal6.go/tools"
 )
 
 // Signup register a new user and gives it a token.
@@ -46,11 +46,16 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Check format
-    nameid := form.Nameid
-    err = auth.ValidateNameid(nameid, nameid)
+    err = auth.ValidateName(form.Name)
 	if err != nil { http.Error(w, err.Error(), 400); return }
-    nidOwner := nameid + "##" + "@" + uctx.Username
+    err = auth.ValidateNameid(form.Nameid, form.Nameid)
+	if err != nil { http.Error(w, err.Error(), 400); return }
+    if strings.Contains(form.Nameid, "#") {
+        http.Error(w, "Illegal character '#' in nameid", 400); return
+    }
 
+    nameid := form.Nameid
+    nidOwner := nameid + "##" + "@" + uctx.Username
     isPersonal := true
     var userCanJoin bool
     var guestCanCreateTension bool = true
@@ -143,29 +148,30 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Check if uctx has rights in nameid (is coordo)
+    nameid := form.Nameid
     _, uctx, err := auth.GetUserContext(r.Context())
     if err != nil { http.Error(w, err.Error(), 500); return }
-    if i := ga.UserHasCoordoRole(uctx, form.Nameid); i < 0 {
+    if i := auth.UserHasCoordoRole(uctx, nameid); i < 0 {
         http.Error(w, "Only coordinators of the circle can do this.", 400)
         return
     }
 
     // Set the value
     val := strconv.FormatBool(form.Val)
-    err = db.GetDB().SetFieldByEq("Node.nameid", form.Nameid, "Node.userCanJoin", val)
+    err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.userCanJoin", val)
     if err != nil { http.Error(w, err.Error(), 500); return }
 
     // Maybe Update the circle visibility if userCanJoin is set to True
     if form.Val {
-        visibility, err := db.GetDB().GetFieldByEq("Node.nameid", form.Nameid, "Node.visibility")
+        visibility, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.visibility")
         visibilityPublic := string(model.NodeVisibilityPublic)
         if err != nil { http.Error(w, err.Error(), 500); return }
         if visibility.(string) != visibilityPublic {
             // Update Node
-            _, err := db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid":form.Nameid, "value":visibilityPublic})
+            _, err := db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid":nameid, "value":visibilityPublic})
             if err != nil { http.Error(w, err.Error(), 500); return }
             // Change all role direct children
-            err = db.DB.SetChildrenRoleVisibility(form.Nameid, visibilityPublic)
+            err = db.DB.SetChildrenRoleVisibility(nameid, visibilityPublic)
             if err != nil { http.Error(w, err.Error(), 500); return }
         }
     }
@@ -183,16 +189,17 @@ func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
 	if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Check if uctx has rights in nameid (is coordo)
+    nameid := form.Nameid
     _, uctx, err := auth.GetUserContext(r.Context())
     if err != nil { http.Error(w, err.Error(), 500); return }
-    if i := ga.UserHasCoordoRole(uctx, form.Nameid); i < 0 {
+    if i := auth.UserHasCoordoRole(uctx, nameid); i < 0 {
         http.Error(w, "Only coordinators of the circle can do this.", 400)
         return
     }
 
     // Set the value
     val := strconv.FormatBool(form.Val)
-    err = db.GetDB().SetFieldByEq("Node.nameid", form.Nameid, "Node.guestCanCreateTension", val)
+    err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.guestCanCreateTension", val)
     if err != nil { http.Error(w, err.Error(), 500); return }
 
     w.Write([]byte(val))

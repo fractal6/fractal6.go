@@ -33,10 +33,10 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 
 	gen "fractale/fractal6.go/graph/generated"
-    webauth "fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+    "fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/db"
+	. "fractale/fractal6.go/tools"
 )
 
 //
@@ -209,7 +209,7 @@ func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interf
 }
 
 func private(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     rc := graphql.GetResolverContext(ctx)
@@ -296,7 +296,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 }
 
 func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
-    uctx := webauth.GetUserContextOrEmpty(ctx)
+    uctx := auth.GetUserContextOrEmpty(ctx)
     // @FIX this hack ! Redis push ?
     var ok bool
     var v string

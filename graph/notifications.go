@@ -26,11 +26,11 @@ import (
     "strings"
 	"encoding/json"
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/web/auth"
+	"fractale/fractal6.go/web/email"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/graph/codec"
 	. "fractale/fractal6.go/tools"
-	"fractale/fractal6.go/web/email"
 )
 
 

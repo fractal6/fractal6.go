@@ -25,13 +25,11 @@ import (
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 
-	//"fractale/fractal6.go/db"
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/graph/auth"
+	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
-	webauth "fractale/fractal6.go/web/auth"
 )
 
 ////////////////////////////////////////////////
@@ -51,7 +49,7 @@ type AddArtefactInput struct {
 
 type FilterArtefactInput struct {
 	ID         []string                                `json:"id,omitempty"`
-	Rootnameid *model.StringHashFilter                       `json:"rootnameid,omitempty"`
+	Rootnameid *model.StringHashFilter                 `json:"rootnameid,omitempty"`
 	Name       *model.StringHashFilterStringTermFilter `json:"name,omitempty"`
 }
 
@@ -66,7 +64,7 @@ type UpdateArtefactInput struct {
 func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     var ok bool =  false
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -101,7 +99,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     var ok bool =  false
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input

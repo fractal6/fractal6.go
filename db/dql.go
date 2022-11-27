@@ -1284,7 +1284,7 @@ func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) 
     if user == nil || user.Username == "" {
         return nil, fmt.Errorf("User not found for '%s': %s", fieldid, userid)
     }
-    // @deprecated: special role are processed in graph/auth
+    // @deprecated: special role are processed in web/auth
     // Filter special roles
     //for i := 0; i < len(user.Roles); i++ {
     //    if *user.Roles[i].RoleType == model.RoleTypeRetired ||

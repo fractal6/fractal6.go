@@ -25,11 +25,10 @@ import (
 	"context"
 	"github.com/99designs/gqlgen/graphql"
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/graph/auth"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/web/auth"
 	. "fractale/fractal6.go/tools"
-	webauth "fractale/fractal6.go/web/auth"
 )
 
 
@@ -55,7 +54,7 @@ func init() {
 // If user(u) field is empty, assume a user object, else field should match the user(u) credential.
 func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
     // Retrieve userCtx from token
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Get attributes and check everything is ok
@@ -198,7 +197,7 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
             continue
         }
 
-        ctx, uctx, err := webauth.GetUserContext(ctx)
+        ctx, uctx, err := auth.GetUserContext(ctx)
         if err != nil { return nil, err }
         // Get receiverid
         var receiverid string

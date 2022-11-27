@@ -29,8 +29,7 @@ import (
     "fractale/fractal6.go/graph/model"
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/db"
-    "fractale/fractal6.go/graph/auth"
-    webauth"fractale/fractal6.go/web/auth"
+    "fractale/fractal6.go/web/auth"
     . "fractale/fractal6.go/tools"
 )
 
@@ -71,7 +70,7 @@ func addContractInputHook(ctx context.Context, obj interface{}, next graphql.Res
                     *newData[i].Event.Old,
                     *newData[i].Event.New,
                 )
-            } else if err := webauth.ValidateEmail(*c.Email); err != nil {
+            } else if err := auth.ValidateEmail(*c.Email); err != nil {
                 return nil, err
             } else {
                pendings = append(pendings, c)
@@ -87,7 +86,7 @@ func addContractInputHook(ctx context.Context, obj interface{}, next graphql.Res
 // Add Contract hook
 func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input
@@ -153,7 +152,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 // Update Contract hook
 func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input
@@ -199,7 +198,7 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 // Delete Contract hook
 func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -264,7 +263,7 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 
 func isContractValidator(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate input
@@ -294,7 +293,7 @@ func isContractValidator(ctx context.Context, obj interface{}, next graphql.Reso
 
 func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     // Get User context
-    ctx, uctx, err := webauth.GetUserContext(ctx)
+    ctx, uctx, err := auth.GetUserContext(ctx)
     if err != nil { return nil, LogErr("Access denied", err) }
 
     // Validate Input

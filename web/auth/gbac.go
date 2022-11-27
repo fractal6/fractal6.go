@@ -28,6 +28,16 @@ import (
     . "fractale/fractal6.go/tools"
 )
 
+
+/*
+ *
+ * Base authorization methods
+ * @future: GBAC authorization with @auth directive (Dgraph)
+ *
+ */
+
+var UserSelection string = "User.username User.email User.name User.notifyByEmail"
+
 // Inherits node properties
 func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
     if node.Mode == nil {
@@ -38,12 +48,6 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
     }
 }
 
-////////////////////////////////////////////////
-// Base authorization methods
-// @future: GBAC authorization with @auth directive (DGraph)
-////////////////////////////////////////////////
-
-var UserSelection string = "User.username User.email User.name User.notifyByEmail"
 
 // HasCoordoAuth tells if the user has authority in the given node.
 func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {

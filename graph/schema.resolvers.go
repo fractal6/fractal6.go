@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/web/auth"
 	. "fractale/fractal6.go/tools"
-	webauth "fractale/fractal6.go/web/auth"
 )
 
 // AddNode is the resolver for the addNode field.
@@ -198,7 +198,7 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
 	// Inputs is updated in hooks.
 	// @debug: field with arguments will be ignored
-	_, uctx, err := webauth.GetUserContext(ctx)
+	_, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
 		return nil, LogErr("Access denied", err)
 	}
