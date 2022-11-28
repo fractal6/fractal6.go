@@ -4,7 +4,7 @@ domain = "fractale.co"
 hostname = "localhost"
 port = "8888"
 jwt_secret = "my_jwt_secret"
-prometheus_instrumentation = true
+prometheus_instrumentation = false
 prometheus_credentials = "my_prom_secret"
 client_version = "git hash used to build the client"
 
@@ -19,6 +19,7 @@ email_api_key = "..."
 # postal default-dkim-record: Just the p=... part of the TXT record (without the semicolon at the end)
 dkim_key = "..."
 # webhook redirection for Postal alert.
+matrix_domain = "matrix.org"
 matrix_postal_room = "!...:matrix.org"
 matrix_token = "..."
 
