@@ -198,10 +198,10 @@ fetch_client_source:
 #
 
 docs:
-	cd ../doc && \
+	cd ../docs && \
 		make quickdoc && \
 		cd - && \
-		cp ../doc/_data/* data
+		cp ../docs/_data/* data/
 
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort
