@@ -173,8 +173,8 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
         HttpOnly: true,
         Secure: isCookieSecured,
         SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
-        //Expires: expirationTime,
-        //MaxAge: 90000,
+        Expires: time.Now().Add(tokenValidityTime).UTC(),
+        MaxAge: int(tokenValidityTime.Seconds()),
     }
 
     return &httpCookie, nil
