@@ -5,7 +5,7 @@ MOD := fractale/fractal6.go
 BINARY := f6
 DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
-CLIENT_RELEASE := 0.7
+CLIENT_RELEASE := 0.7.1
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
