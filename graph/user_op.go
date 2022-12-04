@@ -53,14 +53,26 @@ func UnlinkUser(rootnameid, nameid, username string) error {
     return err
 }
 
-func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, unsafe bool) (bool, error) {
+	var err error
+	var rootnameid string
+	var nameid string
     parentid := tension.Receiver.Nameid
 
     // Type check
     if node.RoleType == nil { return false, fmt.Errorf("Node need a role type for this action.") }
 
-    // Get References
-    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+    // unsafe is used to Guest user to be unlink,
+    // as the nameid include a "@" char.
+    if unsafe {
+		nameid = *node.Nameid
+		rootnameid, err = codec.Nid2rootid(nameid)
+		if err != nil {return false, err}
+	} else {
+		// Get References
+		rootnameid, nameid, err = codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+		if err != nil {return false, err}
+	}
 
     // If user doesn't play role, return error
     if i := auth.UserPlaysRole(uctx, nameid); i < 0 {

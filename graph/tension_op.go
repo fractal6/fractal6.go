@@ -405,6 +405,8 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
         unsafe = true
     }
 
+    fmt.Println(*node)
+    fmt.Println(unsafe)
     ok, err := TryUpdateLink(uctx, tension, node, event, unsafe)
 
     return ok, err
@@ -507,6 +509,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     // * update user membership
     // --
     var ok bool
+    var unsafe bool
 
     blob := GetBlob(tension)
     if blob == nil { return false, fmt.Errorf("blob not found.") }
@@ -525,6 +528,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
         nf.FirstLink = &uctx.Username
         nf.Type = &t
         node = &nf
+        unsafe = true
     } else if role_type == model.RoleTypeRetired ||
     role_type == model.RoleTypeMember ||
     role_type == model.RoleTypePending {
@@ -533,7 +537,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
         return false, fmt.Errorf("Owner cannot leave organisation. Please contact us if you need to transfer ownership.")
     }
 
-    ok, err := LeaveRole(uctx, tension, node)
+    ok, err := LeaveRole(uctx, tension, node, unsafe)
     return ok, err
 }
 

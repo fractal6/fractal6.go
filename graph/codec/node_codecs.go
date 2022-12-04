@@ -57,7 +57,7 @@ func NodeIdCodec(parentid, targetid string, type_ model.NodeType) (string, strin
     }
 
 
-    nameid = strings.TrimSuffix(nameid, "#")
+    nameid = strings.TrimSuffix(nameid, "#") // @obsolete
     return rootnameid, nameid, nil
 }
 
