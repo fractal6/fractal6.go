@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
+	. "fractale/fractal6.go/tools"
 )
 
 // AddNode is the resolver for the addNode field.
