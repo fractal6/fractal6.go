@@ -166,6 +166,9 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
         return nil, err
     }
 
+    // Increase the validity time to avoid jet leag edge cases
+    validityTime := tokenValidityTime + time.Hour*24
+
     httpCookie := http.Cookie{
         Name: "jwt",
         Value: token,
@@ -173,8 +176,8 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
         HttpOnly: true,
         Secure: isCookieSecured,
         SameSite: http.SameSiteLaxMode, // https://golang.org/src/net/http/cookie.go
-        Expires: time.Now().Add(tokenValidityTime).UTC(),
-        MaxAge: int(tokenValidityTime.Seconds()),
+        Expires: time.Now().Add(validityTime).UTC(),
+        MaxAge: int(validityTime.Seconds()),
     }
 
     return &httpCookie, nil
