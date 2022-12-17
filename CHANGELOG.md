@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - schema: new announcement tension type.
 - mailer: handle user to notify for announcement tension + queries to get watchers.
 - auth: authorization for special tension type (Alert & Announcement).
-- cmd: pas optional username argument fort token gen command.
+- cmd: pass optional username argument fort token gen command.
 
 ## Changed
 - mailer: send valid unsubscribe/unwatch email notifications + email typo fix
