@@ -369,7 +369,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     blob_type := model.BlobTypeOnNode
     var noderef model.NodeFragmentRef
     StructMap(node, &noderef)
-    emptyString := ""
+    emptyString := "" // root's tension feature
     noderef.Nameid = &emptyString
     blob := model.BlobRef{
         CreatedAt: &now,

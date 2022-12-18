@@ -225,3 +225,6 @@ certs:
 	openssl rsa -in private.pem -pubout -out public.pem
 	# Copy public key for the Dgraph authorization in the schema
 	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 |  xclip -selection clipboard;
+
+tags:
+	ctags --exclude=.git  --exclude="public/*" --exclude="releases/*" -R -f .tags
