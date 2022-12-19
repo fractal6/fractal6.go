@@ -360,7 +360,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
             "References": "<tension/%s@`+DOMAIN+`>"
         }
-    }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid)
+    }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), notif.Tid, notif.Tid)
     // @TODO; "List-Unsubscribe": "<%s>"
     // Other fields: http://apiv1.postalserver.io/controllers/send/message
 
