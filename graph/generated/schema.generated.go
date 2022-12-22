@@ -9059,6 +9059,8 @@ func (ec *executionContext) fieldContext_AddEventCountPayload_eventCount(ctx con
 				return ec.fieldContext_EventCount_unread_events(ctx, field)
 			case "pending_contracts":
 				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			case "assigned_tensions":
+				return ec.fieldContext_EventCount_assigned_tensions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
 		},
@@ -14815,6 +14817,8 @@ func (ec *executionContext) fieldContext_DeleteEventCountPayload_eventCount(ctx 
 				return ec.fieldContext_EventCount_unread_events(ctx, field)
 			case "pending_contracts":
 				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			case "assigned_tensions":
+				return ec.fieldContext_EventCount_assigned_tensions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
 		},
@@ -18475,6 +18479,44 @@ func (ec *executionContext) fieldContext_EventCount_pending_contracts(ctx contex
 	return fc, nil
 }
 
+func (ec *executionContext) _EventCount_assigned_tensions(ctx context.Context, field graphql.CollectedField, obj *model.EventCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCount_assigned_tensions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssignedTensions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCount_assigned_tensions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _EventCountAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_EventCountAggregateResult_count(ctx, field)
 	if err != nil {
@@ -18805,6 +18847,158 @@ func (ec *executionContext) _EventCountAggregateResult_pending_contractsAvg(ctx 
 }
 
 func (ec *executionContext) fieldContext_EventCountAggregateResult_pending_contractsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_assigned_tensionsMin(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_assigned_tensionsMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssignedTensionsMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_assigned_tensionsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_assigned_tensionsMax(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_assigned_tensionsMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssignedTensionsMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_assigned_tensionsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_assigned_tensionsSum(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_assigned_tensionsSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssignedTensionsSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_assigned_tensionsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventCountAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventCountAggregateResult_assigned_tensionsAvg(ctx context.Context, field graphql.CollectedField, obj *model.EventCountAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventCountAggregateResult_assigned_tensionsAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssignedTensionsAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventCountAggregateResult_assigned_tensionsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EventCountAggregateResult",
 		Field:      field,
@@ -36745,6 +36939,8 @@ func (ec *executionContext) fieldContext_Query_queryEventCount(ctx context.Conte
 				return ec.fieldContext_EventCount_unread_events(ctx, field)
 			case "pending_contracts":
 				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			case "assigned_tensions":
+				return ec.fieldContext_EventCount_assigned_tensions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
 		},
@@ -36814,6 +37010,14 @@ func (ec *executionContext) fieldContext_Query_aggregateEventCount(ctx context.C
 				return ec.fieldContext_EventCountAggregateResult_pending_contractsSum(ctx, field)
 			case "pending_contractsAvg":
 				return ec.fieldContext_EventCountAggregateResult_pending_contractsAvg(ctx, field)
+			case "assigned_tensionsMin":
+				return ec.fieldContext_EventCountAggregateResult_assigned_tensionsMin(ctx, field)
+			case "assigned_tensionsMax":
+				return ec.fieldContext_EventCountAggregateResult_assigned_tensionsMax(ctx, field)
+			case "assigned_tensionsSum":
+				return ec.fieldContext_EventCountAggregateResult_assigned_tensionsSum(ctx, field)
+			case "assigned_tensionsAvg":
+				return ec.fieldContext_EventCountAggregateResult_assigned_tensionsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventCountAggregateResult", field.Name)
 		},
@@ -41407,6 +41611,8 @@ func (ec *executionContext) fieldContext_UpdateEventCountPayload_eventCount(ctx 
 				return ec.fieldContext_EventCount_unread_events(ctx, field)
 			case "pending_contracts":
 				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			case "assigned_tensions":
+				return ec.fieldContext_EventCount_assigned_tensions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
 		},
@@ -45102,6 +45308,8 @@ func (ec *executionContext) fieldContext_User_event_count(ctx context.Context, f
 				return ec.fieldContext_EventCount_unread_events(ctx, field)
 			case "pending_contracts":
 				return ec.fieldContext_EventCount_pending_contracts(ctx, field)
+			case "assigned_tensions":
+				return ec.fieldContext_EventCount_assigned_tensions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventCount", field.Name)
 		},
@@ -48977,7 +49185,7 @@ func (ec *executionContext) unmarshalInputAddEventCountInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"unread_events", "pending_contracts"}
+	fieldsInOrder := [...]string{"unread_events", "pending_contracts", "assigned_tensions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -48997,6 +49205,14 @@ func (ec *executionContext) unmarshalInputAddEventCountInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
 			it.PendingContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "assigned_tensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assigned_tensions"))
+			it.AssignedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -53749,7 +53965,7 @@ func (ec *executionContext) unmarshalInputEventCountPatch(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"unread_events", "pending_contracts"}
+	fieldsInOrder := [...]string{"unread_events", "pending_contracts", "assigned_tensions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -53804,6 +54020,30 @@ func (ec *executionContext) unmarshalInputEventCountPatch(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "assigned_tensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assigned_tensions"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.AssignedTensions = data
+			} else if tmp == nil {
+				it.AssignedTensions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -53817,7 +54057,7 @@ func (ec *executionContext) unmarshalInputEventCountRef(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"unread_events", "pending_contracts"}
+	fieldsInOrder := [...]string{"unread_events", "pending_contracts", "assigned_tensions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -53837,6 +54077,14 @@ func (ec *executionContext) unmarshalInputEventCountRef(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
 			it.PendingContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "assigned_tensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assigned_tensions"))
+			it.AssignedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -67796,6 +68044,10 @@ func (ec *executionContext) _EventCount(ctx context.Context, sel ast.SelectionSe
 
 			out.Values[i] = ec._EventCount_pending_contracts(ctx, field, obj)
 
+		case "assigned_tensions":
+
+			out.Values[i] = ec._EventCount_assigned_tensions(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -67852,6 +68104,22 @@ func (ec *executionContext) _EventCountAggregateResult(ctx context.Context, sel 
 		case "pending_contractsAvg":
 
 			out.Values[i] = ec._EventCountAggregateResult_pending_contractsAvg(ctx, field, obj)
+
+		case "assigned_tensionsMin":
+
+			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsMin(ctx, field, obj)
+
+		case "assigned_tensionsMax":
+
+			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsMax(ctx, field, obj)
+
+		case "assigned_tensionsSum":
+
+			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsSum(ctx, field, obj)
+
+		case "assigned_tensionsAvg":
+
+			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

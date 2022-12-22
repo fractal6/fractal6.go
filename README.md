@@ -1,4 +1,4 @@
-# fractal6.go
+# Fractale - self-organization for Humans
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 

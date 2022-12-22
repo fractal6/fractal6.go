@@ -646,9 +646,12 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     "getEventCount": `{
 		var(func: eq(User.username, "{{.username}}")) {
-			User.events(first:10) @filter(eq(UserEvent.isRead, "false")) {
+			User.events @filter(eq(UserEvent.isRead, "false")) {
 				ev as UserEvent.event(first:1)
 			}
+            User.tensions_assigned @filter(eq(Tension.status, "Open")) {
+                t as count(uid)
+            }
 		}
 		var(func: uid(ev)) @filter(NOT type(Contract)) {
 			e as count(uid)
@@ -660,6 +663,7 @@ var dqlQueries map[string]string = map[string]string{
 		all() {
 			unread_events: sum(val(e))
 			pending_contracts: sum(val(c))
+            assigned_tensions: sum(val(t))
 		}
     }`,
     "getMembers": `{

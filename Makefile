@@ -58,9 +58,10 @@ dgraph: # Do alter Dgraph
 	cd ../fractal6-schema
 	make dgraph_in
 	cd -
-	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
 	mkdir -p schema/
 	cp ../fractal6-schema/gen_dgraph_in/schema.graphql schema/dgraph_schema.graphql
+	# Update Dgraph
+	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
 	# Used by the `schema` rule, to generate the gqlgen input schema
 	get-graphql-schema http://localhost:8080/graphql > schema/dgraph_out.graphql
 	# Alternative: gq http://localhost:8080/graphql -H "Content-Type: application/json" --introspect > schema/dgraph_out.graphql
