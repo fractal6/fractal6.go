@@ -22,7 +22,6 @@ package cmd
 
 import (
     "fmt"
-    "time"
     "log"
     "context"
     "encoding/json"
@@ -113,8 +112,9 @@ func processContractNotification(msg *redis.Message) {
         return
     }
 
+    // @deprecated
     // Add a little sleep to wait for UpdateContractHook as it writes after publishing
-    time.Sleep(1 * time.Second)
+    //time.Sleep(1 * time.Second)
 
     // Push notification
     if err := graph.PushContractNotifications(notif); err != nil {

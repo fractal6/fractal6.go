@@ -402,7 +402,6 @@ var dqlQueries map[string]string = map[string]string{
             {{.user_payload}}
         }
     }`,
-    // @debug sub filter comments on username/author...
     "getLastComment": `{
         all(func: uid({{.tid}})) @normalize {
             title: Tension.title
@@ -410,12 +409,12 @@ var dqlQueries map[string]string = map[string]string{
                 rootnameid: Node.rootnameid
                 receiverid: Node.nameid
             }
-            Tension.comments(first:1, orderdesc: Post.createdAt) {
+            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
                 message: Post.message
+                Post.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }
     }`,
-    // @debug sub filter comments on username/author...
     "getLastContractComment": `{
         all(func: uid({{.cid}})) @normalize {
             Contract.tension {
@@ -424,8 +423,9 @@ var dqlQueries map[string]string = map[string]string{
                     receiverid: Node.nameid
                 }
             }
-            Contract.comments(first:1, orderdesc: Post.createdAt) {
+            Contract.comments(first:1, orderdesc: Post.createdAt) @cascade {
                 message: Post.message
+                Post.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }
     }`,

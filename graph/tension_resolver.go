@@ -152,10 +152,12 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
         ok, contract, err = TensionEventHook(uctx, ids[0], input.Set.History, blob)
         if err != nil { return nil, err }
         if ok {
-            // History and notification Logics --
-            // In order to notify user on the given event, we need to know their ids to pass and link them
-            // to the notification (UserEvent edge) function. To do so we first cut the history from the original
-            // input, and push then the history (see the PushHistory function).
+            // History and notification Logics
+            // --
+            // In order to notify user on the given event, we need to know
+            // their ids to pass and link them to the user's notifications (UserEvent edge).
+            // To do so we first cut the history from the original input,
+            // and push then the history (see the [[PushHistory]] function).
             ctx = context.WithValue(ctx, "cut_history", true)
             // Execute query
             data, err := next(ctx)

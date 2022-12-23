@@ -47,8 +47,8 @@ var ctx context.Context = context.Background()
 // Publisher functions (Redis)
 //
 
-// Will trigger processTensionNotification in cmd/notifier.go
-// and PushEventNotifications
+// Will trigger Event notifications in cmd/notifier.go
+// PublishTensionEvent -> cmd.processTensionNotification -> PushEventNotifications
 func PublishTensionEvent(notif model.EventNotif) error {
     payload, _ := json.Marshal(notif)
     if err := cache.Publish(ctx, "api-tension-notification", payload).Err(); err != nil {
@@ -59,8 +59,8 @@ func PublishTensionEvent(notif model.EventNotif) error {
     return nil
 }
 
-// Will trigger processContractNotification in cmd/notifier.go
-// and PushContractNotifications
+// Will trigger Contract notifications in cmd/notifier.go
+// PublishContractEvent -> cmd.processContractNotification -> PushContractNotifications
 func PublishContractEvent(notif model.ContractNotif) error {
     payload, _ := json.Marshal(notif)
     if err := cache.Publish(ctx, "api-contract-notification", payload).Err(); err != nil {
@@ -71,8 +71,8 @@ func PublishContractEvent(notif model.ContractNotif) error {
     return nil
 }
 
-// Will trigger processNotifNotification in cmd/notifier.go
-// and PushNotifNotifications
+// Will trigger Notif notifications in cmd/notifier.go
+// PublishNotifEvent -> cmd.processNotifNotification -> PushNotifNotifications
 func PublishNotifEvent(notif model.NotifNotif) error {
     payload, _ := json.Marshal(notif)
     if err := cache.Publish(ctx, "api-notif-notification", payload).Err(); err != nil {
@@ -165,7 +165,7 @@ func PushEventNotifications(notif model.EventNotif) error {
     }
     // +
     // Add mentions and **set tension data**
-    if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid}); err != nil {
+    if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid":notif.Tid, "username":notif.Uctx.Username}); err != nil {
         return err
     } else if len(m) > 0 {
         notif.Rootnameid = m[0]["rootnameid"].(string)
@@ -293,7 +293,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
     }
     // +
     // Add mentionned and **set tension data**
-    if m, err := db.GetDB().Meta("getLastContractComment", map[string]string{"cid":notif.Contract.ID}); err != nil {
+    if m, err := db.GetDB().Meta("getLastContractComment", map[string]string{"cid":notif.Contract.ID, "username":notif.Uctx.Username}); err != nil {
         return err
     } else if len(m) > 0 {
         notif.Rootnameid = m[0]["rootnameid"].(string)
