@@ -170,10 +170,10 @@ func PushEventNotifications(notif model.EventNotif) error {
     } else if len(m) > 0 {
         notif.Rootnameid = m[0]["rootnameid"].(string)
         notif.Receiverid = m[0]["receiverid"].(string)
-        notif.Msg, _ = m[0]["message"].(string)
         notif.Title = m[0]["title"].(string)
+        notif.Msg, _ = m[0]["message"].(string)
 
-        if notif.Msg != "" {
+        if notif.Msg != "" && notif.HasEvent(model.TensionEventCommentPushed) {
             // Mentioned users
             err = UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
             if err != nil { return err }
