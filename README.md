@@ -1,4 +1,4 @@
-# Fractale - self-organization for Humans
+# Fractale - self-organization for humans
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 

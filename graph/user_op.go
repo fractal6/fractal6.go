@@ -91,14 +91,13 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     default: // Guest Peer, Coordinator + user defined roles
         err = UnlinkUser(rootnameid, nameid, uctx.Username)
         if err != nil {return false, err}
-        // @obsolete: Remove user from last blob if present
-        //err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
     }
 
     // Update NodeFragment
-    // @debug: should delete instead...
+    // @debug: should delete instead...DelFieldById => `<x> <x> * .`
     if node.ID != "" {
         err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
+        //err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
     }
 
     return true, err
@@ -128,6 +127,11 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
             err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
         } else if len(roles) == 1 && (*roles[0].RoleType == model.RoleTypeGuest || *roles[0].RoleType == model.RoleTypePending) {
             err = DB.UpgradeMember(nid, model.RoleTypeRetired)
+            if err != nil { return err }
+
+            // User is leaving an organization: Remove user assignement from tensions in organization
+            _, err =  db.GetDB().Meta("removeAssignedTension", map[string]string{"username":username, "nameid":rootnameid})
+
         }
         return err
     }

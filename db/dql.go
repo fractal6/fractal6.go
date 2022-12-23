@@ -114,15 +114,16 @@ var contractHookPayload string = `{
 }`
 
 type QueryMut struct {
-    Q string
-    M string
+    Q string  // query
+    S string  // set
+    D string  // delete
 }
 
 // @uture: with Go.18 rewrite this module with generics
 //
 // make QueryMut and Queries/Mutations {
 //      Q string // query blocks
-//      M string // mutations block (for dql mutaitons
+//      S string // mutations block (for dql mutaitons)
 //      T expected type/
 // }
 //
@@ -675,7 +676,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-    // Deletion
+    // Deletion - Used by DeepDelete
     "deleteTension": `{
         id as var(func: uid({{.id}})) {
           rid_emitter as Tension.emitter
@@ -716,7 +717,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-        M: `uid(uids) <UserEvent.isRead> "true" .`,
+        S: `uid(uids) <UserEvent.isRead> "true" .`,
     },
     "markContractAsRead": QueryMut{
         Q: `query {
@@ -726,16 +727,15 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-        M: `uid(uids) <UserEvent.isRead> "true" .`,
+        S: `uid(uids) <UserEvent.isRead> "true" .`,
     },
-    // @TODO: A generic setNodeSetting (e.g "field":"visibility" ) (update node_op.go operation)...
     "setPendingUserToken": QueryMut{
         Q: `query {
             var(func: eq(PendingUser.email, "{{.email}}")) @filter(NOT has(PendingUser.token)) {
                 u as uid
             }
         }`,
-        M: `uid(u) <PendingUser.token> "{{.token}}" .`,
+        S: `uid(u) <PendingUser.token> "{{.token}}" .`,
     },
     "setNodeVisibility": QueryMut{
         Q: `query {
@@ -746,10 +746,25 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-        M: `
+        S: `
         uid(n) <Node.visibility> "{{.value}}" .
         uid(nf) <NodeFragment.visibility> "{{.value}}" .
         `,
+    },
+    "removeAssignedTension": QueryMut{
+        Q: `query {
+            var(func: eq(User.username, "{{.username}}")) {
+                u as uid
+                User.tensions_assigned @filter(eq(Tension.receiverid, "{{.nameid}}")) {
+                    t as uid
+
+                }
+            }
+        }`,
+        D: `
+        uid(u) <User.tensions_assigned> uid(t) .
+        `,
+
     },
 }
 
