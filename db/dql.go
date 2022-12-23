@@ -755,14 +755,14 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 u as uid
-                User.tensions_assigned @filter(eq(Tension.receiverid, "{{.nameid}}")) {
-                    t as uid
-
+                t as User.tensions_assigned @cascade {
+                    Tension.receiver @filter(eq(Node.rootnameid, "{{.rootnameid}}"))
                 }
             }
         }`,
         D: `
         uid(u) <User.tensions_assigned> uid(t) .
+        uid(t) <Tension.assignees> uid(u) .
         `,
 
     },
