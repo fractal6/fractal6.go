@@ -146,6 +146,10 @@ upload_release_op:
 		--upload-file $(RELEASE_DIR)/$(RELEASE_NAME).zip \
 		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
 
+delete_release_op:
+	curl -k -H "Authorization: token $(F6_TOKEN)" -X DELETE \
+		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
+
 #
 # Share release build rules
 #
