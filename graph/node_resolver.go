@@ -108,6 +108,10 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 
     var nodes []*model.NodeRef
     if input.Set != nil {
+        if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
+        nodes = append(nodes, input.Set.Nodes[0])
+        rid, _ := codec.Nid2rootid(*nodes[0].Nameid)
+
         // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
         n_nodes := 0
         _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
@@ -115,16 +119,15 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
         if len(input.Filter.ID) > 0 {
             n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")
         } else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
+            if rid != *input.Filter.Rootnameid.Eq { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
             n_nodes = db.GetDB().Count2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes")
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("invalid filter to query node artefact."))
         }
-        if n_nodes > 1 {
-            return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is possible only if one node defines this object."))
-        }
 
-        if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
-        nodes = append(nodes, input.Set.Nodes[0])
+        if n_nodes > 1 && *nodes[0].Nameid != rid  {
+            return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is only possible at the root circle level."))
+        }
     }
     if input.Remove != nil {
         // @DEBUG: only allow nodes to be removed...

@@ -53,14 +53,26 @@ func UnlinkUser(rootnameid, nameid, username string) error {
     return err
 }
 
-func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, unsafe bool) (bool, error) {
+	var err error
+	var rootnameid string
+	var nameid string
     parentid := tension.Receiver.Nameid
 
     // Type check
     if node.RoleType == nil { return false, fmt.Errorf("Node need a role type for this action.") }
 
-    // Get References
-    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+    // unsafe is used to Guest user to be unlink,
+    // as the nameid include a "@" char.
+    if unsafe {
+		nameid = *node.Nameid
+		rootnameid, err = codec.Nid2rootid(nameid)
+		if err != nil {return false, err}
+	} else {
+		// Get References
+		rootnameid, nameid, err = codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+		if err != nil {return false, err}
+	}
 
     // If user doesn't play role, return error
     if i := auth.UserPlaysRole(uctx, nameid); i < 0 {
@@ -79,14 +91,13 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     default: // Guest Peer, Coordinator + user defined roles
         err = UnlinkUser(rootnameid, nameid, uctx.Username)
         if err != nil {return false, err}
-        // @obsolete: Remove user from last blob if present
-        //err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
     }
 
     // Update NodeFragment
-    // @debug: should delete instead...
+    // @debug: should delete instead...DelFieldById => `<x> <x> * .`
     if node.ID != "" {
         err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
+        //err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
     }
 
     return true, err
@@ -116,6 +127,10 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
             err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
         } else if len(roles) == 1 && (*roles[0].RoleType == model.RoleTypeGuest || *roles[0].RoleType == model.RoleTypePending) {
             err = DB.UpgradeMember(nid, model.RoleTypeRetired)
+            if err != nil { return err }
+
+            // User is leaving an organization: Remove user assignement from tensions in organization
+            _, err =  db.GetDB().Meta("removeAssignedTension", map[string]string{"username":username, "rootnameid":rootnameid})
         }
         return err
     }

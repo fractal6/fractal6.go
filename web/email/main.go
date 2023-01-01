@@ -328,6 +328,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
     // Add footer
     var url_unsubscribe string
+    var url_leave string
     payload += fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.<br>
     <a href="%s">View it on Fractale</a>`, ui.Reason.ToText(), url_redirect)
@@ -338,7 +339,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unwatch=email", notif.Rootnameid, notif.Tid)
         payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a> from all announcements for this organization.</div>`, url_unsubscribe)
     } else if ui.Reason == model.ReasonIsAlert {
-        payload += ", reply to this email directly or leave this organization to stop receiving these alerts.</div>"
+        url_leave = fmt.Sprintf("https://"+DOMAIN+"/m/%s", notif.Rootnameid)
+        payload += fmt.Sprintf(`, reply to this email directly or <a href="%s">leave this organization</a> to stop receiving these alerts.</div>`, url_leave)
     } else {
         payload += " or reply to this email directly.</div>"
     }
@@ -358,7 +360,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
             "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
             "References": "<tension/%s@`+DOMAIN+`>"
         }
-    }`, author, email, subject, tools.CleanString(content, true), notif.Tid, notif.Tid)
+    }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), notif.Tid, notif.Tid)
     // @TODO; "List-Unsubscribe": "<%s>"
     // Other fields: http://apiv1.postalserver.io/controllers/send/message
 

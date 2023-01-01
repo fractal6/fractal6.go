@@ -443,6 +443,7 @@ type Notif implements Post {
 type EventCount {
   unread_events: Int
   pending_contracts: Int
+  assigned_tensions: Int
 }
 
 enum NodeType {

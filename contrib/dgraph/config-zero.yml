@@ -1,5 +1,5 @@
 my: localhost:5080
-wal: data/_data/zw
+wal: _data/zw
 
 telemetry:
   sentry: false

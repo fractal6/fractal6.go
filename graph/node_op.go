@@ -178,37 +178,40 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
 }
 
 func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, event *model.EventRef, unsafe bool) (bool, error) {
-    var ok bool
+	var err error
+	var rootnameid string
+	var nameid string
     parentid := tension.Receiver.Nameid
-
-    // Get References
-    rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
-    if err != nil { return ok, err }
 
     // unsafe is used to Guest user to be unlink,
     // as the nameid include a "@" char.
-    if !unsafe {
-        ok, err = NodeCheck(uctx, node, nameid, tension.Action)
-        if err != nil || !ok { return ok, err }
+    if unsafe {
+		nameid = *node.Nameid
+		rootnameid, err = codec.Nid2rootid(nameid)
+		if err != nil {return false, err}
     } else {
-        ok = true
+        // Get References
+        rootnameid, nameid, err = codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+        if err != nil { return false, err }
+        ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+        if err != nil || !ok { return false, err }
     }
 
     // Get the current first link
     firstLink, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
-    if err != nil { return ok, err }
+    if err != nil { return false, err }
 
     if *event.EventType == model.TensionEventMemberLinked {
         // Link user
         // --
-        if firstLink != nil {return ok, fmt.Errorf("Role is already linked.")}
+        if firstLink != nil {return false, fmt.Errorf("Role is already linked.")}
         err = LinkUser(rootnameid, nameid, *event.New)
-        if err != nil { return ok, err }
+        if err != nil { return false, err }
     } else if *event.EventType == model.TensionEventMemberUnlinked {
         // UnLink user
         // --
         err = UnlinkUser(rootnameid, nameid, *event.Old)
-        if err != nil { return ok, err }
+        if err != nil { return false, err }
     }
 
     // Update NodeFragment
@@ -217,16 +220,18 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
         err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
     }
 
-    return ok, err
+    return true, err
 }
 
 // NodeCheck validate and type checks.
+// @obsolete with NodeIdCodec
 func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, action *model.TensionAction) (bool, error) {
     var ok bool = false
     var err error
 
     name := *node.Name
-    rootnameid, _ := codec.Nid2rootid(nameid)
+    rootnameid, err := codec.Nid2rootid(nameid)
+    if err != nil { return ok, err }
 
     err = auth.ValidateNameid(nameid, rootnameid)
     if err != nil { return ok, err }
@@ -364,7 +369,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     blob_type := model.BlobTypeOnNode
     var noderef model.NodeFragmentRef
     StructMap(node, &noderef)
-    emptyString := ""
+    emptyString := "" // root's tension feature
     noderef.Nameid = &emptyString
     blob := model.BlobRef{
         CreatedAt: &now,

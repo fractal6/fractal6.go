@@ -114,15 +114,16 @@ var contractHookPayload string = `{
 }`
 
 type QueryMut struct {
-    Q string
-    M string
+    Q string  // query
+    S string  // set
+    D string  // delete
 }
 
 // @uture: with Go.18 rewrite this module with generics
 //
 // make QueryMut and Queries/Mutations {
 //      Q string // query blocks
-//      M string // mutations block (for dql mutaitons
+//      S string // mutations block (for dql mutaitons)
 //      T expected type/
 // }
 //
@@ -401,7 +402,6 @@ var dqlQueries map[string]string = map[string]string{
             {{.user_payload}}
         }
     }`,
-    // @debug sub filter comments on username/author...
     "getLastComment": `{
         all(func: uid({{.tid}})) @normalize {
             title: Tension.title
@@ -409,12 +409,12 @@ var dqlQueries map[string]string = map[string]string{
                 rootnameid: Node.rootnameid
                 receiverid: Node.nameid
             }
-            Tension.comments(first:1, orderdesc: Post.createdAt) {
+            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
                 message: Post.message
+                Post.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }
     }`,
-    // @debug sub filter comments on username/author...
     "getLastContractComment": `{
         all(func: uid({{.cid}})) @normalize {
             Contract.tension {
@@ -423,8 +423,9 @@ var dqlQueries map[string]string = map[string]string{
                     receiverid: Node.nameid
                 }
             }
-            Contract.comments(first:1, orderdesc: Post.createdAt) {
+            Contract.comments(first:1, orderdesc: Post.createdAt) @cascade {
                 message: Post.message
+                Post.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }
     }`,
@@ -646,9 +647,12 @@ var dqlQueries map[string]string = map[string]string{
     }`,
     "getEventCount": `{
 		var(func: eq(User.username, "{{.username}}")) {
-			User.events(first:10) @filter(eq(UserEvent.isRead, "false")) {
+			User.events @filter(eq(UserEvent.isRead, "false")) {
 				ev as UserEvent.event(first:1)
 			}
+            User.tensions_assigned @filter(eq(Tension.status, "Open")) {
+                t as count(uid)
+            }
 		}
 		var(func: uid(ev)) @filter(NOT type(Contract)) {
 			e as count(uid)
@@ -660,6 +664,7 @@ var dqlQueries map[string]string = map[string]string{
 		all() {
 			unread_events: sum(val(e))
 			pending_contracts: sum(val(c))
+            assigned_tensions: sum(val(t))
 		}
     }`,
     "getMembers": `{
@@ -671,7 +676,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-    // Deletion
+    // Deletion - Used by DeepDelete
     "deleteTension": `{
         id as var(func: uid({{.id}})) {
           rid_emitter as Tension.emitter
@@ -712,7 +717,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-        M: `uid(uids) <UserEvent.isRead> "true" .`,
+        S: `uid(uids) <UserEvent.isRead> "true" .`,
     },
     "markContractAsRead": QueryMut{
         Q: `query {
@@ -722,16 +727,15 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-        M: `uid(uids) <UserEvent.isRead> "true" .`,
+        S: `uid(uids) <UserEvent.isRead> "true" .`,
     },
-    // @TODO: A generic setNodeSetting (e.g "field":"visibility" ) (update node_op.go operation)...
     "setPendingUserToken": QueryMut{
         Q: `query {
             var(func: eq(PendingUser.email, "{{.email}}")) @filter(NOT has(PendingUser.token)) {
                 u as uid
             }
         }`,
-        M: `uid(u) <PendingUser.token> "{{.token}}" .`,
+        S: `uid(u) <PendingUser.token> "{{.token}}" .`,
     },
     "setNodeVisibility": QueryMut{
         Q: `query {
@@ -742,10 +746,25 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-        M: `
+        S: `
         uid(n) <Node.visibility> "{{.value}}" .
         uid(nf) <NodeFragment.visibility> "{{.value}}" .
         `,
+    },
+    "removeAssignedTension": QueryMut{
+        Q: `query {
+            var(func: eq(User.username, "{{.username}}")) {
+                u as uid
+                t as User.tensions_assigned @cascade {
+                    Tension.receiver @filter(eq(Node.rootnameid, "{{.rootnameid}}"))
+                }
+            }
+        }`,
+        D: `
+        uid(u) <User.tensions_assigned> uid(t) .
+        uid(t) <Tension.assignees> uid(u) .
+        `,
+
     },
 }
 

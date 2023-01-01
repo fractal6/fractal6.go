@@ -1,12 +1,12 @@
 my: localhost:7080
 zero: localhost:5080
-postings: data/_data/p
-wal: data/_data/w
-tmp: data/tmp
+postings: _data/p
+wal: _data/w
+tmp: _data/tmp
 
 cache:
   # 4096
-  size-mb: 1024 
+  size-mb: 1024
   percentage: 50,30,20
 
 graphql:
@@ -20,7 +20,7 @@ limit:
   mutations: strict
   query-timeout: 1m
 
-lambda: 
+lambda:
   num: 0
 
 

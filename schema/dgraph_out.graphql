@@ -1,34 +1,34 @@
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @lambda on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -87,6 +87,7 @@ type AddContractPayload {
 input AddEventCountInput {
   unread_events: Int
   pending_contracts: Int
+  assigned_tensions: Int
 }
 
 type AddEventCountPayload {
@@ -923,6 +924,7 @@ type EventAggregateResult {
 type EventCount {
   unread_events: Int
   pending_contracts: Int
+  assigned_tensions: Int
 }
 
 type EventCountAggregateResult {
@@ -935,6 +937,10 @@ type EventCountAggregateResult {
   pending_contractsMax: Int
   pending_contractsSum: Int
   pending_contractsAvg: Float
+  assigned_tensionsMin: Int
+  assigned_tensionsMax: Int
+  assigned_tensionsSum: Int
+  assigned_tensionsAvg: Float
 }
 
 input EventCountFilter {
@@ -947,6 +953,7 @@ input EventCountFilter {
 enum EventCountHasFilter {
   unread_events
   pending_contracts
+  assigned_tensions
 }
 
 input EventCountOrder {
@@ -958,16 +965,19 @@ input EventCountOrder {
 enum EventCountOrderable {
   unread_events
   pending_contracts
+  assigned_tensions
 }
 
 input EventCountPatch {
   unread_events: Int
   pending_contracts: Int
+  assigned_tensions: Int
 }
 
 input EventCountRef {
   unread_events: Int
   pending_contracts: Int
+  assigned_tensions: Int
 }
 
 input EventFilter {

@@ -181,12 +181,14 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
             }
         }
         if ok {
+            // Execute query
+            data, err := next(ctx)
+            if err != nil { return data, err }
             // Notify users by email
             if input.Set.Comments != nil && len(input.Set.Comments) > 0 {
                 PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: contract.Tension.ID, Contract: contract, ContractEvent: model.NewComment})
             }
-            // Execute query
-            return next(ctx)
+            return data, err
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("You are not authorized to access this ressource."))
         }

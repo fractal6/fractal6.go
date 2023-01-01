@@ -5,7 +5,7 @@ MOD := fractale/fractal6.go
 BINARY := f6
 DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
-CLIENT_RELEASE := 0.7
+CLIENT_RELEASE := 0.7.2
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
@@ -58,9 +58,10 @@ dgraph: # Do alter Dgraph
 	cd ../fractal6-schema
 	make dgraph_in
 	cd -
-	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
 	mkdir -p schema/
 	cp ../fractal6-schema/gen_dgraph_in/schema.graphql schema/dgraph_schema.graphql
+	# Update Dgraph
+	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
 	# Used by the `schema` rule, to generate the gqlgen input schema
 	get-graphql-schema http://localhost:8080/graphql > schema/dgraph_out.graphql
 	# Alternative: gq http://localhost:8080/graphql -H "Content-Type: application/json" --introspect > schema/dgraph_out.graphql
@@ -145,6 +146,10 @@ upload_release_op:
 		--upload-file $(RELEASE_DIR)/$(RELEASE_NAME).zip \
 		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
 
+delete_release_op:
+	curl -k -H "Authorization: token $(F6_TOKEN)" -X DELETE \
+		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
+
 #
 # Share release build rules
 #
@@ -198,10 +203,10 @@ fetch_client_source:
 #
 
 docs:
-	cd ../doc && \
+	cd ../docs && \
 		make quickdoc && \
 		cd - && \
-		cp ../doc/_data/* data
+		cp ../docs/_data/* data/
 
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort
@@ -225,3 +230,6 @@ certs:
 	openssl rsa -in private.pem -pubout -out public.pem
 	# Copy public key for the Dgraph authorization in the schema
 	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 |  xclip -selection clipboard;
+
+tags:
+	ctags --exclude=.git  --exclude="public/*" --exclude="releases/*" -R -f .tags

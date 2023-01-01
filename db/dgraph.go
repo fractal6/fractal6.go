@@ -65,7 +65,8 @@ type Dgraph struct {
     // HTTP/Graphql and GPRC/DQL client template
     gqlTemplates map[string]*QueryString
     dqlTemplates map[string]*QueryString
-    dqlMutTemplates map[string]*QueryString
+    dqlSetTemplates map[string]*QueryString
+    dqlDelTemplates map[string]*QueryString
 }
 
 type DgraphClaims struct {
@@ -197,10 +198,15 @@ func initDB() *Dgraph {
         //fmt.Println("Dgraph Grpc addr:", grpcAddr)
     }
 
+    // Initialize templates
     gqlT := map[string]*QueryString{}
     dqlT := map[string]*QueryString{}
-    dqlMutT := map[string]*QueryString{}
-
+    dqlSetT := map[string]*QueryString{}
+    dqlDelT := map[string]*QueryString{}
+    for op, q := range(gqlQueries) {
+        gqlT[op] = &QueryString{Q:q}
+        gqlT[op].Init(true)
+    }
     for op, q := range(dqlQueries) {
         dqlT[op] = &QueryString{Q:q}
         dqlT[op].Init(true)
@@ -208,12 +214,10 @@ func initDB() *Dgraph {
     for op, q := range(dqlMutations) {
         dqlT[op] = &QueryString{Q:q.Q}
         dqlT[op].Init(true)
-        dqlMutT[op] = &QueryString{Q:q.M}
-        dqlMutT[op].Init(false)
-    }
-    for op, q := range(gqlQueries) {
-        gqlT[op] = &QueryString{Q:q}
-        gqlT[op].Init(true)
+        dqlSetT[op] = &QueryString{Q:q.S}
+        dqlSetT[op].Init(false)
+        dqlDelT[op] = &QueryString{Q:q.D}
+        dqlDelT[op].Init(false)
     }
 
     return &Dgraph{
@@ -221,7 +225,8 @@ func initDB() *Dgraph {
         grpcAddr: grpcAddr,
         gqlTemplates: gqlT,
         dqlTemplates: dqlT,
-        dqlMutTemplates: dqlMutT,
+        dqlSetTemplates: dqlSetT,
+        dqlDelTemplates: dqlDelT,
     }
 }
 
@@ -249,9 +254,19 @@ func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
     return q
 }
 
-func (dg Dgraph) getDqlMutQuery(op string, m map[string]string) string {
+func (dg Dgraph) getDqlSetQuery(op string, m map[string]string) string {
     var q string
-    if _q, ok := dg.dqlMutTemplates[op]; ok {
+    if _q, ok := dg.dqlSetTemplates[op]; ok {
+        q = _q.Format(m)
+    } else {
+        panic("unknonw DQL query op: " + op)
+    }
+    return q
+}
+
+func (dg Dgraph) getDqlDelQuery(op string, m map[string]string) string {
+    var q string
+    if _q, ok := dg.dqlDelTemplates[op]; ok {
         q = _q.Format(m)
     } else {
         panic("unknonw DQL query op: " + op)
@@ -427,15 +442,20 @@ func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Re
     defer txn.Discard(ctx)
 
     query := dg.getDqlQuery(op, maps)
-    muSet := dg.getDqlMutQuery(op, maps)
+    muSet := dg.getDqlSetQuery(op, maps)
+    muDel := dg.getDqlDelQuery(op, maps)
+
+    mu := api.Mutation{}
+    if muSet != "" {
+        mu.SetNquads = []byte(muSet)
+    }
+    if muDel != "" {
+        mu.DelNquads = []byte(muDel)
+    }
 
     req := &api.Request{
         Query: query,
-        Mutations: []*api.Mutation{
-            &api.Mutation{
-                SetNquads: []byte(muSet),
-            },
-        },
+        Mutations: []*api.Mutation{&mu},
         CommitNow: true,
     }
 
@@ -443,119 +463,6 @@ func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Re
     return res, err
 }
 
-//MutateUpsertDql adds a new object in the database if it doesn't exist
-func (dg Dgraph) MutateUpsertDql_(object map[string]interface{}, dtype string, upsertField string, upsertVal string) error {
-    // init client
-    dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-    txn := dgc.NewTxn()
-    defer txn.Discard(ctx)
-
-    // make the template here.
-    template := template.Must(template.New("graphql").Parse(`{
-        all(func: eq({{.dtype}}.{{.upsertField}}, "{{.upserVal}}")) {
-            v as uid
-        }
-    }`))
-    buf := bytes.Buffer{}
-    template.Execute(&buf, map[string]string{"dtype":dtype, "upsertField":upsertField, "upsertVal":upsertVal})
-    query := buf.String()
-
-    object["dgraph.type"] = []string{dtype}
-    object["uid"] = "uid(v)"
-    js, err := json.Marshal(object)
-    if err != nil { return err }
-    mu := &api.Mutation{SetJson: js}
-
-    req := &api.Request{
-        Query: query,
-        Mutations: []*api.Mutation{mu},
-        CommitNow: true,
-    }
-    // User do instead of Mutate here ?
-    _, err = txn.Do(ctx, req)
-    return err
-}
-
-//Push adds a new object in the database.
-func (dg Dgraph) Push_(object map[string]interface{}, dtype string) (string, error) {
-    // init client
-    dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-    txn := dgc.NewTxn()
-    defer txn.Discard(ctx)
-
-    object["dgraph.type"] = []string{dtype}
-    uid, ok := object["uid"]
-    if !ok {
-        uid = "_:new_obj"
-        object["uid"] = uid
-    }
-    js, err := json.Marshal(object)
-    if err != nil { return "", err }
-
-    mu := &api.Mutation{
-        CommitNow: true,
-        SetJson: js,
-    }
-    r, err := txn.Mutate(ctx, mu)
-    if err != nil { return "", err }
-
-    uid = r.Uids[uid.(string)]
-    return uid.(string), nil
-}
-
-//ClearNodes remove nodes from theirs uid and their edges in dgraph.
-// refers to https://dgraph.io/docs/mutations/json-mutation-format/#deleting-edges
-func (dg Dgraph) ClearNodes_(uids ...string) (error) {
-    // init client
-    dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-    txn := dgc.NewTxn()
-    defer txn.Discard(ctx)
-
-    d :=  map[string]string{}
-    for _, uid := range uids { d["uid"] = uid }
-    js, err := json.Marshal(d)
-    if err != nil { return err }
-
-    mu := &api.Mutation{
-        CommitNow: true,
-        DeleteJson: js,
-    }
-
-    _, err = txn.Mutate(ctx, mu)
-    return err
-}
-
-//ClearEdges remove edges from their uid
-func (dg Dgraph) ClearEdges_(key string, value string, delMap map[string]interface{}) (error) {
-    // init client
-    dgc, cancel := dg.getDgraphClient()
-    defer cancel()
-    ctx := context.Background()
-    txn := dgc.NewTxn()
-    defer txn.Discard(ctx)
-
-    query := fmt.Sprintf(`query {
-        o as var(func: eq(%s, "%s"))
-    }`, key, value)
-
-    var mu string
-    for k, _ := range delMap {
-        mu = mu + fmt.Sprintf(`uid(o) <%s> * .`, k) + "\n"
-    }
-
-    mutation := &api.Mutation{
-        DelNquads: []byte(mu),
-    }
-
-    err := dg.MutateWithQueryDql(query, mutation)
-    return err
-}
 
 //
 // GraphQL Interface

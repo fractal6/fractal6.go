@@ -69,6 +69,7 @@ type AddContractPayload struct {
 type AddEventCountInput struct {
 	UnreadEvents     *int `json:"unread_events"`
 	PendingContracts *int `json:"pending_contracts"`
+	AssignedTensions *int `json:"assigned_tensions"`
 }
 
 type AddEventCountPayload struct {
@@ -791,6 +792,7 @@ type EventAggregateResult struct {
 type EventCount struct {
 	UnreadEvents     *int `json:"unread_events"`
 	PendingContracts *int `json:"pending_contracts"`
+	AssignedTensions *int `json:"assigned_tensions"`
 }
 
 type EventCountAggregateResult struct {
@@ -803,6 +805,10 @@ type EventCountAggregateResult struct {
 	PendingContractsMax *int     `json:"pending_contractsMax"`
 	PendingContractsSum *int     `json:"pending_contractsSum"`
 	PendingContractsAvg *float64 `json:"pending_contractsAvg,omitempty"`
+	AssignedTensionsMin *int     `json:"assigned_tensionsMin"`
+	AssignedTensionsMax *int     `json:"assigned_tensionsMax"`
+	AssignedTensionsSum *int     `json:"assigned_tensionsSum"`
+	AssignedTensionsAvg *float64 `json:"assigned_tensionsAvg,omitempty"`
 }
 
 type EventCountFilter struct {
@@ -821,11 +827,13 @@ type EventCountOrder struct {
 type EventCountPatch struct {
 	UnreadEvents     *int `json:"unread_events"`
 	PendingContracts *int `json:"pending_contracts"`
+	AssignedTensions *int `json:"assigned_tensions"`
 }
 
 type EventCountRef struct {
 	UnreadEvents     *int `json:"unread_events"`
 	PendingContracts *int `json:"pending_contracts"`
+	AssignedTensions *int `json:"assigned_tensions"`
 }
 
 type EventFilter struct {
@@ -2983,16 +2991,18 @@ type EventCountHasFilter string
 const (
 	EventCountHasFilterUnreadEvents     EventCountHasFilter = "unread_events"
 	EventCountHasFilterPendingContracts EventCountHasFilter = "pending_contracts"
+	EventCountHasFilterAssignedTensions EventCountHasFilter = "assigned_tensions"
 )
 
 var AllEventCountHasFilter = []EventCountHasFilter{
 	EventCountHasFilterUnreadEvents,
 	EventCountHasFilterPendingContracts,
+	EventCountHasFilterAssignedTensions,
 }
 
 func (e EventCountHasFilter) IsValid() bool {
 	switch e {
-	case EventCountHasFilterUnreadEvents, EventCountHasFilterPendingContracts:
+	case EventCountHasFilterUnreadEvents, EventCountHasFilterPendingContracts, EventCountHasFilterAssignedTensions:
 		return true
 	}
 	return false
@@ -3024,16 +3034,18 @@ type EventCountOrderable string
 const (
 	EventCountOrderableUnreadEvents     EventCountOrderable = "unread_events"
 	EventCountOrderablePendingContracts EventCountOrderable = "pending_contracts"
+	EventCountOrderableAssignedTensions EventCountOrderable = "assigned_tensions"
 )
 
 var AllEventCountOrderable = []EventCountOrderable{
 	EventCountOrderableUnreadEvents,
 	EventCountOrderablePendingContracts,
+	EventCountOrderableAssignedTensions,
 }
 
 func (e EventCountOrderable) IsValid() bool {
 	switch e {
-	case EventCountOrderableUnreadEvents, EventCountOrderablePendingContracts:
+	case EventCountOrderableUnreadEvents, EventCountOrderablePendingContracts, EventCountOrderableAssignedTensions:
 		return true
 	}
 	return false
