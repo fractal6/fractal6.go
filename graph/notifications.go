@@ -533,20 +533,26 @@ func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]mo
 
     for i, U := range FindUsernames(msg) {
         u := strings.ToLower(U)
-        if _, ex := users[u]; ex { continue }
-        // Check that user is a member
-        filter := `has(Node.first_link) AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")`
-        if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex { continue }
-        res, err := db.GetDB().GetFieldByEq("User.username", u, auth.UserSelection)
-        if err != nil { return err }
-        if res != nil {
-            var user model.User
-            if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
-                users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
+        if _, ex := users[u]; ex {
+            user := users[u]
+            user.Reason = model.ReasonIsMentionned
+            users[u] = user
+        } else {
+            // Check that user is a member
+            filter := `has(Node.first_link) AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")`
+            if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex { continue }
+            res, err := db.GetDB().GetFieldByEq("User.username", u, auth.UserSelection)
+            if err != nil { return err }
+            if res != nil {
+                var user model.User
+                if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+                    users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
+                }
             }
         }
+
         if i > 100 {
-            return fmt.Errorf("Too many user memtioned. Please consider using an Alert tension to notify group of users.")
+            return fmt.Errorf("Too many user mentioned. Please consider using an Alert tension to notify group of users.")
         }
     }
     return nil
