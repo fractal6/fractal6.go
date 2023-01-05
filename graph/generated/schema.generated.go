@@ -50823,8 +50823,18 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				}
 				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, nil)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -50858,7 +50868,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
 			}
 			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
 				if err != nil {
 					return nil, err
 				}
@@ -50867,8 +50877,18 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				}
 				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, nil)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -61913,8 +61933,18 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				}
 				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, nil)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -61948,7 +61978,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
 			}
 			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
 				if err != nil {
 					return nil, err
 				}
@@ -61957,8 +61987,18 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				}
 				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, nil)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -62411,8 +62451,18 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				}
 				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, nil)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -62446,7 +62496,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return ec.directives.X_alter(ctx, obj, directive0, r, nil, e, nil)
 			}
 			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
 				if err != nil {
 					return nil, err
 				}
@@ -62455,8 +62505,18 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				}
 				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
 			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, nil)
+			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
