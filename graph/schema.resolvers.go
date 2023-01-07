@@ -152,7 +152,13 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 
 // AddReaction is the resolver for the addReaction field.
 func (r *mutationResolver) AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (data *model.AddReactionPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+    // @DEBUG: see #3a1a434 (gqlgen bug...)
+	// Input is updated in hooks. Fields with arguments will be ignored
+	_, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+	errors = r.db.AddExtra(*uctx, "reaction", input, upsert, GetQueryGraph(ctx), &data)
 	return data, errors
 }
 
@@ -163,7 +169,8 @@ func (r *mutationResolver) UpdateReaction(ctx context.Context, input model.Updat
 
 // DeleteReaction is the resolver for the deleteReaction field.
 func (r *mutationResolver) DeleteReaction(ctx context.Context, filter model.ReactionFilter) (data *model.DeleteReactionPayload, errors error) {
-	panic(fmt.Errorf("not implemented: DeleteReaction - deleteReaction"))
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
 }
 
 // AddBlob is the resolver for the addBlob field.
@@ -213,8 +220,8 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 
 // AddContract is the resolver for the addContract field.
 func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
-	// Inputs is updated in hooks.
-	// @debug: field with arguments will be ignored
+    // @DEBUG: see #3a1a434 (gqlgen bug...)
+	// Input is updated in hooks. Fields with arguments will be ignored
 	_, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
 		return nil, LogErr("Access denied", err)
