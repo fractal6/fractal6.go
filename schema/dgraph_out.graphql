@@ -1,34 +1,34 @@
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
+
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -53,7 +53,7 @@ input AddCommentInput {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
-  _VOID: String
+  reactions: [ReactionRef!]
 }
 
 type AddCommentPayload {
@@ -255,6 +255,18 @@ type AddPendingUserPayload {
   numUids: Int
 }
 
+input AddReactionInput {
+  reactionid: String
+  user: UserRef!
+  comment: CommentRef!
+  type_: Int!
+}
+
+type AddReactionPayload {
+  reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
+  numUids: Int
+}
+
 input AddRoleExtInput {
   rootnameid: String!
   name: String!
@@ -335,6 +347,7 @@ input AddUserInput {
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  reactions: [ReactionRef!]
   events: [UserEventRef!]
   markAllAsRead: String
   event_count: EventCountRef
@@ -499,7 +512,8 @@ type Comment implements Post {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
-  _VOID: String
+  reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
+  reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
 }
 
 type CommentAggregateResult {
@@ -510,8 +524,6 @@ type CommentAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
-  _VOIDMin: String
-  _VOIDMax: String
 }
 
 input CommentFilter {
@@ -529,7 +541,7 @@ enum CommentHasFilter {
   createdAt
   updatedAt
   message
-  _VOID
+  reactions
 }
 
 input CommentOrder {
@@ -542,7 +554,6 @@ enum CommentOrderable {
   createdAt
   updatedAt
   message
-  _VOID
 }
 
 input CommentPatch {
@@ -550,7 +561,7 @@ input CommentPatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  _VOID: String
+  reactions: [ReactionRef!]
 }
 
 input CommentRef {
@@ -559,7 +570,7 @@ input CommentRef {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  _VOID: String
+  reactions: [ReactionRef!]
 }
 
 input ContainsFilter {
@@ -824,6 +835,12 @@ type DeletePendingUserPayload {
 
 type DeletePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
+  msg: String
+  numUids: Int
+}
+
+type DeleteReactionPayload {
+  reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   msg: String
   numUids: Int
 }
@@ -1375,6 +1392,9 @@ type Mutation {
   addComment(input: [AddCommentInput!]!): AddCommentPayload
   updateComment(input: UpdateCommentInput!): UpdateCommentPayload
   deleteComment(filter: CommentFilter!): DeleteCommentPayload
+  addReaction(input: [AddReactionInput!]!, upsert: Boolean): AddReactionPayload
+  updateReaction(input: UpdateReactionInput!): UpdateReactionPayload
+  deleteReaction(filter: ReactionFilter!): DeleteReactionPayload
   addBlob(input: [AddBlobInput!]!): AddBlobPayload
   updateBlob(input: UpdateBlobInput!): UpdateBlobPayload
   deleteBlob(filter: BlobFilter!): DeleteBlobPayload
@@ -2122,6 +2142,9 @@ type Query {
   getComment(id: ID!): Comment
   queryComment(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
+  getReaction(id: ID, reactionid: String): Reaction
+  queryReaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
+  aggregateReaction(filter: ReactionFilter): ReactionAggregateResult
   getBlob(id: ID!): Blob
   queryBlob(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   aggregateBlob(filter: BlobFilter): BlobAggregateResult
@@ -2152,6 +2175,66 @@ type Query {
   aggregateNotif(filter: NotifFilter): NotifAggregateResult
   queryEventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
   aggregateEventCount(filter: EventCountFilter): EventCountAggregateResult
+}
+
+type Reaction {
+  id: ID!
+  reactionid: String
+  user(filter: UserFilter): User!
+  comment(filter: CommentFilter): Comment!
+  type_: Int!
+}
+
+type ReactionAggregateResult {
+  count: Int
+  reactionidMin: String
+  reactionidMax: String
+  type_Min: Int
+  type_Max: Int
+  type_Sum: Int
+  type_Avg: Float
+}
+
+input ReactionFilter {
+  id: [ID!]
+  reactionid: StringHashFilter
+  has: [ReactionHasFilter]
+  and: [ReactionFilter]
+  or: [ReactionFilter]
+  not: ReactionFilter
+}
+
+enum ReactionHasFilter {
+  reactionid
+  user
+  comment
+  type_
+}
+
+input ReactionOrder {
+  asc: ReactionOrderable
+  desc: ReactionOrderable
+  then: ReactionOrder
+}
+
+enum ReactionOrderable {
+  reactionid
+  type_
+}
+
+input ReactionPatch {
+  reactionid: String
+  user: UserRef
+  comment: CommentRef
+  type_: Int
+}
+
+input ReactionRef {
+  id: ID
+  reactionid: String
+  user: UserRef
+  comment: CommentRef
+  type_: Int
 }
 
 type RoleExt {
@@ -2686,6 +2769,17 @@ type UpdatePostPayload {
   numUids: Int
 }
 
+input UpdateReactionInput {
+  filter: ReactionFilter!
+  set: ReactionPatch
+  remove: ReactionPatch
+}
+
+type UpdateReactionPayload {
+  reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
+  numUids: Int
+}
+
 input UpdateRoleExtInput {
   filter: RoleExtFilter!
   set: RoleExtPatch
@@ -2775,6 +2869,7 @@ type User {
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
+  reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!]
   markAllAsRead: String
   event_count(filter: EventCountFilter): EventCount
@@ -2785,6 +2880,7 @@ type User {
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
   eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
 }
 
@@ -2901,6 +2997,7 @@ enum UserHasFilter {
   tensions_created
   tensions_assigned
   contracts
+  reactions
   events
   markAllAsRead
   event_count
@@ -2947,6 +3044,7 @@ input UserPatch {
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  reactions: [ReactionRef!]
   events: [UserEventRef!]
   markAllAsRead: String
   event_count: EventCountRef
@@ -2975,6 +3073,7 @@ input UserRef {
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
+  reactions: [ReactionRef!]
   events: [UserEventRef!]
   markAllAsRead: String
   event_count: EventCountRef

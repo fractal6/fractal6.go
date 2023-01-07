@@ -147,6 +147,16 @@ func Init() gen.Config {
     c.Directives.Hook_addComment = nothing
     c.Directives.Hook_updateComment = nothing
     c.Directives.Hook_deleteComment = nothing
+    //Reaction
+    c.Directives.Hook_getReactionInput = nothing
+    c.Directives.Hook_queryReactionInput = nothing
+    c.Directives.Hook_addReactionInput = nothing
+    c.Directives.Hook_updateReactionInput = nothing
+    c.Directives.Hook_deleteReactionInput = nothing
+    // --
+    c.Directives.Hook_addReaction = nothing
+    c.Directives.Hook_updateReaction = nothing
+    c.Directives.Hook_deleteReaction = nothing
     //Contract
     c.Directives.Hook_getContractInput = nothing
     c.Directives.Hook_queryContractInput = nothing

@@ -150,6 +150,22 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 	panic(fmt.Errorf("not implemented"))
 }
 
+// AddReaction is the resolver for the addReaction field.
+func (r *mutationResolver) AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (data *model.AddReactionPayload, errors error) {
+	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	return data, errors
+}
+
+// UpdateReaction is the resolver for the updateReaction field.
+func (r *mutationResolver) UpdateReaction(ctx context.Context, input model.UpdateReactionInput) (data *model.UpdateReactionPayload, errors error) {
+	panic(fmt.Errorf("not implemented: UpdateReaction - updateReaction"))
+}
+
+// DeleteReaction is the resolver for the deleteReaction field.
+func (r *mutationResolver) DeleteReaction(ctx context.Context, filter model.ReactionFilter) (data *model.DeleteReactionPayload, errors error) {
+	panic(fmt.Errorf("not implemented: DeleteReaction - deleteReaction"))
+}
+
 // AddBlob is the resolver for the addBlob field.
 func (r *mutationResolver) AddBlob(ctx context.Context, input []*model.AddBlobInput) (data *model.AddBlobPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
@@ -460,6 +476,21 @@ func (r *queryResolver) QueryComment(ctx context.Context, filter *model.CommentF
 // AggregateComment is the resolver for the aggregateComment field.
 func (r *queryResolver) AggregateComment(ctx context.Context, filter *model.CommentFilter) (data *model.CommentAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// GetReaction is the resolver for the getReaction field.
+func (r *queryResolver) GetReaction(ctx context.Context, id *string, reactionid *string) (data *model.Reaction, errors error) {
+	panic(fmt.Errorf("not implemented: GetReaction - getReaction"))
+}
+
+// QueryReaction is the resolver for the queryReaction field.
+func (r *queryResolver) QueryReaction(ctx context.Context, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) (data []*model.Reaction, errors error) {
+	panic(fmt.Errorf("not implemented: QueryReaction - queryReaction"))
+}
+
+// AggregateReaction is the resolver for the aggregateReaction field.
+func (r *queryResolver) AggregateReaction(ctx context.Context, filter *model.ReactionFilter) (data *model.ReactionAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented: AggregateReaction - aggregateReaction"))
 }
 
 // GetBlob is the resolver for the getBlob field.

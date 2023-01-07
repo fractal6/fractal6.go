@@ -266,8 +266,27 @@ type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root
       }
     }"""
 }]
-}){
-_VOID: String
+}) {
+  reactions: [Reaction!] @hasInverse(field: comment)
+}
+
+type Reaction @auth(add:{ rule:"""query ($USERNAME: String!) {
+      queryReaction {
+        user(filter: {username: {eq: $USERNAME}}) { username }
+      }
+    }"""
+}, update:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}, delete:{ rule:"""query ($USERNAME: String!) {
+      queryReaction {
+        user(filter: {username: {eq: $USERNAME}}) { username }
+      }
+    }"""
+}) {
+  id: ID!
+  reactionid: String @id
+  user: User!
+  comment: Comment!
+  type_: Int!
 }
 
 type Blob implements Post {
@@ -384,6 +403,7 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   tensions_created: [Tension!] @hasInverse(field: createdBy)
   tensions_assigned: [Tension!] @hasInverse(field: assignees)
   contracts: [Contract!] @hasInverse(field: candidates)
+  reactions: [Reaction!] @hasInverse(field: user)
   events: [UserEvent!] @hasInverse(field: user)
   markAllAsRead: String
   event_count: EventCount

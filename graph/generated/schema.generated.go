@@ -44,6 +44,9 @@ type MutationResolver interface {
 	AddComment(ctx context.Context, input []*model.AddCommentInput) (*model.AddCommentPayload, error)
 	UpdateComment(ctx context.Context, input model.UpdateCommentInput) (*model.UpdateCommentPayload, error)
 	DeleteComment(ctx context.Context, filter model.CommentFilter) (*model.DeleteCommentPayload, error)
+	AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (*model.AddReactionPayload, error)
+	UpdateReaction(ctx context.Context, input model.UpdateReactionInput) (*model.UpdateReactionPayload, error)
+	DeleteReaction(ctx context.Context, filter model.ReactionFilter) (*model.DeleteReactionPayload, error)
 	AddBlob(ctx context.Context, input []*model.AddBlobInput) (*model.AddBlobPayload, error)
 	UpdateBlob(ctx context.Context, input model.UpdateBlobInput) (*model.UpdateBlobPayload, error)
 	DeleteBlob(ctx context.Context, filter model.BlobFilter) (*model.DeleteBlobPayload, error)
@@ -105,6 +108,9 @@ type QueryResolver interface {
 	GetComment(ctx context.Context, id string) (*model.Comment, error)
 	QueryComment(ctx context.Context, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) ([]*model.Comment, error)
 	AggregateComment(ctx context.Context, filter *model.CommentFilter) (*model.CommentAggregateResult, error)
+	GetReaction(ctx context.Context, id *string, reactionid *string) (*model.Reaction, error)
+	QueryReaction(ctx context.Context, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) ([]*model.Reaction, error)
+	AggregateReaction(ctx context.Context, filter *model.ReactionFilter) (*model.ReactionAggregateResult, error)
 	GetBlob(ctx context.Context, id string) (*model.Blob, error)
 	QueryBlob(ctx context.Context, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) ([]*model.Blob, error)
 	AggregateBlob(ctx context.Context, filter *model.BlobFilter) (*model.BlobAggregateResult, error)
@@ -1323,6 +1329,48 @@ func (ec *executionContext) field_AddPendingUserPayload_pendingUser_args(ctx con
 	return args, nil
 }
 
+func (ec *executionContext) field_AddReactionPayload_reaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ReactionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1632,6 +1680,63 @@ func (ec *executionContext) field_Comment_createdBy_args(ctx context.Context, ra
 		}
 	}
 	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Comment_reactionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Comment_reactions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ReactionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -2496,6 +2601,48 @@ func (ec *executionContext) field_DeletePostPayload_post_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteReactionPayload_reaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ReactionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3180,6 +3327,47 @@ func (ec *executionContext) field_Mutation_addPendingUser_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addReaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddReactionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddReactionInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addReactionInput == nil {
+				return nil, errors.New("directive hook_addReactionInput is not implemented")
+			}
+			return ec.directives.Hook_addReactionInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddReactionInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddReactionInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["upsert"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3611,6 +3799,36 @@ func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteReaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNReactionFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteReactionInput == nil {
+				return nil, errors.New("directive hook_deleteReactionInput is not implemented")
+			}
+			return ec.directives.Hook_deleteReactionInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ReactionFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.ReactionFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4010,6 +4228,36 @@ func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, 
 		arg0, err = ec.unmarshalNUpdatePostInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateReaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateReactionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateReactionInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateReactionInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateReactionInput == nil {
+				return nil, errors.New("directive hook_updateReactionInput is not implemented")
+			}
+			return ec.directives.Hook_updateReactionInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateReactionInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateReactionInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -5213,6 +5461,21 @@ func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateReaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5501,6 +5764,30 @@ func (ec *executionContext) field_Query_getPost_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getReaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["reactionid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["reactionid"] = arg1
 	return args, nil
 }
 
@@ -6245,6 +6532,65 @@ func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryReaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryReactionInput == nil {
+				return nil, errors.New("directive hook_queryReactionInput is not implemented")
+			}
+			return ec.directives.Hook_queryReactionInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ReactionFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ReactionFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ReactionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_queryRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -6562,6 +6908,36 @@ func (ec *executionContext) field_Query_queryVote_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Reaction_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CommentFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Reaction_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -7783,6 +8159,48 @@ func (ec *executionContext) field_UpdatePostPayload_post_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateReactionPayload_reaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ReactionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateRoleExtPayload_roleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -8243,6 +8661,63 @@ func (ec *executionContext) field_User_events_args(ctx context.Context, rawArgs 
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOUserEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_User_reactionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_User_reactions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReactionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ReactionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -8829,6 +9304,8 @@ func (ec *executionContext) fieldContext_AddCommentPayload_comment(ctx context.C
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -8837,6 +9314,8 @@ func (ec *executionContext) fieldContext_AddCommentPayload_comment(ctx context.C
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -10134,6 +10613,105 @@ func (ec *executionContext) fieldContext_AddPendingUserPayload_numUids(ctx conte
 	return fc, nil
 }
 
+func (ec *executionContext) _AddReactionPayload_reaction(ctx context.Context, field graphql.CollectedField, obj *model.AddReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddReactionPayload_reaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reaction, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddReactionPayload_reaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddReactionPayload_reaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddReactionPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddReactionPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddReactionPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AddRoleExtPayload_roleExt(ctx context.Context, field graphql.CollectedField, obj *model.AddRoleExtPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AddRoleExtPayload_roleExt(ctx, field)
 	if err != nil {
@@ -10572,6 +11150,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -10592,6 +11172,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -11333,6 +11915,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -11353,6 +11937,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -12025,6 +12611,67 @@ func (ec *executionContext) fieldContext_Comment_message(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_reactions(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_reactions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reactions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_reactions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Comment_reactions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_id(ctx, field)
 	if err != nil {
@@ -12146,6 +12793,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -12166,6 +12815,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -12261,6 +12912,71 @@ func (ec *executionContext) fieldContext_Comment_updatedAt(ctx context.Context, 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comment_reactionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_reactionsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReactionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ReactionAggregateResult)
+	fc.Result = res
+	return ec.marshalOReactionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_reactionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ReactionAggregateResult_count(ctx, field)
+			case "reactionidMin":
+				return ec.fieldContext_ReactionAggregateResult_reactionidMin(ctx, field)
+			case "reactionidMax":
+				return ec.fieldContext_ReactionAggregateResult_reactionidMax(ctx, field)
+			case "type_Min":
+				return ec.fieldContext_ReactionAggregateResult_type_Min(ctx, field)
+			case "type_Max":
+				return ec.fieldContext_ReactionAggregateResult_type_Max(ctx, field)
+			case "type_Sum":
+				return ec.fieldContext_ReactionAggregateResult_type_Sum(ctx, field)
+			case "type_Avg":
+				return ec.fieldContext_ReactionAggregateResult_type_Avg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ReactionAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Comment_reactionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -12519,82 +13235,6 @@ func (ec *executionContext) _CommentAggregateResult_messageMax(ctx context.Conte
 }
 
 func (ec *executionContext) fieldContext_CommentAggregateResult_messageMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "CommentAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _CommentAggregateResult__VOIDMin(ctx context.Context, field graphql.CollectedField, obj *model.CommentAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CommentAggregateResult__VOIDMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.VOIDMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_CommentAggregateResult__VOIDMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "CommentAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _CommentAggregateResult__VOIDMax(ctx context.Context, field graphql.CollectedField, obj *model.CommentAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CommentAggregateResult__VOIDMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.VOIDMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_CommentAggregateResult__VOIDMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CommentAggregateResult",
 		Field:      field,
@@ -13093,6 +13733,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -13113,6 +13755,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -13239,6 +13883,8 @@ func (ec *executionContext) fieldContext_Contract_comments(ctx context.Context, 
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -13247,6 +13893,8 @@ func (ec *executionContext) fieldContext_Contract_comments(ctx context.Context, 
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -13444,6 +14092,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -13464,6 +14114,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -13887,10 +14539,6 @@ func (ec *executionContext) fieldContext_Contract_commentsAggregate(ctx context.
 				return ec.fieldContext_CommentAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_CommentAggregateResult_messageMax(ctx, field)
-			case "_VOIDMin":
-				return ec.fieldContext_CommentAggregateResult__VOIDMin(ctx, field)
-			case "_VOIDMax":
-				return ec.fieldContext_CommentAggregateResult__VOIDMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CommentAggregateResult", field.Name)
 		},
@@ -14511,6 +15159,8 @@ func (ec *executionContext) fieldContext_DeleteCommentPayload_comment(ctx contex
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -14519,6 +15169,8 @@ func (ec *executionContext) fieldContext_DeleteCommentPayload_comment(ctx contex
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -16409,6 +17061,143 @@ func (ec *executionContext) fieldContext_DeletePostPayload_numUids(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteReactionPayload_reaction(ctx context.Context, field graphql.CollectedField, obj *model.DeleteReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteReactionPayload_reaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reaction, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteReactionPayload_reaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteReactionPayload_reaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteReactionPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteReactionPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteReactionPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteReactionPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteReactionPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteReactionPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteRoleExtPayload_roleExt(ctx context.Context, field graphql.CollectedField, obj *model.DeleteRoleExtPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteRoleExtPayload_roleExt(ctx, field)
 	if err != nil {
@@ -16961,6 +17750,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -16981,6 +17772,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -17828,6 +18621,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -17848,6 +18643,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -22566,6 +23363,233 @@ func (ec *executionContext) fieldContext_Mutation_deleteComment(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addReaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addReaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddReaction(rctx, fc.Args["input"].([]*model.AddReactionInput), fc.Args["upsert"].(*bool))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addReaction == nil {
+				return nil, errors.New("directive hook_addReaction is not implemented")
+			}
+			return ec.directives.Hook_addReaction(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddReactionPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddReactionPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddReactionPayload)
+	fc.Result = res
+	return ec.marshalOAddReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addReaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "reaction":
+				return ec.fieldContext_AddReactionPayload_reaction(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddReactionPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddReactionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateReaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateReaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateReaction(rctx, fc.Args["input"].(model.UpdateReactionInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateReaction == nil {
+				return nil, errors.New("directive hook_updateReaction is not implemented")
+			}
+			return ec.directives.Hook_updateReaction(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateReactionPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateReactionPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateReactionPayload)
+	fc.Result = res
+	return ec.marshalOUpdateReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateReactionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateReaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "reaction":
+				return ec.fieldContext_UpdateReactionPayload_reaction(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateReactionPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateReactionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteReaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteReaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteReaction(rctx, fc.Args["filter"].(model.ReactionFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteReaction == nil {
+				return nil, errors.New("directive hook_deleteReaction is not implemented")
+			}
+			return ec.directives.Hook_deleteReaction(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteReactionPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteReactionPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteReactionPayload)
+	fc.Result = res
+	return ec.marshalODeleteReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteReactionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteReaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "reaction":
+				return ec.fieldContext_DeleteReactionPayload_reaction(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteReactionPayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteReactionPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteReactionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_addBlob(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_addBlob(ctx, field)
 	if err != nil {
@@ -24704,6 +25728,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -24724,6 +25750,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -26427,6 +27455,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -26447,6 +27477,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -26544,6 +27576,8 @@ func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, f
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -26564,6 +27598,8 @@ func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, f
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -26768,6 +27804,8 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -26788,6 +27826,8 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -30092,6 +31132,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -30112,6 +31154,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -32349,6 +33393,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -32369,6 +33415,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -34668,6 +35716,8 @@ func (ec *executionContext) fieldContext_Query_getComment(ctx context.Context, f
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -34676,6 +35726,8 @@ func (ec *executionContext) fieldContext_Query_getComment(ctx context.Context, f
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -34729,6 +35781,8 @@ func (ec *executionContext) fieldContext_Query_queryComment(ctx context.Context,
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -34737,6 +35791,8 @@ func (ec *executionContext) fieldContext_Query_queryComment(ctx context.Context,
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -34802,10 +35858,6 @@ func (ec *executionContext) fieldContext_Query_aggregateComment(ctx context.Cont
 				return ec.fieldContext_CommentAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_CommentAggregateResult_messageMax(ctx, field)
-			case "_VOIDMin":
-				return ec.fieldContext_CommentAggregateResult__VOIDMin(ctx, field)
-			case "_VOIDMax":
-				return ec.fieldContext_CommentAggregateResult__VOIDMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CommentAggregateResult", field.Name)
 		},
@@ -34818,6 +35870,193 @@ func (ec *executionContext) fieldContext_Query_aggregateComment(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getReaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getReaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetReaction(rctx, fc.Args["id"].(*string), fc.Args["reactionid"].(*string))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getReaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryReaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryReaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryReaction(rctx, fc.Args["filter"].(*model.ReactionFilter), fc.Args["order"].(*model.ReactionOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryReaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateReaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateReaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateReaction(rctx, fc.Args["filter"].(*model.ReactionFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ReactionAggregateResult)
+	fc.Result = res
+	return ec.marshalOReactionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateReaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ReactionAggregateResult_count(ctx, field)
+			case "reactionidMin":
+				return ec.fieldContext_ReactionAggregateResult_reactionidMin(ctx, field)
+			case "reactionidMax":
+				return ec.fieldContext_ReactionAggregateResult_reactionidMax(ctx, field)
+			case "type_Min":
+				return ec.fieldContext_ReactionAggregateResult_type_Min(ctx, field)
+			case "type_Max":
+				return ec.fieldContext_ReactionAggregateResult_type_Max(ctx, field)
+			case "type_Sum":
+				return ec.fieldContext_ReactionAggregateResult_type_Sum(ctx, field)
+			case "type_Avg":
+				return ec.fieldContext_ReactionAggregateResult_type_Avg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ReactionAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -35919,6 +37158,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -35939,6 +37180,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -36036,6 +37279,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -36056,6 +37301,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -37154,6 +38401,584 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Reaction_id(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Reaction_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Reaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Reaction_reactionid(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_reactionid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reactionid, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Reaction_reactionid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Reaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Reaction_user(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Reaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "lastAck":
+				return ec.fieldContext_User_lastAck(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "bio":
+				return ec.fieldContext_User_bio(ctx, field)
+			case "location":
+				return ec.fieldContext_User_location(ctx, field)
+			case "utc":
+				return ec.fieldContext_User_utc(ctx, field)
+			case "links":
+				return ec.fieldContext_User_links(ctx, field)
+			case "skills":
+				return ec.fieldContext_User_skills(ctx, field)
+			case "notifyByEmail":
+				return ec.fieldContext_User_notifyByEmail(ctx, field)
+			case "lang":
+				return ec.fieldContext_User_lang(ctx, field)
+			case "subscriptions":
+				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
+			case "rights":
+				return ec.fieldContext_User_rights(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "backed_roles":
+				return ec.fieldContext_User_backed_roles(ctx, field)
+			case "tensions_created":
+				return ec.fieldContext_User_tensions_created(ctx, field)
+			case "tensions_assigned":
+				return ec.fieldContext_User_tensions_assigned(ctx, field)
+			case "contracts":
+				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
+			case "events":
+				return ec.fieldContext_User_events(ctx, field)
+			case "markAllAsRead":
+				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
+			case "subscriptionsAggregate":
+				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_User_rolesAggregate(ctx, field)
+			case "backed_rolesAggregate":
+				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
+			case "tensions_createdAggregate":
+				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
+			case "tensions_assignedAggregate":
+				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
+			case "eventsAggregate":
+				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Reaction_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Reaction_comment(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_comment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comment, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Comment)
+	fc.Result = res
+	return ec.marshalNComment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Reaction_comment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Reaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "message":
+				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Comment_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Comment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Reaction_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Reaction_type_(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_type_(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Reaction_type_(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Reaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_reactionidMin(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_reactionidMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReactionidMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_reactionidMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_reactionidMax(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_reactionidMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReactionidMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_reactionidMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_type_Min(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_type_Min(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TypeMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_type_Min(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_type_Max(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_type_Max(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TypeMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_type_Max(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_type_Sum(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_type_Sum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TypeSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_type_Sum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReactionAggregateResult_type_Avg(ctx context.Context, field graphql.CollectedField, obj *model.ReactionAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReactionAggregateResult_type_Avg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TypeAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReactionAggregateResult_type_Avg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReactionAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -38828,6 +40653,8 @@ func (ec *executionContext) fieldContext_Tension_comments(ctx context.Context, f
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -38836,6 +40663,8 @@ func (ec *executionContext) fieldContext_Tension_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -38931,6 +40760,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -38951,6 +40782,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -39423,6 +41256,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -39443,6 +41278,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -39660,6 +41497,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -39680,6 +41519,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -39864,10 +41705,6 @@ func (ec *executionContext) fieldContext_Tension_commentsAggregate(ctx context.C
 				return ec.fieldContext_CommentAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_CommentAggregateResult_messageMax(ctx, field)
-			case "_VOIDMin":
-				return ec.fieldContext_CommentAggregateResult__VOIDMin(ctx, field)
-			case "_VOIDMax":
-				return ec.fieldContext_CommentAggregateResult__VOIDMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CommentAggregateResult", field.Name)
 		},
@@ -41381,6 +43218,8 @@ func (ec *executionContext) fieldContext_UpdateCommentPayload_comment(ctx contex
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -41389,6 +43228,8 @@ func (ec *executionContext) fieldContext_UpdateCommentPayload_comment(ctx contex
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -42785,6 +44626,105 @@ func (ec *executionContext) fieldContext_UpdatePostPayload_numUids(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateReactionPayload_reaction(ctx context.Context, field graphql.CollectedField, obj *model.UpdateReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateReactionPayload_reaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reaction, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateReactionPayload_reaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateReactionPayload_reaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateReactionPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateReactionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateReactionPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateReactionPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateReactionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateRoleExtPayload_roleExt(ctx context.Context, field graphql.CollectedField, obj *model.UpdateRoleExtPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateRoleExtPayload_roleExt(ctx, field)
 	if err != nil {
@@ -43223,6 +45163,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -43243,6 +45185,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -45124,6 +47068,67 @@ func (ec *executionContext) fieldContext_User_contracts(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _User_reactions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_reactions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reactions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Reaction)
+	fc.Result = res
+	return ec.marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_reactions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Reaction_id(ctx, field)
+			case "reactionid":
+				return ec.fieldContext_Reaction_reactionid(ctx, field)
+			case "user":
+				return ec.fieldContext_Reaction_user(ctx, field)
+			case "comment":
+				return ec.fieldContext_Reaction_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_Reaction_type_(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_reactions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_events(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_events(ctx, field)
 	if err != nil {
@@ -45941,6 +47946,71 @@ func (ec *executionContext) fieldContext_User_contractsAggregate(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_contractsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_reactionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_reactionsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReactionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ReactionAggregateResult)
+	fc.Result = res
+	return ec.marshalOReactionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_reactionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ReactionAggregateResult_count(ctx, field)
+			case "reactionidMin":
+				return ec.fieldContext_ReactionAggregateResult_reactionidMin(ctx, field)
+			case "reactionidMax":
+				return ec.fieldContext_ReactionAggregateResult_reactionidMax(ctx, field)
+			case "type_Min":
+				return ec.fieldContext_ReactionAggregateResult_type_Min(ctx, field)
+			case "type_Max":
+				return ec.fieldContext_ReactionAggregateResult_type_Max(ctx, field)
+			case "type_Sum":
+				return ec.fieldContext_ReactionAggregateResult_type_Sum(ctx, field)
+			case "type_Avg":
+				return ec.fieldContext_ReactionAggregateResult_type_Avg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ReactionAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_reactionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -47005,6 +49075,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -47025,6 +49097,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -48237,6 +50311,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assigned(ctx, field)
 			case "contracts":
 				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
 			case "events":
 				return ec.fieldContext_User_events(ctx, field)
 			case "markAllAsRead":
@@ -48257,6 +50333,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
@@ -48893,7 +50971,7 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "_VOID"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "reactions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -48956,11 +51034,11 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "_VOID":
+		case "reactions":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_VOID"))
-			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
+			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -50408,6 +52486,102 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddReactionInput(ctx context.Context, obj interface{}) (model.AddReactionInput, error) {
+	var it model.AddReactionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"reactionid", "user", "comment", "type_"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "reactionid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
+			it.Reactionid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "user":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.User = data
+			} else if tmp == nil {
+				it.User = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "comment":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CommentRef); ok {
+				it.Comment = data
+			} else if tmp == nil {
+				it.Comment = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CommentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "type_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			it.Type, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, obj interface{}) (model.AddRoleExtInput, error) {
 	var it model.AddRoleExtInput
 	asMap := map[string]interface{}{}
@@ -51101,7 +53275,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -51489,6 +53663,14 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "reactions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
+			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
 			}
 		case "events":
 			var err error
@@ -52529,7 +54711,7 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "_VOID"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "reactions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -52642,13 +54824,31 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "_VOID":
+		case "reactions":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_VOID"))
-			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ReactionRef); ok {
+				it.Reactions = data
+			} else if tmp == nil {
+				it.Reactions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ReactionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		}
 	}
@@ -52663,7 +54863,7 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "_VOID"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "reactions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -52750,11 +54950,11 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "_VOID":
+		case "reactions":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_VOID"))
-			it.Void, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
+			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -60296,6 +62496,342 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputReactionFilter(ctx context.Context, obj interface{}) (model.ReactionFilter, error) {
+	var it model.ReactionFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "reactionid", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "reactionid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
+			it.Reactionid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOReactionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputReactionOrder(ctx context.Context, obj interface{}) (model.ReactionOrder, error) {
+	var it model.ReactionOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputReactionPatch(ctx context.Context, obj interface{}) (model.ReactionPatch, error) {
+	var it model.ReactionPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"reactionid", "user", "comment", "type_"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "reactionid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Reactionid = data
+			} else if tmp == nil {
+				it.Reactionid = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "user":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.User = data
+			} else if tmp == nil {
+				it.User = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "comment":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CommentRef); ok {
+				it.Comment = data
+			} else if tmp == nil {
+				it.Comment = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CommentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "type_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.Type = data
+			} else if tmp == nil {
+				it.Type = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputReactionRef(ctx context.Context, obj interface{}) (model.ReactionRef, error) {
+	var it model.ReactionRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "reactionid", "user", "comment", "type_"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "reactionid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
+			it.Reactionid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "user":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.User = data
+			} else if tmp == nil {
+				it.User = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "comment":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CommentRef); ok {
+				it.Comment = data
+			} else if tmp == nil {
+				it.Comment = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CommentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "type_":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			it.Type, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj interface{}) (model.RoleExtFilter, error) {
 	var it model.RoleExtFilter
 	asMap := map[string]interface{}{}
@@ -63354,6 +65890,50 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateReactionInput(ctx context.Context, obj interface{}) (model.UpdateReactionInput, error) {
+	var it model.UpdateReactionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateRoleExtInput(ctx context.Context, obj interface{}) (model.UpdateRoleExtInput, error) {
 	var it model.UpdateRoleExtInput
 	asMap := map[string]interface{}{}
@@ -64091,7 +66671,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -64654,6 +67234,32 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ContractRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "reactions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ReactionRef); ok {
+				it.Reactions = data
+			} else if tmp == nil {
+				it.Reactions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ReactionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "events":
 			var err error
 
@@ -64757,7 +67363,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65288,6 +67894,32 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				it.Contracts = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ContractRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "reactions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ReactionRef); ok {
+				it.Reactions = data
+			} else if tmp == nil {
+				it.Reactions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ReactionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "events":
@@ -66655,6 +69287,35 @@ func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.
 	return out
 }
 
+var addReactionPayloadImplementors = []string{"AddReactionPayload"}
+
+func (ec *executionContext) _AddReactionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddReactionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addReactionPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddReactionPayload")
+		case "reaction":
+
+			out.Values[i] = ec._AddReactionPayload_reaction(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._AddReactionPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var addRoleExtPayloadImplementors = []string{"AddRoleExtPayload"}
 
 func (ec *executionContext) _AddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRoleExtPayload) graphql.Marshaler {
@@ -66999,6 +69660,10 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "reactions":
+
+			out.Values[i] = ec._Comment_reactions(ctx, field, obj)
+
 		case "id":
 
 			out.Values[i] = ec._Comment_id(ctx, field, obj)
@@ -67023,6 +69688,10 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 		case "updatedAt":
 
 			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
+
+		case "reactionsAggregate":
+
+			out.Values[i] = ec._Comment_reactionsAggregate(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -67072,14 +69741,6 @@ func (ec *executionContext) _CommentAggregateResult(ctx context.Context, sel ast
 		case "messageMax":
 
 			out.Values[i] = ec._CommentAggregateResult_messageMax(ctx, field, obj)
-
-		case "_VOIDMin":
-
-			out.Values[i] = ec._CommentAggregateResult__VOIDMin(ctx, field, obj)
-
-		case "_VOIDMax":
-
-			out.Values[i] = ec._CommentAggregateResult__VOIDMax(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -67735,6 +70396,39 @@ func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.Sele
 		case "numUids":
 
 			out.Values[i] = ec._DeletePostPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteReactionPayloadImplementors = []string{"DeleteReactionPayload"}
+
+func (ec *executionContext) _DeleteReactionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteReactionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteReactionPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteReactionPayload")
+		case "reaction":
+
+			out.Values[i] = ec._DeleteReactionPayload_reaction(ctx, field, obj)
+
+		case "msg":
+
+			out.Values[i] = ec._DeleteReactionPayload_msg(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._DeleteReactionPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -68697,6 +71391,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteComment(ctx, field)
+			})
+
+		case "addReaction":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addReaction(ctx, field)
+			})
+
+		case "updateReaction":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateReaction(ctx, field)
+			})
+
+		case "deleteReaction":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteReaction(ctx, field)
 			})
 
 		case "addBlob":
@@ -70482,6 +73194,66 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getReaction":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getReaction(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "queryReaction":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryReaction(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateReaction":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateReaction(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "getBlob":
 			field := field
 
@@ -71093,6 +73865,108 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var reactionImplementors = []string{"Reaction"}
+
+func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet, obj *model.Reaction) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, reactionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Reaction")
+		case "id":
+
+			out.Values[i] = ec._Reaction_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "reactionid":
+
+			out.Values[i] = ec._Reaction_reactionid(ctx, field, obj)
+
+		case "user":
+
+			out.Values[i] = ec._Reaction_user(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "comment":
+
+			out.Values[i] = ec._Reaction_comment(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "type_":
+
+			out.Values[i] = ec._Reaction_type_(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var reactionAggregateResultImplementors = []string{"ReactionAggregateResult"}
+
+func (ec *executionContext) _ReactionAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ReactionAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, reactionAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ReactionAggregateResult")
+		case "count":
+
+			out.Values[i] = ec._ReactionAggregateResult_count(ctx, field, obj)
+
+		case "reactionidMin":
+
+			out.Values[i] = ec._ReactionAggregateResult_reactionidMin(ctx, field, obj)
+
+		case "reactionidMax":
+
+			out.Values[i] = ec._ReactionAggregateResult_reactionidMax(ctx, field, obj)
+
+		case "type_Min":
+
+			out.Values[i] = ec._ReactionAggregateResult_type_Min(ctx, field, obj)
+
+		case "type_Max":
+
+			out.Values[i] = ec._ReactionAggregateResult_type_Max(ctx, field, obj)
+
+		case "type_Sum":
+
+			out.Values[i] = ec._ReactionAggregateResult_type_Sum(ctx, field, obj)
+
+		case "type_Avg":
+
+			out.Values[i] = ec._ReactionAggregateResult_type_Avg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -71925,6 +74799,35 @@ func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var updateReactionPayloadImplementors = []string{"UpdateReactionPayload"}
+
+func (ec *executionContext) _UpdateReactionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateReactionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateReactionPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateReactionPayload")
+		case "reaction":
+
+			out.Values[i] = ec._UpdateReactionPayload_reaction(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._UpdateReactionPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var updateRoleExtPayloadImplementors = []string{"UpdateRoleExtPayload"}
 
 func (ec *executionContext) _UpdateRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateRoleExtPayload) graphql.Marshaler {
@@ -72224,6 +75127,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._User_contracts(ctx, field, obj)
 
+		case "reactions":
+
+			out.Values[i] = ec._User_reactions(ctx, field, obj)
+
 		case "events":
 
 			out.Values[i] = ec._User_events(ctx, field, obj)
@@ -72263,6 +75170,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "contractsAggregate":
 
 			out.Values[i] = ec._User_contractsAggregate(ctx, field, obj)
+
+		case "reactionsAggregate":
+
+			out.Values[i] = ec._User_reactionsAggregate(ctx, field, obj)
 
 		case "eventsAggregate":
 
@@ -73012,6 +75923,28 @@ func (ec *executionContext) unmarshalNAddPendingUserInput2ᚕᚖfractaleᚋfract
 
 func (ec *executionContext) unmarshalNAddPendingUserInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInput(ctx context.Context, v interface{}) (*model.AddPendingUserInput, error) {
 	res, err := ec.unmarshalInputAddPendingUserInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddReactionInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionInputᚄ(ctx context.Context, v interface{}) ([]*model.AddReactionInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddReactionInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddReactionInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddReactionInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionInput(ctx context.Context, v interface{}) (*model.AddReactionInput, error) {
+	res, err := ec.unmarshalInputAddReactionInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -73795,6 +76728,31 @@ func (ec *executionContext) unmarshalNPostFilter2ᚖfractaleᚋfractal6ᚗgoᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNReaction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx context.Context, sel ast.SelectionSet, v *model.Reaction) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Reaction(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNReactionFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx context.Context, v interface{}) (model.ReactionFilter, error) {
+	res, err := ec.unmarshalInputReactionFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx context.Context, v interface{}) (*model.ReactionFilter, error) {
+	res, err := ec.unmarshalInputReactionFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNReactionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRef(ctx context.Context, v interface{}) (*model.ReactionRef, error) {
+	res, err := ec.unmarshalInputReactionRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNRoleExt2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx context.Context, sel ast.SelectionSet, v *model.RoleExt) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -73952,6 +76910,11 @@ func (ec *executionContext) unmarshalNUpdatePendingUserInput2fractaleᚋfractal6
 
 func (ec *executionContext) unmarshalNUpdatePostInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePostInput(ctx context.Context, v interface{}) (model.UpdatePostInput, error) {
 	res, err := ec.unmarshalInputUpdatePostInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateReactionInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateReactionInput(ctx context.Context, v interface{}) (model.UpdateReactionInput, error) {
+	res, err := ec.unmarshalInputUpdateReactionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -74245,6 +77208,13 @@ func (ec *executionContext) marshalOAddPendingUserPayload2ᚖfractaleᚋfractal6
 		return graphql.Null
 	}
 	return ec._AddPendingUserPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddReactionPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddReactionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddRoleExtPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddRoleExtPayload) graphql.Marshaler {
@@ -74948,6 +77918,14 @@ func (ec *executionContext) unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgo�
 	return res, nil
 }
 
+func (ec *executionContext) unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx context.Context, v interface{}) (*model.CommentRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCommentRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOContainsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContainsFilter(ctx context.Context, v interface{}) (*model.ContainsFilter, error) {
 	if v == nil {
 		return nil, nil
@@ -75561,6 +78539,13 @@ func (ec *executionContext) marshalODeletePostPayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._DeletePostPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteReactionPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteReactionPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteReactionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteRoleExtPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteRoleExtPayload) graphql.Marshaler {
@@ -78748,6 +81733,265 @@ func (ec *executionContext) unmarshalOPostPatch2ᚖfractaleᚋfractal6ᚗgoᚋgr
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx context.Context, sel ast.SelectionSet, v []*model.Reaction) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOReaction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Reaction) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNReaction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOReaction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx context.Context, sel ast.SelectionSet, v *model.Reaction) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Reaction(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOReactionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ReactionAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ReactionAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx context.Context, v interface{}) ([]*model.ReactionFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ReactionFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx context.Context, v interface{}) (*model.ReactionFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputReactionFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOReactionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx context.Context, v interface{}) ([]*model.ReactionHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ReactionHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOReactionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOReactionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ReactionHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOReactionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOReactionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx context.Context, v interface{}) (*model.ReactionHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ReactionHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOReactionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ReactionHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx context.Context, v interface{}) (*model.ReactionOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputReactionOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx context.Context, v interface{}) (*model.ReactionOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ReactionOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx context.Context, sel ast.SelectionSet, v *model.ReactionOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx context.Context, v interface{}) (*model.ReactionPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputReactionPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx context.Context, v interface{}) ([]*model.ReactionRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ReactionRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNReactionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalORoleExt2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExt(ctx context.Context, sel ast.SelectionSet, v []*model.RoleExt) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -79857,6 +83101,13 @@ func (ec *executionContext) marshalOUpdatePostPayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._UpdatePostPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateReactionPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateReactionPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateReactionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateRoleExtPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateRoleExtPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateRoleExtPayload) graphql.Marshaler {
