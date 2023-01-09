@@ -50,6 +50,8 @@ type DirectiveRoot struct {
 	Hook_addContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addLabel            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addReaction         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addReactionInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addRoleExt          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addTension          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -64,6 +66,8 @@ type DirectiveRoot struct {
 	Hook_deleteContractInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteLabel         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteLabelInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteReaction      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteReactionInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteRoleExt       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteRoleExtInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -75,6 +79,7 @@ type DirectiveRoot struct {
 	Hook_getCommentInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getReactionInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getUserInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -82,6 +87,7 @@ type DirectiveRoot struct {
 	Hook_queryCommentInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryContractInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryLabelInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryReactionInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryRoleExtInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryTensionInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryUserInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -92,6 +98,8 @@ type DirectiveRoot struct {
 	Hook_updateContractInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateLabel         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateLabelInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateReaction      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateReactionInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateRoleExt       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateRoleExtInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateTension       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -192,6 +200,11 @@ type ComplexityRoot struct {
 		PendingUser func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
 	}
 
+	AddReactionPayload struct {
+		NumUids  func(childComplexity int) int
+		Reaction func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
+	}
+
 	AddRoleExtPayload struct {
 		NumUids func(childComplexity int) int
 		RoleExt func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
@@ -253,11 +266,13 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int, filter *model.UserFilter) int
-		ID        func(childComplexity int) int
-		Message   func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		CreatedAt          func(childComplexity int) int
+		CreatedBy          func(childComplexity int, filter *model.UserFilter) int
+		ID                 func(childComplexity int) int
+		Message            func(childComplexity int) int
+		Reactions          func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
+		ReactionsAggregate func(childComplexity int, filter *model.ReactionFilter) int
+		UpdatedAt          func(childComplexity int) int
 	}
 
 	CommentAggregateResult struct {
@@ -268,8 +283,6 @@ type ComplexityRoot struct {
 		MessageMin   func(childComplexity int) int
 		UpdatedAtMax func(childComplexity int) int
 		UpdatedAtMin func(childComplexity int) int
-		VOIDMax      func(childComplexity int) int
-		VOIDMin      func(childComplexity int) int
 	}
 
 	Contract struct {
@@ -391,6 +404,12 @@ type ComplexityRoot struct {
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+	}
+
+	DeleteReactionPayload struct {
+		Msg      func(childComplexity int) int
+		NumUids  func(childComplexity int) int
+		Reaction func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
 	}
 
 	DeleteRoleExtPayload struct {
@@ -554,6 +573,7 @@ type ComplexityRoot struct {
 		AddNotif            func(childComplexity int, input []*model.AddNotifInput) int
 		AddOrgaAgg          func(childComplexity int, input []*model.AddOrgaAggInput) int
 		AddPendingUser      func(childComplexity int, input []*model.AddPendingUserInput, upsert *bool) int
+		AddReaction         func(childComplexity int, input []*model.AddReactionInput, upsert *bool) int
 		AddRoleExt          func(childComplexity int, input []*model.AddRoleExtInput) int
 		AddTension          func(childComplexity int, input []*model.AddTensionInput) int
 		AddUser             func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
@@ -574,6 +594,7 @@ type ComplexityRoot struct {
 		DeleteOrgaAgg       func(childComplexity int, filter model.OrgaAggFilter) int
 		DeletePendingUser   func(childComplexity int, filter model.PendingUserFilter) int
 		DeletePost          func(childComplexity int, filter model.PostFilter) int
+		DeleteReaction      func(childComplexity int, filter model.ReactionFilter) int
 		DeleteRoleExt       func(childComplexity int, filter model.RoleExtFilter) int
 		DeleteTension       func(childComplexity int, filter model.TensionFilter) int
 		DeleteUser          func(childComplexity int, filter model.UserFilter) int
@@ -594,6 +615,7 @@ type ComplexityRoot struct {
 		UpdateOrgaAgg       func(childComplexity int, input model.UpdateOrgaAggInput) int
 		UpdatePendingUser   func(childComplexity int, input model.UpdatePendingUserInput) int
 		UpdatePost          func(childComplexity int, input model.UpdatePostInput) int
+		UpdateReaction      func(childComplexity int, input model.UpdateReactionInput) int
 		UpdateRoleExt       func(childComplexity int, input model.UpdateRoleExtInput) int
 		UpdateTension       func(childComplexity int, input model.UpdateTensionInput) int
 		UpdateUser          func(childComplexity int, input model.UpdateUserInput) int
@@ -824,6 +846,7 @@ type ComplexityRoot struct {
 		AggregateOrgaAgg       func(childComplexity int, filter *model.OrgaAggFilter) int
 		AggregatePendingUser   func(childComplexity int, filter *model.PendingUserFilter) int
 		AggregatePost          func(childComplexity int, filter *model.PostFilter) int
+		AggregateReaction      func(childComplexity int, filter *model.ReactionFilter) int
 		AggregateRoleExt       func(childComplexity int, filter *model.RoleExtFilter) int
 		AggregateTension       func(childComplexity int, filter *model.TensionFilter) int
 		AggregateUser          func(childComplexity int, filter *model.UserFilter) int
@@ -841,6 +864,7 @@ type ComplexityRoot struct {
 		GetNotif               func(childComplexity int, id string) int
 		GetPendingUser         func(childComplexity int, id *string, username *string, email *string) int
 		GetPost                func(childComplexity int, id string) int
+		GetReaction            func(childComplexity int, id *string, reactionid *string) int
 		GetRoleExt             func(childComplexity int, id string) int
 		GetTension             func(childComplexity int, id string) int
 		GetUser                func(childComplexity int, id *string, username *string, email *string) int
@@ -860,12 +884,31 @@ type ComplexityRoot struct {
 		QueryOrgaAgg           func(childComplexity int, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) int
 		QueryPendingUser       func(childComplexity int, filter *model.PendingUserFilter, order *model.PendingUserOrder, first *int, offset *int) int
 		QueryPost              func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
+		QueryReaction          func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
 		QueryRoleExt           func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		QueryTension           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		QueryUser              func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		QueryUserEvent         func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		QueryUserRights        func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
 		QueryVote              func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+	}
+
+	Reaction struct {
+		Comment    func(childComplexity int, filter *model.CommentFilter) int
+		ID         func(childComplexity int) int
+		Reactionid func(childComplexity int) int
+		Type       func(childComplexity int) int
+		User       func(childComplexity int, filter *model.UserFilter) int
+	}
+
+	ReactionAggregateResult struct {
+		Count         func(childComplexity int) int
+		ReactionidMax func(childComplexity int) int
+		ReactionidMin func(childComplexity int) int
+		TypeAvg       func(childComplexity int) int
+		TypeMax       func(childComplexity int) int
+		TypeMin       func(childComplexity int) int
+		TypeSum       func(childComplexity int) int
 	}
 
 	RoleExt struct {
@@ -1022,6 +1065,11 @@ type ComplexityRoot struct {
 		Post    func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
 	}
 
+	UpdateReactionPayload struct {
+		NumUids  func(childComplexity int) int
+		Reaction func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
+	}
+
 	UpdateRoleExtPayload struct {
 		NumUids func(childComplexity int) int
 		RoleExt func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
@@ -1072,6 +1120,8 @@ type ComplexityRoot struct {
 		Name                      func(childComplexity int) int
 		NotifyByEmail             func(childComplexity int) int
 		Password                  func(childComplexity int) int
+		Reactions                 func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
+		ReactionsAggregate        func(childComplexity int, filter *model.ReactionFilter) int
 		Rights                    func(childComplexity int, filter *model.UserRightsFilter) int
 		Roles                     func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		RolesAggregate            func(childComplexity int, filter *model.NodeFilter) int
@@ -1434,6 +1484,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AddPendingUserPayload.PendingUser(childComplexity, args["filter"].(*model.PendingUserFilter), args["order"].(*model.PendingUserOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "AddReactionPayload.numUids":
+		if e.complexity.AddReactionPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddReactionPayload.NumUids(childComplexity), true
+
+	case "AddReactionPayload.reaction":
+		if e.complexity.AddReactionPayload.Reaction == nil {
+			break
+		}
+
+		args, err := ec.field_AddReactionPayload_reaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddReactionPayload.Reaction(childComplexity, args["filter"].(*model.ReactionFilter), args["order"].(*model.ReactionOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "AddRoleExtPayload.numUids":
 		if e.complexity.AddRoleExtPayload.NumUids == nil {
 			break
@@ -1764,6 +1833,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Message(childComplexity), true
 
+	case "Comment.reactions":
+		if e.complexity.Comment.Reactions == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_reactions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.Reactions(childComplexity, args["filter"].(*model.ReactionFilter), args["order"].(*model.ReactionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Comment.reactionsAggregate":
+		if e.complexity.Comment.ReactionsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_reactionsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.ReactionsAggregate(childComplexity, args["filter"].(*model.ReactionFilter)), true
+
 	case "Comment.updatedAt":
 		if e.complexity.Comment.UpdatedAt == nil {
 			break
@@ -1819,20 +1912,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CommentAggregateResult.UpdatedAtMin(childComplexity), true
-
-	case "CommentAggregateResult._VOIDMax":
-		if e.complexity.CommentAggregateResult.VOIDMax == nil {
-			break
-		}
-
-		return e.complexity.CommentAggregateResult.VOIDMax(childComplexity), true
-
-	case "CommentAggregateResult._VOIDMin":
-		if e.complexity.CommentAggregateResult.VOIDMin == nil {
-			break
-		}
-
-		return e.complexity.CommentAggregateResult.VOIDMin(childComplexity), true
 
 	case "Contract.candidates":
 		if e.complexity.Contract.Candidates == nil {
@@ -2469,6 +2548,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeletePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeleteReactionPayload.msg":
+		if e.complexity.DeleteReactionPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteReactionPayload.Msg(childComplexity), true
+
+	case "DeleteReactionPayload.numUids":
+		if e.complexity.DeleteReactionPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteReactionPayload.NumUids(childComplexity), true
+
+	case "DeleteReactionPayload.reaction":
+		if e.complexity.DeleteReactionPayload.Reaction == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteReactionPayload_reaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteReactionPayload.Reaction(childComplexity, args["filter"].(*model.ReactionFilter), args["order"].(*model.ReactionOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "DeleteRoleExtPayload.msg":
 		if e.complexity.DeleteRoleExtPayload.Msg == nil {
@@ -3363,6 +3468,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddPendingUser(childComplexity, args["input"].([]*model.AddPendingUserInput), args["upsert"].(*bool)), true
 
+	case "Mutation.addReaction":
+		if e.complexity.Mutation.AddReaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addReaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddReaction(childComplexity, args["input"].([]*model.AddReactionInput), args["upsert"].(*bool)), true
+
 	case "Mutation.addRoleExt":
 		if e.complexity.Mutation.AddRoleExt == nil {
 			break
@@ -3603,6 +3720,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeletePost(childComplexity, args["filter"].(model.PostFilter)), true
 
+	case "Mutation.deleteReaction":
+		if e.complexity.Mutation.DeleteReaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteReaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteReaction(childComplexity, args["filter"].(model.ReactionFilter)), true
+
 	case "Mutation.deleteRoleExt":
 		if e.complexity.Mutation.DeleteRoleExt == nil {
 			break
@@ -3842,6 +3971,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdatePost(childComplexity, args["input"].(model.UpdatePostInput)), true
+
+	case "Mutation.updateReaction":
+		if e.complexity.Mutation.UpdateReaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateReaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateReaction(childComplexity, args["input"].(model.UpdateReactionInput)), true
 
 	case "Mutation.updateRoleExt":
 		if e.complexity.Mutation.UpdateRoleExt == nil {
@@ -5392,6 +5533,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregatePost(childComplexity, args["filter"].(*model.PostFilter)), true
 
+	case "Query.aggregateReaction":
+		if e.complexity.Query.AggregateReaction == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateReaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateReaction(childComplexity, args["filter"].(*model.ReactionFilter)), true
+
 	case "Query.aggregateRoleExt":
 		if e.complexity.Query.AggregateRoleExt == nil {
 			break
@@ -5595,6 +5748,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetPost(childComplexity, args["id"].(string)), true
+
+	case "Query.getReaction":
+		if e.complexity.Query.GetReaction == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getReaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetReaction(childComplexity, args["id"].(*string), args["reactionid"].(*string)), true
 
 	case "Query.getRoleExt":
 		if e.complexity.Query.GetRoleExt == nil {
@@ -5824,6 +5989,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QueryPost(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "Query.queryReaction":
+		if e.complexity.Query.QueryReaction == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryReaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryReaction(childComplexity, args["filter"].(*model.ReactionFilter), args["order"].(*model.ReactionOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "Query.queryRoleExt":
 		if e.complexity.Query.QueryRoleExt == nil {
 			break
@@ -5895,6 +6072,100 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryVote(childComplexity, args["filter"].(*model.VoteFilter), args["order"].(*model.VoteOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Reaction.comment":
+		if e.complexity.Reaction.Comment == nil {
+			break
+		}
+
+		args, err := ec.field_Reaction_comment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Reaction.Comment(childComplexity, args["filter"].(*model.CommentFilter)), true
+
+	case "Reaction.id":
+		if e.complexity.Reaction.ID == nil {
+			break
+		}
+
+		return e.complexity.Reaction.ID(childComplexity), true
+
+	case "Reaction.reactionid":
+		if e.complexity.Reaction.Reactionid == nil {
+			break
+		}
+
+		return e.complexity.Reaction.Reactionid(childComplexity), true
+
+	case "Reaction.type_":
+		if e.complexity.Reaction.Type == nil {
+			break
+		}
+
+		return e.complexity.Reaction.Type(childComplexity), true
+
+	case "Reaction.user":
+		if e.complexity.Reaction.User == nil {
+			break
+		}
+
+		args, err := ec.field_Reaction_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Reaction.User(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "ReactionAggregateResult.count":
+		if e.complexity.ReactionAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.Count(childComplexity), true
+
+	case "ReactionAggregateResult.reactionidMax":
+		if e.complexity.ReactionAggregateResult.ReactionidMax == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.ReactionidMax(childComplexity), true
+
+	case "ReactionAggregateResult.reactionidMin":
+		if e.complexity.ReactionAggregateResult.ReactionidMin == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.ReactionidMin(childComplexity), true
+
+	case "ReactionAggregateResult.type_Avg":
+		if e.complexity.ReactionAggregateResult.TypeAvg == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.TypeAvg(childComplexity), true
+
+	case "ReactionAggregateResult.type_Max":
+		if e.complexity.ReactionAggregateResult.TypeMax == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.TypeMax(childComplexity), true
+
+	case "ReactionAggregateResult.type_Min":
+		if e.complexity.ReactionAggregateResult.TypeMin == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.TypeMin(childComplexity), true
+
+	case "ReactionAggregateResult.type_Sum":
+		if e.complexity.ReactionAggregateResult.TypeSum == nil {
+			break
+		}
+
+		return e.complexity.ReactionAggregateResult.TypeSum(childComplexity), true
 
 	case "RoleExt.about":
 		if e.complexity.RoleExt.About == nil {
@@ -6786,6 +7057,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdatePostPayload.Post(childComplexity, args["filter"].(*model.PostFilter), args["order"].(*model.PostOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "UpdateReactionPayload.numUids":
+		if e.complexity.UpdateReactionPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateReactionPayload.NumUids(childComplexity), true
+
+	case "UpdateReactionPayload.reaction":
+		if e.complexity.UpdateReactionPayload.Reaction == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateReactionPayload_reaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateReactionPayload.Reaction(childComplexity, args["filter"].(*model.ReactionFilter), args["order"].(*model.ReactionOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "UpdateRoleExtPayload.numUids":
 		if e.complexity.UpdateRoleExtPayload.NumUids == nil {
 			break
@@ -7067,6 +7357,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Password(childComplexity), true
+
+	case "User.reactions":
+		if e.complexity.User.Reactions == nil {
+			break
+		}
+
+		args, err := ec.field_User_reactions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Reactions(childComplexity, args["filter"].(*model.ReactionFilter), args["order"].(*model.ReactionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.reactionsAggregate":
+		if e.complexity.User.ReactionsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_reactionsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.ReactionsAggregate(childComplexity, args["filter"].(*model.ReactionFilter)), true
 
 	case "User.rights":
 		if e.complexity.User.Rights == nil {
@@ -7701,6 +8015,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddNotifInput,
 		ec.unmarshalInputAddOrgaAggInput,
 		ec.unmarshalInputAddPendingUserInput,
+		ec.unmarshalInputAddReactionInput,
 		ec.unmarshalInputAddRoleExtInput,
 		ec.unmarshalInputAddTensionInput,
 		ec.unmarshalInputAddUserEventInput,
@@ -7793,6 +8108,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputPostOrder,
 		ec.unmarshalInputPostPatch,
 		ec.unmarshalInputPostRef,
+		ec.unmarshalInputReactionFilter,
+		ec.unmarshalInputReactionOrder,
+		ec.unmarshalInputReactionPatch,
+		ec.unmarshalInputReactionRef,
 		ec.unmarshalInputRoleExtFilter,
 		ec.unmarshalInputRoleExtOrder,
 		ec.unmarshalInputRoleExtPatch,
@@ -7827,6 +8146,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateOrgaAggInput,
 		ec.unmarshalInputUpdatePendingUserInput,
 		ec.unmarshalInputUpdatePostInput,
+		ec.unmarshalInputUpdateReactionInput,
 		ec.unmarshalInputUpdateRoleExtInput,
 		ec.unmarshalInputUpdateTensionInput,
 		ec.unmarshalInputUpdateUserEventInput,
@@ -7937,6 +8257,12 @@ directive @hook_updateCommentInput on ARGUMENT_DEFINITION
 directive @hook_updateComment on FIELD_DEFINITION
 directive @hook_deleteCommentInput on ARGUMENT_DEFINITION
 directive @hook_deleteComment on FIELD_DEFINITION
+directive @hook_addReactionInput on ARGUMENT_DEFINITION
+directive @hook_addReaction on FIELD_DEFINITION
+directive @hook_updateReactionInput on ARGUMENT_DEFINITION
+directive @hook_updateReaction on FIELD_DEFINITION
+directive @hook_deleteReactionInput on ARGUMENT_DEFINITION
+directive @hook_deleteReaction on FIELD_DEFINITION
 directive @hook_addContractInput on ARGUMENT_DEFINITION
 directive @hook_addContract on FIELD_DEFINITION
 directive @hook_updateContractInput on ARGUMENT_DEFINITION
@@ -7963,6 +8289,8 @@ directive @hook_getTensionInput on ARGUMENT_DEFINITION
 directive @hook_queryTensionInput on ARGUMENT_DEFINITION
 directive @hook_getCommentInput on ARGUMENT_DEFINITION
 directive @hook_queryCommentInput on ARGUMENT_DEFINITION
+directive @hook_getReactionInput on ARGUMENT_DEFINITION
+directive @hook_queryReactionInput on ARGUMENT_DEFINITION
 directive @hook_getContractInput on ARGUMENT_DEFINITION
 directive @hook_queryContractInput on ARGUMENT_DEFINITION
 directive @hook_getVoteInput on ARGUMENT_DEFINITION
@@ -7979,18 +8307,6 @@ directive @meta(f: String!, k: String) on FIELD_DEFINITION
 
 directive @isContractValidator on FIELD_DEFINITION
 
-directive @w_add(a: String!) on INPUT_FIELD_DEFINITION
-
-directive @w_set(a: String!) on INPUT_FIELD_DEFINITION
-
-directive @w_remove(a: String!) on INPUT_FIELD_DEFINITION
-
-directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
-
-directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
-
-directive @w_meta_patch(f: String!, k: String) on INPUT_FIELD_DEFINITION
-
 directive @x_add(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
 
 directive @x_set(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FIELD_DEFINITION
@@ -8004,6 +8320,18 @@ directive @x_alter(r: String, f: String, e: [TensionEvent!], n: Int) on INPUT_FI
 directive @x_patch_ro on INPUT_FIELD_DEFINITION
 
 directive @x_ro on INPUT_FIELD_DEFINITION
+
+directive @w_add(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_set(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_remove(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_patch(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_alter(a: String!) on INPUT_FIELD_DEFINITION
+
+directive @w_meta_patch(f: String!, k: String) on INPUT_FIELD_DEFINITION
 
 type Node {
   id: ID!
@@ -8160,10 +8488,21 @@ type Tension {
 
 type Comment {
   message: String!
+  reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
   updatedAt: DateTime
+
+  reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
+}
+
+type Reaction {
+  id: ID!
+  reactionid: String
+  user(filter: UserFilter): User!
+  comment(filter: CommentFilter): Comment!
+  type_: Int!
 }
 
 type Blob {
@@ -8258,6 +8597,7 @@ type User {
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @private
+  reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!] @private
   markAllAsRead: String
   event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:"username")
@@ -8269,6 +8609,7 @@ type User {
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
+  reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
   eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
 }
 
@@ -8472,37 +8813,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8527,7 +8868,7 @@ input AddCommentInput {
   createdAt: DateTime!
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
-  _VOID: String
+  reactions: [ReactionRef!]
 }
 
 type AddCommentPayload {
@@ -8729,6 +9070,18 @@ type AddPendingUserPayload {
   numUids: Int
 }
 
+input AddReactionInput {
+  reactionid: String
+  user: UserRef! @x_add(r:"ref")
+  comment: CommentRef! @x_add(r:"ref")
+  type_: Int!
+}
+
+type AddReactionPayload {
+  reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
+  numUids: Int
+}
+
 input AddRoleExtInput {
   rootnameid: String!
   name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
@@ -8759,8 +9112,8 @@ input AddTensionInput {
   status: TensionStatus!
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
-  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"oneByOne") @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!]
   mentions: [EventRef!]
@@ -8809,6 +9162,7 @@ input AddUserInput {
   tensions_created: [TensionRef!] @x_add(r:"ref")
   tensions_assigned: [TensionRef!] @x_add(r:"ref")
   contracts: [ContractRef!] @x_add(r:"ref")
+  reactions: [ReactionRef!]
   events: [UserEventRef!]
   markAllAsRead: String
   event_count: EventCountRef
@@ -8953,8 +9307,6 @@ type CommentAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
-  _VOIDMin: String
-  _VOIDMax: String
 }
 
 input CommentFilter {
@@ -8972,7 +9324,7 @@ enum CommentHasFilter {
   createdAt
   updatedAt
   message
-  _VOID
+  reactions
 }
 
 input CommentOrder {
@@ -8985,7 +9337,6 @@ enum CommentOrderable {
   createdAt
   updatedAt
   message
-  _VOID
 }
 
 input CommentPatch {
@@ -8993,7 +9344,7 @@ input CommentPatch {
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_alter
-  _VOID: String
+  reactions: [ReactionRef!] @x_patch_ro
 }
 
 input CommentRef {
@@ -9002,7 +9353,7 @@ input CommentRef {
   createdAt: DateTime
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_alter
-  _VOID: String
+  reactions: [ReactionRef!]
 }
 
 input ContainsFilter {
@@ -9226,6 +9577,12 @@ type DeletePendingUserPayload {
 
 type DeletePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
+  msg: String
+  numUids: Int
+}
+
+type DeleteReactionPayload {
+  reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   msg: String
   numUids: Int
 }
@@ -9721,6 +10078,9 @@ type Mutation {
   addComment(input: [AddCommentInput!]! @hook_addCommentInput): AddCommentPayload @hook_addComment
   updateComment(input: UpdateCommentInput! @hook_updateCommentInput): UpdateCommentPayload @hook_updateComment
   deleteComment(filter: CommentFilter! @hook_deleteCommentInput): DeleteCommentPayload @hook_deleteComment
+  addReaction(input: [AddReactionInput!]! @hook_addReactionInput, upsert: Boolean): AddReactionPayload @hook_addReaction
+  updateReaction(input: UpdateReactionInput! @hook_updateReactionInput): UpdateReactionPayload @hook_updateReaction
+  deleteReaction(filter: ReactionFilter! @hook_deleteReactionInput): DeleteReactionPayload @hook_deleteReaction
   addBlob(input: [AddBlobInput!]!): AddBlobPayload
   updateBlob(input: UpdateBlobInput!): UpdateBlobPayload
   deleteBlob(filter: BlobFilter!): DeleteBlobPayload
@@ -10348,6 +10708,9 @@ type Query {
   getComment(id: ID!): Comment
   queryComment(filter: CommentFilter @hook_queryCommentInput, order: CommentOrder, first: Int, offset: Int): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
+  getReaction(id: ID, reactionid: String): Reaction
+  queryReaction(filter: ReactionFilter @hook_queryReactionInput, order: ReactionOrder, first: Int, offset: Int): [Reaction]
+  aggregateReaction(filter: ReactionFilter): ReactionAggregateResult
   getBlob(id: ID!): Blob
   queryBlob(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   aggregateBlob(filter: BlobFilter): BlobAggregateResult
@@ -10378,6 +10741,58 @@ type Query {
   aggregateNotif(filter: NotifFilter): NotifAggregateResult
   queryEventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
   aggregateEventCount(filter: EventCountFilter): EventCountAggregateResult
+}
+
+type ReactionAggregateResult {
+  count: Int
+  reactionidMin: String
+  reactionidMax: String
+  type_Min: Int
+  type_Max: Int
+  type_Sum: Int
+  type_Avg: Float
+}
+
+input ReactionFilter {
+  id: [ID!]
+  reactionid: StringHashFilter
+  has: [ReactionHasFilter]
+  and: [ReactionFilter]
+  or: [ReactionFilter]
+  not: ReactionFilter
+}
+
+enum ReactionHasFilter {
+  reactionid
+  user
+  comment
+  type_
+}
+
+input ReactionOrder {
+  asc: ReactionOrderable
+  desc: ReactionOrderable
+  then: ReactionOrder
+}
+
+enum ReactionOrderable {
+  reactionid
+  type_
+}
+
+input ReactionPatch {
+  reactionid: String @x_patch_ro
+  user: UserRef @x_patch_ro
+  comment: CommentRef @x_patch_ro
+  type_: Int @x_patch_ro
+}
+
+input ReactionRef {
+  id: ID
+  reactionid: String
+  user: UserRef @x_add(r:"ref")
+  comment: CommentRef @x_add(r:"ref")
+  type_: Int
 }
 
 type RoleExtAggregateResult {
@@ -10601,8 +11016,8 @@ input TensionPatch {
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
-  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"oneByOne") @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
   mentions: [EventRef!] @x_patch_ro
@@ -10627,8 +11042,8 @@ input TensionRef {
   status: TensionStatus
   action: TensionAction
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
-  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne")
-  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"oneByOne") @x_alter(r:"ref")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
   mentions: [EventRef!]
@@ -10799,6 +11214,17 @@ input UpdatePostInput {
 
 type UpdatePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
+  numUids: Int
+}
+
+input UpdateReactionInput {
+  filter: ReactionFilter!
+  set: ReactionPatch
+  remove: ReactionPatch
+}
+
+type UpdateReactionPayload {
+  reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   numUids: Int
 }
 
@@ -10973,6 +11399,7 @@ enum UserHasFilter {
   tensions_created
   tensions_assigned
   contracts
+  reactions
   events
   markAllAsRead
   event_count
@@ -11019,6 +11446,7 @@ input UserPatch {
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
+  reactions: [ReactionRef!] @x_alter
   events: [UserEventRef!] @x_alter
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
   event_count: EventCountRef @x_patch_ro
@@ -11047,6 +11475,7 @@ input UserRef {
   tensions_created: [TensionRef!] @x_add(r:"ref")
   tensions_assigned: [TensionRef!] @x_add(r:"ref")
   contracts: [ContractRef!] @x_add(r:"ref")
+  reactions: [ReactionRef!] @x_alter
   events: [UserEventRef!] @x_alter
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
   event_count: EventCountRef

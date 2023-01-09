@@ -31,11 +31,11 @@ type AddBlobPayload struct {
 }
 
 type AddCommentInput struct {
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
-	CreatedAt string   `json:"createdAt,omitempty"`
-	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	Message   *string  `json:"message,omitempty"`
-	Void      *string  `json:"_VOID,omitempty"`
+	CreatedBy *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt string         `json:"createdAt,omitempty"`
+	UpdatedAt *string        `json:"updatedAt,omitempty"`
+	Message   *string        `json:"message,omitempty"`
+	Reactions []*ReactionRef `json:"reactions,omitempty"`
 }
 
 type AddCommentPayload struct {
@@ -237,6 +237,18 @@ type AddPendingUserPayload struct {
 	NumUids     *int           `json:"numUids"`
 }
 
+type AddReactionInput struct {
+	Reactionid *string     `json:"reactionid,omitempty"`
+	User       *UserRef    `json:"user,omitempty"`
+	Comment    *CommentRef `json:"comment,omitempty"`
+	Type       int         `json:"type_"`
+}
+
+type AddReactionPayload struct {
+	Reaction []*Reaction `json:"reaction,omitempty"`
+	NumUids  *int        `json:"numUids"`
+}
+
 type AddRoleExtInput struct {
 	Rootnameid string      `json:"rootnameid,omitempty"`
 	Name       string      `json:"name,omitempty"`
@@ -317,6 +329,7 @@ type AddUserInput struct {
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
+	Reactions        []*ReactionRef  `json:"reactions,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
@@ -446,11 +459,13 @@ type BlobTypeHash struct {
 }
 
 type Comment struct {
-	Message   string  `json:"message,omitempty"`
-	ID        string  `json:"id,omitempty"`
-	CreatedBy *User   `json:"createdBy,omitempty"`
-	CreatedAt string  `json:"createdAt,omitempty"`
-	UpdatedAt *string `json:"updatedAt,omitempty"`
+	Message            string                   `json:"message,omitempty"`
+	Reactions          []*Reaction              `json:"reactions,omitempty"`
+	ID                 string                   `json:"id,omitempty"`
+	CreatedBy          *User                    `json:"createdBy,omitempty"`
+	CreatedAt          string                   `json:"createdAt,omitempty"`
+	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
+	ReactionsAggregate *ReactionAggregateResult `json:"reactionsAggregate,omitempty"`
 }
 
 type CommentAggregateResult struct {
@@ -461,8 +476,6 @@ type CommentAggregateResult struct {
 	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
 	MessageMin   *string `json:"messageMin,omitempty"`
 	MessageMax   *string `json:"messageMax,omitempty"`
-	VOIDMin      *string `json:"_VOIDMin,omitempty"`
-	VOIDMax      *string `json:"_VOIDMax,omitempty"`
 }
 
 type CommentFilter struct {
@@ -482,20 +495,20 @@ type CommentOrder struct {
 }
 
 type CommentPatch struct {
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
-	CreatedAt *string  `json:"createdAt,omitempty"`
-	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	Message   *string  `json:"message,omitempty"`
-	Void      *string  `json:"_VOID,omitempty"`
+	CreatedBy *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt *string        `json:"createdAt,omitempty"`
+	UpdatedAt *string        `json:"updatedAt,omitempty"`
+	Message   *string        `json:"message,omitempty"`
+	Reactions []*ReactionRef `json:"reactions,omitempty"`
 }
 
 type CommentRef struct {
-	ID        *string  `json:"id,omitempty"`
-	CreatedBy *UserRef `json:"createdBy,omitempty"`
-	CreatedAt *string  `json:"createdAt,omitempty"`
-	UpdatedAt *string  `json:"updatedAt,omitempty"`
-	Message   *string  `json:"message,omitempty"`
-	Void      *string  `json:"_VOID,omitempty"`
+	ID        *string        `json:"id,omitempty"`
+	CreatedBy *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt *string        `json:"createdAt,omitempty"`
+	UpdatedAt *string        `json:"updatedAt,omitempty"`
+	Message   *string        `json:"message,omitempty"`
+	Reactions []*ReactionRef `json:"reactions,omitempty"`
 }
 
 type ContainsFilter struct {
@@ -718,6 +731,12 @@ type DeletePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids"`
+}
+
+type DeleteReactionPayload struct {
+	Reaction []*Reaction `json:"reaction,omitempty"`
+	Msg      *string     `json:"msg,omitempty"`
+	NumUids  *int        `json:"numUids"`
 }
 
 type DeleteRoleExtPayload struct {
@@ -1646,6 +1665,54 @@ type PostRef struct {
 	ID string `json:"id,omitempty"`
 }
 
+type Reaction struct {
+	ID         string   `json:"id,omitempty"`
+	Reactionid *string  `json:"reactionid,omitempty"`
+	User       *User    `json:"user,omitempty"`
+	Comment    *Comment `json:"comment,omitempty"`
+	Type       int      `json:"type_"`
+}
+
+type ReactionAggregateResult struct {
+	Count         *int     `json:"count"`
+	ReactionidMin *string  `json:"reactionidMin,omitempty"`
+	ReactionidMax *string  `json:"reactionidMax,omitempty"`
+	TypeMin       *int     `json:"type_Min"`
+	TypeMax       *int     `json:"type_Max"`
+	TypeSum       *int     `json:"type_Sum"`
+	TypeAvg       *float64 `json:"type_Avg,omitempty"`
+}
+
+type ReactionFilter struct {
+	ID         []string             `json:"id,omitempty"`
+	Reactionid *StringHashFilter    `json:"reactionid,omitempty"`
+	Has        []*ReactionHasFilter `json:"has,omitempty"`
+	And        []*ReactionFilter    `json:"and,omitempty"`
+	Or         []*ReactionFilter    `json:"or,omitempty"`
+	Not        *ReactionFilter      `json:"not,omitempty"`
+}
+
+type ReactionOrder struct {
+	Asc  *ReactionOrderable `json:"asc,omitempty"`
+	Desc *ReactionOrderable `json:"desc,omitempty"`
+	Then *ReactionOrder     `json:"then,omitempty"`
+}
+
+type ReactionPatch struct {
+	Reactionid *string     `json:"reactionid,omitempty"`
+	User       *UserRef    `json:"user,omitempty"`
+	Comment    *CommentRef `json:"comment,omitempty"`
+	Type       *int        `json:"type_"`
+}
+
+type ReactionRef struct {
+	ID         *string     `json:"id,omitempty"`
+	Reactionid *string     `json:"reactionid,omitempty"`
+	User       *UserRef    `json:"user,omitempty"`
+	Comment    *CommentRef `json:"comment,omitempty"`
+	Type       *int        `json:"type_"`
+}
+
 type RoleExt struct {
 	ID             string               `json:"id,omitempty"`
 	Rootnameid     string               `json:"rootnameid,omitempty"`
@@ -2062,6 +2129,17 @@ type UpdatePostPayload struct {
 	NumUids *int    `json:"numUids"`
 }
 
+type UpdateReactionInput struct {
+	Filter *ReactionFilter `json:"filter,omitempty"`
+	Set    *ReactionPatch  `json:"set,omitempty"`
+	Remove *ReactionPatch  `json:"remove,omitempty"`
+}
+
+type UpdateReactionPayload struct {
+	Reaction []*Reaction `json:"reaction,omitempty"`
+	NumUids  *int        `json:"numUids"`
+}
+
 type UpdateRoleExtInput struct {
 	Filter *RoleExtFilter `json:"filter,omitempty"`
 	Set    *RoleExtPatch  `json:"set,omitempty"`
@@ -2151,6 +2229,7 @@ type User struct {
 	TensionsCreated           []*Tension                `json:"tensions_created,omitempty"`
 	TensionsAssigned          []*Tension                `json:"tensions_assigned,omitempty"`
 	Contracts                 []*Contract               `json:"contracts,omitempty"`
+	Reactions                 []*Reaction               `json:"reactions,omitempty"`
 	Events                    []*UserEvent              `json:"events,omitempty"`
 	MarkAllAsRead             *string                   `json:"markAllAsRead,omitempty"`
 	EventCount                *EventCount               `json:"event_count,omitempty"`
@@ -2161,6 +2240,7 @@ type User struct {
 	TensionsCreatedAggregate  *TensionAggregateResult   `json:"tensions_createdAggregate,omitempty"`
 	TensionsAssignedAggregate *TensionAggregateResult   `json:"tensions_assignedAggregate,omitempty"`
 	ContractsAggregate        *ContractAggregateResult  `json:"contractsAggregate,omitempty"`
+	ReactionsAggregate        *ReactionAggregateResult  `json:"reactionsAggregate,omitempty"`
 	EventsAggregate           *UserEventAggregateResult `json:"eventsAggregate,omitempty"`
 }
 
@@ -2272,6 +2352,7 @@ type UserPatch struct {
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
+	Reactions        []*ReactionRef  `json:"reactions,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
@@ -2300,6 +2381,7 @@ type UserRef struct {
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
+	Reactions        []*ReactionRef  `json:"reactions,omitempty"`
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
@@ -2585,7 +2667,7 @@ const (
 	CommentHasFilterCreatedAt CommentHasFilter = "createdAt"
 	CommentHasFilterUpdatedAt CommentHasFilter = "updatedAt"
 	CommentHasFilterMessage   CommentHasFilter = "message"
-	CommentHasFilterVoid      CommentHasFilter = "_VOID"
+	CommentHasFilterReactions CommentHasFilter = "reactions"
 )
 
 var AllCommentHasFilter = []CommentHasFilter{
@@ -2593,12 +2675,12 @@ var AllCommentHasFilter = []CommentHasFilter{
 	CommentHasFilterCreatedAt,
 	CommentHasFilterUpdatedAt,
 	CommentHasFilterMessage,
-	CommentHasFilterVoid,
+	CommentHasFilterReactions,
 }
 
 func (e CommentHasFilter) IsValid() bool {
 	switch e {
-	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterVoid:
+	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterReactions:
 		return true
 	}
 	return false
@@ -2631,19 +2713,17 @@ const (
 	CommentOrderableCreatedAt CommentOrderable = "createdAt"
 	CommentOrderableUpdatedAt CommentOrderable = "updatedAt"
 	CommentOrderableMessage   CommentOrderable = "message"
-	CommentOrderableVoid      CommentOrderable = "_VOID"
 )
 
 var AllCommentOrderable = []CommentOrderable{
 	CommentOrderableCreatedAt,
 	CommentOrderableUpdatedAt,
 	CommentOrderableMessage,
-	CommentOrderableVoid,
 }
 
 func (e CommentOrderable) IsValid() bool {
 	switch e {
-	case CommentOrderableCreatedAt, CommentOrderableUpdatedAt, CommentOrderableMessage, CommentOrderableVoid:
+	case CommentOrderableCreatedAt, CommentOrderableUpdatedAt, CommentOrderableMessage:
 		return true
 	}
 	return false
@@ -4383,6 +4463,92 @@ func (e PostOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ReactionHasFilter string
+
+const (
+	ReactionHasFilterReactionid ReactionHasFilter = "reactionid"
+	ReactionHasFilterUser       ReactionHasFilter = "user"
+	ReactionHasFilterComment    ReactionHasFilter = "comment"
+	ReactionHasFilterType       ReactionHasFilter = "type_"
+)
+
+var AllReactionHasFilter = []ReactionHasFilter{
+	ReactionHasFilterReactionid,
+	ReactionHasFilterUser,
+	ReactionHasFilterComment,
+	ReactionHasFilterType,
+}
+
+func (e ReactionHasFilter) IsValid() bool {
+	switch e {
+	case ReactionHasFilterReactionid, ReactionHasFilterUser, ReactionHasFilterComment, ReactionHasFilterType:
+		return true
+	}
+	return false
+}
+
+func (e ReactionHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ReactionHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ReactionHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ReactionHasFilter", str)
+	}
+	return nil
+}
+
+func (e ReactionHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ReactionOrderable string
+
+const (
+	ReactionOrderableReactionid ReactionOrderable = "reactionid"
+	ReactionOrderableType       ReactionOrderable = "type_"
+)
+
+var AllReactionOrderable = []ReactionOrderable{
+	ReactionOrderableReactionid,
+	ReactionOrderableType,
+}
+
+func (e ReactionOrderable) IsValid() bool {
+	switch e {
+	case ReactionOrderableReactionid, ReactionOrderableType:
+		return true
+	}
+	return false
+}
+
+func (e ReactionOrderable) String() string {
+	return string(e)
+}
+
+func (e *ReactionOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ReactionOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ReactionOrderable", str)
+	}
+	return nil
+}
+
+func (e ReactionOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type RoleExtHasFilter string
 
 const (
@@ -5002,6 +5168,7 @@ const (
 	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
+	UserHasFilterReactions        UserHasFilter = "reactions"
 	UserHasFilterEvents           UserHasFilter = "events"
 	UserHasFilterMarkAllAsRead    UserHasFilter = "markAllAsRead"
 	UserHasFilterEventCount       UserHasFilter = "event_count"
@@ -5029,6 +5196,7 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterTensionsCreated,
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
+	UserHasFilterReactions,
 	UserHasFilterEvents,
 	UserHasFilterMarkAllAsRead,
 	UserHasFilterEventCount,
@@ -5036,7 +5204,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
 		return true
 	}
 	return false

@@ -621,6 +621,8 @@ var dqlQueries map[string]string = map[string]string{
             Tension.action
             Tension.labels { uid Label.name Label.color }
             n_comments: count(Tension.comments)
+
+            Tension.assignees { User.username User.name }
         }
     }`,
     "getTensionCount": `{
