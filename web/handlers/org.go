@@ -113,7 +113,9 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     owner.Name = &n
     owner.RoleType = &rt
     owner.IsRoot = &_root
+    owner.About = nil
     owner.Mandate = nil
+    owner.Watchers = nil
     nodeInput.Children = []*model.NodeRef{&owner}
     // Gql mutation
     _, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
