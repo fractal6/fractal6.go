@@ -633,8 +633,6 @@ type ComplexityRoot struct {
 		ContractsAggregate     func(childComplexity int, filter *model.VoteFilter) int
 		CreatedAt              func(childComplexity int) int
 		CreatedBy              func(childComplexity int, filter *model.UserFilter) int
-		Docs                   func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
-		DocsAggregate          func(childComplexity int, filter *model.BlobFilter) int
 		EventsHistory          func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		EventsHistoryAggregate func(childComplexity int, filter *model.EventFilter) int
 		FirstLink              func(childComplexity int, filter *model.UserFilter) int
@@ -645,7 +643,6 @@ type ComplexityRoot struct {
 		IsRoot                 func(childComplexity int) int
 		Labels                 func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		LabelsAggregate        func(childComplexity int, filter *model.LabelFilter) int
-		Mandate                func(childComplexity int, filter *model.MandateFilter) int
 		Mode                   func(childComplexity int) int
 		Name                   func(childComplexity int) int
 		Nameid                 func(childComplexity int) int
@@ -695,22 +692,20 @@ type ComplexityRoot struct {
 	}
 
 	NodeFragment struct {
-		About             func(childComplexity int) int
-		Children          func(childComplexity int, filter *model.NodeFragmentFilter, order *model.NodeFragmentOrder, first *int, offset *int) int
-		ChildrenAggregate func(childComplexity int, filter *model.NodeFragmentFilter) int
-		Color             func(childComplexity int) int
-		FirstLink         func(childComplexity int) int
-		ID                func(childComplexity int) int
-		Mandate           func(childComplexity int, filter *model.MandateFilter) int
-		Mode              func(childComplexity int) int
-		Name              func(childComplexity int) int
-		Nameid            func(childComplexity int) int
-		RoleExt           func(childComplexity int) int
-		RoleType          func(childComplexity int) int
-		SecondLink        func(childComplexity int) int
-		Skills            func(childComplexity int) int
-		Type              func(childComplexity int) int
-		Visibility        func(childComplexity int) int
+		About      func(childComplexity int) int
+		Color      func(childComplexity int) int
+		FirstLink  func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Mandate    func(childComplexity int, filter *model.MandateFilter) int
+		Mode       func(childComplexity int) int
+		Name       func(childComplexity int) int
+		Nameid     func(childComplexity int) int
+		RoleExt    func(childComplexity int) int
+		RoleType   func(childComplexity int) int
+		SecondLink func(childComplexity int) int
+		Skills     func(childComplexity int) int
+		Type       func(childComplexity int) int
+		Visibility func(childComplexity int) int
 	}
 
 	NodeFragmentAggregateResult struct {
@@ -4137,30 +4132,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
-	case "Node.docs":
-		if e.complexity.Node.Docs == nil {
-			break
-		}
-
-		args, err := ec.field_Node_docs_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.Docs(childComplexity, args["filter"].(*model.BlobFilter), args["order"].(*model.BlobOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "Node.docsAggregate":
-		if e.complexity.Node.DocsAggregate == nil {
-			break
-		}
-
-		args, err := ec.field_Node_docsAggregate_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.DocsAggregate(childComplexity, args["filter"].(*model.BlobFilter)), true
-
 	case "Node.events_history":
 		if e.complexity.Node.EventsHistory == nil {
 			break
@@ -4255,18 +4226,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
-
-	case "Node.mandate":
-		if e.complexity.Node.Mandate == nil {
-			break
-		}
-
-		args, err := ec.field_Node_mandate_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.Mandate(childComplexity, args["filter"].(*model.MandateFilter)), true
 
 	case "Node.mode":
 		if e.complexity.Node.Mode == nil {
@@ -4640,30 +4599,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeFragment.About(childComplexity), true
-
-	case "NodeFragment.children":
-		if e.complexity.NodeFragment.Children == nil {
-			break
-		}
-
-		args, err := ec.field_NodeFragment_children_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.NodeFragment.Children(childComplexity, args["filter"].(*model.NodeFragmentFilter), args["order"].(*model.NodeFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "NodeFragment.childrenAggregate":
-		if e.complexity.NodeFragment.ChildrenAggregate == nil {
-			break
-		}
-
-		args, err := ec.field_NodeFragment_childrenAggregate_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.NodeFragment.ChildrenAggregate(childComplexity, args["filter"].(*model.NodeFragmentFilter)), true
 
 	case "NodeFragment.color":
 		if e.complexity.NodeFragment.Color == nil {
@@ -8338,17 +8273,17 @@ type Node {
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
   updatedAt: DateTime
-  name: String!
   nameid: String!
   rootnameid: String!
+  source(filter: BlobFilter): Blob
+  name: String!
+  about: String
+  skills: [String!]
   isRoot: Boolean!
   parent(filter: NodeFilter): Node
   type_: NodeType!
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-  about: String
-  mandate(filter: MandateFilter): Mandate
-  source(filter: BlobFilter): Blob
   visibility: NodeVisibility!
   mode: NodeMode!
   rights: Int!
@@ -8357,7 +8292,6 @@ type Node {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
   role_ext(filter: RoleExtFilter): RoleExt
@@ -8365,7 +8299,6 @@ type Node {
   color: String
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
-  skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
@@ -8374,7 +8307,6 @@ type Node {
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
-  docsAggregate(filter: BlobFilter): BlobAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
@@ -8389,7 +8321,6 @@ type NodeFragment {
   about: String
   mandate(filter: MandateFilter): Mandate
   skills: [String!]
-  children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -8398,8 +8329,6 @@ type NodeFragment {
   role_ext: String
   role_type: RoleType
   color: String
-
-  childrenAggregate(filter: NodeFragmentFilter): NodeFragmentAggregateResult
 }
 
 type Mandate {
@@ -8813,37 +8742,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8970,7 +8899,6 @@ input AddNodeFragmentInput {
   about: String @x_alter(r:"maxLen", n:280)
   mandate: MandateRef
   skills: [String!]
-  children: [NodeFragmentRef!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -8990,17 +8918,17 @@ input AddNodeInput {
   createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime
-  name: String!
   nameid: String!
   rootnameid: String!
+  source: BlobRef
+  name: String!
+  about: String
+  skills: [String!]
   isRoot: Boolean!
   parent: NodeRef
   type_: NodeType!
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
-  about: String
-  mandate: MandateRef
-  source: BlobRef
   visibility: NodeVisibility!
   mode: NodeMode!
   rights: Int!
@@ -9009,7 +8937,6 @@ input AddNodeInput {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children: [NodeRef!]
-  docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   role_ext: RoleExtRef
@@ -9017,7 +8944,6 @@ input AddNodeInput {
   color: String
   first_link: UserRef
   second_link: UserRef
-  skills: [String!]
   contracts: [VoteRef!]
   watchers: [UserRef!]
   orga_agg: OrgaAggRef
@@ -10127,12 +10053,12 @@ type NodeAggregateResult {
   createdAtMax: DateTime
   updatedAtMin: DateTime
   updatedAtMax: DateTime
-  nameMin: String
-  nameMax: String
   nameidMin: String
   nameidMax: String
   rootnameidMin: String
   rootnameidMax: String
+  nameMin: String
+  nameMax: String
   aboutMin: String
   aboutMax: String
   rightsMin: Int
@@ -10146,18 +10072,18 @@ type NodeAggregateResult {
 input NodeFilter {
   id: [ID!]
   createdAt: DateTimeFilter
-  name: StringTermFilter
   nameid: StringHashFilter_StringRegExpFilter
   rootnameid: StringHashFilter_StringRegExpFilter
+  name: StringTermFilter
+  about: StringFullTextFilter
+  skills: StringTermFilter
   isRoot: Boolean
   type_: NodeType_hash
-  about: StringFullTextFilter
   visibility: NodeVisibility_hash
   mode: NodeMode_hash
   isArchived: Boolean
   isPersonal: Boolean
   role_type: RoleType_hash
-  skills: StringTermFilter
   has: [NodeHasFilter]
   and: [NodeFilter]
   or: [NodeFilter]
@@ -10196,7 +10122,6 @@ enum NodeFragmentHasFilter {
   about
   mandate
   skills
-  children
   visibility
   mode
   type_
@@ -10229,7 +10154,6 @@ input NodeFragmentPatch {
   about: String @x_alter(r:"maxLen", n:280)
   mandate: MandateRef @x_alter
   skills: [String!] @x_alter
-  children: [NodeFragmentRef!] @x_alter
   visibility: NodeVisibility @x_patch_ro
   mode: NodeMode @x_patch_ro
   type_: NodeType @x_patch_ro
@@ -10247,7 +10171,6 @@ input NodeFragmentRef {
   about: String @x_alter(r:"maxLen", n:280)
   mandate: MandateRef @x_alter
   skills: [String!] @x_alter
-  children: [NodeFragmentRef!] @x_alter
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -10262,17 +10185,17 @@ enum NodeHasFilter {
   createdBy
   createdAt
   updatedAt
-  name
   nameid
   rootnameid
+  source
+  name
+  about
+  skills
   isRoot
   parent
   type_
   tensions_out
   tensions_in
-  about
-  mandate
-  source
   visibility
   mode
   rights
@@ -10281,7 +10204,6 @@ enum NodeHasFilter {
   userCanJoin
   guestCanCreateTension
   children
-  docs
   labels
   roles
   role_ext
@@ -10289,7 +10211,6 @@ enum NodeHasFilter {
   color
   first_link
   second_link
-  skills
   contracts
   watchers
   orga_agg
@@ -10310,9 +10231,9 @@ input NodeOrder {
 enum NodeOrderable {
   createdAt
   updatedAt
-  name
   nameid
   rootnameid
+  name
   about
   rights
   color
@@ -10322,17 +10243,17 @@ input NodePatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_patch_ro
-  name: String @x_patch_ro
   nameid: String @x_patch_ro
   rootnameid: String @x_patch_ro
+  source: BlobRef @x_patch_ro
+  name: String @x_patch_ro
+  about: String @x_patch_ro
+  skills: [String!] @x_patch_ro
   isRoot: Boolean @x_patch_ro
   parent: NodeRef @x_patch_ro
   type_: NodeType @x_patch_ro
   tensions_out: [TensionRef!] @x_patch_ro
   tensions_in: [TensionRef!] @x_patch_ro
-  about: String @x_patch_ro
-  mandate: MandateRef @x_patch_ro
-  source: BlobRef @x_patch_ro
   visibility: NodeVisibility @x_patch_ro
   mode: NodeMode @x_patch_ro
   rights: Int @x_patch_ro
@@ -10341,7 +10262,6 @@ input NodePatch {
   userCanJoin: Boolean @x_patch_ro
   guestCanCreateTension: Boolean @x_patch_ro
   children: [NodeRef!] @x_patch_ro
-  docs: [BlobRef] @x_patch_ro
   labels: [LabelRef!] @x_patch_ro
   roles: [RoleExtRef!] @x_patch_ro
   role_ext: RoleExtRef @x_patch_ro
@@ -10349,7 +10269,6 @@ input NodePatch {
   color: String @x_patch_ro
   first_link: UserRef @x_patch_ro
   second_link: UserRef @x_patch_ro
-  skills: [String!] @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
   watchers: [UserRef!] @x_patch_ro
   orga_agg: OrgaAggRef @x_patch_ro
@@ -10361,17 +10280,17 @@ input NodeRef {
   createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  name: String
   nameid: String
   rootnameid: String
+  source: BlobRef
+  name: String
+  about: String
+  skills: [String!]
   isRoot: Boolean
   parent: NodeRef
   type_: NodeType
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
-  about: String
-  mandate: MandateRef
-  source: BlobRef
   visibility: NodeVisibility
   mode: NodeMode
   rights: Int
@@ -10380,7 +10299,6 @@ input NodeRef {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children: [NodeRef!]
-  docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   role_ext: RoleExtRef
@@ -10388,7 +10306,6 @@ input NodeRef {
   color: String
   first_link: UserRef
   second_link: UserRef
-  skills: [String!]
   contracts: [VoteRef!]
   watchers: [UserRef!]
   orga_agg: OrgaAggRef

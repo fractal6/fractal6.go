@@ -69,17 +69,17 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   createdBy: User!
   createdAt: DateTime! @search
   updatedAt: DateTime
-  name: String! @search(by:[term])
   nameid: String! @search(by:[hash, regexp]) @id
   rootnameid: String! @search(by:[hash, regexp])
+  source: Blob
+  name: String! @search(by:[term])
+  about: String @search(by:[fulltext])
+  skills: [String!] @search(by:[term])
   isRoot: Boolean! @search
   parent: Node
   type_: NodeType! @search
   tensions_out: [Tension!] @hasInverse(field: emitter)
   tensions_in: [Tension!] @hasInverse(field: receiver)
-  about: String @search(by:[fulltext])
-  mandate: Mandate
-  source: Blob
   visibility: NodeVisibility! @search
   mode: NodeMode! @search
   rights: Int!
@@ -88,7 +88,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children: [Node!] @hasInverse(field: parent)
-  docs: [Blob]
   labels: [Label!]
   roles: [RoleExt!]
   role_ext: RoleExt
@@ -96,7 +95,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   color: String
   first_link: User
   second_link: User
-  skills: [String!] @search(by:[term])
   contracts: [Vote!] @hasInverse(field: node)
   watchers: [User!] @hasInverse(field: watching)
   orga_agg: OrgaAgg
@@ -110,7 +108,6 @@ type NodeFragment {
   about: String
   mandate: Mandate
   skills: [String!]
-  children: [NodeFragment!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType

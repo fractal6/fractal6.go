@@ -88,7 +88,6 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
         Type: model.NodeTypeCircle,
         IsRoot: true,
         IsPersonal: &isPersonal,
-        Mandate: &model.MandateRef{ Purpose: form.Purpose },
         Watchers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}},
         // Permission
         Visibility: visibility,
@@ -114,7 +113,6 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     owner.RoleType = &rt
     owner.IsRoot = &_root
     owner.About = nil
-    owner.Mandate = nil
     owner.Watchers = nil
     nodeInput.Children = []*model.NodeRef{&owner}
     // Gql mutation
@@ -122,7 +120,9 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
     if err != nil { http.Error(w, err.Error(), 400); return }
 
     // Add the root control tension
-    tensionInput := graph.MakeNewRootTension(nameid, nodeInput)
+    about := form.About
+    mandate := &model.MandateRef{ Purpose: form.Purpose }
+    tensionInput := graph.MakeNewRootTension(nameid, nodeInput, about, mandate)
     tid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "tension", tensionInput)
     if err != nil { http.Error(w, err.Error(), 400); return }
 

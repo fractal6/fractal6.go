@@ -4414,63 +4414,6 @@ func (ec *executionContext) field_Mutation_updateVote_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_NodeFragment_childrenAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeFragmentFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_NodeFragment_children_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeFragmentFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.NodeFragmentOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalONodeFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
 func (ec *executionContext) field_NodeFragment_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4615,63 +4558,6 @@ func (ec *executionContext) field_Node_createdBy_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Node_docsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.BlobFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOBlobFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_docs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.BlobFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOBlobFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.BlobOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOBlobOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
 func (ec *executionContext) field_Node_events_historyAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4798,21 +4684,6 @@ func (ec *executionContext) field_Node_labels_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_mandate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.MandateFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOMandateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
 	return args, nil
 }
 
@@ -10051,8 +9922,6 @@ func (ec *executionContext) fieldContext_AddNodeFragmentPayload_nodeFragment(ctx
 				return ec.fieldContext_NodeFragment_mandate(ctx, field)
 			case "skills":
 				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
 			case "visibility":
 				return ec.fieldContext_NodeFragment_visibility(ctx, field)
 			case "mode":
@@ -10069,8 +9938,6 @@ func (ec *executionContext) fieldContext_AddNodeFragmentPayload_nodeFragment(ctx
 				return ec.fieldContext_NodeFragment_role_type(ctx, field)
 			case "color":
 				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
 		},
@@ -10168,12 +10035,18 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -10184,12 +10057,6 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -10206,8 +10073,6 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -10222,8 +10087,6 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -10238,8 +10101,6 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -11718,8 +11579,6 @@ func (ec *executionContext) fieldContext_Blob_node(ctx context.Context, field gr
 				return ec.fieldContext_NodeFragment_mandate(ctx, field)
 			case "skills":
 				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
 			case "visibility":
 				return ec.fieldContext_NodeFragment_visibility(ctx, field)
 			case "mode":
@@ -11736,8 +11595,6 @@ func (ec *executionContext) fieldContext_Blob_node(ctx context.Context, field gr
 				return ec.fieldContext_NodeFragment_role_type(ctx, field)
 			case "color":
 				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
 		},
@@ -16172,8 +16029,6 @@ func (ec *executionContext) fieldContext_DeleteNodeFragmentPayload_nodeFragment(
 				return ec.fieldContext_NodeFragment_mandate(ctx, field)
 			case "skills":
 				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
 			case "visibility":
 				return ec.fieldContext_NodeFragment_visibility(ctx, field)
 			case "mode":
@@ -16190,8 +16045,6 @@ func (ec *executionContext) fieldContext_DeleteNodeFragmentPayload_nodeFragment(
 				return ec.fieldContext_NodeFragment_role_type(ctx, field)
 			case "color":
 				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
 		},
@@ -16327,12 +16180,18 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -16343,12 +16202,6 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -16365,8 +16218,6 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -16381,8 +16232,6 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -16397,8 +16246,6 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -20468,12 +20315,18 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -20484,12 +20337,6 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -20506,8 +20353,6 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -20522,8 +20367,6 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -20538,8 +20381,6 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -20704,10 +20545,6 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -20716,6 +20553,10 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -25851,47 +25692,6 @@ func (ec *executionContext) fieldContext_Node_updatedAt(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Node_name(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Node_nameid(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_nameid(ctx, field)
 	if err != nil {
@@ -25962,6 +25762,196 @@ func (ec *executionContext) _Node_rootnameid(ctx context.Context, field graphql.
 }
 
 func (ec *executionContext) fieldContext_Node_rootnameid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_source(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_source(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Source, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Blob)
+	fc.Result = res
+	return ec.marshalOBlob2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_source(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tension":
+				return ec.fieldContext_Blob_tension(ctx, field)
+			case "blob_type":
+				return ec.fieldContext_Blob_blob_type(ctx, field)
+			case "pushedFlag":
+				return ec.fieldContext_Blob_pushedFlag(ctx, field)
+			case "archivedFlag":
+				return ec.fieldContext_Blob_archivedFlag(ctx, field)
+			case "node":
+				return ec.fieldContext_Blob_node(ctx, field)
+			case "md":
+				return ec.fieldContext_Blob_md(ctx, field)
+			case "id":
+				return ec.fieldContext_Blob_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Blob_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Blob_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Blob_updatedAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Blob_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Blob", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_source_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_name(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_about(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_about(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.About, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_about(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_skills(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_skills(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Skills, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_skills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Node",
 		Field:      field,
@@ -26056,12 +26046,18 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -26072,12 +26068,6 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -26094,8 +26084,6 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -26110,8 +26098,6 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -26126,8 +26112,6 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -26417,178 +26401,6 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_tensions_in_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_about(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_about(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.About, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_about(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_mandate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_mandate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Mandate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Mandate)
-	fc.Result = res
-	return ec.marshalOMandate2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandate(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_mandate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Mandate_id(ctx, field)
-			case "purpose":
-				return ec.fieldContext_Mandate_purpose(ctx, field)
-			case "responsabilities":
-				return ec.fieldContext_Mandate_responsabilities(ctx, field)
-			case "domains":
-				return ec.fieldContext_Mandate_domains(ctx, field)
-			case "policies":
-				return ec.fieldContext_Mandate_policies(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_mandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_source(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_source(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Source, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Blob)
-	fc.Result = res
-	return ec.marshalOBlob2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_source(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "tension":
-				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
-			case "pushedFlag":
-				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
-			case "node":
-				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
-			case "id":
-				return ec.fieldContext_Blob_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Blob_createdBy(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Blob_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Blob_updatedAt(ctx, field)
-			case "message":
-				return ec.fieldContext_Blob_message(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Blob", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_source_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -26914,12 +26726,18 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -26930,12 +26748,6 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -26952,8 +26764,6 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -26968,8 +26778,6 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -26984,8 +26792,6 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -27008,79 +26814,6 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_children_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_docs(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_docs(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Docs, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Blob)
-	fc.Result = res
-	return ec.marshalOBlob2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlob(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_docs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "tension":
-				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
-			case "pushedFlag":
-				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
-			case "node":
-				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
-			case "id":
-				return ec.fieldContext_Blob_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Blob_createdBy(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Blob_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Blob_updatedAt(ctx, field)
-			case "message":
-				return ec.fieldContext_Blob_message(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Blob", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_docs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -27616,44 +27349,6 @@ func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, f
 	if fc.Args, err = ec.field_Node_second_link_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_skills(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_skills(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Skills, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_skills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
 	}
 	return fc, nil
 }
@@ -28259,10 +27954,6 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -28271,6 +27962,10 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -28299,83 +27994,6 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_childrenAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_docsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_docsAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DocsAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.BlobAggregateResult)
-	fc.Result = res
-	return ec.marshalOBlobAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_docsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_BlobAggregateResult_count(ctx, field)
-			case "createdAtMin":
-				return ec.fieldContext_BlobAggregateResult_createdAtMin(ctx, field)
-			case "createdAtMax":
-				return ec.fieldContext_BlobAggregateResult_createdAtMax(ctx, field)
-			case "updatedAtMin":
-				return ec.fieldContext_BlobAggregateResult_updatedAtMin(ctx, field)
-			case "updatedAtMax":
-				return ec.fieldContext_BlobAggregateResult_updatedAtMax(ctx, field)
-			case "messageMin":
-				return ec.fieldContext_BlobAggregateResult_messageMin(ctx, field)
-			case "messageMax":
-				return ec.fieldContext_BlobAggregateResult_messageMax(ctx, field)
-			case "pushedFlagMin":
-				return ec.fieldContext_BlobAggregateResult_pushedFlagMin(ctx, field)
-			case "pushedFlagMax":
-				return ec.fieldContext_BlobAggregateResult_pushedFlagMax(ctx, field)
-			case "archivedFlagMin":
-				return ec.fieldContext_BlobAggregateResult_archivedFlagMin(ctx, field)
-			case "archivedFlagMax":
-				return ec.fieldContext_BlobAggregateResult_archivedFlagMax(ctx, field)
-			case "mdMin":
-				return ec.fieldContext_BlobAggregateResult_mdMin(ctx, field)
-			case "mdMax":
-				return ec.fieldContext_BlobAggregateResult_mdMax(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type BlobAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_docsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -28945,82 +28563,6 @@ func (ec *executionContext) fieldContext_NodeAggregateResult_updatedAtMax(ctx co
 	return fc, nil
 }
 
-func (ec *executionContext) _NodeAggregateResult_nameMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NameMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeAggregateResult_nameMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeAggregateResult_nameMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NameMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeAggregateResult_nameMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _NodeAggregateResult_nameidMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 	if err != nil {
@@ -29161,6 +28703,82 @@ func (ec *executionContext) _NodeAggregateResult_rootnameidMax(ctx context.Conte
 }
 
 func (ec *executionContext) fieldContext_NodeAggregateResult_rootnameidMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NodeAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NodeAggregateResult_nameMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NameMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NodeAggregateResult_nameMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NodeAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NodeAggregateResult_nameMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NameMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NodeAggregateResult_nameMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "NodeAggregateResult",
 		Field:      field,
@@ -29731,89 +29349,6 @@ func (ec *executionContext) fieldContext_NodeFragment_skills(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _NodeFragment_children(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeFragment_children(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Children, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NodeFragment)
-	fc.Result = res
-	return ec.marshalONodeFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeFragment_children(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeFragment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_NodeFragment_id(ctx, field)
-			case "nameid":
-				return ec.fieldContext_NodeFragment_nameid(ctx, field)
-			case "name":
-				return ec.fieldContext_NodeFragment_name(ctx, field)
-			case "about":
-				return ec.fieldContext_NodeFragment_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_NodeFragment_mandate(ctx, field)
-			case "skills":
-				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
-			case "visibility":
-				return ec.fieldContext_NodeFragment_visibility(ctx, field)
-			case "mode":
-				return ec.fieldContext_NodeFragment_mode(ctx, field)
-			case "type_":
-				return ec.fieldContext_NodeFragment_type_(ctx, field)
-			case "first_link":
-				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
-			case "role_ext":
-				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
-			case "role_type":
-				return ec.fieldContext_NodeFragment_role_type(ctx, field)
-			case "color":
-				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_NodeFragment_children_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _NodeFragment_visibility(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_NodeFragment_visibility(ctx, field)
 	if err != nil {
@@ -30114,87 +29649,6 @@ func (ec *executionContext) fieldContext_NodeFragment_color(ctx context.Context,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeFragment_childrenAggregate(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ChildrenAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeFragmentAggregateResult)
-	fc.Result = res
-	return ec.marshalONodeFragmentAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeFragment_childrenAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeFragment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_NodeFragmentAggregateResult_count(ctx, field)
-			case "nameidMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_nameidMin(ctx, field)
-			case "nameidMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_nameidMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_aboutMax(ctx, field)
-			case "first_linkMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_first_linkMin(ctx, field)
-			case "first_linkMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_first_linkMax(ctx, field)
-			case "second_linkMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_second_linkMin(ctx, field)
-			case "second_linkMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_second_linkMax(ctx, field)
-			case "role_extMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_role_extMin(ctx, field)
-			case "role_extMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_role_extMax(ctx, field)
-			case "colorMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_colorMin(ctx, field)
-			case "colorMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_colorMax(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type NodeFragmentAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_NodeFragment_childrenAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -33861,12 +33315,18 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -33877,12 +33337,6 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -33899,8 +33353,6 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -33915,8 +33367,6 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -33931,8 +33381,6 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -34002,12 +33450,18 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -34018,12 +33472,6 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -34040,8 +33488,6 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -34056,8 +33502,6 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -34072,8 +33516,6 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -34145,10 +33587,6 @@ func (ec *executionContext) fieldContext_Query_aggregateNode(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -34157,6 +33595,10 @@ func (ec *executionContext) fieldContext_Query_aggregateNode(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -34236,8 +33678,6 @@ func (ec *executionContext) fieldContext_Query_getNodeFragment(ctx context.Conte
 				return ec.fieldContext_NodeFragment_mandate(ctx, field)
 			case "skills":
 				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
 			case "visibility":
 				return ec.fieldContext_NodeFragment_visibility(ctx, field)
 			case "mode":
@@ -34254,8 +33694,6 @@ func (ec *executionContext) fieldContext_Query_getNodeFragment(ctx context.Conte
 				return ec.fieldContext_NodeFragment_role_type(ctx, field)
 			case "color":
 				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
 		},
@@ -34319,8 +33757,6 @@ func (ec *executionContext) fieldContext_Query_queryNodeFragment(ctx context.Con
 				return ec.fieldContext_NodeFragment_mandate(ctx, field)
 			case "skills":
 				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
 			case "visibility":
 				return ec.fieldContext_NodeFragment_visibility(ctx, field)
 			case "mode":
@@ -34337,8 +33773,6 @@ func (ec *executionContext) fieldContext_Query_queryNodeFragment(ctx context.Con
 				return ec.fieldContext_NodeFragment_role_type(ctx, field)
 			case "color":
 				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
 		},
@@ -39326,12 +38760,18 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -39342,12 +38782,6 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -39364,8 +38798,6 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -39380,8 +38812,6 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -39396,8 +38826,6 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -39467,12 +38895,18 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -39483,12 +38917,6 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -39505,8 +38933,6 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -39521,8 +38947,6 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -39537,8 +38961,6 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -39610,10 +39032,6 @@ func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -39622,6 +39040,10 @@ func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -39699,10 +39121,6 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -39711,6 +39129,10 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -40131,12 +39553,18 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -40147,12 +39575,6 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -40169,8 +39591,6 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -40185,8 +39605,6 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -40201,8 +39619,6 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -40316,12 +39732,18 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -40332,12 +39754,6 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -40354,8 +39770,6 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -40370,8 +39784,6 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -40386,8 +39798,6 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -43965,8 +43375,6 @@ func (ec *executionContext) fieldContext_UpdateNodeFragmentPayload_nodeFragment(
 				return ec.fieldContext_NodeFragment_mandate(ctx, field)
 			case "skills":
 				return ec.fieldContext_NodeFragment_skills(ctx, field)
-			case "children":
-				return ec.fieldContext_NodeFragment_children(ctx, field)
 			case "visibility":
 				return ec.fieldContext_NodeFragment_visibility(ctx, field)
 			case "mode":
@@ -43983,8 +43391,6 @@ func (ec *executionContext) fieldContext_UpdateNodeFragmentPayload_nodeFragment(
 				return ec.fieldContext_NodeFragment_role_type(ctx, field)
 			case "color":
 				return ec.fieldContext_NodeFragment_color(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_NodeFragment_childrenAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeFragment", field.Name)
 		},
@@ -44082,12 +43488,18 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -44098,12 +43510,6 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -44120,8 +43526,6 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -44136,8 +43540,6 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -44152,8 +43554,6 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -46243,12 +45643,18 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -46259,12 +45665,6 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -46281,8 +45681,6 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -46297,8 +45695,6 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -46313,8 +45709,6 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -46450,12 +45844,18 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -46466,12 +45866,6 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -46488,8 +45882,6 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -46504,8 +45896,6 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -46520,8 +45910,6 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -46591,12 +45979,18 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -46607,12 +46001,6 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -46629,8 +46017,6 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -46645,8 +46031,6 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -46661,8 +46045,6 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -47469,10 +46851,6 @@ func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -47481,6 +46859,10 @@ func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -47558,10 +46940,6 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -47570,6 +46948,10 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -47647,10 +47029,6 @@ func (ec *executionContext) fieldContext_User_backed_rolesAggregate(ctx context.
 				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
 			case "updatedAtMax":
 				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "nameidMin":
 				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
 			case "nameidMax":
@@ -47659,6 +47037,10 @@ func (ec *executionContext) fieldContext_User_backed_rolesAggregate(ctx context.
 				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
 				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
 			case "aboutMin":
 				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
 			case "aboutMax":
@@ -50049,12 +49431,18 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
 			case "nameid":
 				return ec.fieldContext_Node_nameid(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
 			case "isRoot":
 				return ec.fieldContext_Node_isRoot(ctx, field)
 			case "parent":
@@ -50065,12 +49453,6 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_tensions_out(ctx, field)
 			case "tensions_in":
 				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "mandate":
-				return ec.fieldContext_Node_mandate(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
 			case "visibility":
 				return ec.fieldContext_Node_visibility(ctx, field)
 			case "mode":
@@ -50087,8 +49469,6 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "docs":
-				return ec.fieldContext_Node_docs(ctx, field)
 			case "labels":
 				return ec.fieldContext_Node_labels(ctx, field)
 			case "roles":
@@ -50103,8 +49483,6 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_first_link(ctx, field)
 			case "second_link":
 				return ec.fieldContext_Node_second_link(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "watchers":
@@ -50119,8 +49497,6 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "docsAggregate":
-				return ec.fieldContext_Node_docsAggregate(ctx, field)
 			case "labelsAggregate":
 				return ec.fieldContext_Node_labelsAggregate(ctx, field)
 			case "rolesAggregate":
@@ -51733,7 +51109,7 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "children", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -51848,14 +51224,6 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "children":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
-			it.Children, err = ec.unmarshalONodeFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "visibility":
 			var err error
 
@@ -51933,7 +51301,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "watchers", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "watchers", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -51964,14 +51332,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "nameid":
 			var err error
 
@@ -51985,6 +51345,38 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "source":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			it.Source, err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -52025,30 +51417,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_in"))
 			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "about":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "mandate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "source":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
-			it.Source, err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -52116,14 +51484,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "docs":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("docs"))
-			it.Docs, err = ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "labels":
 			var err error
 
@@ -52177,14 +51537,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
 			it.SecondLink, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "skills":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58647,7 +57999,7 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "name", "nameid", "rootnameid", "isRoot", "type_", "about", "visibility", "mode", "isArchived", "isPersonal", "role_type", "skills", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "createdAt", "nameid", "rootnameid", "name", "about", "skills", "isRoot", "type_", "visibility", "mode", "isArchived", "isPersonal", "role_type", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -58670,14 +58022,6 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "nameid":
 			var err error
 
@@ -58694,6 +58038,30 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			it.About, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			it.Skills, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isRoot":
 			var err error
 
@@ -58707,14 +58075,6 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			it.Type, err = ec.unmarshalONodeType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeTypeHash(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "about":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58755,14 +58115,6 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
 			it.RoleType, err = ec.unmarshalORoleType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "skills":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58915,7 +58267,7 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "children", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -59058,32 +58410,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				it.Skills = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "children":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeFragmentRef); ok {
-				it.Children = data
-			} else if tmp == nil {
-				it.Children = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeFragmentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "visibility":
@@ -59299,7 +58625,7 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "nameid", "name", "about", "mandate", "skills", "children", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	fieldsInOrder := [...]string{"id", "nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -59454,32 +58780,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 				it.Skills = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "children":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeFragmentRef); ok {
-				it.Children = data
-			} else if tmp == nil {
-				it.Children = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeFragmentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "visibility":
@@ -59639,7 +58939,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "watchers", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "watchers", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -59720,30 +59020,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Name = data
-			} else if tmp == nil {
-				it.Name = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "nameid":
 			var err error
 
@@ -59790,6 +59066,104 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.Rootnameid = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "source":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.BlobRef); ok {
+				it.Source = data
+			} else if tmp == nil {
+				it.Source = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.BlobRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Name = data
+			} else if tmp == nil {
+				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.About = data
+			} else if tmp == nil {
+				it.About = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Skills = data
+			} else if tmp == nil {
+				it.Skills = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isRoot":
@@ -59918,82 +59292,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.TensionsIn = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "about":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.About = data
-			} else if tmp == nil {
-				it.About = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "mandate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.MandateRef); ok {
-				it.Mandate = data
-			} else if tmp == nil {
-				it.Mandate = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.MandateRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "source":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.BlobRef); ok {
-				it.Source = data
-			} else if tmp == nil {
-				it.Source = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.BlobRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "visibility":
@@ -60194,32 +59492,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "docs":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("docs"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.BlobRef); ok {
-				it.Docs = data
-			} else if tmp == nil {
-				it.Docs = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.BlobRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "labels":
 			var err error
 
@@ -60400,30 +59672,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "skills":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]string); ok {
-				it.Skills = data
-			} else if tmp == nil {
-				it.Skills = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "contracts":
 			var err error
 
@@ -60541,7 +59789,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "name", "nameid", "rootnameid", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "about", "mandate", "source", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "docs", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "skills", "contracts", "watchers", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "children", "labels", "roles", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "watchers", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -60580,14 +59828,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "nameid":
 			var err error
 
@@ -60601,6 +59841,38 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "source":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			it.Source, err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "about":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "skills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
+			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -60641,30 +59913,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_in"))
 			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "about":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "mandate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "source":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
-			it.Source, err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -60732,14 +59980,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "docs":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("docs"))
-			it.Docs, err = ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "labels":
 			var err error
 
@@ -60793,14 +60033,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
 			it.SecondLink, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "skills":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -71655,13 +70887,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_updatedAt(ctx, field, obj)
 
-		case "name":
-
-			out.Values[i] = ec._Node_name(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "nameid":
 
 			out.Values[i] = ec._Node_nameid(ctx, field, obj)
@@ -71676,6 +70901,25 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "source":
+
+			out.Values[i] = ec._Node_source(ctx, field, obj)
+
+		case "name":
+
+			out.Values[i] = ec._Node_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "about":
+
+			out.Values[i] = ec._Node_about(ctx, field, obj)
+
+		case "skills":
+
+			out.Values[i] = ec._Node_skills(ctx, field, obj)
+
 		case "isRoot":
 
 			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
@@ -71701,18 +70945,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		case "tensions_in":
 
 			out.Values[i] = ec._Node_tensions_in(ctx, field, obj)
-
-		case "about":
-
-			out.Values[i] = ec._Node_about(ctx, field, obj)
-
-		case "mandate":
-
-			out.Values[i] = ec._Node_mandate(ctx, field, obj)
-
-		case "source":
-
-			out.Values[i] = ec._Node_source(ctx, field, obj)
 
 		case "visibility":
 
@@ -71758,10 +70990,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_children(ctx, field, obj)
 
-		case "docs":
-
-			out.Values[i] = ec._Node_docs(ctx, field, obj)
-
 		case "labels":
 
 			out.Values[i] = ec._Node_labels(ctx, field, obj)
@@ -71790,10 +71018,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_second_link(ctx, field, obj)
 
-		case "skills":
-
-			out.Values[i] = ec._Node_skills(ctx, field, obj)
-
 		case "contracts":
 
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
@@ -71821,10 +71045,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		case "childrenAggregate":
 
 			out.Values[i] = ec._Node_childrenAggregate(ctx, field, obj)
-
-		case "docsAggregate":
-
-			out.Values[i] = ec._Node_docsAggregate(ctx, field, obj)
 
 		case "labelsAggregate":
 
@@ -71887,14 +71107,6 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 
 			out.Values[i] = ec._NodeAggregateResult_updatedAtMax(ctx, field, obj)
 
-		case "nameMin":
-
-			out.Values[i] = ec._NodeAggregateResult_nameMin(ctx, field, obj)
-
-		case "nameMax":
-
-			out.Values[i] = ec._NodeAggregateResult_nameMax(ctx, field, obj)
-
 		case "nameidMin":
 
 			out.Values[i] = ec._NodeAggregateResult_nameidMin(ctx, field, obj)
@@ -71910,6 +71122,14 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 		case "rootnameidMax":
 
 			out.Values[i] = ec._NodeAggregateResult_rootnameidMax(ctx, field, obj)
+
+		case "nameMin":
+
+			out.Values[i] = ec._NodeAggregateResult_nameMin(ctx, field, obj)
+
+		case "nameMax":
+
+			out.Values[i] = ec._NodeAggregateResult_nameMax(ctx, field, obj)
 
 		case "aboutMin":
 
@@ -71991,10 +71211,6 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 
 			out.Values[i] = ec._NodeFragment_skills(ctx, field, obj)
 
-		case "children":
-
-			out.Values[i] = ec._NodeFragment_children(ctx, field, obj)
-
 		case "visibility":
 
 			out.Values[i] = ec._NodeFragment_visibility(ctx, field, obj)
@@ -72026,10 +71242,6 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 		case "color":
 
 			out.Values[i] = ec._NodeFragment_color(ctx, field, obj)
-
-		case "childrenAggregate":
-
-			out.Values[i] = ec._NodeFragment_childrenAggregate(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -76385,16 +75597,6 @@ func (ec *executionContext) unmarshalNNodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNodeFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragment(ctx context.Context, sel ast.SelectionSet, v *model.NodeFragment) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._NodeFragment(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNNodeFragmentFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx context.Context, v interface{}) (model.NodeFragmentFilter, error) {
 	res, err := ec.unmarshalInputNodeFragmentFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -76402,11 +75604,6 @@ func (ec *executionContext) unmarshalNNodeFragmentFilter2fractaleᚋfractal6ᚗg
 
 func (ec *executionContext) unmarshalNNodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx context.Context, v interface{}) (*model.NodeFragmentFilter, error) {
 	res, err := ec.unmarshalInputNodeFragmentFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx context.Context, v interface{}) (*model.NodeFragmentRef, error) {
-	res, err := ec.unmarshalInputNodeFragmentRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -77524,26 +76721,6 @@ func (ec *executionContext) unmarshalOBlobPatch2ᚖfractaleᚋfractal6ᚗgoᚋgr
 	}
 	res, err := ec.unmarshalInputBlobPatch(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx context.Context, v interface{}) ([]*model.BlobRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.BlobRef, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx context.Context, v interface{}) ([]*model.BlobRef, error) {
@@ -80248,53 +79425,6 @@ func (ec *executionContext) marshalONodeFragment2ᚕᚖfractaleᚋfractal6ᚗgo�
 	return ret
 }
 
-func (ec *executionContext) marshalONodeFragment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.NodeFragment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNNodeFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragment(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalONodeFragment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragment(ctx context.Context, sel ast.SelectionSet, v *model.NodeFragment) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -80444,26 +79574,6 @@ func (ec *executionContext) unmarshalONodeFragmentPatch2ᚖfractaleᚋfractal6�
 	}
 	res, err := ec.unmarshalInputNodeFragmentPatch(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalONodeFragmentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRefᚄ(ctx context.Context, v interface{}) ([]*model.NodeFragmentRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.NodeFragmentRef, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNNodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx context.Context, v interface{}) (*model.NodeFragmentRef, error) {

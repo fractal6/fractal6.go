@@ -77,13 +77,10 @@ var tensionBlobHookPayload string = `
     Blob.md
     Blob.node {
       uid
-      NodeFragment.name
-      NodeFragment.nameid
       NodeFragment.type_
+      NodeFragment.nameid
+      NodeFragment.name
       NodeFragment.about
-      NodeFragment.mandate {
-        expand(_all_)
-      }
 
       NodeFragment.first_link
       NodeFragment.skills

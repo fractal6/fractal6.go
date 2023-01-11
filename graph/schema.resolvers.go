@@ -152,7 +152,7 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 
 // AddReaction is the resolver for the addReaction field.
 func (r *mutationResolver) AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (data *model.AddReactionPayload, errors error) {
-    // @DEBUG: see #3a1a434 (gqlgen bug...)
+	// @DEBUG: see #3a1a434 (gqlgen bug...)
 	// Input is updated in hooks. Fields with arguments will be ignored
 	_, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -220,7 +220,7 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 
 // AddContract is the resolver for the addContract field.
 func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
-    // @DEBUG: see #3a1a434 (gqlgen bug...)
+	// @DEBUG: see #3a1a434 (gqlgen bug...)
 	// Input is updated in hooks. Fields with arguments will be ignored
 	_, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {

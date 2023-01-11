@@ -405,8 +405,6 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
         unsafe = true
     }
 
-    fmt.Println(*node)
-    fmt.Println(unsafe)
     ok, err := TryUpdateLink(uctx, tension, node, event, unsafe)
 
     return ok, err

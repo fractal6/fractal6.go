@@ -27,7 +27,6 @@ import (
     "fractale/fractal6.go/graph/codec"
     "fractale/fractal6.go/web/auth"
     "fractale/fractal6.go/db"
-    "fractale/fractal6.go/text/en"
     . "fractale/fractal6.go/tools"
 )
 
@@ -256,7 +255,7 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
     return ok, err
 }
 
-// pushNode add a new role or circle in an graph.
+// PushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
 func PushNode(username string, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) (error) {
@@ -281,24 +280,6 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
     if bid != nil {
         nodeInput.Source = &model.BlobRef{ ID: bid }
     }
-    // @future: children not implemented
-    //var children []model.NodeFragment
-
-    // @future: for the moment, first_link and children are linked separetly, see contracts....
-    //switch *node.Type {
-    //case model.NodeTypeRole:
-    //    if node.FirstLink != nil {
-    //        nodeInput.FirstLink = &model.UserRef{Username: node.FirstLink}
-    //    }
-    //case model.NodeTypeCircle:
-    //    nodeInput.Children = nil
-    //    for i, c := range(node.Children) {
-    //        if c.FirstLink != nil {
-    //            child := makeNewChild(i, *c.FirstLink, nameid, *c.RoleType, node)
-    //            children = append(children, child)
-    //        }
-    //    }
-    //}
 
     // Push the nodes into the database
     _, err := db.GetDB().Add(db.DB.GetRootUctx(), "node", nodeInput)
@@ -307,9 +288,11 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
     return err
 }
 
-// updateNode update a node from the given fragment
+// UpdateNode update a node from the given fragment
 func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid string) (error) {
     // Map NodeFragment to Node Patch Input
+    // The NodeFraglent copy is only necesary for the @search feature.
+    // see https://discuss.dgraph.io/t/fulltext-search-across-multiple-fields/14354
     var nodePatchFilter model.NodePatchFromFragment
     var nodePatch model.NodePatch
     StructMap(node, &nodePatchFilter)
@@ -333,31 +316,9 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 // Internals
 //
 
-func makeNewChild(i int, username string, parentid string, roleType model.RoleType, node *model.NodeFragment) model.NodeFragment {
-    //name := "Coordinator"
-    name := string(roleType)
-    nameid := parentid +"#"+ name + strconv.Itoa(i)
-    type_ := model.NodeTypeRole
-    fs := username
-    child := model.NodeFragment{
-        Name: &name,
-        Nameid: &nameid,
-        Type: &type_,
-        RoleType: &roleType,
-        FirstLink: &fs,
-    }
-    var nodeProxy *model.Node
-    StructMap(node, &nodeProxy)
-    auth.InheritNodeCharacDefault(&child, nodeProxy)
-    if roleType == model.RoleTypeCoordinator {
-        child.Mandate = &model.Mandate{Purpose: en.CoordoPurpose}
-    }
-    return child
-}
-
 // MakeNewRootTension build the tension that manage a root node.
 // Authors will be suscribed.
-func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTensionInput {
+func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *string, mandate *model.MandateRef) model.AddTensionInput {
     now := Now()
     createdBy := *node.CreatedBy
     emitter := model.NodeRef{Nameid: &rootnameid}
@@ -371,6 +332,8 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput) model.AddTen
     StructMap(node, &noderef)
     emptyString := "" // root's tension feature
     noderef.Nameid = &emptyString
+    noderef.About = about
+    noderef.Mandate = mandate
     blob := model.BlobRef{
         CreatedAt: &now,
         CreatedBy : &createdBy,
