@@ -680,17 +680,25 @@ var dqlQueries map[string]string = map[string]string{
         id as var(func: uid({{.id}})) {
           rid_emitter as Tension.emitter
           rid_receiver as Tension.receiver
-          a as Tension.comments
+          comments as Tension.comments {
+            reactions as Comment.reactions
+          }
           b as Tension.blobs {
-              bb as Blob.node {
-                  bb1 as NodeFragment.children
-                  bb2 as NodeFragment.mandate
+              bn as Blob.node {
+                  m as NodeFragment.mandate
               }
           }
-          c as Tension.contracts
-          d as Tension.history
+          c as Tension.contracts {
+              e as Contract.event
+              votes as Contract.participants
+              comments2 as Contract.comments {
+                reactions2 as Comment.reactions
+              }
+          }
+          events as Tension.history
+          mentions as Tension.mentions
         }
-        all(func: uid(id,a,b,c,d,bb,bb1,bb2)) {
+        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,e,votes,comments2,reactions2)) {
             all_ids as uid
         }
     }`,
@@ -699,9 +707,11 @@ var dqlQueries map[string]string = map[string]string{
           rid as Contract.tension
           a as Contract.event
           b as Contract.participants
-          c as Contract.comments
+          c as Contract.comments {
+            r as Comment.reactions
+          }
         }
-        all(func: uid(id,a,b,c)) {
+        all(func: uid(id,a,b,c,r)) {
             all_ids as uid
         }
     }`,
