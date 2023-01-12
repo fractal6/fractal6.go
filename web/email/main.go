@@ -201,7 +201,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
     var type_hint string
     if ui.Reason == model.ReasonIsAlert {
-        type_hint = "[Alert]"
+        type_hint = ""
     }
 
     // Redirect Url
