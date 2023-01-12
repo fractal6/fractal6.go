@@ -22,6 +22,7 @@ package graph
 
 import (
 	"fmt"
+    "log"
 	"context"
     "strings"
 	"encoding/json"
@@ -119,11 +120,11 @@ func PushEventNotifications(notif model.EventNotif) error {
     err := PushHistory(&notif)
     if err != nil { return err }
 
-    //  Alert and Announcement tensions notify only at tension creation.
+    //  Alert and Announcement tensions notification only active
+    //  for tensions creation.
     var receiverid string
     var type_ model.TensionType
     var isClosed bool
-    // --
     if notif.HasEvent(model.TensionEventCreated) {
         if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
             return err
@@ -231,16 +232,23 @@ func PushEventNotifications(notif model.EventNotif) error {
         }
 
         // User Event
-        eid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
-            User: &model.UserRef{Username: &u},
-            IsRead: false,
-            CreatedAt: createdAt,
-            Event: eventBatch,
-        })
-        if err != nil { return err }
+        var eid string
+        if notif.IsNotifiable(ui) {
+            eid, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "userEvent", &model.AddUserEventInput{
+                User: &model.UserRef{Username: &u},
+                IsRead: false,
+                CreatedAt: createdAt,
+                Event: eventBatch,
+            })
+            if err != nil { return err }
+        }
 
         // Email
         if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
+            if eid == "" {
+                log.Printf("Notification Error: an event is emailable but not notifiable !")
+                return nil
+            }
             ui.Eid = eid
             err = email.SendEventNotificationEmail(ui, notif)
             if err != nil { return err }
