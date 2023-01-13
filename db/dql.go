@@ -718,6 +718,7 @@ var dqlQueries map[string]string = map[string]string{
 }
 
 var dqlMutations map[string]QueryMut = map[string]QueryMut{
+    // Set
     "markAllAsRead": QueryMut{
         Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
@@ -760,6 +761,29 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(nf) <NodeFragment.visibility> "{{.value}}" .
         `,
     },
+    "rewriteLabelEvents": QueryMut{
+        Q: `query {
+            var(func: eq(Node.rootnameid, "{{.rootnameid}}")) {
+                Node.tensions_in {
+                    events as Tension.history @filter(eq(Event.event_type, ["LabelAdded", "LabelRemoved"]))
+                }
+            }
+
+            var(func: uid(events)) @filter(eq(Event.event_type, "LabelAdded") AND eq(Event.new, "{{.old_name}}")) {
+                e_added as uid
+            }
+            var(func: uid(events)) @filter(eq(Event.event_type, "LabelRemoved") AND eq(Event.old, "{{.old_name}}")) {
+                e_removed as uid
+            }
+
+        }`,
+        S: `
+        uid(e_added) <Event.new> "{{.new_name}}" .
+        uid(e_removed) <Event.old> "{{.new_name}}" .
+        `,
+
+    },
+    // Delete
     "removeAssignedTension": QueryMut{
         Q: `query {
             var(func: eq(User.username, "{{.username}}")) {

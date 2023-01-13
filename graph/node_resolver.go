@@ -43,6 +43,8 @@ import (
 ////////////////////////////////////////////////
 
 type AddArtefactInput struct {
+    Name        *string             `json:"name"`
+    Color       *string             `json:"color"`
 	Rootnameid  string              `json:"rootnameid,omitempty"`
 	Nodes       []*model.NodeRef    `json:"nodes,omitempty"`
 }
@@ -83,8 +85,8 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
     for _, input := range inputs {
         if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         node := input.Nodes[0]
-        rid, _ := codec.Nid2rootid(*node.Nameid)
-        if rid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
+        rootnameid, _ := codec.Nid2rootid(*node.Nameid)
+        if rootnameid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
         ok, err = auth.HasCoordoAuth(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
@@ -106,26 +108,28 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
     var input UpdateArtefactInput
     StructMap(graphql.GetResolverContext(ctx).Args["input"], &input)
 
+    var typeName string
+    var rootnameid string
     var nodes []*model.NodeRef
     if input.Set != nil {
         if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         nodes = append(nodes, input.Set.Nodes[0])
-        rid, _ := codec.Nid2rootid(*nodes[0].Nameid)
+        rootnameid, _ = codec.Nid2rootid(*nodes[0].Nameid)
 
         // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
         n_nodes := 0
-        _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+        _, typeName, _, err = queryTypeFromGraphqlContext(ctx)
         if err != nil { return nil, LogErr("UpdateNodeArtefact", err) }
         if len(input.Filter.ID) > 0 {
             n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")
         } else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
-            if rid != *input.Filter.Rootnameid.Eq { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
+            if rootnameid != *input.Filter.Rootnameid.Eq { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
             n_nodes = db.GetDB().Count2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes")
         } else {
             return nil, LogErr("Access denied", fmt.Errorf("invalid filter to query node artefact."))
         }
 
-        if n_nodes > 1 && *nodes[0].Nameid != rid  {
+        if n_nodes > 1 && *nodes[0].Nameid != rootnameid  {
             return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is only possible at the root circle level."))
         }
     }
@@ -145,9 +149,43 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
             return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
         }
     }
-    if ok {
-        return next(ctx)
+    if !ok {
+        return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
     }
-    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+
+    // Update the Label event in tension history as data id hardocoded on new/old value.
+    // @debug/perf: run this asynchronously
+    if typeName == "Label" && input.Set != nil && len(input.Filter.ID) > 0 {
+        old := struct { Name, Color string }{}
+        new := struct { Name, Color string }{}
+        // Old value -- Color is embeded in the event new/old value
+        old_, err := db.GetDB().GetFieldById(input.Filter.ID[0], "Label.name Label.color")
+        if err != nil { return nil, LogErr("Internal error", err) }
+        StructMap(old_, &old)
+
+        // New value
+        new_name :=  input.Set.Name
+        new_color := input.Set.Color
+        if new_name == nil {
+            new.Name = old.Name
+        } else {
+           new.Name = *new_name
+        }
+        if new_color == nil {
+            new.Color = old.Color
+        } else {
+           new.Color = *new_color
+        }
+
+        // Rewrite
+        _, err = db.GetDB().Meta("rewriteLabelEvents", map[string]string{
+            "rootnameid": rootnameid,
+            "old_name": old.Name + "§" + old.Color,
+            "new_name": new.Name + "§" + new.Color,
+        })
+        if err != nil { return nil, LogErr("Internal error", err) }
+    }
+
+    return next(ctx)
 }
 
