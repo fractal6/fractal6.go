@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - add User name and username to tensions_all query results.
 
 ### Fixed 
-- notification: Fix Mentioned email notification -> user mentionned reason take precedence over other reason.
+- notification: Fix Mentioned email notification -> user mentioned reason take precedence over other reason.
 
 
 ## [0.7.2]

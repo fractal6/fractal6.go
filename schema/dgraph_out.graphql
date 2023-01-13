@@ -1,34 +1,34 @@
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
-
 directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
-
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+
 directive @lambda on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -155,7 +155,6 @@ input AddNodeFragmentInput {
   about: String
   mandate: MandateRef
   skills: [String!]
-  children: [NodeFragmentRef!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -175,17 +174,17 @@ input AddNodeInput {
   createdBy: UserRef!
   createdAt: DateTime!
   updatedAt: DateTime
-  name: String!
   nameid: String!
   rootnameid: String!
+  source: BlobRef
+  name: String!
+  about: String
+  skills: [String!]
   isRoot: Boolean!
   parent: NodeRef
   type_: NodeType!
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
-  about: String
-  mandate: MandateRef
-  source: BlobRef
   visibility: NodeVisibility!
   mode: NodeMode!
   rights: Int!
@@ -194,7 +193,6 @@ input AddNodeInput {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children: [NodeRef!]
-  docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   role_ext: RoleExtRef
@@ -202,7 +200,6 @@ input AddNodeInput {
   color: String
   first_link: UserRef
   second_link: UserRef
-  skills: [String!]
   contracts: [VoteRef!]
   watchers: [UserRef!]
   orga_agg: OrgaAggRef
@@ -1440,17 +1437,17 @@ type Node {
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
   updatedAt: DateTime
-  name: String!
   nameid: String!
   rootnameid: String!
+  source(filter: BlobFilter): Blob
+  name: String!
+  about: String
+  skills: [String!]
   isRoot: Boolean!
   parent(filter: NodeFilter): Node
   type_: NodeType!
   tensions_out(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_in(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-  about: String
-  mandate(filter: MandateFilter): Mandate
-  source(filter: BlobFilter): Blob
   visibility: NodeVisibility!
   mode: NodeMode!
   rights: Int!
@@ -1459,7 +1456,6 @@ type Node {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  docs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
   role_ext(filter: RoleExtFilter): RoleExt
@@ -1467,7 +1463,6 @@ type Node {
   color: String
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
-  skills: [String!]
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg
@@ -1475,7 +1470,6 @@ type Node {
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
-  docsAggregate(filter: BlobFilter): BlobAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
@@ -1489,12 +1483,12 @@ type NodeAggregateResult {
   createdAtMax: DateTime
   updatedAtMin: DateTime
   updatedAtMax: DateTime
-  nameMin: String
-  nameMax: String
   nameidMin: String
   nameidMax: String
   rootnameidMin: String
   rootnameidMax: String
+  nameMin: String
+  nameMax: String
   aboutMin: String
   aboutMax: String
   rightsMin: Int
@@ -1508,18 +1502,18 @@ type NodeAggregateResult {
 input NodeFilter {
   id: [ID!]
   createdAt: DateTimeFilter
-  name: StringTermFilter
   nameid: StringHashFilter_StringRegExpFilter
   rootnameid: StringHashFilter_StringRegExpFilter
+  name: StringTermFilter
+  about: StringFullTextFilter
+  skills: StringTermFilter
   isRoot: Boolean
   type_: NodeType_hash
-  about: StringFullTextFilter
   visibility: NodeVisibility_hash
   mode: NodeMode_hash
   isArchived: Boolean
   isPersonal: Boolean
   role_type: RoleType_hash
-  skills: StringTermFilter
   has: [NodeHasFilter]
   and: [NodeFilter]
   or: [NodeFilter]
@@ -1533,7 +1527,6 @@ type NodeFragment {
   about: String
   mandate(filter: MandateFilter): Mandate
   skills: [String!]
-  children(filter: NodeFragmentFilter, order: NodeFragmentOrder, first: Int, offset: Int): [NodeFragment!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -1542,7 +1535,6 @@ type NodeFragment {
   role_ext: String
   role_type: RoleType
   color: String
-  childrenAggregate(filter: NodeFragmentFilter): NodeFragmentAggregateResult
 }
 
 type NodeFragmentAggregateResult {
@@ -1577,7 +1569,6 @@ enum NodeFragmentHasFilter {
   about
   mandate
   skills
-  children
   visibility
   mode
   type_
@@ -1610,7 +1601,6 @@ input NodeFragmentPatch {
   about: String
   mandate: MandateRef
   skills: [String!]
-  children: [NodeFragmentRef!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -1628,7 +1618,6 @@ input NodeFragmentRef {
   about: String
   mandate: MandateRef
   skills: [String!]
-  children: [NodeFragmentRef!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
@@ -1643,17 +1632,17 @@ enum NodeHasFilter {
   createdBy
   createdAt
   updatedAt
-  name
   nameid
   rootnameid
+  source
+  name
+  about
+  skills
   isRoot
   parent
   type_
   tensions_out
   tensions_in
-  about
-  mandate
-  source
   visibility
   mode
   rights
@@ -1662,7 +1651,6 @@ enum NodeHasFilter {
   userCanJoin
   guestCanCreateTension
   children
-  docs
   labels
   roles
   role_ext
@@ -1670,7 +1658,6 @@ enum NodeHasFilter {
   color
   first_link
   second_link
-  skills
   contracts
   watchers
   orga_agg
@@ -1696,9 +1683,9 @@ input NodeOrder {
 enum NodeOrderable {
   createdAt
   updatedAt
-  name
   nameid
   rootnameid
+  name
   about
   rights
   color
@@ -1708,17 +1695,17 @@ input NodePatch {
   createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  name: String
   nameid: String
   rootnameid: String
+  source: BlobRef
+  name: String
+  about: String
+  skills: [String!]
   isRoot: Boolean
   parent: NodeRef
   type_: NodeType
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
-  about: String
-  mandate: MandateRef
-  source: BlobRef
   visibility: NodeVisibility
   mode: NodeMode
   rights: Int
@@ -1727,7 +1714,6 @@ input NodePatch {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children: [NodeRef!]
-  docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   role_ext: RoleExtRef
@@ -1735,7 +1721,6 @@ input NodePatch {
   color: String
   first_link: UserRef
   second_link: UserRef
-  skills: [String!]
   contracts: [VoteRef!]
   watchers: [UserRef!]
   orga_agg: OrgaAggRef
@@ -1747,17 +1732,17 @@ input NodeRef {
   createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  name: String
   nameid: String
   rootnameid: String
+  source: BlobRef
+  name: String
+  about: String
+  skills: [String!]
   isRoot: Boolean
   parent: NodeRef
   type_: NodeType
   tensions_out: [TensionRef!]
   tensions_in: [TensionRef!]
-  about: String
-  mandate: MandateRef
-  source: BlobRef
   visibility: NodeVisibility
   mode: NodeMode
   rights: Int
@@ -1766,7 +1751,6 @@ input NodeRef {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   children: [NodeRef!]
-  docs: [BlobRef]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   role_ext: RoleExtRef
@@ -1774,7 +1758,6 @@ input NodeRef {
   color: String
   first_link: UserRef
   second_link: UserRef
-  skills: [String!]
   contracts: [VoteRef!]
   watchers: [UserRef!]
   orga_agg: OrgaAggRef

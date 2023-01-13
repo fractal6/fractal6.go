@@ -158,6 +158,7 @@ type NotifNotif struct {
 //
 
 
+// External Notification Policy
 func (notif EventNotif) IsEmailable(ui UserNotifInfo) bool {
     var ok bool = false
 
@@ -191,6 +192,66 @@ func (notif EventNotif) IsEmailable(ui UserNotifInfo) bool {
             ok = false
         }
     }
+
+    return ok
+}
+
+// Internal Notification Policy
+func (notif EventNotif) IsNotifiable(ui UserNotifInfo) bool {
+    var ok bool = false
+
+    // Policy accept all for
+    // - firstlink - assignee - mentionned - alert - announce
+    if ui.Reason == ReasonIsFirstLink ||
+    ui.Reason == ReasonIsAssignee ||
+    ui.Reason == ReasonIsMentionned ||
+    ui.Reason == ReasonIsAlert ||
+    ui.Reason == ReasonIsAnnouncement {
+        ok = true
+    }
+
+    // Policy for
+    // - subscriber
+    if ui.Reason == ReasonIsSubscriber && (
+        notif.HasEvent(TensionEventCreated) ||
+        notif.HasEvent(TensionEventReopened) ||
+        notif.HasEvent(TensionEventClosed) ||
+        notif.HasEvent(TensionEventCommentPushed) ||
+        notif.HasEvent(TensionEventBlobPushed) ||
+        notif.HasEvent(TensionEventBlobArchived) ||
+        notif.HasEvent(TensionEventBlobUnarchived) ||
+        notif.HasEvent(TensionEventUserJoined) ||
+        notif.HasEvent(TensionEventUserLeft) ||
+        notif.HasEvent(TensionEventMemberLinked) ||
+        notif.HasEvent(TensionEventMemberUnlinked)) {
+        ok = true
+    }
+
+
+    // Policy for
+    // - coordo
+    if ui.Reason == ReasonIsCoordo && (
+        notif.HasEvent(TensionEventCreated) ||
+        notif.HasEvent(TensionEventBlobPushed) ||
+        notif.HasEvent(TensionEventClosed) ||
+        notif.HasEvent(TensionEventBlobArchived) ||
+        notif.HasEvent(TensionEventBlobUnarchived) ||
+        notif.HasEvent(TensionEventUserJoined) ||
+        notif.HasEvent(TensionEventUserLeft) ||
+        notif.HasEvent(TensionEventMemberLinked) ||
+        notif.HasEvent(TensionEventMemberUnlinked) ||
+        notif.HasEvent(TensionEventMoved)) {
+        ok = true
+    }
+
+    // Policy for
+    // - peer
+    if ui.Reason == ReasonIsPeer && (
+        notif.HasEvent(TensionEventCreated) ||
+        notif.HasEvent(TensionEventBlobPushed)) {
+        ok = true
+    }
+
 
     return ok
 }

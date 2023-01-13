@@ -82,8 +82,6 @@ type OrgaForm struct {
 type NodePatchFromFragment struct {
 	Name       *string            `json:"name,omitempty"`
 	About      *string            `json:"about,omitempty"`
-	Mandate    *MandateRef        `json:"mandate,omitempty"`
 	Skills     []string           `json:"skills,omitempty"`
-	Children   []*NodeFragmentRef `json:"children,omitempty"`
 }
 

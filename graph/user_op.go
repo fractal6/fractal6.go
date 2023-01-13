@@ -94,8 +94,8 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
     }
 
     // Update NodeFragment
-    // @debug: should delete instead...DelFieldById => `<x> <x> * .`
     if node.ID != "" {
+        // @debug: should delete instead...DelFieldById => `<x> <x> * .`
         err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
         //err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
     }

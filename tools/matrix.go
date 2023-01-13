@@ -26,7 +26,7 @@ import (
     "bytes"
     "strconv"
     "net/http"
-    "io/ioutil"
+    //"io/ioutil"
 	"github.com/spf13/viper"
 )
 
@@ -73,8 +73,8 @@ func MatrixJsonSend(body, roomid, access_token string) error {
     if err != nil { return err }
     defer resp.Body.Close()
     if resp.StatusCode != 200 {
-        b, _ := ioutil.ReadAll(resp.Body)
-        fmt.Println(string(b))
+        //b, _ := ioutil.ReadAll(resp.Body)
+        //fmt.Println(string(b))
         return fmt.Errorf("http matrix error, see body. (code %s)", resp.Status)
     }
 
