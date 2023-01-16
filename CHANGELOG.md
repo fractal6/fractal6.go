@@ -9,6 +9,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ...
 
 
+## [0.7.4]
+
+### Changed
+- Set/restrict notification policy
+
+### Fixed 
+- allow multiple label and assignee events to be published at once
+- new orga watchers useless copy to children/
+- remove Alert type hint for alert notification.
+- fix deep delete mutation
+- schema: remove Node.mandate and NodeFragment.children obsolete fields.
+- propagate change in tension history when updating labels.
+
+
 ## [0.7.3]
 
 ### New

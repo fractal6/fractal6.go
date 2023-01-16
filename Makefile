@@ -3,8 +3,9 @@ GOFLAGS ?= $(GOFLAGS:) -v
 GOFLAGS_PROD ?= $(GOFLAGS:) -mod=vendor
 MOD := fractale/fractal6.go
 BINARY := f6
-DGRAPH_RELEASE := v21.03.1
+#DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
+DGRAPH_RELEASE := v22.0.2
 CLIENT_RELEASE := 0.7.4
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
@@ -18,6 +19,7 @@ LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr 
 
 .PHONY: build prod vendor schema
 default: build
+
 
 #
 # Build commands
@@ -161,6 +163,7 @@ install_dgraph:
 		tar zxvf dgraph.tar.gz && \
 		rm -f badger && \
 		rm -f dgraph.tar.gz && \
+		wget -q -O- https://github.com/dgraph-io/dgraph/releases/download/$(DGRAPH_RELEASE)/dgraph-checksum-linux-amd64.sha256 | head -n 1 | cut -d" " -f1 | sed 's/$/ dgraph/' | sha256sum -c && \
 		cd -
 
 copy_config:
