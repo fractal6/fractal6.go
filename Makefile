@@ -110,6 +110,7 @@ pre_build_prod:
 	mkdir -p $(RELEASE_DIR)/$(RELEASE_NAME)
 
 install_client_prod:
+	@echo "Downloading " "https://github.com/fractal6/fractal6-ui.elm/releases/download/$(CLIENT_RELEASE)/fractal6-ui.zip"
 	@curl -f -L https://github.com/fractal6/fractal6-ui.elm/releases/download/$(CLIENT_RELEASE)/fractal6-ui.zip \
 		-o $(RELEASE_DIR)/$(RELEASE_NAME)/fractal6-ui.zip
 
@@ -139,16 +140,19 @@ pre_build_op:
 	mkdir -p $(RELEASE_DIR)/$(RELEASE_NAME)
 
 install_client_op:
+	@echo "Downloading " "https://code.fractale.co/api/packages/fractale/generic/fractal6-ui.elm/$(CLIENT_RELEASE)/fractal6-ui.zip"
 	@curl -f -k -H "Authorization: token $(F6_TOKEN)" \
 		https://code.fractale.co/api/packages/fractale/generic/fractal6-ui.elm/$(CLIENT_RELEASE)/fractal6-ui.zip \
 		-o $(RELEASE_DIR)/$(RELEASE_NAME)/fractal6-ui.zip
 
 upload_release_op:
+	@echo "Uploading to " "https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip"
 	@curl -f -k -H "Authorization: token $(F6_TOKEN)" --progress-bar \
 		--upload-file $(RELEASE_DIR)/$(RELEASE_NAME).zip \
 		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
 
 delete_release_op:
+	@echo "Deleting " "https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip"
 	curl -k -H "Authorization: token $(F6_TOKEN)" -X DELETE \
 		https://code.fractale.co/api/packages/fractale/generic/$(NAME)/$(RELEASE_VERSION)/$(RELEASE_NAME).zip
 
@@ -163,7 +167,7 @@ install_dgraph:
 		tar zxvf dgraph.tar.gz && \
 		rm -f badger && \
 		rm -f dgraph.tar.gz && \
-		wget -q -O- https://github.com/dgraph-io/dgraph/releases/download/$(DGRAPH_RELEASE)/dgraph-checksum-linux-amd64.sha256 | head -n 1 | cut -d" " -f1 | sed 's/$/ dgraph/' | sha256sum -c && \
+		wget -q -O- https://github.com/dgraph-io/dgraph/releases/download/$(DGRAPH_RELEASE)/dgraph-checksum-linux-amd64.sha256 | head -n 1 | cut -d" " -f1 | sed 's/$$/ dgraph/' | sha256sum -c && \
 		cd -
 
 copy_config:
