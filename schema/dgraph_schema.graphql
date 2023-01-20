@@ -87,16 +87,17 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   isPersonal: Boolean @search
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  watchers: [User!] @hasInverse(field: watching)
   children: [Node!] @hasInverse(field: parent)
   labels: [Label!]
   roles: [RoleExt!]
+  pinned: [Tension!]
   role_ext: RoleExt
   role_type: RoleType @search
   color: String
   first_link: User
   second_link: User
   contracts: [Vote!] @hasInverse(field: node)
-  watchers: [User!] @hasInverse(field: watching)
   orga_agg: OrgaAgg
   events_history: [Event!]
 }
@@ -244,9 +245,9 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   type_: TensionType! @search
   status: TensionStatus! @search
   action: TensionAction
-  comments: [Comment!]
   assignees: [User!]
   labels: [Label!]
+  comments: [Comment!]
   blobs: [Blob!] @hasInverse(field: tension)
   history: [Event!] @hasInverse(field: tension)
   mentions: [Event!] @hasInverse(field: mentioned)
@@ -554,6 +555,8 @@ enum TensionEvent {
   BlobCreated
   BlobCommitted
   Mentioned
+  Pinned
+  Unpinned
 
   BlobPushed
   BlobArchived

@@ -78,6 +78,12 @@ func init() {
         model.TensionEventAssigneeRemoved: EventMap{
             Auth: TargetCoordoHook,
         },
+        model.TensionEventPinned: EventMap{
+            Auth: TargetCoordoHook,
+        },
+        model.TensionEventUnpinned: EventMap{
+            Auth: TargetCoordoHook,
+        },
         // --- Trigger Action ---
         model.TensionEventBlobPushed: EventMap{
             Auth: TargetCoordoHook | AssigneeHook,
