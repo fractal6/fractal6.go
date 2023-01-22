@@ -80,9 +80,11 @@ func init() {
         },
         model.TensionEventPinned: EventMap{
             Auth: TargetCoordoHook,
+            Action: PinTension,
         },
         model.TensionEventUnpinned: EventMap{
             Auth: TargetCoordoHook,
+            Action: UnpinTension,
         },
         // --- Trigger Action ---
         model.TensionEventBlobPushed: EventMap{
@@ -544,6 +546,37 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     ok, err := LeaveRole(uctx, tension, node, unsafe)
     return ok, err
 }
+
+func PinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    tid := tension.ID
+    nameid := tension.Receiver.Nameid
+    // node input
+    nodeInput := model.UpdateNodeInput{
+        Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
+        Set: &model.NodePatch{
+            Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+        },
+    }
+    // update node
+    err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+    return true, err
+}
+
+func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    tid := tension.ID
+    nameid := tension.Receiver.Nameid
+    // node input
+    nodeInput := model.UpdateNodeInput{
+        Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
+        Remove: &model.NodePatch{
+            Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+        },
+    }
+    // update node
+    err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+    return true, err
+}
+
 
 
 //
