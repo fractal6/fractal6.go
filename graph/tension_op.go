@@ -482,6 +482,11 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 
     // update tension
     err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
+    if err != nil { return false, err }
+
+    // Update tension pin
+    _, err = db.GetDB().Meta("movePinnedTension", map[string]string{"nameid_old":receiverid_old, "nameid_new":receiverid_new, "tid": tension.ID})
+
     return true, err
 }
 
