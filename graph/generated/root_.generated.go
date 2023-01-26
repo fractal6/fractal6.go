@@ -648,6 +648,8 @@ type ComplexityRoot struct {
 		Nameid                 func(childComplexity int) int
 		OrgaAgg                func(childComplexity int, filter *model.OrgaAggFilter) int
 		Parent                 func(childComplexity int, filter *model.NodeFilter) int
+		Pinned                 func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		PinnedAggregate        func(childComplexity int, filter *model.TensionFilter) int
 		Rights                 func(childComplexity int) int
 		RoleExt                func(childComplexity int, filter *model.RoleExtFilter) int
 		RoleType               func(childComplexity int) int
@@ -4271,6 +4273,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Parent(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "Node.pinned":
+		if e.complexity.Node.Pinned == nil {
+			break
+		}
+
+		args, err := ec.field_Node_pinned_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Pinned(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.pinnedAggregate":
+		if e.complexity.Node.PinnedAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_pinnedAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.PinnedAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "Node.rights":
 		if e.complexity.Node.Rights == nil {
@@ -8291,26 +8317,28 @@ type Node {
   isPersonal: Boolean
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
+  pinned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   role_ext(filter: RoleExtFilter): RoleExt
   role_type: RoleType
   color: String
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
+  watchersAggregate(filter: UserFilter): UserAggregateResult
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
+  pinnedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
-  watchersAggregate(filter: UserFilter): UserAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
 }
 
@@ -8389,9 +8417,9 @@ type Tension {
   type_: TensionType!
   status: TensionStatus!
   action: TensionAction
-  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   mentions(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
@@ -8405,9 +8433,9 @@ type Tension {
   updatedAt: DateTime
   message: String
 
-  commentsAggregate(filter: CommentFilter): CommentAggregateResult
   assigneesAggregate(filter: UserFilter): UserAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  commentsAggregate(filter: CommentFilter): CommentAggregateResult
   blobsAggregate(filter: BlobFilter): BlobAggregateResult
   historyAggregate(filter: EventFilter): EventAggregateResult
   mentionsAggregate(filter: EventFilter): EventAggregateResult
@@ -8683,6 +8711,8 @@ enum TensionEvent {
   BlobCreated
   BlobCommitted
   Mentioned
+  Pinned
+  Unpinned
 
   BlobPushed
   BlobArchived
@@ -8742,37 +8772,37 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
 directive @id(interface: Boolean) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambda on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -8936,16 +8966,17 @@ input AddNodeInput {
   isPersonal: Boolean
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  watchers: [UserRef!]
   children: [NodeRef!]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  pinned: [TensionRef!] @x_add(r:"ref")
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -9037,9 +9068,9 @@ input AddTensionInput {
   type_: TensionType! @x_alter(r:"tensionTypeCheck")
   status: TensionStatus!
   action: TensionAction
-  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!]
   mentions: [EventRef!]
@@ -10203,16 +10234,17 @@ enum NodeHasFilter {
   isPersonal
   userCanJoin
   guestCanCreateTension
+  watchers
   children
   labels
   roles
+  pinned
   role_ext
   role_type
   color
   first_link
   second_link
   contracts
-  watchers
   orga_agg
   events_history
 }
@@ -10261,16 +10293,17 @@ input NodePatch {
   isPersonal: Boolean @x_patch_ro
   userCanJoin: Boolean @x_patch_ro
   guestCanCreateTension: Boolean @x_patch_ro
+  watchers: [UserRef!] @x_patch_ro
   children: [NodeRef!] @x_patch_ro
   labels: [LabelRef!] @x_patch_ro
   roles: [RoleExtRef!] @x_patch_ro
+  pinned: [TensionRef!] @x_patch_ro
   role_ext: RoleExtRef @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
   first_link: UserRef @x_patch_ro
   second_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
-  watchers: [UserRef!] @x_patch_ro
   orga_agg: OrgaAggRef @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
 }
@@ -10298,16 +10331,17 @@ input NodeRef {
   isPersonal: Boolean
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  watchers: [UserRef!]
   children: [NodeRef!]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  pinned: [TensionRef!] @x_add(r:"ref")
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  watchers: [UserRef!]
   orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
@@ -10890,9 +10924,9 @@ enum TensionHasFilter {
   type_
   status
   action
-  comments
   assignees
   labels
+  comments
   blobs
   history
   mentions
@@ -10932,9 +10966,9 @@ input TensionPatch {
   type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus @x_patch_ro
   action: TensionAction @x_patch_ro
-  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
   mentions: [EventRef!] @x_patch_ro
@@ -10958,9 +10992,9 @@ input TensionRef {
   type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus
   action: TensionAction
-  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
   history: [EventRef!] @x_alter
   mentions: [EventRef!]

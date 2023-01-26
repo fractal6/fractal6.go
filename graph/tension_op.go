@@ -78,6 +78,14 @@ func init() {
         model.TensionEventAssigneeRemoved: EventMap{
             Auth: TargetCoordoHook,
         },
+        model.TensionEventPinned: EventMap{
+            Auth: TargetCoordoHook,
+            Action: PinTension,
+        },
+        model.TensionEventUnpinned: EventMap{
+            Auth: TargetCoordoHook,
+            Action: UnpinTension,
+        },
         // --- Trigger Action ---
         model.TensionEventBlobPushed: EventMap{
             Auth: TargetCoordoHook | AssigneeHook,
@@ -474,6 +482,11 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 
     // update tension
     err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
+    if err != nil { return false, err }
+
+    // Update tension pin
+    _, err = db.GetDB().Meta("movePinnedTension", map[string]string{"nameid_old":receiverid_old, "nameid_new":receiverid_new, "tid": tension.ID})
+
     return true, err
 }
 
@@ -538,6 +551,37 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
     ok, err := LeaveRole(uctx, tension, node, unsafe)
     return ok, err
 }
+
+func PinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    tid := tension.ID
+    nameid := tension.Receiver.Nameid
+    // node input
+    nodeInput := model.UpdateNodeInput{
+        Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
+        Set: &model.NodePatch{
+            Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+        },
+    }
+    // update node
+    err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+    return true, err
+}
+
+func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+    tid := tension.ID
+    nameid := tension.Receiver.Nameid
+    // node input
+    nodeInput := model.UpdateNodeInput{
+        Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
+        Remove: &model.NodePatch{
+            Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+        },
+    }
+    // update node
+    err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+    return true, err
+}
+
 
 
 //

@@ -174,16 +174,17 @@ type AddNodeInput struct {
 	IsPersonal            *bool          `json:"isPersonal"`
 	UserCanJoin           *bool          `json:"userCanJoin"`
 	GuestCanCreateTension *bool          `json:"guestCanCreateTension"`
+	Watchers              []*UserRef     `json:"watchers,omitempty"`
 	Children              []*NodeRef     `json:"children,omitempty"`
 	Labels                []*LabelRef    `json:"labels,omitempty"`
 	Roles                 []*RoleExtRef  `json:"roles,omitempty"`
+	Pinned                []*TensionRef  `json:"pinned,omitempty"`
 	RoleExt               *RoleExtRef    `json:"role_ext,omitempty"`
 	RoleType              *RoleType      `json:"role_type,omitempty"`
 	Color                 *string        `json:"color,omitempty"`
 	FirstLink             *UserRef       `json:"first_link,omitempty"`
 	SecondLink            *UserRef       `json:"second_link,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
-	Watchers              []*UserRef     `json:"watchers,omitempty"`
 	OrgaAgg               *OrgaAggRef    `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
 }
@@ -275,9 +276,9 @@ type AddTensionInput struct {
 	Type           TensionType    `json:"type_,omitempty"`
 	Status         TensionStatus  `json:"status,omitempty"`
 	Action         *TensionAction `json:"action,omitempty"`
-	Comments       []*CommentRef  `json:"comments,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
+	Comments       []*CommentRef  `json:"comments,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Mentions       []*EventRef    `json:"mentions,omitempty"`
@@ -1155,25 +1156,27 @@ type Node struct {
 	IsPersonal             *bool                   `json:"isPersonal"`
 	UserCanJoin            *bool                   `json:"userCanJoin"`
 	GuestCanCreateTension  *bool                   `json:"guestCanCreateTension"`
+	Watchers               []*User                 `json:"watchers,omitempty"`
 	Children               []*Node                 `json:"children,omitempty"`
 	Labels                 []*Label                `json:"labels,omitempty"`
 	Roles                  []*RoleExt              `json:"roles,omitempty"`
+	Pinned                 []*Tension              `json:"pinned,omitempty"`
 	RoleExt                *RoleExt                `json:"role_ext,omitempty"`
 	RoleType               *RoleType               `json:"role_type,omitempty"`
 	Color                  *string                 `json:"color,omitempty"`
 	FirstLink              *User                   `json:"first_link,omitempty"`
 	SecondLink             *User                   `json:"second_link,omitempty"`
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
-	Watchers               []*User                 `json:"watchers,omitempty"`
 	OrgaAgg                *OrgaAgg                `json:"orga_agg,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
+	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
 	ChildrenAggregate      *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
 	LabelsAggregate        *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
 	RolesAggregate         *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
+	PinnedAggregate        *TensionAggregateResult `json:"pinnedAggregate,omitempty"`
 	ContractsAggregate     *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
-	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
 	EventsHistoryAggregate *EventAggregateResult   `json:"events_historyAggregate,omitempty"`
 }
 
@@ -1335,16 +1338,17 @@ type NodePatch struct {
 	IsPersonal            *bool           `json:"isPersonal"`
 	UserCanJoin           *bool           `json:"userCanJoin"`
 	GuestCanCreateTension *bool           `json:"guestCanCreateTension"`
+	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
 	Roles                 []*RoleExtRef   `json:"roles,omitempty"`
+	Pinned                []*TensionRef   `json:"pinned,omitempty"`
 	RoleExt               *RoleExtRef     `json:"role_ext,omitempty"`
 	RoleType              *RoleType       `json:"role_type,omitempty"`
 	Color                 *string         `json:"color,omitempty"`
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
-	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
@@ -1372,16 +1376,17 @@ type NodeRef struct {
 	IsPersonal            *bool           `json:"isPersonal"`
 	UserCanJoin           *bool           `json:"userCanJoin"`
 	GuestCanCreateTension *bool           `json:"guestCanCreateTension"`
+	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
 	Roles                 []*RoleExtRef   `json:"roles,omitempty"`
+	Pinned                []*TensionRef   `json:"pinned,omitempty"`
 	RoleExt               *RoleExtRef     `json:"role_ext,omitempty"`
 	RoleType              *RoleType       `json:"role_type,omitempty"`
 	Color                 *string         `json:"color,omitempty"`
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
-	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
@@ -1825,9 +1830,9 @@ type Tension struct {
 	Type                 TensionType              `json:"type_,omitempty"`
 	Status               TensionStatus            `json:"status,omitempty"`
 	Action               *TensionAction           `json:"action,omitempty"`
-	Comments             []*Comment               `json:"comments,omitempty"`
 	Assignees            []*User                  `json:"assignees,omitempty"`
 	Labels               []*Label                 `json:"labels,omitempty"`
+	Comments             []*Comment               `json:"comments,omitempty"`
 	Blobs                []*Blob                  `json:"blobs,omitempty"`
 	History              []*Event                 `json:"history,omitempty"`
 	Mentions             []*Event                 `json:"mentions,omitempty"`
@@ -1840,9 +1845,9 @@ type Tension struct {
 	CreatedAt            string                   `json:"createdAt,omitempty"`
 	UpdatedAt            *string                  `json:"updatedAt,omitempty"`
 	Message              *string                  `json:"message,omitempty"`
-	CommentsAggregate    *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
 	AssigneesAggregate   *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
 	LabelsAggregate      *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
+	CommentsAggregate    *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
 	BlobsAggregate       *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
 	HistoryAggregate     *EventAggregateResult    `json:"historyAggregate,omitempty"`
 	MentionsAggregate    *EventAggregateResult    `json:"mentionsAggregate,omitempty"`
@@ -1913,9 +1918,9 @@ type TensionPatch struct {
 	Type           *TensionType   `json:"type_,omitempty"`
 	Status         *TensionStatus `json:"status,omitempty"`
 	Action         *TensionAction `json:"action,omitempty"`
-	Comments       []*CommentRef  `json:"comments,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
+	Comments       []*CommentRef  `json:"comments,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Mentions       []*EventRef    `json:"mentions,omitempty"`
@@ -1939,9 +1944,9 @@ type TensionRef struct {
 	Type           *TensionType   `json:"type_,omitempty"`
 	Status         *TensionStatus `json:"status,omitempty"`
 	Action         *TensionAction `json:"action,omitempty"`
-	Comments       []*CommentRef  `json:"comments,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
+	Comments       []*CommentRef  `json:"comments,omitempty"`
 	Blobs          []*BlobRef     `json:"blobs,omitempty"`
 	History        []*EventRef    `json:"history,omitempty"`
 	Mentions       []*EventRef    `json:"mentions,omitempty"`
@@ -3818,16 +3823,17 @@ const (
 	NodeHasFilterIsPersonal            NodeHasFilter = "isPersonal"
 	NodeHasFilterUserCanJoin           NodeHasFilter = "userCanJoin"
 	NodeHasFilterGuestCanCreateTension NodeHasFilter = "guestCanCreateTension"
+	NodeHasFilterWatchers              NodeHasFilter = "watchers"
 	NodeHasFilterChildren              NodeHasFilter = "children"
 	NodeHasFilterLabels                NodeHasFilter = "labels"
 	NodeHasFilterRoles                 NodeHasFilter = "roles"
+	NodeHasFilterPinned                NodeHasFilter = "pinned"
 	NodeHasFilterRoleExt               NodeHasFilter = "role_ext"
 	NodeHasFilterRoleType              NodeHasFilter = "role_type"
 	NodeHasFilterColor                 NodeHasFilter = "color"
 	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
 	NodeHasFilterSecondLink            NodeHasFilter = "second_link"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
-	NodeHasFilterWatchers              NodeHasFilter = "watchers"
 	NodeHasFilterOrgaAgg               NodeHasFilter = "orga_agg"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
 )
@@ -3854,23 +3860,24 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterIsPersonal,
 	NodeHasFilterUserCanJoin,
 	NodeHasFilterGuestCanCreateTension,
+	NodeHasFilterWatchers,
 	NodeHasFilterChildren,
 	NodeHasFilterLabels,
 	NodeHasFilterRoles,
+	NodeHasFilterPinned,
 	NodeHasFilterRoleExt,
 	NodeHasFilterRoleType,
 	NodeHasFilterColor,
 	NodeHasFilterFirstLink,
 	NodeHasFilterSecondLink,
 	NodeHasFilterContracts,
-	NodeHasFilterWatchers,
 	NodeHasFilterOrgaAgg,
 	NodeHasFilterEventsHistory,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterWatchers, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
 		return true
 	}
 	return false
@@ -4751,6 +4758,8 @@ const (
 	TensionEventBlobCreated     TensionEvent = "BlobCreated"
 	TensionEventBlobCommitted   TensionEvent = "BlobCommitted"
 	TensionEventMentioned       TensionEvent = "Mentioned"
+	TensionEventPinned          TensionEvent = "Pinned"
+	TensionEventUnpinned        TensionEvent = "Unpinned"
 	TensionEventBlobPushed      TensionEvent = "BlobPushed"
 	TensionEventBlobArchived    TensionEvent = "BlobArchived"
 	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
@@ -4777,6 +4786,8 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventBlobCreated,
 	TensionEventBlobCommitted,
 	TensionEventMentioned,
+	TensionEventPinned,
+	TensionEventUnpinned,
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
@@ -4791,7 +4802,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventPinned, TensionEventUnpinned, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
 		return true
 	}
 	return false
@@ -4833,9 +4844,9 @@ const (
 	TensionHasFilterType           TensionHasFilter = "type_"
 	TensionHasFilterStatus         TensionHasFilter = "status"
 	TensionHasFilterAction         TensionHasFilter = "action"
-	TensionHasFilterComments       TensionHasFilter = "comments"
 	TensionHasFilterAssignees      TensionHasFilter = "assignees"
 	TensionHasFilterLabels         TensionHasFilter = "labels"
+	TensionHasFilterComments       TensionHasFilter = "comments"
 	TensionHasFilterBlobs          TensionHasFilter = "blobs"
 	TensionHasFilterHistory        TensionHasFilter = "history"
 	TensionHasFilterMentions       TensionHasFilter = "mentions"
@@ -4858,9 +4869,9 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterType,
 	TensionHasFilterStatus,
 	TensionHasFilterAction,
-	TensionHasFilterComments,
 	TensionHasFilterAssignees,
 	TensionHasFilterLabels,
+	TensionHasFilterComments,
 	TensionHasFilterBlobs,
 	TensionHasFilterHistory,
 	TensionHasFilterMentions,
@@ -4872,7 +4883,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterComments, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false

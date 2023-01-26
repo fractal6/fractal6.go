@@ -761,6 +761,24 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(nf) <NodeFragment.visibility> "{{.value}}" .
         `,
     },
+    "movePinnedTension": QueryMut{
+        Q: `query {
+            var(func: eq(Node.nameid, "{{.nameid_old}}")) {
+                n_old as uid
+                Node.pinned @filter(uid({{.tid}})) {
+                    t as uid
+                }
+            }
+
+            n_new as var(func: eq(Node.nameid, "{{.nameid_new}}"))
+        }`,
+        S: `
+        uid(n_new) <Node.pinned> uid(t) .
+        `,
+        D:`
+        uid(n_old) <Node.pinned> uid(t) .
+        `,
+    },
     "rewriteLabelEvents": QueryMut{
         Q: `query {
             var(func: eq(Node.rootnameid, "{{.rootnameid}}")) {

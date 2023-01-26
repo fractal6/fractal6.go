@@ -63,7 +63,7 @@ func RunServer() {
 
     var allowedOrigins []string
     if buildMode == "PROD" {
-        allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN)
+        allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN, "https://staging."+DOMAIN)
     } else {
         allowedOrigins = append(allowedOrigins, "http://localhost:8000")
     }
