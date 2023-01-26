@@ -100,6 +100,7 @@ func init() {
         "verification": true,
         "password-reset": true,
         "about": true,
+        "help": true,
         "features": true,
         "showcase": true,
         "user": true,
