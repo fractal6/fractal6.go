@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [0.7.5]
 
 ### New
-* Pin tension support (schema update + auth rules + custom dql query
+* Pin tension support (schema update + auth rules + custom dql query)
 
 ### Changed
 * Update CORS to allow staging.fractale.co used for test purpose.

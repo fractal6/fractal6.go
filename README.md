@@ -28,7 +28,7 @@ Using Fractale for your organization offers the following capabilities and featu
 
 Download and extract the given release
 
-    wget https://github.com/fractal6/fractal6.go/releases/download/0.7.2/fractal6-amd64.zip
+    wget https://github.com/fractal6/fractal6.go/releases/download/0.7.5/fractal6-amd64.zip
     unzip fractal6-adm64.zip && mv fractal6-amd64 fractal6
     cd fractal6
 
