@@ -136,7 +136,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
     "count2": `{
-        all(func: eq({{.f1}}, {{.v1}})) @filter(eq({{.f2}}, {{.v2}})) {
+        all(func: eq({{.f1}}, "{{.v1}}")) @filter(eq({{.f2}}, "{{.v2}}")) {
             count({{.fieldName}})
         }
     }`,
@@ -146,7 +146,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
     "countHas2": `{
-        all(func: has({{.fieldName}})) @filter(eq({{.f2}}, {{.v2}})) {
+        all(func: has({{.fieldName}})) @filter(eq({{.f2}}, "{{.v2}}")) {
             count(uid)
         }
     }`,
