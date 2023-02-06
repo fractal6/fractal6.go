@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ...
 
 
+## [0.7.6]
+
+- fix count2 query to handle space characters.
+- new mockup screenchots
+
+
 ## [0.7.5]
 
 ### New
