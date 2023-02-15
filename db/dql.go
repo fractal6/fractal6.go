@@ -698,7 +698,7 @@ var dqlQueries map[string]string = map[string]string{
           events as Tension.history
           mentions as Tension.mentions
         }
-        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,e,votes,comments2,reactions2)) {
+        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2)) {
             all_ids as uid
         }
     }`,
