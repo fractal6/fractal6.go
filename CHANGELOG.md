@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ...
 
+## [0.7.8]
+
+### Fixed
+- fixed variable defined ut not used in dql delete tension.
+- improve topLabels query to fix label context queries
+- add quote to count2 query to allow string with sp
+
 
 ## [0.7.6]
 
