@@ -13,12 +13,12 @@ type EventKind interface {
 }
 
 type AddBlobInput struct {
-	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
-	CreatedAt    string           `json:"createdAt,omitempty"`
+	CreatedBy    *UserRef         `json:"createdBy"`
+	CreatedAt    string           `json:"createdAt"`
 	UpdatedAt    *string          `json:"updatedAt,omitempty"`
 	Message      *string          `json:"message,omitempty"`
-	Tension      *TensionRef      `json:"tension,omitempty"`
-	BlobType     BlobType         `json:"blob_type,omitempty"`
+	Tension      *TensionRef      `json:"tension"`
+	BlobType     BlobType         `json:"blob_type"`
 	PushedFlag   *string          `json:"pushedFlag,omitempty"`
 	ArchivedFlag *string          `json:"archivedFlag,omitempty"`
 	Node         *NodeFragmentRef `json:"node,omitempty"`
@@ -27,12 +27,12 @@ type AddBlobInput struct {
 
 type AddBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AddCommentInput struct {
-	CreatedBy *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt string         `json:"createdAt,omitempty"`
+	CreatedBy *UserRef       `json:"createdBy"`
+	CreatedAt string         `json:"createdAt"`
 	UpdatedAt *string        `json:"updatedAt,omitempty"`
 	Message   *string        `json:"message,omitempty"`
 	Reactions []*ReactionRef `json:"reactions,omitempty"`
@@ -40,61 +40,61 @@ type AddCommentInput struct {
 
 type AddCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddContractInput struct {
-	CreatedBy         *UserRef          `json:"createdBy,omitempty"`
-	CreatedAt         string            `json:"createdAt,omitempty"`
+	CreatedBy         *UserRef          `json:"createdBy"`
+	CreatedAt         string            `json:"createdAt"`
 	UpdatedAt         *string           `json:"updatedAt,omitempty"`
 	Message           *string           `json:"message,omitempty"`
-	Contractid        string            `json:"contractid,omitempty"`
-	Tension           *TensionRef       `json:"tension,omitempty"`
-	Status            ContractStatus    `json:"status,omitempty"`
-	ContractType      ContractType      `json:"contract_type,omitempty"`
+	Contractid        string            `json:"contractid"`
+	Tension           *TensionRef       `json:"tension"`
+	Status            ContractStatus    `json:"status"`
+	ContractType      ContractType      `json:"contract_type"`
 	ClosedAt          *string           `json:"closedAt,omitempty"`
-	Event             *EventFragmentRef `json:"event,omitempty"`
-	Participants      []*VoteRef        `json:"participants,omitempty"`
+	Event             *EventFragmentRef `json:"event"`
+	Participants      []*VoteRef        `json:"participants"`
 	Candidates        []*UserRef        `json:"candidates,omitempty"`
 	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
 	Comments          []*CommentRef     `json:"comments,omitempty"`
-	IsValidator       *bool             `json:"isValidator"`
+	IsValidator       *bool             `json:"isValidator,omitempty"`
 }
 
 type AddContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
-	NumUids  *int        `json:"numUids"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type AddEventCountInput struct {
-	UnreadEvents     *int `json:"unread_events"`
-	PendingContracts *int `json:"pending_contracts"`
-	AssignedTensions *int `json:"assigned_tensions"`
+	UnreadEvents     *int `json:"unread_events,omitempty"`
+	PendingContracts *int `json:"pending_contracts,omitempty"`
+	AssignedTensions *int `json:"assigned_tensions,omitempty"`
 }
 
 type AddEventCountPayload struct {
 	EventCount []*EventCount `json:"eventCount,omitempty"`
-	NumUids    *int          `json:"numUids"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type AddEventFragmentInput struct {
-	EventType TensionEvent `json:"event_type,omitempty"`
+	EventType TensionEvent `json:"event_type"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
 }
 
 type AddEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
-	NumUids       *int             `json:"numUids"`
+	NumUids       *int             `json:"numUids,omitempty"`
 }
 
 type AddEventInput struct {
-	CreatedBy *UserRef     `json:"createdBy,omitempty"`
-	CreatedAt string       `json:"createdAt,omitempty"`
+	CreatedBy *UserRef     `json:"createdBy"`
+	CreatedAt string       `json:"createdAt"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
-	Tension   *TensionRef  `json:"tension,omitempty"`
-	EventType TensionEvent `json:"event_type,omitempty"`
+	Tension   *TensionRef  `json:"tension"`
+	EventType TensionEvent `json:"event_type"`
 	Mentioned *TensionRef  `json:"mentioned,omitempty"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
@@ -102,12 +102,12 @@ type AddEventInput struct {
 
 type AddEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type AddLabelInput struct {
-	Rootnameid  string        `json:"rootnameid,omitempty"`
-	Name        string        `json:"name,omitempty"`
+	Rootnameid  string        `json:"rootnameid"`
+	Name        string        `json:"name"`
 	Description *string       `json:"description,omitempty"`
 	Color       *string       `json:"color,omitempty"`
 	Tensions    []*TensionRef `json:"tensions,omitempty"`
@@ -116,11 +116,11 @@ type AddLabelInput struct {
 
 type AddLabelPayload struct {
 	Label   []*Label `json:"label,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type AddMandateInput struct {
-	Purpose          string  `json:"purpose,omitempty"`
+	Purpose          string  `json:"purpose"`
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
@@ -128,7 +128,7 @@ type AddMandateInput struct {
 
 type AddMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddNodeFragmentInput struct {
@@ -149,31 +149,31 @@ type AddNodeFragmentInput struct {
 
 type AddNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
-	NumUids      *int            `json:"numUids"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type AddNodeInput struct {
-	CreatedBy             *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt             string         `json:"createdAt,omitempty"`
+	CreatedBy             *UserRef       `json:"createdBy"`
+	CreatedAt             string         `json:"createdAt"`
 	UpdatedAt             *string        `json:"updatedAt,omitempty"`
-	Nameid                string         `json:"nameid,omitempty"`
-	Rootnameid            string         `json:"rootnameid,omitempty"`
+	Nameid                string         `json:"nameid"`
+	Rootnameid            string         `json:"rootnameid"`
 	Source                *BlobRef       `json:"source,omitempty"`
-	Name                  string         `json:"name,omitempty"`
+	Name                  string         `json:"name"`
 	About                 *string        `json:"about,omitempty"`
 	Skills                []string       `json:"skills,omitempty"`
 	IsRoot                bool           `json:"isRoot"`
 	Parent                *NodeRef       `json:"parent,omitempty"`
-	Type                  NodeType       `json:"type_,omitempty"`
+	Type                  NodeType       `json:"type_"`
 	TensionsOut           []*TensionRef  `json:"tensions_out,omitempty"`
 	TensionsIn            []*TensionRef  `json:"tensions_in,omitempty"`
-	Visibility            NodeVisibility `json:"visibility,omitempty"`
-	Mode                  NodeMode       `json:"mode,omitempty"`
+	Visibility            NodeVisibility `json:"visibility"`
+	Mode                  NodeMode       `json:"mode"`
 	Rights                int            `json:"rights"`
 	IsArchived            bool           `json:"isArchived"`
-	IsPersonal            *bool          `json:"isPersonal"`
-	UserCanJoin           *bool          `json:"userCanJoin"`
-	GuestCanCreateTension *bool          `json:"guestCanCreateTension"`
+	IsPersonal            *bool          `json:"isPersonal,omitempty"`
+	UserCanJoin           *bool          `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension *bool          `json:"guestCanCreateTension,omitempty"`
 	Watchers              []*UserRef     `json:"watchers,omitempty"`
 	Children              []*NodeRef     `json:"children,omitempty"`
 	Labels                []*LabelRef    `json:"labels,omitempty"`
@@ -191,12 +191,12 @@ type AddNodeInput struct {
 
 type AddNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AddNotifInput struct {
-	CreatedBy *UserRef     `json:"createdBy,omitempty"`
-	CreatedAt string       `json:"createdAt,omitempty"`
+	CreatedBy *UserRef     `json:"createdBy"`
+	CreatedAt string       `json:"createdAt"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 	Tension   *TensionRef  `json:"tension_,omitempty"`
@@ -206,17 +206,17 @@ type AddNotifInput struct {
 
 type AddNotifPayload struct {
 	Notif   []*Notif `json:"notif,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type AddOrgaAggInput struct {
-	NMembers *int `json:"n_members"`
-	NGuests  *int `json:"n_guests"`
+	NMembers *int `json:"n_members,omitempty"`
+	NGuests  *int `json:"n_guests,omitempty"`
 }
 
 type AddOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddPendingUserInput struct {
@@ -227,31 +227,31 @@ type AddPendingUserInput struct {
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
-	Subscribe  *bool          `json:"subscribe"`
+	Subscribe  *bool          `json:"subscribe,omitempty"`
 }
 
 type AddPendingUserPayload struct {
 	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
-	NumUids     *int           `json:"numUids"`
+	NumUids     *int           `json:"numUids,omitempty"`
 }
 
 type AddReactionInput struct {
 	Reactionid *string     `json:"reactionid,omitempty"`
-	User       *UserRef    `json:"user,omitempty"`
-	Comment    *CommentRef `json:"comment,omitempty"`
+	User       *UserRef    `json:"user"`
+	Comment    *CommentRef `json:"comment"`
 	Type       int         `json:"type_"`
 }
 
 type AddReactionPayload struct {
 	Reaction []*Reaction `json:"reaction,omitempty"`
-	NumUids  *int        `json:"numUids"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type AddRoleExtInput struct {
-	Rootnameid string      `json:"rootnameid,omitempty"`
-	Name       string      `json:"name,omitempty"`
+	Rootnameid string      `json:"rootnameid"`
+	Name       string      `json:"name"`
 	About      *string     `json:"about,omitempty"`
-	RoleType   RoleType    `json:"role_type,omitempty"`
+	RoleType   RoleType    `json:"role_type"`
 	Color      *string     `json:"color,omitempty"`
 	Mandate    *MandateRef `json:"mandate,omitempty"`
 	Roles      []*NodeRef  `json:"roles,omitempty"`
@@ -260,21 +260,21 @@ type AddRoleExtInput struct {
 
 type AddRoleExtPayload struct {
 	RoleExt []*RoleExt `json:"roleExt,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddTensionInput struct {
-	CreatedBy      *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt      string         `json:"createdAt,omitempty"`
+	CreatedBy      *UserRef       `json:"createdBy"`
+	CreatedAt      string         `json:"createdAt"`
 	UpdatedAt      *string        `json:"updatedAt,omitempty"`
 	Message        *string        `json:"message,omitempty"`
-	Emitter        *NodeRef       `json:"emitter,omitempty"`
-	Emitterid      string         `json:"emitterid,omitempty"`
-	Receiver       *NodeRef       `json:"receiver,omitempty"`
-	Receiverid     string         `json:"receiverid,omitempty"`
-	Title          string         `json:"title,omitempty"`
-	Type           TensionType    `json:"type_,omitempty"`
-	Status         TensionStatus  `json:"status,omitempty"`
+	Emitter        *NodeRef       `json:"emitter"`
+	Emitterid      string         `json:"emitterid"`
+	Receiver       *NodeRef       `json:"receiver"`
+	Receiverid     string         `json:"receiverid"`
+	Title          string         `json:"title"`
+	Type           TensionType    `json:"type_"`
+	Status         TensionStatus  `json:"status"`
 	Action         *TensionAction `json:"action,omitempty"`
 	Assignees      []*UserRef     `json:"assignees,omitempty"`
 	Labels         []*LabelRef    `json:"labels,omitempty"`
@@ -284,44 +284,44 @@ type AddTensionInput struct {
 	Mentions       []*EventRef    `json:"mentions,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
-	NComments      *int           `json:"n_comments"`
-	NOpenContracts *int           `json:"n_open_contracts"`
+	NComments      *int           `json:"n_comments,omitempty"`
+	NOpenContracts *int           `json:"n_open_contracts,omitempty"`
 }
 
 type AddTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddUserEventInput struct {
-	CreatedAt string          `json:"createdAt,omitempty"`
+	CreatedAt string          `json:"createdAt"`
 	IsRead    bool            `json:"isRead"`
-	User      *UserRef        `json:"user,omitempty"`
+	User      *UserRef        `json:"user"`
 	Event     []*EventKindRef `json:"event,omitempty"`
 }
 
 type AddUserEventPayload struct {
 	UserEvent []*UserEvent `json:"userEvent,omitempty"`
-	NumUids   *int         `json:"numUids"`
+	NumUids   *int         `json:"numUids,omitempty"`
 }
 
 type AddUserInput struct {
-	CreatedAt        string          `json:"createdAt,omitempty"`
-	LastAck          string          `json:"lastAck,omitempty"`
-	Username         string          `json:"username,omitempty"`
+	CreatedAt        string          `json:"createdAt"`
+	LastAck          string          `json:"lastAck"`
+	Username         string          `json:"username"`
 	Name             *string         `json:"name,omitempty"`
-	Email            string          `json:"email,omitempty"`
-	Password         string          `json:"password,omitempty"`
+	Email            string          `json:"email"`
+	Password         string          `json:"password"`
 	Bio              *string         `json:"bio,omitempty"`
 	Location         *string         `json:"location,omitempty"`
 	Utc              *string         `json:"utc,omitempty"`
 	Links            []string        `json:"links,omitempty"`
 	Skills           []string        `json:"skills,omitempty"`
 	NotifyByEmail    bool            `json:"notifyByEmail"`
-	Lang             Lang            `json:"lang,omitempty"`
+	Lang             Lang            `json:"lang"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Watching         []*NodeRef      `json:"watching,omitempty"`
-	Rights           *UserRightsRef  `json:"rights,omitempty"`
+	Rights           *UserRightsRef  `json:"rights"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
 	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
@@ -335,11 +335,11 @@ type AddUserInput struct {
 
 type AddUserPayload struct {
 	User    []*User `json:"user,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AddUserRightsInput struct {
-	Type                  UserType `json:"type_,omitempty"`
+	Type                  UserType `json:"type_"`
 	CanLogin              bool     `json:"canLogin"`
 	CanCreateRoot         bool     `json:"canCreateRoot"`
 	MaxPublicOrga         int      `json:"maxPublicOrga"`
@@ -349,23 +349,23 @@ type AddUserRightsInput struct {
 
 type AddUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
-	NumUids    *int          `json:"numUids"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type AddVoteInput struct {
-	CreatedBy *UserRef     `json:"createdBy,omitempty"`
-	CreatedAt string       `json:"createdAt,omitempty"`
+	CreatedBy *UserRef     `json:"createdBy"`
+	CreatedAt string       `json:"createdAt"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
-	Voteid    string       `json:"voteid,omitempty"`
-	Contract  *ContractRef `json:"contract,omitempty"`
-	Node      *NodeRef     `json:"node,omitempty"`
+	Voteid    string       `json:"voteid"`
+	Contract  *ContractRef `json:"contract"`
+	Node      *NodeRef     `json:"node"`
 	Data      []int        `json:"data"`
 }
 
 type AddVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AuthRule struct {
@@ -376,21 +376,21 @@ type AuthRule struct {
 }
 
 type Blob struct {
-	Tension      *Tension      `json:"tension,omitempty"`
-	BlobType     BlobType      `json:"blob_type,omitempty"`
+	Tension      *Tension      `json:"tension"`
+	BlobType     BlobType      `json:"blob_type"`
 	PushedFlag   *string       `json:"pushedFlag,omitempty"`
 	ArchivedFlag *string       `json:"archivedFlag,omitempty"`
 	Node         *NodeFragment `json:"node,omitempty"`
 	Md           *string       `json:"md,omitempty"`
-	ID           string        `json:"id,omitempty"`
-	CreatedBy    *User         `json:"createdBy,omitempty"`
-	CreatedAt    string        `json:"createdAt,omitempty"`
+	ID           string        `json:"id"`
+	CreatedBy    *User         `json:"createdBy"`
+	CreatedAt    string        `json:"createdAt"`
 	UpdatedAt    *string       `json:"updatedAt,omitempty"`
 	Message      *string       `json:"message,omitempty"`
 }
 
 type BlobAggregateResult struct {
-	Count           *int    `json:"count"`
+	Count           *int    `json:"count,omitempty"`
 	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
@@ -457,17 +457,17 @@ type BlobTypeHash struct {
 }
 
 type Comment struct {
-	Message            string                   `json:"message,omitempty"`
+	Message            string                   `json:"message"`
 	Reactions          []*Reaction              `json:"reactions,omitempty"`
-	ID                 string                   `json:"id,omitempty"`
-	CreatedBy          *User                    `json:"createdBy,omitempty"`
-	CreatedAt          string                   `json:"createdAt,omitempty"`
+	ID                 string                   `json:"id"`
+	CreatedBy          *User                    `json:"createdBy"`
+	CreatedAt          string                   `json:"createdAt"`
 	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
 	ReactionsAggregate *ReactionAggregateResult `json:"reactionsAggregate,omitempty"`
 }
 
 type CommentAggregateResult struct {
-	Count        *int    `json:"count"`
+	Count        *int    `json:"count,omitempty"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -515,20 +515,20 @@ type ContainsFilter struct {
 }
 
 type Contract struct {
-	Contractid                 string                      `json:"contractid,omitempty"`
-	Tension                    *Tension                    `json:"tension,omitempty"`
-	Status                     ContractStatus              `json:"status,omitempty"`
-	ContractType               ContractType                `json:"contract_type,omitempty"`
+	Contractid                 string                      `json:"contractid"`
+	Tension                    *Tension                    `json:"tension"`
+	Status                     ContractStatus              `json:"status"`
+	ContractType               ContractType                `json:"contract_type"`
 	ClosedAt                   *string                     `json:"closedAt,omitempty"`
-	Event                      *EventFragment              `json:"event,omitempty"`
-	Participants               []*Vote                     `json:"participants,omitempty"`
+	Event                      *EventFragment              `json:"event"`
+	Participants               []*Vote                     `json:"participants"`
 	Candidates                 []*User                     `json:"candidates,omitempty"`
 	PendingCandidates          []*PendingUser              `json:"pending_candidates,omitempty"`
 	Comments                   []*Comment                  `json:"comments,omitempty"`
-	IsValidator                *bool                       `json:"isValidator"`
-	ID                         string                      `json:"id,omitempty"`
-	CreatedBy                  *User                       `json:"createdBy,omitempty"`
-	CreatedAt                  string                      `json:"createdAt,omitempty"`
+	IsValidator                *bool                       `json:"isValidator,omitempty"`
+	ID                         string                      `json:"id"`
+	CreatedBy                  *User                       `json:"createdBy"`
+	CreatedAt                  string                      `json:"createdAt"`
 	UpdatedAt                  *string                     `json:"updatedAt,omitempty"`
 	Message                    *string                     `json:"message,omitempty"`
 	ParticipantsAggregate      *VoteAggregateResult        `json:"participantsAggregate,omitempty"`
@@ -540,7 +540,7 @@ type Contract struct {
 func (Contract) IsEventKind() {}
 
 type ContractAggregateResult struct {
-	Count         *int    `json:"count"`
+	Count         *int    `json:"count,omitempty"`
 	CreatedAtMin  *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax  *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin  *string `json:"updatedAtMin,omitempty"`
@@ -588,7 +588,7 @@ type ContractPatch struct {
 	Candidates        []*UserRef        `json:"candidates,omitempty"`
 	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
 	Comments          []*CommentRef     `json:"comments,omitempty"`
-	IsValidator       *bool             `json:"isValidator"`
+	IsValidator       *bool             `json:"isValidator,omitempty"`
 }
 
 type ContractRef struct {
@@ -607,7 +607,7 @@ type ContractRef struct {
 	Candidates        []*UserRef        `json:"candidates,omitempty"`
 	PendingCandidates []*PendingUserRef `json:"pending_candidates,omitempty"`
 	Comments          []*CommentRef     `json:"comments,omitempty"`
-	IsValidator       *bool             `json:"isValidator"`
+	IsValidator       *bool             `json:"isValidator,omitempty"`
 }
 
 type ContractStatusHash struct {
@@ -621,15 +621,15 @@ type ContractTypeHash struct {
 }
 
 type CustomHTTP struct {
-	URL                  string     `json:"url,omitempty"`
-	Method               HTTPMethod `json:"method,omitempty"`
+	URL                  string     `json:"url"`
+	Method               HTTPMethod `json:"method"`
 	Body                 *string    `json:"body,omitempty"`
 	Graphql              *string    `json:"graphql,omitempty"`
 	Mode                 *Mode      `json:"mode,omitempty"`
 	ForwardHeaders       []string   `json:"forwardHeaders,omitempty"`
 	SecretHeaders        []string   `json:"secretHeaders,omitempty"`
 	IntrospectionHeaders []string   `json:"introspectionHeaders,omitempty"`
-	SkipIntrospection    *bool      `json:"skipIntrospection"`
+	SkipIntrospection    *bool      `json:"skipIntrospection,omitempty"`
 }
 
 type DateTimeFilter struct {
@@ -643,134 +643,134 @@ type DateTimeFilter struct {
 }
 
 type DateTimeRange struct {
-	Min string `json:"min,omitempty"`
-	Max string `json:"max,omitempty"`
+	Min string `json:"min"`
+	Max string `json:"max"`
 }
 
 type DeleteBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
 	Msg      *string     `json:"msg,omitempty"`
-	NumUids  *int        `json:"numUids"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type DeleteEventCountPayload struct {
 	EventCount []*EventCount `json:"eventCount,omitempty"`
 	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type DeleteEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
 	Msg           *string          `json:"msg,omitempty"`
-	NumUids       *int             `json:"numUids"`
+	NumUids       *int             `json:"numUids,omitempty"`
 }
 
 type DeleteEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
 	Msg     *string  `json:"msg,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type DeleteLabelPayload struct {
 	Label   []*Label `json:"label,omitempty"`
 	Msg     *string  `json:"msg,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type DeleteMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
 	Msg          *string         `json:"msg,omitempty"`
-	NumUids      *int            `json:"numUids"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type DeleteNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteNotifPayload struct {
 	Notif   []*Notif `json:"notif,omitempty"`
 	Msg     *string  `json:"msg,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type DeleteOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeletePendingUserPayload struct {
 	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
 	Msg         *string        `json:"msg,omitempty"`
-	NumUids     *int           `json:"numUids"`
+	NumUids     *int           `json:"numUids,omitempty"`
 }
 
 type DeletePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteReactionPayload struct {
 	Reaction []*Reaction `json:"reaction,omitempty"`
 	Msg      *string     `json:"msg,omitempty"`
-	NumUids  *int        `json:"numUids"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type DeleteRoleExtPayload struct {
 	RoleExt []*RoleExt `json:"roleExt,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type DeleteUserEventPayload struct {
 	UserEvent []*UserEvent `json:"userEvent,omitempty"`
 	Msg       *string      `json:"msg,omitempty"`
-	NumUids   *int         `json:"numUids"`
+	NumUids   *int         `json:"numUids,omitempty"`
 }
 
 type DeleteUserPayload struct {
 	User    []*User `json:"user,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
 	Msg        *string       `json:"msg,omitempty"`
-	NumUids    *int          `json:"numUids"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type DeleteVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DgraphDefault struct {
@@ -778,14 +778,14 @@ type DgraphDefault struct {
 }
 
 type Event struct {
-	Tension   *Tension     `json:"tension,omitempty"`
-	EventType TensionEvent `json:"event_type,omitempty"`
+	Tension   *Tension     `json:"tension"`
+	EventType TensionEvent `json:"event_type"`
 	Mentioned *Tension     `json:"mentioned,omitempty"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
-	ID        string       `json:"id,omitempty"`
-	CreatedBy *User        `json:"createdBy,omitempty"`
-	CreatedAt string       `json:"createdAt,omitempty"`
+	ID        string       `json:"id"`
+	CreatedBy *User        `json:"createdBy"`
+	CreatedAt string       `json:"createdAt"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 }
@@ -793,7 +793,7 @@ type Event struct {
 func (Event) IsEventKind() {}
 
 type EventAggregateResult struct {
-	Count        *int    `json:"count"`
+	Count        *int    `json:"count,omitempty"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -807,24 +807,24 @@ type EventAggregateResult struct {
 }
 
 type EventCount struct {
-	UnreadEvents     *int `json:"unread_events"`
-	PendingContracts *int `json:"pending_contracts"`
-	AssignedTensions *int `json:"assigned_tensions"`
+	UnreadEvents     *int `json:"unread_events,omitempty"`
+	PendingContracts *int `json:"pending_contracts,omitempty"`
+	AssignedTensions *int `json:"assigned_tensions,omitempty"`
 }
 
 type EventCountAggregateResult struct {
-	Count               *int     `json:"count"`
-	UnreadEventsMin     *int     `json:"unread_eventsMin"`
-	UnreadEventsMax     *int     `json:"unread_eventsMax"`
-	UnreadEventsSum     *int     `json:"unread_eventsSum"`
+	Count               *int     `json:"count,omitempty"`
+	UnreadEventsMin     *int     `json:"unread_eventsMin,omitempty"`
+	UnreadEventsMax     *int     `json:"unread_eventsMax,omitempty"`
+	UnreadEventsSum     *int     `json:"unread_eventsSum,omitempty"`
 	UnreadEventsAvg     *float64 `json:"unread_eventsAvg,omitempty"`
-	PendingContractsMin *int     `json:"pending_contractsMin"`
-	PendingContractsMax *int     `json:"pending_contractsMax"`
-	PendingContractsSum *int     `json:"pending_contractsSum"`
+	PendingContractsMin *int     `json:"pending_contractsMin,omitempty"`
+	PendingContractsMax *int     `json:"pending_contractsMax,omitempty"`
+	PendingContractsSum *int     `json:"pending_contractsSum,omitempty"`
 	PendingContractsAvg *float64 `json:"pending_contractsAvg,omitempty"`
-	AssignedTensionsMin *int     `json:"assigned_tensionsMin"`
-	AssignedTensionsMax *int     `json:"assigned_tensionsMax"`
-	AssignedTensionsSum *int     `json:"assigned_tensionsSum"`
+	AssignedTensionsMin *int     `json:"assigned_tensionsMin,omitempty"`
+	AssignedTensionsMax *int     `json:"assigned_tensionsMax,omitempty"`
+	AssignedTensionsSum *int     `json:"assigned_tensionsSum,omitempty"`
 	AssignedTensionsAvg *float64 `json:"assigned_tensionsAvg,omitempty"`
 }
 
@@ -842,15 +842,15 @@ type EventCountOrder struct {
 }
 
 type EventCountPatch struct {
-	UnreadEvents     *int `json:"unread_events"`
-	PendingContracts *int `json:"pending_contracts"`
-	AssignedTensions *int `json:"assigned_tensions"`
+	UnreadEvents     *int `json:"unread_events,omitempty"`
+	PendingContracts *int `json:"pending_contracts,omitempty"`
+	AssignedTensions *int `json:"assigned_tensions,omitempty"`
 }
 
 type EventCountRef struct {
-	UnreadEvents     *int `json:"unread_events"`
-	PendingContracts *int `json:"pending_contracts"`
-	AssignedTensions *int `json:"assigned_tensions"`
+	UnreadEvents     *int `json:"unread_events,omitempty"`
+	PendingContracts *int `json:"pending_contracts,omitempty"`
+	AssignedTensions *int `json:"assigned_tensions,omitempty"`
 }
 
 type EventFilter struct {
@@ -865,13 +865,13 @@ type EventFilter struct {
 }
 
 type EventFragment struct {
-	EventType TensionEvent `json:"event_type,omitempty"`
+	EventType TensionEvent `json:"event_type"`
 	Old       *string      `json:"old,omitempty"`
 	New       *string      `json:"new,omitempty"`
 }
 
 type EventFragmentAggregateResult struct {
-	Count  *int    `json:"count"`
+	Count  *int    `json:"count,omitempty"`
 	OldMin *string `json:"oldMin,omitempty"`
 	OldMax *string `json:"oldMax,omitempty"`
 	NewMin *string `json:"newMin,omitempty"`
@@ -959,21 +959,21 @@ type FloatFilter struct {
 }
 
 type FloatRange struct {
-	Min float64 `json:"min,omitempty"`
-	Max float64 `json:"max,omitempty"`
+	Min float64 `json:"min"`
+	Max float64 `json:"max"`
 }
 
 type GenerateMutationParams struct {
-	Add    *bool `json:"add"`
-	Update *bool `json:"update"`
-	Delete *bool `json:"delete"`
+	Add    *bool `json:"add,omitempty"`
+	Update *bool `json:"update,omitempty"`
+	Delete *bool `json:"delete,omitempty"`
 }
 
 type GenerateQueryParams struct {
-	Get       *bool `json:"get"`
-	Query     *bool `json:"query"`
-	Password  *bool `json:"password"`
-	Aggregate *bool `json:"aggregate"`
+	Get       *bool `json:"get,omitempty"`
+	Query     *bool `json:"query,omitempty"`
+	Password  *bool `json:"password,omitempty"`
+	Aggregate *bool `json:"aggregate,omitempty"`
 }
 
 type Int64Filter struct {
@@ -987,17 +987,17 @@ type Int64Filter struct {
 }
 
 type Int64Range struct {
-	Min string `json:"min,omitempty"`
-	Max string `json:"max,omitempty"`
+	Min string `json:"min"`
+	Max string `json:"max"`
 }
 
 type IntFilter struct {
-	Eq      *int      `json:"eq"`
-	In      []*int    `json:"in"`
-	Le      *int      `json:"le"`
-	Lt      *int      `json:"lt"`
-	Ge      *int      `json:"ge"`
-	Gt      *int      `json:"gt"`
+	Eq      *int      `json:"eq,omitempty"`
+	In      []*int    `json:"in,omitempty"`
+	Le      *int      `json:"le,omitempty"`
+	Lt      *int      `json:"lt,omitempty"`
+	Ge      *int      `json:"ge,omitempty"`
+	Gt      *int      `json:"gt,omitempty"`
 	Between *IntRange `json:"between,omitempty"`
 }
 
@@ -1012,9 +1012,9 @@ type IntersectsFilter struct {
 }
 
 type Label struct {
-	ID                string                  `json:"id,omitempty"`
-	Rootnameid        string                  `json:"rootnameid,omitempty"`
-	Name              string                  `json:"name,omitempty"`
+	ID                string                  `json:"id"`
+	Rootnameid        string                  `json:"rootnameid"`
+	Name              string                  `json:"name"`
 	Description       *string                 `json:"description,omitempty"`
 	Color             *string                 `json:"color,omitempty"`
 	Tensions          []*Tension              `json:"tensions,omitempty"`
@@ -1024,7 +1024,7 @@ type Label struct {
 }
 
 type LabelAggregateResult struct {
-	Count          *int    `json:"count"`
+	Count          *int    `json:"count,omitempty"`
 	RootnameidMin  *string `json:"rootnameidMin,omitempty"`
 	RootnameidMax  *string `json:"rootnameidMax,omitempty"`
 	NameMin        *string `json:"nameMin,omitempty"`
@@ -1071,15 +1071,15 @@ type LabelRef struct {
 }
 
 type Mandate struct {
-	ID               string  `json:"id,omitempty"`
-	Purpose          string  `json:"purpose,omitempty"`
+	ID               string  `json:"id"`
+	Purpose          string  `json:"purpose"`
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
 }
 
 type MandateAggregateResult struct {
-	Count               *int    `json:"count"`
+	Count               *int    `json:"count,omitempty"`
 	PurposeMin          *string `json:"purposeMin,omitempty"`
 	PurposeMax          *string `json:"purposeMax,omitempty"`
 	ResponsabilitiesMin *string `json:"responsabilitiesMin,omitempty"`
@@ -1121,41 +1121,41 @@ type MandateRef struct {
 }
 
 type MultiPolygon struct {
-	Polygons []*Polygon `json:"polygons,omitempty"`
+	Polygons []*Polygon `json:"polygons"`
 }
 
 type MultiPolygonRef struct {
-	Polygons []*PolygonRef `json:"polygons,omitempty"`
+	Polygons []*PolygonRef `json:"polygons"`
 }
 
 type NearFilter struct {
-	Distance   float64   `json:"distance,omitempty"`
-	Coordinate *PointRef `json:"coordinate,omitempty"`
+	Distance   float64   `json:"distance"`
+	Coordinate *PointRef `json:"coordinate"`
 }
 
 type Node struct {
-	ID                     string                  `json:"id,omitempty"`
-	CreatedBy              *User                   `json:"createdBy,omitempty"`
-	CreatedAt              string                  `json:"createdAt,omitempty"`
+	ID                     string                  `json:"id"`
+	CreatedBy              *User                   `json:"createdBy"`
+	CreatedAt              string                  `json:"createdAt"`
 	UpdatedAt              *string                 `json:"updatedAt,omitempty"`
-	Nameid                 string                  `json:"nameid,omitempty"`
-	Rootnameid             string                  `json:"rootnameid,omitempty"`
+	Nameid                 string                  `json:"nameid"`
+	Rootnameid             string                  `json:"rootnameid"`
 	Source                 *Blob                   `json:"source,omitempty"`
-	Name                   string                  `json:"name,omitempty"`
+	Name                   string                  `json:"name"`
 	About                  *string                 `json:"about,omitempty"`
 	Skills                 []string                `json:"skills,omitempty"`
 	IsRoot                 bool                    `json:"isRoot"`
 	Parent                 *Node                   `json:"parent,omitempty"`
-	Type                   NodeType                `json:"type_,omitempty"`
+	Type                   NodeType                `json:"type_"`
 	TensionsOut            []*Tension              `json:"tensions_out,omitempty"`
 	TensionsIn             []*Tension              `json:"tensions_in,omitempty"`
-	Visibility             NodeVisibility          `json:"visibility,omitempty"`
-	Mode                   NodeMode                `json:"mode,omitempty"`
+	Visibility             NodeVisibility          `json:"visibility"`
+	Mode                   NodeMode                `json:"mode"`
 	Rights                 int                     `json:"rights"`
 	IsArchived             bool                    `json:"isArchived"`
-	IsPersonal             *bool                   `json:"isPersonal"`
-	UserCanJoin            *bool                   `json:"userCanJoin"`
-	GuestCanCreateTension  *bool                   `json:"guestCanCreateTension"`
+	IsPersonal             *bool                   `json:"isPersonal,omitempty"`
+	UserCanJoin            *bool                   `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension  *bool                   `json:"guestCanCreateTension,omitempty"`
 	Watchers               []*User                 `json:"watchers,omitempty"`
 	Children               []*Node                 `json:"children,omitempty"`
 	Labels                 []*Label                `json:"labels,omitempty"`
@@ -1181,7 +1181,7 @@ type Node struct {
 }
 
 type NodeAggregateResult struct {
-	Count         *int     `json:"count"`
+	Count         *int     `json:"count,omitempty"`
 	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
 	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
 	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
@@ -1194,9 +1194,9 @@ type NodeAggregateResult struct {
 	NameMax       *string  `json:"nameMax,omitempty"`
 	AboutMin      *string  `json:"aboutMin,omitempty"`
 	AboutMax      *string  `json:"aboutMax,omitempty"`
-	RightsMin     *int     `json:"rightsMin"`
-	RightsMax     *int     `json:"rightsMax"`
-	RightsSum     *int     `json:"rightsSum"`
+	RightsMin     *int     `json:"rightsMin,omitempty"`
+	RightsMax     *int     `json:"rightsMax,omitempty"`
+	RightsSum     *int     `json:"rightsSum,omitempty"`
 	RightsAvg     *float64 `json:"rightsAvg,omitempty"`
 	ColorMin      *string  `json:"colorMin,omitempty"`
 	ColorMax      *string  `json:"colorMax,omitempty"`
@@ -1210,12 +1210,12 @@ type NodeFilter struct {
 	Name       *StringTermFilter                   `json:"name,omitempty"`
 	About      *StringFullTextFilter               `json:"about,omitempty"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
-	IsRoot     *bool                               `json:"isRoot"`
+	IsRoot     *bool                               `json:"isRoot,omitempty"`
 	Type       *NodeTypeHash                       `json:"type_,omitempty"`
 	Visibility *NodeVisibilityHash                 `json:"visibility,omitempty"`
 	Mode       *NodeModeHash                       `json:"mode,omitempty"`
-	IsArchived *bool                               `json:"isArchived"`
-	IsPersonal *bool                               `json:"isPersonal"`
+	IsArchived *bool                               `json:"isArchived,omitempty"`
+	IsPersonal *bool                               `json:"isPersonal,omitempty"`
 	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
 	Has        []*NodeHasFilter                    `json:"has,omitempty"`
 	And        []*NodeFilter                       `json:"and,omitempty"`
@@ -1224,7 +1224,7 @@ type NodeFilter struct {
 }
 
 type NodeFragment struct {
-	ID         string          `json:"id,omitempty"`
+	ID         string          `json:"id"`
 	Nameid     *string         `json:"nameid,omitempty"`
 	Name       *string         `json:"name,omitempty"`
 	About      *string         `json:"about,omitempty"`
@@ -1241,7 +1241,7 @@ type NodeFragment struct {
 }
 
 type NodeFragmentAggregateResult struct {
-	Count         *int    `json:"count"`
+	Count         *int    `json:"count,omitempty"`
 	NameidMin     *string `json:"nameidMin,omitempty"`
 	NameidMax     *string `json:"nameidMax,omitempty"`
 	NameMin       *string `json:"nameMin,omitempty"`
@@ -1326,18 +1326,18 @@ type NodePatch struct {
 	Name                  *string         `json:"name,omitempty"`
 	About                 *string         `json:"about,omitempty"`
 	Skills                []string        `json:"skills,omitempty"`
-	IsRoot                *bool           `json:"isRoot"`
+	IsRoot                *bool           `json:"isRoot,omitempty"`
 	Parent                *NodeRef        `json:"parent,omitempty"`
 	Type                  *NodeType       `json:"type_,omitempty"`
 	TensionsOut           []*TensionRef   `json:"tensions_out,omitempty"`
 	TensionsIn            []*TensionRef   `json:"tensions_in,omitempty"`
 	Visibility            *NodeVisibility `json:"visibility,omitempty"`
 	Mode                  *NodeMode       `json:"mode,omitempty"`
-	Rights                *int            `json:"rights"`
-	IsArchived            *bool           `json:"isArchived"`
-	IsPersonal            *bool           `json:"isPersonal"`
-	UserCanJoin           *bool           `json:"userCanJoin"`
-	GuestCanCreateTension *bool           `json:"guestCanCreateTension"`
+	Rights                *int            `json:"rights,omitempty"`
+	IsArchived            *bool           `json:"isArchived,omitempty"`
+	IsPersonal            *bool           `json:"isPersonal,omitempty"`
+	UserCanJoin           *bool           `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension *bool           `json:"guestCanCreateTension,omitempty"`
 	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
@@ -1364,18 +1364,18 @@ type NodeRef struct {
 	Name                  *string         `json:"name,omitempty"`
 	About                 *string         `json:"about,omitempty"`
 	Skills                []string        `json:"skills,omitempty"`
-	IsRoot                *bool           `json:"isRoot"`
+	IsRoot                *bool           `json:"isRoot,omitempty"`
 	Parent                *NodeRef        `json:"parent,omitempty"`
 	Type                  *NodeType       `json:"type_,omitempty"`
 	TensionsOut           []*TensionRef   `json:"tensions_out,omitempty"`
 	TensionsIn            []*TensionRef   `json:"tensions_in,omitempty"`
 	Visibility            *NodeVisibility `json:"visibility,omitempty"`
 	Mode                  *NodeMode       `json:"mode,omitempty"`
-	Rights                *int            `json:"rights"`
-	IsArchived            *bool           `json:"isArchived"`
-	IsPersonal            *bool           `json:"isPersonal"`
-	UserCanJoin           *bool           `json:"userCanJoin"`
-	GuestCanCreateTension *bool           `json:"guestCanCreateTension"`
+	Rights                *int            `json:"rights,omitempty"`
+	IsArchived            *bool           `json:"isArchived,omitempty"`
+	IsPersonal            *bool           `json:"isPersonal,omitempty"`
+	UserCanJoin           *bool           `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension *bool           `json:"guestCanCreateTension,omitempty"`
 	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
@@ -1405,9 +1405,9 @@ type Notif struct {
 	Tension   *Tension  `json:"tension_,omitempty"`
 	Contract  *Contract `json:"contract,omitempty"`
 	Link      *string   `json:"link,omitempty"`
-	ID        string    `json:"id,omitempty"`
-	CreatedBy *User     `json:"createdBy,omitempty"`
-	CreatedAt string    `json:"createdAt,omitempty"`
+	ID        string    `json:"id"`
+	CreatedBy *User     `json:"createdBy"`
+	CreatedAt string    `json:"createdAt"`
 	UpdatedAt *string   `json:"updatedAt,omitempty"`
 	Message   *string   `json:"message,omitempty"`
 }
@@ -1415,7 +1415,7 @@ type Notif struct {
 func (Notif) IsEventKind() {}
 
 type NotifAggregateResult struct {
-	Count        *int    `json:"count"`
+	Count        *int    `json:"count,omitempty"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -1464,19 +1464,19 @@ type NotifRef struct {
 }
 
 type OrgaAgg struct {
-	NMembers *int `json:"n_members"`
-	NGuests  *int `json:"n_guests"`
+	NMembers *int `json:"n_members,omitempty"`
+	NGuests  *int `json:"n_guests,omitempty"`
 }
 
 type OrgaAggAggregateResult struct {
-	Count       *int     `json:"count"`
-	NMembersMin *int     `json:"n_membersMin"`
-	NMembersMax *int     `json:"n_membersMax"`
-	NMembersSum *int     `json:"n_membersSum"`
+	Count       *int     `json:"count,omitempty"`
+	NMembersMin *int     `json:"n_membersMin,omitempty"`
+	NMembersMax *int     `json:"n_membersMax,omitempty"`
+	NMembersSum *int     `json:"n_membersSum,omitempty"`
 	NMembersAvg *float64 `json:"n_membersAvg,omitempty"`
-	NGuestsMin  *int     `json:"n_guestsMin"`
-	NGuestsMax  *int     `json:"n_guestsMax"`
-	NGuestsSum  *int     `json:"n_guestsSum"`
+	NGuestsMin  *int     `json:"n_guestsMin,omitempty"`
+	NGuestsMax  *int     `json:"n_guestsMax,omitempty"`
+	NGuestsSum  *int     `json:"n_guestsSum,omitempty"`
 	NGuestsAvg  *float64 `json:"n_guestsAvg,omitempty"`
 }
 
@@ -1494,17 +1494,17 @@ type OrgaAggOrder struct {
 }
 
 type OrgaAggPatch struct {
-	NMembers *int `json:"n_members"`
-	NGuests  *int `json:"n_guests"`
+	NMembers *int `json:"n_members,omitempty"`
+	NGuests  *int `json:"n_guests,omitempty"`
 }
 
 type OrgaAggRef struct {
-	NMembers *int `json:"n_members"`
-	NGuests  *int `json:"n_guests"`
+	NMembers *int `json:"n_members,omitempty"`
+	NGuests  *int `json:"n_guests,omitempty"`
 }
 
 type PendingUser struct {
-	ID                 string                   `json:"id,omitempty"`
+	ID                 string                   `json:"id"`
 	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
 	Username           *string                  `json:"username,omitempty"`
 	Password           *string                  `json:"password,omitempty"`
@@ -1512,12 +1512,12 @@ type PendingUser struct {
 	EmailToken         *string                  `json:"email_token,omitempty"`
 	Token              *string                  `json:"token,omitempty"`
 	Contracts          []*Contract              `json:"contracts,omitempty"`
-	Subscribe          *bool                    `json:"subscribe"`
+	Subscribe          *bool                    `json:"subscribe,omitempty"`
 	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 }
 
 type PendingUserAggregateResult struct {
-	Count         *int    `json:"count"`
+	Count         *int    `json:"count,omitempty"`
 	UpdatedAtMin  *string `json:"updatedAtMin,omitempty"`
 	UpdatedAtMax  *string `json:"updatedAtMax,omitempty"`
 	UsernameMin   *string `json:"usernameMin,omitempty"`
@@ -1558,7 +1558,7 @@ type PendingUserPatch struct {
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
-	Subscribe  *bool          `json:"subscribe"`
+	Subscribe  *bool          `json:"subscribe,omitempty"`
 }
 
 type PendingUserRef struct {
@@ -1570,12 +1570,12 @@ type PendingUserRef struct {
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
-	Subscribe  *bool          `json:"subscribe"`
+	Subscribe  *bool          `json:"subscribe,omitempty"`
 }
 
 type Point struct {
-	Longitude float64 `json:"longitude,omitempty"`
-	Latitude  float64 `json:"latitude,omitempty"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
 }
 
 type PointGeoFilter struct {
@@ -1584,20 +1584,20 @@ type PointGeoFilter struct {
 }
 
 type PointList struct {
-	Points []*Point `json:"points,omitempty"`
+	Points []*Point `json:"points"`
 }
 
 type PointListRef struct {
-	Points []*PointRef `json:"points,omitempty"`
+	Points []*PointRef `json:"points"`
 }
 
 type PointRef struct {
-	Longitude float64 `json:"longitude,omitempty"`
-	Latitude  float64 `json:"latitude,omitempty"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
 }
 
 type Polygon struct {
-	Coordinates []*PointList `json:"coordinates,omitempty"`
+	Coordinates []*PointList `json:"coordinates"`
 }
 
 type PolygonGeoFilter struct {
@@ -1608,19 +1608,19 @@ type PolygonGeoFilter struct {
 }
 
 type PolygonRef struct {
-	Coordinates []*PointListRef `json:"coordinates,omitempty"`
+	Coordinates []*PointListRef `json:"coordinates"`
 }
 
 type Post struct {
-	ID        string  `json:"id,omitempty"`
-	CreatedBy *User   `json:"createdBy,omitempty"`
-	CreatedAt string  `json:"createdAt,omitempty"`
+	ID        string  `json:"id"`
+	CreatedBy *User   `json:"createdBy"`
+	CreatedAt string  `json:"createdAt"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
 	Message   *string `json:"message,omitempty"`
 }
 
 type PostAggregateResult struct {
-	Count        *int    `json:"count"`
+	Count        *int    `json:"count,omitempty"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -1653,24 +1653,24 @@ type PostPatch struct {
 }
 
 type PostRef struct {
-	ID string `json:"id,omitempty"`
+	ID string `json:"id"`
 }
 
 type Reaction struct {
-	ID         string   `json:"id,omitempty"`
+	ID         string   `json:"id"`
 	Reactionid *string  `json:"reactionid,omitempty"`
-	User       *User    `json:"user,omitempty"`
-	Comment    *Comment `json:"comment,omitempty"`
+	User       *User    `json:"user"`
+	Comment    *Comment `json:"comment"`
 	Type       int      `json:"type_"`
 }
 
 type ReactionAggregateResult struct {
-	Count         *int     `json:"count"`
+	Count         *int     `json:"count,omitempty"`
 	ReactionidMin *string  `json:"reactionidMin,omitempty"`
 	ReactionidMax *string  `json:"reactionidMax,omitempty"`
-	TypeMin       *int     `json:"type_Min"`
-	TypeMax       *int     `json:"type_Max"`
-	TypeSum       *int     `json:"type_Sum"`
+	TypeMin       *int     `json:"type_Min,omitempty"`
+	TypeMax       *int     `json:"type_Max,omitempty"`
+	TypeSum       *int     `json:"type_Sum,omitempty"`
 	TypeAvg       *float64 `json:"type_Avg,omitempty"`
 }
 
@@ -1693,7 +1693,7 @@ type ReactionPatch struct {
 	Reactionid *string     `json:"reactionid,omitempty"`
 	User       *UserRef    `json:"user,omitempty"`
 	Comment    *CommentRef `json:"comment,omitempty"`
-	Type       *int        `json:"type_"`
+	Type       *int        `json:"type_,omitempty"`
 }
 
 type ReactionRef struct {
@@ -1701,15 +1701,15 @@ type ReactionRef struct {
 	Reactionid *string     `json:"reactionid,omitempty"`
 	User       *UserRef    `json:"user,omitempty"`
 	Comment    *CommentRef `json:"comment,omitempty"`
-	Type       *int        `json:"type_"`
+	Type       *int        `json:"type_,omitempty"`
 }
 
 type RoleExt struct {
-	ID             string               `json:"id,omitempty"`
-	Rootnameid     string               `json:"rootnameid,omitempty"`
-	Name           string               `json:"name,omitempty"`
+	ID             string               `json:"id"`
+	Rootnameid     string               `json:"rootnameid"`
+	Name           string               `json:"name"`
 	About          *string              `json:"about,omitempty"`
-	RoleType       RoleType             `json:"role_type,omitempty"`
+	RoleType       RoleType             `json:"role_type"`
 	Color          *string              `json:"color,omitempty"`
 	Mandate        *Mandate             `json:"mandate,omitempty"`
 	Roles          []*Node              `json:"roles,omitempty"`
@@ -1719,7 +1719,7 @@ type RoleExt struct {
 }
 
 type RoleExtAggregateResult struct {
-	Count         *int    `json:"count"`
+	Count         *int    `json:"count,omitempty"`
 	RootnameidMin *string `json:"rootnameidMin,omitempty"`
 	RootnameidMax *string `json:"rootnameidMax,omitempty"`
 	NameMin       *string `json:"nameMin,omitempty"`
@@ -1808,8 +1808,8 @@ type StringHashFilterStringTermFilter struct {
 }
 
 type StringRange struct {
-	Min string `json:"min,omitempty"`
-	Max string `json:"max,omitempty"`
+	Min string `json:"min"`
+	Max string `json:"max"`
 }
 
 type StringRegExpFilter struct {
@@ -1822,13 +1822,13 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Emitter              *Node                    `json:"emitter,omitempty"`
-	Emitterid            string                   `json:"emitterid,omitempty"`
-	Receiver             *Node                    `json:"receiver,omitempty"`
-	Receiverid           string                   `json:"receiverid,omitempty"`
-	Title                string                   `json:"title,omitempty"`
-	Type                 TensionType              `json:"type_,omitempty"`
-	Status               TensionStatus            `json:"status,omitempty"`
+	Emitter              *Node                    `json:"emitter"`
+	Emitterid            string                   `json:"emitterid"`
+	Receiver             *Node                    `json:"receiver"`
+	Receiverid           string                   `json:"receiverid"`
+	Title                string                   `json:"title"`
+	Type                 TensionType              `json:"type_"`
+	Status               TensionStatus            `json:"status"`
 	Action               *TensionAction           `json:"action,omitempty"`
 	Assignees            []*User                  `json:"assignees,omitempty"`
 	Labels               []*Label                 `json:"labels,omitempty"`
@@ -1838,11 +1838,11 @@ type Tension struct {
 	Mentions             []*Event                 `json:"mentions,omitempty"`
 	Contracts            []*Contract              `json:"contracts,omitempty"`
 	Subscribers          []*User                  `json:"subscribers,omitempty"`
-	NComments            *int                     `json:"n_comments"`
-	NOpenContracts       *int                     `json:"n_open_contracts"`
-	ID                   string                   `json:"id,omitempty"`
-	CreatedBy            *User                    `json:"createdBy,omitempty"`
-	CreatedAt            string                   `json:"createdAt,omitempty"`
+	NComments            *int                     `json:"n_comments,omitempty"`
+	NOpenContracts       *int                     `json:"n_open_contracts,omitempty"`
+	ID                   string                   `json:"id"`
+	CreatedBy            *User                    `json:"createdBy"`
+	CreatedAt            string                   `json:"createdAt"`
 	UpdatedAt            *string                  `json:"updatedAt,omitempty"`
 	Message              *string                  `json:"message,omitempty"`
 	AssigneesAggregate   *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
@@ -1856,7 +1856,7 @@ type Tension struct {
 }
 
 type TensionAggregateResult struct {
-	Count             *int     `json:"count"`
+	Count             *int     `json:"count,omitempty"`
 	CreatedAtMin      *string  `json:"createdAtMin,omitempty"`
 	CreatedAtMax      *string  `json:"createdAtMax,omitempty"`
 	UpdatedAtMin      *string  `json:"updatedAtMin,omitempty"`
@@ -1869,13 +1869,13 @@ type TensionAggregateResult struct {
 	ReceiveridMax     *string  `json:"receiveridMax,omitempty"`
 	TitleMin          *string  `json:"titleMin,omitempty"`
 	TitleMax          *string  `json:"titleMax,omitempty"`
-	NCommentsMin      *int     `json:"n_commentsMin"`
-	NCommentsMax      *int     `json:"n_commentsMax"`
-	NCommentsSum      *int     `json:"n_commentsSum"`
+	NCommentsMin      *int     `json:"n_commentsMin,omitempty"`
+	NCommentsMax      *int     `json:"n_commentsMax,omitempty"`
+	NCommentsSum      *int     `json:"n_commentsSum,omitempty"`
 	NCommentsAvg      *float64 `json:"n_commentsAvg,omitempty"`
-	NOpenContractsMin *int     `json:"n_open_contractsMin"`
-	NOpenContractsMax *int     `json:"n_open_contractsMax"`
-	NOpenContractsSum *int     `json:"n_open_contractsSum"`
+	NOpenContractsMin *int     `json:"n_open_contractsMin,omitempty"`
+	NOpenContractsMax *int     `json:"n_open_contractsMax,omitempty"`
+	NOpenContractsSum *int     `json:"n_open_contractsSum,omitempty"`
 	NOpenContractsAvg *float64 `json:"n_open_contractsAvg,omitempty"`
 }
 
@@ -1926,8 +1926,8 @@ type TensionPatch struct {
 	Mentions       []*EventRef    `json:"mentions,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
-	NComments      *int           `json:"n_comments"`
-	NOpenContracts *int           `json:"n_open_contracts"`
+	NComments      *int           `json:"n_comments,omitempty"`
+	NOpenContracts *int           `json:"n_open_contracts,omitempty"`
 }
 
 type TensionRef struct {
@@ -1952,8 +1952,8 @@ type TensionRef struct {
 	Mentions       []*EventRef    `json:"mentions,omitempty"`
 	Contracts      []*ContractRef `json:"contracts,omitempty"`
 	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
-	NComments      *int           `json:"n_comments"`
-	NOpenContracts *int           `json:"n_open_contracts"`
+	NComments      *int           `json:"n_comments,omitempty"`
+	NOpenContracts *int           `json:"n_open_contracts,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -1967,254 +1967,254 @@ type TensionTypeHash struct {
 }
 
 type UpdateBlobInput struct {
-	Filter *BlobFilter `json:"filter,omitempty"`
+	Filter *BlobFilter `json:"filter"`
 	Set    *BlobPatch  `json:"set,omitempty"`
 	Remove *BlobPatch  `json:"remove,omitempty"`
 }
 
 type UpdateBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdateCommentInput struct {
-	Filter *CommentFilter `json:"filter,omitempty"`
+	Filter *CommentFilter `json:"filter"`
 	Set    *CommentPatch  `json:"set,omitempty"`
 	Remove *CommentPatch  `json:"remove,omitempty"`
 }
 
 type UpdateCommentPayload struct {
 	Comment []*Comment `json:"comment,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateContractInput struct {
-	Filter *ContractFilter `json:"filter,omitempty"`
+	Filter *ContractFilter `json:"filter"`
 	Set    *ContractPatch  `json:"set,omitempty"`
 	Remove *ContractPatch  `json:"remove,omitempty"`
 }
 
 type UpdateContractPayload struct {
 	Contract []*Contract `json:"contract,omitempty"`
-	NumUids  *int        `json:"numUids"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type UpdateEventCountInput struct {
-	Filter *EventCountFilter `json:"filter,omitempty"`
+	Filter *EventCountFilter `json:"filter"`
 	Set    *EventCountPatch  `json:"set,omitempty"`
 	Remove *EventCountPatch  `json:"remove,omitempty"`
 }
 
 type UpdateEventCountPayload struct {
 	EventCount []*EventCount `json:"eventCount,omitempty"`
-	NumUids    *int          `json:"numUids"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type UpdateEventFragmentInput struct {
-	Filter *EventFragmentFilter `json:"filter,omitempty"`
+	Filter *EventFragmentFilter `json:"filter"`
 	Set    *EventFragmentPatch  `json:"set,omitempty"`
 	Remove *EventFragmentPatch  `json:"remove,omitempty"`
 }
 
 type UpdateEventFragmentPayload struct {
 	EventFragment []*EventFragment `json:"eventFragment,omitempty"`
-	NumUids       *int             `json:"numUids"`
+	NumUids       *int             `json:"numUids,omitempty"`
 }
 
 type UpdateEventInput struct {
-	Filter *EventFilter `json:"filter,omitempty"`
+	Filter *EventFilter `json:"filter"`
 	Set    *EventPatch  `json:"set,omitempty"`
 	Remove *EventPatch  `json:"remove,omitempty"`
 }
 
 type UpdateEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type UpdateLabelInput struct {
-	Filter *LabelFilter `json:"filter,omitempty"`
+	Filter *LabelFilter `json:"filter"`
 	Set    *LabelPatch  `json:"set,omitempty"`
 	Remove *LabelPatch  `json:"remove,omitempty"`
 }
 
 type UpdateLabelPayload struct {
 	Label   []*Label `json:"label,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type UpdateMandateInput struct {
-	Filter *MandateFilter `json:"filter,omitempty"`
+	Filter *MandateFilter `json:"filter"`
 	Set    *MandatePatch  `json:"set,omitempty"`
 	Remove *MandatePatch  `json:"remove,omitempty"`
 }
 
 type UpdateMandatePayload struct {
 	Mandate []*Mandate `json:"mandate,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateNodeFragmentInput struct {
-	Filter *NodeFragmentFilter `json:"filter,omitempty"`
+	Filter *NodeFragmentFilter `json:"filter"`
 	Set    *NodeFragmentPatch  `json:"set,omitempty"`
 	Remove *NodeFragmentPatch  `json:"remove,omitempty"`
 }
 
 type UpdateNodeFragmentPayload struct {
 	NodeFragment []*NodeFragment `json:"nodeFragment,omitempty"`
-	NumUids      *int            `json:"numUids"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type UpdateNodeInput struct {
-	Filter *NodeFilter `json:"filter,omitempty"`
+	Filter *NodeFilter `json:"filter"`
 	Set    *NodePatch  `json:"set,omitempty"`
 	Remove *NodePatch  `json:"remove,omitempty"`
 }
 
 type UpdateNodePayload struct {
 	Node    []*Node `json:"node,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdateNotifInput struct {
-	Filter *NotifFilter `json:"filter,omitempty"`
+	Filter *NotifFilter `json:"filter"`
 	Set    *NotifPatch  `json:"set,omitempty"`
 	Remove *NotifPatch  `json:"remove,omitempty"`
 }
 
 type UpdateNotifPayload struct {
 	Notif   []*Notif `json:"notif,omitempty"`
-	NumUids *int     `json:"numUids"`
+	NumUids *int     `json:"numUids,omitempty"`
 }
 
 type UpdateOrgaAggInput struct {
-	Filter *OrgaAggFilter `json:"filter,omitempty"`
+	Filter *OrgaAggFilter `json:"filter"`
 	Set    *OrgaAggPatch  `json:"set,omitempty"`
 	Remove *OrgaAggPatch  `json:"remove,omitempty"`
 }
 
 type UpdateOrgaAggPayload struct {
 	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdatePendingUserInput struct {
-	Filter *PendingUserFilter `json:"filter,omitempty"`
+	Filter *PendingUserFilter `json:"filter"`
 	Set    *PendingUserPatch  `json:"set,omitempty"`
 	Remove *PendingUserPatch  `json:"remove,omitempty"`
 }
 
 type UpdatePendingUserPayload struct {
 	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
-	NumUids     *int           `json:"numUids"`
+	NumUids     *int           `json:"numUids,omitempty"`
 }
 
 type UpdatePostInput struct {
-	Filter *PostFilter `json:"filter,omitempty"`
+	Filter *PostFilter `json:"filter"`
 	Set    *PostPatch  `json:"set,omitempty"`
 	Remove *PostPatch  `json:"remove,omitempty"`
 }
 
 type UpdatePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdateReactionInput struct {
-	Filter *ReactionFilter `json:"filter,omitempty"`
+	Filter *ReactionFilter `json:"filter"`
 	Set    *ReactionPatch  `json:"set,omitempty"`
 	Remove *ReactionPatch  `json:"remove,omitempty"`
 }
 
 type UpdateReactionPayload struct {
 	Reaction []*Reaction `json:"reaction,omitempty"`
-	NumUids  *int        `json:"numUids"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type UpdateRoleExtInput struct {
-	Filter *RoleExtFilter `json:"filter,omitempty"`
+	Filter *RoleExtFilter `json:"filter"`
 	Set    *RoleExtPatch  `json:"set,omitempty"`
 	Remove *RoleExtPatch  `json:"remove,omitempty"`
 }
 
 type UpdateRoleExtPayload struct {
 	RoleExt []*RoleExt `json:"roleExt,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateTensionInput struct {
-	Filter *TensionFilter `json:"filter,omitempty"`
+	Filter *TensionFilter `json:"filter"`
 	Set    *TensionPatch  `json:"set,omitempty"`
 	Remove *TensionPatch  `json:"remove,omitempty"`
 }
 
 type UpdateTensionPayload struct {
 	Tension []*Tension `json:"tension,omitempty"`
-	NumUids *int       `json:"numUids"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateUserEventInput struct {
-	Filter *UserEventFilter `json:"filter,omitempty"`
+	Filter *UserEventFilter `json:"filter"`
 	Set    *UserEventPatch  `json:"set,omitempty"`
 	Remove *UserEventPatch  `json:"remove,omitempty"`
 }
 
 type UpdateUserEventPayload struct {
 	UserEvent []*UserEvent `json:"userEvent,omitempty"`
-	NumUids   *int         `json:"numUids"`
+	NumUids   *int         `json:"numUids,omitempty"`
 }
 
 type UpdateUserInput struct {
-	Filter *UserFilter `json:"filter,omitempty"`
+	Filter *UserFilter `json:"filter"`
 	Set    *UserPatch  `json:"set,omitempty"`
 	Remove *UserPatch  `json:"remove,omitempty"`
 }
 
 type UpdateUserPayload struct {
 	User    []*User `json:"user,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type UpdateUserRightsInput struct {
-	Filter *UserRightsFilter `json:"filter,omitempty"`
+	Filter *UserRightsFilter `json:"filter"`
 	Set    *UserRightsPatch  `json:"set,omitempty"`
 	Remove *UserRightsPatch  `json:"remove,omitempty"`
 }
 
 type UpdateUserRightsPayload struct {
 	UserRights []*UserRights `json:"userRights,omitempty"`
-	NumUids    *int          `json:"numUids"`
+	NumUids    *int          `json:"numUids,omitempty"`
 }
 
 type UpdateVoteInput struct {
-	Filter *VoteFilter `json:"filter,omitempty"`
+	Filter *VoteFilter `json:"filter"`
 	Set    *VotePatch  `json:"set,omitempty"`
 	Remove *VotePatch  `json:"remove,omitempty"`
 }
 
 type UpdateVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
-	NumUids *int    `json:"numUids"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type User struct {
-	ID                        string                    `json:"id,omitempty"`
-	CreatedAt                 string                    `json:"createdAt,omitempty"`
-	LastAck                   string                    `json:"lastAck,omitempty"`
-	Username                  string                    `json:"username,omitempty"`
+	ID                        string                    `json:"id"`
+	CreatedAt                 string                    `json:"createdAt"`
+	LastAck                   string                    `json:"lastAck"`
+	Username                  string                    `json:"username"`
 	Name                      *string                   `json:"name,omitempty"`
-	Email                     string                    `json:"email,omitempty"`
-	Password                  string                    `json:"password,omitempty"`
+	Email                     string                    `json:"email"`
+	Password                  string                    `json:"password"`
 	Bio                       *string                   `json:"bio,omitempty"`
 	Location                  *string                   `json:"location,omitempty"`
 	Utc                       *string                   `json:"utc,omitempty"`
 	Links                     []string                  `json:"links,omitempty"`
 	Skills                    []string                  `json:"skills,omitempty"`
 	NotifyByEmail             bool                      `json:"notifyByEmail"`
-	Lang                      Lang                      `json:"lang,omitempty"`
+	Lang                      Lang                      `json:"lang"`
 	Subscriptions             []*Tension                `json:"subscriptions,omitempty"`
 	Watching                  []*Node                   `json:"watching,omitempty"`
-	Rights                    *UserRights               `json:"rights,omitempty"`
+	Rights                    *UserRights               `json:"rights"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
 	BackedRoles               []*Node                   `json:"backed_roles,omitempty"`
 	TensionsCreated           []*Tension                `json:"tensions_created,omitempty"`
@@ -2236,7 +2236,7 @@ type User struct {
 }
 
 type UserAggregateResult struct {
-	Count            *int    `json:"count"`
+	Count            *int    `json:"count,omitempty"`
 	CreatedAtMin     *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax     *string `json:"createdAtMax,omitempty"`
 	LastAckMin       *string `json:"lastAckMin,omitempty"`
@@ -2260,15 +2260,15 @@ type UserAggregateResult struct {
 }
 
 type UserEvent struct {
-	ID        string      `json:"id,omitempty"`
-	CreatedAt string      `json:"createdAt,omitempty"`
+	ID        string      `json:"id"`
+	CreatedAt string      `json:"createdAt"`
 	IsRead    bool        `json:"isRead"`
-	User      *User       `json:"user,omitempty"`
+	User      *User       `json:"user"`
 	Event     []EventKind `json:"event,omitempty"`
 }
 
 type UserEventAggregateResult struct {
-	Count        *int    `json:"count"`
+	Count        *int    `json:"count,omitempty"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 }
@@ -2276,7 +2276,7 @@ type UserEventAggregateResult struct {
 type UserEventFilter struct {
 	ID        []string              `json:"id,omitempty"`
 	CreatedAt *DateTimeFilter       `json:"createdAt,omitempty"`
-	IsRead    *bool                 `json:"isRead"`
+	IsRead    *bool                 `json:"isRead,omitempty"`
 	Has       []*UserEventHasFilter `json:"has,omitempty"`
 	And       []*UserEventFilter    `json:"and,omitempty"`
 	Or        []*UserEventFilter    `json:"or,omitempty"`
@@ -2291,7 +2291,7 @@ type UserEventOrder struct {
 
 type UserEventPatch struct {
 	CreatedAt *string         `json:"createdAt,omitempty"`
-	IsRead    *bool           `json:"isRead"`
+	IsRead    *bool           `json:"isRead,omitempty"`
 	User      *UserRef        `json:"user,omitempty"`
 	Event     []*EventKindRef `json:"event,omitempty"`
 }
@@ -2299,7 +2299,7 @@ type UserEventPatch struct {
 type UserEventRef struct {
 	ID        *string         `json:"id,omitempty"`
 	CreatedAt *string         `json:"createdAt,omitempty"`
-	IsRead    *bool           `json:"isRead"`
+	IsRead    *bool           `json:"isRead,omitempty"`
 	User      *UserRef        `json:"user,omitempty"`
 	Event     []*EventKindRef `json:"event,omitempty"`
 }
@@ -2333,7 +2333,7 @@ type UserPatch struct {
 	Utc              *string         `json:"utc,omitempty"`
 	Links            []string        `json:"links,omitempty"`
 	Skills           []string        `json:"skills,omitempty"`
-	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	NotifyByEmail    *bool           `json:"notifyByEmail,omitempty"`
 	Lang             *Lang           `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Watching         []*NodeRef      `json:"watching,omitempty"`
@@ -2362,7 +2362,7 @@ type UserRef struct {
 	Utc              *string         `json:"utc,omitempty"`
 	Links            []string        `json:"links,omitempty"`
 	Skills           []string        `json:"skills,omitempty"`
-	NotifyByEmail    *bool           `json:"notifyByEmail"`
+	NotifyByEmail    *bool           `json:"notifyByEmail,omitempty"`
 	Lang             *Lang           `json:"lang,omitempty"`
 	Subscriptions    []*TensionRef   `json:"subscriptions,omitempty"`
 	Watching         []*NodeRef      `json:"watching,omitempty"`
@@ -2379,7 +2379,7 @@ type UserRef struct {
 }
 
 type UserRights struct {
-	Type                  UserType `json:"type_,omitempty"`
+	Type                  UserType `json:"type_"`
 	CanLogin              bool     `json:"canLogin"`
 	CanCreateRoot         bool     `json:"canCreateRoot"`
 	MaxPublicOrga         int      `json:"maxPublicOrga"`
@@ -2388,14 +2388,14 @@ type UserRights struct {
 }
 
 type UserRightsAggregateResult struct {
-	Count             *int     `json:"count"`
-	MaxPublicOrgaMin  *int     `json:"maxPublicOrgaMin"`
-	MaxPublicOrgaMax  *int     `json:"maxPublicOrgaMax"`
-	MaxPublicOrgaSum  *int     `json:"maxPublicOrgaSum"`
+	Count             *int     `json:"count,omitempty"`
+	MaxPublicOrgaMin  *int     `json:"maxPublicOrgaMin,omitempty"`
+	MaxPublicOrgaMax  *int     `json:"maxPublicOrgaMax,omitempty"`
+	MaxPublicOrgaSum  *int     `json:"maxPublicOrgaSum,omitempty"`
 	MaxPublicOrgaAvg  *float64 `json:"maxPublicOrgaAvg,omitempty"`
-	MaxPrivateOrgaMin *int     `json:"maxPrivateOrgaMin"`
-	MaxPrivateOrgaMax *int     `json:"maxPrivateOrgaMax"`
-	MaxPrivateOrgaSum *int     `json:"maxPrivateOrgaSum"`
+	MaxPrivateOrgaMin *int     `json:"maxPrivateOrgaMin,omitempty"`
+	MaxPrivateOrgaMax *int     `json:"maxPrivateOrgaMax,omitempty"`
+	MaxPrivateOrgaSum *int     `json:"maxPrivateOrgaSum,omitempty"`
 	MaxPrivateOrgaAvg *float64 `json:"maxPrivateOrgaAvg,omitempty"`
 }
 
@@ -2414,36 +2414,36 @@ type UserRightsOrder struct {
 
 type UserRightsPatch struct {
 	Type                  *UserType `json:"type_,omitempty"`
-	CanLogin              *bool     `json:"canLogin"`
-	CanCreateRoot         *bool     `json:"canCreateRoot"`
-	MaxPublicOrga         *int      `json:"maxPublicOrga"`
-	MaxPrivateOrga        *int      `json:"maxPrivateOrga"`
-	HasEmailNotifications *bool     `json:"hasEmailNotifications"`
+	CanLogin              *bool     `json:"canLogin,omitempty"`
+	CanCreateRoot         *bool     `json:"canCreateRoot,omitempty"`
+	MaxPublicOrga         *int      `json:"maxPublicOrga,omitempty"`
+	MaxPrivateOrga        *int      `json:"maxPrivateOrga,omitempty"`
+	HasEmailNotifications *bool     `json:"hasEmailNotifications,omitempty"`
 }
 
 type UserRightsRef struct {
 	Type                  *UserType `json:"type_,omitempty"`
-	CanLogin              *bool     `json:"canLogin"`
-	CanCreateRoot         *bool     `json:"canCreateRoot"`
-	MaxPublicOrga         *int      `json:"maxPublicOrga"`
-	MaxPrivateOrga        *int      `json:"maxPrivateOrga"`
-	HasEmailNotifications *bool     `json:"hasEmailNotifications"`
+	CanLogin              *bool     `json:"canLogin,omitempty"`
+	CanCreateRoot         *bool     `json:"canCreateRoot,omitempty"`
+	MaxPublicOrga         *int      `json:"maxPublicOrga,omitempty"`
+	MaxPrivateOrga        *int      `json:"maxPrivateOrga,omitempty"`
+	HasEmailNotifications *bool     `json:"hasEmailNotifications,omitempty"`
 }
 
 type Vote struct {
-	Voteid    string    `json:"voteid,omitempty"`
-	Contract  *Contract `json:"contract,omitempty"`
-	Node      *Node     `json:"node,omitempty"`
+	Voteid    string    `json:"voteid"`
+	Contract  *Contract `json:"contract"`
+	Node      *Node     `json:"node"`
 	Data      []int     `json:"data"`
-	ID        string    `json:"id,omitempty"`
-	CreatedBy *User     `json:"createdBy,omitempty"`
-	CreatedAt string    `json:"createdAt,omitempty"`
+	ID        string    `json:"id"`
+	CreatedBy *User     `json:"createdBy"`
+	CreatedAt string    `json:"createdAt"`
 	UpdatedAt *string   `json:"updatedAt,omitempty"`
 	Message   *string   `json:"message,omitempty"`
 }
 
 type VoteAggregateResult struct {
-	Count        *int    `json:"count"`
+	Count        *int    `json:"count,omitempty"`
 	CreatedAtMin *string `json:"createdAtMin,omitempty"`
 	CreatedAtMax *string `json:"createdAtMax,omitempty"`
 	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
@@ -2479,7 +2479,7 @@ type VotePatch struct {
 	Voteid    *string      `json:"voteid,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Node      *NodeRef     `json:"node,omitempty"`
-	Data      []int        `json:"data"`
+	Data      []int        `json:"data,omitempty"`
 }
 
 type VoteRef struct {
@@ -2491,11 +2491,11 @@ type VoteRef struct {
 	Voteid    *string      `json:"voteid,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Node      *NodeRef     `json:"node,omitempty"`
-	Data      []int        `json:"data"`
+	Data      []int        `json:"data,omitempty"`
 }
 
 type WithinFilter struct {
-	Polygon *PolygonRef `json:"polygon,omitempty"`
+	Polygon *PolygonRef `json:"polygon"`
 }
 
 type BlobHasFilter string
