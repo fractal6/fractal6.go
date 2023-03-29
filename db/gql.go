@@ -93,6 +93,16 @@ var gqlQueries map[string]string = map[string]string{
             "input": {{.InputPayload}}
         }
     }`,
+    "updateExtra": `{
+        "query": "mutation {{.QueryName}}($input:{{.InputType}}!){
+            {{.QueryName}}{{.QueryInput}} {
+                {{.QueryGraph}}
+            }
+        }",
+        "variables": {
+            "input": {{.InputPayload}}
+        }
+    }`,
 }
 
 //
@@ -352,6 +362,42 @@ func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, 
 
     // Send request
     err := dg.QueryGql(uctx, "addExtra", reqInput, data)
+    return err
+}
+
+// Update codec, to be used in the resolver functions
+func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{}, qg string, data interface{}) error {
+    Vertex := strings.Title(vertex)
+    queryName := "update" + Vertex
+    inputType := "Update" + Vertex + "Input"
+    //queryGraph := vertex + " {" + qgraph + "}"
+
+    // Build the string request
+    var queryInput string = "(input: $input)"
+    var inputs string
+    slice, ok := InterfaceSlice(input)
+    if ok {
+        var ipts []string
+        for _, x := range slice {
+            s, _ := MarshalWithoutNil(x)
+            ipts = append(ipts, string(s))
+        }
+        inputs = "[" + strings.Join(ipts, ",") + "]"
+    } else {
+        x, _ := MarshalWithoutNil(input)
+        inputs = string(x)
+    }
+
+    reqInput := map[string]string{
+        "QueryName": queryName, // Query name (e.g addUser)
+        "InputType": inputType, // input type name (e.g AddUserInput)
+        "QueryInput": QuoteString(queryInput), // inputs data
+        "QueryGraph": CleanString(qg, true), // output data
+        "InputPayload": string(inputs), // inputs data
+    }
+
+    // Send request
+    err := dg.QueryGql(uctx, "updateExtra", reqInput, data)
     return err
 }
 

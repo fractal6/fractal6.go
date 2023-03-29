@@ -40,18 +40,46 @@ func init() {
     cache = sessions.GetCache()
 }
 
+/* Raw bridges pass the raw query from the request context to Dgraph.
+ * @Warning: It looses transformation that eventually happen in the resolvers/directives.
+ */
 
-func (r *queryResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
-    return DgraphRawQueryResolver(ctx, data, r.db)
+func (r *queryResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
+    err := DgraphQueryResolverRaw(ctx, r.db, data)
+    return postGqlProcess(ctx, r.db, data, err)
 }
 
-func (r *mutationResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data interface{}) error {
-    return DgraphRawQueryResolver(ctx, data, r.db)
+func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
+    err := DgraphQueryResolverRaw(ctx, r.db, data)
+    return postGqlProcess(ctx, r.db, data, err)
 }
 
-//func (r *mutationResolver) Gqlgen2DgraphMutationResolver(ctx context.Context, ipts interface{}, data interface{}) error {
-//    return DgraphQueryResolver(ctx, ipts, data, r.db)
-//}
+/* Those bridges rebuild the query from the request context preloads, and uses the input
+ * parameters from the gqlgen resolvers whuch reflext the modifications in the resolvers/directives.
+ * @Warning: It looses eventual directive in the query graph (@cascade, @skip etc)
+ */
+
+func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) DgraphQueryBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input interface{}, upsert *bool, data interface{}) error {
+    err := DgraphAddResolver(ctx, r.db, input, upsert, data)
+    return postGqlProcess(ctx, r.db, data, err)
+}
+
+func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input interface{}, data interface{}) error {
+    err := DgraphUpdateResolver(ctx, r.db, input, data)
+    return postGqlProcess(ctx, r.db, data, err)
+}
+
+func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter interface{}, data interface{}) error {
+	panic(fmt.Errorf("not implemented"))
+}
 
 /*
 *
@@ -59,7 +87,32 @@ func (r *mutationResolver) Gqlgen2DgraphQueryResolver(ctx context.Context, data 
 *
 */
 
-func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph) error {
+func DgraphAddResolver(ctx context.Context, db *db.Dgraph, input interface{}, upsert *bool,  data interface{}) error {
+	_, uctx, err := auth.GetUserContext(ctx)
+	if err != nil { return tools.LogErr("Access denied", err) }
+
+    _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+    if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
+
+    err = db.AddExtra(*uctx, typeName, input, upsert, GetQueryGraph(ctx), data)
+	return err
+}
+
+func DgraphUpdateResolver(ctx context.Context, db *db.Dgraph, input interface{}, data interface{}) error {
+	_, uctx, err := auth.GetUserContext(ctx)
+	if err != nil { return tools.LogErr("Access denied", err) }
+
+    _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+    if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
+
+    err = db.UpdateExtra(*uctx, typeName, input, GetQueryGraph(ctx), data)
+	return err
+}
+
+// Follow the Gql request to Dgraph.
+// This use raw query from the request context and thus won't propage change
+// of the input that may happend in the resolvers.
+func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}) error {
     // How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
     // for k, a := range rc.Args {
 
@@ -86,7 +139,7 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
         rawQuery = reg.ReplaceAllString(rawQuery, "history:[]")
 
         // If Graphql variables are given...
-        t := strings.ToLower(typeName)
+        t := strings.ToLower(typeName) // @DEBUG: only the first letter must lowered ?!
         if variables[t] != nil && variables[t].(map[string]interface{})["set"] != nil {
             s := variables[t].(map[string]interface{})["set"].(map[string]interface{})
             s["history"] = nil
@@ -105,10 +158,14 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
     // Send request
     uctx := auth.GetUserContextOrEmpty(ctx)
     err = db.QueryGql(uctx, "rawQuery", reqInput, data)
-    if data != nil && err != nil {
+    return err
+}
+
+func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors error) error {
+    if data != nil && errors != nil {
         // Gqlgen ignore the data if there is an error returned
         // see https://github.com/99designs/gqlgen/issues/1191
-        //graphql.AddErrorf(ctx, err.Error())
+        //graphql.AddErrorf(ctx, errors.Error())
 
         // Nodes query can return null field if Node are hidden
         // but children are not. The source ends up to be a tension where
@@ -118,14 +175,16 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
         if (string(d) == "null") {
             // If there is really no data, show the graphql error
             // otherwise, fail silently.
-            return err
+            return errors
         }
-        fmt.Println("Dgraph Error Ignored: ", err.Error())
+        fmt.Println("Dgraph Error Ignored: ", errors.Error())
         return nil
-    } else if err != nil || data == nil {
-        return err
+    } else if errors != nil || data == nil {
+        return errors
     }
 
+    uctx := auth.GetUserContextOrEmpty(ctx)
+    if uctx.Username == "" { return errors }
     // Post processing (@meta_patch) / Post hook operation.
     // If the query go trough the validation stack, execute.
     //if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
@@ -144,51 +203,5 @@ func DgraphRawQueryResolver(ctx context.Context, data interface{}, db *db.Dgraph
         //fmt.Println("Redis error: ", err)
     }
 
-    return err
+    return errors
 }
-
-//// Mutation type Enum
-//type mutationType string
-//const (
-//    AddMut mutationType = "add"
-//    UpdateMut mutationType = "update"
-//    DelMut mutationType = "delete"
-//)
-//type MutationContext struct  {
-//    type_ mutationType
-//    argName string
-//}
-
-
-//// @Debug: GetPreloads loose subfilter in payload(in QueryGraph)
-//func DgraphQueryResolver(ctx context.Context, ipts interface{}, data interface{}, db *db.Dgraph) error {
-//    mutCtx := ctx.Value("mutation_context").(MutationContext)
-//
-//    /* Rebuild the Graphql inputs request from this context */
-//    rc := graphql.GetResolverContext(ctx)
-//    queryName := rc.Field.Name
-//
-//    // Format inputs
-//    inputs, _ := json.Marshal(ipts)
-//    // If inputs needs to get modified, see tools.StructToMap() usage
-//    // in order to to get the struct in the schema.resolver caller.
-//
-//    // Format collected fields
-//    inputType := strings.Split(fmt.Sprintf("%T", rc.Args[mutCtx.argName]), ".")[1]
-//    queryGraph := GetQueryGraph(ctx)
-//
-//    // Build the graphql raw request
-//    reqInput := map[string]string{
-//        "QueryName": queryName, // function name (e.g addUser)
-//        "InputType": inputType, // input type name (e.g AddUserInput)
-//        "QueryGraph": queryGraph, // output data
-//        "InputPayload": string(inputs), // inputs data
-//    }
-//
-//    op := string(mutCtx.type_)
-//
-//    // Send request
-//    uctx := auth.GetUserContextOrEmpty(ctx)
-//    err = db.QueryGql(uctx, op, reqInput, data)
-//    return err
-//}
