@@ -1,20 +1,10 @@
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
-
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
 directive @cascade(fields: [String]) on FIELD
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
@@ -22,13 +12,23 @@ directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -196,6 +196,7 @@ input AddNodeInput {
   children: [NodeRef!]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  projects: [ProjectRef!]
   pinned: [TensionRef!]
   role_ext: RoleExtRef
   role_type: RoleType
@@ -250,6 +251,18 @@ input AddPendingUserInput {
 
 type AddPendingUserPayload {
   pendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
+  numUids: Int
+}
+
+input AddProjectInput {
+  rootnameid: String!
+  nameid: String!
+  name: String!
+  nodes: [NodeRef!]
+}
+
+type AddProjectPayload {
+  project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
   numUids: Int
 }
 
@@ -837,6 +850,12 @@ type DeletePostPayload {
   numUids: Int
 }
 
+type DeleteProjectPayload {
+  project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
+  msg: String
+  numUids: Int
+}
+
 type DeleteReactionPayload {
   reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   msg: String
@@ -1379,6 +1398,9 @@ type Mutation {
   addRoleExt(input: [AddRoleExtInput!]!): AddRoleExtPayload
   updateRoleExt(input: UpdateRoleExtInput!): UpdateRoleExtPayload
   deleteRoleExt(filter: RoleExtFilter!): DeleteRoleExtPayload
+  addProject(input: [AddProjectInput!]!): AddProjectPayload
+  updateProject(input: UpdateProjectInput!): UpdateProjectPayload
+  deleteProject(filter: ProjectFilter!): DeleteProjectPayload
   addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
   updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
   deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
@@ -1460,6 +1482,7 @@ type Node {
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
+  projects(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project!]
   pinned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   role_ext(filter: RoleExtFilter): RoleExt
   role_type: RoleType
@@ -1475,6 +1498,7 @@ type Node {
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
+  projectsAggregate(filter: ProjectFilter): ProjectAggregateResult
   pinnedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
@@ -1657,6 +1681,7 @@ enum NodeHasFilter {
   children
   labels
   roles
+  projects
   pinned
   role_ext
   role_type
@@ -1721,6 +1746,7 @@ input NodePatch {
   children: [NodeRef!]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  projects: [ProjectRef!]
   pinned: [TensionRef!]
   role_ext: RoleExtRef
   role_type: RoleType
@@ -1759,6 +1785,7 @@ input NodeRef {
   children: [NodeRef!]
   labels: [LabelRef!]
   roles: [RoleExtRef!]
+  projects: [ProjectRef!]
   pinned: [TensionRef!]
   role_ext: RoleExtRef
   role_type: RoleType
@@ -2104,6 +2131,69 @@ input PostRef {
   id: ID!
 }
 
+type Project {
+  id: ID!
+  rootnameid: String!
+  nameid: String!
+  name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
+}
+
+type ProjectAggregateResult {
+  count: Int
+  rootnameidMin: String
+  rootnameidMax: String
+  nameidMin: String
+  nameidMax: String
+  nameMin: String
+  nameMax: String
+}
+
+input ProjectFilter {
+  id: [ID!]
+  rootnameid: StringHashFilter
+  name: StringHashFilter_StringTermFilter
+  has: [ProjectHasFilter]
+  and: [ProjectFilter]
+  or: [ProjectFilter]
+  not: ProjectFilter
+}
+
+enum ProjectHasFilter {
+  rootnameid
+  nameid
+  name
+  nodes
+}
+
+input ProjectOrder {
+  asc: ProjectOrderable
+  desc: ProjectOrderable
+  then: ProjectOrder
+}
+
+enum ProjectOrderable {
+  rootnameid
+  nameid
+  name
+}
+
+input ProjectPatch {
+  rootnameid: String
+  nameid: String
+  name: String
+  nodes: [NodeRef!]
+}
+
+input ProjectRef {
+  id: ID
+  rootnameid: String
+  nameid: String
+  name: String
+  nodes: [NodeRef!]
+}
+
 type Query {
   getNode(id: ID, nameid: String): Node
   queryNode(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node]
@@ -2120,6 +2210,9 @@ type Query {
   getRoleExt(id: ID!): RoleExt
   queryRoleExt(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   aggregateRoleExt(filter: RoleExtFilter): RoleExtAggregateResult
+  getProject(id: ID!): Project
+  queryProject(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
+  aggregateProject(filter: ProjectFilter): ProjectAggregateResult
   queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
   getPost(id: ID!): Post
@@ -2757,6 +2850,17 @@ input UpdatePostInput {
 
 type UpdatePostPayload {
   post(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
+  numUids: Int
+}
+
+input UpdateProjectInput {
+  filter: ProjectFilter!
+  set: ProjectPatch
+  remove: ProjectPatch
+}
+
+type UpdateProjectPayload {
+  project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
   numUids: Int
 }
 

@@ -91,6 +91,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   children: [Node!] @hasInverse(field: parent)
   labels: [Label!]
   roles: [RoleExt!]
+  projects: [Project!]
   pinned: [Tension!]
   role_ext: RoleExt
   role_type: RoleType @search
@@ -167,6 +168,24 @@ type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   mandate: Mandate
   roles: [Node!] @hasInverse(field: role_ext)
   nodes: [Node!] @hasInverse(field: roles)
+}
+
+type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryProject {
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by:[hash])
+  nameid: String!
+  name: String! @search(by:[hash, term])
+  nodes: [Node!] @hasInverse(field: projects)
 }
 
 type OrgaAgg {

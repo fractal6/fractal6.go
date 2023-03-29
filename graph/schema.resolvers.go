@@ -60,13 +60,13 @@ func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.Manda
 
 // AddLabel is the resolver for the addLabel field.
 func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
-    errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
 	return data, errors
 }
 
 // UpdateLabel is the resolver for the updateLabel field.
 func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
-    errors = r.DgraphUpdateBridge(ctx, input, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -77,19 +77,34 @@ func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFi
 
 // AddRoleExt is the resolver for the addRoleExt field.
 func (r *mutationResolver) AddRoleExt(ctx context.Context, input []*model.AddRoleExtInput) (data *model.AddRoleExtPayload, errors error) {
-    errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
 	return data, errors
 }
 
 // UpdateRoleExt is the resolver for the updateRoleExt field.
 func (r *mutationResolver) UpdateRoleExt(ctx context.Context, input model.UpdateRoleExtInput) (data *model.UpdateRoleExtPayload, errors error) {
-    errors = r.DgraphUpdateBridge(ctx, input, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
 // DeleteRoleExt is the resolver for the deleteRoleExt field.
 func (r *mutationResolver) DeleteRoleExt(ctx context.Context, filter model.RoleExtFilter) (data *model.DeleteRoleExtPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// AddProject is the resolver for the addProject field.
+func (r *mutationResolver) AddProject(ctx context.Context, input []*model.AddProjectInput) (*model.AddProjectPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProject - addProject"))
+}
+
+// UpdateProject is the resolver for the updateProject field.
+func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*model.UpdateProjectPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProject - updateProject"))
+}
+
+// DeleteProject is the resolver for the deleteProject field.
+func (r *mutationResolver) DeleteProject(ctx context.Context, filter model.ProjectFilter) (*model.DeleteProjectPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProject - deleteProject"))
 }
 
 // AddOrgaAgg is the resolver for the addOrgaAgg field.
@@ -424,6 +439,21 @@ func (r *queryResolver) QueryRoleExt(ctx context.Context, filter *model.RoleExtF
 // AggregateRoleExt is the resolver for the aggregateRoleExt field.
 func (r *queryResolver) AggregateRoleExt(ctx context.Context, filter *model.RoleExtFilter) (data *model.RoleExtAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// GetProject is the resolver for the getProject field.
+func (r *queryResolver) GetProject(ctx context.Context, id string) (*model.Project, error) {
+	panic(fmt.Errorf("not implemented: GetProject - getProject"))
+}
+
+// QueryProject is the resolver for the queryProject field.
+func (r *queryResolver) QueryProject(ctx context.Context, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) ([]*model.Project, error) {
+	panic(fmt.Errorf("not implemented: QueryProject - queryProject"))
+}
+
+// AggregateProject is the resolver for the aggregateProject field.
+func (r *queryResolver) AggregateProject(ctx context.Context, filter *model.ProjectFilter) (*model.ProjectAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProject - aggregateProject"))
 }
 
 // QueryOrgaAgg is the resolver for the queryOrgaAgg field.

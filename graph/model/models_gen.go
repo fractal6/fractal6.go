@@ -178,6 +178,7 @@ type AddNodeInput struct {
 	Children              []*NodeRef     `json:"children,omitempty"`
 	Labels                []*LabelRef    `json:"labels,omitempty"`
 	Roles                 []*RoleExtRef  `json:"roles,omitempty"`
+	Projects              []*ProjectRef  `json:"projects,omitempty"`
 	Pinned                []*TensionRef  `json:"pinned,omitempty"`
 	RoleExt               *RoleExtRef    `json:"role_ext,omitempty"`
 	RoleType              *RoleType      `json:"role_type,omitempty"`
@@ -233,6 +234,18 @@ type AddPendingUserInput struct {
 type AddPendingUserPayload struct {
 	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
 	NumUids     *int           `json:"numUids,omitempty"`
+}
+
+type AddProjectInput struct {
+	Rootnameid string     `json:"rootnameid"`
+	Nameid     string     `json:"nameid"`
+	Name       string     `json:"name"`
+	Nodes      []*NodeRef `json:"nodes,omitempty"`
+}
+
+type AddProjectPayload struct {
+	Project []*Project `json:"project,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type AddReactionInput struct {
@@ -731,6 +744,12 @@ type DeletePostPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type DeleteProjectPayload struct {
+	Project []*Project `json:"project,omitempty"`
+	Msg     *string    `json:"msg,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
+}
+
 type DeleteReactionPayload struct {
 	Reaction []*Reaction `json:"reaction,omitempty"`
 	Msg      *string     `json:"msg,omitempty"`
@@ -1160,6 +1179,7 @@ type Node struct {
 	Children               []*Node                 `json:"children,omitempty"`
 	Labels                 []*Label                `json:"labels,omitempty"`
 	Roles                  []*RoleExt              `json:"roles,omitempty"`
+	Projects               []*Project              `json:"projects,omitempty"`
 	Pinned                 []*Tension              `json:"pinned,omitempty"`
 	RoleExt                *RoleExt                `json:"role_ext,omitempty"`
 	RoleType               *RoleType               `json:"role_type,omitempty"`
@@ -1175,6 +1195,7 @@ type Node struct {
 	ChildrenAggregate      *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
 	LabelsAggregate        *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
 	RolesAggregate         *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
+	ProjectsAggregate      *ProjectAggregateResult `json:"projectsAggregate,omitempty"`
 	PinnedAggregate        *TensionAggregateResult `json:"pinnedAggregate,omitempty"`
 	ContractsAggregate     *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
 	EventsHistoryAggregate *EventAggregateResult   `json:"events_historyAggregate,omitempty"`
@@ -1342,6 +1363,7 @@ type NodePatch struct {
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
 	Roles                 []*RoleExtRef   `json:"roles,omitempty"`
+	Projects              []*ProjectRef   `json:"projects,omitempty"`
 	Pinned                []*TensionRef   `json:"pinned,omitempty"`
 	RoleExt               *RoleExtRef     `json:"role_ext,omitempty"`
 	RoleType              *RoleType       `json:"role_type,omitempty"`
@@ -1380,6 +1402,7 @@ type NodeRef struct {
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
 	Roles                 []*RoleExtRef   `json:"roles,omitempty"`
+	Projects              []*ProjectRef   `json:"projects,omitempty"`
 	Pinned                []*TensionRef   `json:"pinned,omitempty"`
 	RoleExt               *RoleExtRef     `json:"role_ext,omitempty"`
 	RoleType              *RoleType       `json:"role_type,omitempty"`
@@ -1654,6 +1677,56 @@ type PostPatch struct {
 
 type PostRef struct {
 	ID string `json:"id"`
+}
+
+type Project struct {
+	ID             string               `json:"id"`
+	Rootnameid     string               `json:"rootnameid"`
+	Nameid         string               `json:"nameid"`
+	Name           string               `json:"name"`
+	Nodes          []*Node              `json:"nodes,omitempty"`
+	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
+}
+
+type ProjectAggregateResult struct {
+	Count         *int    `json:"count,omitempty"`
+	RootnameidMin *string `json:"rootnameidMin,omitempty"`
+	RootnameidMax *string `json:"rootnameidMax,omitempty"`
+	NameidMin     *string `json:"nameidMin,omitempty"`
+	NameidMax     *string `json:"nameidMax,omitempty"`
+	NameMin       *string `json:"nameMin,omitempty"`
+	NameMax       *string `json:"nameMax,omitempty"`
+}
+
+type ProjectFilter struct {
+	ID         []string                          `json:"id,omitempty"`
+	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
+	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
+	Has        []*ProjectHasFilter               `json:"has,omitempty"`
+	And        []*ProjectFilter                  `json:"and,omitempty"`
+	Or         []*ProjectFilter                  `json:"or,omitempty"`
+	Not        *ProjectFilter                    `json:"not,omitempty"`
+}
+
+type ProjectOrder struct {
+	Asc  *ProjectOrderable `json:"asc,omitempty"`
+	Desc *ProjectOrderable `json:"desc,omitempty"`
+	Then *ProjectOrder     `json:"then,omitempty"`
+}
+
+type ProjectPatch struct {
+	Rootnameid *string    `json:"rootnameid,omitempty"`
+	Nameid     *string    `json:"nameid,omitempty"`
+	Name       *string    `json:"name,omitempty"`
+	Nodes      []*NodeRef `json:"nodes,omitempty"`
+}
+
+type ProjectRef struct {
+	ID         *string    `json:"id,omitempty"`
+	Rootnameid *string    `json:"rootnameid,omitempty"`
+	Nameid     *string    `json:"nameid,omitempty"`
+	Name       *string    `json:"name,omitempty"`
+	Nodes      []*NodeRef `json:"nodes,omitempty"`
 }
 
 type Reaction struct {
@@ -2118,6 +2191,17 @@ type UpdatePostInput struct {
 type UpdatePostPayload struct {
 	Post    []*Post `json:"post,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type UpdateProjectInput struct {
+	Filter *ProjectFilter `json:"filter"`
+	Set    *ProjectPatch  `json:"set,omitempty"`
+	Remove *ProjectPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectPayload struct {
+	Project []*Project `json:"project,omitempty"`
+	NumUids *int       `json:"numUids,omitempty"`
 }
 
 type UpdateReactionInput struct {
@@ -3827,6 +3911,7 @@ const (
 	NodeHasFilterChildren              NodeHasFilter = "children"
 	NodeHasFilterLabels                NodeHasFilter = "labels"
 	NodeHasFilterRoles                 NodeHasFilter = "roles"
+	NodeHasFilterProjects              NodeHasFilter = "projects"
 	NodeHasFilterPinned                NodeHasFilter = "pinned"
 	NodeHasFilterRoleExt               NodeHasFilter = "role_ext"
 	NodeHasFilterRoleType              NodeHasFilter = "role_type"
@@ -3864,6 +3949,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterChildren,
 	NodeHasFilterLabels,
 	NodeHasFilterRoles,
+	NodeHasFilterProjects,
 	NodeHasFilterPinned,
 	NodeHasFilterRoleExt,
 	NodeHasFilterRoleType,
@@ -3877,7 +3963,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
 		return true
 	}
 	return false
@@ -4447,6 +4533,94 @@ func (e *PostOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PostOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectHasFilter string
+
+const (
+	ProjectHasFilterRootnameid ProjectHasFilter = "rootnameid"
+	ProjectHasFilterNameid     ProjectHasFilter = "nameid"
+	ProjectHasFilterName       ProjectHasFilter = "name"
+	ProjectHasFilterNodes      ProjectHasFilter = "nodes"
+)
+
+var AllProjectHasFilter = []ProjectHasFilter{
+	ProjectHasFilterRootnameid,
+	ProjectHasFilterNameid,
+	ProjectHasFilterName,
+	ProjectHasFilterNodes,
+}
+
+func (e ProjectHasFilter) IsValid() bool {
+	switch e {
+	case ProjectHasFilterRootnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterNodes:
+		return true
+	}
+	return false
+}
+
+func (e ProjectHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectOrderable string
+
+const (
+	ProjectOrderableRootnameid ProjectOrderable = "rootnameid"
+	ProjectOrderableNameid     ProjectOrderable = "nameid"
+	ProjectOrderableName       ProjectOrderable = "name"
+)
+
+var AllProjectOrderable = []ProjectOrderable{
+	ProjectOrderableRootnameid,
+	ProjectOrderableNameid,
+	ProjectOrderableName,
+}
+
+func (e ProjectOrderable) IsValid() bool {
+	switch e {
+	case ProjectOrderableRootnameid, ProjectOrderableNameid, ProjectOrderableName:
+		return true
+	}
+	return false
+}
+
+func (e ProjectOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
