@@ -51,7 +51,7 @@ var gqlQueries map[string]string = map[string]string{
         }"
     }`,
 
-    // MUTATIONS
+    // MUTATIONS - @todo merge with bridger query ?
     "add": `{
         "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) {
             {{.QueryName}}(input: $input) {
@@ -82,7 +82,7 @@ var gqlQueries map[string]string = map[string]string{
             "input": {{.InputPayload}}
         }
     }`,
-    // Extra
+    // Extra - Bridge
     "addExtra": `{
         "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!){
             {{.QueryName}}{{.QueryInput}} {
@@ -93,7 +93,7 @@ var gqlQueries map[string]string = map[string]string{
             "input": {{.InputPayload}}
         }
     }`,
-    "updateExtra": `{
+    "mutationExtra": `{
         "query": "mutation {{.QueryName}}($input:{{.InputType}}!){
             {{.QueryName}}{{.QueryInput}} {
                 {{.QueryGraph}}
@@ -323,6 +323,10 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
     return err
 }
 
+//
+// Bridge queries
+//
+
 // Add codec, to be used in the resolver functions
 func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, upsert *bool, qg string, data interface{}) error {
     Vertex := strings.Title(vertex)
@@ -397,7 +401,43 @@ func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{
     }
 
     // Send request
-    err := dg.QueryGql(uctx, "updateExtra", reqInput, data)
+    err := dg.QueryGql(uctx, "mutationExtra", reqInput, data)
+    return err
+}
+
+// Delete codec, to be used in the resolver functions
+func (dg Dgraph) DeleteExtra(uctx model.UserCtx, vertex string, input interface{}, qg string, data interface{}) error {
+    Vertex := strings.Title(vertex)
+    queryName := "delete" + Vertex
+    inputType := Vertex + "Filter"
+    //queryGraph := vertex + " {" + qgraph + "}"
+
+    // Build the string request
+    var queryInput string = "(filter: $input)"
+    var inputs string
+    slice, ok := InterfaceSlice(input)
+    if ok {
+        var ipts []string
+        for _, x := range slice {
+            s, _ := MarshalWithoutNil(x)
+            ipts = append(ipts, string(s))
+        }
+        inputs = "[" + strings.Join(ipts, ",") + "]"
+    } else {
+        x, _ := MarshalWithoutNil(input)
+        inputs = string(x)
+    }
+
+    reqInput := map[string]string{
+        "QueryName": queryName, // Query name (e.g addUser)
+        "InputType": inputType, // input type name (e.g AddUserInput)
+        "QueryInput": QuoteString(queryInput), // inputs data
+        "QueryGraph": CleanString(qg, true), // output data
+        "InputPayload": string(inputs), // inputs data
+    }
+
+    // Send request
+    err := dg.QueryGql(uctx, "mutationExtra", reqInput, data)
     return err
 }
 

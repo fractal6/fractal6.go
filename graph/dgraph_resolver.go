@@ -78,7 +78,8 @@ func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input interfa
 }
 
 func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter interface{}, data interface{}) error {
-	panic(fmt.Errorf("not implemented"))
+    err := DgraphDeleteResolver(ctx, r.db, filter, data)
+    return postGqlProcess(ctx, r.db, data, err)
 }
 
 /*
@@ -109,7 +110,18 @@ func DgraphUpdateResolver(ctx context.Context, db *db.Dgraph, input interface{},
 	return err
 }
 
-// Follow the Gql request to Dgraph.
+func DgraphDeleteResolver(ctx context.Context, db *db.Dgraph, input interface{}, data interface{}) error {
+	_, uctx, err := auth.GetUserContext(ctx)
+	if err != nil { return tools.LogErr("Access denied", err) }
+
+    _, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+    if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
+
+    err = db.DeleteExtra(*uctx, typeName, input, GetQueryGraph(ctx), data)
+	return err
+}
+
+// @deprecated: Follow the Gql request to Dgraph.
 // This use raw query from the request context and thus won't propage change
 // of the input that may happend in the resolvers.
 func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}) error {

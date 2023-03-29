@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
-	"fractale/fractal6.go/web/auth"
 )
 
 // AddNode is the resolver for the addNode field.
@@ -134,13 +132,13 @@ func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilt
 
 // AddTension is the resolver for the addTension field.
 func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (data *model.AddTensionPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
 	return data, errors
 }
 
 // UpdateTension is the resolver for the updateTension field.
 func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -156,7 +154,7 @@ func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCom
 
 // UpdateComment is the resolver for the updateComment field.
 func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -167,12 +165,7 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 
 // AddReaction is the resolver for the addReaction field.
 func (r *mutationResolver) AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (data *model.AddReactionPayload, errors error) {
-	// Input is updated in hooks.
-	_, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return nil, LogErr("Access denied", err)
-	}
-	errors = r.db.AddExtra(*uctx, "reaction", input, upsert, GetQueryGraph(ctx), &data)
+	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
 	return data, errors
 }
 
@@ -183,7 +176,7 @@ func (r *mutationResolver) UpdateReaction(ctx context.Context, input model.Updat
 
 // DeleteReaction is the resolver for the deleteReaction field.
 func (r *mutationResolver) DeleteReaction(ctx context.Context, filter model.ReactionFilter) (data *model.DeleteReactionPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphDeleteBridge(ctx, filter, &data)
 	return data, errors
 }
 
@@ -234,30 +227,25 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 
 // AddContract is the resolver for the addContract field.
 func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
-	// Input is updated in hooks.
-	_, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return nil, LogErr("Access denied", err)
-	}
-	errors = r.db.AddExtra(*uctx, "contract", input, upsert, GetQueryGraph(ctx), &data)
+	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
 	return data, errors
 }
 
 // UpdateContract is the resolver for the updateContract field.
 func (r *mutationResolver) UpdateContract(ctx context.Context, input model.UpdateContractInput) (data *model.UpdateContractPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
 // DeleteContract is the resolver for the deleteContract field.
 func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.ContractFilter) (data *model.DeleteContractPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphDeleteBridge(ctx, filter, &data)
 	return data, errors
 }
 
 // AddVote is the resolver for the addVote field.
 func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (data *model.AddVotePayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
 	return data, errors
 }
 
@@ -278,7 +266,7 @@ func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserIn
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (data *model.UpdateUserPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -324,7 +312,7 @@ func (r *mutationResolver) AddUserEvent(ctx context.Context, input []*model.AddU
 
 // UpdateUserEvent is the resolver for the updateUserEvent field.
 func (r *mutationResolver) UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (data *model.UpdateUserEventPayload, errors error) {
-	errors = r.DgraphBridgeRaw(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
