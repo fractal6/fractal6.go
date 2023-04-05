@@ -183,9 +183,29 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }) {
   id: ID!
   rootnameid: String! @search(by:[hash])
-  nameid: String!
+  parentnameid: String!
+  nameid: String! @search(by:[hash])
   name: String! @search(by:[hash, term])
+  about: String
+  columns: [ProjectColumn!] @hasInverse(field: project)
+  leaders: [Node!]
   nodes: [Node!] @hasInverse(field: projects)
+}
+
+type ProjectTension {
+  id: ID!
+  tension: Tension!
+  pos: Int!
+  pc: ProjectColumn!
+}
+
+type ProjectColumn {
+  id: ID!
+  name: String! @id
+  about: String
+  pos: Int!
+  tensions: [ProjectTension!] @hasInverse(field: pc)
+  project: Project!
 }
 
 type OrgaAgg {
@@ -272,6 +292,7 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   mentions: [Event!] @hasInverse(field: mentioned)
   contracts: [Contract!] @hasInverse(field: tension)
   subscribers: [User!] @hasInverse(field: subscriptions)
+  projects: [ProjectTension!] @hasInverse(field: tension)
   n_comments: Int
   n_open_contracts: Int
 }

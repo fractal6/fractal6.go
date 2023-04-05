@@ -236,16 +236,44 @@ type AddPendingUserPayload struct {
 	NumUids     *int           `json:"numUids,omitempty"`
 }
 
+type AddProjectColumnInput struct {
+	Name     string               `json:"name"`
+	About    *string              `json:"about,omitempty"`
+	Pos      int                  `json:"pos"`
+	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
+	Project  *ProjectRef          `json:"project"`
+}
+
+type AddProjectColumnPayload struct {
+	ProjectColumn []*ProjectColumn `json:"projectColumn,omitempty"`
+	NumUids       *int             `json:"numUids,omitempty"`
+}
+
 type AddProjectInput struct {
-	Rootnameid string     `json:"rootnameid"`
-	Nameid     string     `json:"nameid"`
-	Name       string     `json:"name"`
-	Nodes      []*NodeRef `json:"nodes,omitempty"`
+	Rootnameid   string              `json:"rootnameid"`
+	Parentnameid string              `json:"parentnameid"`
+	Nameid       string              `json:"nameid"`
+	Name         string              `json:"name"`
+	About        *string             `json:"about,omitempty"`
+	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
+	Leaders      []*NodeRef          `json:"leaders,omitempty"`
+	Nodes        []*NodeRef          `json:"nodes,omitempty"`
 }
 
 type AddProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type AddProjectTensionInput struct {
+	Tension *TensionRef       `json:"tension"`
+	Pos     int               `json:"pos"`
+	Pc      *ProjectColumnRef `json:"pc"`
+}
+
+type AddProjectTensionPayload struct {
+	ProjectTension []*ProjectTension `json:"projectTension,omitempty"`
+	NumUids        *int              `json:"numUids,omitempty"`
 }
 
 type AddReactionInput struct {
@@ -277,28 +305,29 @@ type AddRoleExtPayload struct {
 }
 
 type AddTensionInput struct {
-	CreatedBy      *UserRef       `json:"createdBy"`
-	CreatedAt      string         `json:"createdAt"`
-	UpdatedAt      *string        `json:"updatedAt,omitempty"`
-	Message        *string        `json:"message,omitempty"`
-	Emitter        *NodeRef       `json:"emitter"`
-	Emitterid      string         `json:"emitterid"`
-	Receiver       *NodeRef       `json:"receiver"`
-	Receiverid     string         `json:"receiverid"`
-	Title          string         `json:"title"`
-	Type           TensionType    `json:"type_"`
-	Status         TensionStatus  `json:"status"`
-	Action         *TensionAction `json:"action,omitempty"`
-	Assignees      []*UserRef     `json:"assignees,omitempty"`
-	Labels         []*LabelRef    `json:"labels,omitempty"`
-	Comments       []*CommentRef  `json:"comments,omitempty"`
-	Blobs          []*BlobRef     `json:"blobs,omitempty"`
-	History        []*EventRef    `json:"history,omitempty"`
-	Mentions       []*EventRef    `json:"mentions,omitempty"`
-	Contracts      []*ContractRef `json:"contracts,omitempty"`
-	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
-	NComments      *int           `json:"n_comments,omitempty"`
-	NOpenContracts *int           `json:"n_open_contracts,omitempty"`
+	CreatedBy      *UserRef             `json:"createdBy"`
+	CreatedAt      string               `json:"createdAt"`
+	UpdatedAt      *string              `json:"updatedAt,omitempty"`
+	Message        *string              `json:"message,omitempty"`
+	Emitter        *NodeRef             `json:"emitter"`
+	Emitterid      string               `json:"emitterid"`
+	Receiver       *NodeRef             `json:"receiver"`
+	Receiverid     string               `json:"receiverid"`
+	Title          string               `json:"title"`
+	Type           TensionType          `json:"type_"`
+	Status         TensionStatus        `json:"status"`
+	Action         *TensionAction       `json:"action,omitempty"`
+	Assignees      []*UserRef           `json:"assignees,omitempty"`
+	Labels         []*LabelRef          `json:"labels,omitempty"`
+	Comments       []*CommentRef        `json:"comments,omitempty"`
+	Blobs          []*BlobRef           `json:"blobs,omitempty"`
+	History        []*EventRef          `json:"history,omitempty"`
+	Mentions       []*EventRef          `json:"mentions,omitempty"`
+	Contracts      []*ContractRef       `json:"contracts,omitempty"`
+	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
+	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
+	NComments      *int                 `json:"n_comments,omitempty"`
+	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -744,10 +773,22 @@ type DeletePostPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type DeleteProjectColumnPayload struct {
+	ProjectColumn []*ProjectColumn `json:"projectColumn,omitempty"`
+	Msg           *string          `json:"msg,omitempty"`
+	NumUids       *int             `json:"numUids,omitempty"`
+}
+
 type DeleteProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type DeleteProjectTensionPayload struct {
+	ProjectTension []*ProjectTension `json:"projectTension,omitempty"`
+	Msg            *string           `json:"msg,omitempty"`
+	NumUids        *int              `json:"numUids,omitempty"`
 }
 
 type DeleteReactionPayload struct {
@@ -1680,27 +1721,92 @@ type PostRef struct {
 }
 
 type Project struct {
-	ID             string               `json:"id"`
-	Rootnameid     string               `json:"rootnameid"`
-	Nameid         string               `json:"nameid"`
-	Name           string               `json:"name"`
-	Nodes          []*Node              `json:"nodes,omitempty"`
-	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
+	ID               string                        `json:"id"`
+	Rootnameid       string                        `json:"rootnameid"`
+	Parentnameid     string                        `json:"parentnameid"`
+	Nameid           string                        `json:"nameid"`
+	Name             string                        `json:"name"`
+	About            *string                       `json:"about,omitempty"`
+	Columns          []*ProjectColumn              `json:"columns,omitempty"`
+	Leaders          []*Node                       `json:"leaders,omitempty"`
+	Nodes            []*Node                       `json:"nodes,omitempty"`
+	ColumnsAggregate *ProjectColumnAggregateResult `json:"columnsAggregate,omitempty"`
+	LeadersAggregate *NodeAggregateResult          `json:"leadersAggregate,omitempty"`
+	NodesAggregate   *NodeAggregateResult          `json:"nodesAggregate,omitempty"`
 }
 
 type ProjectAggregateResult struct {
-	Count         *int    `json:"count,omitempty"`
-	RootnameidMin *string `json:"rootnameidMin,omitempty"`
-	RootnameidMax *string `json:"rootnameidMax,omitempty"`
-	NameidMin     *string `json:"nameidMin,omitempty"`
-	NameidMax     *string `json:"nameidMax,omitempty"`
-	NameMin       *string `json:"nameMin,omitempty"`
-	NameMax       *string `json:"nameMax,omitempty"`
+	Count           *int    `json:"count,omitempty"`
+	RootnameidMin   *string `json:"rootnameidMin,omitempty"`
+	RootnameidMax   *string `json:"rootnameidMax,omitempty"`
+	ParentnameidMin *string `json:"parentnameidMin,omitempty"`
+	ParentnameidMax *string `json:"parentnameidMax,omitempty"`
+	NameidMin       *string `json:"nameidMin,omitempty"`
+	NameidMax       *string `json:"nameidMax,omitempty"`
+	NameMin         *string `json:"nameMin,omitempty"`
+	NameMax         *string `json:"nameMax,omitempty"`
+	AboutMin        *string `json:"aboutMin,omitempty"`
+	AboutMax        *string `json:"aboutMax,omitempty"`
+}
+
+type ProjectColumn struct {
+	ID                string                         `json:"id"`
+	Name              string                         `json:"name"`
+	About             *string                        `json:"about,omitempty"`
+	Pos               int                            `json:"pos"`
+	Tensions          []*ProjectTension              `json:"tensions,omitempty"`
+	Project           *Project                       `json:"project"`
+	TensionsAggregate *ProjectTensionAggregateResult `json:"tensionsAggregate,omitempty"`
+}
+
+type ProjectColumnAggregateResult struct {
+	Count    *int     `json:"count,omitempty"`
+	NameMin  *string  `json:"nameMin,omitempty"`
+	NameMax  *string  `json:"nameMax,omitempty"`
+	AboutMin *string  `json:"aboutMin,omitempty"`
+	AboutMax *string  `json:"aboutMax,omitempty"`
+	PosMin   *int     `json:"posMin,omitempty"`
+	PosMax   *int     `json:"posMax,omitempty"`
+	PosSum   *int     `json:"posSum,omitempty"`
+	PosAvg   *float64 `json:"posAvg,omitempty"`
+}
+
+type ProjectColumnFilter struct {
+	ID   []string                  `json:"id,omitempty"`
+	Name *StringHashFilter         `json:"name,omitempty"`
+	Has  []*ProjectColumnHasFilter `json:"has,omitempty"`
+	And  []*ProjectColumnFilter    `json:"and,omitempty"`
+	Or   []*ProjectColumnFilter    `json:"or,omitempty"`
+	Not  *ProjectColumnFilter      `json:"not,omitempty"`
+}
+
+type ProjectColumnOrder struct {
+	Asc  *ProjectColumnOrderable `json:"asc,omitempty"`
+	Desc *ProjectColumnOrderable `json:"desc,omitempty"`
+	Then *ProjectColumnOrder     `json:"then,omitempty"`
+}
+
+type ProjectColumnPatch struct {
+	Name     *string              `json:"name,omitempty"`
+	About    *string              `json:"about,omitempty"`
+	Pos      *int                 `json:"pos,omitempty"`
+	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
+	Project  *ProjectRef          `json:"project,omitempty"`
+}
+
+type ProjectColumnRef struct {
+	ID       *string              `json:"id,omitempty"`
+	Name     *string              `json:"name,omitempty"`
+	About    *string              `json:"about,omitempty"`
+	Pos      *int                 `json:"pos,omitempty"`
+	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
+	Project  *ProjectRef          `json:"project,omitempty"`
 }
 
 type ProjectFilter struct {
 	ID         []string                          `json:"id,omitempty"`
 	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
+	Nameid     *StringHashFilter                 `json:"nameid,omitempty"`
 	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
 	Has        []*ProjectHasFilter               `json:"has,omitempty"`
 	And        []*ProjectFilter                  `json:"and,omitempty"`
@@ -1715,18 +1821,68 @@ type ProjectOrder struct {
 }
 
 type ProjectPatch struct {
-	Rootnameid *string    `json:"rootnameid,omitempty"`
-	Nameid     *string    `json:"nameid,omitempty"`
-	Name       *string    `json:"name,omitempty"`
-	Nodes      []*NodeRef `json:"nodes,omitempty"`
+	Rootnameid   *string             `json:"rootnameid,omitempty"`
+	Parentnameid *string             `json:"parentnameid,omitempty"`
+	Nameid       *string             `json:"nameid,omitempty"`
+	Name         *string             `json:"name,omitempty"`
+	About        *string             `json:"about,omitempty"`
+	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
+	Leaders      []*NodeRef          `json:"leaders,omitempty"`
+	Nodes        []*NodeRef          `json:"nodes,omitempty"`
 }
 
 type ProjectRef struct {
-	ID         *string    `json:"id,omitempty"`
-	Rootnameid *string    `json:"rootnameid,omitempty"`
-	Nameid     *string    `json:"nameid,omitempty"`
-	Name       *string    `json:"name,omitempty"`
-	Nodes      []*NodeRef `json:"nodes,omitempty"`
+	ID           *string             `json:"id,omitempty"`
+	Rootnameid   *string             `json:"rootnameid,omitempty"`
+	Parentnameid *string             `json:"parentnameid,omitempty"`
+	Nameid       *string             `json:"nameid,omitempty"`
+	Name         *string             `json:"name,omitempty"`
+	About        *string             `json:"about,omitempty"`
+	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
+	Leaders      []*NodeRef          `json:"leaders,omitempty"`
+	Nodes        []*NodeRef          `json:"nodes,omitempty"`
+}
+
+type ProjectTension struct {
+	ID      string         `json:"id"`
+	Tension *Tension       `json:"tension"`
+	Pos     int            `json:"pos"`
+	Pc      *ProjectColumn `json:"pc"`
+}
+
+type ProjectTensionAggregateResult struct {
+	Count  *int     `json:"count,omitempty"`
+	PosMin *int     `json:"posMin,omitempty"`
+	PosMax *int     `json:"posMax,omitempty"`
+	PosSum *int     `json:"posSum,omitempty"`
+	PosAvg *float64 `json:"posAvg,omitempty"`
+}
+
+type ProjectTensionFilter struct {
+	ID  []string                   `json:"id,omitempty"`
+	Has []*ProjectTensionHasFilter `json:"has,omitempty"`
+	And []*ProjectTensionFilter    `json:"and,omitempty"`
+	Or  []*ProjectTensionFilter    `json:"or,omitempty"`
+	Not *ProjectTensionFilter      `json:"not,omitempty"`
+}
+
+type ProjectTensionOrder struct {
+	Asc  *ProjectTensionOrderable `json:"asc,omitempty"`
+	Desc *ProjectTensionOrderable `json:"desc,omitempty"`
+	Then *ProjectTensionOrder     `json:"then,omitempty"`
+}
+
+type ProjectTensionPatch struct {
+	Tension *TensionRef       `json:"tension,omitempty"`
+	Pos     *int              `json:"pos,omitempty"`
+	Pc      *ProjectColumnRef `json:"pc,omitempty"`
+}
+
+type ProjectTensionRef struct {
+	ID      *string           `json:"id,omitempty"`
+	Tension *TensionRef       `json:"tension,omitempty"`
+	Pos     *int              `json:"pos,omitempty"`
+	Pc      *ProjectColumnRef `json:"pc,omitempty"`
 }
 
 type Reaction struct {
@@ -1895,37 +2051,39 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Emitter              *Node                    `json:"emitter"`
-	Emitterid            string                   `json:"emitterid"`
-	Receiver             *Node                    `json:"receiver"`
-	Receiverid           string                   `json:"receiverid"`
-	Title                string                   `json:"title"`
-	Type                 TensionType              `json:"type_"`
-	Status               TensionStatus            `json:"status"`
-	Action               *TensionAction           `json:"action,omitempty"`
-	Assignees            []*User                  `json:"assignees,omitempty"`
-	Labels               []*Label                 `json:"labels,omitempty"`
-	Comments             []*Comment               `json:"comments,omitempty"`
-	Blobs                []*Blob                  `json:"blobs,omitempty"`
-	History              []*Event                 `json:"history,omitempty"`
-	Mentions             []*Event                 `json:"mentions,omitempty"`
-	Contracts            []*Contract              `json:"contracts,omitempty"`
-	Subscribers          []*User                  `json:"subscribers,omitempty"`
-	NComments            *int                     `json:"n_comments,omitempty"`
-	NOpenContracts       *int                     `json:"n_open_contracts,omitempty"`
-	ID                   string                   `json:"id"`
-	CreatedBy            *User                    `json:"createdBy"`
-	CreatedAt            string                   `json:"createdAt"`
-	UpdatedAt            *string                  `json:"updatedAt,omitempty"`
-	Message              *string                  `json:"message,omitempty"`
-	AssigneesAggregate   *UserAggregateResult     `json:"assigneesAggregate,omitempty"`
-	LabelsAggregate      *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
-	CommentsAggregate    *CommentAggregateResult  `json:"commentsAggregate,omitempty"`
-	BlobsAggregate       *BlobAggregateResult     `json:"blobsAggregate,omitempty"`
-	HistoryAggregate     *EventAggregateResult    `json:"historyAggregate,omitempty"`
-	MentionsAggregate    *EventAggregateResult    `json:"mentionsAggregate,omitempty"`
-	ContractsAggregate   *ContractAggregateResult `json:"contractsAggregate,omitempty"`
-	SubscribersAggregate *UserAggregateResult     `json:"subscribersAggregate,omitempty"`
+	Emitter              *Node                          `json:"emitter"`
+	Emitterid            string                         `json:"emitterid"`
+	Receiver             *Node                          `json:"receiver"`
+	Receiverid           string                         `json:"receiverid"`
+	Title                string                         `json:"title"`
+	Type                 TensionType                    `json:"type_"`
+	Status               TensionStatus                  `json:"status"`
+	Action               *TensionAction                 `json:"action,omitempty"`
+	Assignees            []*User                        `json:"assignees,omitempty"`
+	Labels               []*Label                       `json:"labels,omitempty"`
+	Comments             []*Comment                     `json:"comments,omitempty"`
+	Blobs                []*Blob                        `json:"blobs,omitempty"`
+	History              []*Event                       `json:"history,omitempty"`
+	Mentions             []*Event                       `json:"mentions,omitempty"`
+	Contracts            []*Contract                    `json:"contracts,omitempty"`
+	Subscribers          []*User                        `json:"subscribers,omitempty"`
+	Projects             []*ProjectTension              `json:"projects,omitempty"`
+	NComments            *int                           `json:"n_comments,omitempty"`
+	NOpenContracts       *int                           `json:"n_open_contracts,omitempty"`
+	ID                   string                         `json:"id"`
+	CreatedBy            *User                          `json:"createdBy"`
+	CreatedAt            string                         `json:"createdAt"`
+	UpdatedAt            *string                        `json:"updatedAt,omitempty"`
+	Message              *string                        `json:"message,omitempty"`
+	AssigneesAggregate   *UserAggregateResult           `json:"assigneesAggregate,omitempty"`
+	LabelsAggregate      *LabelAggregateResult          `json:"labelsAggregate,omitempty"`
+	CommentsAggregate    *CommentAggregateResult        `json:"commentsAggregate,omitempty"`
+	BlobsAggregate       *BlobAggregateResult           `json:"blobsAggregate,omitempty"`
+	HistoryAggregate     *EventAggregateResult          `json:"historyAggregate,omitempty"`
+	MentionsAggregate    *EventAggregateResult          `json:"mentionsAggregate,omitempty"`
+	ContractsAggregate   *ContractAggregateResult       `json:"contractsAggregate,omitempty"`
+	SubscribersAggregate *UserAggregateResult           `json:"subscribersAggregate,omitempty"`
+	ProjectsAggregate    *ProjectTensionAggregateResult `json:"projectsAggregate,omitempty"`
 }
 
 type TensionAggregateResult struct {
@@ -1979,54 +2137,56 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
-	CreatedBy      *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt      *string        `json:"createdAt,omitempty"`
-	UpdatedAt      *string        `json:"updatedAt,omitempty"`
-	Message        *string        `json:"message,omitempty"`
-	Emitter        *NodeRef       `json:"emitter,omitempty"`
-	Emitterid      *string        `json:"emitterid,omitempty"`
-	Receiver       *NodeRef       `json:"receiver,omitempty"`
-	Receiverid     *string        `json:"receiverid,omitempty"`
-	Title          *string        `json:"title,omitempty"`
-	Type           *TensionType   `json:"type_,omitempty"`
-	Status         *TensionStatus `json:"status,omitempty"`
-	Action         *TensionAction `json:"action,omitempty"`
-	Assignees      []*UserRef     `json:"assignees,omitempty"`
-	Labels         []*LabelRef    `json:"labels,omitempty"`
-	Comments       []*CommentRef  `json:"comments,omitempty"`
-	Blobs          []*BlobRef     `json:"blobs,omitempty"`
-	History        []*EventRef    `json:"history,omitempty"`
-	Mentions       []*EventRef    `json:"mentions,omitempty"`
-	Contracts      []*ContractRef `json:"contracts,omitempty"`
-	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
-	NComments      *int           `json:"n_comments,omitempty"`
-	NOpenContracts *int           `json:"n_open_contracts,omitempty"`
+	CreatedBy      *UserRef             `json:"createdBy,omitempty"`
+	CreatedAt      *string              `json:"createdAt,omitempty"`
+	UpdatedAt      *string              `json:"updatedAt,omitempty"`
+	Message        *string              `json:"message,omitempty"`
+	Emitter        *NodeRef             `json:"emitter,omitempty"`
+	Emitterid      *string              `json:"emitterid,omitempty"`
+	Receiver       *NodeRef             `json:"receiver,omitempty"`
+	Receiverid     *string              `json:"receiverid,omitempty"`
+	Title          *string              `json:"title,omitempty"`
+	Type           *TensionType         `json:"type_,omitempty"`
+	Status         *TensionStatus       `json:"status,omitempty"`
+	Action         *TensionAction       `json:"action,omitempty"`
+	Assignees      []*UserRef           `json:"assignees,omitempty"`
+	Labels         []*LabelRef          `json:"labels,omitempty"`
+	Comments       []*CommentRef        `json:"comments,omitempty"`
+	Blobs          []*BlobRef           `json:"blobs,omitempty"`
+	History        []*EventRef          `json:"history,omitempty"`
+	Mentions       []*EventRef          `json:"mentions,omitempty"`
+	Contracts      []*ContractRef       `json:"contracts,omitempty"`
+	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
+	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
+	NComments      *int                 `json:"n_comments,omitempty"`
+	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
 }
 
 type TensionRef struct {
-	ID             *string        `json:"id,omitempty"`
-	CreatedBy      *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt      *string        `json:"createdAt,omitempty"`
-	UpdatedAt      *string        `json:"updatedAt,omitempty"`
-	Message        *string        `json:"message,omitempty"`
-	Emitter        *NodeRef       `json:"emitter,omitempty"`
-	Emitterid      *string        `json:"emitterid,omitempty"`
-	Receiver       *NodeRef       `json:"receiver,omitempty"`
-	Receiverid     *string        `json:"receiverid,omitempty"`
-	Title          *string        `json:"title,omitempty"`
-	Type           *TensionType   `json:"type_,omitempty"`
-	Status         *TensionStatus `json:"status,omitempty"`
-	Action         *TensionAction `json:"action,omitempty"`
-	Assignees      []*UserRef     `json:"assignees,omitempty"`
-	Labels         []*LabelRef    `json:"labels,omitempty"`
-	Comments       []*CommentRef  `json:"comments,omitempty"`
-	Blobs          []*BlobRef     `json:"blobs,omitempty"`
-	History        []*EventRef    `json:"history,omitempty"`
-	Mentions       []*EventRef    `json:"mentions,omitempty"`
-	Contracts      []*ContractRef `json:"contracts,omitempty"`
-	Subscribers    []*UserRef     `json:"subscribers,omitempty"`
-	NComments      *int           `json:"n_comments,omitempty"`
-	NOpenContracts *int           `json:"n_open_contracts,omitempty"`
+	ID             *string              `json:"id,omitempty"`
+	CreatedBy      *UserRef             `json:"createdBy,omitempty"`
+	CreatedAt      *string              `json:"createdAt,omitempty"`
+	UpdatedAt      *string              `json:"updatedAt,omitempty"`
+	Message        *string              `json:"message,omitempty"`
+	Emitter        *NodeRef             `json:"emitter,omitempty"`
+	Emitterid      *string              `json:"emitterid,omitempty"`
+	Receiver       *NodeRef             `json:"receiver,omitempty"`
+	Receiverid     *string              `json:"receiverid,omitempty"`
+	Title          *string              `json:"title,omitempty"`
+	Type           *TensionType         `json:"type_,omitempty"`
+	Status         *TensionStatus       `json:"status,omitempty"`
+	Action         *TensionAction       `json:"action,omitempty"`
+	Assignees      []*UserRef           `json:"assignees,omitempty"`
+	Labels         []*LabelRef          `json:"labels,omitempty"`
+	Comments       []*CommentRef        `json:"comments,omitempty"`
+	Blobs          []*BlobRef           `json:"blobs,omitempty"`
+	History        []*EventRef          `json:"history,omitempty"`
+	Mentions       []*EventRef          `json:"mentions,omitempty"`
+	Contracts      []*ContractRef       `json:"contracts,omitempty"`
+	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
+	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
+	NComments      *int                 `json:"n_comments,omitempty"`
+	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -2193,6 +2353,17 @@ type UpdatePostPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type UpdateProjectColumnInput struct {
+	Filter *ProjectColumnFilter `json:"filter"`
+	Set    *ProjectColumnPatch  `json:"set,omitempty"`
+	Remove *ProjectColumnPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectColumnPayload struct {
+	ProjectColumn []*ProjectColumn `json:"projectColumn,omitempty"`
+	NumUids       *int             `json:"numUids,omitempty"`
+}
+
 type UpdateProjectInput struct {
 	Filter *ProjectFilter `json:"filter"`
 	Set    *ProjectPatch  `json:"set,omitempty"`
@@ -2202,6 +2373,17 @@ type UpdateProjectInput struct {
 type UpdateProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type UpdateProjectTensionInput struct {
+	Filter *ProjectTensionFilter `json:"filter"`
+	Set    *ProjectTensionPatch  `json:"set,omitempty"`
+	Remove *ProjectTensionPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectTensionPayload struct {
+	ProjectTension []*ProjectTension `json:"projectTension,omitempty"`
+	NumUids        *int              `json:"numUids,omitempty"`
 }
 
 type UpdateReactionInput struct {
@@ -4536,25 +4718,123 @@ func (e PostOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ProjectColumnHasFilter string
+
+const (
+	ProjectColumnHasFilterName     ProjectColumnHasFilter = "name"
+	ProjectColumnHasFilterAbout    ProjectColumnHasFilter = "about"
+	ProjectColumnHasFilterPos      ProjectColumnHasFilter = "pos"
+	ProjectColumnHasFilterTensions ProjectColumnHasFilter = "tensions"
+	ProjectColumnHasFilterProject  ProjectColumnHasFilter = "project"
+)
+
+var AllProjectColumnHasFilter = []ProjectColumnHasFilter{
+	ProjectColumnHasFilterName,
+	ProjectColumnHasFilterAbout,
+	ProjectColumnHasFilterPos,
+	ProjectColumnHasFilterTensions,
+	ProjectColumnHasFilterProject,
+}
+
+func (e ProjectColumnHasFilter) IsValid() bool {
+	switch e {
+	case ProjectColumnHasFilterName, ProjectColumnHasFilterAbout, ProjectColumnHasFilterPos, ProjectColumnHasFilterTensions, ProjectColumnHasFilterProject:
+		return true
+	}
+	return false
+}
+
+func (e ProjectColumnHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectColumnHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectColumnHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectColumnHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectColumnHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectColumnOrderable string
+
+const (
+	ProjectColumnOrderableName  ProjectColumnOrderable = "name"
+	ProjectColumnOrderableAbout ProjectColumnOrderable = "about"
+	ProjectColumnOrderablePos   ProjectColumnOrderable = "pos"
+)
+
+var AllProjectColumnOrderable = []ProjectColumnOrderable{
+	ProjectColumnOrderableName,
+	ProjectColumnOrderableAbout,
+	ProjectColumnOrderablePos,
+}
+
+func (e ProjectColumnOrderable) IsValid() bool {
+	switch e {
+	case ProjectColumnOrderableName, ProjectColumnOrderableAbout, ProjectColumnOrderablePos:
+		return true
+	}
+	return false
+}
+
+func (e ProjectColumnOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectColumnOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectColumnOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectColumnOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectColumnOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type ProjectHasFilter string
 
 const (
-	ProjectHasFilterRootnameid ProjectHasFilter = "rootnameid"
-	ProjectHasFilterNameid     ProjectHasFilter = "nameid"
-	ProjectHasFilterName       ProjectHasFilter = "name"
-	ProjectHasFilterNodes      ProjectHasFilter = "nodes"
+	ProjectHasFilterRootnameid   ProjectHasFilter = "rootnameid"
+	ProjectHasFilterParentnameid ProjectHasFilter = "parentnameid"
+	ProjectHasFilterNameid       ProjectHasFilter = "nameid"
+	ProjectHasFilterName         ProjectHasFilter = "name"
+	ProjectHasFilterAbout        ProjectHasFilter = "about"
+	ProjectHasFilterColumns      ProjectHasFilter = "columns"
+	ProjectHasFilterLeaders      ProjectHasFilter = "leaders"
+	ProjectHasFilterNodes        ProjectHasFilter = "nodes"
 )
 
 var AllProjectHasFilter = []ProjectHasFilter{
 	ProjectHasFilterRootnameid,
+	ProjectHasFilterParentnameid,
 	ProjectHasFilterNameid,
 	ProjectHasFilterName,
+	ProjectHasFilterAbout,
+	ProjectHasFilterColumns,
+	ProjectHasFilterLeaders,
 	ProjectHasFilterNodes,
 }
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterRootnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterNodes:
+	case ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterAbout, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
 		return true
 	}
 	return false
@@ -4584,20 +4864,24 @@ func (e ProjectHasFilter) MarshalGQL(w io.Writer) {
 type ProjectOrderable string
 
 const (
-	ProjectOrderableRootnameid ProjectOrderable = "rootnameid"
-	ProjectOrderableNameid     ProjectOrderable = "nameid"
-	ProjectOrderableName       ProjectOrderable = "name"
+	ProjectOrderableRootnameid   ProjectOrderable = "rootnameid"
+	ProjectOrderableParentnameid ProjectOrderable = "parentnameid"
+	ProjectOrderableNameid       ProjectOrderable = "nameid"
+	ProjectOrderableName         ProjectOrderable = "name"
+	ProjectOrderableAbout        ProjectOrderable = "about"
 )
 
 var AllProjectOrderable = []ProjectOrderable{
 	ProjectOrderableRootnameid,
+	ProjectOrderableParentnameid,
 	ProjectOrderableNameid,
 	ProjectOrderableName,
+	ProjectOrderableAbout,
 }
 
 func (e ProjectOrderable) IsValid() bool {
 	switch e {
-	case ProjectOrderableRootnameid, ProjectOrderableNameid, ProjectOrderableName:
+	case ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableAbout:
 		return true
 	}
 	return false
@@ -4621,6 +4905,88 @@ func (e *ProjectOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectTensionHasFilter string
+
+const (
+	ProjectTensionHasFilterTension ProjectTensionHasFilter = "tension"
+	ProjectTensionHasFilterPos     ProjectTensionHasFilter = "pos"
+	ProjectTensionHasFilterPc      ProjectTensionHasFilter = "pc"
+)
+
+var AllProjectTensionHasFilter = []ProjectTensionHasFilter{
+	ProjectTensionHasFilterTension,
+	ProjectTensionHasFilterPos,
+	ProjectTensionHasFilterPc,
+}
+
+func (e ProjectTensionHasFilter) IsValid() bool {
+	switch e {
+	case ProjectTensionHasFilterTension, ProjectTensionHasFilterPos, ProjectTensionHasFilterPc:
+		return true
+	}
+	return false
+}
+
+func (e ProjectTensionHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectTensionHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectTensionHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectTensionHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectTensionHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectTensionOrderable string
+
+const (
+	ProjectTensionOrderablePos ProjectTensionOrderable = "pos"
+)
+
+var AllProjectTensionOrderable = []ProjectTensionOrderable{
+	ProjectTensionOrderablePos,
+}
+
+func (e ProjectTensionOrderable) IsValid() bool {
+	switch e {
+	case ProjectTensionOrderablePos:
+		return true
+	}
+	return false
+}
+
+func (e ProjectTensionOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectTensionOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectTensionOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectTensionOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectTensionOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -5026,6 +5392,7 @@ const (
 	TensionHasFilterMentions       TensionHasFilter = "mentions"
 	TensionHasFilterContracts      TensionHasFilter = "contracts"
 	TensionHasFilterSubscribers    TensionHasFilter = "subscribers"
+	TensionHasFilterProjects       TensionHasFilter = "projects"
 	TensionHasFilterNComments      TensionHasFilter = "n_comments"
 	TensionHasFilterNOpenContracts TensionHasFilter = "n_open_contracts"
 )
@@ -5051,13 +5418,14 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterMentions,
 	TensionHasFilterContracts,
 	TensionHasFilterSubscribers,
+	TensionHasFilterProjects,
 	TensionHasFilterNComments,
 	TensionHasFilterNOpenContracts,
 }
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjects, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
 		return true
 	}
 	return false

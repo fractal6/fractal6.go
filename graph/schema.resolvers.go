@@ -105,6 +105,36 @@ func (r *mutationResolver) DeleteProject(ctx context.Context, filter model.Proje
 	panic(fmt.Errorf("not implemented: DeleteProject - deleteProject"))
 }
 
+// AddProjectTension is the resolver for the addProjectTension field.
+func (r *mutationResolver) AddProjectTension(ctx context.Context, input []*model.AddProjectTensionInput) (*model.AddProjectTensionPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProjectTension - addProjectTension"))
+}
+
+// UpdateProjectTension is the resolver for the updateProjectTension field.
+func (r *mutationResolver) UpdateProjectTension(ctx context.Context, input model.UpdateProjectTensionInput) (*model.UpdateProjectTensionPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProjectTension - updateProjectTension"))
+}
+
+// DeleteProjectTension is the resolver for the deleteProjectTension field.
+func (r *mutationResolver) DeleteProjectTension(ctx context.Context, filter model.ProjectTensionFilter) (*model.DeleteProjectTensionPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProjectTension - deleteProjectTension"))
+}
+
+// AddProjectColumn is the resolver for the addProjectColumn field.
+func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput, upsert *bool) (*model.AddProjectColumnPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProjectColumn - addProjectColumn"))
+}
+
+// UpdateProjectColumn is the resolver for the updateProjectColumn field.
+func (r *mutationResolver) UpdateProjectColumn(ctx context.Context, input model.UpdateProjectColumnInput) (*model.UpdateProjectColumnPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProjectColumn - updateProjectColumn"))
+}
+
+// DeleteProjectColumn is the resolver for the deleteProjectColumn field.
+func (r *mutationResolver) DeleteProjectColumn(ctx context.Context, filter model.ProjectColumnFilter) (*model.DeleteProjectColumnPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProjectColumn - deleteProjectColumn"))
+}
+
 // AddOrgaAgg is the resolver for the addOrgaAgg field.
 func (r *mutationResolver) AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (data *model.AddOrgaAggPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
@@ -442,6 +472,36 @@ func (r *queryResolver) QueryProject(ctx context.Context, filter *model.ProjectF
 // AggregateProject is the resolver for the aggregateProject field.
 func (r *queryResolver) AggregateProject(ctx context.Context, filter *model.ProjectFilter) (*model.ProjectAggregateResult, error) {
 	panic(fmt.Errorf("not implemented: AggregateProject - aggregateProject"))
+}
+
+// GetProjectTension is the resolver for the getProjectTension field.
+func (r *queryResolver) GetProjectTension(ctx context.Context, id string) (*model.ProjectTension, error) {
+	panic(fmt.Errorf("not implemented: GetProjectTension - getProjectTension"))
+}
+
+// QueryProjectTension is the resolver for the queryProjectTension field.
+func (r *queryResolver) QueryProjectTension(ctx context.Context, filter *model.ProjectTensionFilter, order *model.ProjectTensionOrder, first *int, offset *int) ([]*model.ProjectTension, error) {
+	panic(fmt.Errorf("not implemented: QueryProjectTension - queryProjectTension"))
+}
+
+// AggregateProjectTension is the resolver for the aggregateProjectTension field.
+func (r *queryResolver) AggregateProjectTension(ctx context.Context, filter *model.ProjectTensionFilter) (*model.ProjectTensionAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProjectTension - aggregateProjectTension"))
+}
+
+// GetProjectColumn is the resolver for the getProjectColumn field.
+func (r *queryResolver) GetProjectColumn(ctx context.Context, id *string, name *string) (*model.ProjectColumn, error) {
+	panic(fmt.Errorf("not implemented: GetProjectColumn - getProjectColumn"))
+}
+
+// QueryProjectColumn is the resolver for the queryProjectColumn field.
+func (r *queryResolver) QueryProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) ([]*model.ProjectColumn, error) {
+	panic(fmt.Errorf("not implemented: QueryProjectColumn - queryProjectColumn"))
+}
+
+// AggregateProjectColumn is the resolver for the aggregateProjectColumn field.
+func (r *queryResolver) AggregateProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter) (*model.ProjectColumnAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProjectColumn - aggregateProjectColumn"))
 }
 
 // QueryOrgaAgg is the resolver for the queryOrgaAgg field.
