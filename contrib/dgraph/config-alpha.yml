@@ -1,5 +1,6 @@
 my: localhost:7080
 zero: localhost:5080
+port_offset: 0
 postings: _data/p
 wal: _data/w
 tmp: _data/tmp
