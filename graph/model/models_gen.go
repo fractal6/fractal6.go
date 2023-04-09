@@ -254,7 +254,7 @@ type AddProjectInput struct {
 	Parentnameid string              `json:"parentnameid"`
 	Nameid       string              `json:"nameid"`
 	Name         string              `json:"name"`
-	About        *string             `json:"about,omitempty"`
+	Description  *string             `json:"description,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -1726,7 +1726,7 @@ type Project struct {
 	Parentnameid     string                        `json:"parentnameid"`
 	Nameid           string                        `json:"nameid"`
 	Name             string                        `json:"name"`
-	About            *string                       `json:"about,omitempty"`
+	Description      *string                       `json:"description,omitempty"`
 	Columns          []*ProjectColumn              `json:"columns,omitempty"`
 	Leaders          []*Node                       `json:"leaders,omitempty"`
 	Nodes            []*Node                       `json:"nodes,omitempty"`
@@ -1745,8 +1745,8 @@ type ProjectAggregateResult struct {
 	NameidMax       *string `json:"nameidMax,omitempty"`
 	NameMin         *string `json:"nameMin,omitempty"`
 	NameMax         *string `json:"nameMax,omitempty"`
-	AboutMin        *string `json:"aboutMin,omitempty"`
-	AboutMax        *string `json:"aboutMax,omitempty"`
+	DescriptionMin  *string `json:"descriptionMin,omitempty"`
+	DescriptionMax  *string `json:"descriptionMax,omitempty"`
 }
 
 type ProjectColumn struct {
@@ -1804,14 +1804,15 @@ type ProjectColumnRef struct {
 }
 
 type ProjectFilter struct {
-	ID         []string                          `json:"id,omitempty"`
-	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
-	Nameid     *StringHashFilter                 `json:"nameid,omitempty"`
-	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
-	Has        []*ProjectHasFilter               `json:"has,omitempty"`
-	And        []*ProjectFilter                  `json:"and,omitempty"`
-	Or         []*ProjectFilter                  `json:"or,omitempty"`
-	Not        *ProjectFilter                    `json:"not,omitempty"`
+	ID           []string            `json:"id,omitempty"`
+	Rootnameid   *StringHashFilter   `json:"rootnameid,omitempty"`
+	Parentnameid *StringHashFilter   `json:"parentnameid,omitempty"`
+	Nameid       *StringHashFilter   `json:"nameid,omitempty"`
+	Name         *StringTermFilter   `json:"name,omitempty"`
+	Has          []*ProjectHasFilter `json:"has,omitempty"`
+	And          []*ProjectFilter    `json:"and,omitempty"`
+	Or           []*ProjectFilter    `json:"or,omitempty"`
+	Not          *ProjectFilter      `json:"not,omitempty"`
 }
 
 type ProjectOrder struct {
@@ -1825,7 +1826,7 @@ type ProjectPatch struct {
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
-	About        *string             `json:"about,omitempty"`
+	Description  *string             `json:"description,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -1837,7 +1838,7 @@ type ProjectRef struct {
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
-	About        *string             `json:"about,omitempty"`
+	Description  *string             `json:"description,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -4815,7 +4816,7 @@ const (
 	ProjectHasFilterParentnameid ProjectHasFilter = "parentnameid"
 	ProjectHasFilterNameid       ProjectHasFilter = "nameid"
 	ProjectHasFilterName         ProjectHasFilter = "name"
-	ProjectHasFilterAbout        ProjectHasFilter = "about"
+	ProjectHasFilterDescription  ProjectHasFilter = "description"
 	ProjectHasFilterColumns      ProjectHasFilter = "columns"
 	ProjectHasFilterLeaders      ProjectHasFilter = "leaders"
 	ProjectHasFilterNodes        ProjectHasFilter = "nodes"
@@ -4826,7 +4827,7 @@ var AllProjectHasFilter = []ProjectHasFilter{
 	ProjectHasFilterParentnameid,
 	ProjectHasFilterNameid,
 	ProjectHasFilterName,
-	ProjectHasFilterAbout,
+	ProjectHasFilterDescription,
 	ProjectHasFilterColumns,
 	ProjectHasFilterLeaders,
 	ProjectHasFilterNodes,
@@ -4834,7 +4835,7 @@ var AllProjectHasFilter = []ProjectHasFilter{
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterAbout, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
+	case ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
 		return true
 	}
 	return false
@@ -4868,7 +4869,7 @@ const (
 	ProjectOrderableParentnameid ProjectOrderable = "parentnameid"
 	ProjectOrderableNameid       ProjectOrderable = "nameid"
 	ProjectOrderableName         ProjectOrderable = "name"
-	ProjectOrderableAbout        ProjectOrderable = "about"
+	ProjectOrderableDescription  ProjectOrderable = "description"
 )
 
 var AllProjectOrderable = []ProjectOrderable{
@@ -4876,12 +4877,12 @@ var AllProjectOrderable = []ProjectOrderable{
 	ProjectOrderableParentnameid,
 	ProjectOrderableNameid,
 	ProjectOrderableName,
-	ProjectOrderableAbout,
+	ProjectOrderableDescription,
 }
 
 func (e ProjectOrderable) IsValid() bool {
 	switch e {
-	case ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableAbout:
+	case ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
 		return true
 	}
 	return false

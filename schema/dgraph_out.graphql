@@ -1,34 +1,34 @@
-directive @cascade(fields: [String]) on FIELD
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
 directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @id(interface: Boolean) on FIELD_DEFINITION
+
+directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
+
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -272,7 +272,7 @@ input AddProjectInput {
   parentnameid: String!
   nameid: String!
   name: String!
-  about: String
+  description: String
   columns: [ProjectColumnRef!]
   leaders: [NodeRef!]
   nodes: [NodeRef!]
@@ -2184,7 +2184,7 @@ type Project {
   parentnameid: String!
   nameid: String!
   name: String!
-  about: String
+  description: String
   columns(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn!]
   leaders(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -2203,8 +2203,8 @@ type ProjectAggregateResult {
   nameidMax: String
   nameMin: String
   nameMax: String
-  aboutMin: String
-  aboutMax: String
+  descriptionMin: String
+  descriptionMax: String
 }
 
 type ProjectColumn {
@@ -2278,8 +2278,9 @@ input ProjectColumnRef {
 input ProjectFilter {
   id: [ID!]
   rootnameid: StringHashFilter
+  parentnameid: StringHashFilter
   nameid: StringHashFilter
-  name: StringHashFilter_StringTermFilter
+  name: StringTermFilter
   has: [ProjectHasFilter]
   and: [ProjectFilter]
   or: [ProjectFilter]
@@ -2291,7 +2292,7 @@ enum ProjectHasFilter {
   parentnameid
   nameid
   name
-  about
+  description
   columns
   leaders
   nodes
@@ -2308,7 +2309,7 @@ enum ProjectOrderable {
   parentnameid
   nameid
   name
-  about
+  description
 }
 
 input ProjectPatch {
@@ -2316,7 +2317,7 @@ input ProjectPatch {
   parentnameid: String
   nameid: String
   name: String
-  about: String
+  description: String
   columns: [ProjectColumnRef!]
   leaders: [NodeRef!]
   nodes: [NodeRef!]
@@ -2328,7 +2329,7 @@ input ProjectRef {
   parentnameid: String
   nameid: String
   name: String
-  about: String
+  description: String
   columns: [ProjectColumnRef!]
   leaders: [NodeRef!]
   nodes: [NodeRef!]

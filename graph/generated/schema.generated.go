@@ -11901,8 +11901,8 @@ func (ec *executionContext) fieldContext_AddProjectPayload_project(ctx context.C
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -18706,8 +18706,8 @@ func (ec *executionContext) fieldContext_DeleteProjectPayload_project(ctx contex
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -29776,8 +29776,8 @@ func (ec *executionContext) fieldContext_Node_projects(ctx context.Context, fiel
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -31124,10 +31124,10 @@ func (ec *executionContext) fieldContext_Node_projectsAggregate(ctx context.Cont
 				return ec.fieldContext_ProjectAggregateResult_nameMin(ctx, field)
 			case "nameMax":
 				return ec.fieldContext_ProjectAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_ProjectAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_ProjectAggregateResult_aboutMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_ProjectAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_ProjectAggregateResult_descriptionMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectAggregateResult", field.Name)
 		},
@@ -36491,8 +36491,8 @@ func (ec *executionContext) fieldContext_Project_name(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Project_about(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Project_about(ctx, field)
+func (ec *executionContext) _Project_description(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -36505,7 +36505,7 @@ func (ec *executionContext) _Project_about(ctx context.Context, field graphql.Co
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.About, nil
+		return obj.Description, nil
 	})
 
 	if resTmp == nil {
@@ -36516,7 +36516,7 @@ func (ec *executionContext) _Project_about(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Project_about(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Project_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Project",
 		Field:      field,
@@ -37469,8 +37469,8 @@ func (ec *executionContext) fieldContext_ProjectAggregateResult_nameMax(ctx cont
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectAggregateResult_aboutMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectAggregateResult_aboutMin(ctx, field)
+func (ec *executionContext) _ProjectAggregateResult_descriptionMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAggregateResult_descriptionMin(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -37483,7 +37483,7 @@ func (ec *executionContext) _ProjectAggregateResult_aboutMin(ctx context.Context
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AboutMin, nil
+		return obj.DescriptionMin, nil
 	})
 
 	if resTmp == nil {
@@ -37494,7 +37494,7 @@ func (ec *executionContext) _ProjectAggregateResult_aboutMin(ctx context.Context
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectAggregateResult_aboutMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectAggregateResult_descriptionMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ProjectAggregateResult",
 		Field:      field,
@@ -37507,8 +37507,8 @@ func (ec *executionContext) fieldContext_ProjectAggregateResult_aboutMin(ctx con
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectAggregateResult_aboutMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectAggregateResult_aboutMax(ctx, field)
+func (ec *executionContext) _ProjectAggregateResult_descriptionMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAggregateResult_descriptionMax(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -37521,7 +37521,7 @@ func (ec *executionContext) _ProjectAggregateResult_aboutMax(ctx context.Context
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AboutMax, nil
+		return obj.DescriptionMax, nil
 	})
 
 	if resTmp == nil {
@@ -37532,7 +37532,7 @@ func (ec *executionContext) _ProjectAggregateResult_aboutMax(ctx context.Context
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectAggregateResult_aboutMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectAggregateResult_descriptionMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ProjectAggregateResult",
 		Field:      field,
@@ -37811,8 +37811,8 @@ func (ec *executionContext) fieldContext_ProjectColumn_project(ctx context.Conte
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -39976,8 +39976,8 @@ func (ec *executionContext) fieldContext_Query_getProject(ctx context.Context, f
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -40051,8 +40051,8 @@ func (ec *executionContext) fieldContext_Query_queryProject(ctx context.Context,
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -40134,10 +40134,10 @@ func (ec *executionContext) fieldContext_Query_aggregateProject(ctx context.Cont
 				return ec.fieldContext_ProjectAggregateResult_nameMin(ctx, field)
 			case "nameMax":
 				return ec.fieldContext_ProjectAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_ProjectAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_ProjectAggregateResult_aboutMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_ProjectAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_ProjectAggregateResult_descriptionMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectAggregateResult", field.Name)
 		},
@@ -50389,8 +50389,8 @@ func (ec *executionContext) fieldContext_UpdateProjectPayload_project(ctx contex
 				return ec.fieldContext_Project_nameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Project_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Project_about(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
 			case "leaders":
@@ -58521,7 +58521,7 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "parentnameid", "nameid", "name", "about", "columns", "leaders", "nodes"}
+	fieldsInOrder := [...]string{"rootnameid", "parentnameid", "nameid", "name", "description", "columns", "leaders", "nodes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -58548,16 +58548,18 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			it.Nameid, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
 				if err != nil {
 					return nil, err
@@ -58569,9 +58571,9 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+				return ec.directives.X_alter(ctx, obj, directive1, r, f, nil, nil)
 			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
+			directive3 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
@@ -58583,24 +58585,32 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, n)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(string); ok {
-				it.Name = data
+				it.Nameid = data
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "about":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -69163,7 +69173,7 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "nameid", "name", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "parentnameid", "nameid", "name", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -69186,19 +69196,49 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "parentnameid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentnameid"))
+			it.Parentnameid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "nameid":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			it.Nameid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.StringHashFilter); ok {
+				it.Nameid = data
+			} else if tmp == nil {
+				it.Nameid = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.StringHashFilter`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringHashFilter_StringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
+			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -69291,7 +69331,7 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "parentnameid", "nameid", "name", "about", "columns", "leaders", "nodes"}
+	fieldsInOrder := [...]string{"rootnameid", "parentnameid", "nameid", "name", "description", "columns", "leaders", "nodes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -69352,13 +69392,45 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "parentnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, f, nil, nil)
+			}
+			directive3 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, n)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -69376,35 +69448,13 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
-				if err != nil {
-					return nil, err
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
 				}
-				f, err := ec.unmarshalOString2ᚖstring(ctx, "parentnameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
-				if err != nil {
-					return nil, err
-				}
-				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -69416,10 +69466,10 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "about":
+		case "description":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_alter == nil {
@@ -69433,9 +69483,9 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(*string); ok {
-				it.About = data
+				it.Description = data
 			} else if tmp == nil {
-				it.About = nil
+				it.Description = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -69549,7 +69599,7 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "parentnameid", "nameid", "name", "about", "columns", "leaders", "nodes"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "parentnameid", "nameid", "name", "description", "columns", "leaders", "nodes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -69584,16 +69634,18 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			it.Nameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "lower")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_alter == nil {
+					return nil, errors.New("directive w_alter is not implemented")
+				}
+				return ec.directives.W_alter(ctx, obj, directive0, a)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
 				if err != nil {
 					return nil, err
@@ -69605,9 +69657,9 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+				return ec.directives.X_alter(ctx, obj, directive1, r, f, nil, nil)
 			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
+			directive3 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
@@ -69619,25 +69671,33 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+				return ec.directives.X_alter(ctx, obj, directive2, r, nil, nil, n)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive3(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(*string); ok {
-				it.Name = data
+				it.Nameid = data
 			} else if tmp == nil {
-				it.Name = nil
+				it.Nameid = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "about":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_alter == nil {
@@ -69651,9 +69711,9 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(*string); ok {
-				it.About = data
+				it.Description = data
 			} else if tmp == nil {
-				it.About = nil
+				it.Description = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -80712,9 +80772,9 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "about":
+		case "description":
 
-			out.Values[i] = ec._Project_about(ctx, field, obj)
+			out.Values[i] = ec._Project_description(ctx, field, obj)
 
 		case "columns":
 
@@ -80797,13 +80857,13 @@ func (ec *executionContext) _ProjectAggregateResult(ctx context.Context, sel ast
 
 			out.Values[i] = ec._ProjectAggregateResult_nameMax(ctx, field, obj)
 
-		case "aboutMin":
+		case "descriptionMin":
 
-			out.Values[i] = ec._ProjectAggregateResult_aboutMin(ctx, field, obj)
+			out.Values[i] = ec._ProjectAggregateResult_descriptionMin(ctx, field, obj)
 
-		case "aboutMax":
+		case "descriptionMax":
 
-			out.Values[i] = ec._ProjectAggregateResult_aboutMax(ctx, field, obj)
+			out.Values[i] = ec._ProjectAggregateResult_descriptionMax(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
