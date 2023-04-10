@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
-	"fractale/fractal6.go/web/auth"
 )
 
 // AddNode is the resolver for the addNode field.
@@ -60,13 +58,13 @@ func (r *mutationResolver) DeleteMandate(ctx context.Context, filter model.Manda
 
 // AddLabel is the resolver for the addLabel field.
 func (r *mutationResolver) AddLabel(ctx context.Context, input []*model.AddLabelInput) (data *model.AddLabelPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
 	return data, errors
 }
 
 // UpdateLabel is the resolver for the updateLabel field.
 func (r *mutationResolver) UpdateLabel(ctx context.Context, input model.UpdateLabelInput) (data *model.UpdateLabelPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -77,19 +75,64 @@ func (r *mutationResolver) DeleteLabel(ctx context.Context, filter model.LabelFi
 
 // AddRoleExt is the resolver for the addRoleExt field.
 func (r *mutationResolver) AddRoleExt(ctx context.Context, input []*model.AddRoleExtInput) (data *model.AddRoleExtPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
 	return data, errors
 }
 
 // UpdateRoleExt is the resolver for the updateRoleExt field.
 func (r *mutationResolver) UpdateRoleExt(ctx context.Context, input model.UpdateRoleExtInput) (data *model.UpdateRoleExtPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
 // DeleteRoleExt is the resolver for the deleteRoleExt field.
 func (r *mutationResolver) DeleteRoleExt(ctx context.Context, filter model.RoleExtFilter) (data *model.DeleteRoleExtPayload, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// AddProject is the resolver for the addProject field.
+func (r *mutationResolver) AddProject(ctx context.Context, input []*model.AddProjectInput) (*model.AddProjectPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProject - addProject"))
+}
+
+// UpdateProject is the resolver for the updateProject field.
+func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*model.UpdateProjectPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProject - updateProject"))
+}
+
+// DeleteProject is the resolver for the deleteProject field.
+func (r *mutationResolver) DeleteProject(ctx context.Context, filter model.ProjectFilter) (*model.DeleteProjectPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProject - deleteProject"))
+}
+
+// AddProjectTension is the resolver for the addProjectTension field.
+func (r *mutationResolver) AddProjectTension(ctx context.Context, input []*model.AddProjectTensionInput) (*model.AddProjectTensionPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProjectTension - addProjectTension"))
+}
+
+// UpdateProjectTension is the resolver for the updateProjectTension field.
+func (r *mutationResolver) UpdateProjectTension(ctx context.Context, input model.UpdateProjectTensionInput) (*model.UpdateProjectTensionPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProjectTension - updateProjectTension"))
+}
+
+// DeleteProjectTension is the resolver for the deleteProjectTension field.
+func (r *mutationResolver) DeleteProjectTension(ctx context.Context, filter model.ProjectTensionFilter) (*model.DeleteProjectTensionPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProjectTension - deleteProjectTension"))
+}
+
+// AddProjectColumn is the resolver for the addProjectColumn field.
+func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput, upsert *bool) (*model.AddProjectColumnPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProjectColumn - addProjectColumn"))
+}
+
+// UpdateProjectColumn is the resolver for the updateProjectColumn field.
+func (r *mutationResolver) UpdateProjectColumn(ctx context.Context, input model.UpdateProjectColumnInput) (*model.UpdateProjectColumnPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProjectColumn - updateProjectColumn"))
+}
+
+// DeleteProjectColumn is the resolver for the deleteProjectColumn field.
+func (r *mutationResolver) DeleteProjectColumn(ctx context.Context, filter model.ProjectColumnFilter) (*model.DeleteProjectColumnPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProjectColumn - deleteProjectColumn"))
 }
 
 // AddOrgaAgg is the resolver for the addOrgaAgg field.
@@ -119,13 +162,13 @@ func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilt
 
 // AddTension is the resolver for the addTension field.
 func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (data *model.AddTensionPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
 	return data, errors
 }
 
 // UpdateTension is the resolver for the updateTension field.
 func (r *mutationResolver) UpdateTension(ctx context.Context, input model.UpdateTensionInput) (data *model.UpdateTensionPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -141,7 +184,7 @@ func (r *mutationResolver) AddComment(ctx context.Context, input []*model.AddCom
 
 // UpdateComment is the resolver for the updateComment field.
 func (r *mutationResolver) UpdateComment(ctx context.Context, input model.UpdateCommentInput) (data *model.UpdateCommentPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -152,13 +195,7 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 
 // AddReaction is the resolver for the addReaction field.
 func (r *mutationResolver) AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (data *model.AddReactionPayload, errors error) {
-	// @DEBUG: see #3a1a434 (gqlgen bug...)
-	// Input is updated in hooks. Fields with arguments will be ignored
-	_, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return nil, LogErr("Access denied", err)
-	}
-	errors = r.db.AddExtra(*uctx, "reaction", input, upsert, GetQueryGraph(ctx), &data)
+	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
 	return data, errors
 }
 
@@ -169,7 +206,7 @@ func (r *mutationResolver) UpdateReaction(ctx context.Context, input model.Updat
 
 // DeleteReaction is the resolver for the deleteReaction field.
 func (r *mutationResolver) DeleteReaction(ctx context.Context, filter model.ReactionFilter) (data *model.DeleteReactionPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphDeleteBridge(ctx, filter, &data)
 	return data, errors
 }
 
@@ -220,31 +257,25 @@ func (r *mutationResolver) DeleteEventFragment(ctx context.Context, filter model
 
 // AddContract is the resolver for the addContract field.
 func (r *mutationResolver) AddContract(ctx context.Context, input []*model.AddContractInput, upsert *bool) (data *model.AddContractPayload, errors error) {
-	// @DEBUG: see #3a1a434 (gqlgen bug...)
-	// Input is updated in hooks. Fields with arguments will be ignored
-	_, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return nil, LogErr("Access denied", err)
-	}
-	errors = r.db.AddExtra(*uctx, "contract", input, upsert, GetQueryGraph(ctx), &data)
+	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
 	return data, errors
 }
 
 // UpdateContract is the resolver for the updateContract field.
 func (r *mutationResolver) UpdateContract(ctx context.Context, input model.UpdateContractInput) (data *model.UpdateContractPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
 // DeleteContract is the resolver for the deleteContract field.
 func (r *mutationResolver) DeleteContract(ctx context.Context, filter model.ContractFilter) (data *model.DeleteContractPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphDeleteBridge(ctx, filter, &data)
 	return data, errors
 }
 
 // AddVote is the resolver for the addVote field.
 func (r *mutationResolver) AddVote(ctx context.Context, input []*model.AddVoteInput, upsert *bool) (data *model.AddVotePayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
 	return data, errors
 }
 
@@ -265,7 +296,7 @@ func (r *mutationResolver) AddUser(ctx context.Context, input []*model.AddUserIn
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (data *model.UpdateUserPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -311,7 +342,7 @@ func (r *mutationResolver) AddUserEvent(ctx context.Context, input []*model.AddU
 
 // UpdateUserEvent is the resolver for the updateUserEvent field.
 func (r *mutationResolver) UpdateUserEvent(ctx context.Context, input model.UpdateUserEventInput) (data *model.UpdateUserEventPayload, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
 	return data, errors
 }
 
@@ -352,13 +383,13 @@ func (r *mutationResolver) DeleteEventCount(ctx context.Context, filter model.Ev
 
 // GetNode is the resolver for the getNode field.
 func (r *queryResolver) GetNode(ctx context.Context, id *string, nameid *string) (data *model.Node, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
 // QueryNode is the resolver for the queryNode field.
 func (r *queryResolver) QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) (data []*model.Node, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
@@ -404,7 +435,7 @@ func (r *queryResolver) GetLabel(ctx context.Context, id string) (data *model.La
 
 // QueryLabel is the resolver for the queryLabel field.
 func (r *queryResolver) QueryLabel(ctx context.Context, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) (data []*model.Label, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
@@ -426,6 +457,51 @@ func (r *queryResolver) QueryRoleExt(ctx context.Context, filter *model.RoleExtF
 // AggregateRoleExt is the resolver for the aggregateRoleExt field.
 func (r *queryResolver) AggregateRoleExt(ctx context.Context, filter *model.RoleExtFilter) (data *model.RoleExtAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// GetProject is the resolver for the getProject field.
+func (r *queryResolver) GetProject(ctx context.Context, id string) (*model.Project, error) {
+	panic(fmt.Errorf("not implemented: GetProject - getProject"))
+}
+
+// QueryProject is the resolver for the queryProject field.
+func (r *queryResolver) QueryProject(ctx context.Context, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) ([]*model.Project, error) {
+	panic(fmt.Errorf("not implemented: QueryProject - queryProject"))
+}
+
+// AggregateProject is the resolver for the aggregateProject field.
+func (r *queryResolver) AggregateProject(ctx context.Context, filter *model.ProjectFilter) (*model.ProjectAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProject - aggregateProject"))
+}
+
+// GetProjectTension is the resolver for the getProjectTension field.
+func (r *queryResolver) GetProjectTension(ctx context.Context, id string) (*model.ProjectTension, error) {
+	panic(fmt.Errorf("not implemented: GetProjectTension - getProjectTension"))
+}
+
+// QueryProjectTension is the resolver for the queryProjectTension field.
+func (r *queryResolver) QueryProjectTension(ctx context.Context, filter *model.ProjectTensionFilter, order *model.ProjectTensionOrder, first *int, offset *int) ([]*model.ProjectTension, error) {
+	panic(fmt.Errorf("not implemented: QueryProjectTension - queryProjectTension"))
+}
+
+// AggregateProjectTension is the resolver for the aggregateProjectTension field.
+func (r *queryResolver) AggregateProjectTension(ctx context.Context, filter *model.ProjectTensionFilter) (*model.ProjectTensionAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProjectTension - aggregateProjectTension"))
+}
+
+// GetProjectColumn is the resolver for the getProjectColumn field.
+func (r *queryResolver) GetProjectColumn(ctx context.Context, id *string, name *string) (*model.ProjectColumn, error) {
+	panic(fmt.Errorf("not implemented: GetProjectColumn - getProjectColumn"))
+}
+
+// QueryProjectColumn is the resolver for the queryProjectColumn field.
+func (r *queryResolver) QueryProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) ([]*model.ProjectColumn, error) {
+	panic(fmt.Errorf("not implemented: QueryProjectColumn - queryProjectColumn"))
+}
+
+// AggregateProjectColumn is the resolver for the aggregateProjectColumn field.
+func (r *queryResolver) AggregateProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter) (*model.ProjectColumnAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProjectColumn - aggregateProjectColumn"))
 }
 
 // QueryOrgaAgg is the resolver for the queryOrgaAgg field.
@@ -455,13 +531,13 @@ func (r *queryResolver) AggregatePost(ctx context.Context, filter *model.PostFil
 
 // GetTension is the resolver for the getTension field.
 func (r *queryResolver) GetTension(ctx context.Context, id string) (data *model.Tension, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
 // QueryTension is the resolver for the queryTension field.
 func (r *queryResolver) QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) (data []*model.Tension, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
@@ -542,7 +618,7 @@ func (r *queryResolver) AggregateEventFragment(ctx context.Context, filter *mode
 
 // GetContract is the resolver for the getContract field.
 func (r *queryResolver) GetContract(ctx context.Context, id *string, contractid *string) (data *model.Contract, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
@@ -573,13 +649,13 @@ func (r *queryResolver) AggregateVote(ctx context.Context, filter *model.VoteFil
 
 // GetUser is the resolver for the getUser field.
 func (r *queryResolver) GetUser(ctx context.Context, id *string, username *string, email *string) (data *model.User, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
 // QueryUser is the resolver for the queryUser field.
 func (r *queryResolver) QueryUser(ctx context.Context, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) (data []*model.User, errors error) {
-	errors = r.Gqlgen2DgraphQueryResolver(ctx, &data)
+	errors = r.DgraphBridgeRaw(ctx, &data)
 	return data, errors
 }
 
