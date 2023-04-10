@@ -205,18 +205,20 @@ func SyncPendingUser(username, email string) error {
                 *contractPatch.Event.Old,
                 *contractPatch.Event.New,
             )
-            contractPatch.Contractid = &contractid
             err = db.DB.Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
                 Filter: &model.ContractFilter{ID: []string{cid}},
                 Set: &contractPatch,
             })
+            if err != nil { return err }
+            // @id field cant't be update with graphql (@debug dgraph)
+            err = db.DB.SetFieldById(cid, "Contract.contractid", contractid)
             if err != nil { return err }
 
             // Do MaybeAddPendingNode for each invitation.
             if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
                 // Add pending Nodes
                 for _, pc := range contract.PendingCandidates {
-                    if *pc.Email == email {
+                    if pc.Email == email {
                         _, err = MaybeAddPendingNode(username, &model.Tension{ID: contract.Tension.ID})
                         if err != nil { return err }
                     }

@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ...
 
+## [0.7.9]
+
+- build: make schema compatible with dgraph v22
+- buid: add options to contrib/dgraph configs file to change ports.
+- refactor: update resolvers with bridge query
+- refactor: make DgraphQueryResolverRaw obsolete with new Dgraph bridge resolver using proper inputs [WIP]
+- fix/schema:Fix duplicate issue with artefact case; make w_* effective with *Filter input in schema.
+- fix/updateAretefact: allow duplicate artefacts to be added to circles even if not at root circle.
+- Update go.mod
+
+
+
 ## [0.7.8]
 
 ### Fixed

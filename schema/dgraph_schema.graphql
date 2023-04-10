@@ -321,7 +321,7 @@ type Reaction @auth(add:{ rule:"""query ($USERNAME: String!) {
     }"""
 }) {
   id: ID!
-  reactionid: String @id
+  reactionid: String! @id
   user: User!
   comment: Comment!
   type_: Int!
@@ -450,9 +450,9 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 type PendingUser {
   id: ID!
   updatedAt: DateTime
-  username: String @id
+  username: String! @id
   password: String
-  email: String @id
+  email: String! @id
   email_token: String @search(by:[hash])
   token: String @search(by:[hash])
   contracts: [Contract!]

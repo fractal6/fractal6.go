@@ -39,7 +39,6 @@ type DirectiveRoot struct {
 	CacheControl             func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
 	Cascade                  func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
 	Custom                   func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
-	Default                  func(ctx context.Context, obj interface{}, next graphql.Resolver, add *model.DgraphDefault, update *model.DgraphDefault) (res interface{}, err error)
 	Dgraph                   func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
 	Generate                 func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
 	HasInverse               func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
@@ -116,7 +115,7 @@ type DirectiveRoot struct {
 	Hook_updateUserInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVote          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateVoteInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver, interfaceArg *bool) (res interface{}, err error)
+	Id                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	IsContractValidator      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Lambda                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	LambdaOnMutate           func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
@@ -8997,7 +8996,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCustomHTTP,
 		ec.unmarshalInputDateTimeFilter,
 		ec.unmarshalInputDateTimeRange,
-		ec.unmarshalInputDgraphDefault,
 		ec.unmarshalInputEventCountFilter,
 		ec.unmarshalInputEventCountOrder,
 		ec.unmarshalInputEventCountPatch,
@@ -9511,7 +9509,7 @@ type Comment {
 
 type Reaction {
   id: ID!
-  reactionid: String
+  reactionid: String!
   user(filter: UserFilter): User!
   comment(filter: CommentFilter): Comment!
   type_: Int!
@@ -9628,9 +9626,9 @@ type User {
 type PendingUser {
   id: ID!
   updatedAt: DateTime
-  username: String
+  username: String!
   password: String @hidden
-  email: String @hidden
+  email: String! @hidden
   email_token: String @hidden
   token: String @hidden
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
@@ -9827,37 +9825,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10069,9 +10065,9 @@ type AddOrgaAggPayload {
 
 input AddPendingUserInput {
   updatedAt: DateTime
-  username: String @w_alter(a:"lower")
+  username: String! @w_alter(a:"lower")
   password: String
-  email: String @w_alter(a:"lower")
+  email: String! @w_alter(a:"lower")
   email_token: String
   token: String
   contracts: [ContractRef!]
@@ -10124,7 +10120,7 @@ type AddProjectTensionPayload {
 }
 
 input AddReactionInput {
-  reactionid: String
+  reactionid: String!
   user: UserRef! @x_add(r:"ref")
   comment: CommentRef! @x_add(r:"ref")
   type_: Int!
@@ -10480,7 +10476,6 @@ input ContractPatch {
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
-  contractid: String @x_patch_ro
   tension: TensionRef @x_patch_ro
   status: ContractStatus @x_patch_ro
   contract_type: ContractType @x_patch_ro
@@ -10693,10 +10688,6 @@ type DeleteVotePayload {
   vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   msg: String
   numUids: Int
-}
-
-input DgraphDefault {
-  value: String
 }
 
 enum DgraphIndex {
@@ -11400,7 +11391,6 @@ input NodePatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_patch_ro
-  nameid: String @x_patch_ro
   rootnameid: String @x_patch_ro
   source: BlobRef @x_patch_ro
   name: String @x_patch_ro
@@ -11650,9 +11640,7 @@ enum PendingUserOrderable {
 
 input PendingUserPatch {
   updatedAt: DateTime @x_patch_ro
-  username: String @w_alter(a:"lower")
   password: String @x_patch_ro
-  email: String @w_alter(a:"lower")
   email_token: String @x_patch_ro
   token: String @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
@@ -11815,7 +11803,6 @@ enum ProjectColumnOrderable {
 }
 
 input ProjectColumnPatch {
-  name: String @x_patch_ro
   about: String @x_patch_ro
   pos: Int @x_patch_ro
   tensions: [ProjectTensionRef!] @x_patch_ro
@@ -12045,7 +12032,6 @@ enum ReactionOrderable {
 }
 
 input ReactionPatch {
-  reactionid: String @x_patch_ro
   user: UserRef @x_patch_ro
   comment: CommentRef @x_patch_ro
   type_: Int @x_patch_ro
@@ -12727,9 +12713,7 @@ enum UserOrderable {
 input UserPatch {
   createdAt: DateTime @x_patch_ro
   lastAck: DateTime @x_patch_ro
-  username: String @x_patch_ro
   name: String @x_patch
-  email: String @x_patch_ro
   password: String @x_patch_ro
   bio: String @x_patch @x_alter(r:"maxLen", n:280)
   location: String @x_patch
@@ -12890,7 +12874,6 @@ input VotePatch {
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_patch_ro
-  voteid: String @x_patch_ro
   contract: ContractRef @x_patch_ro
   node: NodeRef @x_patch_ro
   data: [Int!] @x_patch_ro

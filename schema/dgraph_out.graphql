@@ -1,34 +1,32 @@
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
-
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @id(interface: Boolean) on FIELD_DEFINITION
-
-directive @default(add: DgraphDefault, update: DgraphDefault) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -240,9 +238,9 @@ type AddOrgaAggPayload {
 
 input AddPendingUserInput {
   updatedAt: DateTime
-  username: String
+  username: String!
   password: String
-  email: String
+  email: String!
   email_token: String
   token: String
   contracts: [ContractRef!]
@@ -295,7 +293,7 @@ type AddProjectTensionPayload {
 }
 
 input AddReactionInput {
-  reactionid: String
+  reactionid: String!
   user: UserRef!
   comment: CommentRef!
   type_: Int!
@@ -706,7 +704,6 @@ input ContractPatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  contractid: String
   tension: TensionRef
   status: ContractStatus
   contract_type: ContractType
@@ -775,8 +772,7 @@ input CustomHTTP {
 
 """
 The DateTime scalar type represents date and time as a string in RFC3339 format.
-For example: "1985-04-12T23:20:50.52Z" represents 20 minutes and 50.52 seconds
-after the 23rd hour of April 12th, 1985 in UTC.
+For example: "1985-04-12T23:20:50.52Z" represents 20 mins 50.52 secs after the 23rd hour of Apr 12th 1985 in UTC.
 """
 scalar DateTime
 
@@ -937,10 +933,6 @@ type DeleteVotePayload {
   vote(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote]
   msg: String
   numUids: Int
-}
-
-input DgraphDefault {
-  value: String
 }
 
 enum DgraphIndex {
@@ -1771,7 +1763,6 @@ input NodePatch {
   createdBy: UserRef
   createdAt: DateTime
   updatedAt: DateTime
-  nameid: String
   rootnameid: String
   source: BlobRef
   name: String
@@ -1995,9 +1986,9 @@ input OrgaAggRef {
 type PendingUser {
   id: ID!
   updatedAt: DateTime
-  username: String
+  username: String!
   password: String
-  email: String
+  email: String!
   email_token: String
   token: String
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
@@ -2061,9 +2052,7 @@ enum PendingUserOrderable {
 
 input PendingUserPatch {
   updatedAt: DateTime
-  username: String
   password: String
-  email: String
   email_token: String
   token: String
   contracts: [ContractRef!]
@@ -2259,7 +2248,6 @@ enum ProjectColumnOrderable {
 }
 
 input ProjectColumnPatch {
-  name: String
   about: String
   pos: Int
   tensions: [ProjectTensionRef!]
@@ -2460,7 +2448,7 @@ type Query {
 
 type Reaction {
   id: ID!
-  reactionid: String
+  reactionid: String!
   user(filter: UserFilter): User!
   comment(filter: CommentFilter): Comment!
   type_: Int!
@@ -2504,7 +2492,6 @@ enum ReactionOrderable {
 }
 
 input ReactionPatch {
-  reactionid: String
   user: UserRef
   comment: CommentRef
   type_: Int
@@ -3346,9 +3333,7 @@ enum UserOrderable {
 input UserPatch {
   createdAt: DateTime
   lastAck: DateTime
-  username: String
   name: String
-  email: String
   password: String
   bio: String
   location: String
@@ -3536,7 +3521,6 @@ input VotePatch {
   createdAt: DateTime
   updatedAt: DateTime
   message: String
-  voteid: String
   contract: ContractRef
   node: NodeRef
   data: [Int!]

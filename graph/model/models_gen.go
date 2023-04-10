@@ -222,9 +222,9 @@ type AddOrgaAggPayload struct {
 
 type AddPendingUserInput struct {
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	Username   *string        `json:"username,omitempty"`
+	Username   string         `json:"username"`
 	Password   *string        `json:"password,omitempty"`
-	Email      *string        `json:"email,omitempty"`
+	Email      string         `json:"email"`
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
@@ -277,7 +277,7 @@ type AddProjectTensionPayload struct {
 }
 
 type AddReactionInput struct {
-	Reactionid *string     `json:"reactionid,omitempty"`
+	Reactionid string      `json:"reactionid"`
 	User       *UserRef    `json:"user"`
 	Comment    *CommentRef `json:"comment"`
 	Type       int         `json:"type_"`
@@ -620,7 +620,6 @@ type ContractPatch struct {
 	CreatedAt         *string           `json:"createdAt,omitempty"`
 	UpdatedAt         *string           `json:"updatedAt,omitempty"`
 	Message           *string           `json:"message,omitempty"`
-	Contractid        *string           `json:"contractid,omitempty"`
 	Tension           *TensionRef       `json:"tension,omitempty"`
 	Status            *ContractStatus   `json:"status,omitempty"`
 	ContractType      *ContractType     `json:"contract_type,omitempty"`
@@ -831,10 +830,6 @@ type DeleteVotePayload struct {
 	Vote    []*Vote `json:"vote,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
-}
-
-type DgraphDefault struct {
-	Value *string `json:"value,omitempty"`
 }
 
 type Event struct {
@@ -1382,7 +1377,6 @@ type NodePatch struct {
 	CreatedBy             *UserRef        `json:"createdBy,omitempty"`
 	CreatedAt             *string         `json:"createdAt,omitempty"`
 	UpdatedAt             *string         `json:"updatedAt,omitempty"`
-	Nameid                *string         `json:"nameid,omitempty"`
 	Rootnameid            *string         `json:"rootnameid,omitempty"`
 	Source                *BlobRef        `json:"source,omitempty"`
 	Name                  *string         `json:"name,omitempty"`
@@ -1570,9 +1564,9 @@ type OrgaAggRef struct {
 type PendingUser struct {
 	ID                 string                   `json:"id"`
 	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
-	Username           *string                  `json:"username,omitempty"`
+	Username           string                   `json:"username"`
 	Password           *string                  `json:"password,omitempty"`
-	Email              *string                  `json:"email,omitempty"`
+	Email              string                   `json:"email"`
 	EmailToken         *string                  `json:"email_token,omitempty"`
 	Token              *string                  `json:"token,omitempty"`
 	Contracts          []*Contract              `json:"contracts,omitempty"`
@@ -1616,9 +1610,7 @@ type PendingUserOrder struct {
 
 type PendingUserPatch struct {
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
-	Username   *string        `json:"username,omitempty"`
 	Password   *string        `json:"password,omitempty"`
-	Email      *string        `json:"email,omitempty"`
 	EmailToken *string        `json:"email_token,omitempty"`
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
@@ -1787,7 +1779,6 @@ type ProjectColumnOrder struct {
 }
 
 type ProjectColumnPatch struct {
-	Name     *string              `json:"name,omitempty"`
 	About    *string              `json:"about,omitempty"`
 	Pos      *int                 `json:"pos,omitempty"`
 	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
@@ -1888,7 +1879,7 @@ type ProjectTensionRef struct {
 
 type Reaction struct {
 	ID         string   `json:"id"`
-	Reactionid *string  `json:"reactionid,omitempty"`
+	Reactionid string   `json:"reactionid"`
 	User       *User    `json:"user"`
 	Comment    *Comment `json:"comment"`
 	Type       int      `json:"type_"`
@@ -1920,10 +1911,9 @@ type ReactionOrder struct {
 }
 
 type ReactionPatch struct {
-	Reactionid *string     `json:"reactionid,omitempty"`
-	User       *UserRef    `json:"user,omitempty"`
-	Comment    *CommentRef `json:"comment,omitempty"`
-	Type       *int        `json:"type_,omitempty"`
+	User    *UserRef    `json:"user,omitempty"`
+	Comment *CommentRef `json:"comment,omitempty"`
+	Type    *int        `json:"type_,omitempty"`
 }
 
 type ReactionRef struct {
@@ -2591,9 +2581,7 @@ type UserOrder struct {
 type UserPatch struct {
 	CreatedAt        *string         `json:"createdAt,omitempty"`
 	LastAck          *string         `json:"lastAck,omitempty"`
-	Username         *string         `json:"username,omitempty"`
 	Name             *string         `json:"name,omitempty"`
-	Email            *string         `json:"email,omitempty"`
 	Password         *string         `json:"password,omitempty"`
 	Bio              *string         `json:"bio,omitempty"`
 	Location         *string         `json:"location,omitempty"`
@@ -2743,7 +2731,6 @@ type VotePatch struct {
 	CreatedAt *string      `json:"createdAt,omitempty"`
 	UpdatedAt *string      `json:"updatedAt,omitempty"`
 	Message   *string      `json:"message,omitempty"`
-	Voteid    *string      `json:"voteid,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Node      *NodeRef     `json:"node,omitempty"`
 	Data      []int        `json:"data,omitempty"`

@@ -48,7 +48,7 @@ func addReactionInputHook(ctx context.Context, obj interface{}, next graphql.Res
     for i, input := range newData {
         ids := []string{uctx.Username, *input.Comment.ID, strconv.Itoa(input.Type)}
         reactionid := strings.Join(ids, "#")
-        input.Reactionid = &reactionid
+        input.Reactionid = reactionid
         newData[i] = input
     }
 

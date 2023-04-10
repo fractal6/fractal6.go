@@ -270,30 +270,6 @@ func (ec *executionContext) dir_custom_args(ctx context.Context, rawArgs map[str
 	return args, nil
 }
 
-func (ec *executionContext) dir_default_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.DgraphDefault
-	if tmp, ok := rawArgs["add"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("add"))
-		arg0, err = ec.unmarshalODgraphDefault2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphDefault(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["add"] = arg0
-	var arg1 *model.DgraphDefault
-	if tmp, ok := rawArgs["update"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("update"))
-		arg1, err = ec.unmarshalODgraphDefault2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphDefault(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["update"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) dir_dgraph_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -363,21 +339,6 @@ func (ec *executionContext) dir_hasInverse_args(ctx context.Context, rawArgs map
 		}
 	}
 	args["field"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) dir_id_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *bool
-	if tmp, ok := rawArgs["interface"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interface"))
-		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["interface"] = arg0
 	return args, nil
 }
 
@@ -34616,11 +34577,14 @@ func (ec *executionContext) _PendingUser_username(ctx context.Context, field gra
 	})
 
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PendingUser_username(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -34725,18 +34689,21 @@ func (ec *executionContext) _PendingUser_email(ctx context.Context, field graphq
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*string); ok {
+		if data, ok := tmp.(string); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PendingUser_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -43956,11 +43923,14 @@ func (ec *executionContext) _Reaction_reactionid(ctx context.Context, field grap
 	})
 
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Reaction_reactionid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -58356,7 +58326,7 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				a, err := ec.unmarshalNString2string(ctx, "lower")
 				if err != nil {
@@ -58372,12 +58342,10 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*string); ok {
+			if data, ok := tmp.(string); ok {
 				it.Username = data
-			} else if tmp == nil {
-				it.Username = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
@@ -58392,7 +58360,7 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				a, err := ec.unmarshalNString2string(ctx, "lower")
 				if err != nil {
@@ -58408,12 +58376,10 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*string); ok {
+			if data, ok := tmp.(string); ok {
 				it.Email = data
-			} else if tmp == nil {
-				it.Email = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email_token":
@@ -58782,7 +58748,7 @@ func (ec *executionContext) unmarshalInputAddReactionInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
-			it.Reactionid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Reactionid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -61469,7 +61435,7 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "contractid", "tension", "status", "contract_type", "closedAt", "event", "participants", "candidates", "pending_candidates", "comments", "isValidator"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "status", "contract_type", "closedAt", "event", "participants", "candidates", "pending_candidates", "comments", "isValidator"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -61578,30 +61544,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				it.Message = data
 			} else if tmp == nil {
 				it.Message = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "contractid":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Contractid = data
-			} else if tmp == nil {
-				it.Contractid = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -62355,34 +62297,6 @@ func (ec *executionContext) unmarshalInputDateTimeRange(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
 			it.Max, err = ec.unmarshalNDateTime2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputDgraphDefault(ctx context.Context, obj interface{}) (model.DgraphDefault, error) {
-	var it model.DgraphDefault
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"value"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "value":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
-			it.Value, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -65919,7 +65833,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65996,30 +65910,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.UpdatedAt = data
 			} else if tmp == nil {
 				it.UpdatedAt = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "nameid":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Nameid = data
-			} else if tmp == nil {
-				it.Nameid = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -68033,7 +67923,7 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe"}
+	fieldsInOrder := [...]string{"updatedAt", "password", "email_token", "token", "contracts", "subscribe"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -68064,34 +67954,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "username":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				a, err := ec.unmarshalNString2string(ctx, "lower")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.W_alter == nil {
-					return nil, errors.New("directive w_alter is not implemented")
-				}
-				return ec.directives.W_alter(ctx, obj, directive0, a)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Username = data
-			} else if tmp == nil {
-				it.Username = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "password":
 			var err error
 
@@ -68112,34 +67974,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				it.Password = data
 			} else if tmp == nil {
 				it.Password = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "email":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				a, err := ec.unmarshalNString2string(ctx, "lower")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.W_alter == nil {
-					return nil, errors.New("directive w_alter is not implemented")
-				}
-				return ec.directives.W_alter(ctx, obj, directive0, a)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Email = data
-			} else if tmp == nil {
-				it.Email = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -68961,37 +68795,13 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "about", "pos", "tensions", "project"}
+	fieldsInOrder := [...]string{"about", "pos", "tensions", "project"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Name = data
-			} else if tmp == nil {
-				it.Name = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "about":
 			var err error
 
@@ -70215,37 +70025,13 @@ func (ec *executionContext) unmarshalInputReactionPatch(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"reactionid", "user", "comment", "type_"}
+	fieldsInOrder := [...]string{"user", "comment", "type_"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "reactionid":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Reactionid = data
-			} else if tmp == nil {
-				it.Reactionid = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "user":
 			var err error
 
@@ -74507,7 +74293,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -74562,30 +74348,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "username":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Username = data
-			} else if tmp == nil {
-				it.Username = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "name":
 			var err error
 
@@ -74606,30 +74368,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				it.Name = data
 			} else if tmp == nil {
 				it.Name = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "email":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Email = data
-			} else if tmp == nil {
-				it.Email = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -76301,7 +76039,7 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "voteid", "contract", "node", "data"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "contract", "node", "data"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76410,30 +76148,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				it.Message = data
 			} else if tmp == nil {
 				it.Message = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "voteid":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Voteid = data
-			} else if tmp == nil {
-				it.Voteid = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -80425,6 +80139,9 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._PendingUser_username(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "password":
 
 			out.Values[i] = ec._PendingUser_password(ctx, field, obj)
@@ -80433,6 +80150,9 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._PendingUser_email(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "email_token":
 
 			out.Values[i] = ec._PendingUser_email_token(ctx, field, obj)
@@ -82507,6 +82227,9 @@ func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet,
 
 			out.Values[i] = ec._Reaction_reactionid(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "user":
 
 			out.Values[i] = ec._Reaction_user(ctx, field, obj)
@@ -87455,14 +87178,6 @@ func (ec *executionContext) marshalODeleteVotePayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._DeleteVotePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalODgraphDefault2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphDefault(ctx context.Context, v interface{}) (*model.DgraphDefault, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputDgraphDefault(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalODgraphIndex2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDgraphIndexᚄ(ctx context.Context, v interface{}) ([]model.DgraphIndex, error) {
