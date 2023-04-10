@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"strings"
 	"github.com/99designs/gqlgen/graphql"
+	"fractale/fractal6.go/graph/model"
 )
 
 var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (interface{}, error)
@@ -37,6 +38,14 @@ func init() {
 
 }
 
+// need https://github.com/golang/go/issues/51977
+//type StringEqFilter interface {
+//    model.StringExactFilter |
+//    model.StringHashFilter |
+//    model.StringHashFilterStringRegExpFilter |
+//    model.StringHashFilterStringTermFilter
+//    //SetEq(s string)
+//}
 
 func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
     data, err := next(ctx)
@@ -47,6 +56,34 @@ func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
     case string:
         v := strings.ToLower(d)
         return v, err
+    case *model.StringExactFilter:
+        v := *d
+        if v.Eq != nil {
+            s := strings.ToLower(*v.Eq)
+            v.Eq = &s
+        }
+        return &v, err
+    case *model.StringHashFilter:
+        v := *d
+        if v.Eq != nil {
+            s := strings.ToLower(*v.Eq)
+            v.Eq = &s
+        }
+        return &v, err
+    case *model.StringHashFilterStringRegExpFilter:
+        v := *d
+        if v.Eq != nil {
+            s := strings.ToLower(*v.Eq)
+            v.Eq = &s
+        }
+        return &v, err
+    case *model.StringHashFilterStringTermFilter:
+        v := *d
+        if v.Eq != nil {
+            s := strings.ToLower(*v.Eq)
+            v.Eq = &s
+        }
+        return &v, err
     }
     field := *graphql.GetPathContext(ctx).Field
     return nil, fmt.Errorf("Type unknwown for field %s", field)

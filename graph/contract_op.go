@@ -72,9 +72,8 @@ func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventR
             }
         }
         for _, c := range contract.PendingCandidates {
-            if c.Email == nil { continue }
-            if i := auth.IsMember("email", *c.Email, contract.Tension.Receiverid); i >= 0 {
-                return false, contract, fmt.Errorf("Candidate '%s' is already member.", *c.Email)
+            if i := auth.IsMember("email", c.Email, contract.Tension.Receiverid); i >= 0 {
+                return false, contract, fmt.Errorf("Candidate '%s' is already member.", c.Email)
             }
         }
     case model.TensionEventMemberLinked:

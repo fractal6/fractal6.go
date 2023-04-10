@@ -6,7 +6,7 @@ BINARY := f6
 #DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
 DGRAPH_RELEASE := v22.0.2
-CLIENT_RELEASE := 0.7.5
+CLIENT_RELEASE := 0.7.9
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
@@ -78,11 +78,17 @@ schema: # Do not alter Dgraph, just merge schemas...
 	cp ../fractal6-schema/gen/schema.graphql schema/
 
 generate:
+	@# Generate gqlgen output
+	go generate ./...
+
+	# @deprecated: has been implemented in https://github.com/99designs/gqlgen/pull/2488
+	#	sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go
+
+	# @deprecated: At the time gqlgen didn't handl omitempty correctly;
 	# We add "omitempty" for each generate type's literal except for Bool and Int to prevent
 	# loosing data (when literal are set to false/0 values) when marshalling.
-	go generate ./... && \
-		sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go && \
-		sed -i '/\W\(bool\|int\)\W/I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
+	#	sed -i '/\W\(bool\|int\)\W/I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
+
 
 #
 # Publish builds for prod releases

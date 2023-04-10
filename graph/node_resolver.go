@@ -22,6 +22,7 @@ package graph
 
 import (
 	"context"
+    "reflect"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 
@@ -86,7 +87,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
         if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
         node := input.Nodes[0]
         rootnameid, _ := codec.Nid2rootid(*node.Nameid)
-        if rootnameid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
+        if rootnameid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid does not match.")) }
         ok, err = auth.HasCoordoAuth(uctx, *node.Nameid, &mode)
         if err != nil { return nil, LogErr("Internal error", err) }
         if !ok {
@@ -130,7 +131,15 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
         }
 
         if n_nodes > 1 && *nodes[0].Nameid != rootnameid  {
-            return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is only possible at the root circle level."))
+            // Instanciate an empty empty object of the same type than input.Set
+            t := reflect.TypeOf(input.Set).Elem()
+            a := reflect.New(t).Elem().Interface()
+            b := *input.Set
+            b.Nodes = nil
+            // Ignore if the update it is just appending the data to new node (not actually modifing it)
+            if !reflect.DeepEqual(a, b) {
+                return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is only possible at the root circle level."))
+            }
         }
     }
     if input.Remove != nil {

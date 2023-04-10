@@ -8,11 +8,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ...
 
+## [0.7.9]
+
+- build: make schema compatible with dgraph v22
+- buid: add options to contrib/dgraph configs file to change ports.
+- refactor: update resolvers with bridge query
+- refactor: make DgraphQueryResolverRaw obsolete with new Dgraph bridge resolver using proper inputs [WIP]
+- fix/schema:Fix duplicate issue with artefact case; make w_* effective with *Filter input in schema.
+- fix/updateAretefact: allow duplicate artefacts to be added to circles even if not at root circle.
+- Update go.mod
+
+
+
+## [0.7.8]
+
+### Fixed
+- fixed variable defined ut not used in dql delete tension.
+- improve topLabels query to fix label context queries
+- add quote to count2 query to allow string with sp
+
+
+## [0.7.6]
+
+- fix count2 query to handle space characters.
+- new mockup screenchots
+
 
 ## [0.7.5]
 
 ### New
-* Pin tension support (schema update + auth rules + custom dql query
+* Pin tension support (schema update + auth rules + custom dql query)
 
 ### Changed
 * Update CORS to allow staging.fractale.co used for test purpose.

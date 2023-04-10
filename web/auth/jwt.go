@@ -166,8 +166,11 @@ func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
         return nil, err
     }
 
-    // Increase the validity time to avoid jet leag edge cases
-    validityTime := tokenValidityTime + time.Hour*24
+    validityTime := tokenValidityTime
+    // Increase the validity time to avoid jet lag edge cases
+    if buildMode == "PROD" {
+        validityTime += time.Hour*24
+    }
 
     httpCookie := http.Cookie{
         Name: "jwt",

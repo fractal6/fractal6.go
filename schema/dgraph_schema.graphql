@@ -91,6 +91,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   children: [Node!] @hasInverse(field: parent)
   labels: [Label!]
   roles: [RoleExt!]
+  projects: [Project!]
   pinned: [Tension!]
   role_ext: RoleExt
   role_type: RoleType @search
@@ -167,6 +168,44 @@ type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   mandate: Mandate
   roles: [Node!] @hasInverse(field: role_ext)
   nodes: [Node!] @hasInverse(field: roles)
+}
+
+type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryProject {
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by:[hash])
+  parentnameid: String! @search(by:[hash])
+  nameid: String! @search(by:[hash])
+  name: String! @search(by:[term])
+  description: String
+  columns: [ProjectColumn!] @hasInverse(field: project)
+  leaders: [Node!]
+  nodes: [Node!] @hasInverse(field: projects)
+}
+
+type ProjectTension {
+  id: ID!
+  tension: Tension!
+  pos: Int!
+  pc: ProjectColumn!
+}
+
+type ProjectColumn {
+  id: ID!
+  name: String! @id
+  about: String
+  pos: Int!
+  tensions: [ProjectTension!] @hasInverse(field: pc)
+  project: Project!
 }
 
 type OrgaAgg {
@@ -253,6 +292,7 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   mentions: [Event!] @hasInverse(field: mentioned)
   contracts: [Contract!] @hasInverse(field: tension)
   subscribers: [User!] @hasInverse(field: subscriptions)
+  projects: [ProjectTension!] @hasInverse(field: tension)
   n_comments: Int
   n_open_contracts: Int
 }
@@ -281,7 +321,7 @@ type Reaction @auth(add:{ rule:"""query ($USERNAME: String!) {
     }"""
 }) {
   id: ID!
-  reactionid: String @id
+  reactionid: String! @id
   user: User!
   comment: Comment!
   type_: Int!
@@ -410,9 +450,9 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 type PendingUser {
   id: ID!
   updatedAt: DateTime
-  username: String @id
+  username: String! @id
   password: String
-  email: String @id
+  email: String! @id
   email_token: String @search(by:[hash])
   token: String @search(by:[hash])
   contracts: [Contract!]

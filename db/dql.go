@@ -136,7 +136,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
     "count2": `{
-        all(func: eq({{.f1}}, {{.v1}})) @filter(eq({{.f2}}, {{.v2}})) {
+        all(func: eq({{.f1}}, "{{.v1}}")) @filter(eq({{.f2}}, "{{.v2}}")) {
             count({{.fieldName}})
         }
     }`,
@@ -146,7 +146,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
     "countHas2": `{
-        all(func: has({{.fieldName}})) @filter(eq({{.f2}}, {{.v2}})) {
+        all(func: has({{.fieldName}})) @filter(eq({{.f2}}, "{{.v2}}")) {
             count(uid)
         }
     }`,
@@ -472,7 +472,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldidinclude}}, "{{.objid}}")) {
             l as Node.labels
         }
 
@@ -698,7 +698,7 @@ var dqlQueries map[string]string = map[string]string{
           events as Tension.history
           mentions as Tension.mentions
         }
-        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,e,votes,comments2,reactions2)) {
+        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2)) {
             all_ids as uid
         }
     }`,
@@ -1585,11 +1585,18 @@ func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string) ([]model.Nod
 }
 
 // Get all top labels
-func (dg Dgraph) GetTopLabels(fieldid string, objid string) ([]model.Label, error) {
+func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
     // Format Query
+    var fieldinclude string
+    if includeSelf {
+        fieldinclude = fieldid
+    } else {
+        fieldinclude = fieldid + "_IGNORE"
+    }
     maps := map[string]string{
         "fieldid": fieldid,
         "objid": objid,
+        "fieldidinclude": fieldinclude,
     }
     // Send request
     res, err := dg.QueryDql("getTopLabels", maps)

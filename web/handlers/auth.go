@@ -100,8 +100,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
     } else {
         // Create pending user
         _, err = db.DB.Add(db.DB.GetRootUctx(), "pendingUser", model.AddPendingUserInput{
-            Email: &creds.Email,
-            Username: &creds.Username,
+            Email: creds.Email,
+            Username: creds.Username,
             Password: &passwd,
             EmailToken: &email_token,
             UpdatedAt: &now,

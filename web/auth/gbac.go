@@ -231,7 +231,7 @@ func QueryAuthFilter(uctx model.UserCtx, q *db.TensionQuery) error {
             // If Secret & non Peer
             nameidsProtected = append(nameidsProtected, nameid)
         } else {
-            // else (Public or with right)
+            // else (Public or with rights)
             nameids = append(nameids, nameid)
         }
     }
