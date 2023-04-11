@@ -3,6 +3,7 @@ f6
 vendor/
 releases/
 public/
+assets/screenshots/
 _data/
 .secret
 private.pem
