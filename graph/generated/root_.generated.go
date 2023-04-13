@@ -882,6 +882,8 @@ type ComplexityRoot struct {
 	Project struct {
 		Columns          func(childComplexity int, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) int
 		ColumnsAggregate func(childComplexity int, filter *model.ProjectColumnFilter) int
+		CreatedAt        func(childComplexity int) int
+		CreatedBy        func(childComplexity int, filter *model.UserFilter) int
 		Description      func(childComplexity int) int
 		ID               func(childComplexity int) int
 		Leaders          func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
@@ -892,10 +894,14 @@ type ComplexityRoot struct {
 		NodesAggregate   func(childComplexity int, filter *model.NodeFilter) int
 		Parentnameid     func(childComplexity int) int
 		Rootnameid       func(childComplexity int) int
+		Status           func(childComplexity int) int
+		UpdatedAt        func(childComplexity int) int
 	}
 
 	ProjectAggregateResult struct {
 		Count           func(childComplexity int) int
+		CreatedAtMax    func(childComplexity int) int
+		CreatedAtMin    func(childComplexity int) int
 		DescriptionMax  func(childComplexity int) int
 		DescriptionMin  func(childComplexity int) int
 		NameMax         func(childComplexity int) int
@@ -906,6 +912,8 @@ type ComplexityRoot struct {
 		ParentnameidMin func(childComplexity int) int
 		RootnameidMax   func(childComplexity int) int
 		RootnameidMin   func(childComplexity int) int
+		UpdatedAtMax    func(childComplexity int) int
+		UpdatedAtMin    func(childComplexity int) int
 	}
 
 	ProjectColumn struct {
@@ -5760,6 +5768,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.ColumnsAggregate(childComplexity, args["filter"].(*model.ProjectColumnFilter)), true
 
+	case "Project.createdAt":
+		if e.complexity.Project.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Project.CreatedAt(childComplexity), true
+
+	case "Project.createdBy":
+		if e.complexity.Project.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_Project_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Project.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
 	case "Project.description":
 		if e.complexity.Project.Description == nil {
 			break
@@ -5850,12 +5877,40 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Rootnameid(childComplexity), true
 
+	case "Project.status":
+		if e.complexity.Project.Status == nil {
+			break
+		}
+
+		return e.complexity.Project.Status(childComplexity), true
+
+	case "Project.updatedAt":
+		if e.complexity.Project.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Project.UpdatedAt(childComplexity), true
+
 	case "ProjectAggregateResult.count":
 		if e.complexity.ProjectAggregateResult.Count == nil {
 			break
 		}
 
 		return e.complexity.ProjectAggregateResult.Count(childComplexity), true
+
+	case "ProjectAggregateResult.createdAtMax":
+		if e.complexity.ProjectAggregateResult.CreatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectAggregateResult.CreatedAtMax(childComplexity), true
+
+	case "ProjectAggregateResult.createdAtMin":
+		if e.complexity.ProjectAggregateResult.CreatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectAggregateResult.CreatedAtMin(childComplexity), true
 
 	case "ProjectAggregateResult.descriptionMax":
 		if e.complexity.ProjectAggregateResult.DescriptionMax == nil {
@@ -5926,6 +5981,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectAggregateResult.RootnameidMin(childComplexity), true
+
+	case "ProjectAggregateResult.updatedAtMax":
+		if e.complexity.ProjectAggregateResult.UpdatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectAggregateResult.UpdatedAtMax(childComplexity), true
+
+	case "ProjectAggregateResult.updatedAtMin":
+		if e.complexity.ProjectAggregateResult.UpdatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectAggregateResult.UpdatedAtMin(childComplexity), true
 
 	case "ProjectColumn.about":
 		if e.complexity.ProjectColumn.About == nil {
@@ -9069,6 +9138,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputProjectOrder,
 		ec.unmarshalInputProjectPatch,
 		ec.unmarshalInputProjectRef,
+		ec.unmarshalInputProjectStatus_hash,
 		ec.unmarshalInputProjectTensionFilter,
 		ec.unmarshalInputProjectTensionOrder,
 		ec.unmarshalInputProjectTensionPatch,
@@ -9414,11 +9484,15 @@ type RoleExt {
 
 type Project {
   id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   rootnameid: String!
   parentnameid: String!
   nameid: String!
   name: String!
   description: String
+  status: ProjectStatus!
   columns(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn!]
   leaders(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
@@ -9790,6 +9864,11 @@ enum BlobType {
 
 }
 
+enum ProjectStatus {
+  Open
+  Closed
+}
+
 enum ContractStatus {
   Open
   Closed
@@ -9825,35 +9904,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10093,11 +10172,15 @@ type AddProjectColumnPayload {
 }
 
 input AddProjectInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   rootnameid: String!
   parentnameid: String!
   nameid: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String!
-  description: String
+  name: String! @x_alter(r:"maxLen", n:280)
+  description: String @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus!
   columns: [ProjectColumnRef!]
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
@@ -11749,6 +11832,10 @@ input PostRef {
 
 type ProjectAggregateResult {
   count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
   rootnameidMin: String
   rootnameidMax: String
   parentnameidMin: String
@@ -11820,10 +11907,12 @@ input ProjectColumnRef {
 
 input ProjectFilter {
   id: [ID!]
+  createdAt: DateTimeFilter
   rootnameid: StringHashFilter
   parentnameid: StringHashFilter
   nameid: StringHashFilter @w_alter(a:"lower")
   name: StringTermFilter
+  status: ProjectStatus_hash
   has: [ProjectHasFilter]
   and: [ProjectFilter]
   or: [ProjectFilter]
@@ -11831,11 +11920,15 @@ input ProjectFilter {
 }
 
 enum ProjectHasFilter {
+  createdBy
+  createdAt
+  updatedAt
   rootnameid
   parentnameid
   nameid
   name
   description
+  status
   columns
   leaders
   nodes
@@ -11848,6 +11941,8 @@ input ProjectOrder {
 }
 
 enum ProjectOrderable {
+  createdAt
+  updatedAt
   rootnameid
   parentnameid
   nameid
@@ -11856,11 +11951,15 @@ enum ProjectOrderable {
 }
 
 input ProjectPatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_patch_ro
   rootnameid: String @x_patch_ro
   parentnameid: String @x_patch_ro
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String @x_patch_ro
-  description: String @x_alter
+  name: String @x_alter(r:"maxLen", n:280)
+  description: String @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus @x_patch_ro
   columns: [ProjectColumnRef!] @x_patch_ro
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
@@ -11868,14 +11967,23 @@ input ProjectPatch {
 
 input ProjectRef {
   id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime
   rootnameid: String
   parentnameid: String
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String
-  description: String @x_alter
+  name: String @x_alter(r:"maxLen", n:280)
+  description: String @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus
   columns: [ProjectColumnRef!]
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+}
+
+input ProjectStatus_hash {
+  eq: ProjectStatus
+  in: [ProjectStatus]
 }
 
 type ProjectTensionAggregateResult {

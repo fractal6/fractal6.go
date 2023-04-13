@@ -91,47 +91,49 @@ func (r *mutationResolver) DeleteRoleExt(ctx context.Context, filter model.RoleE
 }
 
 // AddProject is the resolver for the addProject field.
-func (r *mutationResolver) AddProject(ctx context.Context, input []*model.AddProjectInput) (*model.AddProjectPayload, error) {
-	panic(fmt.Errorf("not implemented: AddProject - addProject"))
+func (r *mutationResolver) AddProject(ctx context.Context, input []*model.AddProjectInput) (data *model.AddProjectPayload, errors error) {
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	return data, errors
 }
 
 // UpdateProject is the resolver for the updateProject field.
-func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*model.UpdateProjectPayload, error) {
-	panic(fmt.Errorf("not implemented: UpdateProject - updateProject"))
+func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (data *model.UpdateProjectPayload, errors error) {
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
+	return data, errors
 }
 
 // DeleteProject is the resolver for the deleteProject field.
-func (r *mutationResolver) DeleteProject(ctx context.Context, filter model.ProjectFilter) (*model.DeleteProjectPayload, error) {
+func (r *mutationResolver) DeleteProject(ctx context.Context, filter model.ProjectFilter) (data *model.DeleteProjectPayload, errors error) {
 	panic(fmt.Errorf("not implemented: DeleteProject - deleteProject"))
 }
 
 // AddProjectTension is the resolver for the addProjectTension field.
-func (r *mutationResolver) AddProjectTension(ctx context.Context, input []*model.AddProjectTensionInput) (*model.AddProjectTensionPayload, error) {
+func (r *mutationResolver) AddProjectTension(ctx context.Context, input []*model.AddProjectTensionInput) (data *model.AddProjectTensionPayload, errors error) {
 	panic(fmt.Errorf("not implemented: AddProjectTension - addProjectTension"))
 }
 
 // UpdateProjectTension is the resolver for the updateProjectTension field.
-func (r *mutationResolver) UpdateProjectTension(ctx context.Context, input model.UpdateProjectTensionInput) (*model.UpdateProjectTensionPayload, error) {
+func (r *mutationResolver) UpdateProjectTension(ctx context.Context, input model.UpdateProjectTensionInput) (data *model.UpdateProjectTensionPayload, errors error) {
 	panic(fmt.Errorf("not implemented: UpdateProjectTension - updateProjectTension"))
 }
 
 // DeleteProjectTension is the resolver for the deleteProjectTension field.
-func (r *mutationResolver) DeleteProjectTension(ctx context.Context, filter model.ProjectTensionFilter) (*model.DeleteProjectTensionPayload, error) {
+func (r *mutationResolver) DeleteProjectTension(ctx context.Context, filter model.ProjectTensionFilter) (data *model.DeleteProjectTensionPayload, errors error) {
 	panic(fmt.Errorf("not implemented: DeleteProjectTension - deleteProjectTension"))
 }
 
 // AddProjectColumn is the resolver for the addProjectColumn field.
-func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput, upsert *bool) (*model.AddProjectColumnPayload, error) {
+func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput, upsert *bool) (data *model.AddProjectColumnPayload, errors error) {
 	panic(fmt.Errorf("not implemented: AddProjectColumn - addProjectColumn"))
 }
 
 // UpdateProjectColumn is the resolver for the updateProjectColumn field.
-func (r *mutationResolver) UpdateProjectColumn(ctx context.Context, input model.UpdateProjectColumnInput) (*model.UpdateProjectColumnPayload, error) {
+func (r *mutationResolver) UpdateProjectColumn(ctx context.Context, input model.UpdateProjectColumnInput) (data *model.UpdateProjectColumnPayload, errors error) {
 	panic(fmt.Errorf("not implemented: UpdateProjectColumn - updateProjectColumn"))
 }
 
 // DeleteProjectColumn is the resolver for the deleteProjectColumn field.
-func (r *mutationResolver) DeleteProjectColumn(ctx context.Context, filter model.ProjectColumnFilter) (*model.DeleteProjectColumnPayload, error) {
+func (r *mutationResolver) DeleteProjectColumn(ctx context.Context, filter model.ProjectColumnFilter) (data *model.DeleteProjectColumnPayload, errors error) {
 	panic(fmt.Errorf("not implemented: DeleteProjectColumn - deleteProjectColumn"))
 }
 

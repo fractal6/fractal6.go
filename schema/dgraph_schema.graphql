@@ -182,11 +182,15 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }]
 }) {
   id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  updatedAt: DateTime!
   rootnameid: String! @search(by:[hash])
   parentnameid: String! @search(by:[hash])
   nameid: String! @search(by:[hash])
   name: String! @search(by:[term])
   description: String
+  status: ProjectStatus! @search
   columns: [ProjectColumn!] @hasInverse(field: project)
   leaders: [Node!]
   nodes: [Node!] @hasInverse(field: projects)
@@ -619,6 +623,11 @@ enum BlobType {
 
   OnDoc
 
+}
+
+enum ProjectStatus {
+  Open
+  Closed
 }
 
 enum ContractStatus {

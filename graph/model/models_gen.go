@@ -250,11 +250,15 @@ type AddProjectColumnPayload struct {
 }
 
 type AddProjectInput struct {
+	CreatedBy    *UserRef            `json:"createdBy"`
+	CreatedAt    string              `json:"createdAt"`
+	UpdatedAt    string              `json:"updatedAt"`
 	Rootnameid   string              `json:"rootnameid"`
 	Parentnameid string              `json:"parentnameid"`
 	Nameid       string              `json:"nameid"`
 	Name         string              `json:"name"`
 	Description  *string             `json:"description,omitempty"`
+	Status       ProjectStatus       `json:"status"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -1714,11 +1718,15 @@ type PostRef struct {
 
 type Project struct {
 	ID               string                        `json:"id"`
+	CreatedBy        *User                         `json:"createdBy"`
+	CreatedAt        string                        `json:"createdAt"`
+	UpdatedAt        string                        `json:"updatedAt"`
 	Rootnameid       string                        `json:"rootnameid"`
 	Parentnameid     string                        `json:"parentnameid"`
 	Nameid           string                        `json:"nameid"`
 	Name             string                        `json:"name"`
 	Description      *string                       `json:"description,omitempty"`
+	Status           ProjectStatus                 `json:"status"`
 	Columns          []*ProjectColumn              `json:"columns,omitempty"`
 	Leaders          []*Node                       `json:"leaders,omitempty"`
 	Nodes            []*Node                       `json:"nodes,omitempty"`
@@ -1729,6 +1737,10 @@ type Project struct {
 
 type ProjectAggregateResult struct {
 	Count           *int    `json:"count,omitempty"`
+	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax    *string `json:"updatedAtMax,omitempty"`
 	RootnameidMin   *string `json:"rootnameidMin,omitempty"`
 	RootnameidMax   *string `json:"rootnameidMax,omitempty"`
 	ParentnameidMin *string `json:"parentnameidMin,omitempty"`
@@ -1796,10 +1808,12 @@ type ProjectColumnRef struct {
 
 type ProjectFilter struct {
 	ID           []string            `json:"id,omitempty"`
+	CreatedAt    *DateTimeFilter     `json:"createdAt,omitempty"`
 	Rootnameid   *StringHashFilter   `json:"rootnameid,omitempty"`
 	Parentnameid *StringHashFilter   `json:"parentnameid,omitempty"`
 	Nameid       *StringHashFilter   `json:"nameid,omitempty"`
 	Name         *StringTermFilter   `json:"name,omitempty"`
+	Status       *ProjectStatusHash  `json:"status,omitempty"`
 	Has          []*ProjectHasFilter `json:"has,omitempty"`
 	And          []*ProjectFilter    `json:"and,omitempty"`
 	Or           []*ProjectFilter    `json:"or,omitempty"`
@@ -1813,11 +1827,15 @@ type ProjectOrder struct {
 }
 
 type ProjectPatch struct {
+	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt    *string             `json:"createdAt,omitempty"`
+	UpdatedAt    *string             `json:"updatedAt,omitempty"`
 	Rootnameid   *string             `json:"rootnameid,omitempty"`
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
 	Description  *string             `json:"description,omitempty"`
+	Status       *ProjectStatus      `json:"status,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -1825,14 +1843,23 @@ type ProjectPatch struct {
 
 type ProjectRef struct {
 	ID           *string             `json:"id,omitempty"`
+	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt    *string             `json:"createdAt,omitempty"`
+	UpdatedAt    *string             `json:"updatedAt,omitempty"`
 	Rootnameid   *string             `json:"rootnameid,omitempty"`
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
 	Description  *string             `json:"description,omitempty"`
+	Status       *ProjectStatus      `json:"status,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
+}
+
+type ProjectStatusHash struct {
+	Eq *ProjectStatus   `json:"eq,omitempty"`
+	In []*ProjectStatus `json:"in,omitempty"`
 }
 
 type ProjectTension struct {
@@ -4799,22 +4826,30 @@ func (e ProjectColumnOrderable) MarshalGQL(w io.Writer) {
 type ProjectHasFilter string
 
 const (
+	ProjectHasFilterCreatedBy    ProjectHasFilter = "createdBy"
+	ProjectHasFilterCreatedAt    ProjectHasFilter = "createdAt"
+	ProjectHasFilterUpdatedAt    ProjectHasFilter = "updatedAt"
 	ProjectHasFilterRootnameid   ProjectHasFilter = "rootnameid"
 	ProjectHasFilterParentnameid ProjectHasFilter = "parentnameid"
 	ProjectHasFilterNameid       ProjectHasFilter = "nameid"
 	ProjectHasFilterName         ProjectHasFilter = "name"
 	ProjectHasFilterDescription  ProjectHasFilter = "description"
+	ProjectHasFilterStatus       ProjectHasFilter = "status"
 	ProjectHasFilterColumns      ProjectHasFilter = "columns"
 	ProjectHasFilterLeaders      ProjectHasFilter = "leaders"
 	ProjectHasFilterNodes        ProjectHasFilter = "nodes"
 )
 
 var AllProjectHasFilter = []ProjectHasFilter{
+	ProjectHasFilterCreatedBy,
+	ProjectHasFilterCreatedAt,
+	ProjectHasFilterUpdatedAt,
 	ProjectHasFilterRootnameid,
 	ProjectHasFilterParentnameid,
 	ProjectHasFilterNameid,
 	ProjectHasFilterName,
 	ProjectHasFilterDescription,
+	ProjectHasFilterStatus,
 	ProjectHasFilterColumns,
 	ProjectHasFilterLeaders,
 	ProjectHasFilterNodes,
@@ -4822,7 +4857,7 @@ var AllProjectHasFilter = []ProjectHasFilter{
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
+	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
 		return true
 	}
 	return false
@@ -4852,6 +4887,8 @@ func (e ProjectHasFilter) MarshalGQL(w io.Writer) {
 type ProjectOrderable string
 
 const (
+	ProjectOrderableCreatedAt    ProjectOrderable = "createdAt"
+	ProjectOrderableUpdatedAt    ProjectOrderable = "updatedAt"
 	ProjectOrderableRootnameid   ProjectOrderable = "rootnameid"
 	ProjectOrderableParentnameid ProjectOrderable = "parentnameid"
 	ProjectOrderableNameid       ProjectOrderable = "nameid"
@@ -4860,6 +4897,8 @@ const (
 )
 
 var AllProjectOrderable = []ProjectOrderable{
+	ProjectOrderableCreatedAt,
+	ProjectOrderableUpdatedAt,
 	ProjectOrderableRootnameid,
 	ProjectOrderableParentnameid,
 	ProjectOrderableNameid,
@@ -4869,7 +4908,7 @@ var AllProjectOrderable = []ProjectOrderable{
 
 func (e ProjectOrderable) IsValid() bool {
 	switch e {
-	case ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
+	case ProjectOrderableCreatedAt, ProjectOrderableUpdatedAt, ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
 		return true
 	}
 	return false
@@ -4893,6 +4932,47 @@ func (e *ProjectOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectStatus string
+
+const (
+	ProjectStatusOpen   ProjectStatus = "Open"
+	ProjectStatusClosed ProjectStatus = "Closed"
+)
+
+var AllProjectStatus = []ProjectStatus{
+	ProjectStatusOpen,
+	ProjectStatusClosed,
+}
+
+func (e ProjectStatus) IsValid() bool {
+	switch e {
+	case ProjectStatusOpen, ProjectStatusClosed:
+		return true
+	}
+	return false
+}
+
+func (e ProjectStatus) String() string {
+	return string(e)
+}
+
+func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectStatus", str)
+	}
+	return nil
+}
+
+func (e ProjectStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
