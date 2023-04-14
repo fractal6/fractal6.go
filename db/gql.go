@@ -313,7 +313,7 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
         return fmt.Errorf("unknown vertex '%s'", vertex)
     }
 
-    f := fmt.Sprintf(`{"%s":"%s"}`, k, v)
+    f := fmt.Sprintf(`{"%s":"%s"}`, k, QuoteString(v))
     err := json.Unmarshal([]byte(f), &set)
     if err != nil { return err }
     input.Filter = &filter
