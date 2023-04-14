@@ -180,7 +180,7 @@ copy_config:
 	@mkdir -p $(addprefix $(RELEASE_DIR)/$(RELEASE_NAME)/, templates schema) && \
 		cp templates/config.toml $(RELEASE_DIR)/$(RELEASE_NAME)/templates && \
 		sed -i "s/^client_version\s*=.*$$/client_version = \"$(shell cat $(RELEASE_DIR)/$(RELEASE_NAME)/public/client_version)\"/" $(RELEASE_DIR)/$(RELEASE_NAME)/templates/config.toml && \
-		cp -r assets/ $(RELEASE_DIR)/$(RELEASE_NAME) && \
+		cp -r data/ $(RELEASE_DIR)/$(RELEASE_NAME) && \
 		cp -r contrib/ $(RELEASE_DIR)/$(RELEASE_NAME) && \
 		cp schema/dgraph_schema.graphql $(RELEASE_DIR)/$(RELEASE_NAME)/schema && \
 		cp $(BINARY) $(RELEASE_DIR)/$(RELEASE_NAME)
@@ -219,7 +219,7 @@ docs:
 	cd ../docs && \
 		make quickdoc && \
 		cd - && \
-		cp ../docs/_data/* assets/
+		cp ../docs/_data/* data/
 
 show_query:
 	rg "Gqlgen" graph/schema.resolvers.go -B 2 |grep func |sed "s/^func[^)]*)\W*\([^(]*\).*/\1/" | sort

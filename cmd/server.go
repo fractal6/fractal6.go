@@ -187,7 +187,7 @@ func RunServer() {
     // Static & Public files
     // --
     // Serve static files
-    web.FileServer(r, "/assets/", "./assets", "3600")
+    web.FileServer(r, "/data/", "./data", "3600")
     // Serve static frontend files
     web.FileServer(r, "/", "./public", "")
 
