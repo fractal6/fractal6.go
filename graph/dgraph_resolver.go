@@ -133,15 +133,15 @@ func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}
     queryType, typeName, queryName, err := queryTypeFromGraphqlContext(ctx)
     if err != nil { return tools.LogErr("DgraphQueryResolver", err) }
 
-    // Return error if jwt token error (particurly when has expired)
+    // Return error if jwt token error (particularly when has expired)
     if queryType == "add" || queryType == "update" || queryType == "delete" {
         _, _, err := auth.GetUserContext(ctx)
         if err != nil { return tools.LogErr("Access denied", err) }
     }
 
-    // Remove some input
     rawQuery := gc.RawQuery
     variables := gc.Variables
+    // Remove some input
     if ctx.Value("cut_history") != nil {
         // Go along PushHistory...
         // improve that hack with gqlgen #1144 issue
