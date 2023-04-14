@@ -101,7 +101,9 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     // In order to notify user on the given event, we need to know their ids to pass and link them
     // to the notification (UserEvent edge) function. To do so we first cut the history from the original
     // input, and push then the history (see the PushHistory function).
-    ctx = context.WithValue(ctx, "cut_history", true)
+    ctx = context.WithValue(ctx, "cut_history", true) // Used by DgraphQueryResolverRaw
+    history := input.History
+    input.History = nil
     // Execute query
     data, err := next(ctx)
     if err != nil { return data, err }
@@ -112,7 +114,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
     id := tension.ID
 
     // Validate and process Blob Event
-    ok, _,  err := TensionEventHook(uctx, id, input.History, nil)
+    ok, _,  err := TensionEventHook(uctx, id, history, nil)
     if !ok || err != nil {
         // Delete the tension just added
         e := db.GetDB().DeepDelete("tension", id)
@@ -122,7 +124,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
         return data, err
     }
     if ok {
-        PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: input.History})
+        PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: history})
         return data, err
     }
     return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
@@ -152,17 +154,20 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
         ok, contract, err = TensionEventHook(uctx, ids[0], input.Set.History, blob)
         if err != nil { return nil, err }
         if ok {
-            // History and notification Logics
-            // --
+            // History and notification Logics --
             // In order to notify user on the given event, we need to know
             // their ids to pass and link them to the user's notifications (UserEvent edge).
             // To do so we first cut the history from the original input,
             // and push then the history (see the [[PushHistory]] function).
-            ctx = context.WithValue(ctx, "cut_history", true)
+            ctx = context.WithValue(ctx, "cut_history", true) // Used by DgraphQueryResolverRaw
+            history := input.Set.History
+            now := Now()
+            input.Set.History = nil
+            input.Set.UpdatedAt = &now
             // Execute query
             data, err := next(ctx)
             if err != nil { return data, err }
-            PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: ids[0], History: input.Set.History})
+            PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: ids[0], History: history})
             return data, err
         } else if contract != nil {
             var t model.UpdateTensionPayload

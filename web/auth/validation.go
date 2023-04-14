@@ -321,8 +321,8 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
 
     switch uctx.Rights.Type {
     case model.UserTypeRegular:
-        if n_orgs >= MAX_ORGA_REG {
-            return ok, fmt.Errorf("Number of organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
+        if n_orgs >= MAX_ORGA_REG && MAX_ORGA_REG >= 0 {
+            return ok, fmt.Errorf("Number of organisation are limited to %d, please contact us to create more.", MAX_ORGA_REG)
         } else if *form.Visibility == model.NodeVisibilityPublic &&
         n_public >= uctx.Rights.MaxPublicOrga && uctx.Rights.MaxPublicOrga >= 0 {
             return ok, fmt.Errorf("Number of public organisation are limited to %d, please contact us to create more.", uctx.Rights.MaxPublicOrga)
@@ -333,13 +333,12 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
 
     case model.UserTypePro:
         if n_orgs >= MAX_ORGA_PRO && MAX_ORGA_PRO >= 0 {
-            return ok, fmt.Errorf("You own too many organisation, please contact us to create more.")
+            return ok, fmt.Errorf("Number of organisation are limited to %d, please contact us to create more.", MAX_ORGA_PRO)
         }
 
 
     case model.UserTypeRoot:
         // pass
-
     }
 
     ok = true
