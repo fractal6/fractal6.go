@@ -140,9 +140,9 @@ func init() {
 func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
     var ok bool
     var err error
-    var hookEnabled bool =(
+    var hookEnabled bool = (
         em.Validation == "" ||
-        (contract == nil && GetBlob(tension) == nil)) // Moving node, doc etc
+        (contract == nil && GetBlob(tension) == nil) ) // Moving node, doc etc
 
     if tension == nil || event == nil {
         return false, nil, fmt.Errorf("non existing tension or event not allowed")
@@ -441,8 +441,8 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
             contract.Status = model.ContractStatusCanceled
             return true, contract, err
         } else {
-            // @future: Agile mode: any user can create a contract ?
-            return false, nil, err
+            // Allow contract creation
+            return false, contract, err
         }
     } else {
         return false, nil, err

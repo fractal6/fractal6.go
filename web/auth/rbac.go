@@ -150,7 +150,10 @@ func UserHasRole(uctx *model.UserCtx, nameid string) int {
     }
 
     for i, r := range uctx.Roles {
-        if *r.RoleType == model.RoleTypeGuest || *r.RoleType == model.RoleTypePending || *r.RoleType == model.RoleTypeRetired {
+        if *r.RoleType == model.RoleTypeMember ||
+        *r.RoleType == model.RoleTypeGuest ||
+        *r.RoleType == model.RoleTypePending ||
+        *r.RoleType == model.RoleTypeRetired {
             continue
         }
 
