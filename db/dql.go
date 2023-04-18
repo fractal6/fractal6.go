@@ -150,6 +150,30 @@ var dqlQueries map[string]string = map[string]string{
             count(uid)
         }
     }`,
+    "count_open_contracts_from_node": `{
+        var(func: eq(Node.nameid, "{{.nameid}}")) {
+            Node.source {
+                Blob.tension {
+                    Tension.contracts @filter(eq(Contract.status, "Open")) {
+                        c as count(uid)
+                    }
+                }
+            }
+        }
+        all() {
+            n_open_contracts: val(c)
+        }
+    }`,
+    "count_open_contracts_from_tension": `{
+        var(func: uid({{id}})) {
+            Tension.contracts @filter(eq(Contract.status, "Open")) {
+                c as count(uid)
+            }
+        }
+        all() {
+            n_open_contracts: val(c)
+        }
+    }`,
     "getOrgaAgg": `{
         var(func: eq(Node.nameid, "{{.nameid}}")) {
             Node.children @filter(eq(Node.role_type, "Guest")) {

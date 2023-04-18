@@ -245,6 +245,8 @@ func private(ctx context.Context, obj interface{}, next graphql.Resolver) (inter
     return nil, fmt.Errorf("`%s' field is private", fieldName)
 }
 
+// Use DQL query to fetch the given field=k.
+// If k is not given, "id" is automatically pass to the query template.
 func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
     data, err:= next(ctx)
     if err != nil { return nil, err }
