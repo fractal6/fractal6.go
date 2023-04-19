@@ -136,6 +136,7 @@ func RunServer() {
             r.Post("/resetpassword", handle6.ResetPassword)
             r.Post("/resetpassword2", handle6.ResetPassword2)
             r.Post("/uuidcheck", handle6.UuidCheck)
+            r.Post("/updatepassword", handle6.UpdatePassword)
 
             // Organisation
             r.Post("/createorga", handle6.CreateOrga)

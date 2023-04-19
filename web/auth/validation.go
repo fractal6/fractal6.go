@@ -148,7 +148,9 @@ func regularizeUctx(uctx *model.UserCtx) {
 //
 
 // GetUser returns the user ctx from a db.grpc request,
-// **if they are authencitated** against their hashed password.
+// **if they are authenticated** against their hashed password.
+// Note: ===  This is protected ===
+// This method check if the user has login rights, and check passwords.
 func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     // 1. get username/email or throw error
     // 3. if pass compare pasword or throw error
@@ -180,6 +182,11 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
         return nil, FormatError(err, "fieldid")
     }
 
+    // Check if the user has login authorization
+    if !userCtx.Rights.CanLogin  {
+        return nil, ErrCantLogin
+    }
+
     // Compare hashed password.
     ok := tools.VerifyPassword(userCtx.Password, password)
     if !ok {
@@ -199,12 +206,18 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
         return nil, FormatError(err, "username")
     }
 
+    // Check if the user has login authorization
+    if !userCtx.Rights.CanLogin  {
+        return nil, ErrCantLogin
+    }
+
     // Update the user roles cache.
     ctx := context.Background()
     var key string = userCtx.Username + "roles"
     d, _ := json.Marshal(userCtx.Roles)
     err = cache.SetEX(ctx, key, d, time.Second * 12).Err()
     if err != nil { return nil, FormatError(err, "") }
+
 
     regularizeUctx(userCtx)
     return userCtx, nil

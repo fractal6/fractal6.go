@@ -282,12 +282,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-    // Check if the user has login right
-    if !uctx.Rights.CanLogin  {
-        http.Error(w, auth.ErrCantLogin.Error(), 401)
-        return
-    }
-
 	// Create a new cookie with token
     httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
@@ -358,7 +352,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, httpCookie)
 
     // Return the user context
-    data, err := json.Marshal(uctx)
+    data_out, err := json.Marshal(uctx)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -371,7 +365,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-    w.Write(data)
+    w.Write(data_out)
 }
 
 func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
@@ -560,6 +554,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, httpCookie)
 
+    // Return the user context
     data_out, err := json.Marshal(uctx)
     if err != nil {
         http.Error(w, err.Error(), 500)
@@ -599,4 +594,66 @@ func UuidCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+    var data  struct {
+        Username string
+        Password string
+        ConfirmPassword string
+        NewPassword string
+    }
 
+	// Get the JSON body and decode it
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		// Body structure error
+        http.Error(w, err.Error(), 400)
+		return
+	}
+
+    // Validation
+    // --
+    // Validate New password
+    if data.NewPassword != data.ConfirmPassword {
+        http.Error(w, "The passwords does not match.", 400)
+		return
+    }
+	if err = auth.ValidatePassword(data.NewPassword); err != nil {
+        http.Error(w, err.Error(), 400)
+		return
+    }
+    uctx, err := auth.GetAuthUserCtx(model.UserCreds{Username:data.Username, Password:data.Password})
+    if err != nil {
+		// Credentials validation error
+        http.Error(w, err.Error(), 401)
+		return
+    }
+
+	// Set the new password for the given user
+    err = db.GetDB().SetFieldByEq("User.username", data.Username, "User.password", HashPassword(data.NewPassword))
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+	// Create a new cookie with token
+    httpCookie, err := auth.NewUserCookie(*uctx)
+	if err != nil {
+		// Token issuing error
+		//w.WriteHeader(http.StatusInternalServerError)
+        http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Finally, we set the client cookie for "token" as the JWT we just generated
+	// we also set an expiry time which is the same as the token itself
+	http.SetCookie(w, httpCookie)
+
+    // Return the user context
+    data_out, err := json.Marshal(uctx)
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+		return
+    }
+
+    w.Write(data_out)
+}
