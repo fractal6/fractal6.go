@@ -188,6 +188,7 @@ type AddNodeInput struct {
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
 	OrgaAgg               *OrgaAggRef    `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
+	NOpenContracts        *int           `json:"n_open_contracts,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -250,11 +251,15 @@ type AddProjectColumnPayload struct {
 }
 
 type AddProjectInput struct {
+	CreatedBy    *UserRef            `json:"createdBy"`
+	CreatedAt    string              `json:"createdAt"`
+	UpdatedAt    string              `json:"updatedAt"`
 	Rootnameid   string              `json:"rootnameid"`
 	Parentnameid string              `json:"parentnameid"`
 	Nameid       string              `json:"nameid"`
 	Name         string              `json:"name"`
 	Description  *string             `json:"description,omitempty"`
+	Status       ProjectStatus       `json:"status"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -326,8 +331,8 @@ type AddTensionInput struct {
 	Contracts      []*ContractRef       `json:"contracts,omitempty"`
 	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
 	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
-	NComments      *int                 `json:"n_comments,omitempty"`
 	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
+	NComments      *int                 `json:"n_comments,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -1225,6 +1230,7 @@ type Node struct {
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
 	OrgaAgg                *OrgaAgg                `json:"orga_agg,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
+	NOpenContracts         *int                    `json:"n_open_contracts,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
 	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
@@ -1238,25 +1244,29 @@ type Node struct {
 }
 
 type NodeAggregateResult struct {
-	Count         *int     `json:"count,omitempty"`
-	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
-	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
-	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax  *string  `json:"updatedAtMax,omitempty"`
-	NameidMin     *string  `json:"nameidMin,omitempty"`
-	NameidMax     *string  `json:"nameidMax,omitempty"`
-	RootnameidMin *string  `json:"rootnameidMin,omitempty"`
-	RootnameidMax *string  `json:"rootnameidMax,omitempty"`
-	NameMin       *string  `json:"nameMin,omitempty"`
-	NameMax       *string  `json:"nameMax,omitempty"`
-	AboutMin      *string  `json:"aboutMin,omitempty"`
-	AboutMax      *string  `json:"aboutMax,omitempty"`
-	RightsMin     *int     `json:"rightsMin,omitempty"`
-	RightsMax     *int     `json:"rightsMax,omitempty"`
-	RightsSum     *int     `json:"rightsSum,omitempty"`
-	RightsAvg     *float64 `json:"rightsAvg,omitempty"`
-	ColorMin      *string  `json:"colorMin,omitempty"`
-	ColorMax      *string  `json:"colorMax,omitempty"`
+	Count             *int     `json:"count,omitempty"`
+	CreatedAtMin      *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax      *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin      *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax      *string  `json:"updatedAtMax,omitempty"`
+	NameidMin         *string  `json:"nameidMin,omitempty"`
+	NameidMax         *string  `json:"nameidMax,omitempty"`
+	RootnameidMin     *string  `json:"rootnameidMin,omitempty"`
+	RootnameidMax     *string  `json:"rootnameidMax,omitempty"`
+	NameMin           *string  `json:"nameMin,omitempty"`
+	NameMax           *string  `json:"nameMax,omitempty"`
+	AboutMin          *string  `json:"aboutMin,omitempty"`
+	AboutMax          *string  `json:"aboutMax,omitempty"`
+	RightsMin         *int     `json:"rightsMin,omitempty"`
+	RightsMax         *int     `json:"rightsMax,omitempty"`
+	RightsSum         *int     `json:"rightsSum,omitempty"`
+	RightsAvg         *float64 `json:"rightsAvg,omitempty"`
+	ColorMin          *string  `json:"colorMin,omitempty"`
+	ColorMax          *string  `json:"colorMax,omitempty"`
+	NOpenContractsMin *int     `json:"n_open_contractsMin,omitempty"`
+	NOpenContractsMax *int     `json:"n_open_contractsMax,omitempty"`
+	NOpenContractsSum *int     `json:"n_open_contractsSum,omitempty"`
+	NOpenContractsAvg *float64 `json:"n_open_contractsAvg,omitempty"`
 }
 
 type NodeFilter struct {
@@ -1408,6 +1418,7 @@ type NodePatch struct {
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	NOpenContracts        *int            `json:"n_open_contracts,omitempty"`
 }
 
 type NodeRef struct {
@@ -1447,6 +1458,7 @@ type NodeRef struct {
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	NOpenContracts        *int            `json:"n_open_contracts,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -1714,11 +1726,15 @@ type PostRef struct {
 
 type Project struct {
 	ID               string                        `json:"id"`
+	CreatedBy        *User                         `json:"createdBy"`
+	CreatedAt        string                        `json:"createdAt"`
+	UpdatedAt        string                        `json:"updatedAt"`
 	Rootnameid       string                        `json:"rootnameid"`
 	Parentnameid     string                        `json:"parentnameid"`
 	Nameid           string                        `json:"nameid"`
 	Name             string                        `json:"name"`
 	Description      *string                       `json:"description,omitempty"`
+	Status           ProjectStatus                 `json:"status"`
 	Columns          []*ProjectColumn              `json:"columns,omitempty"`
 	Leaders          []*Node                       `json:"leaders,omitempty"`
 	Nodes            []*Node                       `json:"nodes,omitempty"`
@@ -1729,6 +1745,10 @@ type Project struct {
 
 type ProjectAggregateResult struct {
 	Count           *int    `json:"count,omitempty"`
+	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax    *string `json:"updatedAtMax,omitempty"`
 	RootnameidMin   *string `json:"rootnameidMin,omitempty"`
 	RootnameidMax   *string `json:"rootnameidMax,omitempty"`
 	ParentnameidMin *string `json:"parentnameidMin,omitempty"`
@@ -1796,10 +1816,12 @@ type ProjectColumnRef struct {
 
 type ProjectFilter struct {
 	ID           []string            `json:"id,omitempty"`
+	CreatedAt    *DateTimeFilter     `json:"createdAt,omitempty"`
 	Rootnameid   *StringHashFilter   `json:"rootnameid,omitempty"`
 	Parentnameid *StringHashFilter   `json:"parentnameid,omitempty"`
 	Nameid       *StringHashFilter   `json:"nameid,omitempty"`
 	Name         *StringTermFilter   `json:"name,omitempty"`
+	Status       *ProjectStatusHash  `json:"status,omitempty"`
 	Has          []*ProjectHasFilter `json:"has,omitempty"`
 	And          []*ProjectFilter    `json:"and,omitempty"`
 	Or           []*ProjectFilter    `json:"or,omitempty"`
@@ -1813,11 +1835,15 @@ type ProjectOrder struct {
 }
 
 type ProjectPatch struct {
+	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt    *string             `json:"createdAt,omitempty"`
+	UpdatedAt    *string             `json:"updatedAt,omitempty"`
 	Rootnameid   *string             `json:"rootnameid,omitempty"`
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
 	Description  *string             `json:"description,omitempty"`
+	Status       *ProjectStatus      `json:"status,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
@@ -1825,14 +1851,23 @@ type ProjectPatch struct {
 
 type ProjectRef struct {
 	ID           *string             `json:"id,omitempty"`
+	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt    *string             `json:"createdAt,omitempty"`
+	UpdatedAt    *string             `json:"updatedAt,omitempty"`
 	Rootnameid   *string             `json:"rootnameid,omitempty"`
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
 	Description  *string             `json:"description,omitempty"`
+	Status       *ProjectStatus      `json:"status,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
+}
+
+type ProjectStatusHash struct {
+	Eq *ProjectStatus   `json:"eq,omitempty"`
+	In []*ProjectStatus `json:"in,omitempty"`
 }
 
 type ProjectTension struct {
@@ -2059,8 +2094,8 @@ type Tension struct {
 	Contracts            []*Contract                    `json:"contracts,omitempty"`
 	Subscribers          []*User                        `json:"subscribers,omitempty"`
 	Projects             []*ProjectTension              `json:"projects,omitempty"`
-	NComments            *int                           `json:"n_comments,omitempty"`
 	NOpenContracts       *int                           `json:"n_open_contracts,omitempty"`
+	NComments            *int                           `json:"n_comments,omitempty"`
 	ID                   string                         `json:"id"`
 	CreatedBy            *User                          `json:"createdBy"`
 	CreatedAt            string                         `json:"createdAt"`
@@ -2091,14 +2126,14 @@ type TensionAggregateResult struct {
 	ReceiveridMax     *string  `json:"receiveridMax,omitempty"`
 	TitleMin          *string  `json:"titleMin,omitempty"`
 	TitleMax          *string  `json:"titleMax,omitempty"`
-	NCommentsMin      *int     `json:"n_commentsMin,omitempty"`
-	NCommentsMax      *int     `json:"n_commentsMax,omitempty"`
-	NCommentsSum      *int     `json:"n_commentsSum,omitempty"`
-	NCommentsAvg      *float64 `json:"n_commentsAvg,omitempty"`
 	NOpenContractsMin *int     `json:"n_open_contractsMin,omitempty"`
 	NOpenContractsMax *int     `json:"n_open_contractsMax,omitempty"`
 	NOpenContractsSum *int     `json:"n_open_contractsSum,omitempty"`
 	NOpenContractsAvg *float64 `json:"n_open_contractsAvg,omitempty"`
+	NCommentsMin      *int     `json:"n_commentsMin,omitempty"`
+	NCommentsMax      *int     `json:"n_commentsMax,omitempty"`
+	NCommentsSum      *int     `json:"n_commentsSum,omitempty"`
+	NCommentsAvg      *float64 `json:"n_commentsAvg,omitempty"`
 }
 
 type TensionEventHash struct {
@@ -2149,8 +2184,8 @@ type TensionPatch struct {
 	Contracts      []*ContractRef       `json:"contracts,omitempty"`
 	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
 	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
-	NComments      *int                 `json:"n_comments,omitempty"`
 	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
+	NComments      *int                 `json:"n_comments,omitempty"`
 }
 
 type TensionRef struct {
@@ -2176,8 +2211,8 @@ type TensionRef struct {
 	Contracts      []*ContractRef       `json:"contracts,omitempty"`
 	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
 	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
-	NComments      *int                 `json:"n_comments,omitempty"`
 	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
+	NComments      *int                 `json:"n_comments,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -4091,6 +4126,7 @@ const (
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
 	NodeHasFilterOrgaAgg               NodeHasFilter = "orga_agg"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
+	NodeHasFilterNOpenContracts        NodeHasFilter = "n_open_contracts"
 )
 
 var AllNodeHasFilter = []NodeHasFilter{
@@ -4129,11 +4165,12 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterContracts,
 	NodeHasFilterOrgaAgg,
 	NodeHasFilterEventsHistory,
+	NodeHasFilterNOpenContracts,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory, NodeHasFilterNOpenContracts:
 		return true
 	}
 	return false
@@ -4204,14 +4241,15 @@ func (e NodeMode) MarshalGQL(w io.Writer) {
 type NodeOrderable string
 
 const (
-	NodeOrderableCreatedAt  NodeOrderable = "createdAt"
-	NodeOrderableUpdatedAt  NodeOrderable = "updatedAt"
-	NodeOrderableNameid     NodeOrderable = "nameid"
-	NodeOrderableRootnameid NodeOrderable = "rootnameid"
-	NodeOrderableName       NodeOrderable = "name"
-	NodeOrderableAbout      NodeOrderable = "about"
-	NodeOrderableRights     NodeOrderable = "rights"
-	NodeOrderableColor      NodeOrderable = "color"
+	NodeOrderableCreatedAt      NodeOrderable = "createdAt"
+	NodeOrderableUpdatedAt      NodeOrderable = "updatedAt"
+	NodeOrderableNameid         NodeOrderable = "nameid"
+	NodeOrderableRootnameid     NodeOrderable = "rootnameid"
+	NodeOrderableName           NodeOrderable = "name"
+	NodeOrderableAbout          NodeOrderable = "about"
+	NodeOrderableRights         NodeOrderable = "rights"
+	NodeOrderableColor          NodeOrderable = "color"
+	NodeOrderableNOpenContracts NodeOrderable = "n_open_contracts"
 )
 
 var AllNodeOrderable = []NodeOrderable{
@@ -4223,11 +4261,12 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableAbout,
 	NodeOrderableRights,
 	NodeOrderableColor,
+	NodeOrderableNOpenContracts,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableName, NodeOrderableAbout, NodeOrderableRights, NodeOrderableColor:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableName, NodeOrderableAbout, NodeOrderableRights, NodeOrderableColor, NodeOrderableNOpenContracts:
 		return true
 	}
 	return false
@@ -4799,22 +4838,30 @@ func (e ProjectColumnOrderable) MarshalGQL(w io.Writer) {
 type ProjectHasFilter string
 
 const (
+	ProjectHasFilterCreatedBy    ProjectHasFilter = "createdBy"
+	ProjectHasFilterCreatedAt    ProjectHasFilter = "createdAt"
+	ProjectHasFilterUpdatedAt    ProjectHasFilter = "updatedAt"
 	ProjectHasFilterRootnameid   ProjectHasFilter = "rootnameid"
 	ProjectHasFilterParentnameid ProjectHasFilter = "parentnameid"
 	ProjectHasFilterNameid       ProjectHasFilter = "nameid"
 	ProjectHasFilterName         ProjectHasFilter = "name"
 	ProjectHasFilterDescription  ProjectHasFilter = "description"
+	ProjectHasFilterStatus       ProjectHasFilter = "status"
 	ProjectHasFilterColumns      ProjectHasFilter = "columns"
 	ProjectHasFilterLeaders      ProjectHasFilter = "leaders"
 	ProjectHasFilterNodes        ProjectHasFilter = "nodes"
 )
 
 var AllProjectHasFilter = []ProjectHasFilter{
+	ProjectHasFilterCreatedBy,
+	ProjectHasFilterCreatedAt,
+	ProjectHasFilterUpdatedAt,
 	ProjectHasFilterRootnameid,
 	ProjectHasFilterParentnameid,
 	ProjectHasFilterNameid,
 	ProjectHasFilterName,
 	ProjectHasFilterDescription,
+	ProjectHasFilterStatus,
 	ProjectHasFilterColumns,
 	ProjectHasFilterLeaders,
 	ProjectHasFilterNodes,
@@ -4822,7 +4869,7 @@ var AllProjectHasFilter = []ProjectHasFilter{
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
+	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
 		return true
 	}
 	return false
@@ -4852,6 +4899,8 @@ func (e ProjectHasFilter) MarshalGQL(w io.Writer) {
 type ProjectOrderable string
 
 const (
+	ProjectOrderableCreatedAt    ProjectOrderable = "createdAt"
+	ProjectOrderableUpdatedAt    ProjectOrderable = "updatedAt"
 	ProjectOrderableRootnameid   ProjectOrderable = "rootnameid"
 	ProjectOrderableParentnameid ProjectOrderable = "parentnameid"
 	ProjectOrderableNameid       ProjectOrderable = "nameid"
@@ -4860,6 +4909,8 @@ const (
 )
 
 var AllProjectOrderable = []ProjectOrderable{
+	ProjectOrderableCreatedAt,
+	ProjectOrderableUpdatedAt,
 	ProjectOrderableRootnameid,
 	ProjectOrderableParentnameid,
 	ProjectOrderableNameid,
@@ -4869,7 +4920,7 @@ var AllProjectOrderable = []ProjectOrderable{
 
 func (e ProjectOrderable) IsValid() bool {
 	switch e {
-	case ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
+	case ProjectOrderableCreatedAt, ProjectOrderableUpdatedAt, ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
 		return true
 	}
 	return false
@@ -4893,6 +4944,47 @@ func (e *ProjectOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectStatus string
+
+const (
+	ProjectStatusOpen   ProjectStatus = "Open"
+	ProjectStatusClosed ProjectStatus = "Closed"
+)
+
+var AllProjectStatus = []ProjectStatus{
+	ProjectStatusOpen,
+	ProjectStatusClosed,
+}
+
+func (e ProjectStatus) IsValid() bool {
+	switch e {
+	case ProjectStatusOpen, ProjectStatusClosed:
+		return true
+	}
+	return false
+}
+
+func (e ProjectStatus) String() string {
+	return string(e)
+}
+
+func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectStatus", str)
+	}
+	return nil
+}
+
+func (e ProjectStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -5381,8 +5473,8 @@ const (
 	TensionHasFilterContracts      TensionHasFilter = "contracts"
 	TensionHasFilterSubscribers    TensionHasFilter = "subscribers"
 	TensionHasFilterProjects       TensionHasFilter = "projects"
-	TensionHasFilterNComments      TensionHasFilter = "n_comments"
 	TensionHasFilterNOpenContracts TensionHasFilter = "n_open_contracts"
+	TensionHasFilterNComments      TensionHasFilter = "n_comments"
 )
 
 var AllTensionHasFilter = []TensionHasFilter{
@@ -5407,13 +5499,13 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterContracts,
 	TensionHasFilterSubscribers,
 	TensionHasFilterProjects,
-	TensionHasFilterNComments,
 	TensionHasFilterNOpenContracts,
+	TensionHasFilterNComments,
 }
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjects, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjects, TensionHasFilterNOpenContracts, TensionHasFilterNComments:
 		return true
 	}
 	return false
@@ -5449,8 +5541,8 @@ const (
 	TensionOrderableEmitterid      TensionOrderable = "emitterid"
 	TensionOrderableReceiverid     TensionOrderable = "receiverid"
 	TensionOrderableTitle          TensionOrderable = "title"
-	TensionOrderableNComments      TensionOrderable = "n_comments"
 	TensionOrderableNOpenContracts TensionOrderable = "n_open_contracts"
+	TensionOrderableNComments      TensionOrderable = "n_comments"
 )
 
 var AllTensionOrderable = []TensionOrderable{
@@ -5460,13 +5552,13 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableEmitterid,
 	TensionOrderableReceiverid,
 	TensionOrderableTitle,
-	TensionOrderableNComments,
 	TensionOrderableNOpenContracts,
+	TensionOrderableNComments,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNOpenContracts:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableTitle, TensionOrderableNOpenContracts, TensionOrderableNComments:
 		return true
 	}
 	return false

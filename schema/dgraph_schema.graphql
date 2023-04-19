@@ -101,6 +101,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   contracts: [Vote!] @hasInverse(field: node)
   orga_agg: OrgaAgg
   events_history: [Event!]
+  n_open_contracts: Int
 }
 
 type NodeFragment {
@@ -182,11 +183,15 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }]
 }) {
   id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  updatedAt: DateTime!
   rootnameid: String! @search(by:[hash])
   parentnameid: String! @search(by:[hash])
   nameid: String! @search(by:[hash])
   name: String! @search(by:[term])
   description: String
+  status: ProjectStatus! @search
   columns: [ProjectColumn!] @hasInverse(field: project)
   leaders: [Node!]
   nodes: [Node!] @hasInverse(field: projects)
@@ -293,8 +298,8 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   contracts: [Contract!] @hasInverse(field: tension)
   subscribers: [User!] @hasInverse(field: subscriptions)
   projects: [ProjectTension!] @hasInverse(field: tension)
-  n_comments: Int
   n_open_contracts: Int
+  n_comments: Int
 }
 
 type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -619,6 +624,11 @@ enum BlobType {
 
   OnDoc
 
+}
+
+enum ProjectStatus {
+  Open
+  Closed
 }
 
 enum ContractStatus {

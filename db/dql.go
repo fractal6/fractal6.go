@@ -161,17 +161,17 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
         all() {
-            n_open_contracts: val(c)
+            n_open_contracts: sum(val(c))
         }
     }`,
     "count_open_contracts_from_tension": `{
-        var(func: uid({{id}})) {
+        var(func: uid({{.id}})) {
             Tension.contracts @filter(eq(Contract.status, "Open")) {
                 c as count(uid)
             }
         }
         all() {
-            n_open_contracts: val(c)
+            n_open_contracts: sum(val(c))
         }
     }`,
     "getOrgaAgg": `{
