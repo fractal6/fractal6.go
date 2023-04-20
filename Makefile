@@ -56,7 +56,7 @@ gen: schema generate
 dgraph: # Do alter Dgraph
 	# Requirements:
 	# npm install -g get-graphql-schema
-	# Alternative: npm install -g graphqurl
+	# Alternative: graphqurl, graphql-cli
 	cd ../fractal6-schema
 	make dgraph_in
 	cd -
