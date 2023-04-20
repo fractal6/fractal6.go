@@ -5109,21 +5109,6 @@ func (ec *executionContext) field_Node_labels_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
-func (ec *executionContext) field_Node_orga_agg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11344,12 +11329,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -12331,8 +12312,6 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -12955,8 +12934,6 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -14803,8 +14780,6 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -17832,12 +17807,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -19298,8 +19269,6 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -20112,8 +20081,6 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -20270,8 +20237,6 @@ func (ec *executionContext) fieldContext_Event_mentioned(ctx context.Context, fi
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -22277,8 +22242,6 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -22428,12 +22391,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -22531,14 +22490,6 @@ func (ec *executionContext) fieldContext_Label_tensionsAggregate(ctx context.Con
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -22636,14 +22587,6 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -28738,12 +28681,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -28890,8 +28829,6 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -29007,8 +28944,6 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -29557,12 +29492,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -29893,8 +29824,6 @@ func (ec *executionContext) fieldContext_Node_pinned(ctx context.Context, field 
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -30403,89 +30332,6 @@ func (ec *executionContext) fieldContext_Node_contracts(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Node_orga_agg(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_orga_agg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.OrgaAgg, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "getOrgaAgg")
-			if err != nil {
-				return nil, err
-			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Meta == nil {
-				return nil, errors.New("directive meta is not implemented")
-			}
-			return ec.directives.Meta(ctx, obj, directive0, f, k)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.OrgaAgg); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.OrgaAgg`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.OrgaAgg)
-	fc.Result = res
-	return ec.marshalOOrgaAgg2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_orga_agg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "n_members":
-				return ec.fieldContext_OrgaAgg_n_members(ctx, field)
-			case "n_guests":
-				return ec.fieldContext_OrgaAgg_n_guests(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAgg", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_orga_agg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Node_events_history(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_events_history(ctx, field)
 	if err != nil {
@@ -30585,72 +30431,6 @@ func (ec *executionContext) fieldContext_Node_events_history(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Node_n_open_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_n_open_contracts(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NOpenContracts, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "count_open_contracts_from_node")
-			if err != nil {
-				return nil, err
-			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Meta == nil {
-				return nil, errors.New("directive meta is not implemented")
-			}
-			return ec.directives.Meta(ctx, obj, directive0, f, k)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_n_open_contracts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Node_tensions_outAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 	if err != nil {
@@ -30710,14 +30490,6 @@ func (ec *executionContext) fieldContext_Node_tensions_outAggregate(ctx context.
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -30803,14 +30575,6 @@ func (ec *executionContext) fieldContext_Node_tensions_inAggregate(ctx context.C
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -31001,14 +30765,6 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -31305,14 +31061,6 @@ func (ec *executionContext) fieldContext_Node_pinnedAggregate(ctx context.Contex
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -32198,158 +31946,6 @@ func (ec *executionContext) fieldContext_NodeAggregateResult_colorMax(ctx contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -33550,8 +33146,6 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -37200,12 +36794,8 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -37345,12 +36935,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -37529,14 +37115,6 @@ func (ec *executionContext) fieldContext_Project_leadersAggregate(ctx context.Co
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -37626,14 +37204,6 @@ func (ec *executionContext) fieldContext_Project_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -39042,8 +38612,6 @@ func (ec *executionContext) fieldContext_ProjectTension_tension(ctx context.Cont
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -39492,12 +39060,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -39637,12 +39201,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -39752,14 +39312,6 @@ func (ec *executionContext) fieldContext_Query_aggregateNode(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -41633,8 +41185,6 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -41750,8 +41300,6 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -41859,14 +41407,6 @@ func (ec *executionContext) fieldContext_Query_aggregateTension(ctx context.Cont
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -45601,12 +45141,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -45746,12 +45282,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -45861,14 +45393,6 @@ func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -45958,14 +45482,6 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -46430,12 +45946,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -46619,12 +46131,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -47602,72 +47110,6 @@ func (ec *executionContext) fieldContext_Tension_projects(ctx context.Context, f
 	if fc.Args, err = ec.field_Tension_projects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Tension_n_open_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tension_n_open_contracts(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.NOpenContracts, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "count_open_contracts_from_tension")
-			if err != nil {
-				return nil, err
-			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "id")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Meta == nil {
-				return nil, errors.New("directive meta is not implemented")
-			}
-			return ec.directives.Meta(ctx, obj, directive0, f, k)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*int); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Tension_n_open_contracts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tension",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
 	}
 	return fc, nil
 }
@@ -49163,158 +48605,6 @@ func (ec *executionContext) fieldContext_TensionAggregateResult_titleMax(ctx con
 	return fc, nil
 }
 
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _TensionAggregateResult_n_commentsMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 	if err != nil {
@@ -50533,12 +49823,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -51619,8 +50905,6 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -52856,8 +52140,6 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -53027,12 +52309,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -53238,12 +52516,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -53383,12 +52657,8 @@ func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, 
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -53514,8 +52784,6 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -53651,8 +52919,6 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 				return ec.fieldContext_Tension_subscribers(ctx, field)
 			case "projects":
 				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
 			case "id":
@@ -54136,14 +53402,6 @@ func (ec *executionContext) fieldContext_User_subscriptionsAggregate(ctx context
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -54241,14 +53499,6 @@ func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -54338,14 +53588,6 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -54435,14 +53677,6 @@ func (ec *executionContext) fieldContext_User_backed_rolesAggregate(ctx context.
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
 				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_NodeAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
 		},
@@ -54520,14 +53754,6 @@ func (ec *executionContext) fieldContext_User_tensions_createdAggregate(ctx cont
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -54613,14 +53839,6 @@ func (ec *executionContext) fieldContext_User_tensions_assignedAggregate(ctx con
 				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
 			case "titleMax":
 				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			case "n_commentsMin":
 				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
 			case "n_commentsMax":
@@ -56877,12 +56095,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Node_n_open_contracts(ctx, field)
 			case "tensions_outAggregate":
 				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
 			case "tensions_inAggregate":
@@ -58697,7 +57911,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history", "n_open_contracts"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -58990,27 +58204,11 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "orga_agg":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
-			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "events_history":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
 			it.EventsHistory, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -59953,7 +59151,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_open_contracts", "n_comments"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -60381,14 +59579,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		case "n_comments":
 			var err error
@@ -66767,7 +65957,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history", "n_open_contracts"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -67580,32 +66770,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.VoteRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "orga_agg":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.OrgaAggRef); ok {
-				it.OrgaAgg = data
-			} else if tmp == nil {
-				it.OrgaAgg = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.OrgaAggRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "events_history":
 			var err error
 
@@ -67632,30 +66796,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.NOpenContracts = data
-			} else if tmp == nil {
-				it.NOpenContracts = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -67669,7 +66809,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history", "n_open_contracts"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -67970,27 +67110,11 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "orga_agg":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
-			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "events_history":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
 			it.EventsHistory, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -72681,7 +71805,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_open_contracts", "n_comments"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73306,30 +72430,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.NOpenContracts = data
-			} else if tmp == nil {
-				it.NOpenContracts = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "n_comments":
 			var err error
 
@@ -73367,7 +72467,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_open_contracts", "n_comments"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73823,14 +72923,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		case "n_comments":
 			var err error
@@ -80790,17 +79882,9 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
 
-		case "orga_agg":
-
-			out.Values[i] = ec._Node_orga_agg(ctx, field, obj)
-
 		case "events_history":
 
 			out.Values[i] = ec._Node_events_history(ctx, field, obj)
-
-		case "n_open_contracts":
-
-			out.Values[i] = ec._Node_n_open_contracts(ctx, field, obj)
 
 		case "tensions_outAggregate":
 
@@ -80938,22 +80022,6 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 		case "colorMax":
 
 			out.Values[i] = ec._NodeAggregateResult_colorMax(ctx, field, obj)
-
-		case "n_open_contractsMin":
-
-			out.Values[i] = ec._NodeAggregateResult_n_open_contractsMin(ctx, field, obj)
-
-		case "n_open_contractsMax":
-
-			out.Values[i] = ec._NodeAggregateResult_n_open_contractsMax(ctx, field, obj)
-
-		case "n_open_contractsSum":
-
-			out.Values[i] = ec._NodeAggregateResult_n_open_contractsSum(ctx, field, obj)
-
-		case "n_open_contractsAvg":
-
-			out.Values[i] = ec._NodeAggregateResult_n_open_contractsAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -83806,10 +82874,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Tension_projects(ctx, field, obj)
 
-		case "n_open_contracts":
-
-			out.Values[i] = ec._Tension_n_open_contracts(ctx, field, obj)
-
 		case "n_comments":
 
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
@@ -83951,22 +83015,6 @@ func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast
 		case "titleMax":
 
 			out.Values[i] = ec._TensionAggregateResult_titleMax(ctx, field, obj)
-
-		case "n_open_contractsMin":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMin(ctx, field, obj)
-
-		case "n_open_contractsMax":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMax(ctx, field, obj)
-
-		case "n_open_contractsSum":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsSum(ctx, field, obj)
-
-		case "n_open_contractsAvg":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsAvg(ctx, field, obj)
 
 		case "n_commentsMin":
 
@@ -91042,14 +90090,6 @@ func (ec *executionContext) unmarshalOOrgaAggPatch2ᚖfractaleᚋfractal6ᚗgo�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputOrgaAggPatch(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx context.Context, v interface{}) (*model.OrgaAggRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOrgaAggRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
