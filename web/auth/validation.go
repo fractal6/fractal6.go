@@ -285,16 +285,18 @@ func ValidateNewUser(creds model.UserCreds) error {
 func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     now := tools.Now()
     // Rights
-    canLogin := true
-    canCreateRoot := false
     userType := model.UserTypeRegular
     maxPublicOrga := MAX_PUBLIC_ORGA
     maxPrivateOrga := MAX_PRIVATE_ORGA
     hasEmailNotifications := true
-    var lang model.Lang
-    if creds.Lang == nil {
-        lang = model.LangEn
-    } else {
+    canLogin := true
+    canCreateRoot := false
+    lang := model.LangEn
+
+    if creds.CanLogin != nil {
+        canLogin = bool(*creds.CanLogin)
+    }
+    if creds.Lang != nil {
         lang = model.Lang(*creds.Lang)
     }
 
@@ -322,7 +324,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         return nil, err
     }
 
-    // Try getting usetCtx
+    // Try getting userCtx
     userCtx, err := db.GetDB().GetUctx("username", creds.Username)
     if err != nil {
         return nil, err

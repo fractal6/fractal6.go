@@ -783,7 +783,6 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(e_added) <Event.new> "{{.new_name}}" .
         uid(e_removed) <Event.old> "{{.new_name}}" .
         `,
-
     },
     // Delete
     "removeAssignedTension": QueryMut{
@@ -799,7 +798,60 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(u) <User.tensions_assigned> uid(t) .
         uid(t) <Tension.assignees> uid(u) .
         `,
+    },
+    // Deleting user by replacing its authoring by the ghost user.
+    // * [x] Unnassigned his tension
+    // * [x] Unlink his roles
+    // * [x] Delete his membership
+    // * [x] Delete his reactions
+    // * [x] Remove his contracts (candidates)
+    // * [x] Delete his UserEvents (subDelte Notif!)
+    "deleteUser": QueryMut{
+        Q: `query {
+            var(func: eq(User.username, "{{.username}}")) {
+                u as uid
+                ur as User.UserRights
+                assigned as User.tensions_assigned
+                roles as User.roles @filter(not eq(Node.role_type, ["Guest", "Member", "Owner", "Retired", "Pending"])) {
+                    Node.source { Blob.node { frag as NodeFragment.first_link }}
+                }
+                reactions as User.reactions
+                contracts as User.contracts
+                ue as User.events {
+                    notifs as UserEvent.event @filter(type(Notif))
+                }
+            }
+            var(func: eq(User.username, "{{.username}}")) {
+                membership as User.roles @filter(eq(Node.role_type, ["Guest", "Member", "Owner", "Retired", "Pending"]))
+            }
 
+            posts as var(func: has(Post.createdBy)) @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}"))
+            }
+            node_created as var(func: has(Node.createdBy)) @cascade {
+                Node.createdBy @filter(eq(User.username, "{{.username}}"))
+            }
+            project_created as var(func: has(Project.createdBy)) @cascade {
+                Project.createdBy @filter(eq(User.username, "{{.username}}"))
+            }
+        }`,
+        S: `
+        uid(posts) <Post.createdBy> <{{.ghostid}}> .
+        uid(node_created) <Node.createdBy> <{{.ghostid}}> .
+        uid(project_created) <Project.createdBy> <{{.ghostid}}> .
+        `,
+        D:`
+        uid(ur) * *  .
+        uid(assigned) <Tension.assignees> uid(u) .
+        uid(roles) <Node.first_link> * .
+        uid(membership) * * .
+        uid(frag) <NodeFragment.first_link> * .
+        uid(reactions) * * .
+        uid(contracts) <Contract.candidates> uid(u) .
+        uid(notifs) * * .
+        uid(ue) * * .
+        uid(u) * * .
+        `,
     },
 }
 

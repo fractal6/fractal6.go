@@ -26,6 +26,7 @@ import (
     "strings"
 )
 
+// Type boolean unmarshal string (true or false) to a bool like value.
 type Boolean bool
 
 func (bit *Boolean) UnmarshalJSON(data []byte) error {

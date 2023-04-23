@@ -52,14 +52,15 @@ type UserCtx struct {
 
 // UserCreds are data sink/form for login request
 type UserCreds struct {
-    Username   string  `json:"username"`
-    Email      string  `json:"email"`
-    Name       *string `json:"name"`
-    Lang       *string `json:"lang"`
-    Password   string  `json:"password"`
-    Puid       *string `json:"puid"`
-    EmailToken *string `json:"email_token"`
-    Subscribe  Boolean `json:"subscribe"`
+    Username   string   `json:"username"`
+    Email      string   `json:"email"`
+    Name       *string  `json:"name"`
+    Lang       *string  `json:"lang"`
+    Password   string   `json:"password"`
+    Puid       *string  `json:"puid"`
+    EmailToken *string  `json:"email_token"`
+    Subscribe  Boolean  `json:"subscribe"`
+    CanLogin   *Boolean `json:"canLogin"`
 }
 
 
