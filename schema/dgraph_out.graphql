@@ -1,24 +1,20 @@
-directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
+directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
@@ -26,7 +22,11 @@ directive @cascade(fields: [String]) on FIELD
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -157,7 +157,6 @@ input AddNodeFragmentInput {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -200,7 +199,6 @@ input AddNodeInput {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
 }
@@ -383,7 +381,6 @@ input AddUserInput {
   watching: [NodeRef!]
   rights: UserRightsRef!
   roles: [NodeRef!]
-  backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
@@ -1529,7 +1526,6 @@ type Node {
   role_type: RoleType
   color: String
   first_link(filter: UserFilter): User
-  second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -1598,7 +1594,6 @@ type NodeFragment {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -1614,8 +1609,6 @@ type NodeFragmentAggregateResult {
   aboutMax: String
   first_linkMin: String
   first_linkMax: String
-  second_linkMin: String
-  second_linkMax: String
   role_extMin: String
   role_extMax: String
   colorMin: String
@@ -1640,7 +1633,6 @@ enum NodeFragmentHasFilter {
   mode
   type_
   first_link
-  second_link
   role_ext
   role_type
   color
@@ -1657,7 +1649,6 @@ enum NodeFragmentOrderable {
   name
   about
   first_link
-  second_link
   role_ext
   color
 }
@@ -1672,7 +1663,6 @@ input NodeFragmentPatch {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -1689,7 +1679,6 @@ input NodeFragmentRef {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -1727,7 +1716,6 @@ enum NodeHasFilter {
   role_type
   color
   first_link
-  second_link
   contracts
   events_history
 }
@@ -1790,7 +1778,6 @@ input NodePatch {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
 }
@@ -1828,7 +1815,6 @@ input NodeRef {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
 }
@@ -3196,7 +3182,6 @@ type User {
   watching(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
@@ -3207,7 +3192,6 @@ type User {
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
-  backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
@@ -3324,7 +3308,6 @@ enum UserHasFilter {
   watching
   rights
   roles
-  backed_roles
   tensions_created
   tensions_assigned
   contracts
@@ -3369,7 +3352,6 @@ input UserPatch {
   watching: [NodeRef!]
   rights: UserRightsRef
   roles: [NodeRef!]
-  backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]
@@ -3398,7 +3380,6 @@ input UserRef {
   watching: [NodeRef!]
   rights: UserRightsRef
   roles: [NodeRef!]
-  backed_roles: [NodeRef!]
   tensions_created: [TensionRef!]
   tensions_assigned: [TensionRef!]
   contracts: [ContractRef!]

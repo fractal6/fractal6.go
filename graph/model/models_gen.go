@@ -141,7 +141,6 @@ type AddNodeFragmentInput struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
@@ -184,7 +183,6 @@ type AddNodeInput struct {
 	RoleType              *RoleType      `json:"role_type,omitempty"`
 	Color                 *string        `json:"color,omitempty"`
 	FirstLink             *UserRef       `json:"first_link,omitempty"`
-	SecondLink            *UserRef       `json:"second_link,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
 }
@@ -367,7 +365,6 @@ type AddUserInput struct {
 	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
@@ -1223,7 +1220,6 @@ type Node struct {
 	RoleType               *RoleType               `json:"role_type,omitempty"`
 	Color                  *string                 `json:"color,omitempty"`
 	FirstLink              *User                   `json:"first_link,omitempty"`
-	SecondLink             *User                   `json:"second_link,omitempty"`
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
@@ -1292,28 +1288,25 @@ type NodeFragment struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
 }
 
 type NodeFragmentAggregateResult struct {
-	Count         *int    `json:"count,omitempty"`
-	NameidMin     *string `json:"nameidMin,omitempty"`
-	NameidMax     *string `json:"nameidMax,omitempty"`
-	NameMin       *string `json:"nameMin,omitempty"`
-	NameMax       *string `json:"nameMax,omitempty"`
-	AboutMin      *string `json:"aboutMin,omitempty"`
-	AboutMax      *string `json:"aboutMax,omitempty"`
-	FirstLinkMin  *string `json:"first_linkMin,omitempty"`
-	FirstLinkMax  *string `json:"first_linkMax,omitempty"`
-	SecondLinkMin *string `json:"second_linkMin,omitempty"`
-	SecondLinkMax *string `json:"second_linkMax,omitempty"`
-	RoleExtMin    *string `json:"role_extMin,omitempty"`
-	RoleExtMax    *string `json:"role_extMax,omitempty"`
-	ColorMin      *string `json:"colorMin,omitempty"`
-	ColorMax      *string `json:"colorMax,omitempty"`
+	Count        *int    `json:"count,omitempty"`
+	NameidMin    *string `json:"nameidMin,omitempty"`
+	NameidMax    *string `json:"nameidMax,omitempty"`
+	NameMin      *string `json:"nameMin,omitempty"`
+	NameMax      *string `json:"nameMax,omitempty"`
+	AboutMin     *string `json:"aboutMin,omitempty"`
+	AboutMax     *string `json:"aboutMax,omitempty"`
+	FirstLinkMin *string `json:"first_linkMin,omitempty"`
+	FirstLinkMax *string `json:"first_linkMax,omitempty"`
+	RoleExtMin   *string `json:"role_extMin,omitempty"`
+	RoleExtMax   *string `json:"role_extMax,omitempty"`
+	ColorMin     *string `json:"colorMin,omitempty"`
+	ColorMax     *string `json:"colorMax,omitempty"`
 }
 
 type NodeFragmentFilter struct {
@@ -1340,7 +1333,6 @@ type NodeFragmentPatch struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
@@ -1357,7 +1349,6 @@ type NodeFragmentRef struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
@@ -1405,7 +1396,6 @@ type NodePatch struct {
 	RoleType              *RoleType       `json:"role_type,omitempty"`
 	Color                 *string         `json:"color,omitempty"`
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
-	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
@@ -1443,7 +1433,6 @@ type NodeRef struct {
 	RoleType              *RoleType       `json:"role_type,omitempty"`
 	Color                 *string         `json:"color,omitempty"`
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
-	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
@@ -2488,7 +2477,6 @@ type User struct {
 	Watching                  []*Node                   `json:"watching,omitempty"`
 	Rights                    *UserRights               `json:"rights"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
-	BackedRoles               []*Node                   `json:"backed_roles,omitempty"`
 	TensionsCreated           []*Tension                `json:"tensions_created,omitempty"`
 	TensionsAssigned          []*Tension                `json:"tensions_assigned,omitempty"`
 	Contracts                 []*Contract               `json:"contracts,omitempty"`
@@ -2499,7 +2487,6 @@ type User struct {
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	WatchingAggregate         *NodeAggregateResult      `json:"watchingAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
-	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
 	TensionsCreatedAggregate  *TensionAggregateResult   `json:"tensions_createdAggregate,omitempty"`
 	TensionsAssignedAggregate *TensionAggregateResult   `json:"tensions_assignedAggregate,omitempty"`
 	ContractsAggregate        *ContractAggregateResult  `json:"contractsAggregate,omitempty"`
@@ -2609,7 +2596,6 @@ type UserPatch struct {
 	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
@@ -2638,7 +2624,6 @@ type UserRef struct {
 	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
@@ -3966,7 +3951,6 @@ const (
 	NodeFragmentHasFilterMode       NodeFragmentHasFilter = "mode"
 	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
 	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
-	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
 	NodeFragmentHasFilterRoleExt    NodeFragmentHasFilter = "role_ext"
 	NodeFragmentHasFilterRoleType   NodeFragmentHasFilter = "role_type"
 	NodeFragmentHasFilterColor      NodeFragmentHasFilter = "color"
@@ -3982,7 +3966,6 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 	NodeFragmentHasFilterMode,
 	NodeFragmentHasFilterType,
 	NodeFragmentHasFilterFirstLink,
-	NodeFragmentHasFilterSecondLink,
 	NodeFragmentHasFilterRoleExt,
 	NodeFragmentHasFilterRoleType,
 	NodeFragmentHasFilterColor,
@@ -3990,7 +3973,7 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 
 func (e NodeFragmentHasFilter) IsValid() bool {
 	switch e {
-	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleExt, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
+	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterRoleExt, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
 		return true
 	}
 	return false
@@ -4020,13 +4003,12 @@ func (e NodeFragmentHasFilter) MarshalGQL(w io.Writer) {
 type NodeFragmentOrderable string
 
 const (
-	NodeFragmentOrderableNameid     NodeFragmentOrderable = "nameid"
-	NodeFragmentOrderableName       NodeFragmentOrderable = "name"
-	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
-	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
-	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
-	NodeFragmentOrderableRoleExt    NodeFragmentOrderable = "role_ext"
-	NodeFragmentOrderableColor      NodeFragmentOrderable = "color"
+	NodeFragmentOrderableNameid    NodeFragmentOrderable = "nameid"
+	NodeFragmentOrderableName      NodeFragmentOrderable = "name"
+	NodeFragmentOrderableAbout     NodeFragmentOrderable = "about"
+	NodeFragmentOrderableFirstLink NodeFragmentOrderable = "first_link"
+	NodeFragmentOrderableRoleExt   NodeFragmentOrderable = "role_ext"
+	NodeFragmentOrderableColor     NodeFragmentOrderable = "color"
 )
 
 var AllNodeFragmentOrderable = []NodeFragmentOrderable{
@@ -4034,14 +4016,13 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 	NodeFragmentOrderableName,
 	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
-	NodeFragmentOrderableSecondLink,
 	NodeFragmentOrderableRoleExt,
 	NodeFragmentOrderableColor,
 }
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableRoleExt, NodeFragmentOrderableColor:
+	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableRoleExt, NodeFragmentOrderableColor:
 		return true
 	}
 	return false
@@ -4102,7 +4083,6 @@ const (
 	NodeHasFilterRoleType              NodeHasFilter = "role_type"
 	NodeHasFilterColor                 NodeHasFilter = "color"
 	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
-	NodeHasFilterSecondLink            NodeHasFilter = "second_link"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
 )
@@ -4139,14 +4119,13 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterRoleType,
 	NodeHasFilterColor,
 	NodeHasFilterFirstLink,
-	NodeHasFilterSecondLink,
 	NodeHasFilterContracts,
 	NodeHasFilterEventsHistory,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory:
 		return true
 	}
 	return false
@@ -5747,7 +5726,6 @@ const (
 	UserHasFilterWatching         UserHasFilter = "watching"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
-	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
 	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
@@ -5775,7 +5753,6 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterWatching,
 	UserHasFilterRights,
 	UserHasFilterRoles,
-	UserHasFilterBackedRoles,
 	UserHasFilterTensionsCreated,
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
@@ -5787,7 +5764,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
 		return true
 	}
 	return false

@@ -97,7 +97,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   role_type: RoleType @search
   color: String
   first_link: User
-  second_link: User
   contracts: [Vote!] @hasInverse(field: node)
   events_history: [Event!]
 }
@@ -113,7 +112,6 @@ type NodeFragment {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -439,7 +437,6 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   watching: [Node!] @hasInverse(field: watchers)
   rights: UserRights!
   roles: [Node!] @hasInverse(field: first_link)
-  backed_roles: [Node!] @hasInverse(field: second_link)
   tensions_created: [Tension!] @hasInverse(field: createdBy)
   tensions_assigned: [Tension!] @hasInverse(field: assignees)
   contracts: [Contract!] @hasInverse(field: candidates)

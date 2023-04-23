@@ -55,7 +55,7 @@ func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}
 }
 
 /* Those bridges rebuild the query from the request context preloads, and uses the input
- * parameters from the gqlgen resolvers whuch reflext the modifications in the resolvers/directives.
+ * parameters from the gqlgen resolvers which reflext the modifications in the resolvers/directives.
  * @Warning: It looses eventual directive in the query graph (@cascade, @skip etc)
  */
 

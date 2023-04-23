@@ -706,7 +706,6 @@ type ComplexityRoot struct {
 		Roles                  func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		RolesAggregate         func(childComplexity int, filter *model.RoleExtFilter) int
 		Rootnameid             func(childComplexity int) int
-		SecondLink             func(childComplexity int, filter *model.UserFilter) int
 		Skills                 func(childComplexity int) int
 		Source                 func(childComplexity int, filter *model.BlobFilter) int
 		TensionsIn             func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -754,28 +753,25 @@ type ComplexityRoot struct {
 		Nameid     func(childComplexity int) int
 		RoleExt    func(childComplexity int) int
 		RoleType   func(childComplexity int) int
-		SecondLink func(childComplexity int) int
 		Skills     func(childComplexity int) int
 		Type       func(childComplexity int) int
 		Visibility func(childComplexity int) int
 	}
 
 	NodeFragmentAggregateResult struct {
-		AboutMax      func(childComplexity int) int
-		AboutMin      func(childComplexity int) int
-		ColorMax      func(childComplexity int) int
-		ColorMin      func(childComplexity int) int
-		Count         func(childComplexity int) int
-		FirstLinkMax  func(childComplexity int) int
-		FirstLinkMin  func(childComplexity int) int
-		NameMax       func(childComplexity int) int
-		NameMin       func(childComplexity int) int
-		NameidMax     func(childComplexity int) int
-		NameidMin     func(childComplexity int) int
-		RoleExtMax    func(childComplexity int) int
-		RoleExtMin    func(childComplexity int) int
-		SecondLinkMax func(childComplexity int) int
-		SecondLinkMin func(childComplexity int) int
+		AboutMax     func(childComplexity int) int
+		AboutMin     func(childComplexity int) int
+		ColorMax     func(childComplexity int) int
+		ColorMin     func(childComplexity int) int
+		Count        func(childComplexity int) int
+		FirstLinkMax func(childComplexity int) int
+		FirstLinkMin func(childComplexity int) int
+		NameMax      func(childComplexity int) int
+		NameMin      func(childComplexity int) int
+		NameidMax    func(childComplexity int) int
+		NameidMin    func(childComplexity int) int
+		RoleExtMax   func(childComplexity int) int
+		RoleExtMin   func(childComplexity int) int
 	}
 
 	Notif struct {
@@ -1243,8 +1239,6 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		BackedRoles               func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		BackedRolesAggregate      func(childComplexity int, filter *model.NodeFilter) int
 		Bio                       func(childComplexity int) int
 		Contracts                 func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
@@ -4755,18 +4749,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Rootnameid(childComplexity), true
 
-	case "Node.second_link":
-		if e.complexity.Node.SecondLink == nil {
-			break
-		}
-
-		args, err := ec.field_Node_second_link_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.SecondLink(childComplexity, args["filter"].(*model.UserFilter)), true
-
 	case "Node.skills":
 		if e.complexity.Node.Skills == nil {
 			break
@@ -5094,13 +5076,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NodeFragment.RoleType(childComplexity), true
 
-	case "NodeFragment.second_link":
-		if e.complexity.NodeFragment.SecondLink == nil {
-			break
-		}
-
-		return e.complexity.NodeFragment.SecondLink(childComplexity), true
-
 	case "NodeFragment.skills":
 		if e.complexity.NodeFragment.Skills == nil {
 			break
@@ -5212,20 +5187,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeFragmentAggregateResult.RoleExtMin(childComplexity), true
-
-	case "NodeFragmentAggregateResult.second_linkMax":
-		if e.complexity.NodeFragmentAggregateResult.SecondLinkMax == nil {
-			break
-		}
-
-		return e.complexity.NodeFragmentAggregateResult.SecondLinkMax(childComplexity), true
-
-	case "NodeFragmentAggregateResult.second_linkMin":
-		if e.complexity.NodeFragmentAggregateResult.SecondLinkMin == nil {
-			break
-		}
-
-		return e.complexity.NodeFragmentAggregateResult.SecondLinkMin(childComplexity), true
 
 	case "Notif.contract":
 		if e.complexity.Notif.Contract == nil {
@@ -8157,30 +8118,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateVotePayload.Vote(childComplexity, args["filter"].(*model.VoteFilter), args["order"].(*model.VoteOrder), args["first"].(*int), args["offset"].(*int)), true
 
-	case "User.backed_roles":
-		if e.complexity.User.BackedRoles == nil {
-			break
-		}
-
-		args, err := ec.field_User_backed_roles_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.User.BackedRoles(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
-
-	case "User.backed_rolesAggregate":
-		if e.complexity.User.BackedRolesAggregate == nil {
-			break
-		}
-
-		args, err := ec.field_User_backed_rolesAggregate_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.User.BackedRolesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
-
 	case "User.bio":
 		if e.complexity.User.Bio == nil {
 			break
@@ -9359,7 +9296,6 @@ type Node {
   role_type: RoleType
   color: String
   first_link(filter: UserFilter): User
-  second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
@@ -9386,7 +9322,6 @@ type NodeFragment {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -9622,7 +9557,6 @@ type User {
   watching(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @private
@@ -9634,7 +9568,6 @@ type User {
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
-  backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
@@ -9849,35 +9782,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @cascade(fields: [String]) on FIELD
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @id on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @cascade(fields: [String]) on FIELD
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10008,7 +9941,6 @@ input AddNodeFragmentInput {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -10051,7 +9983,6 @@ input AddNodeInput {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
 }
@@ -10234,7 +10165,6 @@ input AddUserInput {
   watching: [NodeRef!] @x_alter(r:"ref")
   rights: UserRightsRef!
   roles: [NodeRef!] @x_add(r:"ref")
-  backed_roles: [NodeRef!] @x_add(r:"ref")
   tensions_created: [TensionRef!] @x_add(r:"ref")
   tensions_assigned: [TensionRef!] @x_add(r:"ref")
   contracts: [ContractRef!] @x_add(r:"ref")
@@ -11272,8 +11202,6 @@ type NodeFragmentAggregateResult {
   aboutMax: String
   first_linkMin: String
   first_linkMax: String
-  second_linkMin: String
-  second_linkMax: String
   role_extMin: String
   role_extMax: String
   colorMin: String
@@ -11298,7 +11226,6 @@ enum NodeFragmentHasFilter {
   mode
   type_
   first_link
-  second_link
   role_ext
   role_type
   color
@@ -11315,7 +11242,6 @@ enum NodeFragmentOrderable {
   name
   about
   first_link
-  second_link
   role_ext
   color
 }
@@ -11330,7 +11256,6 @@ input NodeFragmentPatch {
   mode: NodeMode @x_patch_ro
   type_: NodeType @x_patch_ro
   first_link: String @x_patch_ro
-  second_link: String @x_patch_ro
   role_ext: String @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
@@ -11347,7 +11272,6 @@ input NodeFragmentRef {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -11385,7 +11309,6 @@ enum NodeHasFilter {
   role_type
   color
   first_link
-  second_link
   contracts
   events_history
 }
@@ -11443,7 +11366,6 @@ input NodePatch {
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
   first_link: UserRef @x_patch_ro
-  second_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
 }
@@ -11481,7 +11403,6 @@ input NodeRef {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
 }
@@ -12721,7 +12642,6 @@ enum UserHasFilter {
   watching
   rights
   roles
-  backed_roles
   tensions_created
   tensions_assigned
   contracts
@@ -12766,7 +12686,6 @@ input UserPatch {
   watching: [NodeRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
-  backed_roles: [NodeRef!] @x_patch_ro
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
@@ -12795,7 +12714,6 @@ input UserRef {
   watching: [NodeRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef
   roles: [NodeRef!] @x_add(r:"ref")
-  backed_roles: [NodeRef!] @x_add(r:"ref")
   tensions_created: [TensionRef!] @x_add(r:"ref")
   tensions_assigned: [TensionRef!] @x_add(r:"ref")
   contracts: [ContractRef!] @x_add(r:"ref")

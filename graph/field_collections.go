@@ -48,7 +48,7 @@ func queryTypeFromGraphqlContext(ctx context.Context) (string, string, string, e
     queryType =  qName[0]
     typeName = strings.Join(qName[1:], "")
     queryName = rc.Path().String()
-    for _, t := range []string{"query", "get", "add", "update", "delete"} {
+    for _, t := range []string{"query", "get", "add", "update", "delete", "aggregate"} {
         ok = ok || (queryType == t)
     }
     if !ok {
