@@ -81,6 +81,7 @@ func init() {
     rootCmd.AddCommand(notifierCmd)
     rootCmd.AddCommand(genToken)
     rootCmd.AddCommand(addUser)
+    rootCmd.AddCommand(delUser)
 }
 
 // Run the root command.

@@ -65,9 +65,6 @@ func Init() gen.Config {
     c.Directives.Meta = meta
     c.Directives.IsContractValidator = isContractValidator
 
-    // @testing: resolve hooks fo deeper layers.
-    //c.Directives.input_object_ref_test = inpu_object_ref_test
-
     //
     //  Input Fields directives
     //
@@ -225,7 +222,7 @@ func nothing(ctx context.Context, obj interface{}, next graphql.Resolver) (inter
 func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
     rc := graphql.GetResolverContext(ctx)
     fieldName := rc.Field.Name
-    return nil, fmt.Errorf("`%s' field is hidden", fieldName)
+    return nil, fmt.Errorf("'%s' field is hidden", fieldName)
 }
 
 func private(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
@@ -252,65 +249,79 @@ func private(ctx context.Context, obj interface{}, next graphql.Resolver) (inter
         return nil, fmt.Errorf("Private directive not implemented for this field: %s", fieldName)
     }
 
-    return nil, fmt.Errorf("`%s' field is private", fieldName)
+    return nil, fmt.Errorf("'%s' field is private", fieldName)
 }
 
+// Use DQL query to fetch the given field=k.
+// If k is not given, "id" is automatically pass to the query template.
 func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
     data, err:= next(ctx)
     if err != nil { return nil, err }
 
     var ok bool
     var v string
-    if k != nil { // On Queries
+    maps := map[string]string{}
+    // Get query field
+    if k != nil {
         if v, ok = ctx.Value(*k).(string); !ok {
-            v = reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k)).String()
+            o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k))
+            if !o.IsValid() {
+                rc := graphql.GetResolverContext(ctx)
+                fieldName := rc.Field.Name
+                return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", *k, fieldName)
+            }
+            v = o.String()
         }
         if v == "" {
             rc := graphql.GetResolverContext(ctx)
             fieldName := rc.Field.Name
-            err := fmt.Errorf("`%s' field is needed to query `%s'", *k, fieldName)
+            err := fmt.Errorf("'%s' field is needed to query '%s'", *k, fieldName)
             return nil, err
         }
-    } else {
-        // get uid ?
-        panic("not implemented")
+        maps[*k] = v
     }
 
     // Query
-    var maps map[string]string
-    if k == nil {
-        maps = map[string]string{"id": v}
-    } else {
-        maps = map[string]string{*k: v}
-    }
     res, err := db.GetDB().Meta(f, maps)
     if err != nil { return nil, err }
 
     // Map result
-    rt := reflect.TypeOf(data)
-    switch rt.Kind() {
-    case reflect.Slice:
-        // Convert list of map to the desired list of interface
-        t := reflect.MakeSlice(rt , 1, 1)
-        newData := reflect.MakeSlice(rt , 0, len(res))
-        for i := 0; i < len(res); i++ {
-            v := reflect.ValueOf(t.Interface()).Index(0).Interface()
-            if err := Map2Struct(res[i], &v); err != nil {
-                return data, err
-            }
-            newData = reflect.Append(newData, reflect.ValueOf(v))
-        }
-        data = newData.Interface()
-    default:
-        // Assume interface
-        // Merge results (needed for user defined returns (see getOrgaAgg))
-        m := make(map[string]interface{}, 2)
+    switch data.(type) {
+    case *int:
+        rc := graphql.GetResolverContext(ctx)
+        fieldName := rc.Field.Name
         for _, s := range res {
-            for k, v := range s {
-                m[k] = v
-            }
+            // assumes only one element is returned
+            v, _ := s[fieldName].(float64)
+            v2 := int(v)
+            data = &v2
         }
-        err = Map2Struct(m, &data)
+    default:
+        rt := reflect.TypeOf(data)
+        switch rt.Kind() {
+        case reflect.Slice:
+            // Convert list of map to the desired list of interface
+            t := reflect.MakeSlice(rt , 1, 1)
+            newData := reflect.MakeSlice(rt , 0, len(res))
+            for i := 0; i < len(res); i++ {
+                v := reflect.ValueOf(t.Interface()).Index(0).Interface()
+                if err := Map2Struct(res[i], &v); err != nil {
+                    return data, err
+                }
+                newData = reflect.Append(newData, reflect.ValueOf(v))
+            }
+            data = newData.Interface()
+        default:
+            // Assume interface
+            // Merge results (needed for user defined returns (see getOrgaAgg))
+            m := make(map[string]interface{}, 2)
+            for _, s := range res {
+                for k, v := range s {
+                    m[k] = v
+                }
+            }
+            err = Map2Struct(m, &data)
+        }
     }
     return data, err
 }
@@ -324,29 +335,33 @@ func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f s
     key := uctx.Username + "meta_patch_f"
     err := cache.SetEX(ctx, key, f, time.Second * 5).Err()
     if err != nil { return nil, err }
-    // Set attribute name
     if k != nil {
+        // Set attribute name
         if v, ok = ctx.Value(*k).(string); !ok {
-            v = reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k)).String()
+            o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k))
+            if !o.IsValid() {
+                rc := graphql.GetResolverContext(ctx)
+                fieldName := rc.Field.Name
+                return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", *k, fieldName)
+            }
+            v = o.String()
         }
         if v == "" {
             rc := graphql.GetResolverContext(ctx)
             fieldName := rc.Field.Name
-            err := fmt.Errorf("`%s' field is needed to query `%s'", *k, fieldName)
+            err := fmt.Errorf("'%s' field is needed to query '%s'", *k, fieldName)
             return nil, err
         }
 
         key = uctx.Username + "meta_patch_k"
         err := cache.SetEX(ctx, key, *k, time.Second * 5).Err()
         if err != nil { return nil, err }
-    } else {
-        // get uid ?
-        panic("not implemented")
+
+        // Set attribute value
+        key = uctx.Username + "meta_patch_v"
+        err = cache.SetEX(ctx, key, v, time.Second * 5).Err()
+        if err != nil { return nil, err }
     }
-    // Set attribute value
-    key = uctx.Username + "meta_patch_v"
-    err = cache.SetEX(ctx, key, v, time.Second * 5).Err()
-    if err != nil { return nil, err }
     return next(ctx)
 }
 
@@ -400,69 +415,13 @@ func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resol
     if fun := FieldAuthorizationFunc[*r]; fun != nil {
         return fun(ctx, obj, next, f, e, n)
     }
-    return nil, LogErr("directive error", fmt.Errorf("unknown rule `%s'", *r))
+    return nil, LogErr("directive error", fmt.Errorf("unknown rule '%s'", *r))
 }
 
 func FieldTransform(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (interface{}, error) {
     if fun := FieldTransformFunc[a]; fun != nil {
         return fun(ctx, next)
     }
-    return nil, LogErr("directive error", fmt.Errorf("unknown function `%s'", a))
+    return nil, LogErr("directive error", fmt.Errorf("unknown function '%s'", a))
 }
 
-//
-// @Warning: the following code will be auto-generatd in the future.
-//
-
-
-func inpu_object_ref_test(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    d, e := next(ctx)
-    rc := graphql.GetResolverContext(ctx)
-    queryName := rc.Field.Name
-    pc := graphql.GetPathContext(ctx)
-    fieldName := *pc.Field
-
-    queryType, _, _, err := queryTypeFromGraphqlContext(ctx)
-    if err != nil { panic(err) }
-
-
-    l, ok := InterfaceSlice(d)
-    if ok && len(l) > 0 {
-        // List of ObjectRef
-        fmt.Println("query name:", queryName)
-        fmt.Println("field name", fieldName)
-        fmt.Println(Struct2Map(obj))
-        fmt.Println(3, pc.Path(), "|", len(pc.Path()),"|")
-        fmt.Println(Struct2Map(d), "| isList: ", ok)
-        switch queryType {
-        case "add":
-        case "update":
-        case "delete":
-        default:
-            panic("query not implemented: " + queryType )
-        }
-    }
-
-
-    m := Struct2Map(d)
-    if d != nil && len(m) > 0 {
-        // ObjectRef | add OR update
-        fmt.Println("query name:", queryName)
-        fmt.Println("field name", fieldName)
-        fmt.Println(Struct2Map(obj))
-        _, ok := InterfaceSlice(d)
-        // Can't get rc.Object !N gqlgen bug ?
-        if ok {
-            // Don't run hook on list. Field with list are validated by field level auth.
-            fmt.Println(1, pc.Path(), "|", len(pc.Path()),"|")
-            fmt.Println(Struct2Map(d), "| isList: ", ok)
-            return d, e
-        }
-        fmt.Println(2, pc.Path(), "|", len(pc.Path()),"|")
-        fmt.Println(Struct2Map(d), "| isList: ", ok)
-    }
-
-
-    fmt.Println(queryType)
-    return d, e
-}

@@ -1,32 +1,32 @@
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
+
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
 
-directive @lambda on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
 
 directive @cascade(fields: [String]) on FIELD
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -202,7 +202,6 @@ input AddNodeInput {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -347,7 +346,6 @@ input AddTensionInput {
   subscribers: [UserRef!]
   projects: [ProjectTensionRef!]
   n_comments: Int
-  n_open_contracts: Int
 }
 
 type AddTensionPayload {
@@ -1533,7 +1531,6 @@ type Node {
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  orga_agg(filter: OrgaAggFilter): OrgaAgg
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
@@ -1732,7 +1729,6 @@ enum NodeHasFilter {
   first_link
   second_link
   contracts
-  orga_agg
   events_history
 }
 
@@ -1796,7 +1792,6 @@ input NodePatch {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -1835,7 +1830,6 @@ input NodeRef {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -2713,7 +2707,6 @@ type Tension implements Post {
   subscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   projects(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
   n_comments: Int
-  n_open_contracts: Int
   assigneesAggregate(filter: UserFilter): UserAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   commentsAggregate(filter: CommentFilter): CommentAggregateResult
@@ -2755,10 +2748,6 @@ type TensionAggregateResult {
   n_commentsMax: Int
   n_commentsSum: Int
   n_commentsAvg: Float
-  n_open_contractsMin: Int
-  n_open_contractsMax: Int
-  n_open_contractsSum: Int
-  n_open_contractsAvg: Float
 }
 
 enum TensionEvent {
@@ -2832,7 +2821,6 @@ enum TensionHasFilter {
   subscribers
   projects
   n_comments
-  n_open_contracts
 }
 
 input TensionOrder {
@@ -2849,7 +2837,6 @@ enum TensionOrderable {
   receiverid
   title
   n_comments
-  n_open_contracts
 }
 
 input TensionPatch {
@@ -2875,7 +2862,6 @@ input TensionPatch {
   subscribers: [UserRef!]
   projects: [ProjectTensionRef!]
   n_comments: Int
-  n_open_contracts: Int
 }
 
 input TensionRef {
@@ -2902,7 +2888,6 @@ input TensionRef {
   subscribers: [UserRef!]
   projects: [ProjectTensionRef!]
   n_comments: Int
-  n_open_contracts: Int
 }
 
 enum TensionStatus {

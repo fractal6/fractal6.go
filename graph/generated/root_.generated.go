@@ -695,7 +695,6 @@ type ComplexityRoot struct {
 		Mode                   func(childComplexity int) int
 		Name                   func(childComplexity int) int
 		Nameid                 func(childComplexity int) int
-		OrgaAgg                func(childComplexity int, filter *model.OrgaAggFilter) int
 		Parent                 func(childComplexity int, filter *model.NodeFilter) int
 		Pinned                 func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		PinnedAggregate        func(childComplexity int, filter *model.TensionFilter) int
@@ -1091,7 +1090,6 @@ type ComplexityRoot struct {
 		MentionsAggregate    func(childComplexity int, filter *model.EventFilter) int
 		Message              func(childComplexity int) int
 		NComments            func(childComplexity int) int
-		NOpenContracts       func(childComplexity int) int
 		Projects             func(childComplexity int, filter *model.ProjectTensionFilter, order *model.ProjectTensionOrder, first *int, offset *int) int
 		ProjectsAggregate    func(childComplexity int, filter *model.ProjectTensionFilter) int
 		Receiver             func(childComplexity int, filter *model.NodeFilter) int
@@ -1105,27 +1103,23 @@ type ComplexityRoot struct {
 	}
 
 	TensionAggregateResult struct {
-		Count             func(childComplexity int) int
-		CreatedAtMax      func(childComplexity int) int
-		CreatedAtMin      func(childComplexity int) int
-		EmitteridMax      func(childComplexity int) int
-		EmitteridMin      func(childComplexity int) int
-		MessageMax        func(childComplexity int) int
-		MessageMin        func(childComplexity int) int
-		NCommentsAvg      func(childComplexity int) int
-		NCommentsMax      func(childComplexity int) int
-		NCommentsMin      func(childComplexity int) int
-		NCommentsSum      func(childComplexity int) int
-		NOpenContractsAvg func(childComplexity int) int
-		NOpenContractsMax func(childComplexity int) int
-		NOpenContractsMin func(childComplexity int) int
-		NOpenContractsSum func(childComplexity int) int
-		ReceiveridMax     func(childComplexity int) int
-		ReceiveridMin     func(childComplexity int) int
-		TitleMax          func(childComplexity int) int
-		TitleMin          func(childComplexity int) int
-		UpdatedAtMax      func(childComplexity int) int
-		UpdatedAtMin      func(childComplexity int) int
+		Count         func(childComplexity int) int
+		CreatedAtMax  func(childComplexity int) int
+		CreatedAtMin  func(childComplexity int) int
+		EmitteridMax  func(childComplexity int) int
+		EmitteridMin  func(childComplexity int) int
+		MessageMax    func(childComplexity int) int
+		MessageMin    func(childComplexity int) int
+		NCommentsAvg  func(childComplexity int) int
+		NCommentsMax  func(childComplexity int) int
+		NCommentsMin  func(childComplexity int) int
+		NCommentsSum  func(childComplexity int) int
+		ReceiveridMax func(childComplexity int) int
+		ReceiveridMin func(childComplexity int) int
+		TitleMax      func(childComplexity int) int
+		TitleMin      func(childComplexity int) int
+		UpdatedAtMax  func(childComplexity int) int
+		UpdatedAtMin  func(childComplexity int) int
 	}
 
 	UpdateBlobPayload struct {
@@ -4644,18 +4638,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.Nameid(childComplexity), true
 
-	case "Node.orga_agg":
-		if e.complexity.Node.OrgaAgg == nil {
-			break
-		}
-
-		args, err := ec.field_Node_orga_agg_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Node.OrgaAgg(childComplexity, args["filter"].(*model.OrgaAggFilter)), true
-
 	case "Node.parent":
 		if e.complexity.Node.Parent == nil {
 			break
@@ -7505,13 +7487,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.NComments(childComplexity), true
 
-	case "Tension.n_open_contracts":
-		if e.complexity.Tension.NOpenContracts == nil {
-			break
-		}
-
-		return e.complexity.Tension.NOpenContracts(childComplexity), true
-
 	case "Tension.projects":
 		if e.complexity.Tension.Projects == nil {
 			break
@@ -7683,34 +7658,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TensionAggregateResult.NCommentsSum(childComplexity), true
-
-	case "TensionAggregateResult.n_open_contractsAvg":
-		if e.complexity.TensionAggregateResult.NOpenContractsAvg == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NOpenContractsAvg(childComplexity), true
-
-	case "TensionAggregateResult.n_open_contractsMax":
-		if e.complexity.TensionAggregateResult.NOpenContractsMax == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NOpenContractsMax(childComplexity), true
-
-	case "TensionAggregateResult.n_open_contractsMin":
-		if e.complexity.TensionAggregateResult.NOpenContractsMin == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NOpenContractsMin(childComplexity), true
-
-	case "TensionAggregateResult.n_open_contractsSum":
-		if e.complexity.TensionAggregateResult.NOpenContractsSum == nil {
-			break
-		}
-
-		return e.complexity.TensionAggregateResult.NOpenContractsSum(childComplexity), true
 
 	case "TensionAggregateResult.receiveridMax":
 		if e.complexity.TensionAggregateResult.ReceiveridMax == nil {
@@ -9414,7 +9361,6 @@ type Node {
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -9552,7 +9498,6 @@ type Tension {
   subscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   projects(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
   n_comments: Int
-  n_open_contracts: Int
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -9904,35 +9849,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambda on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
+directive @id on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10108,7 +10053,6 @@ input AddNodeInput {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -10178,7 +10122,7 @@ input AddProjectInput {
   rootnameid: String!
   parentnameid: String!
   nameid: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String! @x_alter(r:"maxLen", n:280)
+  name: String! @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus!
   columns: [ProjectColumnRef!]
@@ -10253,7 +10197,6 @@ input AddTensionInput {
   subscribers: [UserRef!] @x_add(r:"ref")
   projects: [ProjectTensionRef!] @x_add(r:"ref")
   n_comments: Int
-  n_open_contracts: Int
 }
 
 type AddTensionPayload {
@@ -11444,7 +11387,6 @@ enum NodeHasFilter {
   first_link
   second_link
   contracts
-  orga_agg
   events_history
 }
 
@@ -11503,7 +11445,6 @@ input NodePatch {
   first_link: UserRef @x_patch_ro
   second_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
-  orga_agg: OrgaAggRef @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
 }
 
@@ -11542,7 +11483,6 @@ input NodeRef {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -11957,7 +11897,7 @@ input ProjectPatch {
   rootnameid: String @x_patch_ro
   parentnameid: String @x_patch_ro
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String @x_alter(r:"maxLen", n:280)
+  name: String @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus @x_patch_ro
   columns: [ProjectColumnRef!] @x_patch_ro
@@ -11973,7 +11913,7 @@ input ProjectRef {
   rootnameid: String
   parentnameid: String
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String @x_alter(r:"maxLen", n:280)
+  name: String @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus
   columns: [ProjectColumnRef!]
@@ -12292,10 +12232,6 @@ type TensionAggregateResult {
   n_commentsMax: Int
   n_commentsSum: Int
   n_commentsAvg: Float
-  n_open_contractsMin: Int
-  n_open_contractsMax: Int
-  n_open_contractsSum: Int
-  n_open_contractsAvg: Float
 }
 
 input TensionEvent_hash {
@@ -12341,7 +12277,6 @@ enum TensionHasFilter {
   subscribers
   projects
   n_comments
-  n_open_contracts
 }
 
 input TensionOrder {
@@ -12358,7 +12293,6 @@ enum TensionOrderable {
   receiverid
   title
   n_comments
-  n_open_contracts
 }
 
 input TensionPatch {
@@ -12384,7 +12318,6 @@ input TensionPatch {
   subscribers: [UserRef!] @x_patch_ro
   projects: [ProjectTensionRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
-  n_open_contracts: Int @x_patch_ro
 }
 
 input TensionRef {
@@ -12411,7 +12344,6 @@ input TensionRef {
   subscribers: [UserRef!] @x_add(r:"ref")
   projects: [ProjectTensionRef!] @x_add(r:"ref")
   n_comments: Int
-  n_open_contracts: Int
 }
 
 input TensionStatus_hash {

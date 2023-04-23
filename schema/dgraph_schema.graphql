@@ -99,7 +99,6 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   first_link: User
   second_link: User
   contracts: [Vote!] @hasInverse(field: node)
-  orga_agg: OrgaAgg
   events_history: [Event!]
 }
 
@@ -298,7 +297,6 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   subscribers: [User!] @hasInverse(field: subscriptions)
   projects: [ProjectTension!] @hasInverse(field: tension)
   n_comments: Int
-  n_open_contracts: Int
 }
 
 type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

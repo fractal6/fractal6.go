@@ -113,6 +113,9 @@ func FindTensions(msg string) []string {
 }
 
 func ToGoNameFormat(name string) string {
+    if name == "id" {
+        return "ID"
+    }
     var l []string
     for _, s := range strings.Split(name, "_") {
         l = append(l, strings.Title(s))

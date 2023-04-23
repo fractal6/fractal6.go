@@ -142,7 +142,6 @@ type Node {
   first_link(filter: UserFilter): User
   second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -280,7 +279,6 @@ type Tension {
   subscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   projects(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
   n_comments: Int
-  n_open_contracts: Int
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -632,35 +630,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @lambda on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @lambda on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @cascade(fields: [String]) on FIELD
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -836,7 +834,6 @@ input AddNodeInput {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -906,7 +903,7 @@ input AddProjectInput {
   rootnameid: String!
   parentnameid: String!
   nameid: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String! @x_alter(r:"maxLen", n:280)
+  name: String! @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus!
   columns: [ProjectColumnRef!]
@@ -981,7 +978,6 @@ input AddTensionInput {
   subscribers: [UserRef!] @x_add(r:"ref")
   projects: [ProjectTensionRef!] @x_add(r:"ref")
   n_comments: Int
-  n_open_contracts: Int
 }
 
 type AddTensionPayload {
@@ -2172,7 +2168,6 @@ enum NodeHasFilter {
   first_link
   second_link
   contracts
-  orga_agg
   events_history
 }
 
@@ -2231,7 +2226,6 @@ input NodePatch {
   first_link: UserRef @x_patch_ro
   second_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
-  orga_agg: OrgaAggRef @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
 }
 
@@ -2270,7 +2264,6 @@ input NodeRef {
   first_link: UserRef
   second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -2685,7 +2678,7 @@ input ProjectPatch {
   rootnameid: String @x_patch_ro
   parentnameid: String @x_patch_ro
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String @x_alter(r:"maxLen", n:280)
+  name: String @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus @x_patch_ro
   columns: [ProjectColumnRef!] @x_patch_ro
@@ -2701,7 +2694,7 @@ input ProjectRef {
   rootnameid: String
   parentnameid: String
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String @x_alter(r:"maxLen", n:280)
+  name: String @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus
   columns: [ProjectColumnRef!]
@@ -3020,10 +3013,6 @@ type TensionAggregateResult {
   n_commentsMax: Int
   n_commentsSum: Int
   n_commentsAvg: Float
-  n_open_contractsMin: Int
-  n_open_contractsMax: Int
-  n_open_contractsSum: Int
-  n_open_contractsAvg: Float
 }
 
 input TensionEvent_hash {
@@ -3069,7 +3058,6 @@ enum TensionHasFilter {
   subscribers
   projects
   n_comments
-  n_open_contracts
 }
 
 input TensionOrder {
@@ -3086,7 +3074,6 @@ enum TensionOrderable {
   receiverid
   title
   n_comments
-  n_open_contracts
 }
 
 input TensionPatch {
@@ -3112,7 +3099,6 @@ input TensionPatch {
   subscribers: [UserRef!] @x_patch_ro
   projects: [ProjectTensionRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
-  n_open_contracts: Int @x_patch_ro
 }
 
 input TensionRef {
@@ -3139,7 +3125,6 @@ input TensionRef {
   subscribers: [UserRef!] @x_add(r:"ref")
   projects: [ProjectTensionRef!] @x_add(r:"ref")
   n_comments: Int
-  n_open_contracts: Int
 }
 
 input TensionStatus_hash {

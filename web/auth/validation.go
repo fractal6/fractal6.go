@@ -88,10 +88,30 @@ func init() {
         "api": true,
         "auth": true,
         "data": true,
+        "assets": true,
         "static": true,
         "index": true,
         "index.html": true,
-        // front
+        "ghost": true,
+        // front - about
+        "about": true,
+        "help": true,
+        "features": true,
+        "showcases": true,
+        "marketplace": true,
+        "solutions": true,
+        "pricing": true,
+        "trending": true,
+        "topics": true,
+        "manifesto": true,
+        "sitemap": true,
+        "enterprise": true,
+        "collective": true,
+        "developers": true,
+        "terms-of-service": true,
+        // front - app
+        "home": true,
+        "dashboard": true,
         "new": true, // tension, orga, networks
         "explore": true, // orgas, networks, users
         "login": true,
@@ -99,16 +119,18 @@ func init() {
         "signup": true,
         "verification": true,
         "password-reset": true,
-        "about": true,
-        "help": true,
-        "features": true,
-        "showcase": true,
         "user": true,
         "users": true,
         "tension": true,
         "tensions": true,
+        "project": true,
+        "projects": true,
+        "calendar": true,
+        "calendars": true,
         "org": true,
+        "orgs": true,
         "network": true,
+        "networks": true,
     }
 }
 
@@ -126,7 +148,9 @@ func regularizeUctx(uctx *model.UserCtx) {
 //
 
 // GetUser returns the user ctx from a db.grpc request,
-// **if they are authencitated** against their hashed password.
+// **if they are authenticated** against their hashed password.
+// Note: ===  This is protected ===
+// This method check if the user has login rights, and check passwords.
 func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
     // 1. get username/email or throw error
     // 3. if pass compare pasword or throw error
@@ -158,6 +182,11 @@ func GetAuthUserCtx(creds model.UserCreds) (*model.UserCtx, error) {
         return nil, FormatError(err, "fieldid")
     }
 
+    // Check if the user has login authorization
+    if !userCtx.Rights.CanLogin  {
+        return nil, ErrCantLogin
+    }
+
     // Compare hashed password.
     ok := tools.VerifyPassword(userCtx.Password, password)
     if !ok {
@@ -177,12 +206,18 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
         return nil, FormatError(err, "username")
     }
 
+    // Check if the user has login authorization
+    if !userCtx.Rights.CanLogin  {
+        return nil, ErrCantLogin
+    }
+
     // Update the user roles cache.
     ctx := context.Background()
     var key string = userCtx.Username + "roles"
     d, _ := json.Marshal(userCtx.Roles)
     err = cache.SetEX(ctx, key, d, time.Second * 12).Err()
     if err != nil { return nil, FormatError(err, "") }
+
 
     regularizeUctx(userCtx)
     return userCtx, nil
@@ -250,16 +285,18 @@ func ValidateNewUser(creds model.UserCreds) error {
 func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
     now := tools.Now()
     // Rights
-    canLogin := true
-    canCreateRoot := false
     userType := model.UserTypeRegular
     maxPublicOrga := MAX_PUBLIC_ORGA
     maxPrivateOrga := MAX_PRIVATE_ORGA
     hasEmailNotifications := true
-    var lang model.Lang
-    if creds.Lang == nil {
-        lang = model.LangEn
-    } else {
+    canLogin := true
+    canCreateRoot := false
+    lang := model.LangEn
+
+    if creds.CanLogin != nil {
+        canLogin = bool(*creds.CanLogin)
+    }
+    if creds.Lang != nil {
         lang = model.Lang(*creds.Lang)
     }
 
@@ -287,7 +324,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
         return nil, err
     }
 
-    // Try getting usetCtx
+    // Try getting userCtx
     userCtx, err := db.GetDB().GetUctx("username", creds.Username)
     if err != nil {
         return nil, err

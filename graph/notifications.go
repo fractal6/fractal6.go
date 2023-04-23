@@ -272,6 +272,20 @@ func PushContractNotifications(notif model.ContractNotif) error {
     // Get relevant users for the contract
     users, err := GetUsersToNotify(notif.Tid, true, false, false)
     if err != nil { return err }
+    if notif.Contract.ContractType == model.ContractTypeAnyCoordoDual &&
+    notif.Contract.Event.EventType == model.TensionEventMoved && notif.Contract.Event.New != nil {
+        // The contract is created inside the tension or the node to be moved.
+        // But we also need to notidy users in the target circle.
+        targetid := *notif.Contract.Event.New
+        x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", targetid, "Node.source", "Blob.tension", "uid")
+        if err != nil { return err }
+        targetTid, _ := x.(string)
+        users2, err := GetUsersToNotify(targetTid, true, false, false)
+        if err != nil { return err }
+        for k,v := range users2 {
+            users[k] = v
+        }
+    }
     // +
     // Add Candidates
     for _, c := range notif.Contract.Candidates {
@@ -447,7 +461,7 @@ func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
 // User helpers
 //
 
-// GetUserToNotify returns a list of user should receive notifications uponf tension updates.
+// GetUserToNotify returns a list of user that should receive notifications upon tension updates.
 // Note: order is important as for priority and emailing policy.
 func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool) (map[string]model.UserNotifInfo, error) {
     users := make(map[string]model.UserNotifInfo)
