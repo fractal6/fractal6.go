@@ -1261,7 +1261,7 @@ type NodeFilter struct {
 	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
 	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
 	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
-	Name       *StringTermFilter                   `json:"name,omitempty"`
+	Name       *StringFullTextFilter               `json:"name,omitempty"`
 	About      *StringFullTextFilter               `json:"about,omitempty"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
 	IsRoot     *bool                               `json:"isRoot,omitempty"`
@@ -1791,17 +1791,17 @@ type ProjectColumnRef struct {
 }
 
 type ProjectFilter struct {
-	ID           []string            `json:"id,omitempty"`
-	CreatedAt    *DateTimeFilter     `json:"createdAt,omitempty"`
-	Rootnameid   *StringHashFilter   `json:"rootnameid,omitempty"`
-	Parentnameid *StringHashFilter   `json:"parentnameid,omitempty"`
-	Nameid       *StringHashFilter   `json:"nameid,omitempty"`
-	Name         *StringTermFilter   `json:"name,omitempty"`
-	Status       *ProjectStatusHash  `json:"status,omitempty"`
-	Has          []*ProjectHasFilter `json:"has,omitempty"`
-	And          []*ProjectFilter    `json:"and,omitempty"`
-	Or           []*ProjectFilter    `json:"or,omitempty"`
-	Not          *ProjectFilter      `json:"not,omitempty"`
+	ID           []string              `json:"id,omitempty"`
+	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
+	Rootnameid   *StringHashFilter     `json:"rootnameid,omitempty"`
+	Parentnameid *StringHashFilter     `json:"parentnameid,omitempty"`
+	Nameid       *StringHashFilter     `json:"nameid,omitempty"`
+	Name         *StringFullTextFilter `json:"name,omitempty"`
+	Status       *ProjectStatusHash    `json:"status,omitempty"`
+	Has          []*ProjectHasFilter   `json:"has,omitempty"`
+	And          []*ProjectFilter      `json:"and,omitempty"`
+	Or           []*ProjectFilter      `json:"or,omitempty"`
+	Not          *ProjectFilter        `json:"not,omitempty"`
 }
 
 type ProjectOrder struct {

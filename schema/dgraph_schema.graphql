@@ -72,7 +72,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   nameid: String! @search(by:[hash, regexp]) @id
   rootnameid: String! @search(by:[hash, regexp])
   source: Blob
-  name: String! @search(by:[term])
+  name: String! @search(by:[fulltext])
   about: String @search(by:[fulltext])
   skills: [String!] @search(by:[term])
   isRoot: Boolean! @search
@@ -185,7 +185,7 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   rootnameid: String! @search(by:[hash])
   parentnameid: String! @search(by:[hash])
   nameid: String! @search(by:[hash])
-  name: String! @search(by:[term])
+  name: String! @search(by:[fulltext])
   description: String
   status: ProjectStatus! @search
   columns: [ProjectColumn!] @hasInverse(field: project)

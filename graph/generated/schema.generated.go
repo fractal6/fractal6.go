@@ -64339,7 +64339,7 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			it.Name, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -68359,7 +68359,7 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			it.Name, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
