@@ -44,16 +44,20 @@ import (
 ////////////////////////////////////////////////
 
 type AddArtefactInput struct {
-    Name        *string             `json:"name"`
-    Color       *string             `json:"color"`
-	Rootnameid  string              `json:"rootnameid,omitempty"`
-	Nodes       []*model.NodeRef    `json:"nodes,omitempty"`
+    Name        *string          `json:"name"`
+    Color       *string          `json:"color"`
+	Rootnameid  string           `json:"rootnameid,omitempty"`
+	Nodes       []*model.NodeRef `json:"nodes,omitempty"`
 }
 
 type FilterArtefactInput struct {
-	ID         []string                                `json:"id,omitempty"`
-	Rootnameid *model.StringHashFilter                 `json:"rootnameid,omitempty"`
-	Name       *model.StringHashFilterStringTermFilter `json:"name,omitempty"`
+	ID           []string                                `json:"id,omitempty"`
+	Rootnameid   *model.StringHashFilter                 `json:"rootnameid,omitempty"`
+    // For Project Only
+    Parentnameid *model.StringHashFilter                 `json:"parentnameid,omitempty"`
+    Nameid       *model.StringHashFilter                 `json:"nameid,omitempty"`
+    // --
+	Name         *model.StringHashFilterStringTermFilter `json:"name,omitempty"`
 }
 
 type UpdateArtefactInput struct {
@@ -117,13 +121,21 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
         nodes = append(nodes, input.Set.Nodes[0])
         rootnameid, _ = codec.Nid2rootid(*nodes[0].Nameid)
 
-        // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
+        // @TODO: Clarify how the ressources access policy for artefacts object (that can belongs to multiple nodes)
+        // Ex: { Leaders: (mandate acess, tension access), Coordinators: (artefact access, tension access) }?
         n_nodes := 0
         _, typeName, _, err = queryTypeFromGraphqlContext(ctx)
         if err != nil { return nil, LogErr("UpdateNodeArtefact", err) }
         if len(input.Filter.ID) > 0 {
+            // Update from UID
             n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")
+        } else if typeName == "Project" {
+            // Project Update from hash names
+            rid, _ := codec.Nid2rootid(*input.Filter.Parentnameid.Eq)
+            if rootnameid != rid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
+            n_nodes = db.GetDB().Count2(typeName+".nameid", *input.Filter.Nameid.Eq, typeName+".parentnameid", *input.Filter.Parentnameid.Eq, typeName+".nodes")
         } else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
+            // Other Artefact update from hash names
             if rootnameid != *input.Filter.Rootnameid.Eq { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
             n_nodes = db.GetDB().Count2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes")
         } else {
@@ -138,6 +150,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
             b.Nodes = nil
             // Ignore if the update it is just appending the data to new node (not actually modifing it)
             if !reflect.DeepEqual(a, b) {
+                // Check if the node updated as the lowest depth in the nodes list.
                 return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is only possible at the root circle level."))
             }
         }

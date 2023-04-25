@@ -68717,10 +68717,10 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -69023,9 +69023,27 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectStatus); ok {
+				it.Status = data
+			} else if tmp == nil {
+				it.Status = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectStatus`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "columns":
 			var err error
