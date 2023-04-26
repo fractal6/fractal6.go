@@ -1744,7 +1744,7 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string) ([]model.RoleExt, err
     decoder, err := mapstructure.NewDecoder(config)
     if err != nil { return nil, err }
     err = decoder.Decode(r.All)
-    // Remove duplicate based on Label.name
+    // Remove duplicate based on RoleExt.name
     data := []model.RoleExt{}
     check := make(map[string]bool)
     for _, d := range data_dup {

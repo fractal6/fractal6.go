@@ -510,6 +510,13 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
     //ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
     //if err != nil { return ok, err }
     err = LinkUser(rootid, guestid, username)
+    if err != nil { return ok, err }
+
+    // Make user watch that organisation.
+    err = db.GetDB().Update(*uctx, "user", &model.UpdateUserInput{
+        Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
+        Set: &model.UserPatch{Watching: []*model.NodeRef{&model.NodeRef{Nameid: &rootid}}},
+    })
 
     return true, err
 }
