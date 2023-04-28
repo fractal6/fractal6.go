@@ -313,7 +313,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
             data = newData.Interface()
         default:
             // Assume interface
-            // Merge results (needed for user defined returns (see getOrgaAgg))
+            // Merge results (needed for user defined returns (i.e. EventCouts))
             m := make(map[string]interface{}, 2)
             for _, s := range res {
                 for k, v := range s {

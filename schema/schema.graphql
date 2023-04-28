@@ -219,25 +219,21 @@ type Project {
   description: String
   status: ProjectStatus!
   columns(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn!]
+  fields(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField!]
   leaders(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
   columnsAggregate(filter: ProjectColumnFilter): ProjectColumnAggregateResult
+  fieldsAggregate(filter: ProjectFieldFilter): ProjectFieldAggregateResult
   leadersAggregate(filter: NodeFilter): NodeAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
-}
-
-type ProjectTension {
-  id: ID!
-  tension(filter: TensionFilter): Tension!
-  pos: Int!
-  pc(filter: ProjectColumnFilter): ProjectColumn!
 }
 
 type ProjectColumn {
   id: ID!
   name: String!
-  about: String
+  description: String
+  color: String
   pos: Int!
   tensions(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
   project(filter: ProjectFilter): Project!
@@ -245,9 +241,34 @@ type ProjectColumn {
   tensionsAggregate(filter: ProjectTensionFilter): ProjectTensionAggregateResult
 }
 
-type OrgaAgg {
-  n_members: Int
-  n_guests: Int
+type ProjectField {
+  type_: ProjectFieldType!
+  isVisible: Boolean!
+  values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
+
+  valuesAggregate(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
+}
+
+type ProjectFieldValue {
+  field(filter: ProjectFieldFilter): ProjectField!
+  value: String!
+}
+
+type ProjectTension {
+  id: ID!
+  tension(filter: TensionFilter): Tension!
+  pos: Int!
+  pc(filter: ProjectColumnFilter): ProjectColumn!
+  values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
+
+  valuesAggregate(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
+}
+
+enum ProjectFieldType {
+  INT
+  STRING
+  DATE
+  SINGLE_SELECT
 }
 
 type Post {
@@ -626,35 +647,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -851,16 +872,6 @@ type AddNotifPayload {
   numUids: Int
 }
 
-input AddOrgaAggInput {
-  n_members: Int
-  n_guests: Int
-}
-
-type AddOrgaAggPayload {
-  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  numUids: Int
-}
-
 input AddPendingUserInput {
   updatedAt: DateTime
   username: String! @w_alter(a:"lower")
@@ -879,7 +890,8 @@ type AddPendingUserPayload {
 
 input AddProjectColumnInput {
   name: String!
-  about: String
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String
   pos: Int!
   tensions: [ProjectTensionRef!]
   project: ProjectRef!
@@ -887,6 +899,27 @@ input AddProjectColumnInput {
 
 type AddProjectColumnPayload {
   projectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
+  numUids: Int
+}
+
+input AddProjectFieldInput {
+  type_: ProjectFieldType!
+  isVisible: Boolean!
+  values: [ProjectFieldValueRef!]
+}
+
+type AddProjectFieldPayload {
+  projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  numUids: Int
+}
+
+input AddProjectFieldValueInput {
+  field: ProjectFieldRef!
+  value: String!
+}
+
+type AddProjectFieldValuePayload {
+  projectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
   numUids: Int
 }
 
@@ -901,6 +934,7 @@ input AddProjectInput {
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus!
   columns: [ProjectColumnRef!]
+  fields: [ProjectFieldRef!]
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -914,6 +948,7 @@ input AddProjectTensionInput {
   tension: TensionRef! @x_alter(r:"ref")
   pos: Int!
   pc: ProjectColumnRef!
+  values: [ProjectFieldValueRef!]
 }
 
 type AddProjectTensionPayload {
@@ -1412,12 +1447,6 @@ type DeleteNotifPayload {
   numUids: Int
 }
 
-type DeleteOrgaAggPayload {
-  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  msg: String
-  numUids: Int
-}
-
 type DeletePendingUserPayload {
   pendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   msg: String
@@ -1432,6 +1461,18 @@ type DeletePostPayload {
 
 type DeleteProjectColumnPayload {
   projectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
+  msg: String
+  numUids: Int
+}
+
+type DeleteProjectFieldPayload {
+  projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  msg: String
+  numUids: Int
+}
+
+type DeleteProjectFieldValuePayload {
+  projectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
   msg: String
   numUids: Int
 }
@@ -1933,15 +1974,18 @@ type Mutation {
   addProject(input: [AddProjectInput!]! @hook_addProjectInput): AddProjectPayload @hook_addProject
   updateProject(input: UpdateProjectInput! @hook_updateProjectInput): UpdateProjectPayload @hook_updateProject
   deleteProject(filter: ProjectFilter! @hook_deleteProjectInput): DeleteProjectPayload @hook_deleteProject
-  addProjectTension(input: [AddProjectTensionInput!]!): AddProjectTensionPayload
-  updateProjectTension(input: UpdateProjectTensionInput!): UpdateProjectTensionPayload
-  deleteProjectTension(filter: ProjectTensionFilter!): DeleteProjectTensionPayload
   addProjectColumn(input: [AddProjectColumnInput!]!, upsert: Boolean): AddProjectColumnPayload
   updateProjectColumn(input: UpdateProjectColumnInput!): UpdateProjectColumnPayload
   deleteProjectColumn(filter: ProjectColumnFilter!): DeleteProjectColumnPayload
-  addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
-  updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
-  deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
+  addProjectField(input: [AddProjectFieldInput!]!): AddProjectFieldPayload
+  updateProjectField(input: UpdateProjectFieldInput!): UpdateProjectFieldPayload
+  deleteProjectField(filter: ProjectFieldFilter!): DeleteProjectFieldPayload
+  addProjectFieldValue(input: [AddProjectFieldValueInput!]!): AddProjectFieldValuePayload
+  updateProjectFieldValue(input: UpdateProjectFieldValueInput!): UpdateProjectFieldValuePayload
+  deleteProjectFieldValue(filter: ProjectFieldValueFilter!): DeleteProjectFieldValuePayload
+  addProjectTension(input: [AddProjectTensionInput!]!): AddProjectTensionPayload
+  updateProjectTension(input: UpdateProjectTensionInput!): UpdateProjectTensionPayload
+  deleteProjectTension(filter: ProjectTensionFilter!): DeleteProjectTensionPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
@@ -2327,51 +2371,6 @@ input NotifRef {
   link: String
 }
 
-type OrgaAggAggregateResult {
-  count: Int
-  n_membersMin: Int
-  n_membersMax: Int
-  n_membersSum: Int
-  n_membersAvg: Float
-  n_guestsMin: Int
-  n_guestsMax: Int
-  n_guestsSum: Int
-  n_guestsAvg: Float
-}
-
-input OrgaAggFilter {
-  has: [OrgaAggHasFilter]
-  and: [OrgaAggFilter]
-  or: [OrgaAggFilter]
-  not: OrgaAggFilter
-}
-
-enum OrgaAggHasFilter {
-  n_members
-  n_guests
-}
-
-input OrgaAggOrder {
-  asc: OrgaAggOrderable
-  desc: OrgaAggOrderable
-  then: OrgaAggOrder
-}
-
-enum OrgaAggOrderable {
-  n_members
-  n_guests
-}
-
-input OrgaAggPatch {
-  n_members: Int @x_patch_ro
-  n_guests: Int @x_patch_ro
-}
-
-input OrgaAggRef {
-  n_members: Int
-  n_guests: Int
-}
-
 type PendingUserAggregateResult {
   count: Int
   updatedAtMin: DateTime
@@ -2557,8 +2556,10 @@ type ProjectColumnAggregateResult {
   count: Int
   nameMin: String
   nameMax: String
-  aboutMin: String
-  aboutMax: String
+  descriptionMin: String
+  descriptionMax: String
+  colorMin: String
+  colorMax: String
   posMin: Int
   posMax: Int
   posSum: Int
@@ -2576,7 +2577,8 @@ input ProjectColumnFilter {
 
 enum ProjectColumnHasFilter {
   name
-  about
+  description
+  color
   pos
   tensions
   project
@@ -2590,13 +2592,15 @@ input ProjectColumnOrder {
 
 enum ProjectColumnOrderable {
   name
-  about
+  description
+  color
   pos
 }
 
 input ProjectColumnPatch {
-  about: String @x_patch_ro
-  pos: Int @x_patch_ro
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String @x_alter
+  pos: Int @x_alter
   tensions: [ProjectTensionRef!] @x_patch_ro
   project: ProjectRef @x_patch_ro
 }
@@ -2604,10 +2608,78 @@ input ProjectColumnPatch {
 input ProjectColumnRef {
   id: ID
   name: String
-  about: String
-  pos: Int
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String @x_alter
+  pos: Int @x_alter
   tensions: [ProjectTensionRef!]
   project: ProjectRef
+}
+
+type ProjectFieldAggregateResult {
+  count: Int
+}
+
+input ProjectFieldFilter {
+  has: [ProjectFieldHasFilter]
+  and: [ProjectFieldFilter]
+  or: [ProjectFieldFilter]
+  not: ProjectFieldFilter
+}
+
+enum ProjectFieldHasFilter {
+  type_
+  isVisible
+  values
+}
+
+input ProjectFieldPatch {
+  type_: ProjectFieldType @x_patch_ro
+  isVisible: Boolean @x_patch_ro
+  values: [ProjectFieldValueRef!] @x_patch_ro
+}
+
+input ProjectFieldRef {
+  type_: ProjectFieldType
+  isVisible: Boolean
+  values: [ProjectFieldValueRef!]
+}
+
+type ProjectFieldValueAggregateResult {
+  count: Int
+  valueMin: String
+  valueMax: String
+}
+
+input ProjectFieldValueFilter {
+  has: [ProjectFieldValueHasFilter]
+  and: [ProjectFieldValueFilter]
+  or: [ProjectFieldValueFilter]
+  not: ProjectFieldValueFilter
+}
+
+enum ProjectFieldValueHasFilter {
+  field
+  value
+}
+
+input ProjectFieldValueOrder {
+  asc: ProjectFieldValueOrderable
+  desc: ProjectFieldValueOrderable
+  then: ProjectFieldValueOrder
+}
+
+enum ProjectFieldValueOrderable {
+  value
+}
+
+input ProjectFieldValuePatch {
+  field: ProjectFieldRef @x_patch_ro
+  value: String @x_patch_ro
+}
+
+input ProjectFieldValueRef {
+  field: ProjectFieldRef
+  value: String
 }
 
 input ProjectFilter {
@@ -2635,6 +2707,7 @@ enum ProjectHasFilter {
   description
   status
   columns
+  fields
   leaders
   nodes
 }
@@ -2665,7 +2738,8 @@ input ProjectPatch {
   name: String @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus @x_alter
-  columns: [ProjectColumnRef!] @x_patch_ro
+  columns: [ProjectColumnRef!] @x_alter
+  fields: [ProjectFieldRef!] @x_patch_ro
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -2681,7 +2755,8 @@ input ProjectRef {
   name: String @x_alter(r:"maxLen", n:100)
   description: String @x_alter(r:"maxLen", n:280)
   status: ProjectStatus @x_alter
-  columns: [ProjectColumnRef!]
+  columns: [ProjectColumnRef!] @x_alter
+  fields: [ProjectFieldRef!]
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -2711,6 +2786,7 @@ enum ProjectTensionHasFilter {
   tension
   pos
   pc
+  values
 }
 
 input ProjectTensionOrder {
@@ -2727,6 +2803,7 @@ input ProjectTensionPatch {
   tension: TensionRef @x_alter(r:"ref")
   pos: Int @x_alter
   pc: ProjectColumnRef @x_patch_ro
+  values: [ProjectFieldValueRef!] @x_patch_ro
 }
 
 input ProjectTensionRef {
@@ -2734,6 +2811,7 @@ input ProjectTensionRef {
   tension: TensionRef @x_alter(r:"ref")
   pos: Int @x_alter
   pc: ProjectColumnRef
+  values: [ProjectFieldValueRef!]
 }
 
 type Query {
@@ -2755,14 +2833,16 @@ type Query {
   getProject(id: ID!): Project
   queryProject(filter: ProjectFilter @hook_queryProjectInput, order: ProjectOrder, first: Int, offset: Int): [Project]
   aggregateProject(filter: ProjectFilter): ProjectAggregateResult
-  getProjectTension(id: ID!): ProjectTension
-  queryProjectTension(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension]
-  aggregateProjectTension(filter: ProjectTensionFilter): ProjectTensionAggregateResult
   getProjectColumn(id: ID, name: String): ProjectColumn
   queryProjectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
   aggregateProjectColumn(filter: ProjectColumnFilter): ProjectColumnAggregateResult
-  queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
+  queryProjectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  aggregateProjectField(filter: ProjectFieldFilter): ProjectFieldAggregateResult
+  queryProjectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
+  aggregateProjectFieldValue(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
+  getProjectTension(id: ID!): ProjectTension
+  queryProjectTension(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension]
+  aggregateProjectTension(filter: ProjectTensionFilter): ProjectTensionAggregateResult
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
@@ -3242,17 +3322,6 @@ type UpdateNotifPayload {
   numUids: Int
 }
 
-input UpdateOrgaAggInput {
-  filter: OrgaAggFilter!
-  set: OrgaAggPatch
-  remove: OrgaAggPatch
-}
-
-type UpdateOrgaAggPayload {
-  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  numUids: Int
-}
-
 input UpdatePendingUserInput {
   filter: PendingUserFilter!
   set: PendingUserPatch
@@ -3283,6 +3352,28 @@ input UpdateProjectColumnInput {
 
 type UpdateProjectColumnPayload {
   projectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
+  numUids: Int
+}
+
+input UpdateProjectFieldInput {
+  filter: ProjectFieldFilter!
+  set: ProjectFieldPatch
+  remove: ProjectFieldPatch
+}
+
+type UpdateProjectFieldPayload {
+  projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  numUids: Int
+}
+
+input UpdateProjectFieldValueInput {
+  filter: ProjectFieldValueFilter!
+  set: ProjectFieldValuePatch
+  remove: ProjectFieldValuePatch
+}
+
+type UpdateProjectFieldValuePayload {
+  projectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
   numUids: Int
 }
 

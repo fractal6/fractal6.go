@@ -189,8 +189,30 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   description: String
   status: ProjectStatus! @search
   columns: [ProjectColumn!] @hasInverse(field: project)
+  fields: [ProjectField!]
   leaders: [Node!]
   nodes: [Node!] @hasInverse(field: projects)
+}
+
+type ProjectColumn {
+  id: ID!
+  name: String! @id
+  description: String
+  color: String
+  pos: Int!
+  tensions: [ProjectTension!] @hasInverse(field: pc)
+  project: Project!
+}
+
+type ProjectField {
+  type_: ProjectFieldType!
+  isVisible: Boolean!
+  values: [ProjectFieldValue!] @hasInverse(field: field)
+}
+
+type ProjectFieldValue {
+  field: ProjectField!
+  value: String!
 }
 
 type ProjectTension {
@@ -198,20 +220,14 @@ type ProjectTension {
   tension: Tension!
   pos: Int!
   pc: ProjectColumn!
+  values: [ProjectFieldValue!]
 }
 
-type ProjectColumn {
-  id: ID!
-  name: String! @id
-  about: String
-  pos: Int!
-  tensions: [ProjectTension!] @hasInverse(field: pc)
-  project: Project!
-}
-
-type OrgaAgg {
-  n_members: Int
-  n_guests: Int
+enum ProjectFieldType {
+  INT
+  STRING
+  DATE
+  SINGLE_SELECT
 }
 
 interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
