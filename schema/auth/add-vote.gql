@@ -1,0 +1,11 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize user with role
+    { rule: """query ($USERNAME: String!) {
+      queryVote {
+        node { first_link(filter: {username: {eq: $USERNAME}}) { username } }
+      }
+    }""" }
+  ]
+}

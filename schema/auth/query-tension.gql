@@ -1,0 +1,41 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize author
+    { rule: """query ($USERNAME: String!) {
+      queryTension {
+        createdBy(filter: {username: {eq: $USERNAME}}) { username }
+      }
+    }""" },
+    # Authorize public data OR Owner
+    { rule: """query ($OWNIDS: [String]) {
+        queryTension {
+          receiver(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
+        }
+    }""" },
+    # Authorize private data (members only)
+    { rule: """query ($ROOTIDS: [String]) {
+        queryTension {
+          receiver(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
+        }
+    }""" },
+    # Authorize secret data (explicit member only)
+    { rule: """query ($USERNAME: String!) {
+        queryTension {
+          receiver(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }""" },
+    # Authorize candidates
+    { rule: """query ($USERNAME: String!) {
+      queryTension {
+        contracts(filter: {status: {eq: Open}}) {
+          candidates(filter: {username: {eq: $USERNAME}}) { username }
+        }
+      }
+    }""" }
+  ]
+}

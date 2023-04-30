@@ -1,0 +1,9 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize author
+    { rule: """query ($USERNAME: String!) {
+      queryUser (filter: {username: {eq: $USERNAME}}) { username }
+    }""" }
+  ]
+}

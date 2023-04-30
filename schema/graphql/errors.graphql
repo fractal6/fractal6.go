@@ -1,0 +1,15 @@
+#
+# Single source of authority to share errors
+# commonly used by the backend to ease the interpretability
+# by the clients.
+#
+
+
+enum ErrorBla {
+  ContactCoordo
+  OrgaLimitReached
+  MemberLimitReached
+  EmailLimitReached
+  StorageLimitReached
+}
+

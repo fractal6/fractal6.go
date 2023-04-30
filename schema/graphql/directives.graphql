@@ -1,0 +1,93 @@
+###########################################################
+#
+# Reader directives: work at the field level.
+#
+###########################################################
+
+#  Make the field unable to read
+directive @hidden on FIELD_DEFINITION
+
+# Only owner can view the field
+directive @private on FIELD_DEFINITION
+
+# Use for DQL requests.
+directive @meta(f: String!, k: String) on FIELD_DEFINITION
+
+# Return true if the user is a authorized validator for the given contract.
+directive @isContractValidator on FIELD_DEFINITION
+
+# ===============
+# AUTH DIRECTIVES
+# ===============
+#
+# There is two kind of auth directive:
+# - x_*: for authorization rule.
+# - w_*: that impicitly allow field modification with, but that with a write/modification rule.
+#
+# By default, If neither directives (x_* or w_*) are given for a field,
+# the @x_patch_ro will be automatically generated for that field;
+# else-if x_* is given with no arguments are given, the authorization is granted;
+# else the function in argument must validate.
+# --
+# Those directives are automagically generated on the corresponding input types.
+# see the schema/gqlast.py parser for details.
+# --
+#
+# _add:    apply on input fields of Add* queries
+# _set:    (not implemented) apply on input fields of update:set queries
+# _remove: (not implemented) apply on input fields of update:remove queries
+# _patch:  (not implemented) apply on input fields of update:set + remove) queries (*Patch)
+# _alter:  allows field to be altered (added + set + remove)
+#
+#
+# Note1: _set, _remove and _patch are equivalent to _alter for now. This arise from
+#        the difficulty to differentiate the type used for update, remove and delete
+#        bacause they all use type like "<type>Patch".
+# Note2: Auth directive are propagated to object ref, "<type>Ref",
+#        and deeper object ref (the one where parent are also ref object)
+#        can be protected with @x_alter(r:"ref")
+
+###########################################################
+#
+# Authorization directives: work at input field level.
+#
+# r:rule    Optional function that should pass (pass by default ie no argument)
+# f:field   Optional field to lookup
+# e:event   Optional event
+# n:number  Optional integer value
+#
+###########################################################
+
+# Add rules should be controlled by 1) dgraph @auth rule, 2) schema definition (! field) and 3) @hook_ BLA validation.
+directive @x_add(r: String, f: String, e: [TensionEvent!], n:Int) on INPUT_FIELD_DEFINITION
+directive @x_set(r: String, f: String, e: [TensionEvent!], n:Int) on INPUT_FIELD_DEFINITION
+directive @x_remove(r: String, f: String, e: [TensionEvent!], n:Int) on INPUT_FIELD_DEFINITION
+directive @x_patch(r: String, f: String, e: [TensionEvent!], n:Int) on INPUT_FIELD_DEFINITION
+directive @x_alter(r: String, f: String, e: [TensionEvent!], n:Int) on INPUT_FIELD_DEFINITION
+directive @x_patch_ro on INPUT_FIELD_DEFINITION # [defaut] prevent a field to be patched.
+directive @x_ro on INPUT_FIELD_DEFINITION # make a field read-only (for exemple a an optional field that is not allowed to be set by a user.)
+                                          # Also Use ot to protect field against deep mutations.
+
+###########################################################
+#
+# Writer directives: work at input field level.
+#
+# a:action  The function to be executed on the field.
+#
+###########################################################
+
+directive @w_add(a:String!) on INPUT_FIELD_DEFINITION
+directive @w_set(a:String!) on INPUT_FIELD_DEFINITION
+directive @w_remove(a:String!) on INPUT_FIELD_DEFINITION
+directive @w_patch(a:String!) on INPUT_FIELD_DEFINITION
+directive @w_alter(a:String!) on INPUT_FIELD_DEFINITION
+# Use for post hook execution.
+directive @w_meta_patch(f:String!, k: String) on INPUT_FIELD_DEFINITION
+
+
+# Hook directive for mutation
+# Gqlast automatically append hook in Dgraph Type, like:
+#
+#   addNode(input: [AddNodeInput!]! @hook_addNodeInput): AddNodePayload @hook_addNode
+#   for input
+

@@ -1,0 +1,15 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize public data
+    { rule: """query {
+        queryRoleExt {
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }""" },
+    # Authorize member and owner
+    { rule: """query ($ROOTIDS: [String]) {
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }""" }
+  ]
+}

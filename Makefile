@@ -50,32 +50,18 @@ test:
 # Generate Graphql code and schema
 #
 
-genall: dgraph schema generate
-gen: schema generate
+genall: dgraph_schema gqlgen_schema generate
 
-dgraph: # Do alter Dgraph
-	# Requirements:
-	# npm install -g get-graphql-schema
-	# Alternative: graphqurl, graphql-cli
-	cd ../fractal6-schema
+dgraph_schema:
+	cd schema
 	make dgraph_in
-	cd -
-	mkdir -p schema/
-	cp ../fractal6-schema/gen_dgraph_in/schema.graphql schema/dgraph_schema.graphql
-	# Update Dgraph
-	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
-	# Used by the `schema` rule, to generate the gqlgen input schema
-	get-graphql-schema http://localhost:8080/graphql > schema/dgraph_out.graphql
-	# Alternative: gq http://localhost:8080/graphql -H "Content-Type: application/json" --introspect > schema/dgraph_out.graphql
-	# Used by gqlgen_in rule
-	cp schema/dgraph_out.graphql ../fractal6-schema/gen_dgraph_out/schema.graphql
+	make dgraph
 
-schema: # Do not alter Dgraph, just merge schemas...
-	cd ../fractal6-schema
+gqlgen_schema:
+	cd schema
+	make dgraph_out
 	make gqlgen_in
-	cd -
-	mkdir -p schema/
-	cp ../fractal6-schema/gen/schema.graphql schema/
+	make clean
 
 generate:
 	@# Generate gqlgen output
@@ -92,7 +78,6 @@ generate:
 
 #
 # Publish builds for prod releases
-#
 #
 
 publish_prod: build_release_prod

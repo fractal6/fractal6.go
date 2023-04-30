@@ -1,0 +1,16 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize public data
+    { rule: """query {
+        queryLabel {
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }""" },
+    # Authorize member and owner
+    # Note: when a node is removed from Label.nodes, there is an auth regression.
+    { rule: """query ($ROOTIDS: [String]) {
+        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }""" }
+  ]
+}

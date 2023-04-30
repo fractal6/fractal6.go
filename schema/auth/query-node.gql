@@ -1,0 +1,68 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize public data OR Owner
+    { rule: """query ($OWNIDS: [String]) {
+        queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
+    }""" },
+    # Authorize private data (members only)
+    { rule: """query ($ROOTIDS: [String]) {
+        queryNode(filter: {visibility: {eq: Private}, and: [{rootnameid: {in: $ROOTIDS}}]}) { id }
+    }""" },
+    # Authorize secret data (explicit member only)
+    # -- parent
+    { rule: """query ($USERNAME: String!) {
+        queryNode(filter: {visibility: {eq: Secret}}) {
+          children {
+            first_link(filter: {username: {eq: $USERNAME}}) { username }
+          }
+        }
+    }""" },
+    # -- children (including secret circle!)
+    { rule: """query ($USERNAME: String!) {
+        queryNode(filter: {visibility: {eq: Secret}}) {
+          parent {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }""" },
+    # Authorize candidates
+    # -- parent
+    { rule: """query ($USERNAME: String!) {
+      queryNode {
+        tensions_in {
+          contracts(filter: {status: {eq: Open}}) {
+            candidates(filter: {username: {eq: $USERNAME}}) { username }
+          }
+        }
+      }
+    }""" },
+    # -- children
+    { rule: """query ($USERNAME: String!) {
+      queryNode {
+        parent {
+          tensions_in {
+            contracts(filter: {status: {eq: Open}}) {
+              candidates(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+      }
+    }""" },
+    # Authorization for Bot
+    # -- the circle that contains a Bot (Bot make the circle public (mandate...) (but not its tension or children))
+    # e.g the receiver for the "external" tension.
+    { rule: """query {
+        queryNode {
+          children(filter: {role_type: {eq: Bot}}) { id }
+        }
+    }""" },
+    # -- authorize the Bot | except if it is Secret (In this case, it serves just to make a node public, but not its tensions)
+    # e.g. the emitter for the "external" tension.
+    { rule: """query {
+        queryNode(filter: {role_type: {eq: Bot}, not: {visibility: {eq: Secret}}}) { id }
+    }""" }
+  ]
+}
