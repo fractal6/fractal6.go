@@ -17,7 +17,7 @@ RELEASE_DIR := releases/$(BRANCH_NAME)/$(RELEASE_VERSION)
 LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
 
 
-.PHONY: build prod vendor schema
+.PHONY: build prod vendor
 default: build
 
 

@@ -9,6 +9,10 @@
 # Schema authorization is a mix between the Dgraph authorization rules (RBAC and GBAC),
 # fractal6.go authorization directives `@x_`, for field level protection, handled in graph/FieldAuthorization.
 # fractal6.go authorization directives `@hook_`, to manage more complex scenario at type level, handled in graph/**resolver**,
+# TODO: checks
+# - Artefact nodes.rootnameid == Label.rootnameid
+# - Tension receiver/emitter == receiverid/emmiterid
+# - Node parent.nameid == Node.rootnameid
 
 #type Network {
 #  name: String
@@ -178,7 +182,9 @@ type RoleExt @auth(
 }
 
 type Project @auth(
-  query: <<query-project>>
+  query: <<query-project>>,
+  add: <<alter-project>>,
+  update: <<alter-project>>
 ) @hook_ {
   id: ID!
   createdBy: User!

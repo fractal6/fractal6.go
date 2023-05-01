@@ -7,7 +7,7 @@
           nodes(filter: {visibility: {eq: Public}}) { id }
         }
     }""" },
-    # Authorize member and owner
+    # Authorize members
     { rule: """query ($ROOTIDS: [String]) {
         queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }""" }
