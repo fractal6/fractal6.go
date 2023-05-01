@@ -89,11 +89,12 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 }
 
 func TopLabels(w http.ResponseWriter, r *http.Request) {
-	// Get the JSON body and decode into it
     form := struct {
         Nameid string
         IncludeSelf bool
     }{}
+
+	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&form)
 	if err != nil {
 		// Body structure error
@@ -145,18 +146,21 @@ func SubLabels(w http.ResponseWriter, r *http.Request) {
 }
 
 func TopRoles(w http.ResponseWriter, r *http.Request) {
-	var q string
+    form := struct {
+        Nameid string
+        IncludeSelf bool
+    }{}
 
 	// Get the JSON body and decode it
-	err := json.NewDecoder(r.Body).Decode(&q)
+	err := json.NewDecoder(r.Body).Decode(&form)
 	if err != nil {
 		// Body structure error
         http.Error(w, err.Error(), 400)
 		return
 	}
 
-    // Get top labels
-    data, err := db.GetDB().GetTopRoles("nameid", q)
+    // Get top roles
+    data, err := db.GetDB().GetTopRoles("nameid", form.Nameid, form.IncludeSelf)
     if err != nil {
         http.Error(w, err.Error(), 500)
 		return
@@ -182,7 +186,7 @@ func SubRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    // Get sub labels
+    // Get sub roles
     data, err := db.GetDB().GetSubRoles("nameid", q)
     if err != nil {
         http.Error(w, err.Error(), 500)

@@ -474,7 +474,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldidinclude}}, "{{.objid}}")) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldinclude}}, "{{.objid}}")) {
             l as Node.labels
         }
 
@@ -507,7 +507,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldinclude}}, "{{.objid}}")) {
             l as Node.roles
         }
 
@@ -1858,14 +1858,14 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 	// Format Query
 	var fieldinclude string
 	if includeSelf {
-		fieldinclude = fieldid
-	} else {
 		fieldinclude = fieldid + "_IGNORE"
+	} else {
+		fieldinclude = fieldid
 	}
 	maps := map[string]string{
 		"fieldid":        fieldid,
 		"objid":          objid,
-		"fieldidinclude": fieldinclude,
+		"fieldinclude": fieldinclude,
 	}
 	// Send request
 	res, err := dg.QueryDql("getTopLabels", maps)
@@ -1959,11 +1959,18 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, erro
 }
 
 // Get all top roles
-func (dg Dgraph) GetTopRoles(fieldid string, objid string) ([]model.RoleExt, error) {
+func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
 	// Format Query
+	var fieldinclude string
+	if includeSelf {
+		fieldinclude = fieldid + "_IGNORE"
+	} else {
+		fieldinclude = fieldid
+	}
 	maps := map[string]string{
-		"fieldid": fieldid,
-		"objid":   objid,
+		"fieldid":        fieldid,
+		"objid":          objid,
+		"fieldinclude": fieldinclude,
 	}
 	// Send request
 	res, err := dg.QueryDql("getTopRoles", maps)
