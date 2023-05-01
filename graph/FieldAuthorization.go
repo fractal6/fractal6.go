@@ -119,7 +119,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
         return nil, fmt.Errorf("@unique alone not implemented.")
     }
 
-    return data, LogErr("Duplicate error", fmt.Errorf("'%s' is already taken", field))
+    return data, LogErr("Duplicate error", fmt.Errorf("%s '%s' is already taken", field, v))
 }
 
 //oneByOne ensure that the mutation on the given field should contains at least one element.
