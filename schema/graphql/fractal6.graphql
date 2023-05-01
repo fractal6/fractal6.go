@@ -5,6 +5,9 @@
 # * fractal6-db/script: hardcoded spec
 # * fractal6.go/db/api: hardcoded query, mutation and delete (fields)
 
+# <!> Generation Warning <!>
+# interface must be defined before their implementation (or gqlast will crash)
+
 # <!> Security Notes <!>
 # Schema authorization is a mix between the Dgraph authorization rules (RBAC and GBAC),
 # fractal6.go authorization directives `@x_`, for field level protection, handled in graph/FieldAuthorization.
@@ -13,13 +16,6 @@
 # - Artefact nodes.rootnameid == Label.rootnameid
 # - Tension receiver/emitter == receiverid/emmiterid
 # - Node parent.nameid == Node.rootnameid
-
-#type Network {
-#  name: String
-#  nameid: String
-#  nodes: [Node!] @hasInverse(field: network) # root nodes only
-#  category: [String!] @search(by: [term])
-#}
 
 #
 # Node Interface (Role and Circle)
@@ -75,7 +71,6 @@ type Node @auth(
   isArchived: Boolean!        @search # Blob source is archived
 
   # Root node only
-  #network: [Network] @hasInverse(field: nodes)
   isPersonal: Boolean @search # Help explore "official" orga - nameid ends with @{username}
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
@@ -211,19 +206,22 @@ type ProjectColumn {
   description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
   pos: Int! @x_alter
+  col_type : ProjectColumnType! @x_alter
   tensions: [ProjectTension!] @hasInverse(field: pc)
+  drafts: [ProjectDraft!] @hasInverse(field: pc)
   project: Project!
 }
 
 type ProjectField {
-  type_: ProjectFieldType!
-  isVisible: Boolean!
+  field_type: ProjectFieldType!
+  isVisible: Boolean! # In table view
   values: [ProjectFieldValue!] @hasInverse(field: field)
 }
 
 type ProjectFieldValue {
   field: ProjectField!
   value: String!
+  pos: Int
 }
 
 type ProjectTension {
@@ -233,6 +231,11 @@ type ProjectTension {
   pc: ProjectColumn!
   """ Generalisation of boards's column status """
   values: [ProjectFieldValue!]
+}
+
+enum ProjectColumnType {
+  NormalColumn
+  NoStatusColumn
 }
 
 enum ProjectFieldType {
@@ -254,6 +257,14 @@ interface Post @auth(
   createdAt: DateTime! @search
   updatedAt: DateTime                          @x_alter(r:"isOwner", f:"createdBy")
   message: String      @search(by: [fulltext]) @x_alter(r:"isOwner", f:"createdBy")
+}
+
+type ProjectDraft implements Post {
+  title: String!
+  pos: Int! @x_alter
+  pc: ProjectColumn!
+  """ Generalisation of boards's column status """
+  values: [ProjectFieldValue!]
 }
 
 type Tension implements Post @auth(

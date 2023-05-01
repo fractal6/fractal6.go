@@ -230,12 +230,14 @@ type ProjectColumn {
   description: String
   color: String
   pos: Int!
+  col_type: ProjectColumnType!
   tensions: [ProjectTension!] @hasInverse(field: pc)
+  drafts: [ProjectDraft!] @hasInverse(field: pc)
   project: Project!
 }
 
 type ProjectField {
-  type_: ProjectFieldType!
+  field_type: ProjectFieldType!
   isVisible: Boolean!
   values: [ProjectFieldValue!] @hasInverse(field: field)
 }
@@ -243,6 +245,7 @@ type ProjectField {
 type ProjectFieldValue {
   field: ProjectField!
   value: String!
+  pos: Int
 }
 
 type ProjectTension {
@@ -251,6 +254,11 @@ type ProjectTension {
   pos: Int!
   pc: ProjectColumn!
   values: [ProjectFieldValue!]
+}
+
+enum ProjectColumnType {
+  NormalColumn
+  NoStatusColumn
 }
 
 enum ProjectFieldType {
@@ -273,6 +281,13 @@ interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   createdAt: DateTime! @search
   updatedAt: DateTime
   message: String @search(by:[fulltext])
+}
+
+type ProjectDraft implements Post {
+  title: String!
+  pos: Int!
+  pc: ProjectColumn!
+  values: [ProjectFieldValue!]
 }
 
 type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

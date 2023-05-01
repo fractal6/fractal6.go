@@ -177,6 +177,21 @@ func (r *mutationResolver) DeletePost(ctx context.Context, filter model.PostFilt
 	panic(fmt.Errorf("not implemented"))
 }
 
+// AddProjectDraft is the resolver for the addProjectDraft field.
+func (r *mutationResolver) AddProjectDraft(ctx context.Context, input []*model.AddProjectDraftInput) (*model.AddProjectDraftPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProjectDraft - addProjectDraft"))
+}
+
+// UpdateProjectDraft is the resolver for the updateProjectDraft field.
+func (r *mutationResolver) UpdateProjectDraft(ctx context.Context, input model.UpdateProjectDraftInput) (*model.UpdateProjectDraftPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProjectDraft - updateProjectDraft"))
+}
+
+// DeleteProjectDraft is the resolver for the deleteProjectDraft field.
+func (r *mutationResolver) DeleteProjectDraft(ctx context.Context, filter model.ProjectDraftFilter) (*model.DeleteProjectDraftPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProjectDraft - deleteProjectDraft"))
+}
+
 // AddTension is the resolver for the addTension field.
 func (r *mutationResolver) AddTension(ctx context.Context, input []*model.AddTensionInput) (data *model.AddTensionPayload, errors error) {
 	errors = r.DgraphAddBridge(ctx, input, nil, &data)
@@ -556,6 +571,21 @@ func (r *queryResolver) QueryPost(ctx context.Context, filter *model.PostFilter,
 // AggregatePost is the resolver for the aggregatePost field.
 func (r *queryResolver) AggregatePost(ctx context.Context, filter *model.PostFilter) (data *model.PostAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// GetProjectDraft is the resolver for the getProjectDraft field.
+func (r *queryResolver) GetProjectDraft(ctx context.Context, id string) (*model.ProjectDraft, error) {
+	panic(fmt.Errorf("not implemented: GetProjectDraft - getProjectDraft"))
+}
+
+// QueryProjectDraft is the resolver for the queryProjectDraft field.
+func (r *queryResolver) QueryProjectDraft(ctx context.Context, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) ([]*model.ProjectDraft, error) {
+	panic(fmt.Errorf("not implemented: QueryProjectDraft - queryProjectDraft"))
+}
+
+// AggregateProjectDraft is the resolver for the aggregateProjectDraft field.
+func (r *queryResolver) AggregateProjectDraft(ctx context.Context, filter *model.ProjectDraftFilter) (*model.ProjectDraftAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProjectDraft - aggregateProjectDraft"))
 }
 
 // GetTension is the resolver for the getTension field.

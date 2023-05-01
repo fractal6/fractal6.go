@@ -228,7 +228,9 @@ type AddProjectColumnInput struct {
 	Description *string              `json:"description,omitempty"`
 	Color       *string              `json:"color,omitempty"`
 	Pos         int                  `json:"pos"`
+	ColType     ProjectColumnType    `json:"col_type"`
 	Tensions    []*ProjectTensionRef `json:"tensions,omitempty"`
+	Drafts      []*ProjectDraftRef   `json:"drafts,omitempty"`
 	Project     *ProjectRef          `json:"project"`
 }
 
@@ -237,8 +239,24 @@ type AddProjectColumnPayload struct {
 	NumUids       *int             `json:"numUids,omitempty"`
 }
 
+type AddProjectDraftInput struct {
+	CreatedBy *UserRef                `json:"createdBy"`
+	CreatedAt string                  `json:"createdAt"`
+	UpdatedAt *string                 `json:"updatedAt,omitempty"`
+	Message   *string                 `json:"message,omitempty"`
+	Title     string                  `json:"title"`
+	Pos       int                     `json:"pos"`
+	Pc        *ProjectColumnRef       `json:"pc"`
+	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type AddProjectDraftPayload struct {
+	ProjectDraft []*ProjectDraft `json:"projectDraft,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
 type AddProjectFieldInput struct {
-	Type      ProjectFieldType        `json:"type_"`
+	FieldType ProjectFieldType        `json:"field_type"`
 	IsVisible bool                    `json:"isVisible"`
 	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
 }
@@ -251,6 +269,7 @@ type AddProjectFieldPayload struct {
 type AddProjectFieldValueInput struct {
 	Field *ProjectFieldRef `json:"field"`
 	Value string           `json:"value"`
+	Pos   *int             `json:"pos,omitempty"`
 }
 
 type AddProjectFieldValuePayload struct {
@@ -783,6 +802,12 @@ type DeleteProjectColumnPayload struct {
 	ProjectColumn []*ProjectColumn `json:"projectColumn,omitempty"`
 	Msg           *string          `json:"msg,omitempty"`
 	NumUids       *int             `json:"numUids,omitempty"`
+}
+
+type DeleteProjectDraftPayload struct {
+	ProjectDraft []*ProjectDraft `json:"projectDraft,omitempty"`
+	Msg          *string         `json:"msg,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type DeleteProjectFieldPayload struct {
@@ -1725,9 +1750,12 @@ type ProjectColumn struct {
 	Description       *string                        `json:"description,omitempty"`
 	Color             *string                        `json:"color,omitempty"`
 	Pos               int                            `json:"pos"`
+	ColType           ProjectColumnType              `json:"col_type"`
 	Tensions          []*ProjectTension              `json:"tensions,omitempty"`
+	Drafts            []*ProjectDraft                `json:"drafts,omitempty"`
 	Project           *Project                       `json:"project"`
 	TensionsAggregate *ProjectTensionAggregateResult `json:"tensionsAggregate,omitempty"`
+	DraftsAggregate   *ProjectDraftAggregateResult   `json:"draftsAggregate,omitempty"`
 }
 
 type ProjectColumnAggregateResult struct {
@@ -1763,7 +1791,9 @@ type ProjectColumnPatch struct {
 	Description *string              `json:"description,omitempty"`
 	Color       *string              `json:"color,omitempty"`
 	Pos         *int                 `json:"pos,omitempty"`
+	ColType     *ProjectColumnType   `json:"col_type,omitempty"`
 	Tensions    []*ProjectTensionRef `json:"tensions,omitempty"`
+	Drafts      []*ProjectDraftRef   `json:"drafts,omitempty"`
 	Project     *ProjectRef          `json:"project,omitempty"`
 }
 
@@ -1773,12 +1803,82 @@ type ProjectColumnRef struct {
 	Description *string              `json:"description,omitempty"`
 	Color       *string              `json:"color,omitempty"`
 	Pos         *int                 `json:"pos,omitempty"`
+	ColType     *ProjectColumnType   `json:"col_type,omitempty"`
 	Tensions    []*ProjectTensionRef `json:"tensions,omitempty"`
+	Drafts      []*ProjectDraftRef   `json:"drafts,omitempty"`
 	Project     *ProjectRef          `json:"project,omitempty"`
 }
 
+type ProjectDraft struct {
+	Title           string                            `json:"title"`
+	Pos             int                               `json:"pos"`
+	Pc              *ProjectColumn                    `json:"pc"`
+	Values          []*ProjectFieldValue              `json:"values,omitempty"`
+	ID              string                            `json:"id"`
+	CreatedBy       *User                             `json:"createdBy"`
+	CreatedAt       string                            `json:"createdAt"`
+	UpdatedAt       *string                           `json:"updatedAt,omitempty"`
+	Message         *string                           `json:"message,omitempty"`
+	ValuesAggregate *ProjectFieldValueAggregateResult `json:"valuesAggregate,omitempty"`
+}
+
+type ProjectDraftAggregateResult struct {
+	Count        *int     `json:"count,omitempty"`
+	CreatedAtMin *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string  `json:"updatedAtMax,omitempty"`
+	MessageMin   *string  `json:"messageMin,omitempty"`
+	MessageMax   *string  `json:"messageMax,omitempty"`
+	TitleMin     *string  `json:"titleMin,omitempty"`
+	TitleMax     *string  `json:"titleMax,omitempty"`
+	PosMin       *int     `json:"posMin,omitempty"`
+	PosMax       *int     `json:"posMax,omitempty"`
+	PosSum       *int     `json:"posSum,omitempty"`
+	PosAvg       *float64 `json:"posAvg,omitempty"`
+}
+
+type ProjectDraftFilter struct {
+	ID        []string                 `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter          `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter    `json:"message,omitempty"`
+	Has       []*ProjectDraftHasFilter `json:"has,omitempty"`
+	And       []*ProjectDraftFilter    `json:"and,omitempty"`
+	Or        []*ProjectDraftFilter    `json:"or,omitempty"`
+	Not       *ProjectDraftFilter      `json:"not,omitempty"`
+}
+
+type ProjectDraftOrder struct {
+	Asc  *ProjectDraftOrderable `json:"asc,omitempty"`
+	Desc *ProjectDraftOrderable `json:"desc,omitempty"`
+	Then *ProjectDraftOrder     `json:"then,omitempty"`
+}
+
+type ProjectDraftPatch struct {
+	CreatedBy *UserRef                `json:"createdBy,omitempty"`
+	CreatedAt *string                 `json:"createdAt,omitempty"`
+	UpdatedAt *string                 `json:"updatedAt,omitempty"`
+	Message   *string                 `json:"message,omitempty"`
+	Title     *string                 `json:"title,omitempty"`
+	Pos       *int                    `json:"pos,omitempty"`
+	Pc        *ProjectColumnRef       `json:"pc,omitempty"`
+	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type ProjectDraftRef struct {
+	ID        *string                 `json:"id,omitempty"`
+	CreatedBy *UserRef                `json:"createdBy,omitempty"`
+	CreatedAt *string                 `json:"createdAt,omitempty"`
+	UpdatedAt *string                 `json:"updatedAt,omitempty"`
+	Message   *string                 `json:"message,omitempty"`
+	Title     *string                 `json:"title,omitempty"`
+	Pos       *int                    `json:"pos,omitempty"`
+	Pc        *ProjectColumnRef       `json:"pc,omitempty"`
+	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
 type ProjectField struct {
-	Type            ProjectFieldType                  `json:"type_"`
+	FieldType       ProjectFieldType                  `json:"field_type"`
 	IsVisible       bool                              `json:"isVisible"`
 	Values          []*ProjectFieldValue              `json:"values,omitempty"`
 	ValuesAggregate *ProjectFieldValueAggregateResult `json:"valuesAggregate,omitempty"`
@@ -1796,13 +1896,13 @@ type ProjectFieldFilter struct {
 }
 
 type ProjectFieldPatch struct {
-	Type      *ProjectFieldType       `json:"type_,omitempty"`
+	FieldType *ProjectFieldType       `json:"field_type,omitempty"`
 	IsVisible *bool                   `json:"isVisible,omitempty"`
 	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
 }
 
 type ProjectFieldRef struct {
-	Type      *ProjectFieldType       `json:"type_,omitempty"`
+	FieldType *ProjectFieldType       `json:"field_type,omitempty"`
 	IsVisible *bool                   `json:"isVisible,omitempty"`
 	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
 }
@@ -1810,12 +1910,17 @@ type ProjectFieldRef struct {
 type ProjectFieldValue struct {
 	Field *ProjectField `json:"field"`
 	Value string        `json:"value"`
+	Pos   *int          `json:"pos,omitempty"`
 }
 
 type ProjectFieldValueAggregateResult struct {
-	Count    *int    `json:"count,omitempty"`
-	ValueMin *string `json:"valueMin,omitempty"`
-	ValueMax *string `json:"valueMax,omitempty"`
+	Count    *int     `json:"count,omitempty"`
+	ValueMin *string  `json:"valueMin,omitempty"`
+	ValueMax *string  `json:"valueMax,omitempty"`
+	PosMin   *int     `json:"posMin,omitempty"`
+	PosMax   *int     `json:"posMax,omitempty"`
+	PosSum   *int     `json:"posSum,omitempty"`
+	PosAvg   *float64 `json:"posAvg,omitempty"`
 }
 
 type ProjectFieldValueFilter struct {
@@ -1834,11 +1939,13 @@ type ProjectFieldValueOrder struct {
 type ProjectFieldValuePatch struct {
 	Field *ProjectFieldRef `json:"field,omitempty"`
 	Value *string          `json:"value,omitempty"`
+	Pos   *int             `json:"pos,omitempty"`
 }
 
 type ProjectFieldValueRef struct {
 	Field *ProjectFieldRef `json:"field,omitempty"`
 	Value *string          `json:"value,omitempty"`
+	Pos   *int             `json:"pos,omitempty"`
 }
 
 type ProjectFilter struct {
@@ -2403,6 +2510,17 @@ type UpdateProjectColumnInput struct {
 type UpdateProjectColumnPayload struct {
 	ProjectColumn []*ProjectColumn `json:"projectColumn,omitempty"`
 	NumUids       *int             `json:"numUids,omitempty"`
+}
+
+type UpdateProjectDraftInput struct {
+	Filter *ProjectDraftFilter `json:"filter"`
+	Set    *ProjectDraftPatch  `json:"set,omitempty"`
+	Remove *ProjectDraftPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectDraftPayload struct {
+	ProjectDraft []*ProjectDraft `json:"projectDraft,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
 }
 
 type UpdateProjectFieldInput struct {
@@ -4691,7 +4809,9 @@ const (
 	ProjectColumnHasFilterDescription ProjectColumnHasFilter = "description"
 	ProjectColumnHasFilterColor       ProjectColumnHasFilter = "color"
 	ProjectColumnHasFilterPos         ProjectColumnHasFilter = "pos"
+	ProjectColumnHasFilterColType     ProjectColumnHasFilter = "col_type"
 	ProjectColumnHasFilterTensions    ProjectColumnHasFilter = "tensions"
+	ProjectColumnHasFilterDrafts      ProjectColumnHasFilter = "drafts"
 	ProjectColumnHasFilterProject     ProjectColumnHasFilter = "project"
 )
 
@@ -4700,13 +4820,15 @@ var AllProjectColumnHasFilter = []ProjectColumnHasFilter{
 	ProjectColumnHasFilterDescription,
 	ProjectColumnHasFilterColor,
 	ProjectColumnHasFilterPos,
+	ProjectColumnHasFilterColType,
 	ProjectColumnHasFilterTensions,
+	ProjectColumnHasFilterDrafts,
 	ProjectColumnHasFilterProject,
 }
 
 func (e ProjectColumnHasFilter) IsValid() bool {
 	switch e {
-	case ProjectColumnHasFilterName, ProjectColumnHasFilterDescription, ProjectColumnHasFilterColor, ProjectColumnHasFilterPos, ProjectColumnHasFilterTensions, ProjectColumnHasFilterProject:
+	case ProjectColumnHasFilterName, ProjectColumnHasFilterDescription, ProjectColumnHasFilterColor, ProjectColumnHasFilterPos, ProjectColumnHasFilterColType, ProjectColumnHasFilterTensions, ProjectColumnHasFilterDrafts, ProjectColumnHasFilterProject:
 		return true
 	}
 	return false
@@ -4778,23 +4900,164 @@ func (e ProjectColumnOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ProjectColumnType string
+
+const (
+	ProjectColumnTypeNormalColumn   ProjectColumnType = "NormalColumn"
+	ProjectColumnTypeNoStatusColumn ProjectColumnType = "NoStatusColumn"
+)
+
+var AllProjectColumnType = []ProjectColumnType{
+	ProjectColumnTypeNormalColumn,
+	ProjectColumnTypeNoStatusColumn,
+}
+
+func (e ProjectColumnType) IsValid() bool {
+	switch e {
+	case ProjectColumnTypeNormalColumn, ProjectColumnTypeNoStatusColumn:
+		return true
+	}
+	return false
+}
+
+func (e ProjectColumnType) String() string {
+	return string(e)
+}
+
+func (e *ProjectColumnType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectColumnType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectColumnType", str)
+	}
+	return nil
+}
+
+func (e ProjectColumnType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectDraftHasFilter string
+
+const (
+	ProjectDraftHasFilterCreatedBy ProjectDraftHasFilter = "createdBy"
+	ProjectDraftHasFilterCreatedAt ProjectDraftHasFilter = "createdAt"
+	ProjectDraftHasFilterUpdatedAt ProjectDraftHasFilter = "updatedAt"
+	ProjectDraftHasFilterMessage   ProjectDraftHasFilter = "message"
+	ProjectDraftHasFilterTitle     ProjectDraftHasFilter = "title"
+	ProjectDraftHasFilterPos       ProjectDraftHasFilter = "pos"
+	ProjectDraftHasFilterPc        ProjectDraftHasFilter = "pc"
+	ProjectDraftHasFilterValues    ProjectDraftHasFilter = "values"
+)
+
+var AllProjectDraftHasFilter = []ProjectDraftHasFilter{
+	ProjectDraftHasFilterCreatedBy,
+	ProjectDraftHasFilterCreatedAt,
+	ProjectDraftHasFilterUpdatedAt,
+	ProjectDraftHasFilterMessage,
+	ProjectDraftHasFilterTitle,
+	ProjectDraftHasFilterPos,
+	ProjectDraftHasFilterPc,
+	ProjectDraftHasFilterValues,
+}
+
+func (e ProjectDraftHasFilter) IsValid() bool {
+	switch e {
+	case ProjectDraftHasFilterCreatedBy, ProjectDraftHasFilterCreatedAt, ProjectDraftHasFilterUpdatedAt, ProjectDraftHasFilterMessage, ProjectDraftHasFilterTitle, ProjectDraftHasFilterPos, ProjectDraftHasFilterPc, ProjectDraftHasFilterValues:
+		return true
+	}
+	return false
+}
+
+func (e ProjectDraftHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectDraftHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectDraftHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectDraftHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectDraftHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectDraftOrderable string
+
+const (
+	ProjectDraftOrderableCreatedAt ProjectDraftOrderable = "createdAt"
+	ProjectDraftOrderableUpdatedAt ProjectDraftOrderable = "updatedAt"
+	ProjectDraftOrderableMessage   ProjectDraftOrderable = "message"
+	ProjectDraftOrderableTitle     ProjectDraftOrderable = "title"
+	ProjectDraftOrderablePos       ProjectDraftOrderable = "pos"
+)
+
+var AllProjectDraftOrderable = []ProjectDraftOrderable{
+	ProjectDraftOrderableCreatedAt,
+	ProjectDraftOrderableUpdatedAt,
+	ProjectDraftOrderableMessage,
+	ProjectDraftOrderableTitle,
+	ProjectDraftOrderablePos,
+}
+
+func (e ProjectDraftOrderable) IsValid() bool {
+	switch e {
+	case ProjectDraftOrderableCreatedAt, ProjectDraftOrderableUpdatedAt, ProjectDraftOrderableMessage, ProjectDraftOrderableTitle, ProjectDraftOrderablePos:
+		return true
+	}
+	return false
+}
+
+func (e ProjectDraftOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectDraftOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectDraftOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectDraftOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectDraftOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type ProjectFieldHasFilter string
 
 const (
-	ProjectFieldHasFilterType      ProjectFieldHasFilter = "type_"
+	ProjectFieldHasFilterFieldType ProjectFieldHasFilter = "field_type"
 	ProjectFieldHasFilterIsVisible ProjectFieldHasFilter = "isVisible"
 	ProjectFieldHasFilterValues    ProjectFieldHasFilter = "values"
 )
 
 var AllProjectFieldHasFilter = []ProjectFieldHasFilter{
-	ProjectFieldHasFilterType,
+	ProjectFieldHasFilterFieldType,
 	ProjectFieldHasFilterIsVisible,
 	ProjectFieldHasFilterValues,
 }
 
 func (e ProjectFieldHasFilter) IsValid() bool {
 	switch e {
-	case ProjectFieldHasFilterType, ProjectFieldHasFilterIsVisible, ProjectFieldHasFilterValues:
+	case ProjectFieldHasFilterFieldType, ProjectFieldHasFilterIsVisible, ProjectFieldHasFilterValues:
 		return true
 	}
 	return false
@@ -4871,16 +5134,18 @@ type ProjectFieldValueHasFilter string
 const (
 	ProjectFieldValueHasFilterField ProjectFieldValueHasFilter = "field"
 	ProjectFieldValueHasFilterValue ProjectFieldValueHasFilter = "value"
+	ProjectFieldValueHasFilterPos   ProjectFieldValueHasFilter = "pos"
 )
 
 var AllProjectFieldValueHasFilter = []ProjectFieldValueHasFilter{
 	ProjectFieldValueHasFilterField,
 	ProjectFieldValueHasFilterValue,
+	ProjectFieldValueHasFilterPos,
 }
 
 func (e ProjectFieldValueHasFilter) IsValid() bool {
 	switch e {
-	case ProjectFieldValueHasFilterField, ProjectFieldValueHasFilterValue:
+	case ProjectFieldValueHasFilterField, ProjectFieldValueHasFilterValue, ProjectFieldValueHasFilterPos:
 		return true
 	}
 	return false
@@ -4911,15 +5176,17 @@ type ProjectFieldValueOrderable string
 
 const (
 	ProjectFieldValueOrderableValue ProjectFieldValueOrderable = "value"
+	ProjectFieldValueOrderablePos   ProjectFieldValueOrderable = "pos"
 )
 
 var AllProjectFieldValueOrderable = []ProjectFieldValueOrderable{
 	ProjectFieldValueOrderableValue,
+	ProjectFieldValueOrderablePos,
 }
 
 func (e ProjectFieldValueOrderable) IsValid() bool {
 	switch e {
-	case ProjectFieldValueOrderableValue:
+	case ProjectFieldValueOrderableValue, ProjectFieldValueOrderablePos:
 		return true
 	}
 	return false

@@ -207,6 +207,11 @@ type ComplexityRoot struct {
 		ProjectColumn func(childComplexity int, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) int
 	}
 
+	AddProjectDraftPayload struct {
+		NumUids      func(childComplexity int) int
+		ProjectDraft func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
+	}
+
 	AddProjectFieldPayload struct {
 		NumUids      func(childComplexity int) int
 		ProjectField func(childComplexity int, filter *model.ProjectFieldFilter, first *int, offset *int) int
@@ -433,6 +438,12 @@ type ComplexityRoot struct {
 		ProjectColumn func(childComplexity int, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) int
 	}
 
+	DeleteProjectDraftPayload struct {
+		Msg          func(childComplexity int) int
+		NumUids      func(childComplexity int) int
+		ProjectDraft func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
+	}
+
 	DeleteProjectFieldPayload struct {
 		Msg          func(childComplexity int) int
 		NumUids      func(childComplexity int) int
@@ -625,6 +636,7 @@ type ComplexityRoot struct {
 		AddPendingUser          func(childComplexity int, input []*model.AddPendingUserInput, upsert *bool) int
 		AddProject              func(childComplexity int, input []*model.AddProjectInput) int
 		AddProjectColumn        func(childComplexity int, input []*model.AddProjectColumnInput, upsert *bool) int
+		AddProjectDraft         func(childComplexity int, input []*model.AddProjectDraftInput) int
 		AddProjectField         func(childComplexity int, input []*model.AddProjectFieldInput) int
 		AddProjectFieldValue    func(childComplexity int, input []*model.AddProjectFieldValueInput) int
 		AddProjectTension       func(childComplexity int, input []*model.AddProjectTensionInput) int
@@ -650,6 +662,7 @@ type ComplexityRoot struct {
 		DeletePost              func(childComplexity int, filter model.PostFilter) int
 		DeleteProject           func(childComplexity int, filter model.ProjectFilter) int
 		DeleteProjectColumn     func(childComplexity int, filter model.ProjectColumnFilter) int
+		DeleteProjectDraft      func(childComplexity int, filter model.ProjectDraftFilter) int
 		DeleteProjectField      func(childComplexity int, filter model.ProjectFieldFilter) int
 		DeleteProjectFieldValue func(childComplexity int, filter model.ProjectFieldValueFilter) int
 		DeleteProjectTension    func(childComplexity int, filter model.ProjectTensionFilter) int
@@ -675,6 +688,7 @@ type ComplexityRoot struct {
 		UpdatePost              func(childComplexity int, input model.UpdatePostInput) int
 		UpdateProject           func(childComplexity int, input model.UpdateProjectInput) int
 		UpdateProjectColumn     func(childComplexity int, input model.UpdateProjectColumnInput) int
+		UpdateProjectDraft      func(childComplexity int, input model.UpdateProjectDraftInput) int
 		UpdateProjectField      func(childComplexity int, input model.UpdateProjectFieldInput) int
 		UpdateProjectFieldValue func(childComplexity int, input model.UpdateProjectFieldValueInput) int
 		UpdateProjectTension    func(childComplexity int, input model.UpdateProjectTensionInput) int
@@ -911,8 +925,11 @@ type ComplexityRoot struct {
 	}
 
 	ProjectColumn struct {
+		ColType           func(childComplexity int) int
 		Color             func(childComplexity int) int
 		Description       func(childComplexity int) int
+		Drafts            func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
+		DraftsAggregate   func(childComplexity int, filter *model.ProjectDraftFilter) int
 		ID                func(childComplexity int) int
 		Name              func(childComplexity int) int
 		Pos               func(childComplexity int) int
@@ -935,9 +952,38 @@ type ComplexityRoot struct {
 		PosSum         func(childComplexity int) int
 	}
 
+	ProjectDraft struct {
+		CreatedAt       func(childComplexity int) int
+		CreatedBy       func(childComplexity int, filter *model.UserFilter) int
+		ID              func(childComplexity int) int
+		Message         func(childComplexity int) int
+		Pc              func(childComplexity int, filter *model.ProjectColumnFilter) int
+		Pos             func(childComplexity int) int
+		Title           func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
+		Values          func(childComplexity int, filter *model.ProjectFieldValueFilter, order *model.ProjectFieldValueOrder, first *int, offset *int) int
+		ValuesAggregate func(childComplexity int, filter *model.ProjectFieldValueFilter) int
+	}
+
+	ProjectDraftAggregateResult struct {
+		Count        func(childComplexity int) int
+		CreatedAtMax func(childComplexity int) int
+		CreatedAtMin func(childComplexity int) int
+		MessageMax   func(childComplexity int) int
+		MessageMin   func(childComplexity int) int
+		PosAvg       func(childComplexity int) int
+		PosMax       func(childComplexity int) int
+		PosMin       func(childComplexity int) int
+		PosSum       func(childComplexity int) int
+		TitleMax     func(childComplexity int) int
+		TitleMin     func(childComplexity int) int
+		UpdatedAtMax func(childComplexity int) int
+		UpdatedAtMin func(childComplexity int) int
+	}
+
 	ProjectField struct {
+		FieldType       func(childComplexity int) int
 		IsVisible       func(childComplexity int) int
-		Type            func(childComplexity int) int
 		Values          func(childComplexity int, filter *model.ProjectFieldValueFilter, order *model.ProjectFieldValueOrder, first *int, offset *int) int
 		ValuesAggregate func(childComplexity int, filter *model.ProjectFieldValueFilter) int
 	}
@@ -948,11 +994,16 @@ type ComplexityRoot struct {
 
 	ProjectFieldValue struct {
 		Field func(childComplexity int, filter *model.ProjectFieldFilter) int
+		Pos   func(childComplexity int) int
 		Value func(childComplexity int) int
 	}
 
 	ProjectFieldValueAggregateResult struct {
 		Count    func(childComplexity int) int
+		PosAvg   func(childComplexity int) int
+		PosMax   func(childComplexity int) int
+		PosMin   func(childComplexity int) int
+		PosSum   func(childComplexity int) int
 		ValueMax func(childComplexity int) int
 		ValueMin func(childComplexity int) int
 	}
@@ -990,6 +1041,7 @@ type ComplexityRoot struct {
 		AggregatePost              func(childComplexity int, filter *model.PostFilter) int
 		AggregateProject           func(childComplexity int, filter *model.ProjectFilter) int
 		AggregateProjectColumn     func(childComplexity int, filter *model.ProjectColumnFilter) int
+		AggregateProjectDraft      func(childComplexity int, filter *model.ProjectDraftFilter) int
 		AggregateProjectField      func(childComplexity int, filter *model.ProjectFieldFilter) int
 		AggregateProjectFieldValue func(childComplexity int, filter *model.ProjectFieldValueFilter) int
 		AggregateProjectTension    func(childComplexity int, filter *model.ProjectTensionFilter) int
@@ -1013,6 +1065,7 @@ type ComplexityRoot struct {
 		GetPost                    func(childComplexity int, id string) int
 		GetProject                 func(childComplexity int, id string) int
 		GetProjectColumn           func(childComplexity int, id *string, name *string) int
+		GetProjectDraft            func(childComplexity int, id string) int
 		GetProjectTension          func(childComplexity int, id string) int
 		GetReaction                func(childComplexity int, id *string, reactionid *string) int
 		GetRoleExt                 func(childComplexity int, id string) int
@@ -1035,6 +1088,7 @@ type ComplexityRoot struct {
 		QueryPost                  func(childComplexity int, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) int
 		QueryProject               func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
 		QueryProjectColumn         func(childComplexity int, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) int
+		QueryProjectDraft          func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
 		QueryProjectField          func(childComplexity int, filter *model.ProjectFieldFilter, first *int, offset *int) int
 		QueryProjectFieldValue     func(childComplexity int, filter *model.ProjectFieldValueFilter, order *model.ProjectFieldValueOrder, first *int, offset *int) int
 		QueryProjectTension        func(childComplexity int, filter *model.ProjectTensionFilter, order *model.ProjectTensionOrder, first *int, offset *int) int
@@ -1214,6 +1268,11 @@ type ComplexityRoot struct {
 	UpdateProjectColumnPayload struct {
 		NumUids       func(childComplexity int) int
 		ProjectColumn func(childComplexity int, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) int
+	}
+
+	UpdateProjectDraftPayload struct {
+		NumUids      func(childComplexity int) int
+		ProjectDraft func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
 	}
 
 	UpdateProjectFieldPayload struct {
@@ -1652,6 +1711,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddProjectColumnPayload.ProjectColumn(childComplexity, args["filter"].(*model.ProjectColumnFilter), args["order"].(*model.ProjectColumnOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddProjectDraftPayload.numUids":
+		if e.complexity.AddProjectDraftPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddProjectDraftPayload.NumUids(childComplexity), true
+
+	case "AddProjectDraftPayload.projectDraft":
+		if e.complexity.AddProjectDraftPayload.ProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_AddProjectDraftPayload_projectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddProjectDraftPayload.ProjectDraft(childComplexity, args["filter"].(*model.ProjectDraftFilter), args["order"].(*model.ProjectDraftOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddProjectFieldPayload.numUids":
 		if e.complexity.AddProjectFieldPayload.NumUids == nil {
@@ -2794,6 +2872,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteProjectColumnPayload.ProjectColumn(childComplexity, args["filter"].(*model.ProjectColumnFilter), args["order"].(*model.ProjectColumnOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "DeleteProjectDraftPayload.msg":
+		if e.complexity.DeleteProjectDraftPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteProjectDraftPayload.Msg(childComplexity), true
+
+	case "DeleteProjectDraftPayload.numUids":
+		if e.complexity.DeleteProjectDraftPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteProjectDraftPayload.NumUids(childComplexity), true
+
+	case "DeleteProjectDraftPayload.projectDraft":
+		if e.complexity.DeleteProjectDraftPayload.ProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteProjectDraftPayload_projectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteProjectDraftPayload.ProjectDraft(childComplexity, args["filter"].(*model.ProjectDraftFilter), args["order"].(*model.ProjectDraftOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteProjectFieldPayload.msg":
 		if e.complexity.DeleteProjectFieldPayload.Msg == nil {
 			break
@@ -3829,6 +3933,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddProjectColumn(childComplexity, args["input"].([]*model.AddProjectColumnInput), args["upsert"].(*bool)), true
 
+	case "Mutation.addProjectDraft":
+		if e.complexity.Mutation.AddProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addProjectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddProjectDraft(childComplexity, args["input"].([]*model.AddProjectDraftInput)), true
+
 	case "Mutation.addProjectField":
 		if e.complexity.Mutation.AddProjectField == nil {
 			break
@@ -4129,6 +4245,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteProjectColumn(childComplexity, args["filter"].(model.ProjectColumnFilter)), true
 
+	case "Mutation.deleteProjectDraft":
+		if e.complexity.Mutation.DeleteProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteProjectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteProjectDraft(childComplexity, args["filter"].(model.ProjectDraftFilter)), true
+
 	case "Mutation.deleteProjectField":
 		if e.complexity.Mutation.DeleteProjectField == nil {
 			break
@@ -4428,6 +4556,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateProjectColumn(childComplexity, args["input"].(model.UpdateProjectColumnInput)), true
+
+	case "Mutation.updateProjectDraft":
+		if e.complexity.Mutation.UpdateProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProjectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProjectDraft(childComplexity, args["input"].(model.UpdateProjectDraftInput)), true
 
 	case "Mutation.updateProjectField":
 		if e.complexity.Mutation.UpdateProjectField == nil {
@@ -6000,6 +6140,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectAggregateResult.UpdatedAtMin(childComplexity), true
 
+	case "ProjectColumn.col_type":
+		if e.complexity.ProjectColumn.ColType == nil {
+			break
+		}
+
+		return e.complexity.ProjectColumn.ColType(childComplexity), true
+
 	case "ProjectColumn.color":
 		if e.complexity.ProjectColumn.Color == nil {
 			break
@@ -6013,6 +6160,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectColumn.Description(childComplexity), true
+
+	case "ProjectColumn.drafts":
+		if e.complexity.ProjectColumn.Drafts == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectColumn_drafts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectColumn.Drafts(childComplexity, args["filter"].(*model.ProjectDraftFilter), args["order"].(*model.ProjectDraftOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "ProjectColumn.draftsAggregate":
+		if e.complexity.ProjectColumn.DraftsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectColumn_draftsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectColumn.DraftsAggregate(childComplexity, args["filter"].(*model.ProjectDraftFilter)), true
 
 	case "ProjectColumn.id":
 		if e.complexity.ProjectColumn.ID == nil {
@@ -6148,19 +6319,200 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectColumnAggregateResult.PosSum(childComplexity), true
 
+	case "ProjectDraft.createdAt":
+		if e.complexity.ProjectDraft.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraft.CreatedAt(childComplexity), true
+
+	case "ProjectDraft.createdBy":
+		if e.complexity.ProjectDraft.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "ProjectDraft.id":
+		if e.complexity.ProjectDraft.ID == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraft.ID(childComplexity), true
+
+	case "ProjectDraft.message":
+		if e.complexity.ProjectDraft.Message == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraft.Message(childComplexity), true
+
+	case "ProjectDraft.pc":
+		if e.complexity.ProjectDraft.Pc == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_pc_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.Pc(childComplexity, args["filter"].(*model.ProjectColumnFilter)), true
+
+	case "ProjectDraft.pos":
+		if e.complexity.ProjectDraft.Pos == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraft.Pos(childComplexity), true
+
+	case "ProjectDraft.title":
+		if e.complexity.ProjectDraft.Title == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraft.Title(childComplexity), true
+
+	case "ProjectDraft.updatedAt":
+		if e.complexity.ProjectDraft.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraft.UpdatedAt(childComplexity), true
+
+	case "ProjectDraft.values":
+		if e.complexity.ProjectDraft.Values == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_values_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.Values(childComplexity, args["filter"].(*model.ProjectFieldValueFilter), args["order"].(*model.ProjectFieldValueOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "ProjectDraft.valuesAggregate":
+		if e.complexity.ProjectDraft.ValuesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_valuesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.ValuesAggregate(childComplexity, args["filter"].(*model.ProjectFieldValueFilter)), true
+
+	case "ProjectDraftAggregateResult.count":
+		if e.complexity.ProjectDraftAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.Count(childComplexity), true
+
+	case "ProjectDraftAggregateResult.createdAtMax":
+		if e.complexity.ProjectDraftAggregateResult.CreatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.CreatedAtMax(childComplexity), true
+
+	case "ProjectDraftAggregateResult.createdAtMin":
+		if e.complexity.ProjectDraftAggregateResult.CreatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "ProjectDraftAggregateResult.messageMax":
+		if e.complexity.ProjectDraftAggregateResult.MessageMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.MessageMax(childComplexity), true
+
+	case "ProjectDraftAggregateResult.messageMin":
+		if e.complexity.ProjectDraftAggregateResult.MessageMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.MessageMin(childComplexity), true
+
+	case "ProjectDraftAggregateResult.posAvg":
+		if e.complexity.ProjectDraftAggregateResult.PosAvg == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.PosAvg(childComplexity), true
+
+	case "ProjectDraftAggregateResult.posMax":
+		if e.complexity.ProjectDraftAggregateResult.PosMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.PosMax(childComplexity), true
+
+	case "ProjectDraftAggregateResult.posMin":
+		if e.complexity.ProjectDraftAggregateResult.PosMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.PosMin(childComplexity), true
+
+	case "ProjectDraftAggregateResult.posSum":
+		if e.complexity.ProjectDraftAggregateResult.PosSum == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.PosSum(childComplexity), true
+
+	case "ProjectDraftAggregateResult.titleMax":
+		if e.complexity.ProjectDraftAggregateResult.TitleMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.TitleMax(childComplexity), true
+
+	case "ProjectDraftAggregateResult.titleMin":
+		if e.complexity.ProjectDraftAggregateResult.TitleMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.TitleMin(childComplexity), true
+
+	case "ProjectDraftAggregateResult.updatedAtMax":
+		if e.complexity.ProjectDraftAggregateResult.UpdatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.UpdatedAtMax(childComplexity), true
+
+	case "ProjectDraftAggregateResult.updatedAtMin":
+		if e.complexity.ProjectDraftAggregateResult.UpdatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectDraftAggregateResult.UpdatedAtMin(childComplexity), true
+
+	case "ProjectField.field_type":
+		if e.complexity.ProjectField.FieldType == nil {
+			break
+		}
+
+		return e.complexity.ProjectField.FieldType(childComplexity), true
+
 	case "ProjectField.isVisible":
 		if e.complexity.ProjectField.IsVisible == nil {
 			break
 		}
 
 		return e.complexity.ProjectField.IsVisible(childComplexity), true
-
-	case "ProjectField.type_":
-		if e.complexity.ProjectField.Type == nil {
-			break
-		}
-
-		return e.complexity.ProjectField.Type(childComplexity), true
 
 	case "ProjectField.values":
 		if e.complexity.ProjectField.Values == nil {
@@ -6205,6 +6557,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectFieldValue.Field(childComplexity, args["filter"].(*model.ProjectFieldFilter)), true
 
+	case "ProjectFieldValue.pos":
+		if e.complexity.ProjectFieldValue.Pos == nil {
+			break
+		}
+
+		return e.complexity.ProjectFieldValue.Pos(childComplexity), true
+
 	case "ProjectFieldValue.value":
 		if e.complexity.ProjectFieldValue.Value == nil {
 			break
@@ -6218,6 +6577,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectFieldValueAggregateResult.Count(childComplexity), true
+
+	case "ProjectFieldValueAggregateResult.posAvg":
+		if e.complexity.ProjectFieldValueAggregateResult.PosAvg == nil {
+			break
+		}
+
+		return e.complexity.ProjectFieldValueAggregateResult.PosAvg(childComplexity), true
+
+	case "ProjectFieldValueAggregateResult.posMax":
+		if e.complexity.ProjectFieldValueAggregateResult.PosMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectFieldValueAggregateResult.PosMax(childComplexity), true
+
+	case "ProjectFieldValueAggregateResult.posMin":
+		if e.complexity.ProjectFieldValueAggregateResult.PosMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectFieldValueAggregateResult.PosMin(childComplexity), true
+
+	case "ProjectFieldValueAggregateResult.posSum":
+		if e.complexity.ProjectFieldValueAggregateResult.PosSum == nil {
+			break
+		}
+
+		return e.complexity.ProjectFieldValueAggregateResult.PosSum(childComplexity), true
 
 	case "ProjectFieldValueAggregateResult.valueMax":
 		if e.complexity.ProjectFieldValueAggregateResult.ValueMax == nil {
@@ -6510,6 +6897,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateProjectColumn(childComplexity, args["filter"].(*model.ProjectColumnFilter)), true
 
+	case "Query.aggregateProjectDraft":
+		if e.complexity.Query.AggregateProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateProjectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateProjectDraft(childComplexity, args["filter"].(*model.ProjectDraftFilter)), true
+
 	case "Query.aggregateProjectField":
 		if e.complexity.Query.AggregateProjectField == nil {
 			break
@@ -6786,6 +7185,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetProjectColumn(childComplexity, args["id"].(*string), args["name"].(*string)), true
 
+	case "Query.getProjectDraft":
+		if e.complexity.Query.GetProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getProjectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetProjectDraft(childComplexity, args["id"].(string)), true
+
 	case "Query.getProjectTension":
 		if e.complexity.Query.GetProjectTension == nil {
 			break
@@ -7049,6 +7460,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryProjectColumn(childComplexity, args["filter"].(*model.ProjectColumnFilter), args["order"].(*model.ProjectColumnOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryProjectDraft":
+		if e.complexity.Query.QueryProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryProjectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryProjectDraft(childComplexity, args["filter"].(*model.ProjectDraftFilter), args["order"].(*model.ProjectDraftOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryProjectField":
 		if e.complexity.Query.QueryProjectField == nil {
@@ -8143,6 +8566,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateProjectColumnPayload.ProjectColumn(childComplexity, args["filter"].(*model.ProjectColumnFilter), args["order"].(*model.ProjectColumnOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "UpdateProjectDraftPayload.numUids":
+		if e.complexity.UpdateProjectDraftPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateProjectDraftPayload.NumUids(childComplexity), true
+
+	case "UpdateProjectDraftPayload.projectDraft":
+		if e.complexity.UpdateProjectDraftPayload.ProjectDraft == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateProjectDraftPayload_projectDraft_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateProjectDraftPayload.ProjectDraft(childComplexity, args["filter"].(*model.ProjectDraftFilter), args["order"].(*model.ProjectDraftOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "UpdateProjectFieldPayload.numUids":
 		if e.complexity.UpdateProjectFieldPayload.NumUids == nil {
 			break
@@ -9153,6 +9595,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddNotifInput,
 		ec.unmarshalInputAddPendingUserInput,
 		ec.unmarshalInputAddProjectColumnInput,
+		ec.unmarshalInputAddProjectDraftInput,
 		ec.unmarshalInputAddProjectFieldInput,
 		ec.unmarshalInputAddProjectFieldValueInput,
 		ec.unmarshalInputAddProjectInput,
@@ -9249,6 +9692,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputProjectColumnOrder,
 		ec.unmarshalInputProjectColumnPatch,
 		ec.unmarshalInputProjectColumnRef,
+		ec.unmarshalInputProjectDraftFilter,
+		ec.unmarshalInputProjectDraftOrder,
+		ec.unmarshalInputProjectDraftPatch,
+		ec.unmarshalInputProjectDraftRef,
 		ec.unmarshalInputProjectFieldFilter,
 		ec.unmarshalInputProjectFieldPatch,
 		ec.unmarshalInputProjectFieldRef,
@@ -9303,6 +9750,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdatePendingUserInput,
 		ec.unmarshalInputUpdatePostInput,
 		ec.unmarshalInputUpdateProjectColumnInput,
+		ec.unmarshalInputUpdateProjectDraftInput,
 		ec.unmarshalInputUpdateProjectFieldInput,
 		ec.unmarshalInputUpdateProjectFieldValueInput,
 		ec.unmarshalInputUpdateProjectInput,
@@ -9630,14 +10078,17 @@ type ProjectColumn {
   description: String
   color: String
   pos: Int!
+  col_type: ProjectColumnType!
   tensions(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
+  drafts(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft!]
   project(filter: ProjectFilter): Project!
 
   tensionsAggregate(filter: ProjectTensionFilter): ProjectTensionAggregateResult
+  draftsAggregate(filter: ProjectDraftFilter): ProjectDraftAggregateResult
 }
 
 type ProjectField {
-  type_: ProjectFieldType!
+  field_type: ProjectFieldType!
   isVisible: Boolean!
   values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
 
@@ -9647,6 +10098,7 @@ type ProjectField {
 type ProjectFieldValue {
   field(filter: ProjectFieldFilter): ProjectField!
   value: String!
+  pos: Int
 }
 
 type ProjectTension {
@@ -9657,6 +10109,11 @@ type ProjectTension {
   values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
 
   valuesAggregate(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
+}
+
+enum ProjectColumnType {
+  NormalColumn
+  NoStatusColumn
 }
 
 enum ProjectFieldType {
@@ -9672,6 +10129,20 @@ type Post {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
+}
+
+type ProjectDraft {
+  title: String!
+  pos: Int!
+  pc(filter: ProjectColumnFilter): ProjectColumn!
+  values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  message: String
+
+  valuesAggregate(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
 }
 
 type Tension {
@@ -10042,35 +10513,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @id on FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
+directive @lambda on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
 directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10288,7 +10759,9 @@ input AddProjectColumnInput {
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   pos: Int!
+  col_type: ProjectColumnType!
   tensions: [ProjectTensionRef!]
+  drafts: [ProjectDraftRef!]
   project: ProjectRef!
 }
 
@@ -10297,8 +10770,24 @@ type AddProjectColumnPayload {
   numUids: Int
 }
 
+input AddProjectDraftInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  title: String!
+  pos: Int!
+  pc: ProjectColumnRef!
+  values: [ProjectFieldValueRef!]
+}
+
+type AddProjectDraftPayload {
+  projectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  numUids: Int
+}
+
 input AddProjectFieldInput {
-  type_: ProjectFieldType!
+  field_type: ProjectFieldType!
   isVisible: Boolean!
   values: [ProjectFieldValueRef!]
 }
@@ -10311,6 +10800,7 @@ type AddProjectFieldPayload {
 input AddProjectFieldValueInput {
   field: ProjectFieldRef!
   value: String!
+  pos: Int
 }
 
 type AddProjectFieldValuePayload {
@@ -10860,6 +11350,12 @@ type DeleteProjectColumnPayload {
   numUids: Int
 }
 
+type DeleteProjectDraftPayload {
+  projectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  msg: String
+  numUids: Int
+}
+
 type DeleteProjectFieldPayload {
   projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
   msg: String
@@ -11383,6 +11879,9 @@ type Mutation {
   deleteProjectTension(filter: ProjectTensionFilter!): DeleteProjectTensionPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
+  addProjectDraft(input: [AddProjectDraftInput!]!): AddProjectDraftPayload
+  updateProjectDraft(input: UpdateProjectDraftInput!): UpdateProjectDraftPayload
+  deleteProjectDraft(filter: ProjectDraftFilter!): DeleteProjectDraftPayload
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
   updateTension(input: UpdateTensionInput! @hook_updateTensionInput): UpdateTensionPayload @hook_updateTension
   deleteTension(filter: TensionFilter! @hook_deleteTensionInput): DeleteTensionPayload @hook_deleteTension
@@ -11975,7 +12474,9 @@ enum ProjectColumnHasFilter {
   description
   color
   pos
+  col_type
   tensions
+  drafts
   project
 }
 
@@ -11996,7 +12497,9 @@ input ProjectColumnPatch {
   description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
   pos: Int @x_alter
+  col_type: ProjectColumnType @x_alter
   tensions: [ProjectTensionRef!] @x_patch_ro
+  drafts: [ProjectDraftRef!] @x_patch_ro
   project: ProjectRef @x_patch_ro
 }
 
@@ -12006,8 +12509,84 @@ input ProjectColumnRef {
   description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
   pos: Int @x_alter
+  col_type: ProjectColumnType @x_alter
   tensions: [ProjectTensionRef!]
+  drafts: [ProjectDraftRef!]
   project: ProjectRef
+}
+
+type ProjectDraftAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
+  messageMin: String
+  messageMax: String
+  titleMin: String
+  titleMax: String
+  posMin: Int
+  posMax: Int
+  posSum: Int
+  posAvg: Float
+}
+
+input ProjectDraftFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  message: StringFullTextFilter
+  has: [ProjectDraftHasFilter]
+  and: [ProjectDraftFilter]
+  or: [ProjectDraftFilter]
+  not: ProjectDraftFilter
+}
+
+enum ProjectDraftHasFilter {
+  createdBy
+  createdAt
+  updatedAt
+  message
+  title
+  pos
+  pc
+  values
+}
+
+input ProjectDraftOrder {
+  asc: ProjectDraftOrderable
+  desc: ProjectDraftOrderable
+  then: ProjectDraftOrder
+}
+
+enum ProjectDraftOrderable {
+  createdAt
+  updatedAt
+  message
+  title
+  pos
+}
+
+input ProjectDraftPatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String @x_patch_ro
+  title: String @x_patch_ro
+  pos: Int @x_alter
+  pc: ProjectColumnRef @x_patch_ro
+  values: [ProjectFieldValueRef!] @x_patch_ro
+}
+
+input ProjectDraftRef {
+  id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  title: String
+  pos: Int @x_alter
+  pc: ProjectColumnRef
+  values: [ProjectFieldValueRef!]
 }
 
 type ProjectFieldAggregateResult {
@@ -12022,19 +12601,19 @@ input ProjectFieldFilter {
 }
 
 enum ProjectFieldHasFilter {
-  type_
+  field_type
   isVisible
   values
 }
 
 input ProjectFieldPatch {
-  type_: ProjectFieldType @x_patch_ro
+  field_type: ProjectFieldType @x_patch_ro
   isVisible: Boolean @x_patch_ro
   values: [ProjectFieldValueRef!] @x_patch_ro
 }
 
 input ProjectFieldRef {
-  type_: ProjectFieldType
+  field_type: ProjectFieldType
   isVisible: Boolean
   values: [ProjectFieldValueRef!]
 }
@@ -12043,6 +12622,10 @@ type ProjectFieldValueAggregateResult {
   count: Int
   valueMin: String
   valueMax: String
+  posMin: Int
+  posMax: Int
+  posSum: Int
+  posAvg: Float
 }
 
 input ProjectFieldValueFilter {
@@ -12055,6 +12638,7 @@ input ProjectFieldValueFilter {
 enum ProjectFieldValueHasFilter {
   field
   value
+  pos
 }
 
 input ProjectFieldValueOrder {
@@ -12065,16 +12649,19 @@ input ProjectFieldValueOrder {
 
 enum ProjectFieldValueOrderable {
   value
+  pos
 }
 
 input ProjectFieldValuePatch {
   field: ProjectFieldRef @x_patch_ro
   value: String @x_patch_ro
+  pos: Int @x_patch_ro
 }
 
 input ProjectFieldValueRef {
   field: ProjectFieldRef
   value: String
+  pos: Int
 }
 
 input ProjectFilter {
@@ -12241,6 +12828,9 @@ type Query {
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
+  getProjectDraft(id: ID!): ProjectDraft
+  queryProjectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  aggregateProjectDraft(filter: ProjectDraftFilter): ProjectDraftAggregateResult
   getTension(id: ID!): Tension
   queryTension(filter: TensionFilter @hook_queryTensionInput, order: TensionOrder, first: Int, offset: Int): [Tension]
   aggregateTension(filter: TensionFilter): TensionAggregateResult
@@ -12747,6 +13337,17 @@ input UpdateProjectColumnInput {
 
 type UpdateProjectColumnPayload {
   projectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
+  numUids: Int
+}
+
+input UpdateProjectDraftInput {
+  filter: ProjectDraftFilter!
+  set: ProjectDraftPatch
+  remove: ProjectDraftPatch
+}
+
+type UpdateProjectDraftPayload {
+  projectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
   numUids: Int
 }
 
