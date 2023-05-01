@@ -21,15 +21,14 @@
 package auth
 
 import (
-    "fmt"
-    "strings"
-    "errors"
-    re "regexp"
+	"errors"
+	"fmt"
+	re "regexp"
+	"strings"
 )
 
-
 func FormatError(err error, loc string) error {
-    return fmt.Errorf(`{
+	return fmt.Errorf(`{
         "errors":[{
             "message": "%s",
             "location": "%s"
@@ -39,105 +38,105 @@ func FormatError(err error, loc string) error {
 
 // Library errors
 var (
-    ErrBadUsernameFormat = errors.New(`{
+	ErrBadUsernameFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid username. Special characters (@:!,?%. etc) are not allowed.",
             "location": "username"
         }]
     }`)
-    ErrUsernameTooLong = errors.New(`{
+	ErrUsernameTooLong = errors.New(`{
         "errors":[{
             "message":"Username too long.",
             "location": "username"
         }]
     }`)
-    ErrUsernameTooShort = errors.New(`{
+	ErrUsernameTooShort = errors.New(`{
         "errors":[{
             "message":"Username too short.",
             "location": "username"
         }]
     }`)
-    ErrBadNameidFormat = errors.New(`{
+	ErrBadNameidFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid name.",
             "location": "nameid"
         }]
     }`)
-    ErrBadNameFormat = errors.New(`{
+	ErrBadNameFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid name.",
             "location": "name"
         }]
     }`)
-    ErrNameTooLong = errors.New(`{
+	ErrNameTooLong = errors.New(`{
         "errors":[{
             "message":"Name too long.",
             "location": "name"
         }]
     }`)
-    ErrNameTooShort = errors.New(`{
+	ErrNameTooShort = errors.New(`{
         "errors":[{
             "message":"Name too short.",
             "location": "name"
         }]
     }`)
-    ErrBadEmailFormat = errors.New(`{
+	ErrBadEmailFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid email.",
             "location": "email"
         }]
     }`)
-    ErrEmailTooLong = errors.New(`{
+	ErrEmailTooLong = errors.New(`{
         "errors":[{
             "message":"Email too long.",
             "location": "name"
         }]
     }`)
-    ErrWrongPassword = errors.New(`{
+	ErrWrongPassword = errors.New(`{
         "errors":[{
             "message":"Wrong Password.",
             "location": "password"
         }]
     }`)
-    ErrPasswordTooShort = errors.New(`{
+	ErrPasswordTooShort = errors.New(`{
         "errors":[{
             "message":"Password too short.",
             "location": "password"
         }]
     }`)
-    ErrPasswordTooLong = errors.New(`{
+	ErrPasswordTooLong = errors.New(`{
         "errors":[{
             "message":"Password too long.",
             "location": "password"
         }]
     }`)
-    ErrPasswordRequirements = errors.New(`{
+	ErrPasswordRequirements = errors.New(`{
         "errors":[{
             "message":"Password need to contains at least one number and one letter.",
             "location": "password"
         }]
     }`)
-    ErrReserverdNamed = errors.New(`{
+	ErrReserverdNamed = errors.New(`{
         "errors":[{
             "message":"This name already exists, please use another one.",
             "location": "name"
         }]
     }`)
-    // Upsert error
-    ErrUsernameExist = errors.New(`{
+	// Upsert error
+	ErrUsernameExist = errors.New(`{
         "errors":[{
             "message":"Username already exists.",
             "location": "username"
         }]
     }`)
-    ErrEmailExist = errors.New(`{
+	ErrEmailExist = errors.New(`{
         "errors":[{
             "message":"Email already exists.",
             "location": "email"
         }]
     }`)
-    // User Rights
-    ErrCantLogin = errors.New(`{
+	// User Rights
+	ErrCantLogin = errors.New(`{
         "errors":[{
             "message": "You are not authorized to login.",
             "location": ""
@@ -155,20 +154,20 @@ var safeWordReg *re.Regexp
 var emailReg *re.Regexp
 
 func init() {
-    reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
-    special :=     `\@\#\<\>\{\}\%\"\'\!\\` + "`" + `\*\^\%\;\~¨:,$£§`
-    specialSoft := `\{\}\%\"\^\;¨\\` + "`"
-    // --
-    reservedURIReg = re.MustCompile(`[`+reservedURI+`]`) // nameid
-    specialReg = re.MustCompile(`[`+special+`]`)         // nameid
-    specialSoftReg = re.MustCompile(`[`+specialSoft+`]`) // name
-    // --
-    stripReg = re.MustCompile(`^\s|\s$`)
-    numReg = re.MustCompile(`[0-9]`)
-    letterReg = re.MustCompile(`[a-zA-Z]`)
-    // --
-    safeWordReg = re.MustCompile(`^[\w\.\-]+$`) // username
-    emailReg = re.MustCompile(`^[\w\.\-\+]+@[\w\.\-]+\.[\w\-]+$`) // email
+	reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`
+	special := `\@\#\<\>\{\}\%\"\'\!\\` + "`" + `\*\^\%\;\~¨:,$£§`
+	specialSoft := `\{\}\%\"\^\;¨\\` + "`"
+	// --
+	reservedURIReg = re.MustCompile(`[` + reservedURI + `]`) // nameid
+	specialReg = re.MustCompile(`[` + special + `]`)         // nameid
+	specialSoftReg = re.MustCompile(`[` + specialSoft + `]`) // name
+	// --
+	stripReg = re.MustCompile(`^\s|\s$`)
+	numReg = re.MustCompile(`[0-9]`)
+	letterReg = re.MustCompile(`[a-zA-Z]`)
+	// --
+	safeWordReg = re.MustCompile(`^[\w\.\-]+$`)                   // username
+	emailReg = re.MustCompile(`^[\w\.\-\+]+@[\w\.\-]+\.[\w\-]+$`) // email
 }
 
 //
@@ -176,135 +175,134 @@ func init() {
 //
 
 func ValidateName(n string) error {
-    // Size control
-    if len(n) > 100 {
-        return ErrNameTooLong
-    }
-    if len(n) < 2 {
-        return ErrNameTooShort
-    }
+	// Size control
+	if len(n) > 100 {
+		return ErrNameTooLong
+	}
+	if len(n) < 2 {
+		return ErrNameTooShort
+	}
 
-    // Character control
-    if matchReg(n, stripReg) {
-        return ErrBadNameFormat
-    }
-    if matchReg(n, specialSoftReg) {
-        return ErrBadNameFormat
-    }
-    return nil
+	// Character control
+	if matchReg(n, stripReg) {
+		return ErrBadNameFormat
+	}
+	if matchReg(n, specialSoftReg) {
+		return ErrBadNameFormat
+	}
+	return nil
 }
 
 func ValidateUsername(u string) error {
-    // Size control
-    if len(u) > 42 {
-        return ErrUsernameTooLong
-    }
-    if len(u) < 3 {
-        return ErrUsernameTooShort
-    }
+	// Size control
+	if len(u) > 42 {
+		return ErrUsernameTooLong
+	}
+	if len(u) < 3 {
+		return ErrUsernameTooShort
+	}
 
-    // Character control
-    if matchReg(u, stripReg)  {
-        return ErrBadUsernameFormat
-    }
-    if !matchReg(u, safeWordReg) {
-        return ErrBadUsernameFormat
-    }
+	// Character control
+	if matchReg(u, stripReg) {
+		return ErrBadUsernameFormat
+	}
+	if !matchReg(u, safeWordReg) {
+		return ErrBadUsernameFormat
+	}
 
-    for _, l := range []byte{u[0], u[len(u)-1]} {
-        if l == '.' || l == '-' || l == '_'{
-            return ErrBadUsernameFormat
-        }
-    }
+	for _, l := range []byte{u[0], u[len(u)-1]} {
+		if l == '.' || l == '-' || l == '_' {
+			return ErrBadUsernameFormat
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func ValidateNameid(nameid string, rootnameid string) error {
-    ns := strings.Split(nameid, "#")
-    if len(ns) == 0 {
-        return ErrBadNameidFormat
-    }
+	ns := strings.Split(nameid, "#")
+	if len(ns) == 0 {
+		return ErrBadNameidFormat
+	}
 
-    for i, n := range ns {
-        if i == 0 && n != rootnameid {
-            return ErrBadNameidFormat
-        }
-        if i==1 && len(ns) == 3 &&  n == "" {
-            // assume role under root node
-            continue
-        }
+	for i, n := range ns {
+		if i == 0 && n != rootnameid {
+			return ErrBadNameidFormat
+		}
+		if i == 1 && len(ns) == 3 && n == "" {
+			// assume role under root node
+			continue
+		}
 
-        // Size control
-        if len(n) > 42 {
-            return ErrNameTooLong
-        }
-        if len(n) < 2 {
-            return ErrNameTooShort
-        }
+		// Size control
+		if len(n) > 42 {
+			return ErrNameTooLong
+		}
+		if len(n) < 2 {
+			return ErrNameTooShort
+		}
 
-        // character control
-        if matchReg(n, stripReg) {
-            return ErrBadNameidFormat
-        }
-        if matchReg(n, specialReg) {
-            return ErrBadNameidFormat
-        }
-        if matchReg(n, reservedURIReg) {
-            return ErrReserverdNamed
-        }
-    }
+		// character control
+		if matchReg(n, stripReg) {
+			return ErrBadNameidFormat
+		}
+		if matchReg(n, specialReg) {
+			return ErrBadNameidFormat
+		}
+		if matchReg(n, reservedURIReg) {
+			return ErrReserverdNamed
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func ValidateEmail(s string) error {
-    // Size control
-    if len(s) > 100 {
-        return ErrUsernameTooLong
-    }
-    if len(s) < 3 {
-        return ErrUsernameTooShort
-    }
+	// Size control
+	if len(s) > 100 {
+		return ErrUsernameTooLong
+	}
+	if len(s) < 3 {
+		return ErrUsernameTooShort
+	}
 
-    // Character control
-    if matchReg(s, stripReg)  {
-        return ErrBadEmailFormat
-    }
-    if !matchReg(s, emailReg) {
-        return ErrBadEmailFormat
-    }
+	// Character control
+	if matchReg(s, stripReg) {
+		return ErrBadEmailFormat
+	}
+	if !matchReg(s, emailReg) {
+		return ErrBadEmailFormat
+	}
 
-    return nil
+	return nil
 }
 
-
 func ValidatePassword(p string) error {
-    // Size control
-    if len(p) < 8 {
-        return ErrPasswordTooShort
-    }
-    if len(p) > 100 {
-        return ErrPasswordTooLong
-    }
-    if !(numReg.MatchString(p) && letterReg.MatchString(p)) {
-        return ErrPasswordRequirements
-    }
-    return nil
+	// Size control
+	if len(p) < 8 {
+		return ErrPasswordTooShort
+	}
+	if len(p) > 100 {
+		return ErrPasswordTooLong
+	}
+	if !(numReg.MatchString(p) && letterReg.MatchString(p)) {
+		return ErrPasswordRequirements
+	}
+	return nil
 }
 
 // This secondary validation method is here ensure compatibility between
 // old user that may not satisfy the primary validation method.
 // @hint: this could be used to sent email alert if password to weak.
 func ValidateSimplePassword(p string) error {
-    // Size control
-    if len(p) < 8 {
-        return ErrPasswordTooShort
-    }
-    if len(p) > 100 {
-        return ErrPasswordTooLong
-    }
-    return nil
+	// Size control
+	if len(p) < 8 {
+		return ErrPasswordTooShort
+	}
+	if len(p) > 100 {
+		return ErrPasswordTooLong
+	}
+	return nil
 }
 
 //
@@ -312,6 +310,5 @@ func ValidateSimplePassword(p string) error {
 //
 
 func matchReg(s string, regexp *re.Regexp) bool {
-    return regexp.MatchString(s)
+	return regexp.MatchString(s)
 }
-

@@ -22,75 +22,72 @@ package cmd
 
 import (
 	//"fmt"
-	"os"
-    "strings"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+	"strings"
+
 	"fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
 var (
-    rootCmd = &cobra.Command{
-        Use:   "f6",
-        Short: "Fractale - Self-organisation for humans",
-        Long:  `Fractale - Self-organisation for humans.`,
-    }
+	rootCmd = &cobra.Command{
+		Use:   "f6",
+		Short: "Fractale - Self-organisation for humans",
+		Long:  `Fractale - Self-organisation for humans.`,
+	}
 
-    apiCmd = &cobra.Command{
-        Use:   "api",
-        Short: "run server",
-        Long:  `run server.`,
-        PreRun: func(cmd *cobra.Command, args []string) {
-            viper.SetDefault("rootCmd", "api")
-        },
-        Run: func(cmd *cobra.Command, args []string) {
-            RunServer()
-        },
-    }
+	apiCmd = &cobra.Command{
+		Use:   "api",
+		Short: "run server",
+		Long:  `run server.`,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			viper.SetDefault("rootCmd", "api")
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			RunServer()
+		},
+	}
 
-    notifierCmd = &cobra.Command{
-        Use:   "notifier",
-        Short: "run notifier daemon",
-        Long:  `run notifier daemon.`,
-        Run: func(cmd *cobra.Command, args []string) {
-            RunNotifier()
-        },
-    }
+	notifierCmd = &cobra.Command{
+		Use:   "notifier",
+		Short: "run notifier daemon",
+		Long:  `run notifier daemon.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			RunNotifier()
+		},
+	}
 
-    genToken = &cobra.Command{
-        Use:   "token [username]",
-        Short: "Generate JWT tokens",
-        Long:  `Generate JWT tokens.`,
-        Args: cobra.MaximumNArgs(1),
-        Run: func(cmd *cobra.Command, args []string) {
-            auth.GenToken(strings.Join(args, ""))
-        },
-    }
-
+	genToken = &cobra.Command{
+		Use:   "token [username]",
+		Short: "Generate JWT tokens",
+		Long:  `Generate JWT tokens.`,
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			auth.GenToken(strings.Join(args, ""))
+		},
+	}
 )
 
 func init() {
 	cobra.OnInitialize(tools.InitViper)
-    rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	viper.BindPFlag("rootCmd", rootCmd.PersistentFlags().Lookup("verbose"))
 
-    // Cli init
-    rootCmd.AddCommand(apiCmd)
-    rootCmd.AddCommand(notifierCmd)
-    rootCmd.AddCommand(genToken)
-    rootCmd.AddCommand(addUser)
-    rootCmd.AddCommand(delUser)
+	// Cli init
+	rootCmd.AddCommand(apiCmd)
+	rootCmd.AddCommand(notifierCmd)
+	rootCmd.AddCommand(genToken)
+	rootCmd.AddCommand(addUser)
+	rootCmd.AddCommand(delUser)
 }
 
 // Run the root command.
 func Run() {
 	if err := rootCmd.Execute(); err != nil {
-        //fmt.Fprintf(os.Stderr, "%v\n", err)
+		//fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(-1)
 	}
 }
-
-
-

@@ -21,51 +21,54 @@
 package middleware
 
 import (
-    "fmt"
-    "context"
-    "runtime/debug"
-    "net/http"
-    "github.com/go-chi/chi/v5/middleware"
+	"context"
+	"fmt"
+	"fractale/fractal6.go/web/email"
 	"github.com/99designs/gqlgen/graphql"
-    "github.com/vektah/gqlparser/v2/gqlerror"
-    "fractale/fractal6.go/web/email"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/vektah/gqlparser/v2/gqlerror"
+	"net/http"
+	"runtime/debug"
 )
-
 
 // Notifier recoverer
 func NotifRecover(info string) {
-    if r := recover(); r != nil {
-        // Email notification
-        fmt.Println("------------------notif recov ------------")
-        e := email.SendMaintainerEmail(
-            fmt.Sprintf("[f6-notifier][error][%s] %v", info, r),
-            string(debug.Stack()),
-        )
-        if e != nil { fmt.Println(e) }
+	if r := recover(); r != nil {
+		// Email notification
+		fmt.Println("------------------notif recov ------------")
+		e := email.SendMaintainerEmail(
+			fmt.Sprintf("[f6-notifier][error][%s] %v", info, r),
+			string(debug.Stack()),
+		)
+		if e != nil {
+			fmt.Println(e)
+		}
 
-        // Log error
-        fmt.Printf("error: Recovering from panic (%s): %v\n", info, r)
-    }
+		// Log error
+		fmt.Printf("error: Recovering from panic (%s): %v\n", info, r)
+	}
 }
 
 // Graphql api recoverer
 func GqlRecover(ctx context.Context, err interface{}) error {
-        qn := graphql.GetResolverContext(ctx).Field.Name
+	qn := graphql.GetResolverContext(ctx).Field.Name
 
-        // Email Notification
-        fmt.Println("------------------gql recov ------------")
-        e := email.SendMaintainerEmail(
-            fmt.Sprintf("[f6-graphql][error] %v", err),
-            string(debug.Stack()),
-        )
-        if err != nil { fmt.Println(e) }
-
-        // Log error
-        //fmt.Printf("panic on `%s`:\n%s\n", qn, string(debug.Stack()))
-        middleware.PrintPrettyStack(err)
-
-        return gqlerror.Errorf("Internal error on '%s': %v", qn, err)
+	// Email Notification
+	fmt.Println("------------------gql recov ------------")
+	e := email.SendMaintainerEmail(
+		fmt.Sprintf("[f6-graphql][error] %v", err),
+		string(debug.Stack()),
+	)
+	if err != nil {
+		fmt.Println(e)
 	}
+
+	// Log error
+	//fmt.Printf("panic on `%s`:\n%s\n", qn, string(debug.Stack()))
+	middleware.PrintPrettyStack(err)
+
+	return gqlerror.Errorf("Internal error on '%s': %v", qn, err)
+}
 
 // Standard server recover middleware
 // Extension of https://github.com/go-chi/chi/blob/master/middleware/recoverer.go
@@ -80,14 +83,16 @@ func Recoverer(next http.Handler) http.Handler {
 					panic(rvr)
 				}
 
-                // Email notification
-                fmt.Println("------------------rest recov ------------")
-                e := email.SendMaintainerEmail(
-                    fmt.Sprintf("[f6-rest][error] %v", rvr),
-                    string(debug.Stack()),
-                )
-                if e != nil { fmt.Println(e) }
-                // -----------------
+				// Email notification
+				fmt.Println("------------------rest recov ------------")
+				e := email.SendMaintainerEmail(
+					fmt.Sprintf("[f6-rest][error] %v", rvr),
+					string(debug.Stack()),
+				)
+				if e != nil {
+					fmt.Println(e)
+				}
+				// -----------------
 
 				logEntry := middleware.GetLogEntry(r)
 				if logEntry != nil {

@@ -21,36 +21,34 @@
 package middleware
 
 import (
-    "context"
-    "net/http"
-    "io/ioutil"
-    "bytes"
+	"bytes"
+	"context"
+	"io/ioutil"
+	"net/http"
 )
 
-
 func RequestContextMiddleware(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        ctx := r.Context()
-        if r.Method == "POST" {
-            // for content-type != application/json
-            //r.ParseForm()
-            //fmt.Println(r.Proto)
-            //fmt.Println(r.URL)
-            //fmt.Println(r.Header)
-            //fmt.Println(r.Body)
-            //fmt.Println(r.Form)
-            //fmt.Println(r.Form.Encode())
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		if r.Method == "POST" {
+			// for content-type != application/json
+			//r.ParseForm()
+			//fmt.Println(r.Proto)
+			//fmt.Println(r.URL)
+			//fmt.Println(r.Header)
+			//fmt.Println(r.Body)
+			//fmt.Println(r.Form)
+			//fmt.Println(r.Form.Encode())
 
-            body, _ := ioutil.ReadAll(r.Body)
-            // Restore the io.ReadCloser to its original state
-            r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-            // Forward body in context
-            ctx = context.WithValue(ctx, "request_body", body)
-        }
-        next.ServeHTTP(w, r.WithContext(ctx))
-    })
+			body, _ := ioutil.ReadAll(r.Body)
+			// Restore the io.ReadCloser to its original state
+			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			// Forward body in context
+			ctx = context.WithValue(ctx, "request_body", body)
+		}
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
-
 
 //type GlobalContext struct {
 //    echo.Context
@@ -79,4 +77,3 @@ func RequestContextMiddleware(next http.Handler) http.Handler {
 //	}
 //	return ec, nil
 //}
-

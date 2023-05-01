@@ -24,12 +24,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/dgraph-io/dgo/v200/protos/api"
+	"github.com/mitchellh/mapstructure"
 	"log"
 	"reflect"
 	"strings"
-
-	"github.com/dgraph-io/dgo/v200/protos/api"
-	"github.com/mitchellh/mapstructure"
 
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
@@ -1863,8 +1862,8 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 		fieldinclude = fieldid
 	}
 	maps := map[string]string{
-		"fieldid":        fieldid,
-		"objid":          objid,
+		"fieldid":      fieldid,
+		"objid":        objid,
 		"fieldinclude": fieldinclude,
 	}
 	// Send request
@@ -1968,8 +1967,8 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]
 		fieldinclude = fieldid
 	}
 	maps := map[string]string{
-		"fieldid":        fieldid,
-		"objid":          objid,
+		"fieldid":      fieldid,
+		"objid":        objid,
 		"fieldinclude": fieldinclude,
 	}
 	// Send request
