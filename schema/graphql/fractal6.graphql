@@ -258,7 +258,7 @@ interface Post @auth(
 ){
   id: ID!
   createdBy: User!
-  createdAt: DateTime! @search
+  createdAt: DateTime! @search                 @w_add(a:"now")
   updatedAt: DateTime                          @x_alter(r:"isOwner", f:"createdBy")
   message: String      @search(by: [fulltext]) @x_alter(r:"isOwner", f:"createdBy")
 }

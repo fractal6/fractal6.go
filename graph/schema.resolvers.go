@@ -124,8 +124,9 @@ func (r *mutationResolver) DeleteProjectColumn(ctx context.Context, filter model
 }
 
 // AddProjectCard is the resolver for the addProjectCard field.
-func (r *mutationResolver) AddProjectCard(ctx context.Context, input []*model.AddProjectCardInput) (*model.AddProjectCardPayload, error) {
-	panic(fmt.Errorf("not implemented: AddProjectCard - addProjectCard"))
+func (r *mutationResolver) AddProjectCard(ctx context.Context, input []*model.AddProjectCardInput) (data *model.AddProjectCardPayload, errors error) {
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	return data, errors
 }
 
 // UpdateProjectCard is the resolver for the updateProjectCard field.

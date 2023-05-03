@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/tools"
 )
 
 var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (interface{}, error)
@@ -35,6 +36,7 @@ func init() {
 
 	FieldTransformFunc = map[string]func(context.Context, graphql.Resolver) (interface{}, error){
 		"lower": lower,
+		"now":   now,
 	}
 
 }
@@ -88,4 +90,10 @@ func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
 	}
 	field := *graphql.GetPathContext(ctx).Field
 	return nil, fmt.Errorf("Type unknwown for field %s", field)
+}
+
+func now(ctx context.Context, next graphql.Resolver) (interface{}, error) {
+	fmt.Println("alors...")
+	_, err := next(ctx)
+	return tools.Now(), err
 }

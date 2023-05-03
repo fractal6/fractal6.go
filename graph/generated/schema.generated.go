@@ -71388,9 +71388,31 @@ func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.DateTimeFilter); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DateTimeFilter`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
 			var err error
