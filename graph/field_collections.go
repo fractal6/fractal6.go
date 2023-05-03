@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/vektah/gqlparser/v2/ast"
 	"reflect"
 	"strings"
 
@@ -154,10 +155,31 @@ func GetQueryGraph(ctx context.Context) string {
 }
 
 func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string, first bool) (preloads []string) {
+	var inEnum bool
+	var currentEnum *string
 	for _, f := range fields {
+		if inEnum {
+			if currentEnum == nil {
+				currentEnum = &f.ObjectDefinition.Name
+				preloads = append(preloads, fmt.Sprintf("... on %s {", *currentEnum))
+			} else if *currentEnum != f.ObjectDefinition.Name {
+				currentEnum = &f.ObjectDefinition.Name
+				preloads = append(preloads, fmt.Sprintf("}"))
+				preloads = append(preloads, fmt.Sprintf("... on %s {", *currentEnum))
+			}
+		}
+
 		//prefixColumn := GetPreloadString(prefix, f.Name)
 		prefixColumn := f.Name
 		preloads = append(preloads, prefixColumn)
+		// <!> UNION <!>
+		if f.ObjectDefinition.Kind == ast.Union {
+			//unionTypes = f.ObjectDefinition.Types
+			// f.Name == "__typename"
+			inEnum = true
+			continue
+		}
+
 		if len(f.Arguments) > 0 {
 			preloads = append(preloads, "(")
 			for i, a := range f.Arguments {
@@ -173,6 +195,10 @@ func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedFi
 			preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, f.SelectionSet, nil), prefixColumn, false)...)
 			preloads = append(preloads, "}")
 		}
+	}
+
+	if inEnum {
+		preloads = append(preloads, "}")
 	}
 	return
 }

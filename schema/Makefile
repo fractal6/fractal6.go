@@ -23,8 +23,12 @@ dgraph_in: auth_schema
 
 # Update Dgraph
 dgraph:
-	curl -X POST http://localhost:8080/admin/schema --data-binary "@dgraph_schema.graphql" | jq
+	@res=$$(curl -X POST http://localhost:8080/admin/schema --data-binary "@dgraph_schema.graphql")
+	echo "$$res" | jq
 	echo "Dgraph schema updated"
+	if [ $$(echo "$$res" | jq -r '.errors[0].extensions.code') == "Error" ]; then
+		exit 1
+	fi
 
 # Generate Dgraph output schema
 dgraph_out:

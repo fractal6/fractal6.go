@@ -274,43 +274,70 @@ func CleanAliasedMapHook() mapstructure.DecodeHookFunc {
 }
 
 func ToUnionHookFunc() mapstructure.DecodeHookFunc {
+	// @DEBUG union type decoding
 	// see  https://github.com/mitchellh/mapstructure/issues/159
-	// and alsoe https://github.com/99designs/gqlgen/issues/1055
+	// and also https://github.com/99designs/gqlgen/issues/1055
 	return func(f, t reflect.Type, data interface{}) (interface{}, error) {
-		var ek model.EventKind // because EventKind is an interface...else TypeOf(MyStrct) works.
-		if t != reflect.TypeOf(&ek).Elem() {
-			return data, nil
-		}
+		var u1 model.EventKind // because EventKind is an interface...else TypeOf(MyStrct) works.
+		if t == reflect.TypeOf(&u1).Elem() {
+			switch f.Kind() {
+			case reflect.Map:
+				var d interface{}
+				b, _ := json.Marshal(data)
+				switch data.(model.JsonAtom)["__typename"] {
+				case "Event":
+					var partial model.Event
+					if err := json.Unmarshal(b, &partial); err != nil {
+						return data, err
+					}
+					d = &partial
+				case "Contract":
+					var partial model.Contract
+					if err := json.Unmarshal(b, &partial); err != nil {
+						return data, err
+					}
+					d = &partial
+				case "Notif":
+					var partial model.Notif
+					if err := json.Unmarshal(b, &partial); err != nil {
+						return data, err
+					}
+					d = &partial
+				}
 
-		switch f.Kind() {
-		case reflect.Map:
-			var d interface{}
-			b, _ := json.Marshal(data)
-			switch data.(model.JsonAtom)["__typename"] {
-			case "Event":
-				var partial model.Event
-				if err := json.Unmarshal(b, &partial); err != nil {
-					return data, err
-				}
-				d = &partial
-			case "Contract":
-				var partial model.Contract
-				if err := json.Unmarshal(b, &partial); err != nil {
-					return data, err
-				}
-				d = &partial
-			case "Notif":
-				var partial model.Notif
-				if err := json.Unmarshal(b, &partial); err != nil {
-					return data, err
-				}
-				d = &partial
-				// Add other unions here...
+				return d, nil
+			default:
+				return data, nil
 			}
-
-			return d, nil
-		default:
-			return data, nil
 		}
+
+		var u2 model.CardKind
+		if t == reflect.TypeOf(&u2).Elem() {
+			switch f.Kind() {
+			case reflect.Map:
+				var d interface{}
+				b, _ := json.Marshal(data)
+				switch data.(model.JsonAtom)["__typename"] {
+				case "Tension":
+					var partial model.Event
+					if err := json.Unmarshal(b, &partial); err != nil {
+						return data, err
+					}
+					d = &partial
+				case "ProjectDraft":
+					var partial model.Contract
+					if err := json.Unmarshal(b, &partial); err != nil {
+						return data, err
+					}
+					d = &partial
+				}
+
+				return d, nil
+			default:
+				return data, nil
+			}
+		}
+
+		return data, nil
 	}
 }

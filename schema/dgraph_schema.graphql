@@ -226,14 +226,22 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type ProjectColumn {
   id: ID!
-  name: String! @id
+  name: String!
   description: String
   color: String
   pos: Int!
   col_type: ProjectColumnType!
-  tensions: [ProjectTension!] @hasInverse(field: pc)
-  drafts: [ProjectDraft!] @hasInverse(field: pc)
+  cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project!
+  tensions: [Tension!] @hasInverse(field: project_statuses)
+}
+
+type ProjectCard {
+  id: ID!
+  pos: Int!
+  card: CardKind!
+  pc: ProjectColumn!
+  values: [ProjectFieldValue!]
 }
 
 type ProjectField {
@@ -248,13 +256,7 @@ type ProjectFieldValue {
   pos: Int
 }
 
-type ProjectTension {
-  id: ID!
-  tension: Tension!
-  pos: Int!
-  pc: ProjectColumn!
-  values: [ProjectFieldValue!]
-}
+union CardKind= Tension| ProjectDraft
 
 enum ProjectColumnType {
   NormalColumn
@@ -285,9 +287,6 @@ interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type ProjectDraft implements Post {
   title: String!
-  pos: Int!
-  pc: ProjectColumn!
-  values: [ProjectFieldValue!]
 }
 
 type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -354,7 +353,7 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   mentions: [Event!] @hasInverse(field: mentioned)
   contracts: [Contract!] @hasInverse(field: tension)
   subscribers: [User!] @hasInverse(field: subscriptions)
-  projects: [ProjectTension!] @hasInverse(field: tension)
+  project_statuses: [ProjectColumn!]
   n_comments: Int
 }
 

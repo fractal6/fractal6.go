@@ -108,8 +108,9 @@ func (r *mutationResolver) DeleteProject(ctx context.Context, filter model.Proje
 }
 
 // AddProjectColumn is the resolver for the addProjectColumn field.
-func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput, upsert *bool) (data *model.AddProjectColumnPayload, errors error) {
-	panic(fmt.Errorf("not implemented: AddProjectColumn - addProjectColumn"))
+func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput) (data *model.AddProjectColumnPayload, errors error) {
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	return data, errors
 }
 
 // UpdateProjectColumn is the resolver for the updateProjectColumn field.
@@ -120,6 +121,21 @@ func (r *mutationResolver) UpdateProjectColumn(ctx context.Context, input model.
 // DeleteProjectColumn is the resolver for the deleteProjectColumn field.
 func (r *mutationResolver) DeleteProjectColumn(ctx context.Context, filter model.ProjectColumnFilter) (data *model.DeleteProjectColumnPayload, errors error) {
 	panic(fmt.Errorf("not implemented: DeleteProjectColumn - deleteProjectColumn"))
+}
+
+// AddProjectCard is the resolver for the addProjectCard field.
+func (r *mutationResolver) AddProjectCard(ctx context.Context, input []*model.AddProjectCardInput) (*model.AddProjectCardPayload, error) {
+	panic(fmt.Errorf("not implemented: AddProjectCard - addProjectCard"))
+}
+
+// UpdateProjectCard is the resolver for the updateProjectCard field.
+func (r *mutationResolver) UpdateProjectCard(ctx context.Context, input model.UpdateProjectCardInput) (*model.UpdateProjectCardPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateProjectCard - updateProjectCard"))
+}
+
+// DeleteProjectCard is the resolver for the deleteProjectCard field.
+func (r *mutationResolver) DeleteProjectCard(ctx context.Context, filter model.ProjectCardFilter) (*model.DeleteProjectCardPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteProjectCard - deleteProjectCard"))
 }
 
 // AddProjectField is the resolver for the addProjectField field.
@@ -150,21 +166,6 @@ func (r *mutationResolver) UpdateProjectFieldValue(ctx context.Context, input mo
 // DeleteProjectFieldValue is the resolver for the deleteProjectFieldValue field.
 func (r *mutationResolver) DeleteProjectFieldValue(ctx context.Context, filter model.ProjectFieldValueFilter) (*model.DeleteProjectFieldValuePayload, error) {
 	panic(fmt.Errorf("not implemented: DeleteProjectFieldValue - deleteProjectFieldValue"))
-}
-
-// AddProjectTension is the resolver for the addProjectTension field.
-func (r *mutationResolver) AddProjectTension(ctx context.Context, input []*model.AddProjectTensionInput) (data *model.AddProjectTensionPayload, errors error) {
-	panic(fmt.Errorf("not implemented: AddProjectTension - addProjectTension"))
-}
-
-// UpdateProjectTension is the resolver for the updateProjectTension field.
-func (r *mutationResolver) UpdateProjectTension(ctx context.Context, input model.UpdateProjectTensionInput) (data *model.UpdateProjectTensionPayload, errors error) {
-	panic(fmt.Errorf("not implemented: UpdateProjectTension - updateProjectTension"))
-}
-
-// DeleteProjectTension is the resolver for the deleteProjectTension field.
-func (r *mutationResolver) DeleteProjectTension(ctx context.Context, filter model.ProjectTensionFilter) (data *model.DeleteProjectTensionPayload, errors error) {
-	panic(fmt.Errorf("not implemented: DeleteProjectTension - deleteProjectTension"))
 }
 
 // UpdatePost is the resolver for the updatePost field.
@@ -509,7 +510,7 @@ func (r *queryResolver) AggregateProject(ctx context.Context, filter *model.Proj
 }
 
 // GetProjectColumn is the resolver for the getProjectColumn field.
-func (r *queryResolver) GetProjectColumn(ctx context.Context, id *string, name *string) (*model.ProjectColumn, error) {
+func (r *queryResolver) GetProjectColumn(ctx context.Context, id string) (*model.ProjectColumn, error) {
 	panic(fmt.Errorf("not implemented: GetProjectColumn - getProjectColumn"))
 }
 
@@ -521,6 +522,21 @@ func (r *queryResolver) QueryProjectColumn(ctx context.Context, filter *model.Pr
 // AggregateProjectColumn is the resolver for the aggregateProjectColumn field.
 func (r *queryResolver) AggregateProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter) (*model.ProjectColumnAggregateResult, error) {
 	panic(fmt.Errorf("not implemented: AggregateProjectColumn - aggregateProjectColumn"))
+}
+
+// GetProjectCard is the resolver for the getProjectCard field.
+func (r *queryResolver) GetProjectCard(ctx context.Context, id string) (*model.ProjectCard, error) {
+	panic(fmt.Errorf("not implemented: GetProjectCard - getProjectCard"))
+}
+
+// QueryProjectCard is the resolver for the queryProjectCard field.
+func (r *queryResolver) QueryProjectCard(ctx context.Context, filter *model.ProjectCardFilter, order *model.ProjectCardOrder, first *int, offset *int) ([]*model.ProjectCard, error) {
+	panic(fmt.Errorf("not implemented: QueryProjectCard - queryProjectCard"))
+}
+
+// AggregateProjectCard is the resolver for the aggregateProjectCard field.
+func (r *queryResolver) AggregateProjectCard(ctx context.Context, filter *model.ProjectCardFilter) (*model.ProjectCardAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateProjectCard - aggregateProjectCard"))
 }
 
 // QueryProjectField is the resolver for the queryProjectField field.
@@ -541,21 +557,6 @@ func (r *queryResolver) QueryProjectFieldValue(ctx context.Context, filter *mode
 // AggregateProjectFieldValue is the resolver for the aggregateProjectFieldValue field.
 func (r *queryResolver) AggregateProjectFieldValue(ctx context.Context, filter *model.ProjectFieldValueFilter) (*model.ProjectFieldValueAggregateResult, error) {
 	panic(fmt.Errorf("not implemented: AggregateProjectFieldValue - aggregateProjectFieldValue"))
-}
-
-// GetProjectTension is the resolver for the getProjectTension field.
-func (r *queryResolver) GetProjectTension(ctx context.Context, id string) (*model.ProjectTension, error) {
-	panic(fmt.Errorf("not implemented: GetProjectTension - getProjectTension"))
-}
-
-// QueryProjectTension is the resolver for the queryProjectTension field.
-func (r *queryResolver) QueryProjectTension(ctx context.Context, filter *model.ProjectTensionFilter, order *model.ProjectTensionOrder, first *int, offset *int) ([]*model.ProjectTension, error) {
-	panic(fmt.Errorf("not implemented: QueryProjectTension - queryProjectTension"))
-}
-
-// AggregateProjectTension is the resolver for the aggregateProjectTension field.
-func (r *queryResolver) AggregateProjectTension(ctx context.Context, filter *model.ProjectTensionFilter) (*model.ProjectTensionAggregateResult, error) {
-	panic(fmt.Errorf("not implemented: AggregateProjectTension - aggregateProjectTension"))
 }
 
 // GetPost is the resolver for the getPost field.

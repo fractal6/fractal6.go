@@ -188,7 +188,7 @@ type Project @auth(
   rootnameid: String!    @search(by: [hash])
   parentnameid: String!  @search(by: [hash])
   nameid: String!        @search(by: [hash]) @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1) @w_alter(a:"lower")
-  name: String!          @search(by: [fulltext]) @x_alter(r:"maxLen", n:100)
+  name: String!          @search(by: [fulltext]) @x_alter(r:"minLen", n:1) @x_alter(r:"maxLen", n:100)
   description: String    @x_alter(r:"maxLen", n:280)
   status: ProjectStatus! @search @x_alter
   columns: [ProjectColumn!] @hasInverse(field: project) @x_alter
@@ -202,14 +202,25 @@ type Project @auth(
 
 type ProjectColumn {
   id: ID!
-  name: String!   @id
+  name: String! @x_alter
   description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
+  pos: Int! @x_alter # @auto-in-hook
+  col_type: ProjectColumnType! @x_alter
+  cards: [ProjectCard!] @hasInverse(field: pc)
+  project: Project! @x_alter(r:"ref")
+  # Keep track if the status of tensions (i.e not in a NoStatusColumn col)
+  tensions: [Tension!] @hasInverse(field: project_statuses) # @auto-in-hook
+}
+
+type ProjectCard {
+  id: ID!
   pos: Int! @x_alter
-  col_type : ProjectColumnType! @x_alter
-  tensions: [ProjectTension!] @hasInverse(field: pc)
-  drafts: [ProjectDraft!] @hasInverse(field: pc)
-  project: Project!
+  card: CardKind! @x_alter(r:"ref")
+  pc: ProjectColumn! @x_alter(r:"ref")
+  """ Generalisation of boards's column status """
+  values: [ProjectFieldValue!]
+
 }
 
 type ProjectField {
@@ -224,14 +235,7 @@ type ProjectFieldValue {
   pos: Int
 }
 
-type ProjectTension {
-  id: ID!
-  tension: Tension! @x_alter(r:"ref")
-  pos: Int! @x_alter
-  pc: ProjectColumn!
-  """ Generalisation of boards's column status """
-  values: [ProjectFieldValue!]
-}
+union CardKind = Tension | ProjectDraft
 
 enum ProjectColumnType {
   NormalColumn
@@ -260,11 +264,8 @@ interface Post @auth(
 }
 
 type ProjectDraft implements Post {
-  title: String!
-  pos: Int! @x_alter
-  pc: ProjectColumn!
-  """ Generalisation of boards's column status """
-  values: [ProjectFieldValue!]
+  title: String! @x_alter
+  message: String @x_alter
 }
 
 type Tension implements Post @auth(
@@ -291,7 +292,8 @@ type Tension implements Post @auth(
   mentions: [Event!]     @hasInverse(field: mentioned)
   contracts: [Contract!] @hasInverse(field: tension) @x_add(r:"ref")
   subscribers: [User!]   @hasInverse(field: subscriptions) @x_add(r:"ref")
-  projects: [ProjectTension!] @hasInverse(field: tension) @x_add(r:"ref")
+  # keep reference of tensions in projects
+  project_statuses: [ProjectColumn!]
 
   # Aggregators
   # We need this field to count things with DQL request since it is not yet
