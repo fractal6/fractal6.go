@@ -213,7 +213,7 @@ type ProjectColumn {
   tensions: [Tension!] @hasInverse(field: project_statuses) # @auto-in-hook
 }
 
-type ProjectCard {
+type ProjectCard @hook_ {
   id: ID!
   pos: Int! @x_alter
   card: CardKind! @x_alter(r:"ref")

@@ -131,6 +131,16 @@ func Init() gen.Config {
 	c.Directives.Hook_addProject = addNodeArtefactHook
 	c.Directives.Hook_updateProject = updateNodeArtefactHook
 	c.Directives.Hook_deleteProject = nothing
+	//ProjectCard
+	c.Directives.Hook_getProjectCardInput = nothing
+	c.Directives.Hook_queryProjectCardInput = nothing
+	c.Directives.Hook_addProjectCardInput = nothing
+	c.Directives.Hook_updateProjectCardInput = nothing
+	c.Directives.Hook_deleteProjectCardInput = nothing
+	// --
+	c.Directives.Hook_addProjectCard = addProjectCardHook
+	c.Directives.Hook_updateProjectCard = updateProjectCardHook
+	c.Directives.Hook_deleteProjectCard = nothing
 	//Tension
 	c.Directives.Hook_getTensionInput = nothing
 	c.Directives.Hook_queryTensionInput = nothing

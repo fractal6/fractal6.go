@@ -3710,9 +3710,26 @@ func (ec *executionContext) field_Mutation_addProjectCard_args(ctx context.Conte
 	var arg0 []*model.AddProjectCardInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddProjectCardInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardInputᚄ(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddProjectCardInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectCardInput == nil {
+				return nil, errors.New("directive hook_addProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_addProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddProjectCardInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddProjectCardInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -4274,9 +4291,24 @@ func (ec *executionContext) field_Mutation_deleteProjectCard_args(ctx context.Co
 	var arg0 model.ProjectCardFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectCardFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNProjectCardFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectCardInput == nil {
+				return nil, errors.New("directive hook_deleteProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ProjectCardFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.ProjectCardFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -4799,9 +4831,24 @@ func (ec *executionContext) field_Mutation_updateProjectCard_args(ctx context.Co
 	var arg0 model.UpdateProjectCardInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateProjectCardInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectCardInput(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateProjectCardInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectCardInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectCardInput == nil {
+				return nil, errors.New("directive hook_updateProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_updateProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateProjectCardInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateProjectCardInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -7787,9 +7834,26 @@ func (ec *executionContext) field_Query_queryProjectCard_args(ctx context.Contex
 	var arg0 *model.ProjectCardFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryProjectCardInput == nil {
+				return nil, errors.New("directive hook_queryProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_queryProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ProjectCardFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectCardFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -25965,8 +26029,28 @@ func (ec *executionContext) _Mutation_addProjectCard(ctx context.Context, field 
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddProjectCard(rctx, fc.Args["input"].([]*model.AddProjectCardInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddProjectCard(rctx, fc.Args["input"].([]*model.AddProjectCardInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectCard == nil {
+				return nil, errors.New("directive hook_addProjectCard is not implemented")
+			}
+			return ec.directives.Hook_addProjectCard(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddProjectCardPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddProjectCardPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -26020,8 +26104,28 @@ func (ec *executionContext) _Mutation_updateProjectCard(ctx context.Context, fie
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProjectCard(rctx, fc.Args["input"].(model.UpdateProjectCardInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateProjectCard(rctx, fc.Args["input"].(model.UpdateProjectCardInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectCard == nil {
+				return nil, errors.New("directive hook_updateProjectCard is not implemented")
+			}
+			return ec.directives.Hook_updateProjectCard(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateProjectCardPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateProjectCardPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -26075,8 +26179,28 @@ func (ec *executionContext) _Mutation_deleteProjectCard(ctx context.Context, fie
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteProjectCard(rctx, fc.Args["filter"].(model.ProjectCardFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteProjectCard(rctx, fc.Args["filter"].(model.ProjectCardFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectCard == nil {
+				return nil, errors.New("directive hook_deleteProjectCard is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectCard(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteProjectCardPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteProjectCardPayload`, tmp)
 	})
 
 	if resTmp == nil {
