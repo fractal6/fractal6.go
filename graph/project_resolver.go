@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
+	"strconv"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -74,6 +75,29 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	// Validate input
 	input := graphql.GetResolverContext(ctx).Args["input"].(model.UpdateProjectCardInput)
 	ids := input.Filter.ID
+	isMoved := false
+	var uid string
+	var old_pos string
+	var old_colid string
+	if input.Set != nil && len(ids) == 1 {
+		if input.Set.Pos != nil && input.Set.Pc != nil {
+			// Extract the value before moving
+			isMoved = true
+			uid = ids[0]
+			// @TODO: optimize the number of query !
+			x, err := db.GetDB().GetFieldById(uid, "ProjectCard.pos")
+			if err != nil {
+				return nil, err
+			}
+			old_pos = strconv.Itoa(int(x.(float64)))
+
+			x, err = db.GetDB().GetSubFieldById(uid, "ProjectCard.pc", "uid")
+			if err != nil {
+				return nil, err
+			}
+			old_colid = x.(string)
+		}
+	}
 
 	if input.Remove != nil {
 		return nil, fmt.Errorf("remove is not allowed for this mutation")
@@ -86,8 +110,12 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 
 	// Auto increment card position only when updating a single card,
 	// otherwise, assume that the user is know what he is doing.
-	if input.Set != nil && len(ids) == 1 {
-		_, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": ids[0]})
+	if isMoved {
+		_, err := db.GetDB().Meta("incrementCardPos2", map[string]string{
+			"cardid":    uid,
+			"old_pos":   old_pos,
+			"old_colid": old_colid,
+		})
 		if err != nil {
 			return data, err
 		}

@@ -811,15 +811,45 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
 
             var(func: uid(colid)) {
-                ProjectColumn.cards @filter(gt(ProjectCard.pos, val(pos))) {
-                    mutme as uid
-                    p as ProjectCard.pos
-                    new_pos as math(p + 1)
+                ProjectColumn.cards @filter(ge(ProjectCard.pos, val(pos)) AND not uid({{.cardid}})) {
+                    incrme as uid
+                    p1 as ProjectCard.pos
+                    new_pos_incr as math(p1 + 1)
                 }
             }
         }`,
 		S: `
-        uid(mutme) <ProjectCard.pos> val(new_pos) .
+        uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
+        `,
+	},
+	"incrementCardPos2": QueryMut{
+		Q: `query {
+            var(func: uid({{.cardid}})) {
+                pos as ProjectCard.pos
+                ProjectCard.pc {
+                    colid as uid
+                }
+            }
+
+            var(func: uid(colid)) {
+                ProjectColumn.cards @filter(ge(ProjectCard.pos, val(pos)) AND not uid({{.cardid}})) {
+                    incrme as uid
+                    p1 as ProjectCard.pos
+                    new_pos_incr as math(p1 + 1)
+                }
+            }
+
+            var(func: uid("{{.old_colid}}")) {
+                ProjectColumn.cards @filter(gt(ProjectCard.pos, {{.old_pos}})) {
+                    decrme as uid
+                    p2 as ProjectCard.pos
+                    new_pos_decr as math(p2 - 1)
+                }
+            }
+        }`,
+		S: `
+        uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
+        uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
         `,
 	},
 	// Delete
