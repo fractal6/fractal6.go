@@ -465,8 +465,7 @@ func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Re
 		CommitNow: true,
 	}
 
-	res, err := txn.Do(ctx, req)
-	return res, err
+	return txn.Do(ctx, req)
 }
 
 //
@@ -495,28 +494,24 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 			v[k] = val
 		}
 	default: // Interface{} data type (Payload)
-		var config *mapstructure.DecoderConfig
-		if op == "query" || op == "rawQuery" {
-			// Decoder config to handle aliased request
-			// @DEBUG: see bug #3c3f1f7
-			config = &mapstructure.DecoderConfig{
-				Result:  data,
-				TagName: "json",
-				DecodeHook: mapstructure.ComposeDecodeHookFunc(
-					CleanAliasedMapHook(),
-					ToUnionHookFunc(),
-				),
-			}
-		} else {
-			config = &mapstructure.DecoderConfig{TagName: "json", Result: data}
+		config := &mapstructure.DecoderConfig{
+			Result:  data,
+			TagName: "json",
+			DecodeHook: mapstructure.ComposeDecodeHookFunc(
+				// Decoder config to handle aliased request
+				// @DEBUG: see bug #3c3f1f7
+				// Not needed since version 5.0.10 of elm-graphql that do not used hashes by defaut.
+				// Not that alias won be supported since we know to handle it with gqlgen resolver.
+				//CleanAliasedMapHook(),
+				ToUnionHookFunc(),
+			),
 		}
 
 		decoder, err := mapstructure.NewDecoder(config)
 		if err != nil {
 			return err
 		}
-		err = decoder.Decode(res.Data[queryName])
-		if err != nil {
+		if err = decoder.Decode(res.Data[queryName]); err != nil {
 			return err
 		}
 	}

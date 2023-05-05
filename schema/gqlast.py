@@ -242,20 +242,18 @@ class SemanticFilter:
             # LOG DEBUG
             #print('%s inherited %s field from %s' % (ast._name.name, name, interface_name))
 
-            # Inherit a  field
+            # Inherit a field
             # deepcopy prevent the parent AST to be modified later, when
             # working on the child AST.
             fields.append(deepcopy(fd))
 
-            # Current field
-            curfd = [x.field for x in fields if name == self.get_name(x.field)][0]
-
-            # Inherit a directive
+            # Inherit directives
+            curfd = [x.field for x in fields if name == self.get_name(x.field)][0] # Current field
             directives = itf_fd['directives']
-            if not curfd._directives and directives:
-                self._ast_set(curfd, '_directives', [x['ast'] for x in  directives])
-                # LOG DEBUG
-                #print('%s inherited %s directive from %s' % (curfd._name.name, len(directives), interface_name))
+            cur_directives = curfd._directives or []
+            self._ast_set(curfd, '_directives', [x['ast'] for x in  directives if x['name'] not in cur_directives])
+            # LOG DEBUG
+            #print('%s inherited %s directive from %s' % (curfd._name.name, len(directives), interface_name))
 
 
         return
@@ -292,11 +290,13 @@ class SemanticFilter:
         return
 
     def copy_directives(self, name_in, data_types_in,
-                        name_out, data_type_out,
-                        directive_name, set_default=False, with_args=False):
+                        name_out, data_type_out, directive_name,
+                        set_default=False, with_args=False, remove_x_alter=False):
         _fields = None
         for data_type in data_types_in:
             data_in = getattr(self, data_type)
+            # The first object should already have inherited
+            # from its implemented interface, if any.
             if name_in in data_in:
                 _fields = data_in[name_in]
                 # LOG DEBUG
@@ -315,6 +315,7 @@ class SemanticFilter:
 
                 for d in _f['directives']:
                     dn = d['name']
+                    # Match directive in {directive_name}
                     if re.search(directive_name, dn) and (not with_args or with_args and d['ast']._args):
                         if not f['ast'].field._directives:
                             self._ast_set(f['ast'].field, '_directives', [])
@@ -327,6 +328,23 @@ class SemanticFilter:
                     # Protect the object from Patch queries by default...
                     ro = AST2({'_cst__bb': '@', '_name': AST2({'name': 'x_patch_ro'}), '_args': None})
                     self._ast_set(f['ast'].field, '_directives', [ro])
+
+                if remove_x_alter and f['ast'].field._directives:
+                    # clean the @x_alter directive, if given with no argument
+                    to_remove = []
+                    for i, d in enumerate(f['ast'].field._directives):
+                        if not d:
+                            continue
+
+                        # Target x_alter directive with no argument.
+                        if self.get_name(d) != "x_alter" or d._args:
+                            continue
+
+                        to_remove.append(i)
+
+                    # filter directives
+                    for i in to_remove[::-1]:
+                        a=f['ast'].field._directives.pop(i)
 
         return
 
@@ -534,18 +552,18 @@ class GqlgenSemantics(GraphqlSemantics):
                 self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^x_(add|alter)', with_args=True)
         elif name.endswith('Patch'):
             # This match the `input` field for the 'Update' and 'Remove' mutations
-            # - set_defaut protect field with no auth directives as read_only
+            # - set_defaut protect field with no auth directives as read_only (@x_alter with no argument used here.)
             type_name = re.match(r'(\w*)Patch', name).groups()[0]
             if type_name:
                 self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^w_(?!add)')
-                self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^x_(?!add)', set_default=True)
+                self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^x_(?!add)', set_default=True, remove_x_alter=True)
 
         elif name.endswith('Filter'):
             # This match the `filter` field for the 'Update' and 'Remove' mutations
             type_name = re.match(r'(\w*)Filter', name).groups()[0]
             # Ignore Unions
             if type_name and not type_name in self.sf.unions:
-                self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^w_')
+                self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^w_alter')
 
         elif name.endswith('Ref'):
             # This match the fields for the 'Update' and 'Remove' mutations
@@ -553,7 +571,7 @@ class GqlgenSemantics(GraphqlSemantics):
             # Ignore Unions
             if type_name and not type_name in self.sf.unions:
                 self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^w_')
-                self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^x_')
+                self.sf.copy_directives(type_name, ['types', 'interfaces'], name, 'inputs', r'^x_', remove_x_alter=True)
 
         return ast
 

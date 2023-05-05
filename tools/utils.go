@@ -262,8 +262,6 @@ func CleanCompositeName(m map[string]interface{}, deep bool) map[string]interfac
 	return out
 }
 
-// @TODO: migrate CleanCompositeNameHook (db/dql.go) here...
-
 func CleanAliasedMapHook() mapstructure.DecodeHookFunc {
 	return func(from, to reflect.Kind, data interface{}) (interface{}, error) {
 		if to == reflect.Struct {
@@ -319,13 +317,13 @@ func ToUnionHookFunc() mapstructure.DecodeHookFunc {
 				b, _ := json.Marshal(data)
 				switch data.(model.JsonAtom)["__typename"] {
 				case "Tension":
-					var partial model.Event
+					var partial model.Tension
 					if err := json.Unmarshal(b, &partial); err != nil {
 						return data, err
 					}
 					d = &partial
 				case "ProjectDraft":
-					var partial model.Contract
+					var partial model.ProjectDraft
 					if err := json.Unmarshal(b, &partial); err != nil {
 						return data, err
 					}

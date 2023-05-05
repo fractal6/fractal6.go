@@ -93,7 +93,14 @@ func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
 }
 
 func now(ctx context.Context, next graphql.Resolver) (interface{}, error) {
-	fmt.Println("alors...")
-	_, err := next(ctx)
-	return tools.Now(), err
+	data, err := next(ctx)
+	now := tools.Now()
+	switch data.(type) {
+	case *string:
+		return &now, err
+	case string:
+		return now, err
+	}
+	field := *graphql.GetPathContext(ctx).Field
+	return nil, fmt.Errorf("Type unknwown for field %s", field)
 }
