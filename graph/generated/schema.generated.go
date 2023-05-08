@@ -72353,7 +72353,7 @@ func (ec *executionContext) unmarshalInputProjectColumnFilter(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "col_type", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72365,6 +72365,14 @@ func (ec *executionContext) unmarshalInputProjectColumnFilter(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "col_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
+			it.ColType, err = ec.unmarshalOProjectColumnType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -72745,6 +72753,42 @@ func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
 			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectColumnType_hash(ctx context.Context, obj interface{}) (model.ProjectColumnTypeHash, error) {
+	var it model.ProjectColumnTypeHash
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
+			it.In, err = ec.unmarshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -95810,6 +95854,67 @@ func (ec *executionContext) unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, v interface{}) ([]*model.ProjectColumnType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectColumnType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectColumnType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, v interface{}) (*model.ProjectColumnType, error) {
 	if v == nil {
 		return nil, nil
@@ -95824,6 +95929,14 @@ func (ec *executionContext) marshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOProjectColumnType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnTypeHash(ctx context.Context, v interface{}) (*model.ProjectColumnTypeHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectColumnType_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectDraft) graphql.Marshaler {

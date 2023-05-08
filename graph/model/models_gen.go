@@ -1831,11 +1831,12 @@ type ProjectColumnAggregateResult struct {
 }
 
 type ProjectColumnFilter struct {
-	ID  []string                  `json:"id,omitempty"`
-	Has []*ProjectColumnHasFilter `json:"has,omitempty"`
-	And []*ProjectColumnFilter    `json:"and,omitempty"`
-	Or  []*ProjectColumnFilter    `json:"or,omitempty"`
-	Not *ProjectColumnFilter      `json:"not,omitempty"`
+	ID      []string                  `json:"id,omitempty"`
+	ColType *ProjectColumnTypeHash    `json:"col_type,omitempty"`
+	Has     []*ProjectColumnHasFilter `json:"has,omitempty"`
+	And     []*ProjectColumnFilter    `json:"and,omitempty"`
+	Or      []*ProjectColumnFilter    `json:"or,omitempty"`
+	Not     *ProjectColumnFilter      `json:"not,omitempty"`
 }
 
 type ProjectColumnOrder struct {
@@ -1865,6 +1866,11 @@ type ProjectColumnRef struct {
 	Cards       []*ProjectCardRef  `json:"cards,omitempty"`
 	Project     *ProjectRef        `json:"project,omitempty"`
 	Tensions    []*TensionRef      `json:"tensions,omitempty"`
+}
+
+type ProjectColumnTypeHash struct {
+	Eq *ProjectColumnType   `json:"eq,omitempty"`
+	In []*ProjectColumnType `json:"in,omitempty"`
 }
 
 type ProjectDraft struct {

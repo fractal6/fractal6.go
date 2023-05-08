@@ -31,6 +31,12 @@ import (
 	. "fractale/fractal6.go/tools"
 )
 
+//
+// ProjectCard Resolver
+// --
+// We update the card position in list when thery are
+// moved to respect the shifting.
+
 // Add "ProjectCard"
 func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing: Authorization
@@ -56,8 +62,9 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 
 	for _, card := range d.ProjectCard {
 		if card.ID == "" {
-			return nil, fmt.Errorf("id payload required for project card mutation")
+			return data, fmt.Errorf("id payload required for project card mutation")
 		}
+
 		_, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID})
 		if err != nil {
 			return data, err

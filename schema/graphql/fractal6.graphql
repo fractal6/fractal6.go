@@ -206,7 +206,7 @@ type ProjectColumn {
   description: String @x_alter(r:"maxLen", n:280)
   color: String @x_alter
   pos: Int! @x_alter # @auto-in-hook
-  col_type: ProjectColumnType! @x_alter
+  col_type: ProjectColumnType! @x_alter @search
   cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project! @x_alter(r:"ref")
   # Keep track if the status of tensions (i.e not in a NoStatusColumn col)

@@ -145,6 +145,7 @@ func Init() gen.Config {
 	c.Directives.Hook_getTensionInput = nothing
 	c.Directives.Hook_queryTensionInput = nothing
 	// @DEBUG: input rawQuery isssue (input modification not propagated with rawQuery whil rawQuery loose field with argument) !!!
+	// to be reviewed...
 	//c.Directives.Hook_addTensionInput = tensionInputHook
 	//c.Directives.Hook_updateTensionInput = tensionInputHook
 	c.Directives.Hook_addTensionInput = nothing

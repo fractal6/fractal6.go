@@ -230,7 +230,7 @@ type ProjectColumn {
   description: String
   color: String
   pos: Int!
-  col_type: ProjectColumnType!
+  col_type: ProjectColumnType! @search
   cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project!
   tensions: [Tension!] @hasInverse(field: project_statuses)
