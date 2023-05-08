@@ -536,6 +536,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	"getTensionInt": `{
+        {{.extra_pre_vars}}
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
             tensions as Node.tensions_in {{.tensionFilter}} @cascade {
                 {{.authorsFilter}}
@@ -555,6 +556,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	"getTensionExt": `{
+        {{.extra_pre_vars}}
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
             tensions_in as Node.tensions_in {{.tensionFilter}} @cascade {
                 Tension.emitter @filter(NOT ({{.nameids}}))
@@ -573,6 +575,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	"getTensionAll": `{
+        {{.extra_pre_vars}}
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
             tensions as Node.tensions_in {{.tensionFilter}} @cascade {
                 {{.authorsFilter}}
@@ -592,6 +595,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	"getTensionCount": `{
+        {{.extra_pre_vars}}
         var(func: eq(Node.rootnameid, "{{.rootnameid}}")) @filter({{.nameids}}) {
             tensions as Node.tensions_in {{.tensionFilter}} @cascade {
                 {{.authorsFilter}}

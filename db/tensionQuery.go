@@ -39,6 +39,9 @@ type TensionQuery struct {
 	Type    *model.TensionType   `json:"type_"`
 	Authors []string             `json:"authors"`
 	Labels  []string             `json:"labels"`
+	// Either filter tension that in or NOT in the given project
+	InProject bool    `json:in_project`
+	Projectid *string `json:"projectid"`
 	// Protected tensions @auth
 	NameidsProtected []string
 	Username         string
@@ -48,6 +51,7 @@ type TensionQuery struct {
 func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	var err error
 	/* list format */
+	preVars := ""
 
 	// Nameids
 	var nameids []string
@@ -92,6 +96,16 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	}
 	if len(q.Labels) > 0 {
 		tf = append(tf, `has(Tension.labels)`)
+	}
+	if q.Projectid != nil {
+		if q.InProject {
+			tf = append(tf, `uid_in(Tension.project_statuses, uid(columns))`)
+		} else {
+			tf = append(tf, `NOT uid_in(Tension.project_statuses, uid(columns))`)
+		}
+		preVars += `var(func: uid({{.projectid}}) {
+            columns as Project.columns
+        }\n`
 	}
 
 	if len(tf) > 0 {
@@ -169,6 +183,8 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 		"rootnameidProtected": rootnameidProtected,
 		"nameidsProtected":    nameidsProtectedString,
 		"username":            q.Username,
+		// Extra
+		"extra_pre_vars": preVars,
 	}
 
 	return maps, nil

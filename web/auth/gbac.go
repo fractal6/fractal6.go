@@ -223,6 +223,7 @@ func GetPeersFromTid(tid string) ([]model.User, error) {
 // Sanitize TensionQuery
 //
 
+// NameidsProtected and Username information into the query.
 func QueryAuthFilter(uctx model.UserCtx, q *db.TensionQuery) error {
 	if q == nil {
 		return fmt.Errorf("Empty query")
