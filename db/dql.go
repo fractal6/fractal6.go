@@ -2120,7 +2120,8 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 		payload = `uid
             Tension.title
             Tension.status
-            Tension.type_`
+            Tension.type_
+            Tension.labels { uid Label.name Label.color }`
 	} else if type_ == "getTensionAll" {
 		payload += `
            Tension.assignees { User.username User.name }`

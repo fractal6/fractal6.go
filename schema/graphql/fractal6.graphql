@@ -210,6 +210,7 @@ type ProjectColumn {
   cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project! @x_alter(r:"ref")
   # Keep track if the status of tensions (i.e not in a NoStatusColumn col)
+  # @TODO
   tensions: [Tension!] @hasInverse(field: project_statuses) # @auto-in-hook
 }
 
