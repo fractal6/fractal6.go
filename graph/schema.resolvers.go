@@ -115,7 +115,8 @@ func (r *mutationResolver) AddProjectColumn(ctx context.Context, input []*model.
 
 // UpdateProjectColumn is the resolver for the updateProjectColumn field.
 func (r *mutationResolver) UpdateProjectColumn(ctx context.Context, input model.UpdateProjectColumnInput) (data *model.UpdateProjectColumnPayload, errors error) {
-	panic(fmt.Errorf("not implemented: UpdateProjectColumn - updateProjectColumn"))
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
+	return data, errors
 }
 
 // DeleteProjectColumn is the resolver for the deleteProjectColumn field.
@@ -512,8 +513,9 @@ func (r *queryResolver) AggregateProject(ctx context.Context, filter *model.Proj
 }
 
 // GetProjectColumn is the resolver for the getProjectColumn field.
-func (r *queryResolver) GetProjectColumn(ctx context.Context, id string) (*model.ProjectColumn, error) {
-	panic(fmt.Errorf("not implemented: GetProjectColumn - getProjectColumn"))
+func (r *queryResolver) GetProjectColumn(ctx context.Context, id string) (data *model.ProjectColumn, errors error) {
+	errors = r.DgraphBridgeRaw(ctx, &data)
+	return data, errors
 }
 
 // QueryProjectColumn is the resolver for the queryProjectColumn field.

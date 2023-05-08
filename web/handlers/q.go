@@ -206,6 +206,57 @@ func SubRoles(w http.ResponseWriter, r *http.Request) {
 // Query Tensions
 //
 
+func TensionsLight(w http.ResponseWriter, r *http.Request) {
+	var q db.TensionQuery
+
+	// Get the JSON body and decode it
+	err := json.NewDecoder(r.Body).Decode(&q)
+	if err != nil {
+		// Body structure error
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	// Filter the nameids according to the @auth directives
+	uctx := auth.GetUserContextOrEmpty(r.Context())
+	err = auth.QueryAuthFilter(uctx, &q)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Get Int Tensions
+	data, err := db.GetDB().GetTensions(q, "light")
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Filter authorized tension
+	//final := []model.Tension{}
+	//ids := []string{}
+	//for _, t := range data {
+	//    ids = append(ids, t.ID)
+	//}
+	//newIds, err := db.GetDB().Query(uctx, "tension", "id", ids, "id")
+	//if err != nil {
+	//    http.Error(w, err.Error(), 500)
+	//    return
+	//}
+	//if len(ids) != len(newIds) {
+	//    // What to do ?
+	//    // It is prompt to breaks the "LoadMore" functionality
+	//}
+
+	// Return the user context
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Write(jsonData)
+}
+
 func TensionsInt(w http.ResponseWriter, r *http.Request) {
 	var q db.TensionQuery
 

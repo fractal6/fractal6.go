@@ -551,17 +551,7 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
-            uid
-            Post.createdAt
-            Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type }
-            Tension.emitter { Node.nameid Node.name Node.role_type }
-            Tension.title
-            Tension.status
-            Tension.type_
-            Tension.action
-            Tension.labels { uid Label.name Label.color }
-            n_comments: count(Tension.comments)
+            {{.payload}}
         }
     }`,
 	"getTensionExt": `{
@@ -579,17 +569,7 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
-            uid
-            Post.createdAt
-            Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type }
-            Tension.emitter { Node.nameid Node.name Node.role_type }
-            Tension.title
-            Tension.status
-            Tension.type_
-            Tension.action
-            Tension.labels { uid Label.name Label.color }
-            n_comments: count(Tension.comments)
+            {{.payload}}
         }
     }`,
 	"getTensionAll": `{
@@ -608,19 +588,7 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
-            uid
-            Post.createdAt
-            Post.createdBy { User.username }
-            Tension.receiver { Node.nameid Node.name Node.role_type }
-            Tension.emitter { Node.nameid Node.name Node.role_type }
-            Tension.title
-            Tension.status
-            Tension.type_
-            Tension.action
-            Tension.labels { uid Label.name Label.color }
-            n_comments: count(Tension.comments)
-
-            Tension.assignees { User.username User.name }
+            {{.payload}}
         }
     }`,
 	"getTensionCount": `{
@@ -2113,7 +2081,7 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string) ([]model.RoleExt, err
 	return data, err
 }
 
-func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, error) {
+func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, error) {
 	// Format Query
 	maps, err := FormatTensionIntExtMap(q)
 	if err != nil {
@@ -2121,7 +2089,12 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
 	}
 	// Send request
 	var op string
-	if type_ == "int" {
+	var isLight bool = false
+	var payload string
+	if type_ == "light" {
+		op = "getTensionInt"
+		isLight = true
+	} else if type_ == "int" {
 		op = "getTensionInt"
 	} else if type_ == "ext" {
 		op = "getTensionExt"
@@ -2130,6 +2103,30 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
 	} else {
 		panic("Unknow type (tension query)")
 	}
+
+	payload = `uid
+        Post.createdAt
+        Post.createdBy { User.username }
+        Tension.receiver { Node.nameid Node.name Node.role_type }
+        Tension.emitter { Node.nameid Node.name Node.role_type }
+        Tension.title
+        Tension.status
+        Tension.type_
+        Tension.action
+        Tension.labels { uid Label.name Label.color }
+        n_comments: count(Tension.comments)`
+
+	if isLight {
+		payload = `uid
+            Tension.title
+            Tension.status
+            Tension.type_`
+	} else if type_ == "getTensionAll" {
+		payload += `
+           Tension.assignees { User.username User.name }`
+	}
+
+	(*maps)["payload"] = payload
 	res, err := dg.QueryDql(op, *maps)
 	if err != nil {
 		return nil, err
@@ -2142,7 +2139,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.Tension, err
 		return nil, err
 	}
 
-	var data []model.Tension
+	var data []model.TensionRef
 	config := &mapstructure.DecoderConfig{
 		Result:  &data,
 		TagName: "json",

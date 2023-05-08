@@ -168,6 +168,7 @@ func RunServer() {
 				// The filtering is done directly in the query resolver as
 				// doing it here required to rewrite the body, which seems difficult ?!
 				//r.Use(middle6.CheckTensionQueryRights)
+				r.Post("/tensions_light", handle6.TensionsLight)
 				r.Post("/tensions_int", handle6.TensionsInt)
 				r.Post("/tensions_ext", handle6.TensionsExt)
 				r.Post("/tensions_all", handle6.TensionsAll)
