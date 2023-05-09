@@ -33,7 +33,7 @@ type TensionQuery struct {
 	Nameids []string             `json:"nameids"`
 	First   int                  `json:"first"`
 	Offset  int                  `json:"offset"`
-	Query   *string              `json:"query"`
+	Pattern *string              `json:"pattern"`
 	Sort    *string              `json:"sort"`
 	Status  *model.TensionStatus `json:"status"`
 	Type    *model.TensionType   `json:"type_"`
@@ -88,8 +88,8 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	if q.Type != nil {
 		tf = append(tf, fmt.Sprintf(`eq(Tension.type_, "%s")`, q.Type))
 	}
-	if q.Query != nil {
-		tf = append(tf, fmt.Sprintf(`anyoftext(Tension.title, "%s")`, *q.Query))
+	if q.Pattern != nil {
+		tf = append(tf, fmt.Sprintf(`anyoftext(Tension.title, "%s")`, *q.Pattern))
 	}
 	if len(q.Authors) > 0 {
 		tf = append(tf, `has(Post.createdBy)`)
@@ -103,9 +103,9 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 		} else {
 			tf = append(tf, `NOT uid_in(Tension.project_statuses, uid(columns))`)
 		}
-		preVars += `var(func: uid({{.projectid}}) {
+		preVars += fmt.Sprintf(`var(func: uid(%s)) {
             columns as Project.columns
-        }\n`
+        }`, *q.Projectid)
 	}
 
 	if len(tf) > 0 {

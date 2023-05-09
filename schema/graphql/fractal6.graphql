@@ -193,7 +193,7 @@ type Project @auth(
   status: ProjectStatus! @search @x_alter
   columns: [ProjectColumn!] @hasInverse(field: project) @x_alter
   fields: [ProjectField!]
-  # @TODO: project view are different filter, and view preference about one project.
+  # @feature: project view are different filter, and view preference about one project.
   #views: [ProjectView!]
   """ Extra auth """
   leaders: [Node!]     @x_alter(r:"ref") # @Debug: Role vs User selection ...
@@ -210,8 +210,8 @@ type ProjectColumn {
   cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project! @x_alter(r:"ref")
   # Keep track if the status of tensions (i.e not in a NoStatusColumn col)
-  # @TODO
-  tensions: [Tension!] @hasInverse(field: project_statuses) # @auto-in-hook
+  # @auto-in-hook
+  tensions: [Tension!] @hasInverse(field: project_statuses)
 }
 
 type ProjectCard @hook_ {
@@ -401,7 +401,7 @@ type User @auth(
   notifyByEmail: Boolean! @x_patch
   lang: Lang!             @x_patch
   # Preference
-  # @TODO...
+  # ...
   # orgas_settings: [OrgaSetting] # order, window_pos...
   """ Tension must comply with tension @auth rules to be added. """
   subscriptions: [Tension!] @x_patch @private @hasInverse(field: subscribers) @x_alter(r:"ref")
