@@ -86,7 +86,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 		if card.ID == "" {
 			return data, fmt.Errorf("id payload required for project card mutation")
 		}
-		_, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID})
+		_, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID, "now": Now()})
 		if err != nil {
 			return data, err
 		}
@@ -209,6 +209,7 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 			"cardid":    oldCard.ID,
 			"old_pos":   strconv.Itoa(oldCard.Pos),
 			"old_colid": oldCard.Colid,
+			"now":       Now(),
 		})
 		if err != nil {
 			return data, err

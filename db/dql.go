@@ -786,6 +786,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
 
             var(func: uid(colid)) {
+                projectid as ProjectColumn.project
                 ProjectColumn.cards @filter(ge(ProjectCard.pos, val(pos)) AND not uid({{.cardid}})) {
                     incrme as uid
                     p1 as ProjectCard.pos
@@ -797,6 +798,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
         uid(colid) <ProjectColumn.tensions> uid(tid) .
         uid(tid) <Tension.project_statuses> uid(colid) .
+        uid(projectid) <Project.updatedAt> "{{.now}}" .
         `,
 	},
 	"decrementCardPos": QueryMut{
@@ -830,6 +832,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
 
             var(func: uid(colid)) {
+                projectid as ProjectColumn.project
                 ProjectColumn.cards @filter(ge(ProjectCard.pos, val(pos)) AND not uid({{.cardid}})) {
                     incrme as uid
                     p1 as ProjectCard.pos
@@ -850,6 +853,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
         uid(colid) <ProjectColumn.tensions> uid(tid) .
         uid(tid) <Tension.project_statuses> uid(colid) .
+        uid(projectid) <Project.updatedAt> "{{.now}}" .
         `,
 		D: `
         <{{.old_colid}}> <ProjectColumn.tensions> uid(tid) .
