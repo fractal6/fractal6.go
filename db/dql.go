@@ -781,7 +781,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                     colid as uid
                 }
                 ProjectCard.card @filter(type(Tension)) {
-                    tid as Tension
+                    tid as uid
                 }
             }
 
@@ -797,6 +797,24 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
         uid(colid) <ProjectColumn.tensions> uid(tid) .
         uid(tid) <Tension.project_statuses> uid(colid) .
+        `,
+	},
+	"decrementCardPos": QueryMut{
+		Q: `query {
+            var(func: uid({{.colid}})) {
+                ProjectColumn.cards @filter(gt(ProjectCard.pos, {{.pos}})) {
+                    decrme as uid
+                    p2 as ProjectCard.pos
+                    new_pos_decr as math(p2 - 1)
+                }
+            }
+        }`,
+		S: `
+        uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
+        `,
+		D: `
+        <{{.colid}}> <ProjectColumn.tensions> <{{.tid}}> .
+        <{{.tid}}> <Tension.project_statuses> <{{.colid}}> .
         `,
 	},
 	"incrementCardPos2": QueryMut{
@@ -851,6 +869,20 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 		D: `
         uid(u) <User.tensions_assigned> uid(t) .
         uid(t) <Tension.assignees> uid(u) .
+        `,
+	},
+	"deleteCardDraft": QueryMut{
+		Q: `query {
+            var(func: uid({{.cardid}})) {
+                c as uid
+                cc as ProjectCard.card
+                v as ProjectCard.values
+            }
+        }`,
+		D: `
+        uid(v) * *  .
+        uid(cc) * * .
+        uid(c) * * .
         `,
 	},
 	// Deleting user by replacing its authoring by the ghost user.
@@ -1090,6 +1122,45 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{
 
 func (dg Dgraph) Meta1(f string, maps map[string]string, data interface{}) error {
 	x, err := dg.Meta(f, maps)
+	if err != nil {
+		return err
+	}
+	if len(x) > 0 {
+		Map2Struct(x[0], data)
+	}
+	return nil
+}
+
+func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]interface{}, error) {
+	var res *api.Response
+	var err error
+
+	res, err = dg.MutateWithQueryDql3(q, maps)
+	if res == nil {
+		return nil, err
+	}
+
+	// Decode response
+	var r DqlResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract result
+	x := make([]map[string]interface{}, len(r.All))
+	for i, s := range r.All {
+		y := make(map[string]interface{}, len(s))
+		for n, m := range CleanCompositeName(s, true) {
+			y[n] = m
+		}
+		x[i] = y
+	}
+	return x, err
+}
+
+func (dg Dgraph) Gamma1(q QueryMut, maps map[string]string, data interface{}) error {
+	x, err := dg.Gamma(q, maps)
 	if err != nil {
 		return err
 	}
