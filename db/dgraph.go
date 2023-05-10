@@ -130,6 +130,14 @@ func (q QueryString) Format(maps map[string]string) string {
 	return buf.String()
 }
 
+func RawFormat(q string, maps map[string]string) string {
+	template := template.Must(template.New("graphql").Parse(q))
+	buf := bytes.Buffer{}
+	template.Execute(&buf, maps)
+	return buf.String()
+
+}
+
 //
 // Initialization
 //
@@ -457,6 +465,47 @@ func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Re
 	}
 	if muDel != "" {
 		mu.DelNquads = []byte(muDel)
+	}
+	//fmt.Println(query)
+	//fmt.Println(muSet)
+	//fmt.Println(muDel)
+
+	req := &api.Request{
+		Query:     query,
+		Mutations: []*api.Mutation{&mu},
+		CommitNow: true,
+	}
+
+	return txn.Do(ctx, req)
+}
+
+// MutateWithQueryDql3 is like the previous version, except it compute the template
+// from string directly.
+func (dg Dgraph) MutateWithQueryDql3(q QueryMut, maps map[string]string) (*api.Response, error) {
+	// init client
+	dgc, cancel := dg.getDgraphClient()
+	defer cancel()
+	ctx := context.Background()
+	txn := dgc.NewTxn()
+	defer txn.Discard(ctx)
+
+	query := RawFormat(q.Q, maps)
+	muSet := RawFormat(q.S, maps)
+	muDel := RawFormat(q.D, maps)
+
+	mu := api.Mutation{}
+	if muSet != "" {
+		mu.SetNquads = []byte(muSet)
+	}
+	if muDel != "" {
+		mu.DelNquads = []byte(muDel)
+	}
+	//fmt.Println(query)
+	//fmt.Println(muSet)
+	//fmt.Println(muDel)
+
+	if q.S == "" && q.D == "" {
+		return txn.Query(ctx, query)
 	}
 
 	req := &api.Request{
