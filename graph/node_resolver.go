@@ -67,6 +67,11 @@ type UpdateArtefactInput struct {
 
 // Add "Artefact"
 func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+	// Authorization
+	// - Check that rootnameid comply with Nodes
+	// - nodes is required
+	// - Check that user satisfy strict condition (coordo roles on node linked)
+
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -74,18 +79,8 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 	}
 
 	// Validate input
-	var inputs []*AddArtefactInput
-	inputs_, _ := InterfaceSlice(graphql.GetResolverContext(ctx).Args["input"])
-	for _, s := range inputs_ {
-		temp := AddArtefactInput{}
-		StructMap(s, &temp)
-		inputs = append(inputs, &temp)
-	}
-
-	// Authorization
-	// - Check that rootnameid comply with Nodes
-	// - nodes is required
-	// - Check that user satisfy strict condition (coordo roles on node linked)
+	var inputs []AddArtefactInput
+	ExtractInputs(ctx, &inputs)
 	for _, input := range inputs {
 		if len(input.Nodes) == 0 {
 			return nil, LogErr("Access denied", fmt.Errorf("A node must be given."))
@@ -101,6 +96,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 		}
 	}
 
+	// Forward Query
 	return next(ctx)
 }
 
@@ -127,7 +123,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 
 	// Validate input
 	var input UpdateArtefactInput
-	StructMap(graphql.GetResolverContext(ctx).Args["input"], &input)
+	ExtractInput(ctx, &input)
 
 	// Get nodes in order to perform @auth rules against it
 	nodes := []model.NodeRef{}
@@ -177,8 +173,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 	}
 
 	// If an artefact is protected and is linked to multiple nodes,
-	// Only allow if user has auth in the node with the shortest path.
-	// Detele are allowed ad
+	// Only allow updates if user has auth in the node with the shortest path.
 	if input.Set != nil && isProtected && len(nodes) > 1 {
 		mode := model.NodeModeCoordinated
 		rootnameid, _ := codec.Nid2rootid(*nodes[0].Nameid)
@@ -205,8 +200,17 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 
 	}
 
-	// Update the Label event in tension history as data is hardocoded on new/old value.
-	// @debug/perf: run this asynchronously
+	// Forward Query
+	data, err := next(ctx)
+	if err != nil {
+		return data, err
+	}
+
+	// Post-processing:
+	// - Rename unlink labels
+
+	// Update the Label event in tension history as data is hardcoded on new/old value.
+	// @debug/perf: run this asynchronously and after next()
 	if typeName == "Label" && len(input.Filter.ID) > 0 && input.Set != nil && (input.Set.Name != nil || input.Set.Color != nil) {
 		old := struct{ Name, Color, Rootnameid string }{}
 		new := struct{ Name, Color string }{}
@@ -242,5 +246,5 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 		}
 	}
 
-	return next(ctx)
+	return data, err
 }

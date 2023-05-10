@@ -1,8 +1,53 @@
 package tools
 
 import (
-// "golang.org/x/exp/constraints"
+	"encoding/json"
+	"fmt"
+	// "golang.org/x/exp/constraints"
 )
+
+// Use generics to feed a slice of unknow Type T from a list of map.
+func ExtractSlice[T any](a interface{}, data *[]T) error {
+	elements, ok := InterfaceSlice(a)
+	if !ok {
+		return fmt.Errorf("Input is not a slice")
+	}
+
+	for _, e := range elements {
+		//temp := new(T)
+		//StructMap(e, temp)
+		raw, err := json.Marshal(e)
+		if err != nil {
+			return err
+		}
+		temp, _ := unmarshalAny[T](raw)
+		*data = append(*data, *temp)
+	}
+
+	return nil
+}
+
+func unmarshalAny[T any](bytes []byte) (*T, error) {
+	out := new(T)
+	if err := json.Unmarshal(bytes, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+//
+// COMMON
+//
+
+// Merge - receives slices of type T and merges them into a single slice of type T.
+func Merge[T any](slices ...[]T) (mergedSlice []T) {
+	for _, slice := range slices {
+		for _, el := range slice {
+			mergedSlice = append(mergedSlice, el)
+		}
+	}
+	return mergedSlice
+}
 
 // Find - given a slice of type T, executes the passed in predicate function for each element in the slice.
 // If the predicate returns true - a pointer to the element is returned. If no element is found, nil is returned.

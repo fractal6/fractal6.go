@@ -39,12 +39,13 @@ func addReactionInputHook(ctx context.Context, obj interface{}, next graphql.Res
 		return nil, LogErr("Access denied", err)
 	}
 
+	// Process Query
 	data, err := next(ctx)
 	if err != nil {
 		return data, err
 	}
 
-	// Move pendingCandidate to candidate if email exists in User
+	// Set reactionid field to reactions inputs
 	newData := data.([]*model.AddReactionInput)
 	for i, input := range newData {
 		ids := []string{uctx.Username, *input.Comment.ID, strconv.Itoa(input.Type)}

@@ -21,7 +21,6 @@
 package tools
 
 import (
-	//"fmt"
 	"encoding/json"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"

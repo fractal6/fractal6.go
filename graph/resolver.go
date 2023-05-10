@@ -140,7 +140,7 @@ func Init() gen.Config {
 	// --
 	c.Directives.Hook_addProjectCard = addProjectCardHook
 	c.Directives.Hook_updateProjectCard = updateProjectCardHook
-	c.Directives.Hook_deleteProjectCard = nothing
+	c.Directives.Hook_deleteProjectCard = deleteProjectCardHook
 	//Tension
 	c.Directives.Hook_getTensionInput = nothing
 	c.Directives.Hook_queryTensionInput = nothing
@@ -213,6 +213,21 @@ func compose(manyv ...func(ctx context.Context, obj interface{}, next graphql.Re
 		}
 		return obj, err
 	}
+}
+
+func ExtractInputs[T any](ctx context.Context, inputs *[]T) {
+	a := graphql.GetResolverContext(ctx).Args["input"]
+	ExtractSlice(a, inputs)
+}
+
+func ExtractInput[T any](ctx context.Context, input *T) {
+	a := graphql.GetResolverContext(ctx).Args["input"]
+	StructMap(a, input)
+}
+
+func ExtractFilter[T any](ctx context.Context, filter *T) {
+	a := graphql.GetResolverContext(ctx).Args["filter"]
+	StructMap(a, filter)
 }
 
 /*

@@ -36,10 +36,32 @@ import (
 // We update the card position in list when thery are
 // moved to respect the shifting.
 
+type ProjectCardLoc struct {
+	ID        string `json:"id"`
+	Colid     string
+	Pos       int
+	Contentid string
+	Typenames []string
+}
+
+var QueryCardLoc db.QueryMut = db.QueryMut{
+	Q: `query {
+            all(func: uid({{.cardid}})) @normalize {
+                uid
+                ProjectCard.pc { colid: uid }
+                ProjectCard.pos
+                ProjectCard.card {
+                    contentid: uid
+                    typenames: dgraph.type
+                }
+            }
+        }`,
+}
+
 // Add "ProjectCard"
 func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-	// Pre-processing: Authorization
-	// --
+	// Pre-processing:
+	// - Auth
 
 	// Get User context
 	//ctx, uctx, err := auth.GetUserContext(ctx)
@@ -47,10 +69,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 	//    return nil, LogErr("Access denied", err)
 	//}
 
-	// Validate input
-	//var input model.UpdateProjectCardInput
-	//StructMap(graphql.GetResolverContext(ctx).Args["input"], &input)
-
+	// Forward query
 	data, err := next(ctx)
 	if err != nil {
 		return data, err
@@ -60,14 +79,13 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 		return nil, LogErr("add projectCard", fmt.Errorf("no card added"))
 	}
 
-	// Post-processing: fix pos in columns list
-	// --
+	// Post-processing:
+	// - Shift card position in columns list
 
 	for _, card := range d.ProjectCard {
 		if card.ID == "" {
 			return data, fmt.Errorf("id payload required for project card mutation")
 		}
-
 		_, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID})
 		if err != nil {
 			return data, err
@@ -77,35 +95,103 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 	return data, err
 }
 
-// Update "ProjectCard"
-func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-	// Pre-processing: Authorization
-	// --
+// Add "ProjectCard"
+func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+	// Pre-processing:
+	// - Auth
 
-	// Validate input
-	input := graphql.GetResolverContext(ctx).Args["input"].(model.UpdateProjectCardInput)
+	// Get input
+	var filter model.ProjectCardFilter
+	ExtractFilter(ctx, &filter)
+	if len(filter.ID) == 0 {
+		return nil, fmt.Errorf("Delete project required id filters.")
+	}
+	// Prior to remove, get information about that card for post-processing
+	oldCards := []ProjectCardLoc{}
+	for _, uid := range filter.ID {
+		card := ProjectCardLoc{}
+		err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": uid}, &card)
+		if err != nil {
+			return nil, err
+		}
+		oldCards = append(oldCards, card)
+	}
+
+	// Forward query
+	data, err := next(ctx)
+	if err != nil {
+		return data, err
+	}
+	d := data.(*model.DeleteProjectCardPayload)
+	if d == nil {
+		return nil, LogErr("delete projectCard", fmt.Errorf("no card deleted"))
+	}
+
+	// Post-processing:
+	// - shift card positions in columns list
+	// - eventually delete draft
+
+	for i, card := range d.ProjectCard {
+		var cardLoc ProjectCardLoc
+		if card.ID == "" {
+			return data, fmt.Errorf("id payload required for project card mutation")
+		}
+		// Search for ids that as been actually deleted
+		for ii := i; i < len(oldCards); i++ {
+			if oldCards[ii].ID == card.ID {
+				cardLoc = oldCards[ii]
+				break
+			} else {
+				continue
+			}
+		}
+		// Shift card position
+		_, err := db.GetDB().Meta("decrementCardPos", map[string]string{
+			"pos":   strconv.Itoa(card.Pos),
+			"colid": cardLoc.Colid,
+			"tid":   cardLoc.Contentid,
+		})
+		if err != nil {
+			return data, err
+		}
+		if l := FindIndexOf(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
+			// Delete draft
+			_, err := db.GetDB().Meta("deleteCardDraft", map[string]string{"cardid": card.ID})
+			if err != nil {
+				return data, err
+			}
+		}
+	}
+
+	return data, err
+}
+
+// Update "ProjectCard"
+// @warning: update of card position only supported for one card at a time.
+func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+	// Pre-processing:
+	// - Auth
+
+	// Forward query
+	data, err := next(ctx)
+	if err != nil {
+		return data, err
+	}
+
+	// Get input
+	var input model.UpdateProjectCardInput
+	ExtractInput(ctx, &input)
 	ids := input.Filter.ID
 	isMoved := false
-	var uid string
-	var old_pos string
-	var old_colid string
+	oldCard := ProjectCardLoc{}
 	if input.Set != nil && len(ids) == 1 {
 		if input.Set.Pos != nil && input.Set.Pc != nil {
 			// Extract the value before moving
 			isMoved = true
-			uid = ids[0]
-			// @TODO: optimize the number of query !
-			x, err := db.GetDB().GetFieldById(uid, "ProjectCard.pos")
+			err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": ids[0]}, &oldCard)
 			if err != nil {
 				return nil, err
 			}
-			old_pos = strconv.Itoa(int(x.(float64)))
-
-			x, err = db.GetDB().GetSubFieldById(uid, "ProjectCard.pc", "uid")
-			if err != nil {
-				return nil, err
-			}
-			old_colid = x.(string)
 		}
 	}
 
@@ -113,18 +199,16 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 		return nil, fmt.Errorf("remove is not allowed for this mutation")
 	}
 
-	data, err := next(ctx)
-
-	// Post-processing: fix pos in columns list
-	// --
+	// Post-processing:
+	// - shift card positiun in columns list
 
 	// Auto increment card position only when updating a single card,
 	// otherwise, assume that the user is know what he is doing.
 	if isMoved {
 		_, err := db.GetDB().Meta("incrementCardPos2", map[string]string{
-			"cardid":    uid,
-			"old_pos":   old_pos,
-			"old_colid": old_colid,
+			"cardid":    oldCard.ID,
+			"old_pos":   strconv.Itoa(oldCard.Pos),
+			"old_colid": oldCard.Colid,
 		})
 		if err != nil {
 			return data, err

@@ -52,7 +52,7 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 // @DEBUG: add a schema like validation for mandatory field when passing a list of NodeRef?
 // Mandatory field
 // - nameid
-func CheckNodesAuth(uctx *model.UserCtx, d interface{}, checkAll bool) error {
+func CheckNodesAuth(uctx *model.UserCtx, d interface{}, passAll bool) error {
 	var ok bool
 	var err error
 
@@ -79,19 +79,15 @@ func CheckNodesAuth(uctx *model.UserCtx, d interface{}, checkAll bool) error {
 			return LogErr("Access denied", fmt.Errorf("nameid in required in artefact nodes fields."))
 		}
 
-		ok, err := HasCoordoAuth(uctx, *n.Nameid, &mode)
+		ok, err = HasCoordoAuth(uctx, *n.Nameid, &mode)
 		if err != nil {
 			return LogErr("Internal error", err)
 		}
 
-		if checkAll {
-			if !ok {
-				break
-			}
-		} else {
-			if ok {
-				break
-			}
+		if passAll && !ok {
+			break
+		} else if ok {
+			break
 		}
 	}
 
