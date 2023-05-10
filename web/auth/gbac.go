@@ -48,6 +48,61 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 	}
 }
 
+// Check that user satisfies strict condition (coordo roles on the given nodes)
+// @DEBUG: add a schema like validation for mandatory field when passing a list of NodeRef?
+// Mandatory field
+// - nameid
+func CheckNodesAuth(uctx *model.UserCtx, d interface{}, checkAll bool) error {
+	var ok bool
+	var err error
+
+	nodes := []model.NodeRef{}
+	// Extract NodeRef from input data.
+	switch v := d.(type) {
+	case []model.NodeRef:
+		nodes = append(nodes, v...)
+	case []*model.NodeRef:
+		for _, n := range v {
+			nodes = append(nodes, *n)
+		}
+	case []string:
+		for _, n := range v {
+			nodes = append(nodes, model.NodeRef{Nameid: &n})
+		}
+	}
+
+	// Check @auth
+	// @optimize
+	mode := model.NodeModeCoordinated
+	for _, n := range nodes {
+		if n.Nameid == nil {
+			return LogErr("Access denied", fmt.Errorf("nameid in required in artefact nodes fields."))
+		}
+
+		ok, err := HasCoordoAuth(uctx, *n.Nameid, &mode)
+		if err != nil {
+			return LogErr("Internal error", err)
+		}
+
+		if checkAll {
+			if !ok {
+				break
+			}
+		} else {
+			if ok {
+				break
+			}
+		}
+	}
+
+	if len(nodes) == 0 {
+		ok = true
+	} else if !ok {
+		err = LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+	}
+	return err
+}
+
 // HasCoordoAuth tells if the user has authority in the given node.
 func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {
 	// Get the node mode eventually

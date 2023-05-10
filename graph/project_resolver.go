@@ -31,7 +31,6 @@ import (
 	. "fractale/fractal6.go/tools"
 )
 
-//
 // ProjectCard Resolver
 // --
 // We update the card position in list when thery are
@@ -47,6 +46,10 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 	//if err != nil {
 	//    return nil, LogErr("Access denied", err)
 	//}
+
+	// Validate input
+	//var input model.UpdateProjectCardInput
+	//StructMap(graphql.GetResolverContext(ctx).Args["input"], &input)
 
 	data, err := next(ctx)
 	if err != nil {

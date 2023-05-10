@@ -65,7 +65,7 @@ type UpdateArtefactInput struct {
 	Remove *AddArtefactInput    `json:"remove,omitempty"`
 }
 
-// Add "Artefeact"
+// Add "Artefact"
 func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
@@ -96,7 +96,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 			return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid does not match."))
 		}
 		// Authorization with regards to the given nodes.
-		if err = checkNodesAuth(uctx, input.Nodes); err != nil {
+		if err = auth.CheckNodesAuth(uctx, input.Nodes, true); err != nil {
 			return nil, err
 		}
 	}
@@ -167,12 +167,12 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 	}
 
 	// Authorization with regards to nodes attributes.
-	if err = checkNodesAuth(uctx, nodes); err != nil {
+	if err = auth.CheckNodesAuth(uctx, nodes, false); err != nil {
 		return nil, err
 	}
 
 	// Authorization with regards to the given nodes.
-	if err = checkNodesAuth(uctx, nodesGiven); err != nil {
+	if err = auth.CheckNodesAuth(uctx, nodesGiven, true); err != nil {
 		return nil, err
 	}
 
@@ -243,43 +243,4 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 	}
 
 	return next(ctx)
-}
-
-// Check that user satisfies strict condition (coordo roles on the given nodes)
-// @DEBUG: add a schema like validation for mandatory field when passing a list of NodeRef?
-// Mandatory field
-// - nameid
-func checkNodesAuth(uctx *model.UserCtx, d interface{}) error {
-	nodes := []model.NodeRef{}
-	// Extract NodeRef from input data.
-	switch v := d.(type) {
-	case []model.NodeRef:
-		nodes = append(nodes, v...)
-	case []*model.NodeRef:
-		for _, n := range v {
-			nodes = append(nodes, *n)
-		}
-	case []string:
-		for _, n := range v {
-			nodes = append(nodes, model.NodeRef{Nameid: &n})
-		}
-	}
-
-	// Check @auth
-	mode := model.NodeModeCoordinated
-	for _, n := range nodes {
-		if n.Nameid == nil {
-			return LogErr("Access denied", fmt.Errorf("nameid in required in artefact nodes fields."))
-		}
-
-		ok, err := auth.HasCoordoAuth(uctx, *n.Nameid, &mode)
-		if err != nil {
-			return LogErr("Internal error", err)
-		}
-		if !ok {
-			return LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
-		}
-	}
-
-	return nil
 }

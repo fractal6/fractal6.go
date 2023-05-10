@@ -40,7 +40,6 @@ func SubNodes(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -67,7 +66,6 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -97,7 +95,6 @@ func TopLabels(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&form)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -124,7 +121,6 @@ func SubLabels(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -154,7 +150,6 @@ func TopRoles(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&form)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -181,7 +176,6 @@ func SubRoles(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -212,7 +206,6 @@ func TensionsLight(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -263,7 +256,6 @@ func TensionsInt(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -314,7 +306,6 @@ func TensionsExt(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -349,7 +340,6 @@ func TensionsAll(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -384,7 +374,6 @@ func TensionsCount(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&q)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}

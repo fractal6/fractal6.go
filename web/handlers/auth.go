@@ -50,7 +50,6 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -128,7 +127,6 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -267,7 +265,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode into UserCreds
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -421,7 +418,6 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -499,7 +495,6 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -579,7 +574,6 @@ func UuidCheck(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -609,7 +603,6 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	// Get the JSON body and decode it
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		// Body structure error
 		http.Error(w, err.Error(), 400)
 		return
 	}
