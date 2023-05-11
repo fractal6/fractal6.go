@@ -59,12 +59,6 @@ type Dgraph struct {
 	// HTTP/Graphql and GPRC/DQL client address
 	gqlAddr  string
 	grpcAddr string
-
-	// HTTP/Graphql and GPRC/DQL client template
-	gqlTemplates    map[string]*QueryString
-	dqlTemplates    map[string]*QueryString
-	dqlSetTemplates map[string]*QueryString
-	dqlDelTemplates map[string]*QueryString
 }
 
 type DgraphClaims struct {
@@ -77,7 +71,7 @@ type DgraphClaims struct {
 }
 
 //
-// GRPC/Graphql+-(DQL) response
+// DQL response
 //
 
 type DqlResp struct {
@@ -90,7 +84,7 @@ type DqlRespCount struct {
 }
 
 //
-// HTTP/Graphql response
+// GQL response
 //
 
 type GqlRes struct {
@@ -104,38 +98,6 @@ type GraphQLError struct {
 
 func (e *GraphQLError) Error() string {
 	return fmt.Sprintf("%s", e.msg)
-}
-
-//
-// Query String Interface
-//
-
-type QueryString struct {
-	Q        string
-	Template *template.Template
-}
-
-// Init clean the query to be compatible in application/json format.
-func (q *QueryString) Init(clean bool) {
-	if clean {
-		q.Q = CleanString(q.Q, false)
-	}
-	// Load the template @DEBUG: Do we need a template name ?
-	q.Template = template.Must(template.New("graphql").Parse(q.Q))
-}
-
-func (q QueryString) Format(maps map[string]string) string {
-	buf := bytes.Buffer{}
-	q.Template.Execute(&buf, maps)
-	return buf.String()
-}
-
-func RawFormat(q string, maps map[string]string) string {
-	template := template.Must(template.New("graphql").Parse(q))
-	buf := bytes.Buffer{}
-	template.Execute(&buf, maps)
-	return buf.String()
-
 }
 
 //
@@ -204,36 +166,17 @@ func initDB() *Dgraph {
 		//fmt.Println("Dgraph Grpc addr:", grpcAddr)
 	}
 
-	// Initialize templates
-	gqlT := map[string]*QueryString{}
-	dqlT := map[string]*QueryString{}
-	dqlSetT := map[string]*QueryString{}
-	dqlDelT := map[string]*QueryString{}
-	for op, q := range gqlQueries {
-		gqlT[op] = &QueryString{Q: q}
-		gqlT[op].Init(true)
-	}
-	for op, q := range dqlQueries {
-		dqlT[op] = &QueryString{Q: q}
-		dqlT[op].Init(true)
-	}
-	for op, q := range dqlMutations {
-		dqlT[op] = &QueryString{Q: q.Q}
-		dqlT[op].Init(true)
-		dqlSetT[op] = &QueryString{Q: q.S}
-		dqlSetT[op].Init(false)
-		dqlDelT[op] = &QueryString{Q: q.D}
-		dqlDelT[op].Init(false)
-	}
-
 	return &Dgraph{
-		gqlAddr:         dgraphApiAddr,
-		grpcAddr:        grpcAddr,
-		gqlTemplates:    gqlT,
-		dqlTemplates:    dqlT,
-		dqlSetTemplates: dqlSetT,
-		dqlDelTemplates: dqlDelT,
+		gqlAddr:  dgraphApiAddr,
+		grpcAddr: grpcAddr,
 	}
+}
+
+func RawFormat(q string, maps map[string]string) string {
+	template := template.Must(template.New("graphql").Parse(q))
+	buf := bytes.Buffer{}
+	template.Execute(&buf, maps)
+	return buf.String()
 }
 
 //
@@ -242,8 +185,8 @@ func initDB() *Dgraph {
 
 func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
 	var q string
-	if _q, ok := dg.gqlTemplates[op]; ok {
-		q = _q.Format(m)
+	if _q, ok := gqlQueries[op]; ok {
+		q = RawFormat(CleanString(_q, false), m)
 	} else {
 		panic("unknonw GQL query op: " + op)
 	}
@@ -252,28 +195,8 @@ func (dg Dgraph) getGqlQuery(op string, m map[string]string) string {
 
 func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
 	var q string
-	if _q, ok := dg.dqlTemplates[op]; ok {
-		q = _q.Format(m)
-	} else {
-		panic("unknonw DQL query op: " + op)
-	}
-	return q
-}
-
-func (dg Dgraph) getDqlSetQuery(op string, m map[string]string) string {
-	var q string
-	if _q, ok := dg.dqlSetTemplates[op]; ok {
-		q = _q.Format(m)
-	} else {
-		panic("unknonw DQL query op: " + op)
-	}
-	return q
-}
-
-func (dg Dgraph) getDqlDelQuery(op string, m map[string]string) string {
-	var q string
-	if _q, ok := dg.dqlDelTemplates[op]; ok {
-		q = _q.Format(m)
+	if _q, ok := dqlQueries[op]; ok {
+		q = RawFormat(CleanString(_q, false), m)
 	} else {
 		panic("unknonw DQL query op: " + op)
 	}
@@ -445,42 +368,8 @@ func (dg Dgraph) MutateWithQueryDql(query string, mu *api.Mutation) error {
 	return err
 }
 
-// MutateWithQueryDql2 runs an upsert block mutation by first querying query
-// and then mutate based on the result.
-func (dg Dgraph) MutateWithQueryDql2(op string, maps map[string]string) (*api.Response, error) {
-	// init client
-	dgc, cancel := dg.getDgraphClient()
-	defer cancel()
-	ctx := context.Background()
-	txn := dgc.NewTxn()
-	defer txn.Discard(ctx)
-
-	query := dg.getDqlQuery(op, maps)
-	muSet := dg.getDqlSetQuery(op, maps)
-	muDel := dg.getDqlDelQuery(op, maps)
-
-	mu := api.Mutation{}
-	if muSet != "" {
-		mu.SetNquads = []byte(muSet)
-	}
-	if muDel != "" {
-		mu.DelNquads = []byte(muDel)
-	}
-	//fmt.Println(query)
-	//fmt.Println(muSet)
-	//fmt.Println(muDel)
-
-	req := &api.Request{
-		Query:     query,
-		Mutations: []*api.Mutation{&mu},
-		CommitNow: true,
-	}
-
-	return txn.Do(ctx, req)
-}
-
-// MutateWithQueryDql3 is like the previous version, except it compute the template
-// from string directly.
+// MutateWithQueryDql3 runs an upsert block mutations by first querying query
+// and then mutate based on the result. Accepte conditions.
 func (dg Dgraph) MutateWithQueryDql3(q QueryMut, maps map[string]string) (*api.Response, error) {
 	// init client
 	dgc, cancel := dg.getDgraphClient()
@@ -490,27 +379,34 @@ func (dg Dgraph) MutateWithQueryDql3(q QueryMut, maps map[string]string) (*api.R
 	defer txn.Discard(ctx)
 
 	query := RawFormat(q.Q, maps)
-	muSet := RawFormat(q.S, maps)
-	muDel := RawFormat(q.D, maps)
+	mutations := []*api.Mutation{}
+	for _, m := range q.M {
+		mu := api.Mutation{}
+		muSet := RawFormat(m.S, maps)
+		muDel := RawFormat(m.D, maps)
+		cond := RawFormat(m.C, maps)
+		if muSet != "" {
+			mu.SetNquads = []byte(muSet)
+		}
+		if muDel != "" {
+			mu.DelNquads = []byte(muDel)
+		}
+		if cond != "" {
+			mu.Cond = cond
+		}
+		mutations = append(mutations, &mu)
+	}
 
-	mu := api.Mutation{}
-	if muSet != "" {
-		mu.SetNquads = []byte(muSet)
-	}
-	if muDel != "" {
-		mu.DelNquads = []byte(muDel)
-	}
 	//fmt.Println(query)
-	//fmt.Println(muSet)
-	//fmt.Println(muDel)
+	//fmt.Println(mutations)
 
-	if q.S == "" && q.D == "" {
+	if len(q.M) == 0 {
 		return txn.Query(ctx, query)
 	}
 
 	req := &api.Request{
 		Query:     query,
-		Mutations: []*api.Mutation{&mu},
+		Mutations: mutations,
 		CommitNow: true,
 	}
 

@@ -49,7 +49,7 @@ var QueryCardLoc db.QueryMut = db.QueryMut{
             all(func: uid({{.cardid}})) @normalize {
                 uid
                 ProjectCard.pc { colid: uid }
-                ProjectCard.pos
+                pos: ProjectCard.pos
                 ProjectCard.card {
                     contentid: uid
                     typenames: dgraph.type
@@ -177,14 +177,14 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	// Get input
 	var input model.UpdateProjectCardInput
 	ExtractInput(ctx, &input)
-	ids := input.Filter.ID
 	isMoved := false
 	oldCard := ProjectCardLoc{}
-	if input.Set != nil && len(ids) == 1 {
+	if input.Set != nil && len(input.Filter.ID) == 1 {
 		if input.Set.Pos != nil && input.Set.Pc != nil {
 			// Extract the value before moving
 			isMoved = true
-			err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": ids[0]}, &oldCard)
+			id := input.Filter.ID[0]
+			err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": id}, &oldCard)
 			if err != nil {
 				return nil, err
 			}
@@ -207,7 +207,18 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	// Auto increment card position only when updating a single card,
 	// otherwise, assume that the user is know what he is doing.
 	if isMoved {
-		_, err := db.GetDB().Meta("incrementCardPos2", map[string]string{
+		newPos := *input.Set.Pos
+		newColid := *input.Set.Pc.ID
+		q := "moveCardPos"
+		if newColid == oldCard.Colid {
+			if oldCard.Pos > newPos {
+				q = "moveCardPosUp"
+			} else if newPos > oldCard.Pos {
+				q = "moveCardPosDown"
+			}
+		}
+
+		_, err := db.GetDB().Meta(q, map[string]string{
 			"cardid":    oldCard.ID,
 			"old_pos":   strconv.Itoa(oldCard.Pos),
 			"old_colid": oldCard.Colid,

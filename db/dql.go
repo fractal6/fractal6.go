@@ -109,9 +109,13 @@ var contractHookPayload string = `{
 }`
 
 type QueryMut struct {
-	Q string // query
+	Q string // DQL Query
+	M []X    // DQL Mutation
+}
+type X struct {
 	S string // set
 	D string // delete
+	C string // condition
 }
 
 // @uture: with Go.18 rewrite this module with generics
@@ -700,7 +704,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		S: `uid(uids) <UserEvent.isRead> "true" .`,
+		M: []X{X{
+			S: `uid(uids) <UserEvent.isRead> "true" .`,
+		}},
 	},
 	"markContractAsRead": QueryMut{
 		Q: `query {
@@ -710,7 +716,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		S: `uid(uids) <UserEvent.isRead> "true" .`,
+		M: []X{X{
+			S: `uid(uids) <UserEvent.isRead> "true" .`,
+		}},
 	},
 	"setPendingUserToken": QueryMut{
 		Q: `query {
@@ -718,7 +726,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 u as uid
             }
         }`,
-		S: `uid(u) <PendingUser.token> "{{.token}}" .`,
+		M: []X{X{
+			S: `uid(u) <PendingUser.token> "{{.token}}" .`,
+		}},
 	},
 	"setNodeVisibility": QueryMut{
 		Q: `query {
@@ -729,10 +739,11 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		S: `
-        uid(n) <Node.visibility> "{{.value}}" .
-        uid(nf) <NodeFragment.visibility> "{{.value}}" .
-        `,
+		M: []X{X{
+			S: `uid(n) <Node.visibility> "{{.value}}" .
+                uid(nf) <NodeFragment.visibility> "{{.value}}" .
+                `,
+		}},
 	},
 	"movePinnedTension": QueryMut{
 		Q: `query {
@@ -745,12 +756,10 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 
             n_new as var(func: eq(Node.nameid, "{{.nameid_new}}"))
         }`,
-		S: `
-        uid(n_new) <Node.pinned> uid(t) .
-        `,
-		D: `
-        uid(n_old) <Node.pinned> uid(t) .
-        `,
+		M: []X{X{
+			S: `uid(n_new) <Node.pinned> uid(t) . `,
+			D: `uid(n_old) <Node.pinned> uid(t) . `,
+		}},
 	},
 	"rewriteLabelEvents": QueryMut{
 		Q: `query {
@@ -768,10 +777,11 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
 
         }`,
-		S: `
-        uid(e_added) <Event.new> "{{.new_name}}" .
-        uid(e_removed) <Event.old> "{{.new_name}}" .
-        `,
+		M: []X{X{
+			S: `uid(e_added) <Event.new> "{{.new_name}}" .
+                uid(e_removed) <Event.old> "{{.new_name}}" .
+                `,
+		}},
 	},
 	"incrementCardPos": QueryMut{
 		Q: `query {
@@ -794,12 +804,13 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		S: `
-        uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
-        uid(colid) <ProjectColumn.tensions> uid(tid) .
-        uid(tid) <Tension.project_statuses> uid(colid) .
-        uid(projectid) <Project.updatedAt> "{{.now}}" .
-        `,
+		M: []X{X{
+			S: `uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
+                uid(colid) <ProjectColumn.tensions> uid(tid) .
+                uid(tid) <Tension.project_statuses> uid(colid) .
+                uid(projectid) <Project.updatedAt> "{{.now}}" .
+                `,
+		}},
 	},
 	"decrementCardPos": QueryMut{
 		Q: `query {
@@ -811,15 +822,14 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		S: `
-        uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
-        `,
-		D: `
-        <{{.colid}}> <ProjectColumn.tensions> <{{.tid}}> .
-        <{{.tid}}> <Tension.project_statuses> <{{.colid}}> .
-        `,
+		M: []X{X{
+			S: `uid(decrme) <ProjectCard.pos> val(new_pos_decr) . `,
+			D: `<{{.colid}}> <ProjectColumn.tensions> <{{.tid}}> .
+                <{{.tid}}> <Tension.project_statuses> <{{.colid}}> .
+                `,
+		}},
 	},
-	"incrementCardPos2": QueryMut{
+	"moveCardPos": QueryMut{
 		Q: `query {
             var(func: uid({{.cardid}})) {
                 pos as ProjectCard.pos
@@ -830,6 +840,8 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                     tid as uid
                 }
             }
+
+            sameCol as var(func: uid({{.old_colid}})) @filter(uid(colid))
 
             var(func: uid(colid)) {
                 projectid as ProjectColumn.project
@@ -848,17 +860,75 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		S: `
-        uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
-        uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
-        uid(colid) <ProjectColumn.tensions> uid(tid) .
-        uid(tid) <Tension.project_statuses> uid(colid) .
-        uid(projectid) <Project.updatedAt> "{{.now}}" .
-        `,
-		D: `
-        <{{.old_colid}}> <ProjectColumn.tensions> uid(tid) .
-        uid(tid) <Tension.project_statuses> <{{.old_colid}}> .
-        `,
+		M: []X{
+			X{
+				S: `uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
+                    uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
+                    uid(projectid) <Project.updatedAt> "{{.now}}" .
+                    uid(colid) <ProjectColumn.tensions> uid(tid) .
+                    uid(tid) <Tension.project_statuses> uid(colid) .
+                `,
+
+				D: `<{{.old_colid}}> <ProjectColumn.tensions> uid(tid) .
+                    uid(tid) <Tension.project_statuses> <{{.old_colid}}> .
+                `,
+				// do not set reverse is the column is the same
+				// @obsolete (keep it as a example of @if usage)
+				C: `@if(NOT eq(len(sameCol), 1))`,
+			},
+		},
+	},
+	"moveCardPosUp": QueryMut{
+		Q: `query {
+            var(func: uid({{.cardid}})) {
+                pos as ProjectCard.pos
+                ProjectCard.pc {
+                    colid as uid
+                }
+            }
+
+            var(func: uid(colid)) {
+                projectid as ProjectColumn.project
+                ProjectColumn.cards @filter(ge(ProjectCard.pos, val(pos)) AND lt(ProjectCard.pos, {{.old_pos}}) AND not uid({{.cardid}})) {
+                    incrme as uid
+                    p1 as ProjectCard.pos
+                    new_pos_incr as math(p1 + 1)
+                }
+            }
+        }`,
+		M: []X{
+			X{
+				S: `uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
+                    uid(projectid) <Project.updatedAt> "{{.now}}" .
+                `,
+			},
+		},
+	},
+	"moveCardPosDown": QueryMut{
+		Q: `query {
+            var(func: uid({{.cardid}})) {
+                pos as ProjectCard.pos
+                ProjectCard.pc {
+                    colid as uid
+                }
+            }
+
+            var(func: uid(colid)) {
+                projectid as ProjectColumn.project
+                ProjectColumn.cards @filter(gt(ProjectCard.pos, {{.old_pos}}) AND le(ProjectCard.pos, val(pos)) AND not uid({{.cardid}})) {
+                    decrme as uid
+                    p1 as ProjectCard.pos
+                    new_pos_decr as math(p1 - 1)
+                }
+            }
+        }`,
+		M: []X{
+			X{
+				S: `uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
+                    uid(projectid) <Project.updatedAt> "{{.now}}" .
+                `,
+			},
+		},
 	},
 	// Delete
 	"removeAssignedTension": QueryMut{
@@ -870,10 +940,11 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		D: `
-        uid(u) <User.tensions_assigned> uid(t) .
-        uid(t) <Tension.assignees> uid(u) .
-        `,
+		M: []X{X{
+			D: `uid(u) <User.tensions_assigned> uid(t) .
+                uid(t) <Tension.assignees> uid(u) .
+                `,
+		}},
 	},
 	"deleteCardDraft": QueryMut{
 		Q: `query {
@@ -883,11 +954,13 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 v as ProjectCard.values
             }
         }`,
-		D: `
+		M: []X{X{
+			D: `
         uid(v) * *  .
         uid(cc) * * .
         uid(c) * * .
         `,
+		}},
 	},
 	// Deleting user by replacing its authoring by the ghost user.
 	// * [x] Unnassigned his tension
@@ -925,12 +998,13 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 Project.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }`,
-		S: `
+		M: []X{X{
+			S: `
         uid(posts) <Post.createdBy> <{{.ghostid}}> .
         uid(node_created) <Node.createdBy> <{{.ghostid}}> .
         uid(project_created) <Project.createdBy> <{{.ghostid}}> .
         `,
-		D: `
+			D: `
         uid(ur) * *  .
         uid(assigned) <Tension.assignees> uid(u) .
         uid(roles) <Node.first_link> * .
@@ -942,6 +1016,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(ue) * * .
         uid(u) * * .
         `,
+		}},
 	},
 }
 
@@ -1094,14 +1169,15 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{
 	if _, ok := dqlQueries[f]; ok { // Query Case
 		// Send request
 		res, err = dg.QueryDql(f, maps)
-		if err != nil {
-			return nil, err
-		}
-	} else { // Mutation Case
+	} else if _, ok := dqlMutations[f]; ok { // Mutation Case
 		// Send request
-		//err := dg.MutateWithQueryDql(query, mutation)
 		// @codefactor: unify api...
-		res, err = dg.MutateWithQueryDql2(f, maps)
+		res, err = dg.MutateWithQueryDql3(dqlMutations[f], maps)
+	} else {
+		err = fmt.Errorf("Unknown DQL query")
+	}
+
+	if err != nil {
 		return nil, err
 	}
 

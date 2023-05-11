@@ -24,7 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"fractale/fractal6.go/db"
@@ -269,7 +268,8 @@ func PushEventNotifications(notif model.EventNotif) error {
 		// Email
 		if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
 			if eid == "" {
-				log.Printf("Notification Error: an event is emailable but not notifiable !")
+				// @deprected warning: unnecessary/noisy
+				//log.Printf("Notification Error: an event is emailable but not notifiable !")
 				return nil
 			}
 			ui.Eid = eid
