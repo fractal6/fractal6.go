@@ -841,7 +841,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
 
             var(func: uid({{.old_colid}})) {
-                ProjectColumn.cards @filter(gt(ProjectCard.pos, {{.old_pos}})) {
+                ProjectColumn.cards @filter(gt(ProjectCard.pos, {{.old_pos}}) AND not uid({{.cardid}})) {
                     decrme as uid
                     p2 as ProjectCard.pos
                     new_pos_decr as math(p2 - 1)

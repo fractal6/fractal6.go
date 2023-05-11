@@ -102,6 +102,10 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 
 // Update "Artefact" - Must be coordo
 func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+	// Pre-processing:
+	// - Auth
+	// - get values prior mutattions
+
 	// Protected Object has more restrivive conditions to be updated.
 	// @TODO: Clarify how the ressources access policy for artefacts object (that can belongs to multiple nodes)
 	// Ex: { Leaders: (mandate acess, tension access), Coordinators: (artefact access, tension access) }?
@@ -200,6 +204,18 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 
 	}
 
+	// Get value prior mutation
+	isRelabeling := typeName == "Label" && len(input.Filter.ID) > 0 && input.Set != nil && (input.Set.Name != nil || input.Set.Color != nil)
+	old := struct{ Name, Color, Rootnameid string }{}
+	if isRelabeling {
+		// Old value -- Color is embeded in the event new/old value
+		old_, err := db.GetDB().GetFieldById(input.Filter.ID[0], "Label.name Label.color Label.rootnameid")
+		if err != nil {
+			return nil, LogErr("Internal error", err)
+		}
+		StructMap(old_, &old)
+	}
+
 	// Forward Query
 	data, err := next(ctx)
 	if err != nil {
@@ -211,16 +227,8 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 
 	// Update the Label event in tension history as data is hardcoded on new/old value.
 	// @debug/perf: run this asynchronously and after next()
-	if typeName == "Label" && len(input.Filter.ID) > 0 && input.Set != nil && (input.Set.Name != nil || input.Set.Color != nil) {
-		old := struct{ Name, Color, Rootnameid string }{}
+	if isRelabeling {
 		new := struct{ Name, Color string }{}
-		// Old value -- Color is embeded in the event new/old value
-		old_, err := db.GetDB().GetFieldById(input.Filter.ID[0], "Label.name Label.color Label.rootnameid")
-		if err != nil {
-			return nil, LogErr("Internal error", err)
-		}
-		StructMap(old_, &old)
-
 		// New value
 		new_name := input.Set.Name
 		new_color := input.Set.Color
@@ -242,7 +250,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 			"new_name":   new.Name + "§" + new.Color,
 		})
 		if err != nil {
-			return nil, LogErr("Internal error", err)
+			return data, LogErr("Internal error", err)
 		}
 	}
 
