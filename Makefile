@@ -45,6 +45,7 @@ vendor:
 
 test:
 	go test ./...
+	go test ./web/auth/... -v
 
 #
 # Generate Graphql code and schema

@@ -955,11 +955,10 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
         }`,
 		M: []X{X{
-			D: `
-        uid(v) * *  .
-        uid(cc) * * .
-        uid(c) * * .
-        `,
+			D: `uid(v) * *  .
+                uid(cc) * * .
+                uid(c) * * .
+                `,
 		}},
 	},
 	// Deleting user by replacing its authoring by the ghost user.

@@ -49,25 +49,79 @@ func Merge[T any](slices ...[]T) (mergedSlice []T) {
 	return mergedSlice
 }
 
-// Find - given a slice of type T, executes the passed in predicate function for each element in the slice.
-// If the predicate returns true - a pointer to the element is returned. If no element is found, nil is returned.
-// The function is passed the current element, the current index and the slice itself as function arguments.
-func Find[T any](slice []T, predicate func(value T, index int, slice []T) bool) *T {
-	for i, el := range slice {
-		if ok := predicate(el, i, slice); ok {
-			return &el
-		}
-	}
-	return nil
-}
-
-// FindIndexOf - given a slice of type T and a value of type T, return ths first index of an element equal to value.
-// If no element is found, -1 is returned.
-func FindIndexOf[T comparable](slice []T, value T) int {
-	for i, el := range slice {
-		if el == value {
+// IndexOf returns the index at which the first occurrence of a value is found in an array or return -1
+// if the value cannot be found.
+func IndexOf[T comparable](collection []T, element T) int {
+	for i, item := range collection {
+		if item == element {
 			return i
 		}
 	}
+
 	return -1
+}
+
+// LastIndexOf returns the index at which the last occurrence of a value is found in an array or return -1
+// if the value cannot be found.
+func LastIndexOf[T comparable](collection []T, element T) int {
+	length := len(collection)
+
+	for i := length - 1; i >= 0; i-- {
+		if collection[i] == element {
+			return i
+		}
+	}
+
+	return -1
+}
+
+// Find search an element in a slice based on a predicate. It returns element and true if element was found.
+func Find[T any](collection []T, predicate func(item T) bool) (T, bool) {
+	for _, item := range collection {
+		if predicate(item) {
+			return item, true
+		}
+	}
+
+	var result T
+	return result, false
+}
+
+// FindIndexOf searches an element in a slice based on a predicate and returns the index and true.
+// It returns -1 and false if the element is not found.
+func FindIndexOf[T any](collection []T, predicate func(item T) bool) (T, int, bool) {
+	for i, item := range collection {
+		if predicate(item) {
+			return item, i, true
+		}
+	}
+
+	var result T
+	return result, -1, false
+}
+
+// FindLastIndexOf searches last element in a slice based on a predicate and returns the index and true.
+// It returns -1 and false if the element is not found.
+func FindLastIndexOf[T any](collection []T, predicate func(item T) bool) (T, int, bool) {
+	length := len(collection)
+
+	for i := length - 1; i >= 0; i-- {
+		if predicate(collection[i]) {
+			return collection[i], i, true
+		}
+	}
+
+	var result T
+	return result, -1, false
+}
+
+// FindOrElse search an element in a slice based on a predicate. It returns the element if found or a given fallback value otherwise.
+func FindOrElse[T any](collection []T, fallback T, predicate func(item T) bool) T {
+	for _, item := range collection {
+		if predicate(item) {
+			return item
+		}
+	}
+
+	return fallback
 }

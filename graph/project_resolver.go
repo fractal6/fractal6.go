@@ -23,8 +23,10 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
+	"log"
 	"strconv"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -133,19 +135,17 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	// - shift card positions in columns list
 	// - eventually delete draft
 
-	for i, card := range d.ProjectCard {
-		var cardLoc ProjectCardLoc
+	for _, card := range d.ProjectCard {
 		if card.ID == "" {
 			return data, fmt.Errorf("id payload required for project card mutation")
 		}
 		// Search for ids that as been actually deleted
-		for ii := i; i < len(oldCards); i++ {
-			if oldCards[ii].ID == card.ID {
-				cardLoc = oldCards[ii]
-				break
-			} else {
-				continue
-			}
+		cardLoc, ok := Find(oldCards, func(c ProjectCardLoc) bool {
+			return c.ID == card.ID
+		})
+		if !ok {
+			log.Printf("Error: ProjectCard loc not found for card: %s", card.ID)
+			continue
 		}
 		// Shift card position
 		_, err := db.GetDB().Meta("decrementCardPos", map[string]string{
@@ -156,7 +156,7 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 		if err != nil {
 			return data, err
 		}
-		if l := FindIndexOf(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
+		if l := IndexOf(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
 			// Delete draft
 			_, err := db.GetDB().Meta("deleteCardDraft", map[string]string{"cardid": card.ID})
 			if err != nil {
