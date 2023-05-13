@@ -35,118 +35,126 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Auth                        func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
-	CacheControl                func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
-	Cascade                     func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
-	Custom                      func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
-	Dgraph                      func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
-	Generate                    func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
-	HasInverse                  func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
-	Hidden                      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addComment             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addCommentInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addContract            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addContractInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addLabel               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addLabelInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProject             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectCard         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectCardInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addReaction            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addReactionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addRoleExt             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addRoleExtInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTension             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTensionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addUser                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addUserInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addVote                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addVoteInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteComment          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteCommentInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteContract         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteLabel            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProject          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectCard      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectCardInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteReaction         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteReactionInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteRoleExt          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteTension          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteUser             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteUserInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteVote             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteVoteInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getCommentInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getContractInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getLabelInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getProjectCardInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getProjectInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getReactionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getRoleExtInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getTensionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getUserInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getVoteInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryCommentInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryContractInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryLabelInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryProjectCardInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryProjectInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryReactionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryRoleExtInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryTensionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryUserInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryVoteInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateComment          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateCommentInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateContract         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateContractInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateLabel            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateLabelInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProject          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectCard      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectCardInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateReaction         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateReactionInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateRoleExt          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateRoleExtInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTension          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTensionInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateUser             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateUserInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateVote             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateVoteInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	IsContractValidator         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Lambda                      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	LambdaOnMutate              func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
-	Meta                        func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
-	Private                     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Remote                      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	RemoteResponse              func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
-	Search                      func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
-	Secret                      func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
-	W_add                       func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_alter                     func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_meta_patch                func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
-	W_patch                     func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_remove                    func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_set                       func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	WithSubscription            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	X_add                       func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_alter                     func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_patch                     func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_patch_ro                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	X_remove                    func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_ro                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	X_set                       func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	Auth                          func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
+	CacheControl                  func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
+	Cascade                       func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
+	Custom                        func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
+	Dgraph                        func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
+	Generate                      func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
+	HasInverse                    func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
+	Hidden                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addComment               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addCommentInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addContract              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addContractInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addLabel                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addLabelInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProject               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectCard           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectColumn         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addReaction              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addRoleExt               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTension               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTensionInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addUser                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addUserInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addVote                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addVoteInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteComment            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteCommentInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContract           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContractInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabel              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabelInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProject            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectCard        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectCardInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectColumn      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectColumnInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteReaction           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteReactionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteRoleExt            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteRoleExtInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTension            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTensionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteUser               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteUserInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteVote               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteVoteInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getCommentInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getContractInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getLabelInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getTensionInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getUserInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getVoteInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryCommentInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryContractInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryLabelInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectCardInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectColumnInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryReactionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryRoleExtInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryTensionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryUserInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryVoteInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateComment            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateCommentInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateContract           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateContractInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateLabel              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateLabelInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProject            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectCard        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectCardInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectColumn      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectColumnInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateReaction           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateReactionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateRoleExt            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateRoleExtInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTension            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTensionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateUser               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateUserInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateVote               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateVoteInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id                            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	IsContractValidator           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Lambda                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	LambdaOnMutate                func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
+	Meta                          func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
+	Private                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Remote                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	RemoteResponse                func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
+	Search                        func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
+	Secret                        func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
+	W_add                         func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_alter                       func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_meta_patch                  func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
+	W_patch                       func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_remove                      func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_set                         func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	WithSubscription              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	X_add                         func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_alter                       func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_patch                       func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_patch_ro                    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	X_remove                      func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_ro                          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	X_set                         func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -9792,6 +9800,12 @@ directive @hook_updateProjectInput on ARGUMENT_DEFINITION
 directive @hook_updateProject on FIELD_DEFINITION
 directive @hook_deleteProjectInput on ARGUMENT_DEFINITION
 directive @hook_deleteProject on FIELD_DEFINITION
+directive @hook_addProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_addProjectColumn on FIELD_DEFINITION
+directive @hook_updateProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_updateProjectColumn on FIELD_DEFINITION
+directive @hook_deleteProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_deleteProjectColumn on FIELD_DEFINITION
 directive @hook_addProjectCardInput on ARGUMENT_DEFINITION
 directive @hook_addProjectCard on FIELD_DEFINITION
 directive @hook_updateProjectCardInput on ARGUMENT_DEFINITION
@@ -9840,6 +9854,8 @@ directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_getProjectInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectInput on ARGUMENT_DEFINITION
+directive @hook_getProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_queryProjectColumnInput on ARGUMENT_DEFINITION
 directive @hook_getProjectCardInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectCardInput on ARGUMENT_DEFINITION
 directive @hook_getTensionInput on ARGUMENT_DEFINITION
@@ -10450,35 +10466,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @id on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -11815,9 +11831,9 @@ type Mutation {
   addProject(input: [AddProjectInput!]! @hook_addProjectInput): AddProjectPayload @hook_addProject
   updateProject(input: UpdateProjectInput! @hook_updateProjectInput): UpdateProjectPayload @hook_updateProject
   deleteProject(filter: ProjectFilter! @hook_deleteProjectInput): DeleteProjectPayload @hook_deleteProject
-  addProjectColumn(input: [AddProjectColumnInput!]!): AddProjectColumnPayload
-  updateProjectColumn(input: UpdateProjectColumnInput!): UpdateProjectColumnPayload
-  deleteProjectColumn(filter: ProjectColumnFilter!): DeleteProjectColumnPayload
+  addProjectColumn(input: [AddProjectColumnInput!]! @hook_addProjectColumnInput): AddProjectColumnPayload @hook_addProjectColumn
+  updateProjectColumn(input: UpdateProjectColumnInput! @hook_updateProjectColumnInput): UpdateProjectColumnPayload @hook_updateProjectColumn
+  deleteProjectColumn(filter: ProjectColumnFilter! @hook_deleteProjectColumnInput): DeleteProjectColumnPayload @hook_deleteProjectColumn
   addProjectCard(input: [AddProjectCardInput!]! @hook_addProjectCardInput): AddProjectCardPayload @hook_addProjectCard
   updateProjectCard(input: UpdateProjectCardInput! @hook_updateProjectCardInput): UpdateProjectCardPayload @hook_updateProjectCard
   deleteProjectCard(filter: ProjectCardFilter! @hook_deleteProjectCardInput): DeleteProjectCardPayload @hook_deleteProjectCard
@@ -12758,7 +12774,7 @@ type Query {
   queryProject(filter: ProjectFilter @hook_queryProjectInput, order: ProjectOrder, first: Int, offset: Int): [Project]
   aggregateProject(filter: ProjectFilter): ProjectAggregateResult
   getProjectColumn(id: ID!): ProjectColumn
-  queryProjectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
+  queryProjectColumn(filter: ProjectColumnFilter @hook_queryProjectColumnInput, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
   aggregateProjectColumn(filter: ProjectColumnFilter): ProjectColumnAggregateResult
   getProjectCard(id: ID!): ProjectCard
   queryProjectCard(filter: ProjectCardFilter @hook_queryProjectCardInput, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard]

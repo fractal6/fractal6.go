@@ -3742,9 +3742,26 @@ func (ec *executionContext) field_Mutation_addProjectColumn_args(ctx context.Con
 	var arg0 []*model.AddProjectColumnInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddProjectColumnInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectColumnInputᚄ(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddProjectColumnInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectColumnInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectColumnInput == nil {
+				return nil, errors.New("directive hook_addProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_addProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddProjectColumnInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddProjectColumnInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -4321,9 +4338,24 @@ func (ec *executionContext) field_Mutation_deleteProjectColumn_args(ctx context.
 	var arg0 model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectColumnFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNProjectColumnFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectColumnInput == nil {
+				return nil, errors.New("directive hook_deleteProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ProjectColumnFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.ProjectColumnFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -4861,9 +4893,24 @@ func (ec *executionContext) field_Mutation_updateProjectColumn_args(ctx context.
 	var arg0 model.UpdateProjectColumnInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateProjectColumnInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectColumnInput(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateProjectColumnInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectColumnInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectColumnInput == nil {
+				return nil, errors.New("directive hook_updateProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_updateProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateProjectColumnInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateProjectColumnInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -7893,9 +7940,26 @@ func (ec *executionContext) field_Query_queryProjectColumn_args(ctx context.Cont
 	var arg0 *model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryProjectColumnInput == nil {
+				return nil, errors.New("directive hook_queryProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_queryProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ProjectColumnFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -25862,8 +25926,28 @@ func (ec *executionContext) _Mutation_addProjectColumn(ctx context.Context, fiel
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddProjectColumn(rctx, fc.Args["input"].([]*model.AddProjectColumnInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddProjectColumn(rctx, fc.Args["input"].([]*model.AddProjectColumnInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectColumn == nil {
+				return nil, errors.New("directive hook_addProjectColumn is not implemented")
+			}
+			return ec.directives.Hook_addProjectColumn(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddProjectColumnPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddProjectColumnPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -25917,8 +26001,28 @@ func (ec *executionContext) _Mutation_updateProjectColumn(ctx context.Context, f
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProjectColumn(rctx, fc.Args["input"].(model.UpdateProjectColumnInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateProjectColumn(rctx, fc.Args["input"].(model.UpdateProjectColumnInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectColumn == nil {
+				return nil, errors.New("directive hook_updateProjectColumn is not implemented")
+			}
+			return ec.directives.Hook_updateProjectColumn(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateProjectColumnPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateProjectColumnPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -25972,8 +26076,28 @@ func (ec *executionContext) _Mutation_deleteProjectColumn(ctx context.Context, f
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteProjectColumn(rctx, fc.Args["filter"].(model.ProjectColumnFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteProjectColumn(rctx, fc.Args["filter"].(model.ProjectColumnFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectColumn == nil {
+				return nil, errors.New("directive hook_deleteProjectColumn is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectColumn(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteProjectColumnPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteProjectColumnPayload`, tmp)
 	})
 
 	if resTmp == nil {

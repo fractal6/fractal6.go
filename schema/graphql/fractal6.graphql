@@ -200,7 +200,7 @@ type Project @auth(
   nodes: [Node!]       @hasInverse(field: projects) @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
-type ProjectColumn {
+type ProjectColumn @hook_ {
   id: ID!
   name: String! @x_alter
   description: String @x_alter(r:"maxLen", n:280)

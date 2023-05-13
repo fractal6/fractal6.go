@@ -79,7 +79,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 	}
 	d := data.(*model.AddProjectCardPayload)
 	if d == nil {
-		return nil, LogErr("add projectCard", fmt.Errorf("no card added"))
+		return nil, LogErr("add ProjectCard", fmt.Errorf("no card added"))
 	}
 
 	// Post-processing:
@@ -110,7 +110,7 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	if len(filter.ID) == 0 {
 		return nil, fmt.Errorf("Delete project required id filters.")
 	}
-	// Prior to remove, get information about that card for post-processing
+	// Prior to remove, get information about that object for post-processing
 	oldCards := []ProjectCardLoc{}
 	for _, uid := range filter.ID {
 		card := ProjectCardLoc{}
@@ -128,7 +128,7 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	}
 	d := data.(*model.DeleteProjectCardPayload)
 	if d == nil {
-		return nil, LogErr("delete projectCard", fmt.Errorf("no card deleted"))
+		return nil, LogErr("delete ProjectCard", fmt.Errorf("no card deleted"))
 	}
 
 	// Post-processing:
@@ -205,7 +205,7 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	// - shift card positiun in columns list
 
 	// Auto increment card position only when updating a single card,
-	// otherwise, assume that the user is know what he is doing.
+	// otherwise, assume that user know what they are doing.
 	if isMoved {
 		newPos := *input.Set.Pos
 		newColid := *input.Set.Pc.ID
