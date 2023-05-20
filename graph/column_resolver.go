@@ -49,7 +49,7 @@ var QueryColumnLoc db.QueryMut = db.QueryMut{
 	Q: `query {
             all(func: uid({{.colid}})) @normalize {
                 uid
-                ProjectColumn.project { projectid: uid  }
+                ProjectColumn.project { projectid: uid }
                 pos: ProjectColumn.pos
                 cardslen: count(ProjectColumn.cards)
             }
@@ -82,7 +82,7 @@ var MoveColumnPosUp db.QueryMut = db.QueryMut{
             var(func: uid({{.projectid}})) {
                 Project.columns @filter(ge(ProjectColumn.pos, val(pos)) AND lt(ProjectColumn.pos, {{.old_pos}}) AND not uid({{.colid}})) {
                     incrme as uid
-                    p1 as ProjectCard.pos
+                    p1 as ProjectColumn.pos
                     new_pos_incr as math(p1 + 1)
                 }
             }
@@ -102,7 +102,7 @@ var MoveColumnPosDown db.QueryMut = db.QueryMut{
             }
 
             var(func: uid({{.projectid}})) {
-                ProjectColumn.cards @filter(gt(ProjectColumn.pos, {{.old_pos}}) AND le(ProjectColumn.pos, val(pos)) AND not uid({{.colid}})) {
+                Project.columns @filter(gt(ProjectColumn.pos, {{.old_pos}}) AND le(ProjectColumn.pos, val(pos)) AND not uid({{.colid}})) {
                     decrme as uid
                     p1 as ProjectColumn.pos
                     new_pos_decr as math(p1 - 1)
@@ -164,7 +164,7 @@ func deleteProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 			return nil, err
 		}
 		if col.CardsLen > 0 {
-			return nil, fmt.Errorf("This column has cards...please, move or remove it before deletion.")
+			return nil, fmt.Errorf("This column has cards...please, move or remove them before deletion.")
 		}
 		oldColumns = append(oldColumns, col)
 	}
@@ -241,7 +241,7 @@ func updateProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 	}
 
 	// Post-processing:
-	// - shift col positiun in columns list
+	// - shift col position in columns list
 
 	// Auto increment col position only when updating a single col,
 	// otherwise, assume that user know what they are doing.
