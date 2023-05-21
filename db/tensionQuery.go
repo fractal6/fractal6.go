@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
