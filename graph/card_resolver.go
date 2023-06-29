@@ -64,7 +64,6 @@ var QueryCardLoc db.QueryMut = db.QueryMut{
 func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing:
 	// - Auth
-	// - get values prior mutattions
 
 	// Get User context
 	//ctx, uctx, err := auth.GetUserContext(ctx)
@@ -102,7 +101,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing:
 	// - Auth
-	// - get values prior mutattions
+	// - get values prior mutations
 
 	// Get input
 	var filter model.ProjectCardFilter

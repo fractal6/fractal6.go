@@ -120,7 +120,6 @@ var MoveColumnPosDown db.QueryMut = db.QueryMut{
 func addProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing:
 	// - Auth
-	// - get values prior mutattions
 
 	// Get User context
 	//ctx, uctx, err := auth.GetUserContext(ctx)
@@ -147,7 +146,7 @@ func addProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Res
 func deleteProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing:
 	// - Auth
-	// - get values prior mutattions
+	// - get values prior mutations
 
 	// Get input
 	var filter model.ProjectColumnFilter

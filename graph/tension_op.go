@@ -159,6 +159,9 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 	if events == nil {
 		return false, nil, LogErr("Access denied", fmt.Errorf("No event given."))
 	}
+	if tid == "" {
+		return false, nil, LogErr("Value error", fmt.Errorf("Tension ID is mandatory."))
+	}
 
 	for _, event := range events {
 		if tension == nil { // don't fetch if there is no events (Comment updated...)

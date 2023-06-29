@@ -266,7 +266,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 				// (except if the user has subscrided to the anchor tensionn which is unlikelly).
 				return nil
 			} else {
-				auto_msg = fmt.Sprintf(`%s joined this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+				auto_msg = fmt.Sprintf(`%s joined this organization in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 			}
 
 		} else if notif.HasEvent(model.TensionEventUserLeft) {
@@ -448,12 +448,18 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		switch notif.Contract.Status {
 		case model.ContractStatusOpen:
 			if ui.Reason == model.ReasonIsInvited {
-				subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
-				payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited in the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a> by %s.<br><br>
-                You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, recv, recv, author, url_redirect, url_redirect)
+				orga_name := recv
+				if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.Name"); err != nil {
+					return err
+				} else {
+					orga_name = x.(string)
+				}
+				subject = fmt.Sprintf("[%s] You are invited to this organization", recv)
+				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited by %s, to join the organization <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
+                You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)
 			} else if ui.Reason == model.ReasonIsLinkCandidate {
 				subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
-				payload = fmt.Sprintf(`Hi%s,<br><br> Your are kindly invited to take a new role by %s.<br><br>
+				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited to take a new role by %s.<br><br>
                 You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
 			} else {
 				subject = fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())

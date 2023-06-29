@@ -264,7 +264,7 @@ interface Post @auth(
   message: String      @search(by: [fulltext]) @x_alter(r:"isOwner", f:"createdBy")
 }
 
-type ProjectDraft implements Post {
+type ProjectDraft implements Post @hook_ {
   title: String! @x_alter
   message: String @x_alter
 }
