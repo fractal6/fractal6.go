@@ -31,6 +31,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/auth"
 )
 
 // ProjectCard Resolver
@@ -41,6 +42,7 @@ import (
 type ProjectCardLoc struct {
 	ID        string `json:"id"`
 	Colid     string
+	Projectid string
 	Pos       int
 	Contentid string
 	Typenames []string
@@ -50,7 +52,10 @@ var QueryCardLoc db.QueryMut = db.QueryMut{
 	Q: `query {
             all(func: uid({{.cardid}})) @normalize {
                 uid
-                ProjectCard.pc { colid: uid }
+                ProjectCard.pc {
+                    colid: uid
+                    ProjectColumn.project { projectid: uid }
+                }
                 pos: ProjectCard.pos
                 ProjectCard.card {
                     contentid: uid
@@ -66,10 +71,26 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 	// - Auth
 
 	// Get User context
-	//ctx, uctx, err := auth.GetUserContext(ctx)
-	//if err != nil {
-	//    return nil, LogErr("Access denied", err)
-	//}
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+
+	// Validate input
+	var inputs []model.AddProjectCardInput
+	ExtractInputs(ctx, &inputs)
+	for _, input := range inputs {
+		x, err := db.GetDB().GetSubFieldById(*input.Pc.ID, "ProjectColumn.project", "uid")
+		if err != nil {
+			return nil, err
+		}
+		projectid := x.(string)
+
+		// Check project auth
+		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+			return nil, err
+		}
+	}
 
 	// Forward query
 	data, err := next(ctx)
@@ -100,14 +121,20 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 // Add "ProjectCard"
 func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing:
-	// - Auth
 	// - get values prior mutations
+	// - Auth
+
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
 
 	// Get input
 	var filter model.ProjectCardFilter
 	ExtractFilter(ctx, &filter)
 	if len(filter.ID) == 0 {
-		return nil, fmt.Errorf("Delete project required id filters.")
+		return nil, fmt.Errorf("Query requires id filters.")
 	}
 	// Prior to remove, get information about that object for post-processing
 	oldCards := []ProjectCardLoc{}
@@ -118,6 +145,11 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 			return nil, err
 		}
 		oldCards = append(oldCards, card)
+
+		// Check project auth
+		if err = auth.CheckProjectAuth(uctx, card.Projectid); err != nil {
+			return nil, err
+		}
 	}
 
 	// Forward query
@@ -173,21 +205,43 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	// Pre-processing:
 	// - Auth
 
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+
 	// Get input
 	var input model.UpdateProjectCardInput
 	ExtractInput(ctx, &input)
 	isMoved := false
 	oldCard := ProjectCardLoc{}
 	if input.Set != nil && len(input.Filter.ID) == 1 {
+		id := input.Filter.ID[0]
+		projectid := ""
 		if input.Set.Pos != nil && input.Set.Pc != nil {
 			// Extract the value before moving
 			isMoved = true
-			id := input.Filter.ID[0]
 			err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": id}, &oldCard)
 			if err != nil {
 				return nil, err
 			}
+			projectid = oldCard.Projectid
+		} else {
+			x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
+			if err != nil {
+				return nil, err
+			}
+			projectid = x.(string)
 		}
+
+		// Check project auth
+		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+			return nil, err
+		}
+	} else {
+		// Review Auth + auto increment
+		return nil, fmt.Errorf("Not implemented")
 	}
 
 	if input.Remove != nil {

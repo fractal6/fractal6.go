@@ -189,8 +189,9 @@ func (r *mutationResolver) AddProjectDraft(ctx context.Context, input []*model.A
 }
 
 // UpdateProjectDraft is the resolver for the updateProjectDraft field.
-func (r *mutationResolver) UpdateProjectDraft(ctx context.Context, input model.UpdateProjectDraftInput) (*model.UpdateProjectDraftPayload, error) {
-	panic(fmt.Errorf("not implemented: UpdateProjectDraft - updateProjectDraft"))
+func (r *mutationResolver) UpdateProjectDraft(ctx context.Context, input model.UpdateProjectDraftInput) (data *model.UpdateProjectDraftPayload, errors error) {
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
+	return data, errors
 }
 
 // DeleteProjectDraft is the resolver for the deleteProjectDraft field.

@@ -234,6 +234,7 @@ type ProjectColumn {
   cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project!
   tensions: [Tension!] @hasInverse(field: project_statuses)
+  drafts: [ProjectDraft!] @hasInverse(field: project_status)
 }
 
 type ProjectCard {
@@ -287,6 +288,7 @@ interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type ProjectDraft implements Post {
   title: String!
+  project_status: ProjectColumn!
 }
 
 type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

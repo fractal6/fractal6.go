@@ -212,6 +212,7 @@ type ProjectColumn @hook_ {
   # Keep track if the status of tensions (i.e not in a NoStatusColumn col)
   # @auto-in-hook
   tensions: [Tension!] @hasInverse(field: project_statuses)
+  drafts: [ProjectDraft!] @hasInverse(field: project_status)
 }
 
 type ProjectCard @hook_ {
@@ -267,6 +268,8 @@ interface Post @auth(
 type ProjectDraft implements Post @hook_ {
   title: String! @x_alter
   message: String @x_alter
+  # @auto-in-hook
+  project_status: ProjectColumn!
 }
 
 type Tension implements Post @auth(

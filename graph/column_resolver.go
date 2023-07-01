@@ -31,6 +31,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/auth"
 )
 
 // ProjectColumn Resolver
@@ -122,10 +123,20 @@ func addProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Res
 	// - Auth
 
 	// Get User context
-	//ctx, uctx, err := auth.GetUserContext(ctx)
-	//if err != nil {
-	//    return nil, LogErr("Access denied", err)
-	//}
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+
+	// Validate input
+	var inputs []model.AddProjectColumnInput
+	ExtractInputs(ctx, &inputs)
+	for _, input := range inputs {
+		// Check project auth
+		if err = auth.CheckProjectAuth(uctx, *input.Project.ID); err != nil {
+			return nil, err
+		}
+	}
 
 	// Forward query
 	data, err := next(ctx)
@@ -145,14 +156,20 @@ func addProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Res
 // Add "ProjectColumn"
 func deleteProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	// Pre-processing:
-	// - Auth
 	// - get values prior mutations
+	// - Auth
+
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
 
 	// Get input
 	var filter model.ProjectColumnFilter
 	ExtractFilter(ctx, &filter)
 	if len(filter.ID) == 0 {
-		return nil, fmt.Errorf("Delete project required id filters.")
+		return nil, fmt.Errorf("Query requires id filters.")
 	}
 	// Prior to remove, get information about that object for post-processing
 	oldColumns := []ProjectColumnLoc{}
@@ -166,6 +183,11 @@ func deleteProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 			return nil, fmt.Errorf("This column has cards...please, move or remove them before deletion.")
 		}
 		oldColumns = append(oldColumns, col)
+
+		// Check project auth
+		if err = auth.CheckProjectAuth(uctx, col.Projectid); err != nil {
+			return nil, err
+		}
 	}
 
 	// Forward query
@@ -212,21 +234,44 @@ func updateProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 	// Pre-processing:
 	// - Auth
 
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+
 	// Get input
 	var input model.UpdateProjectColumnInput
 	ExtractInput(ctx, &input)
 	isMoved := false
 	oldColumn := ProjectColumnLoc{}
 	if input.Set != nil && len(input.Filter.ID) == 1 {
+		id := input.Filter.ID[0]
+		projectid := ""
 		if input.Set.Pos != nil {
 			// Extract the value before moving
 			isMoved = true
-			id := input.Filter.ID[0]
 			err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": id}, &oldColumn)
 			if err != nil {
 				return nil, err
 			}
+			projectid = oldColumn.Projectid
+		} else {
+			x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
+			if err != nil {
+				return nil, err
+			}
+			projectid = x.(string)
 		}
+
+		// Check project auth
+		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+			return nil, err
+		}
+
+	} else {
+		// Review Auth + auto increment
+		return nil, fmt.Errorf("Not implemented")
 	}
 
 	if input.Remove != nil {

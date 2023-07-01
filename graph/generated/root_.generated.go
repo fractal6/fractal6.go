@@ -54,6 +54,8 @@ type DirectiveRoot struct {
 	Hook_addProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addProjectColumn         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectDraft          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectDraftInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addReaction              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -76,6 +78,8 @@ type DirectiveRoot struct {
 	Hook_deleteProjectCardInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteProjectColumn      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteProjectColumnInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectDraft       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectDraftInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteProjectInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteReaction           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteReactionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -92,6 +96,7 @@ type DirectiveRoot struct {
 	Hook_getLabelInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectDraftInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -103,6 +108,7 @@ type DirectiveRoot struct {
 	Hook_queryLabelInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryProjectCardInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryProjectColumnInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectDraftInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryProjectInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryReactionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryRoleExtInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -120,6 +126,8 @@ type DirectiveRoot struct {
 	Hook_updateProjectCardInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateProjectColumn      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateProjectColumnInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectDraft       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectDraftInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateProjectInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateReaction           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateReactionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -963,6 +971,8 @@ type ComplexityRoot struct {
 		ColType           func(childComplexity int) int
 		Color             func(childComplexity int) int
 		Description       func(childComplexity int) int
+		Drafts            func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
+		DraftsAggregate   func(childComplexity int, filter *model.ProjectDraftFilter) int
 		ID                func(childComplexity int) int
 		Name              func(childComplexity int) int
 		Pos               func(childComplexity int) int
@@ -986,12 +996,13 @@ type ComplexityRoot struct {
 	}
 
 	ProjectDraft struct {
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int, filter *model.UserFilter) int
-		ID        func(childComplexity int) int
-		Message   func(childComplexity int) int
-		Title     func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		CreatedBy     func(childComplexity int, filter *model.UserFilter) int
+		ID            func(childComplexity int) int
+		Message       func(childComplexity int) int
+		ProjectStatus func(childComplexity int, filter *model.ProjectColumnFilter) int
+		Title         func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
 	}
 
 	ProjectDraftAggregateResult struct {
@@ -6290,6 +6301,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectColumn.Description(childComplexity), true
 
+	case "ProjectColumn.drafts":
+		if e.complexity.ProjectColumn.Drafts == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectColumn_drafts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectColumn.Drafts(childComplexity, args["filter"].(*model.ProjectDraftFilter), args["order"].(*model.ProjectDraftOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "ProjectColumn.draftsAggregate":
+		if e.complexity.ProjectColumn.DraftsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectColumn_draftsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectColumn.DraftsAggregate(childComplexity, args["filter"].(*model.ProjectDraftFilter)), true
+
 	case "ProjectColumn.id":
 		if e.complexity.ProjectColumn.ID == nil {
 			break
@@ -6456,6 +6491,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectDraft.Message(childComplexity), true
+
+	case "ProjectDraft.project_status":
+		if e.complexity.ProjectDraft.ProjectStatus == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_project_status_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.ProjectStatus(childComplexity, args["filter"].(*model.ProjectColumnFilter)), true
 
 	case "ProjectDraft.title":
 		if e.complexity.ProjectDraft.Title == nil {
@@ -9812,6 +9859,12 @@ directive @hook_updateProjectCardInput on ARGUMENT_DEFINITION
 directive @hook_updateProjectCard on FIELD_DEFINITION
 directive @hook_deleteProjectCardInput on ARGUMENT_DEFINITION
 directive @hook_deleteProjectCard on FIELD_DEFINITION
+directive @hook_addProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_addProjectDraft on FIELD_DEFINITION
+directive @hook_updateProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_updateProjectDraft on FIELD_DEFINITION
+directive @hook_deleteProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_deleteProjectDraft on FIELD_DEFINITION
 directive @hook_addTensionInput on ARGUMENT_DEFINITION
 directive @hook_addTension on FIELD_DEFINITION
 directive @hook_updateTensionInput on ARGUMENT_DEFINITION
@@ -9858,6 +9911,8 @@ directive @hook_getProjectColumnInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectColumnInput on ARGUMENT_DEFINITION
 directive @hook_getProjectCardInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectCardInput on ARGUMENT_DEFINITION
+directive @hook_getProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_queryProjectDraftInput on ARGUMENT_DEFINITION
 directive @hook_getTensionInput on ARGUMENT_DEFINITION
 directive @hook_queryTensionInput on ARGUMENT_DEFINITION
 directive @hook_getCommentInput on ARGUMENT_DEFINITION
@@ -10038,9 +10093,11 @@ type ProjectColumn {
   cards(filter: ProjectCardFilter, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard!]
   project(filter: ProjectFilter): Project!
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  drafts(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft!]
 
   cardsAggregate(filter: ProjectCardFilter): ProjectCardAggregateResult
   tensionsAggregate(filter: TensionFilter): TensionAggregateResult
+  draftsAggregate(filter: ProjectDraftFilter): ProjectDraftAggregateResult
 }
 
 type ProjectCard {
@@ -10092,6 +10149,7 @@ type Post {
 type ProjectDraft {
   title: String!
   message: String
+  project_status(filter: ProjectColumnFilter): ProjectColumn!
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -10466,35 +10524,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10728,6 +10786,7 @@ input AddProjectColumnInput {
   cards: [ProjectCardRef!]
   project: ProjectRef! @x_alter(r:"ref")
   tensions: [TensionRef!]
+  drafts: [ProjectDraftRef!]
 }
 
 type AddProjectColumnPayload {
@@ -10741,6 +10800,7 @@ input AddProjectDraftInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   title: String!
+  project_status: ProjectColumnRef!
 }
 
 type AddProjectDraftPayload {
@@ -11845,9 +11905,9 @@ type Mutation {
   deleteProjectFieldValue(filter: ProjectFieldValueFilter!): DeleteProjectFieldValuePayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
-  addProjectDraft(input: [AddProjectDraftInput!]!): AddProjectDraftPayload
-  updateProjectDraft(input: UpdateProjectDraftInput!): UpdateProjectDraftPayload
-  deleteProjectDraft(filter: ProjectDraftFilter!): DeleteProjectDraftPayload
+  addProjectDraft(input: [AddProjectDraftInput!]! @hook_addProjectDraftInput): AddProjectDraftPayload @hook_addProjectDraft
+  updateProjectDraft(input: UpdateProjectDraftInput! @hook_updateProjectDraftInput): UpdateProjectDraftPayload @hook_updateProjectDraft
+  deleteProjectDraft(filter: ProjectDraftFilter! @hook_deleteProjectDraftInput): DeleteProjectDraftPayload @hook_deleteProjectDraft
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
   updateTension(input: UpdateTensionInput! @hook_updateTensionInput): UpdateTensionPayload @hook_updateTension
   deleteTension(filter: TensionFilter! @hook_deleteTensionInput): DeleteTensionPayload @hook_deleteTension
@@ -12492,6 +12552,7 @@ enum ProjectColumnHasFilter {
   cards
   project
   tensions
+  drafts
 }
 
 input ProjectColumnOrder {
@@ -12516,6 +12577,7 @@ input ProjectColumnPatch {
   cards: [ProjectCardRef!] @x_patch_ro
   project: ProjectRef @x_alter(r:"ref")
   tensions: [TensionRef!] @x_patch_ro
+  drafts: [ProjectDraftRef!] @x_patch_ro
 }
 
 input ProjectColumnRef {
@@ -12528,6 +12590,7 @@ input ProjectColumnRef {
   cards: [ProjectCardRef!]
   project: ProjectRef @x_alter(r:"ref")
   tensions: [TensionRef!]
+  drafts: [ProjectDraftRef!]
 }
 
 input ProjectColumnType_hash {
@@ -12563,6 +12626,7 @@ enum ProjectDraftHasFilter {
   updatedAt
   message
   title
+  project_status
 }
 
 input ProjectDraftOrder {
@@ -12584,6 +12648,7 @@ input ProjectDraftPatch {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   title: String
+  project_status: ProjectColumnRef @x_patch_ro
 }
 
 input ProjectDraftRef {
@@ -12593,6 +12658,7 @@ input ProjectDraftRef {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   title: String
+  project_status: ProjectColumnRef
 }
 
 type ProjectFieldAggregateResult {
@@ -12787,7 +12853,7 @@ type Query {
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
   getProjectDraft(id: ID!): ProjectDraft
-  queryProjectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  queryProjectDraft(filter: ProjectDraftFilter @hook_queryProjectDraftInput, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
   aggregateProjectDraft(filter: ProjectDraftFilter): ProjectDraftAggregateResult
   getTension(id: ID!): Tension
   queryTension(filter: TensionFilter @hook_queryTensionInput, order: TensionOrder, first: Int, offset: Int): [Tension]

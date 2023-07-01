@@ -99,6 +99,29 @@ func CheckNodesAuth(uctx *model.UserCtx, d interface{}, passAll bool) error {
 	return err
 }
 
+func CheckProjectAuth(uctx *model.UserCtx, projectid string) error {
+	nodes := []model.NodeRef{}
+	x, err := db.GetDB().GetSubFieldById(projectid, "Project.nodes", "Node.nameid")
+	if err != nil {
+		return LogErr("Internal Error", err)
+	}
+	if x != nil {
+		for _, n := range x.([]interface{}) {
+			nameid := n.(string)
+			nodes = append(nodes, model.NodeRef{Nameid: &nameid})
+		}
+	} else {
+		// Allow if the artefact is not yet linked
+	}
+
+	// Authorization with regards to nodes attributes.
+	if err = CheckNodesAuth(uctx, nodes, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // HasCoordoAuth tells if the user has authority in the given node.
 func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bool, error) {
 	// Get the node mode eventually

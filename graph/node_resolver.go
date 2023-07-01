@@ -146,6 +146,9 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 			return nil, LogErr("Access denied", fmt.Errorf("invalid filter to update node artefact."))
 		}
 	}
+	if err != nil {
+		return nil, err
+	}
 	if x != nil {
 		for _, n := range x.([]interface{}) {
 			nameid := n.(string)
