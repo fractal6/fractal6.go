@@ -210,13 +210,16 @@ func PushEventNotifications(notif model.EventNotif) error {
 	if notif.HasEvent(model.TensionEventMemberUnlinked) && codec.IsCircle(notif.Receiverid) {
 		u := notif.GetExUser()
 		if _, ex := users[u]; !ex {
-			PushNotifNotifications(model.NotifNotif{
-				Uctx: notif.Uctx,
-				Tid:  &notif.Tid,
-				Cid:  nil,
-				Msg:  "You have been removed from this organization",
-				To:   []string{u},
-			}, false)
+			uctxFs, err := db.DB.GetUctx("username", u)
+			if err != nil && !(auth.UserIsMember(uctxFs, notif.Receiverid) >= 0) {
+				PushNotifNotifications(model.NotifNotif{
+					Uctx: notif.Uctx,
+					Tid:  &notif.Tid,
+					Cid:  nil,
+					Msg:  "You have been removed from this organization",
+					To:   []string{u},
+				}, false)
+			}
 		}
 	}
 

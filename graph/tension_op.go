@@ -507,6 +507,9 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 		if isChild {
 			return false, fmt.Errorf("You can't move a node in their children.")
 		}
+		if codec.IsRole(receiverid_new) {
+			return false, fmt.Errorf("You can't move a node in a Role.")
+		}
 
 		// node input
 		nodeInput := model.UpdateNodeInput{

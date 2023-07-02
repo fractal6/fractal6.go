@@ -449,13 +449,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		case model.ContractStatusOpen:
 			if ui.Reason == model.ReasonIsInvited {
 				orga_name := recv
-				if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.Name"); err != nil {
+				if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
 					return err
 				} else {
 					orga_name = x.(string)
 				}
 				subject = fmt.Sprintf("[%s] You are invited to this organization", recv)
-				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited by %s, to join the organization <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
+				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited by %s to join the organization <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
                 You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)
 			} else if ui.Reason == model.ReasonIsLinkCandidate {
 				subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
