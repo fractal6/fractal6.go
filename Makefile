@@ -6,7 +6,7 @@ BINARY := f6
 #DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
 DGRAPH_RELEASE := v22.0.2
-CLIENT_RELEASE := 0.7.9
+CLIENT_RELEASE := 0.8
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
