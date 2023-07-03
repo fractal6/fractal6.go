@@ -1,0 +1,645 @@
+# <!> Schema Dependencies <!>
+# * fractal6.go/graph/tension_auth/EMAP: propagated fields
+# * fractal6.go/graph/tensions_op: Each event need to be individually processed in `TensionEventHook`
+# * fractal6-ui.elm: query and case on enum object
+# * fractal6-db/script: hardcoded spec
+# * fractal6.go/db/api: hardcoded query, mutation and delete (fields)
+
+# <!> Generation Warning <!>
+# interface must be defined before their implementation (or gqlast will crash)
+
+# <!> Security Notes <!>
+# Schema authorization is a mix between the Dgraph authorization rules (RBAC and GBAC),
+# fractal6.go authorization directives `@x_`, for field level protection, handled in graph/FieldAuthorization.
+# fractal6.go authorization directives `@hook_`, to manage more complex scenario at type level, handled in graph/**resolver**,
+# TODO: checks
+# - Artefact nodes.rootnameid == Label.rootnameid
+# - Tension receiver/emitter == receiverid/emmiterid
+# - Node parent.nameid == Node.rootnameid
+
+#
+# Node Interface (Role and Circle)
+#
+
+type Node @auth(
+  query: <<query-node>>,
+  add: <<is-root>>,
+  update: <<is-root>>,
+  delete: <<is-root>>
+){
+  id: ID!
+  """
+  The user that created this ressource.
+  """
+  createdBy: User!
+  """
+  When was this ressource created.
+  """
+  createdAt: DateTime! @search
+  """
+  When was this ressource was last updated.
+  """
+  updatedAt: DateTime
+
+  # Node naming/ID
+  nameid: String!     @search(by: [hash, regexp]) @id
+  rootnameid: String! @search(by: [hash, regexp]) # Convenience to recursively access children
+
+  # Data (name, about, mandate etc)
+  source: Blob
+  # For Search feature (@debug: source redundancy...)
+  name: String!       @search(by: [fulltext])
+  about: String @search(by: [fulltext])
+  skills: [String!]  @search(by: [term])
+
+  # Node linking
+  """
+  Link to the parent node. If parent is null, Node is a root node
+  """
+  isRoot: Boolean! @search
+  parent: Node
+  type_: NodeType! @search
+
+  # Edges
+  tensions_out: [Tension!] @hasInverse(field: emitter)
+  tensions_in: [Tension!]  @hasInverse(field: receiver)
+
+  # Node Permission
+  visibility: NodeVisibility! @search # rules of access (R/W)
+  mode: NodeMode!             @search # Governance mode (Interpratation of role_type)
+  rights: Int!                # Only used for Bot (v0.5). The right value is a binary AND between all event authorized it the same order they appear in the schema.
+  isArchived: Boolean!        @search # Blob source is archived
+
+  # Root node only
+  isPersonal: Boolean @search # Help explore "official" orga - nameid ends with @{username}
+  userCanJoin: Boolean
+  guestCanCreateTension: Boolean
+  # Watchers
+  watchers: [User!] @hasInverse(field: watching)
+
+  # Circle only...is a branch
+  """
+  List of chidren Node
+  """
+  children: [Node!] @hasInverse(field: parent) # @DEBUG union for multi edge graph
+  """
+  Record of available labels in this circle.
+  Available labels means that there are visible when creating and editing tension for example.
+  """
+  labels: [Label!]
+  """
+  Record of available template roles (RoleExt) in this circle.
+  Available roles means that there are visible when creating and editing new roles in a circle.
+  """
+  roles: [RoleExt!]
+  """ List of projects """
+  projects: [Project!]
+  """ List of pinned tensions """
+  pinned: [Tension!] @x_add(r:"ref")
+
+  # Role only... is a Leaf
+  role_ext: RoleExt
+  role_type: RoleType @search # @DEBUG: Waiting Nested filter in Dgragh
+  color: String
+  first_link: User
+  #second_links: [User!] @hasInverse(field: backed_roles)
+  """
+  Contract are used for user collaboration. When a action need a peer validation,
+  a contract is created in the corresponding tension. Each allowed user can vote to accept or reject the contract (or more eventually).
+  The vote are made on the behalf of the role member node, which are recorded in this field.
+  """
+  contracts: [Vote!] @hasInverse(field: node) # only for Member role -- named role (@...)
+
+  # Aggregators
+  events_history: [Event!] @meta(f:"getNodeHistory", k:"nameid")
+}
+
+type NodeFragment {
+  id: ID!
+  nameid: String    @w_add(a:"lower")
+  name: String      @x_alter(r:"minLen", n:1)
+  about: String     @x_alter(r:"maxLen", n:280)
+  mandate: Mandate  @x_alter
+  skills: [String!] @x_alter
+
+  # All the literal below are took into account only when adding a circle.
+  # For updates, one need to use the tension Event to update the circle.
+  # @warning: those are set with TensionEvent old/new value.
+  # @obsolete ?!
+  visibility: NodeVisibility
+  mode: NodeMode
+  type_: NodeType
+  first_link: String
+  role_ext : String
+  role_type: RoleType
+  color: String
+}
+
+type Mandate {
+  id: ID!
+  purpose: String!         @x_alter @search(by: [fulltext])
+  responsabilities: String @x_alter
+  domains: String          @x_alter
+  policies: String         @x_alter
+}
+
+type Label @auth(
+  query: <<query-label>>,
+  add: <<alter-label>>,
+  update: <<alter-label>>
+) @hook_ {
+  id: ID!
+  rootnameid: String!  @search(by: [hash])
+  name: String!        @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1) @w_alter(a:"lower")
+  description: String  @x_alter(r:"maxLen", n:280)
+  color: String        @x_alter
+  tensions: [Tension!] @hasInverse(field: labels) @x_ro
+  nodes: [Node!]       @hasInverse(field: labels) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+}
+
+type RoleExt @auth(
+  query: <<query-roleExt>>,
+  add: <<alter-roleExt>>,
+  update: <<alter-roleExt>>
+) @hook_ {
+  id: ID!
+  rootnameid: String!  @search(by: [hash])
+  name: String!        @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1) @w_alter(a:"lower")
+  about: String        @x_alter(r:"maxLen", n:280)
+  role_type: RoleType! @x_alter
+  color: String        @x_alter
+  mandate: Mandate     @x_alter
+  roles: [Node!]       @hasInverse(field: role_ext) @x_ro
+  nodes: [Node!]       @hasInverse(field: roles) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+
+  # period of validity ? @future
+  # validatedBy  ? @future (vote process...)
+}
+
+type Project @auth(
+  query: <<query-project>>,
+  add: <<alter-project>>,
+  update: <<alter-project>>
+) @hook_ {
+  id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  updatedAt: DateTime!
+  rootnameid: String!    @search(by: [hash])
+  parentnameid: String!  @search(by: [hash])
+  nameid: String!        @search(by: [hash]) @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1) @w_alter(a:"lower")
+  name: String!          @search(by: [fulltext]) @x_alter(r:"minLen", n:1) @x_alter(r:"maxLen", n:100)
+  description: String    @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus! @search @x_alter
+  columns: [ProjectColumn!] @hasInverse(field: project) @x_alter
+  fields: [ProjectField!]
+  # @feature: project view are different filter, and view preference about one project.
+  #views: [ProjectView!]
+  """ Extra auth """
+  leaders: [Node!]     @x_alter(r:"ref") # @Debug: Role vs User selection ...
+  nodes: [Node!]       @hasInverse(field: projects) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+}
+
+type ProjectColumn @hook_ {
+  id: ID!
+  name: String! @x_alter
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String @x_alter
+  pos: Int! @x_alter # @auto-in-hook
+  col_type: ProjectColumnType! @x_alter @search
+  cards: [ProjectCard!] @hasInverse(field: pc)
+  project: Project! @x_alter(r:"ref")
+  # Keep track if the status of tensions (i.e not in a NoStatusColumn col)
+  # @auto-in-hook
+  tensions: [Tension!] @hasInverse(field: project_statuses)
+  drafts: [ProjectDraft!] @hasInverse(field: project_status)
+}
+
+type ProjectCard @hook_ {
+  id: ID!
+  pos: Int! @x_alter
+  card: CardKind! @x_alter(r:"ref")
+  pc: ProjectColumn! @x_alter(r:"ref")
+  """ Generalisation of boards's column status """
+  values: [ProjectFieldValue!]
+
+}
+
+type ProjectField {
+  field_type: ProjectFieldType!
+  isVisible: Boolean! # In table view
+  values: [ProjectFieldValue!] @hasInverse(field: field)
+}
+
+type ProjectFieldValue {
+  field: ProjectField!
+  value: String!
+  pos: Int
+}
+
+union CardKind = Tension | ProjectDraft
+
+enum ProjectColumnType {
+  NormalColumn
+  NoStatusColumn
+}
+
+enum ProjectFieldType {
+  INT
+  STRING
+  DATE
+  SINGLE_SELECT
+}
+
+#
+# Post Interface (Tension, Comment, Event, etc)
+#
+
+interface Post @auth(
+  add: <<add-post>>
+){
+  id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search                 @w_add(a:"now")
+  updatedAt: DateTime                          @x_alter(r:"isOwner", f:"createdBy")
+  message: String      @search(by: [fulltext]) @x_alter(r:"isOwner", f:"createdBy")
+}
+
+type ProjectDraft implements Post @hook_ {
+  title: String! @x_alter
+  message: String @x_alter
+  # @auto-in-hook
+  project_status: ProjectColumn!
+}
+
+type Tension implements Post @auth(
+  query: <<query-tension>>,
+  add: <<add-tension>>
+) @hook_ {
+  emitter: Node!
+  emitterid: String!     @search(by: [hash, regexp]) # @DEBUG: Waiting Nested filter in Dgragh
+  receiver: Node!
+  receiverid: String!    @search(by: [hash, regexp]) # @DEBUG: Waiting Nested filter in Dgragh
+
+  title: String!         @search(by: [fulltext])
+  type_: TensionType!    @search @x_alter(r:"tensionTypeCheck")
+  status: TensionStatus! @search
+  action: TensionAction
+
+  assignees: [User!]     @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
+  labels: [Label!]       @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
+  comments: [Comment!]   @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  blobs: [Blob!]         @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne") @hasInverse(field: tension)
+  history: [Event!]      @x_alter @hasInverse(field: tension) # entry point
+
+  # Relations
+  mentions: [Event!]     @hasInverse(field: mentioned)
+  contracts: [Contract!] @hasInverse(field: tension) @x_add(r:"ref")
+  subscribers: [User!]   @hasInverse(field: subscriptions) @x_add(r:"ref")
+  # keep reference of tensions in projects
+  project_statuses: [ProjectColumn!]
+
+  # Aggregators
+  # We need this field to count things with DQL request since it is not yet
+  # possible to return a Aggregate count result in the DQL response.
+  # -- @debug : Aggregate count result.
+  n_comments: Int
+}
+
+type Comment implements Post @auth(
+  update: <<update-comment>>
+) @hook_ {
+  message: String! @search(by: [fulltext]) @x_alter
+  reactions: [Reaction!] @hasInverse(field: comment)
+}
+
+type Reaction @auth(
+  add: <<add-reaction>>,
+  update: <<is-root>>,
+  delete: <<delete-reaction>>
+) @hook_ {
+  id: ID!
+  reactionid: String! @id # username#cid#type_
+  user: User!        @x_add(r:"ref")
+  comment: Comment!  @x_add(r:"ref")
+  type_: Int!
+}
+
+type Blob implements Post {
+  tension: Tension!      @x_add(r:"ref")
+  blob_type: BlobType!   @search
+  pushedFlag: DateTime   @search
+  archivedFlag: DateTime @search
+
+  # data
+  node: NodeFragment
+  md: String
+}
+
+type Event implements Post {
+  tension: Tension! @x_add(r:"ref")
+  event_type: TensionEvent! @search
+  mentioned: Tension @x_add(r:"ref")
+  old: String # Store blobid for Commit and Pushed event
+  new: String # updated value
+}
+
+type EventFragment {
+  event_type: TensionEvent! @search
+  old: String # Store blobid for Commit and Pushed event
+  new: String # updated value
+}
+
+type Contract implements Post @auth(
+  query: <<query-contract>>
+) @hook_ {
+  # {contractid} is used to perform upsert update of vote and prevent for creating several
+  # auto similar contract. Contractid is set to its uid once the contract is closed to prevent blocking
+  # the creation of new contract.
+  contractid: String!          @id # {tid}#{TensionEvent}#old#new
+  tension: Tension!            @x_add(r:"ref")
+  status: ContractStatus!      @search
+  contract_type: ContractType! @search
+  closedAt: DateTime           @search
+  event: EventFragment!
+  participants: [Vote!]!       @hasInverse(field: contract)   # only user node (@...)
+  candidates: [User!]          @hasInverse(field: contracts)
+  pending_candidates: [PendingUser!]
+  comments: [Comment!]         @x_alter(r:"oneByOne")
+  isValidator: Boolean         @isContractValidator
+}
+
+type Vote implements Post @auth(
+  add: <<add-vote>>
+) @hook_ {
+  # @debug: a vote should trigger a notification but its not evented (contract updated ?)
+  voteid: String!     @id # {contractid}#{nameid}
+  contract: Contract! @x_add(r:"ref")
+  node: Node!         @x_add(r:"ref") # Named Role (@...)
+  data: [Int!]! # Vote results. Maximum len equal len of candidates.
+}
+
+#
+# User
+#
+
+type User @auth(
+  add: <<is-root>>,
+  update: <<update-user>>,
+  delete: <<is-root>>
+) @hook_ {
+  id: ID!
+  createdAt: DateTime!
+  lastAck: DateTime!
+  username: String!   @id @search(by: [hash, regexp]) @w_add(a:"lower")
+  name: String            @search(by: [regexp]) @x_patch
+  email: String!      @id @private @search(by: [hash]) @w_add(a:"lower")
+  password: String!       @hidden
+  # Profile
+  bio: String             @x_patch @x_alter(r:"maxLen", n:280)
+  location: String        @x_patch
+  utc: String             @x_patch
+  links: [String!]        @x_patch
+  skills: [String!]       @x_patch
+  notifyByEmail: Boolean! @x_patch
+  lang: Lang!             @x_patch
+  # Preference
+  # ...
+  # orgas_settings: [OrgaSetting] # order, window_pos...
+  """ Tension must comply with tension @auth rules to be added. """
+  subscriptions: [Tension!] @x_patch @private @hasInverse(field: subscribers) @x_alter(r:"ref")
+  watching: [Node!]         @x_patch @private @hasInverse(field: watchers) @x_alter(r:"ref")
+  # User Rights
+  rights: UserRights!
+  # User Roles
+  roles: [Node!]                @hasInverse(field: first_link) @x_add(r:"ref")
+  #backed_roles: [Node!]         @hasInverse(field: second_link) @x_add(r:"ref")
+  # User Tensions
+  tensions_created: [Tension!]  @hasInverse(field: createdBy) @x_add(r:"ref") @private
+  tensions_assigned: [Tension!] @hasInverse(field: assignees) @x_add(r:"ref") @private
+  contracts: [Contract!]        @hasInverse(field: candidates) @x_add(r:"ref") @private
+  reactions: [Reaction!]        @hasInverse(field: user) @x_alter
+  # Notifications Events (Tensions and Contracts)
+  """
+  An event (UserEvent) will be pushed, for notification purpose, every times an
+  event (TensionEvent) occurs in a tension where the user falls into the following:
+    * a subscriber
+    * an assignee
+    * a receiver coordinator
+    * a emitter coordinator (only for created tension...)
+
+  Or an contract is created where the user fall into the following:
+    * a candidates.
+    * a coordinator with rights.
+  """
+  events: [UserEvent!] @hasInverse(field: user) @x_alter @private
+
+  # Deep update not implemented: https://discuss.dgraph.io/t/feature-request-cascade-delete-deep-mutations-by-reference-directive/14658/3
+  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter # value ignored
+
+  # Aggregators
+  event_count: EventCount @meta(f:"getEventCount", k:"username")
+}
+
+type PendingUser {
+  id: ID!
+  updatedAt: DateTime
+  username: String! @id @w_alter(a:"lower")
+  password: String @hidden
+  email: String! @id @hidden @w_alter(a:"lower")
+  email_token: String @hidden @search(by: [hash])
+  token: String @hidden @search(by: [hash])
+  contracts: [Contract!]
+  subscribe: Boolean
+}
+
+type UserRights {
+  type_: UserType!
+  canLogin: Boolean!  # Managed in web/auth handler functions
+  canCreateRoot: Boolean! # Bypass input Node authorization/limitation.
+  maxPublicOrga: Int! # maximum of public organisation
+  maxPrivateOrga: Int! # maximum of private organisation
+  hasEmailNotifications: Boolean! # if email has been validated
+}
+
+type UserEvent @auth(
+  add: <<add-userEvent>>,
+  update: <<update-userEvent>>
+) {
+  id: ID!
+  createdAt: DateTime! @search
+  isRead: Boolean! @search @x_alter
+  user: User!
+  event: [EventKind!] @x_add(r:"ref") # event can be batched !
+}
+
+# @debug: Each new union type need a decoder in the mapstructure decoder.
+# this function is pass in the decoder config in the db.dgraph.QueyGql function.
+union EventKind = Event | Contract | Notif
+
+type Notif implements Post {
+  tension_: Tension   # Graphql validation error because option tension field conflict with mandatory one in other union types.
+  contract: Contract
+  link: String # for abitrary link
+}
+
+# Count unread events
+type EventCount	 {
+  unread_events: Int
+  pending_contracts: Int
+  assigned_tensions: Int
+}
+
+#
+# Enum
+#
+
+### Node
+
+enum NodeType {
+  Circle
+  Role
+}
+
+enum RoleType { # LeafType
+  # Member Type
+  Owner # Root member
+  Member # member with roles
+  Guest # member with no roles
+  Retired # Retired member
+  Pending # Invited member
+  # Local Role
+  Coordinator # Admin Role
+  Peer # Regular Role
+  Bot # Collector, Bridge etc
+}
+
+enum NodeVisibility {
+  Public # The entire world
+  Private # Only the Organisation members
+  Secret # Only the authorized Roles
+}
+
+enum NodeMode {
+  Coordinated # Coordinator centered
+  Agile # Role centered
+}
+
+### Tension
+
+enum TensionStatus {
+  Open
+  Closed
+}
+
+enum TensionType {
+  Operational
+  Governance
+  Help
+  Alert
+  Announcement
+  # Poll, Event ?
+}
+
+enum TensionAction {
+  # Creating
+  NewRole
+  NewCircle
+  NewMd
+  # Updating
+  EditRole
+  EditCircle
+  EditMd
+  # Archiving
+  ArchivedRole
+  ArchivedCircle
+  ArchivedMd
+  # -- Extra
+  # * Poll ?
+  # * Annoucement ?
+  # * Articles ?
+}
+
+enum TensionEvent {
+  # Tension patch
+  Created
+  Reopened
+  Closed
+  TitleUpdated
+  TypeUpdated
+  CommentPushed
+  AssigneeAdded
+  AssigneeRemoved
+  LabelAdded
+  LabelRemoved
+  BlobCreated
+  BlobCommitted
+  Mentioned
+  Pinned
+  Unpinned
+  # --- Trigger Action ---
+  BlobPushed
+  BlobArchived
+  BlobUnarchived
+  UserJoined
+  UserLeft
+  MemberLinked
+  MemberUnlinked
+  Authority
+  Visibility
+  Moved
+}
+
+enum BlobType {
+  # Node
+  OnNode
+  OnAbout
+  OnMandate
+  OnAboutAndMandate
+  # Doc (md, spreadsheet, etc)
+  OnDoc
+  #OnDocTitle ?
+}
+
+### Project
+
+enum ProjectStatus {
+  Open
+  Closed
+}
+
+### Contract
+
+enum ContractStatus {
+  Open
+  Closed
+  Canceled
+}
+
+enum ContractType { # Validation type
+  # Both coordinators should validate (both are taken from event.old (==tension.receiver.nameid) and event.new
+  AnyCoordoDual
+  # Validate on given participants
+  AnyCandidates
+  # -- self contract
+  # Validate on the tension emitter node
+  AnyCoordoSource
+  # Validate on the tension receiver node
+  AnyCoordoTarget
+}
+
+### User
+
+enum UserType {
+  Regular # Free
+  Pro
+  # --
+  Root  # Sytem only / Admin
+}
+
+enum Lang {
+  EN
+  FR
+}
+
+# Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}

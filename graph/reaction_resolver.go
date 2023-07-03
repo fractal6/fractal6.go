@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,36 +21,38 @@
 package graph
 
 import (
-    //"fmt"
-    "context"
-    "strings"
-    "strconv"
-    "github.com/99designs/gqlgen/graphql"
-    "fractale/fractal6.go/graph/model"
-    "fractale/fractal6.go/web/auth"
+	//"fmt"
+	"context"
+	"fractale/fractal6.go/graph/model"
+	"github.com/99designs/gqlgen/graphql"
+	"strconv"
+	"strings"
+
 	. "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/auth"
 )
 
-
-
 func addReactionInputHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    // Get User context
-    ctx, uctx, err := auth.GetUserContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
 
-    data, err := next(ctx)
-    if err != nil {
-        return data, err
-    }
+	// Process Query
+	data, err := next(ctx)
+	if err != nil {
+		return data, err
+	}
 
-    // Move pendingCandidate to candidate if email exists in User
-    newData := data.([]*model.AddReactionInput)
-    for i, input := range newData {
-        ids := []string{uctx.Username, *input.Comment.ID, strconv.Itoa(input.Type)}
-        reactionid := strings.Join(ids, "#")
-        input.Reactionid = reactionid
-        newData[i] = input
-    }
+	// Set reactionid field to reactions inputs
+	newData := data.([]*model.AddReactionInput)
+	for i, input := range newData {
+		ids := []string{uctx.Username, *input.Comment.ID, strconv.Itoa(input.Type)}
+		reactionid := strings.Join(ids, "#")
+		input.Reactionid = reactionid
+		newData[i] = input
+	}
 
-    return newData, err
+	return newData, err
 }

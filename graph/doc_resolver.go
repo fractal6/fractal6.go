@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,18 +21,17 @@
 package graph
 
 import (
-    "fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/graph/model"
 )
 
 func TryAddDoc(uctx *model.UserCtx, tension *model.Tension, md *string) (bool, error) {
-    return false, nil
+	return false, nil
 }
 
 func TryUpdateDoc(uctx *model.UserCtx, tension *model.Tension, md *string) (bool, error) {
-    return false, nil
+	return false, nil
 }
 
 func TryChangeArchiveDoc(uctx *model.UserCtx, tension *model.Tension, md *string, event model.TensionEvent) (bool, error) {
-    return false, nil
+	return false, nil
 }
-

@@ -8,6 +8,10 @@ import (
 	"strconv"
 )
 
+type CardKind interface {
+	IsCardKind()
+}
+
 type EventKind interface {
 	IsEventKind()
 }
@@ -141,7 +145,6 @@ type AddNodeFragmentInput struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
@@ -184,9 +187,7 @@ type AddNodeInput struct {
 	RoleType              *RoleType      `json:"role_type,omitempty"`
 	Color                 *string        `json:"color,omitempty"`
 	FirstLink             *UserRef       `json:"first_link,omitempty"`
-	SecondLink            *UserRef       `json:"second_link,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
-	OrgaAgg               *OrgaAggRef    `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
 }
 
@@ -210,16 +211,6 @@ type AddNotifPayload struct {
 	NumUids *int     `json:"numUids,omitempty"`
 }
 
-type AddOrgaAggInput struct {
-	NMembers *int `json:"n_members,omitempty"`
-	NGuests  *int `json:"n_guests,omitempty"`
-}
-
-type AddOrgaAggPayload struct {
-	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
-}
-
 type AddPendingUserInput struct {
 	UpdatedAt  *string        `json:"updatedAt,omitempty"`
 	Username   string         `json:"username"`
@@ -236,12 +227,28 @@ type AddPendingUserPayload struct {
 	NumUids     *int           `json:"numUids,omitempty"`
 }
 
+type AddProjectCardInput struct {
+	Pos    int                     `json:"pos"`
+	Card   *CardKindRef            `json:"card"`
+	Pc     *ProjectColumnRef       `json:"pc"`
+	Values []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type AddProjectCardPayload struct {
+	ProjectCard []*ProjectCard `json:"projectCard,omitempty"`
+	NumUids     *int           `json:"numUids,omitempty"`
+}
+
 type AddProjectColumnInput struct {
-	Name     string               `json:"name"`
-	About    *string              `json:"about,omitempty"`
-	Pos      int                  `json:"pos"`
-	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
-	Project  *ProjectRef          `json:"project"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description,omitempty"`
+	Color       *string            `json:"color,omitempty"`
+	Pos         int                `json:"pos"`
+	ColType     ProjectColumnType  `json:"col_type"`
+	Cards       []*ProjectCardRef  `json:"cards,omitempty"`
+	Project     *ProjectRef        `json:"project"`
+	Tensions    []*TensionRef      `json:"tensions,omitempty"`
+	Drafts      []*ProjectDraftRef `json:"drafts,omitempty"`
 }
 
 type AddProjectColumnPayload struct {
@@ -249,13 +256,54 @@ type AddProjectColumnPayload struct {
 	NumUids       *int             `json:"numUids,omitempty"`
 }
 
+type AddProjectDraftInput struct {
+	CreatedBy     *UserRef          `json:"createdBy"`
+	CreatedAt     string            `json:"createdAt"`
+	UpdatedAt     *string           `json:"updatedAt,omitempty"`
+	Message       *string           `json:"message,omitempty"`
+	Title         string            `json:"title"`
+	ProjectStatus *ProjectColumnRef `json:"project_status"`
+}
+
+type AddProjectDraftPayload struct {
+	ProjectDraft []*ProjectDraft `json:"projectDraft,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
+type AddProjectFieldInput struct {
+	FieldType ProjectFieldType        `json:"field_type"`
+	IsVisible bool                    `json:"isVisible"`
+	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type AddProjectFieldPayload struct {
+	ProjectField []*ProjectField `json:"projectField,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
+type AddProjectFieldValueInput struct {
+	Field *ProjectFieldRef `json:"field"`
+	Value string           `json:"value"`
+	Pos   *int             `json:"pos,omitempty"`
+}
+
+type AddProjectFieldValuePayload struct {
+	ProjectFieldValue []*ProjectFieldValue `json:"projectFieldValue,omitempty"`
+	NumUids           *int                 `json:"numUids,omitempty"`
+}
+
 type AddProjectInput struct {
+	CreatedBy    *UserRef            `json:"createdBy"`
+	CreatedAt    string              `json:"createdAt"`
+	UpdatedAt    string              `json:"updatedAt"`
 	Rootnameid   string              `json:"rootnameid"`
 	Parentnameid string              `json:"parentnameid"`
 	Nameid       string              `json:"nameid"`
 	Name         string              `json:"name"`
 	Description  *string             `json:"description,omitempty"`
+	Status       ProjectStatus       `json:"status"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields       []*ProjectFieldRef  `json:"fields,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
 }
@@ -263,17 +311,6 @@ type AddProjectInput struct {
 type AddProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
-}
-
-type AddProjectTensionInput struct {
-	Tension *TensionRef       `json:"tension"`
-	Pos     int               `json:"pos"`
-	Pc      *ProjectColumnRef `json:"pc"`
-}
-
-type AddProjectTensionPayload struct {
-	ProjectTension []*ProjectTension `json:"projectTension,omitempty"`
-	NumUids        *int              `json:"numUids,omitempty"`
 }
 
 type AddReactionInput struct {
@@ -305,29 +342,28 @@ type AddRoleExtPayload struct {
 }
 
 type AddTensionInput struct {
-	CreatedBy      *UserRef             `json:"createdBy"`
-	CreatedAt      string               `json:"createdAt"`
-	UpdatedAt      *string              `json:"updatedAt,omitempty"`
-	Message        *string              `json:"message,omitempty"`
-	Emitter        *NodeRef             `json:"emitter"`
-	Emitterid      string               `json:"emitterid"`
-	Receiver       *NodeRef             `json:"receiver"`
-	Receiverid     string               `json:"receiverid"`
-	Title          string               `json:"title"`
-	Type           TensionType          `json:"type_"`
-	Status         TensionStatus        `json:"status"`
-	Action         *TensionAction       `json:"action,omitempty"`
-	Assignees      []*UserRef           `json:"assignees,omitempty"`
-	Labels         []*LabelRef          `json:"labels,omitempty"`
-	Comments       []*CommentRef        `json:"comments,omitempty"`
-	Blobs          []*BlobRef           `json:"blobs,omitempty"`
-	History        []*EventRef          `json:"history,omitempty"`
-	Mentions       []*EventRef          `json:"mentions,omitempty"`
-	Contracts      []*ContractRef       `json:"contracts,omitempty"`
-	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
-	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
-	NComments      *int                 `json:"n_comments,omitempty"`
-	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
+	CreatedBy       *UserRef            `json:"createdBy"`
+	CreatedAt       string              `json:"createdAt"`
+	UpdatedAt       *string             `json:"updatedAt,omitempty"`
+	Message         *string             `json:"message,omitempty"`
+	Emitter         *NodeRef            `json:"emitter"`
+	Emitterid       string              `json:"emitterid"`
+	Receiver        *NodeRef            `json:"receiver"`
+	Receiverid      string              `json:"receiverid"`
+	Title           string              `json:"title"`
+	Type            TensionType         `json:"type_"`
+	Status          TensionStatus       `json:"status"`
+	Action          *TensionAction      `json:"action,omitempty"`
+	Assignees       []*UserRef          `json:"assignees,omitempty"`
+	Labels          []*LabelRef         `json:"labels,omitempty"`
+	Comments        []*CommentRef       `json:"comments,omitempty"`
+	Blobs           []*BlobRef          `json:"blobs,omitempty"`
+	History         []*EventRef         `json:"history,omitempty"`
+	Mentions        []*EventRef         `json:"mentions,omitempty"`
+	Contracts       []*ContractRef      `json:"contracts,omitempty"`
+	Subscribers     []*UserRef          `json:"subscribers,omitempty"`
+	ProjectStatuses []*ProjectColumnRef `json:"project_statuses,omitempty"`
+	NComments       *int                `json:"n_comments,omitempty"`
 }
 
 type AddTensionPayload struct {
@@ -365,7 +401,6 @@ type AddUserInput struct {
 	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
@@ -496,6 +531,17 @@ type BlobRef struct {
 type BlobTypeHash struct {
 	Eq *BlobType   `json:"eq,omitempty"`
 	In []*BlobType `json:"in,omitempty"`
+}
+
+type CardKindFilter struct {
+	MemberTypes        []CardKindType      `json:"memberTypes,omitempty"`
+	TensionFilter      *TensionFilter      `json:"tensionFilter,omitempty"`
+	ProjectDraftFilter *ProjectDraftFilter `json:"projectDraftFilter,omitempty"`
+}
+
+type CardKindRef struct {
+	TensionRef      *TensionRef      `json:"tensionRef,omitempty"`
+	ProjectDraftRef *ProjectDraftRef `json:"projectDraftRef,omitempty"`
 }
 
 type Comment struct {
@@ -754,12 +800,6 @@ type DeleteNotifPayload struct {
 	NumUids *int     `json:"numUids,omitempty"`
 }
 
-type DeleteOrgaAggPayload struct {
-	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
-	Msg     *string    `json:"msg,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
-}
-
 type DeletePendingUserPayload struct {
 	PendingUser []*PendingUser `json:"pendingUser,omitempty"`
 	Msg         *string        `json:"msg,omitempty"`
@@ -772,22 +812,40 @@ type DeletePostPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type DeleteProjectCardPayload struct {
+	ProjectCard []*ProjectCard `json:"projectCard,omitempty"`
+	Msg         *string        `json:"msg,omitempty"`
+	NumUids     *int           `json:"numUids,omitempty"`
+}
+
 type DeleteProjectColumnPayload struct {
 	ProjectColumn []*ProjectColumn `json:"projectColumn,omitempty"`
 	Msg           *string          `json:"msg,omitempty"`
 	NumUids       *int             `json:"numUids,omitempty"`
 }
 
+type DeleteProjectDraftPayload struct {
+	ProjectDraft []*ProjectDraft `json:"projectDraft,omitempty"`
+	Msg          *string         `json:"msg,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
+type DeleteProjectFieldPayload struct {
+	ProjectField []*ProjectField `json:"projectField,omitempty"`
+	Msg          *string         `json:"msg,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
+type DeleteProjectFieldValuePayload struct {
+	ProjectFieldValue []*ProjectFieldValue `json:"projectFieldValue,omitempty"`
+	Msg               *string              `json:"msg,omitempty"`
+	NumUids           *int                 `json:"numUids,omitempty"`
+}
+
 type DeleteProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	Msg     *string    `json:"msg,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
-}
-
-type DeleteProjectTensionPayload struct {
-	ProjectTension []*ProjectTension `json:"projectTension,omitempty"`
-	Msg            *string           `json:"msg,omitempty"`
-	NumUids        *int              `json:"numUids,omitempty"`
 }
 
 type DeleteReactionPayload struct {
@@ -1221,9 +1279,7 @@ type Node struct {
 	RoleType               *RoleType               `json:"role_type,omitempty"`
 	Color                  *string                 `json:"color,omitempty"`
 	FirstLink              *User                   `json:"first_link,omitempty"`
-	SecondLink             *User                   `json:"second_link,omitempty"`
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
-	OrgaAgg                *OrgaAgg                `json:"orga_agg,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
@@ -1264,7 +1320,7 @@ type NodeFilter struct {
 	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
 	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
 	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
-	Name       *StringTermFilter                   `json:"name,omitempty"`
+	Name       *StringFullTextFilter               `json:"name,omitempty"`
 	About      *StringFullTextFilter               `json:"about,omitempty"`
 	Skills     *StringTermFilter                   `json:"skills,omitempty"`
 	IsRoot     *bool                               `json:"isRoot,omitempty"`
@@ -1291,28 +1347,25 @@ type NodeFragment struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
 }
 
 type NodeFragmentAggregateResult struct {
-	Count         *int    `json:"count,omitempty"`
-	NameidMin     *string `json:"nameidMin,omitempty"`
-	NameidMax     *string `json:"nameidMax,omitempty"`
-	NameMin       *string `json:"nameMin,omitempty"`
-	NameMax       *string `json:"nameMax,omitempty"`
-	AboutMin      *string `json:"aboutMin,omitempty"`
-	AboutMax      *string `json:"aboutMax,omitempty"`
-	FirstLinkMin  *string `json:"first_linkMin,omitempty"`
-	FirstLinkMax  *string `json:"first_linkMax,omitempty"`
-	SecondLinkMin *string `json:"second_linkMin,omitempty"`
-	SecondLinkMax *string `json:"second_linkMax,omitempty"`
-	RoleExtMin    *string `json:"role_extMin,omitempty"`
-	RoleExtMax    *string `json:"role_extMax,omitempty"`
-	ColorMin      *string `json:"colorMin,omitempty"`
-	ColorMax      *string `json:"colorMax,omitempty"`
+	Count        *int    `json:"count,omitempty"`
+	NameidMin    *string `json:"nameidMin,omitempty"`
+	NameidMax    *string `json:"nameidMax,omitempty"`
+	NameMin      *string `json:"nameMin,omitempty"`
+	NameMax      *string `json:"nameMax,omitempty"`
+	AboutMin     *string `json:"aboutMin,omitempty"`
+	AboutMax     *string `json:"aboutMax,omitempty"`
+	FirstLinkMin *string `json:"first_linkMin,omitempty"`
+	FirstLinkMax *string `json:"first_linkMax,omitempty"`
+	RoleExtMin   *string `json:"role_extMin,omitempty"`
+	RoleExtMax   *string `json:"role_extMax,omitempty"`
+	ColorMin     *string `json:"colorMin,omitempty"`
+	ColorMax     *string `json:"colorMax,omitempty"`
 }
 
 type NodeFragmentFilter struct {
@@ -1339,7 +1392,6 @@ type NodeFragmentPatch struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
@@ -1356,7 +1408,6 @@ type NodeFragmentRef struct {
 	Mode       *NodeMode       `json:"mode,omitempty"`
 	Type       *NodeType       `json:"type_,omitempty"`
 	FirstLink  *string         `json:"first_link,omitempty"`
-	SecondLink *string         `json:"second_link,omitempty"`
 	RoleExt    *string         `json:"role_ext,omitempty"`
 	RoleType   *RoleType       `json:"role_type,omitempty"`
 	Color      *string         `json:"color,omitempty"`
@@ -1404,9 +1455,7 @@ type NodePatch struct {
 	RoleType              *RoleType       `json:"role_type,omitempty"`
 	Color                 *string         `json:"color,omitempty"`
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
-	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
-	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
 
@@ -1443,9 +1492,7 @@ type NodeRef struct {
 	RoleType              *RoleType       `json:"role_type,omitempty"`
 	Color                 *string         `json:"color,omitempty"`
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
-	SecondLink            *UserRef        `json:"second_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
-	OrgaAgg               *OrgaAggRef     `json:"orga_agg,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
 }
 
@@ -1519,46 +1566,6 @@ type NotifRef struct {
 	Tension   *TensionRef  `json:"tension_,omitempty"`
 	Contract  *ContractRef `json:"contract,omitempty"`
 	Link      *string      `json:"link,omitempty"`
-}
-
-type OrgaAgg struct {
-	NMembers *int `json:"n_members,omitempty"`
-	NGuests  *int `json:"n_guests,omitempty"`
-}
-
-type OrgaAggAggregateResult struct {
-	Count       *int     `json:"count,omitempty"`
-	NMembersMin *int     `json:"n_membersMin,omitempty"`
-	NMembersMax *int     `json:"n_membersMax,omitempty"`
-	NMembersSum *int     `json:"n_membersSum,omitempty"`
-	NMembersAvg *float64 `json:"n_membersAvg,omitempty"`
-	NGuestsMin  *int     `json:"n_guestsMin,omitempty"`
-	NGuestsMax  *int     `json:"n_guestsMax,omitempty"`
-	NGuestsSum  *int     `json:"n_guestsSum,omitempty"`
-	NGuestsAvg  *float64 `json:"n_guestsAvg,omitempty"`
-}
-
-type OrgaAggFilter struct {
-	Has []*OrgaAggHasFilter `json:"has,omitempty"`
-	And []*OrgaAggFilter    `json:"and,omitempty"`
-	Or  []*OrgaAggFilter    `json:"or,omitempty"`
-	Not *OrgaAggFilter      `json:"not,omitempty"`
-}
-
-type OrgaAggOrder struct {
-	Asc  *OrgaAggOrderable `json:"asc,omitempty"`
-	Desc *OrgaAggOrderable `json:"desc,omitempty"`
-	Then *OrgaAggOrder     `json:"then,omitempty"`
-}
-
-type OrgaAggPatch struct {
-	NMembers *int `json:"n_members,omitempty"`
-	NGuests  *int `json:"n_guests,omitempty"`
-}
-
-type OrgaAggRef struct {
-	NMembers *int `json:"n_members,omitempty"`
-	NGuests  *int `json:"n_guests,omitempty"`
 }
 
 type PendingUser struct {
@@ -1714,21 +1721,31 @@ type PostRef struct {
 
 type Project struct {
 	ID               string                        `json:"id"`
+	CreatedBy        *User                         `json:"createdBy"`
+	CreatedAt        string                        `json:"createdAt"`
+	UpdatedAt        string                        `json:"updatedAt"`
 	Rootnameid       string                        `json:"rootnameid"`
 	Parentnameid     string                        `json:"parentnameid"`
 	Nameid           string                        `json:"nameid"`
 	Name             string                        `json:"name"`
 	Description      *string                       `json:"description,omitempty"`
+	Status           ProjectStatus                 `json:"status"`
 	Columns          []*ProjectColumn              `json:"columns,omitempty"`
+	Fields           []*ProjectField               `json:"fields,omitempty"`
 	Leaders          []*Node                       `json:"leaders,omitempty"`
 	Nodes            []*Node                       `json:"nodes,omitempty"`
 	ColumnsAggregate *ProjectColumnAggregateResult `json:"columnsAggregate,omitempty"`
+	FieldsAggregate  *ProjectFieldAggregateResult  `json:"fieldsAggregate,omitempty"`
 	LeadersAggregate *NodeAggregateResult          `json:"leadersAggregate,omitempty"`
 	NodesAggregate   *NodeAggregateResult          `json:"nodesAggregate,omitempty"`
 }
 
 type ProjectAggregateResult struct {
 	Count           *int    `json:"count,omitempty"`
+	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax    *string `json:"updatedAtMax,omitempty"`
 	RootnameidMin   *string `json:"rootnameidMin,omitempty"`
 	RootnameidMax   *string `json:"rootnameidMax,omitempty"`
 	ParentnameidMin *string `json:"parentnameidMin,omitempty"`
@@ -1741,35 +1758,89 @@ type ProjectAggregateResult struct {
 	DescriptionMax  *string `json:"descriptionMax,omitempty"`
 }
 
+type ProjectCard struct {
+	ID              string                            `json:"id"`
+	Pos             int                               `json:"pos"`
+	Card            CardKind                          `json:"card"`
+	Pc              *ProjectColumn                    `json:"pc"`
+	Values          []*ProjectFieldValue              `json:"values,omitempty"`
+	ValuesAggregate *ProjectFieldValueAggregateResult `json:"valuesAggregate,omitempty"`
+}
+
+type ProjectCardAggregateResult struct {
+	Count  *int     `json:"count,omitempty"`
+	PosMin *int     `json:"posMin,omitempty"`
+	PosMax *int     `json:"posMax,omitempty"`
+	PosSum *int     `json:"posSum,omitempty"`
+	PosAvg *float64 `json:"posAvg,omitempty"`
+}
+
+type ProjectCardFilter struct {
+	ID  []string                `json:"id,omitempty"`
+	Has []*ProjectCardHasFilter `json:"has,omitempty"`
+	And []*ProjectCardFilter    `json:"and,omitempty"`
+	Or  []*ProjectCardFilter    `json:"or,omitempty"`
+	Not *ProjectCardFilter      `json:"not,omitempty"`
+}
+
+type ProjectCardOrder struct {
+	Asc  *ProjectCardOrderable `json:"asc,omitempty"`
+	Desc *ProjectCardOrderable `json:"desc,omitempty"`
+	Then *ProjectCardOrder     `json:"then,omitempty"`
+}
+
+type ProjectCardPatch struct {
+	Pos    *int                    `json:"pos,omitempty"`
+	Card   *CardKindRef            `json:"card,omitempty"`
+	Pc     *ProjectColumnRef       `json:"pc,omitempty"`
+	Values []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type ProjectCardRef struct {
+	ID     *string                 `json:"id,omitempty"`
+	Pos    *int                    `json:"pos,omitempty"`
+	Card   *CardKindRef            `json:"card,omitempty"`
+	Pc     *ProjectColumnRef       `json:"pc,omitempty"`
+	Values []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
 type ProjectColumn struct {
-	ID                string                         `json:"id"`
-	Name              string                         `json:"name"`
-	About             *string                        `json:"about,omitempty"`
-	Pos               int                            `json:"pos"`
-	Tensions          []*ProjectTension              `json:"tensions,omitempty"`
-	Project           *Project                       `json:"project"`
-	TensionsAggregate *ProjectTensionAggregateResult `json:"tensionsAggregate,omitempty"`
+	ID                string                       `json:"id"`
+	Name              string                       `json:"name"`
+	Description       *string                      `json:"description,omitempty"`
+	Color             *string                      `json:"color,omitempty"`
+	Pos               int                          `json:"pos"`
+	ColType           ProjectColumnType            `json:"col_type"`
+	Cards             []*ProjectCard               `json:"cards,omitempty"`
+	Project           *Project                     `json:"project"`
+	Tensions          []*Tension                   `json:"tensions,omitempty"`
+	Drafts            []*ProjectDraft              `json:"drafts,omitempty"`
+	CardsAggregate    *ProjectCardAggregateResult  `json:"cardsAggregate,omitempty"`
+	TensionsAggregate *TensionAggregateResult      `json:"tensionsAggregate,omitempty"`
+	DraftsAggregate   *ProjectDraftAggregateResult `json:"draftsAggregate,omitempty"`
 }
 
 type ProjectColumnAggregateResult struct {
-	Count    *int     `json:"count,omitempty"`
-	NameMin  *string  `json:"nameMin,omitempty"`
-	NameMax  *string  `json:"nameMax,omitempty"`
-	AboutMin *string  `json:"aboutMin,omitempty"`
-	AboutMax *string  `json:"aboutMax,omitempty"`
-	PosMin   *int     `json:"posMin,omitempty"`
-	PosMax   *int     `json:"posMax,omitempty"`
-	PosSum   *int     `json:"posSum,omitempty"`
-	PosAvg   *float64 `json:"posAvg,omitempty"`
+	Count          *int     `json:"count,omitempty"`
+	NameMin        *string  `json:"nameMin,omitempty"`
+	NameMax        *string  `json:"nameMax,omitempty"`
+	DescriptionMin *string  `json:"descriptionMin,omitempty"`
+	DescriptionMax *string  `json:"descriptionMax,omitempty"`
+	ColorMin       *string  `json:"colorMin,omitempty"`
+	ColorMax       *string  `json:"colorMax,omitempty"`
+	PosMin         *int     `json:"posMin,omitempty"`
+	PosMax         *int     `json:"posMax,omitempty"`
+	PosSum         *int     `json:"posSum,omitempty"`
+	PosAvg         *float64 `json:"posAvg,omitempty"`
 }
 
 type ProjectColumnFilter struct {
-	ID   []string                  `json:"id,omitempty"`
-	Name *StringHashFilter         `json:"name,omitempty"`
-	Has  []*ProjectColumnHasFilter `json:"has,omitempty"`
-	And  []*ProjectColumnFilter    `json:"and,omitempty"`
-	Or   []*ProjectColumnFilter    `json:"or,omitempty"`
-	Not  *ProjectColumnFilter      `json:"not,omitempty"`
+	ID      []string                  `json:"id,omitempty"`
+	ColType *ProjectColumnTypeHash    `json:"col_type,omitempty"`
+	Has     []*ProjectColumnHasFilter `json:"has,omitempty"`
+	And     []*ProjectColumnFilter    `json:"and,omitempty"`
+	Or      []*ProjectColumnFilter    `json:"or,omitempty"`
+	Not     *ProjectColumnFilter      `json:"not,omitempty"`
 }
 
 type ProjectColumnOrder struct {
@@ -1779,31 +1850,177 @@ type ProjectColumnOrder struct {
 }
 
 type ProjectColumnPatch struct {
-	About    *string              `json:"about,omitempty"`
-	Pos      *int                 `json:"pos,omitempty"`
-	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
-	Project  *ProjectRef          `json:"project,omitempty"`
+	Name        *string            `json:"name,omitempty"`
+	Description *string            `json:"description,omitempty"`
+	Color       *string            `json:"color,omitempty"`
+	Pos         *int               `json:"pos,omitempty"`
+	ColType     *ProjectColumnType `json:"col_type,omitempty"`
+	Cards       []*ProjectCardRef  `json:"cards,omitempty"`
+	Project     *ProjectRef        `json:"project,omitempty"`
+	Tensions    []*TensionRef      `json:"tensions,omitempty"`
+	Drafts      []*ProjectDraftRef `json:"drafts,omitempty"`
 }
 
 type ProjectColumnRef struct {
-	ID       *string              `json:"id,omitempty"`
-	Name     *string              `json:"name,omitempty"`
-	About    *string              `json:"about,omitempty"`
-	Pos      *int                 `json:"pos,omitempty"`
-	Tensions []*ProjectTensionRef `json:"tensions,omitempty"`
-	Project  *ProjectRef          `json:"project,omitempty"`
+	ID          *string            `json:"id,omitempty"`
+	Name        *string            `json:"name,omitempty"`
+	Description *string            `json:"description,omitempty"`
+	Color       *string            `json:"color,omitempty"`
+	Pos         *int               `json:"pos,omitempty"`
+	ColType     *ProjectColumnType `json:"col_type,omitempty"`
+	Cards       []*ProjectCardRef  `json:"cards,omitempty"`
+	Project     *ProjectRef        `json:"project,omitempty"`
+	Tensions    []*TensionRef      `json:"tensions,omitempty"`
+	Drafts      []*ProjectDraftRef `json:"drafts,omitempty"`
+}
+
+type ProjectColumnTypeHash struct {
+	Eq *ProjectColumnType   `json:"eq,omitempty"`
+	In []*ProjectColumnType `json:"in,omitempty"`
+}
+
+type ProjectDraft struct {
+	Title         string         `json:"title"`
+	Message       *string        `json:"message,omitempty"`
+	ProjectStatus *ProjectColumn `json:"project_status"`
+	ID            string         `json:"id"`
+	CreatedBy     *User          `json:"createdBy"`
+	CreatedAt     string         `json:"createdAt"`
+	UpdatedAt     *string        `json:"updatedAt,omitempty"`
+}
+
+func (ProjectDraft) IsCardKind() {}
+
+type ProjectDraftAggregateResult struct {
+	Count        *int    `json:"count,omitempty"`
+	CreatedAtMin *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
+	MessageMin   *string `json:"messageMin,omitempty"`
+	MessageMax   *string `json:"messageMax,omitempty"`
+	TitleMin     *string `json:"titleMin,omitempty"`
+	TitleMax     *string `json:"titleMax,omitempty"`
+}
+
+type ProjectDraftFilter struct {
+	ID        []string                 `json:"id,omitempty"`
+	CreatedAt *DateTimeFilter          `json:"createdAt,omitempty"`
+	Message   *StringFullTextFilter    `json:"message,omitempty"`
+	Has       []*ProjectDraftHasFilter `json:"has,omitempty"`
+	And       []*ProjectDraftFilter    `json:"and,omitempty"`
+	Or        []*ProjectDraftFilter    `json:"or,omitempty"`
+	Not       *ProjectDraftFilter      `json:"not,omitempty"`
+}
+
+type ProjectDraftOrder struct {
+	Asc  *ProjectDraftOrderable `json:"asc,omitempty"`
+	Desc *ProjectDraftOrderable `json:"desc,omitempty"`
+	Then *ProjectDraftOrder     `json:"then,omitempty"`
+}
+
+type ProjectDraftPatch struct {
+	CreatedBy     *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt     *string           `json:"createdAt,omitempty"`
+	UpdatedAt     *string           `json:"updatedAt,omitempty"`
+	Message       *string           `json:"message,omitempty"`
+	Title         *string           `json:"title,omitempty"`
+	ProjectStatus *ProjectColumnRef `json:"project_status,omitempty"`
+}
+
+type ProjectDraftRef struct {
+	ID            *string           `json:"id,omitempty"`
+	CreatedBy     *UserRef          `json:"createdBy,omitempty"`
+	CreatedAt     *string           `json:"createdAt,omitempty"`
+	UpdatedAt     *string           `json:"updatedAt,omitempty"`
+	Message       *string           `json:"message,omitempty"`
+	Title         *string           `json:"title,omitempty"`
+	ProjectStatus *ProjectColumnRef `json:"project_status,omitempty"`
+}
+
+type ProjectField struct {
+	FieldType       ProjectFieldType                  `json:"field_type"`
+	IsVisible       bool                              `json:"isVisible"`
+	Values          []*ProjectFieldValue              `json:"values,omitempty"`
+	ValuesAggregate *ProjectFieldValueAggregateResult `json:"valuesAggregate,omitempty"`
+}
+
+type ProjectFieldAggregateResult struct {
+	Count *int `json:"count,omitempty"`
+}
+
+type ProjectFieldFilter struct {
+	Has []*ProjectFieldHasFilter `json:"has,omitempty"`
+	And []*ProjectFieldFilter    `json:"and,omitempty"`
+	Or  []*ProjectFieldFilter    `json:"or,omitempty"`
+	Not *ProjectFieldFilter      `json:"not,omitempty"`
+}
+
+type ProjectFieldPatch struct {
+	FieldType *ProjectFieldType       `json:"field_type,omitempty"`
+	IsVisible *bool                   `json:"isVisible,omitempty"`
+	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type ProjectFieldRef struct {
+	FieldType *ProjectFieldType       `json:"field_type,omitempty"`
+	IsVisible *bool                   `json:"isVisible,omitempty"`
+	Values    []*ProjectFieldValueRef `json:"values,omitempty"`
+}
+
+type ProjectFieldValue struct {
+	Field *ProjectField `json:"field"`
+	Value string        `json:"value"`
+	Pos   *int          `json:"pos,omitempty"`
+}
+
+type ProjectFieldValueAggregateResult struct {
+	Count    *int     `json:"count,omitempty"`
+	ValueMin *string  `json:"valueMin,omitempty"`
+	ValueMax *string  `json:"valueMax,omitempty"`
+	PosMin   *int     `json:"posMin,omitempty"`
+	PosMax   *int     `json:"posMax,omitempty"`
+	PosSum   *int     `json:"posSum,omitempty"`
+	PosAvg   *float64 `json:"posAvg,omitempty"`
+}
+
+type ProjectFieldValueFilter struct {
+	Has []*ProjectFieldValueHasFilter `json:"has,omitempty"`
+	And []*ProjectFieldValueFilter    `json:"and,omitempty"`
+	Or  []*ProjectFieldValueFilter    `json:"or,omitempty"`
+	Not *ProjectFieldValueFilter      `json:"not,omitempty"`
+}
+
+type ProjectFieldValueOrder struct {
+	Asc  *ProjectFieldValueOrderable `json:"asc,omitempty"`
+	Desc *ProjectFieldValueOrderable `json:"desc,omitempty"`
+	Then *ProjectFieldValueOrder     `json:"then,omitempty"`
+}
+
+type ProjectFieldValuePatch struct {
+	Field *ProjectFieldRef `json:"field,omitempty"`
+	Value *string          `json:"value,omitempty"`
+	Pos   *int             `json:"pos,omitempty"`
+}
+
+type ProjectFieldValueRef struct {
+	Field *ProjectFieldRef `json:"field,omitempty"`
+	Value *string          `json:"value,omitempty"`
+	Pos   *int             `json:"pos,omitempty"`
 }
 
 type ProjectFilter struct {
-	ID           []string            `json:"id,omitempty"`
-	Rootnameid   *StringHashFilter   `json:"rootnameid,omitempty"`
-	Parentnameid *StringHashFilter   `json:"parentnameid,omitempty"`
-	Nameid       *StringHashFilter   `json:"nameid,omitempty"`
-	Name         *StringTermFilter   `json:"name,omitempty"`
-	Has          []*ProjectHasFilter `json:"has,omitempty"`
-	And          []*ProjectFilter    `json:"and,omitempty"`
-	Or           []*ProjectFilter    `json:"or,omitempty"`
-	Not          *ProjectFilter      `json:"not,omitempty"`
+	ID           []string              `json:"id,omitempty"`
+	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
+	Rootnameid   *StringHashFilter     `json:"rootnameid,omitempty"`
+	Parentnameid *StringHashFilter     `json:"parentnameid,omitempty"`
+	Nameid       *StringHashFilter     `json:"nameid,omitempty"`
+	Name         *StringFullTextFilter `json:"name,omitempty"`
+	Status       *ProjectStatusHash    `json:"status,omitempty"`
+	Has          []*ProjectHasFilter   `json:"has,omitempty"`
+	And          []*ProjectFilter      `json:"and,omitempty"`
+	Or           []*ProjectFilter      `json:"or,omitempty"`
+	Not          *ProjectFilter        `json:"not,omitempty"`
 }
 
 type ProjectOrder struct {
@@ -1813,68 +2030,41 @@ type ProjectOrder struct {
 }
 
 type ProjectPatch struct {
+	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt    *string             `json:"createdAt,omitempty"`
+	UpdatedAt    *string             `json:"updatedAt,omitempty"`
 	Rootnameid   *string             `json:"rootnameid,omitempty"`
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
 	Description  *string             `json:"description,omitempty"`
+	Status       *ProjectStatus      `json:"status,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields       []*ProjectFieldRef  `json:"fields,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
 }
 
 type ProjectRef struct {
 	ID           *string             `json:"id,omitempty"`
+	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt    *string             `json:"createdAt,omitempty"`
+	UpdatedAt    *string             `json:"updatedAt,omitempty"`
 	Rootnameid   *string             `json:"rootnameid,omitempty"`
 	Parentnameid *string             `json:"parentnameid,omitempty"`
 	Nameid       *string             `json:"nameid,omitempty"`
 	Name         *string             `json:"name,omitempty"`
 	Description  *string             `json:"description,omitempty"`
+	Status       *ProjectStatus      `json:"status,omitempty"`
 	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields       []*ProjectFieldRef  `json:"fields,omitempty"`
 	Leaders      []*NodeRef          `json:"leaders,omitempty"`
 	Nodes        []*NodeRef          `json:"nodes,omitempty"`
 }
 
-type ProjectTension struct {
-	ID      string         `json:"id"`
-	Tension *Tension       `json:"tension"`
-	Pos     int            `json:"pos"`
-	Pc      *ProjectColumn `json:"pc"`
-}
-
-type ProjectTensionAggregateResult struct {
-	Count  *int     `json:"count,omitempty"`
-	PosMin *int     `json:"posMin,omitempty"`
-	PosMax *int     `json:"posMax,omitempty"`
-	PosSum *int     `json:"posSum,omitempty"`
-	PosAvg *float64 `json:"posAvg,omitempty"`
-}
-
-type ProjectTensionFilter struct {
-	ID  []string                   `json:"id,omitempty"`
-	Has []*ProjectTensionHasFilter `json:"has,omitempty"`
-	And []*ProjectTensionFilter    `json:"and,omitempty"`
-	Or  []*ProjectTensionFilter    `json:"or,omitempty"`
-	Not *ProjectTensionFilter      `json:"not,omitempty"`
-}
-
-type ProjectTensionOrder struct {
-	Asc  *ProjectTensionOrderable `json:"asc,omitempty"`
-	Desc *ProjectTensionOrderable `json:"desc,omitempty"`
-	Then *ProjectTensionOrder     `json:"then,omitempty"`
-}
-
-type ProjectTensionPatch struct {
-	Tension *TensionRef       `json:"tension,omitempty"`
-	Pos     *int              `json:"pos,omitempty"`
-	Pc      *ProjectColumnRef `json:"pc,omitempty"`
-}
-
-type ProjectTensionRef struct {
-	ID      *string           `json:"id,omitempty"`
-	Tension *TensionRef       `json:"tension,omitempty"`
-	Pos     *int              `json:"pos,omitempty"`
-	Pc      *ProjectColumnRef `json:"pc,omitempty"`
+type ProjectStatusHash struct {
+	Eq *ProjectStatus   `json:"eq,omitempty"`
+	In []*ProjectStatus `json:"in,omitempty"`
 }
 
 type Reaction struct {
@@ -2042,63 +2232,60 @@ type StringTermFilter struct {
 }
 
 type Tension struct {
-	Emitter              *Node                          `json:"emitter"`
-	Emitterid            string                         `json:"emitterid"`
-	Receiver             *Node                          `json:"receiver"`
-	Receiverid           string                         `json:"receiverid"`
-	Title                string                         `json:"title"`
-	Type                 TensionType                    `json:"type_"`
-	Status               TensionStatus                  `json:"status"`
-	Action               *TensionAction                 `json:"action,omitempty"`
-	Assignees            []*User                        `json:"assignees,omitempty"`
-	Labels               []*Label                       `json:"labels,omitempty"`
-	Comments             []*Comment                     `json:"comments,omitempty"`
-	Blobs                []*Blob                        `json:"blobs,omitempty"`
-	History              []*Event                       `json:"history,omitempty"`
-	Mentions             []*Event                       `json:"mentions,omitempty"`
-	Contracts            []*Contract                    `json:"contracts,omitempty"`
-	Subscribers          []*User                        `json:"subscribers,omitempty"`
-	Projects             []*ProjectTension              `json:"projects,omitempty"`
-	NComments            *int                           `json:"n_comments,omitempty"`
-	NOpenContracts       *int                           `json:"n_open_contracts,omitempty"`
-	ID                   string                         `json:"id"`
-	CreatedBy            *User                          `json:"createdBy"`
-	CreatedAt            string                         `json:"createdAt"`
-	UpdatedAt            *string                        `json:"updatedAt,omitempty"`
-	Message              *string                        `json:"message,omitempty"`
-	AssigneesAggregate   *UserAggregateResult           `json:"assigneesAggregate,omitempty"`
-	LabelsAggregate      *LabelAggregateResult          `json:"labelsAggregate,omitempty"`
-	CommentsAggregate    *CommentAggregateResult        `json:"commentsAggregate,omitempty"`
-	BlobsAggregate       *BlobAggregateResult           `json:"blobsAggregate,omitempty"`
-	HistoryAggregate     *EventAggregateResult          `json:"historyAggregate,omitempty"`
-	MentionsAggregate    *EventAggregateResult          `json:"mentionsAggregate,omitempty"`
-	ContractsAggregate   *ContractAggregateResult       `json:"contractsAggregate,omitempty"`
-	SubscribersAggregate *UserAggregateResult           `json:"subscribersAggregate,omitempty"`
-	ProjectsAggregate    *ProjectTensionAggregateResult `json:"projectsAggregate,omitempty"`
+	Emitter                  *Node                         `json:"emitter"`
+	Emitterid                string                        `json:"emitterid"`
+	Receiver                 *Node                         `json:"receiver"`
+	Receiverid               string                        `json:"receiverid"`
+	Title                    string                        `json:"title"`
+	Type                     TensionType                   `json:"type_"`
+	Status                   TensionStatus                 `json:"status"`
+	Action                   *TensionAction                `json:"action,omitempty"`
+	Assignees                []*User                       `json:"assignees,omitempty"`
+	Labels                   []*Label                      `json:"labels,omitempty"`
+	Comments                 []*Comment                    `json:"comments,omitempty"`
+	Blobs                    []*Blob                       `json:"blobs,omitempty"`
+	History                  []*Event                      `json:"history,omitempty"`
+	Mentions                 []*Event                      `json:"mentions,omitempty"`
+	Contracts                []*Contract                   `json:"contracts,omitempty"`
+	Subscribers              []*User                       `json:"subscribers,omitempty"`
+	ProjectStatuses          []*ProjectColumn              `json:"project_statuses,omitempty"`
+	NComments                *int                          `json:"n_comments,omitempty"`
+	ID                       string                        `json:"id"`
+	CreatedBy                *User                         `json:"createdBy"`
+	CreatedAt                string                        `json:"createdAt"`
+	UpdatedAt                *string                       `json:"updatedAt,omitempty"`
+	Message                  *string                       `json:"message,omitempty"`
+	AssigneesAggregate       *UserAggregateResult          `json:"assigneesAggregate,omitempty"`
+	LabelsAggregate          *LabelAggregateResult         `json:"labelsAggregate,omitempty"`
+	CommentsAggregate        *CommentAggregateResult       `json:"commentsAggregate,omitempty"`
+	BlobsAggregate           *BlobAggregateResult          `json:"blobsAggregate,omitempty"`
+	HistoryAggregate         *EventAggregateResult         `json:"historyAggregate,omitempty"`
+	MentionsAggregate        *EventAggregateResult         `json:"mentionsAggregate,omitempty"`
+	ContractsAggregate       *ContractAggregateResult      `json:"contractsAggregate,omitempty"`
+	SubscribersAggregate     *UserAggregateResult          `json:"subscribersAggregate,omitempty"`
+	ProjectStatusesAggregate *ProjectColumnAggregateResult `json:"project_statusesAggregate,omitempty"`
 }
 
+func (Tension) IsCardKind() {}
+
 type TensionAggregateResult struct {
-	Count             *int     `json:"count,omitempty"`
-	CreatedAtMin      *string  `json:"createdAtMin,omitempty"`
-	CreatedAtMax      *string  `json:"createdAtMax,omitempty"`
-	UpdatedAtMin      *string  `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax      *string  `json:"updatedAtMax,omitempty"`
-	MessageMin        *string  `json:"messageMin,omitempty"`
-	MessageMax        *string  `json:"messageMax,omitempty"`
-	EmitteridMin      *string  `json:"emitteridMin,omitempty"`
-	EmitteridMax      *string  `json:"emitteridMax,omitempty"`
-	ReceiveridMin     *string  `json:"receiveridMin,omitempty"`
-	ReceiveridMax     *string  `json:"receiveridMax,omitempty"`
-	TitleMin          *string  `json:"titleMin,omitempty"`
-	TitleMax          *string  `json:"titleMax,omitempty"`
-	NCommentsMin      *int     `json:"n_commentsMin,omitempty"`
-	NCommentsMax      *int     `json:"n_commentsMax,omitempty"`
-	NCommentsSum      *int     `json:"n_commentsSum,omitempty"`
-	NCommentsAvg      *float64 `json:"n_commentsAvg,omitempty"`
-	NOpenContractsMin *int     `json:"n_open_contractsMin,omitempty"`
-	NOpenContractsMax *int     `json:"n_open_contractsMax,omitempty"`
-	NOpenContractsSum *int     `json:"n_open_contractsSum,omitempty"`
-	NOpenContractsAvg *float64 `json:"n_open_contractsAvg,omitempty"`
+	Count         *int     `json:"count,omitempty"`
+	CreatedAtMin  *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax  *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin  *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax  *string  `json:"updatedAtMax,omitempty"`
+	MessageMin    *string  `json:"messageMin,omitempty"`
+	MessageMax    *string  `json:"messageMax,omitempty"`
+	EmitteridMin  *string  `json:"emitteridMin,omitempty"`
+	EmitteridMax  *string  `json:"emitteridMax,omitempty"`
+	ReceiveridMin *string  `json:"receiveridMin,omitempty"`
+	ReceiveridMax *string  `json:"receiveridMax,omitempty"`
+	TitleMin      *string  `json:"titleMin,omitempty"`
+	TitleMax      *string  `json:"titleMax,omitempty"`
+	NCommentsMin  *int     `json:"n_commentsMin,omitempty"`
+	NCommentsMax  *int     `json:"n_commentsMax,omitempty"`
+	NCommentsSum  *int     `json:"n_commentsSum,omitempty"`
+	NCommentsAvg  *float64 `json:"n_commentsAvg,omitempty"`
 }
 
 type TensionEventHash struct {
@@ -2128,56 +2315,54 @@ type TensionOrder struct {
 }
 
 type TensionPatch struct {
-	CreatedBy      *UserRef             `json:"createdBy,omitempty"`
-	CreatedAt      *string              `json:"createdAt,omitempty"`
-	UpdatedAt      *string              `json:"updatedAt,omitempty"`
-	Message        *string              `json:"message,omitempty"`
-	Emitter        *NodeRef             `json:"emitter,omitempty"`
-	Emitterid      *string              `json:"emitterid,omitempty"`
-	Receiver       *NodeRef             `json:"receiver,omitempty"`
-	Receiverid     *string              `json:"receiverid,omitempty"`
-	Title          *string              `json:"title,omitempty"`
-	Type           *TensionType         `json:"type_,omitempty"`
-	Status         *TensionStatus       `json:"status,omitempty"`
-	Action         *TensionAction       `json:"action,omitempty"`
-	Assignees      []*UserRef           `json:"assignees,omitempty"`
-	Labels         []*LabelRef          `json:"labels,omitempty"`
-	Comments       []*CommentRef        `json:"comments,omitempty"`
-	Blobs          []*BlobRef           `json:"blobs,omitempty"`
-	History        []*EventRef          `json:"history,omitempty"`
-	Mentions       []*EventRef          `json:"mentions,omitempty"`
-	Contracts      []*ContractRef       `json:"contracts,omitempty"`
-	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
-	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
-	NComments      *int                 `json:"n_comments,omitempty"`
-	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
+	CreatedBy       *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt       *string             `json:"createdAt,omitempty"`
+	UpdatedAt       *string             `json:"updatedAt,omitempty"`
+	Message         *string             `json:"message,omitempty"`
+	Emitter         *NodeRef            `json:"emitter,omitempty"`
+	Emitterid       *string             `json:"emitterid,omitempty"`
+	Receiver        *NodeRef            `json:"receiver,omitempty"`
+	Receiverid      *string             `json:"receiverid,omitempty"`
+	Title           *string             `json:"title,omitempty"`
+	Type            *TensionType        `json:"type_,omitempty"`
+	Status          *TensionStatus      `json:"status,omitempty"`
+	Action          *TensionAction      `json:"action,omitempty"`
+	Assignees       []*UserRef          `json:"assignees,omitempty"`
+	Labels          []*LabelRef         `json:"labels,omitempty"`
+	Comments        []*CommentRef       `json:"comments,omitempty"`
+	Blobs           []*BlobRef          `json:"blobs,omitempty"`
+	History         []*EventRef         `json:"history,omitempty"`
+	Mentions        []*EventRef         `json:"mentions,omitempty"`
+	Contracts       []*ContractRef      `json:"contracts,omitempty"`
+	Subscribers     []*UserRef          `json:"subscribers,omitempty"`
+	ProjectStatuses []*ProjectColumnRef `json:"project_statuses,omitempty"`
+	NComments       *int                `json:"n_comments,omitempty"`
 }
 
 type TensionRef struct {
-	ID             *string              `json:"id,omitempty"`
-	CreatedBy      *UserRef             `json:"createdBy,omitempty"`
-	CreatedAt      *string              `json:"createdAt,omitempty"`
-	UpdatedAt      *string              `json:"updatedAt,omitempty"`
-	Message        *string              `json:"message,omitempty"`
-	Emitter        *NodeRef             `json:"emitter,omitempty"`
-	Emitterid      *string              `json:"emitterid,omitempty"`
-	Receiver       *NodeRef             `json:"receiver,omitempty"`
-	Receiverid     *string              `json:"receiverid,omitempty"`
-	Title          *string              `json:"title,omitempty"`
-	Type           *TensionType         `json:"type_,omitempty"`
-	Status         *TensionStatus       `json:"status,omitempty"`
-	Action         *TensionAction       `json:"action,omitempty"`
-	Assignees      []*UserRef           `json:"assignees,omitempty"`
-	Labels         []*LabelRef          `json:"labels,omitempty"`
-	Comments       []*CommentRef        `json:"comments,omitempty"`
-	Blobs          []*BlobRef           `json:"blobs,omitempty"`
-	History        []*EventRef          `json:"history,omitempty"`
-	Mentions       []*EventRef          `json:"mentions,omitempty"`
-	Contracts      []*ContractRef       `json:"contracts,omitempty"`
-	Subscribers    []*UserRef           `json:"subscribers,omitempty"`
-	Projects       []*ProjectTensionRef `json:"projects,omitempty"`
-	NComments      *int                 `json:"n_comments,omitempty"`
-	NOpenContracts *int                 `json:"n_open_contracts,omitempty"`
+	ID              *string             `json:"id,omitempty"`
+	CreatedBy       *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt       *string             `json:"createdAt,omitempty"`
+	UpdatedAt       *string             `json:"updatedAt,omitempty"`
+	Message         *string             `json:"message,omitempty"`
+	Emitter         *NodeRef            `json:"emitter,omitempty"`
+	Emitterid       *string             `json:"emitterid,omitempty"`
+	Receiver        *NodeRef            `json:"receiver,omitempty"`
+	Receiverid      *string             `json:"receiverid,omitempty"`
+	Title           *string             `json:"title,omitempty"`
+	Type            *TensionType        `json:"type_,omitempty"`
+	Status          *TensionStatus      `json:"status,omitempty"`
+	Action          *TensionAction      `json:"action,omitempty"`
+	Assignees       []*UserRef          `json:"assignees,omitempty"`
+	Labels          []*LabelRef         `json:"labels,omitempty"`
+	Comments        []*CommentRef       `json:"comments,omitempty"`
+	Blobs           []*BlobRef          `json:"blobs,omitempty"`
+	History         []*EventRef         `json:"history,omitempty"`
+	Mentions        []*EventRef         `json:"mentions,omitempty"`
+	Contracts       []*ContractRef      `json:"contracts,omitempty"`
+	Subscribers     []*UserRef          `json:"subscribers,omitempty"`
+	ProjectStatuses []*ProjectColumnRef `json:"project_statuses,omitempty"`
+	NComments       *int                `json:"n_comments,omitempty"`
 }
 
 type TensionStatusHash struct {
@@ -2311,17 +2496,6 @@ type UpdateNotifPayload struct {
 	NumUids *int     `json:"numUids,omitempty"`
 }
 
-type UpdateOrgaAggInput struct {
-	Filter *OrgaAggFilter `json:"filter"`
-	Set    *OrgaAggPatch  `json:"set,omitempty"`
-	Remove *OrgaAggPatch  `json:"remove,omitempty"`
-}
-
-type UpdateOrgaAggPayload struct {
-	OrgaAgg []*OrgaAgg `json:"orgaAgg,omitempty"`
-	NumUids *int       `json:"numUids,omitempty"`
-}
-
 type UpdatePendingUserInput struct {
 	Filter *PendingUserFilter `json:"filter"`
 	Set    *PendingUserPatch  `json:"set,omitempty"`
@@ -2344,6 +2518,17 @@ type UpdatePostPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type UpdateProjectCardInput struct {
+	Filter *ProjectCardFilter `json:"filter"`
+	Set    *ProjectCardPatch  `json:"set,omitempty"`
+	Remove *ProjectCardPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectCardPayload struct {
+	ProjectCard []*ProjectCard `json:"projectCard,omitempty"`
+	NumUids     *int           `json:"numUids,omitempty"`
+}
+
 type UpdateProjectColumnInput struct {
 	Filter *ProjectColumnFilter `json:"filter"`
 	Set    *ProjectColumnPatch  `json:"set,omitempty"`
@@ -2355,6 +2540,39 @@ type UpdateProjectColumnPayload struct {
 	NumUids       *int             `json:"numUids,omitempty"`
 }
 
+type UpdateProjectDraftInput struct {
+	Filter *ProjectDraftFilter `json:"filter"`
+	Set    *ProjectDraftPatch  `json:"set,omitempty"`
+	Remove *ProjectDraftPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectDraftPayload struct {
+	ProjectDraft []*ProjectDraft `json:"projectDraft,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
+type UpdateProjectFieldInput struct {
+	Filter *ProjectFieldFilter `json:"filter"`
+	Set    *ProjectFieldPatch  `json:"set,omitempty"`
+	Remove *ProjectFieldPatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectFieldPayload struct {
+	ProjectField []*ProjectField `json:"projectField,omitempty"`
+	NumUids      *int            `json:"numUids,omitempty"`
+}
+
+type UpdateProjectFieldValueInput struct {
+	Filter *ProjectFieldValueFilter `json:"filter"`
+	Set    *ProjectFieldValuePatch  `json:"set,omitempty"`
+	Remove *ProjectFieldValuePatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectFieldValuePayload struct {
+	ProjectFieldValue []*ProjectFieldValue `json:"projectFieldValue,omitempty"`
+	NumUids           *int                 `json:"numUids,omitempty"`
+}
+
 type UpdateProjectInput struct {
 	Filter *ProjectFilter `json:"filter"`
 	Set    *ProjectPatch  `json:"set,omitempty"`
@@ -2364,17 +2582,6 @@ type UpdateProjectInput struct {
 type UpdateProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
-}
-
-type UpdateProjectTensionInput struct {
-	Filter *ProjectTensionFilter `json:"filter"`
-	Set    *ProjectTensionPatch  `json:"set,omitempty"`
-	Remove *ProjectTensionPatch  `json:"remove,omitempty"`
-}
-
-type UpdateProjectTensionPayload struct {
-	ProjectTension []*ProjectTension `json:"projectTension,omitempty"`
-	NumUids        *int              `json:"numUids,omitempty"`
 }
 
 type UpdateReactionInput struct {
@@ -2473,7 +2680,6 @@ type User struct {
 	Watching                  []*Node                   `json:"watching,omitempty"`
 	Rights                    *UserRights               `json:"rights"`
 	Roles                     []*Node                   `json:"roles,omitempty"`
-	BackedRoles               []*Node                   `json:"backed_roles,omitempty"`
 	TensionsCreated           []*Tension                `json:"tensions_created,omitempty"`
 	TensionsAssigned          []*Tension                `json:"tensions_assigned,omitempty"`
 	Contracts                 []*Contract               `json:"contracts,omitempty"`
@@ -2484,7 +2690,6 @@ type User struct {
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	WatchingAggregate         *NodeAggregateResult      `json:"watchingAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
-	BackedRolesAggregate      *NodeAggregateResult      `json:"backed_rolesAggregate,omitempty"`
 	TensionsCreatedAggregate  *TensionAggregateResult   `json:"tensions_createdAggregate,omitempty"`
 	TensionsAssignedAggregate *TensionAggregateResult   `json:"tensions_assignedAggregate,omitempty"`
 	ContractsAggregate        *ContractAggregateResult  `json:"contractsAggregate,omitempty"`
@@ -2594,7 +2799,6 @@ type UserPatch struct {
 	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
@@ -2623,7 +2827,6 @@ type UserRef struct {
 	Watching         []*NodeRef      `json:"watching,omitempty"`
 	Rights           *UserRightsRef  `json:"rights,omitempty"`
 	Roles            []*NodeRef      `json:"roles,omitempty"`
-	BackedRoles      []*NodeRef      `json:"backed_roles,omitempty"`
 	TensionsCreated  []*TensionRef   `json:"tensions_created,omitempty"`
 	TensionsAssigned []*TensionRef   `json:"tensions_assigned,omitempty"`
 	Contracts        []*ContractRef  `json:"contracts,omitempty"`
@@ -2902,6 +3105,47 @@ func (e *BlobType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e BlobType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type CardKindType string
+
+const (
+	CardKindTypeTension      CardKindType = "Tension"
+	CardKindTypeProjectDraft CardKindType = "ProjectDraft"
+)
+
+var AllCardKindType = []CardKindType{
+	CardKindTypeTension,
+	CardKindTypeProjectDraft,
+}
+
+func (e CardKindType) IsValid() bool {
+	switch e {
+	case CardKindTypeTension, CardKindTypeProjectDraft:
+		return true
+	}
+	return false
+}
+
+func (e CardKindType) String() string {
+	return string(e)
+}
+
+func (e *CardKindType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = CardKindType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid CardKindType", str)
+	}
+	return nil
+}
+
+func (e CardKindType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -3951,7 +4195,6 @@ const (
 	NodeFragmentHasFilterMode       NodeFragmentHasFilter = "mode"
 	NodeFragmentHasFilterType       NodeFragmentHasFilter = "type_"
 	NodeFragmentHasFilterFirstLink  NodeFragmentHasFilter = "first_link"
-	NodeFragmentHasFilterSecondLink NodeFragmentHasFilter = "second_link"
 	NodeFragmentHasFilterRoleExt    NodeFragmentHasFilter = "role_ext"
 	NodeFragmentHasFilterRoleType   NodeFragmentHasFilter = "role_type"
 	NodeFragmentHasFilterColor      NodeFragmentHasFilter = "color"
@@ -3967,7 +4210,6 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 	NodeFragmentHasFilterMode,
 	NodeFragmentHasFilterType,
 	NodeFragmentHasFilterFirstLink,
-	NodeFragmentHasFilterSecondLink,
 	NodeFragmentHasFilterRoleExt,
 	NodeFragmentHasFilterRoleType,
 	NodeFragmentHasFilterColor,
@@ -3975,7 +4217,7 @@ var AllNodeFragmentHasFilter = []NodeFragmentHasFilter{
 
 func (e NodeFragmentHasFilter) IsValid() bool {
 	switch e {
-	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterSecondLink, NodeFragmentHasFilterRoleExt, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
+	case NodeFragmentHasFilterNameid, NodeFragmentHasFilterName, NodeFragmentHasFilterAbout, NodeFragmentHasFilterMandate, NodeFragmentHasFilterSkills, NodeFragmentHasFilterVisibility, NodeFragmentHasFilterMode, NodeFragmentHasFilterType, NodeFragmentHasFilterFirstLink, NodeFragmentHasFilterRoleExt, NodeFragmentHasFilterRoleType, NodeFragmentHasFilterColor:
 		return true
 	}
 	return false
@@ -4005,13 +4247,12 @@ func (e NodeFragmentHasFilter) MarshalGQL(w io.Writer) {
 type NodeFragmentOrderable string
 
 const (
-	NodeFragmentOrderableNameid     NodeFragmentOrderable = "nameid"
-	NodeFragmentOrderableName       NodeFragmentOrderable = "name"
-	NodeFragmentOrderableAbout      NodeFragmentOrderable = "about"
-	NodeFragmentOrderableFirstLink  NodeFragmentOrderable = "first_link"
-	NodeFragmentOrderableSecondLink NodeFragmentOrderable = "second_link"
-	NodeFragmentOrderableRoleExt    NodeFragmentOrderable = "role_ext"
-	NodeFragmentOrderableColor      NodeFragmentOrderable = "color"
+	NodeFragmentOrderableNameid    NodeFragmentOrderable = "nameid"
+	NodeFragmentOrderableName      NodeFragmentOrderable = "name"
+	NodeFragmentOrderableAbout     NodeFragmentOrderable = "about"
+	NodeFragmentOrderableFirstLink NodeFragmentOrderable = "first_link"
+	NodeFragmentOrderableRoleExt   NodeFragmentOrderable = "role_ext"
+	NodeFragmentOrderableColor     NodeFragmentOrderable = "color"
 )
 
 var AllNodeFragmentOrderable = []NodeFragmentOrderable{
@@ -4019,14 +4260,13 @@ var AllNodeFragmentOrderable = []NodeFragmentOrderable{
 	NodeFragmentOrderableName,
 	NodeFragmentOrderableAbout,
 	NodeFragmentOrderableFirstLink,
-	NodeFragmentOrderableSecondLink,
 	NodeFragmentOrderableRoleExt,
 	NodeFragmentOrderableColor,
 }
 
 func (e NodeFragmentOrderable) IsValid() bool {
 	switch e {
-	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableSecondLink, NodeFragmentOrderableRoleExt, NodeFragmentOrderableColor:
+	case NodeFragmentOrderableNameid, NodeFragmentOrderableName, NodeFragmentOrderableAbout, NodeFragmentOrderableFirstLink, NodeFragmentOrderableRoleExt, NodeFragmentOrderableColor:
 		return true
 	}
 	return false
@@ -4087,9 +4327,7 @@ const (
 	NodeHasFilterRoleType              NodeHasFilter = "role_type"
 	NodeHasFilterColor                 NodeHasFilter = "color"
 	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
-	NodeHasFilterSecondLink            NodeHasFilter = "second_link"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
-	NodeHasFilterOrgaAgg               NodeHasFilter = "orga_agg"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
 )
 
@@ -4125,15 +4363,13 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterRoleType,
 	NodeHasFilterColor,
 	NodeHasFilterFirstLink,
-	NodeHasFilterSecondLink,
 	NodeHasFilterContracts,
-	NodeHasFilterOrgaAgg,
 	NodeHasFilterEventsHistory,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterSecondLink, NodeHasFilterContracts, NodeHasFilterOrgaAgg, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory:
 		return true
 	}
 	return false
@@ -4434,88 +4670,6 @@ func (e NotifOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type OrgaAggHasFilter string
-
-const (
-	OrgaAggHasFilterNMembers OrgaAggHasFilter = "n_members"
-	OrgaAggHasFilterNGuests  OrgaAggHasFilter = "n_guests"
-)
-
-var AllOrgaAggHasFilter = []OrgaAggHasFilter{
-	OrgaAggHasFilterNMembers,
-	OrgaAggHasFilterNGuests,
-}
-
-func (e OrgaAggHasFilter) IsValid() bool {
-	switch e {
-	case OrgaAggHasFilterNMembers, OrgaAggHasFilterNGuests:
-		return true
-	}
-	return false
-}
-
-func (e OrgaAggHasFilter) String() string {
-	return string(e)
-}
-
-func (e *OrgaAggHasFilter) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = OrgaAggHasFilter(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid OrgaAggHasFilter", str)
-	}
-	return nil
-}
-
-func (e OrgaAggHasFilter) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type OrgaAggOrderable string
-
-const (
-	OrgaAggOrderableNMembers OrgaAggOrderable = "n_members"
-	OrgaAggOrderableNGuests  OrgaAggOrderable = "n_guests"
-)
-
-var AllOrgaAggOrderable = []OrgaAggOrderable{
-	OrgaAggOrderableNMembers,
-	OrgaAggOrderableNGuests,
-}
-
-func (e OrgaAggOrderable) IsValid() bool {
-	switch e {
-	case OrgaAggOrderableNMembers, OrgaAggOrderableNGuests:
-		return true
-	}
-	return false
-}
-
-func (e OrgaAggOrderable) String() string {
-	return string(e)
-}
-
-func (e *OrgaAggOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = OrgaAggOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid OrgaAggOrderable", str)
-	}
-	return nil
-}
-
-func (e OrgaAggOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
 type PendingUserHasFilter string
 
 const (
@@ -4706,27 +4860,119 @@ func (e PostOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ProjectCardHasFilter string
+
+const (
+	ProjectCardHasFilterPos    ProjectCardHasFilter = "pos"
+	ProjectCardHasFilterCard   ProjectCardHasFilter = "card"
+	ProjectCardHasFilterPc     ProjectCardHasFilter = "pc"
+	ProjectCardHasFilterValues ProjectCardHasFilter = "values"
+)
+
+var AllProjectCardHasFilter = []ProjectCardHasFilter{
+	ProjectCardHasFilterPos,
+	ProjectCardHasFilterCard,
+	ProjectCardHasFilterPc,
+	ProjectCardHasFilterValues,
+}
+
+func (e ProjectCardHasFilter) IsValid() bool {
+	switch e {
+	case ProjectCardHasFilterPos, ProjectCardHasFilterCard, ProjectCardHasFilterPc, ProjectCardHasFilterValues:
+		return true
+	}
+	return false
+}
+
+func (e ProjectCardHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectCardHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectCardHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectCardHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectCardHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectCardOrderable string
+
+const (
+	ProjectCardOrderablePos ProjectCardOrderable = "pos"
+)
+
+var AllProjectCardOrderable = []ProjectCardOrderable{
+	ProjectCardOrderablePos,
+}
+
+func (e ProjectCardOrderable) IsValid() bool {
+	switch e {
+	case ProjectCardOrderablePos:
+		return true
+	}
+	return false
+}
+
+func (e ProjectCardOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectCardOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectCardOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectCardOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectCardOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type ProjectColumnHasFilter string
 
 const (
-	ProjectColumnHasFilterName     ProjectColumnHasFilter = "name"
-	ProjectColumnHasFilterAbout    ProjectColumnHasFilter = "about"
-	ProjectColumnHasFilterPos      ProjectColumnHasFilter = "pos"
-	ProjectColumnHasFilterTensions ProjectColumnHasFilter = "tensions"
-	ProjectColumnHasFilterProject  ProjectColumnHasFilter = "project"
+	ProjectColumnHasFilterName        ProjectColumnHasFilter = "name"
+	ProjectColumnHasFilterDescription ProjectColumnHasFilter = "description"
+	ProjectColumnHasFilterColor       ProjectColumnHasFilter = "color"
+	ProjectColumnHasFilterPos         ProjectColumnHasFilter = "pos"
+	ProjectColumnHasFilterColType     ProjectColumnHasFilter = "col_type"
+	ProjectColumnHasFilterCards       ProjectColumnHasFilter = "cards"
+	ProjectColumnHasFilterProject     ProjectColumnHasFilter = "project"
+	ProjectColumnHasFilterTensions    ProjectColumnHasFilter = "tensions"
+	ProjectColumnHasFilterDrafts      ProjectColumnHasFilter = "drafts"
 )
 
 var AllProjectColumnHasFilter = []ProjectColumnHasFilter{
 	ProjectColumnHasFilterName,
-	ProjectColumnHasFilterAbout,
+	ProjectColumnHasFilterDescription,
+	ProjectColumnHasFilterColor,
 	ProjectColumnHasFilterPos,
-	ProjectColumnHasFilterTensions,
+	ProjectColumnHasFilterColType,
+	ProjectColumnHasFilterCards,
 	ProjectColumnHasFilterProject,
+	ProjectColumnHasFilterTensions,
+	ProjectColumnHasFilterDrafts,
 }
 
 func (e ProjectColumnHasFilter) IsValid() bool {
 	switch e {
-	case ProjectColumnHasFilterName, ProjectColumnHasFilterAbout, ProjectColumnHasFilterPos, ProjectColumnHasFilterTensions, ProjectColumnHasFilterProject:
+	case ProjectColumnHasFilterName, ProjectColumnHasFilterDescription, ProjectColumnHasFilterColor, ProjectColumnHasFilterPos, ProjectColumnHasFilterColType, ProjectColumnHasFilterCards, ProjectColumnHasFilterProject, ProjectColumnHasFilterTensions, ProjectColumnHasFilterDrafts:
 		return true
 	}
 	return false
@@ -4756,20 +5002,22 @@ func (e ProjectColumnHasFilter) MarshalGQL(w io.Writer) {
 type ProjectColumnOrderable string
 
 const (
-	ProjectColumnOrderableName  ProjectColumnOrderable = "name"
-	ProjectColumnOrderableAbout ProjectColumnOrderable = "about"
-	ProjectColumnOrderablePos   ProjectColumnOrderable = "pos"
+	ProjectColumnOrderableName        ProjectColumnOrderable = "name"
+	ProjectColumnOrderableDescription ProjectColumnOrderable = "description"
+	ProjectColumnOrderableColor       ProjectColumnOrderable = "color"
+	ProjectColumnOrderablePos         ProjectColumnOrderable = "pos"
 )
 
 var AllProjectColumnOrderable = []ProjectColumnOrderable{
 	ProjectColumnOrderableName,
-	ProjectColumnOrderableAbout,
+	ProjectColumnOrderableDescription,
+	ProjectColumnOrderableColor,
 	ProjectColumnOrderablePos,
 }
 
 func (e ProjectColumnOrderable) IsValid() bool {
 	switch e {
-	case ProjectColumnOrderableName, ProjectColumnOrderableAbout, ProjectColumnOrderablePos:
+	case ProjectColumnOrderableName, ProjectColumnOrderableDescription, ProjectColumnOrderableColor, ProjectColumnOrderablePos:
 		return true
 	}
 	return false
@@ -4796,33 +5044,350 @@ func (e ProjectColumnOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ProjectColumnType string
+
+const (
+	ProjectColumnTypeNormalColumn   ProjectColumnType = "NormalColumn"
+	ProjectColumnTypeNoStatusColumn ProjectColumnType = "NoStatusColumn"
+)
+
+var AllProjectColumnType = []ProjectColumnType{
+	ProjectColumnTypeNormalColumn,
+	ProjectColumnTypeNoStatusColumn,
+}
+
+func (e ProjectColumnType) IsValid() bool {
+	switch e {
+	case ProjectColumnTypeNormalColumn, ProjectColumnTypeNoStatusColumn:
+		return true
+	}
+	return false
+}
+
+func (e ProjectColumnType) String() string {
+	return string(e)
+}
+
+func (e *ProjectColumnType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectColumnType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectColumnType", str)
+	}
+	return nil
+}
+
+func (e ProjectColumnType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectDraftHasFilter string
+
+const (
+	ProjectDraftHasFilterCreatedBy     ProjectDraftHasFilter = "createdBy"
+	ProjectDraftHasFilterCreatedAt     ProjectDraftHasFilter = "createdAt"
+	ProjectDraftHasFilterUpdatedAt     ProjectDraftHasFilter = "updatedAt"
+	ProjectDraftHasFilterMessage       ProjectDraftHasFilter = "message"
+	ProjectDraftHasFilterTitle         ProjectDraftHasFilter = "title"
+	ProjectDraftHasFilterProjectStatus ProjectDraftHasFilter = "project_status"
+)
+
+var AllProjectDraftHasFilter = []ProjectDraftHasFilter{
+	ProjectDraftHasFilterCreatedBy,
+	ProjectDraftHasFilterCreatedAt,
+	ProjectDraftHasFilterUpdatedAt,
+	ProjectDraftHasFilterMessage,
+	ProjectDraftHasFilterTitle,
+	ProjectDraftHasFilterProjectStatus,
+}
+
+func (e ProjectDraftHasFilter) IsValid() bool {
+	switch e {
+	case ProjectDraftHasFilterCreatedBy, ProjectDraftHasFilterCreatedAt, ProjectDraftHasFilterUpdatedAt, ProjectDraftHasFilterMessage, ProjectDraftHasFilterTitle, ProjectDraftHasFilterProjectStatus:
+		return true
+	}
+	return false
+}
+
+func (e ProjectDraftHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectDraftHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectDraftHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectDraftHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectDraftHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectDraftOrderable string
+
+const (
+	ProjectDraftOrderableCreatedAt ProjectDraftOrderable = "createdAt"
+	ProjectDraftOrderableUpdatedAt ProjectDraftOrderable = "updatedAt"
+	ProjectDraftOrderableMessage   ProjectDraftOrderable = "message"
+	ProjectDraftOrderableTitle     ProjectDraftOrderable = "title"
+)
+
+var AllProjectDraftOrderable = []ProjectDraftOrderable{
+	ProjectDraftOrderableCreatedAt,
+	ProjectDraftOrderableUpdatedAt,
+	ProjectDraftOrderableMessage,
+	ProjectDraftOrderableTitle,
+}
+
+func (e ProjectDraftOrderable) IsValid() bool {
+	switch e {
+	case ProjectDraftOrderableCreatedAt, ProjectDraftOrderableUpdatedAt, ProjectDraftOrderableMessage, ProjectDraftOrderableTitle:
+		return true
+	}
+	return false
+}
+
+func (e ProjectDraftOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectDraftOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectDraftOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectDraftOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectDraftOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectFieldHasFilter string
+
+const (
+	ProjectFieldHasFilterFieldType ProjectFieldHasFilter = "field_type"
+	ProjectFieldHasFilterIsVisible ProjectFieldHasFilter = "isVisible"
+	ProjectFieldHasFilterValues    ProjectFieldHasFilter = "values"
+)
+
+var AllProjectFieldHasFilter = []ProjectFieldHasFilter{
+	ProjectFieldHasFilterFieldType,
+	ProjectFieldHasFilterIsVisible,
+	ProjectFieldHasFilterValues,
+}
+
+func (e ProjectFieldHasFilter) IsValid() bool {
+	switch e {
+	case ProjectFieldHasFilterFieldType, ProjectFieldHasFilterIsVisible, ProjectFieldHasFilterValues:
+		return true
+	}
+	return false
+}
+
+func (e ProjectFieldHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectFieldHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectFieldHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectFieldHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectFieldHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectFieldType string
+
+const (
+	ProjectFieldTypeInt          ProjectFieldType = "INT"
+	ProjectFieldTypeString       ProjectFieldType = "STRING"
+	ProjectFieldTypeDate         ProjectFieldType = "DATE"
+	ProjectFieldTypeSingleSelect ProjectFieldType = "SINGLE_SELECT"
+)
+
+var AllProjectFieldType = []ProjectFieldType{
+	ProjectFieldTypeInt,
+	ProjectFieldTypeString,
+	ProjectFieldTypeDate,
+	ProjectFieldTypeSingleSelect,
+}
+
+func (e ProjectFieldType) IsValid() bool {
+	switch e {
+	case ProjectFieldTypeInt, ProjectFieldTypeString, ProjectFieldTypeDate, ProjectFieldTypeSingleSelect:
+		return true
+	}
+	return false
+}
+
+func (e ProjectFieldType) String() string {
+	return string(e)
+}
+
+func (e *ProjectFieldType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectFieldType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectFieldType", str)
+	}
+	return nil
+}
+
+func (e ProjectFieldType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectFieldValueHasFilter string
+
+const (
+	ProjectFieldValueHasFilterField ProjectFieldValueHasFilter = "field"
+	ProjectFieldValueHasFilterValue ProjectFieldValueHasFilter = "value"
+	ProjectFieldValueHasFilterPos   ProjectFieldValueHasFilter = "pos"
+)
+
+var AllProjectFieldValueHasFilter = []ProjectFieldValueHasFilter{
+	ProjectFieldValueHasFilterField,
+	ProjectFieldValueHasFilterValue,
+	ProjectFieldValueHasFilterPos,
+}
+
+func (e ProjectFieldValueHasFilter) IsValid() bool {
+	switch e {
+	case ProjectFieldValueHasFilterField, ProjectFieldValueHasFilterValue, ProjectFieldValueHasFilterPos:
+		return true
+	}
+	return false
+}
+
+func (e ProjectFieldValueHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectFieldValueHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectFieldValueHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectFieldValueHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectFieldValueHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectFieldValueOrderable string
+
+const (
+	ProjectFieldValueOrderableValue ProjectFieldValueOrderable = "value"
+	ProjectFieldValueOrderablePos   ProjectFieldValueOrderable = "pos"
+)
+
+var AllProjectFieldValueOrderable = []ProjectFieldValueOrderable{
+	ProjectFieldValueOrderableValue,
+	ProjectFieldValueOrderablePos,
+}
+
+func (e ProjectFieldValueOrderable) IsValid() bool {
+	switch e {
+	case ProjectFieldValueOrderableValue, ProjectFieldValueOrderablePos:
+		return true
+	}
+	return false
+}
+
+func (e ProjectFieldValueOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectFieldValueOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectFieldValueOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectFieldValueOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectFieldValueOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type ProjectHasFilter string
 
 const (
+	ProjectHasFilterCreatedBy    ProjectHasFilter = "createdBy"
+	ProjectHasFilterCreatedAt    ProjectHasFilter = "createdAt"
+	ProjectHasFilterUpdatedAt    ProjectHasFilter = "updatedAt"
 	ProjectHasFilterRootnameid   ProjectHasFilter = "rootnameid"
 	ProjectHasFilterParentnameid ProjectHasFilter = "parentnameid"
 	ProjectHasFilterNameid       ProjectHasFilter = "nameid"
 	ProjectHasFilterName         ProjectHasFilter = "name"
 	ProjectHasFilterDescription  ProjectHasFilter = "description"
+	ProjectHasFilterStatus       ProjectHasFilter = "status"
 	ProjectHasFilterColumns      ProjectHasFilter = "columns"
+	ProjectHasFilterFields       ProjectHasFilter = "fields"
 	ProjectHasFilterLeaders      ProjectHasFilter = "leaders"
 	ProjectHasFilterNodes        ProjectHasFilter = "nodes"
 )
 
 var AllProjectHasFilter = []ProjectHasFilter{
+	ProjectHasFilterCreatedBy,
+	ProjectHasFilterCreatedAt,
+	ProjectHasFilterUpdatedAt,
 	ProjectHasFilterRootnameid,
 	ProjectHasFilterParentnameid,
 	ProjectHasFilterNameid,
 	ProjectHasFilterName,
 	ProjectHasFilterDescription,
+	ProjectHasFilterStatus,
 	ProjectHasFilterColumns,
+	ProjectHasFilterFields,
 	ProjectHasFilterLeaders,
 	ProjectHasFilterNodes,
 }
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterColumns, ProjectHasFilterLeaders, ProjectHasFilterNodes:
+	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterFields, ProjectHasFilterLeaders, ProjectHasFilterNodes:
 		return true
 	}
 	return false
@@ -4852,6 +5417,8 @@ func (e ProjectHasFilter) MarshalGQL(w io.Writer) {
 type ProjectOrderable string
 
 const (
+	ProjectOrderableCreatedAt    ProjectOrderable = "createdAt"
+	ProjectOrderableUpdatedAt    ProjectOrderable = "updatedAt"
 	ProjectOrderableRootnameid   ProjectOrderable = "rootnameid"
 	ProjectOrderableParentnameid ProjectOrderable = "parentnameid"
 	ProjectOrderableNameid       ProjectOrderable = "nameid"
@@ -4860,6 +5427,8 @@ const (
 )
 
 var AllProjectOrderable = []ProjectOrderable{
+	ProjectOrderableCreatedAt,
+	ProjectOrderableUpdatedAt,
 	ProjectOrderableRootnameid,
 	ProjectOrderableParentnameid,
 	ProjectOrderableNameid,
@@ -4869,7 +5438,7 @@ var AllProjectOrderable = []ProjectOrderable{
 
 func (e ProjectOrderable) IsValid() bool {
 	switch e {
-	case ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
+	case ProjectOrderableCreatedAt, ProjectOrderableUpdatedAt, ProjectOrderableRootnameid, ProjectOrderableParentnameid, ProjectOrderableNameid, ProjectOrderableName, ProjectOrderableDescription:
 		return true
 	}
 	return false
@@ -4896,85 +5465,44 @@ func (e ProjectOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type ProjectTensionHasFilter string
+type ProjectStatus string
 
 const (
-	ProjectTensionHasFilterTension ProjectTensionHasFilter = "tension"
-	ProjectTensionHasFilterPos     ProjectTensionHasFilter = "pos"
-	ProjectTensionHasFilterPc      ProjectTensionHasFilter = "pc"
+	ProjectStatusOpen   ProjectStatus = "Open"
+	ProjectStatusClosed ProjectStatus = "Closed"
 )
 
-var AllProjectTensionHasFilter = []ProjectTensionHasFilter{
-	ProjectTensionHasFilterTension,
-	ProjectTensionHasFilterPos,
-	ProjectTensionHasFilterPc,
+var AllProjectStatus = []ProjectStatus{
+	ProjectStatusOpen,
+	ProjectStatusClosed,
 }
 
-func (e ProjectTensionHasFilter) IsValid() bool {
+func (e ProjectStatus) IsValid() bool {
 	switch e {
-	case ProjectTensionHasFilterTension, ProjectTensionHasFilterPos, ProjectTensionHasFilterPc:
+	case ProjectStatusOpen, ProjectStatusClosed:
 		return true
 	}
 	return false
 }
 
-func (e ProjectTensionHasFilter) String() string {
+func (e ProjectStatus) String() string {
 	return string(e)
 }
 
-func (e *ProjectTensionHasFilter) UnmarshalGQL(v interface{}) error {
+func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = ProjectTensionHasFilter(str)
+	*e = ProjectStatus(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ProjectTensionHasFilter", str)
+		return fmt.Errorf("%s is not a valid ProjectStatus", str)
 	}
 	return nil
 }
 
-func (e ProjectTensionHasFilter) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type ProjectTensionOrderable string
-
-const (
-	ProjectTensionOrderablePos ProjectTensionOrderable = "pos"
-)
-
-var AllProjectTensionOrderable = []ProjectTensionOrderable{
-	ProjectTensionOrderablePos,
-}
-
-func (e ProjectTensionOrderable) IsValid() bool {
-	switch e {
-	case ProjectTensionOrderablePos:
-		return true
-	}
-	return false
-}
-
-func (e ProjectTensionOrderable) String() string {
-	return string(e)
-}
-
-func (e *ProjectTensionOrderable) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = ProjectTensionOrderable(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ProjectTensionOrderable", str)
-	}
-	return nil
-}
-
-func (e ProjectTensionOrderable) MarshalGQL(w io.Writer) {
+func (e ProjectStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -5360,29 +5888,28 @@ func (e TensionEvent) MarshalGQL(w io.Writer) {
 type TensionHasFilter string
 
 const (
-	TensionHasFilterCreatedBy      TensionHasFilter = "createdBy"
-	TensionHasFilterCreatedAt      TensionHasFilter = "createdAt"
-	TensionHasFilterUpdatedAt      TensionHasFilter = "updatedAt"
-	TensionHasFilterMessage        TensionHasFilter = "message"
-	TensionHasFilterEmitter        TensionHasFilter = "emitter"
-	TensionHasFilterEmitterid      TensionHasFilter = "emitterid"
-	TensionHasFilterReceiver       TensionHasFilter = "receiver"
-	TensionHasFilterReceiverid     TensionHasFilter = "receiverid"
-	TensionHasFilterTitle          TensionHasFilter = "title"
-	TensionHasFilterType           TensionHasFilter = "type_"
-	TensionHasFilterStatus         TensionHasFilter = "status"
-	TensionHasFilterAction         TensionHasFilter = "action"
-	TensionHasFilterAssignees      TensionHasFilter = "assignees"
-	TensionHasFilterLabels         TensionHasFilter = "labels"
-	TensionHasFilterComments       TensionHasFilter = "comments"
-	TensionHasFilterBlobs          TensionHasFilter = "blobs"
-	TensionHasFilterHistory        TensionHasFilter = "history"
-	TensionHasFilterMentions       TensionHasFilter = "mentions"
-	TensionHasFilterContracts      TensionHasFilter = "contracts"
-	TensionHasFilterSubscribers    TensionHasFilter = "subscribers"
-	TensionHasFilterProjects       TensionHasFilter = "projects"
-	TensionHasFilterNComments      TensionHasFilter = "n_comments"
-	TensionHasFilterNOpenContracts TensionHasFilter = "n_open_contracts"
+	TensionHasFilterCreatedBy       TensionHasFilter = "createdBy"
+	TensionHasFilterCreatedAt       TensionHasFilter = "createdAt"
+	TensionHasFilterUpdatedAt       TensionHasFilter = "updatedAt"
+	TensionHasFilterMessage         TensionHasFilter = "message"
+	TensionHasFilterEmitter         TensionHasFilter = "emitter"
+	TensionHasFilterEmitterid       TensionHasFilter = "emitterid"
+	TensionHasFilterReceiver        TensionHasFilter = "receiver"
+	TensionHasFilterReceiverid      TensionHasFilter = "receiverid"
+	TensionHasFilterTitle           TensionHasFilter = "title"
+	TensionHasFilterType            TensionHasFilter = "type_"
+	TensionHasFilterStatus          TensionHasFilter = "status"
+	TensionHasFilterAction          TensionHasFilter = "action"
+	TensionHasFilterAssignees       TensionHasFilter = "assignees"
+	TensionHasFilterLabels          TensionHasFilter = "labels"
+	TensionHasFilterComments        TensionHasFilter = "comments"
+	TensionHasFilterBlobs           TensionHasFilter = "blobs"
+	TensionHasFilterHistory         TensionHasFilter = "history"
+	TensionHasFilterMentions        TensionHasFilter = "mentions"
+	TensionHasFilterContracts       TensionHasFilter = "contracts"
+	TensionHasFilterSubscribers     TensionHasFilter = "subscribers"
+	TensionHasFilterProjectStatuses TensionHasFilter = "project_statuses"
+	TensionHasFilterNComments       TensionHasFilter = "n_comments"
 )
 
 var AllTensionHasFilter = []TensionHasFilter{
@@ -5406,14 +5933,13 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterMentions,
 	TensionHasFilterContracts,
 	TensionHasFilterSubscribers,
-	TensionHasFilterProjects,
+	TensionHasFilterProjectStatuses,
 	TensionHasFilterNComments,
-	TensionHasFilterNOpenContracts,
 }
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjects, TensionHasFilterNComments, TensionHasFilterNOpenContracts:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjectStatuses, TensionHasFilterNComments:
 		return true
 	}
 	return false
@@ -5443,14 +5969,13 @@ func (e TensionHasFilter) MarshalGQL(w io.Writer) {
 type TensionOrderable string
 
 const (
-	TensionOrderableCreatedAt      TensionOrderable = "createdAt"
-	TensionOrderableUpdatedAt      TensionOrderable = "updatedAt"
-	TensionOrderableMessage        TensionOrderable = "message"
-	TensionOrderableEmitterid      TensionOrderable = "emitterid"
-	TensionOrderableReceiverid     TensionOrderable = "receiverid"
-	TensionOrderableTitle          TensionOrderable = "title"
-	TensionOrderableNComments      TensionOrderable = "n_comments"
-	TensionOrderableNOpenContracts TensionOrderable = "n_open_contracts"
+	TensionOrderableCreatedAt  TensionOrderable = "createdAt"
+	TensionOrderableUpdatedAt  TensionOrderable = "updatedAt"
+	TensionOrderableMessage    TensionOrderable = "message"
+	TensionOrderableEmitterid  TensionOrderable = "emitterid"
+	TensionOrderableReceiverid TensionOrderable = "receiverid"
+	TensionOrderableTitle      TensionOrderable = "title"
+	TensionOrderableNComments  TensionOrderable = "n_comments"
 )
 
 var AllTensionOrderable = []TensionOrderable{
@@ -5461,12 +5986,11 @@ var AllTensionOrderable = []TensionOrderable{
 	TensionOrderableReceiverid,
 	TensionOrderableTitle,
 	TensionOrderableNComments,
-	TensionOrderableNOpenContracts,
 }
 
 func (e TensionOrderable) IsValid() bool {
 	switch e {
-	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableTitle, TensionOrderableNComments, TensionOrderableNOpenContracts:
+	case TensionOrderableCreatedAt, TensionOrderableUpdatedAt, TensionOrderableMessage, TensionOrderableEmitterid, TensionOrderableReceiverid, TensionOrderableTitle, TensionOrderableNComments:
 		return true
 	}
 	return false
@@ -5685,7 +6209,6 @@ const (
 	UserHasFilterWatching         UserHasFilter = "watching"
 	UserHasFilterRights           UserHasFilter = "rights"
 	UserHasFilterRoles            UserHasFilter = "roles"
-	UserHasFilterBackedRoles      UserHasFilter = "backed_roles"
 	UserHasFilterTensionsCreated  UserHasFilter = "tensions_created"
 	UserHasFilterTensionsAssigned UserHasFilter = "tensions_assigned"
 	UserHasFilterContracts        UserHasFilter = "contracts"
@@ -5713,7 +6236,6 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterWatching,
 	UserHasFilterRights,
 	UserHasFilterRoles,
-	UserHasFilterBackedRoles,
 	UserHasFilterTensionsCreated,
 	UserHasFilterTensionsAssigned,
 	UserHasFilterContracts,
@@ -5725,7 +6247,7 @@ var AllUserHasFilter = []UserHasFilter{
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterBackedRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
 		return true
 	}
 	return false

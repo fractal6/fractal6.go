@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,35 +21,35 @@
 package tools
 
 import (
-	"testing"
 	"reflect"
+	"testing"
+
 	"fractale/fractal6.go/graph/model"
 )
 
 func TestStructMap(t *testing.T) {
 
-    var nodeFragment *model.NodeFragment
-    var nodeInput model.AddNodeInput
+	var nodeFragment *model.NodeFragment
+	var nodeInput model.AddNodeInput
 
-    name := "name"
-    nameid := "nameid"
-    username := "username"
-    nodeFragment = &model.NodeFragment{
-        Name: &name,
-        Nameid: &nameid,
-        FirstLink: &username,
-    }
+	name := "name"
+	nameid := "nameid"
+	username := "username"
+	nodeFragment = &model.NodeFragment{
+		Name:      &name,
+		Nameid:    &nameid,
+		FirstLink: &username,
+	}
 
-    StructMap(nodeFragment, &nodeInput)
+	StructMap(nodeFragment, &nodeInput)
 
-    // FirstLink cannot be added by adding a node !
-    want := model.AddNodeInput{
-        Name: name,
-        Nameid: nameid,
-    }
+	// FirstLink cannot be added by adding a node !
+	want := model.AddNodeInput{
+		Name:   name,
+		Nameid: nameid,
+	}
 
-    if reflect.DeepEqual(nodeInput, want) {
-        t.Errorf("StructMap error, want: %v, got: %v", want, nodeInput)
-    }
+	if reflect.DeepEqual(nodeInput, want) {
+		t.Errorf("StructMap error, want: %v, got: %v", want, nodeInput)
+	}
 }
-

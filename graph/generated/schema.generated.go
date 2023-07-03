@@ -36,17 +36,23 @@ type MutationResolver interface {
 	AddProject(ctx context.Context, input []*model.AddProjectInput) (*model.AddProjectPayload, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*model.UpdateProjectPayload, error)
 	DeleteProject(ctx context.Context, filter model.ProjectFilter) (*model.DeleteProjectPayload, error)
-	AddProjectTension(ctx context.Context, input []*model.AddProjectTensionInput) (*model.AddProjectTensionPayload, error)
-	UpdateProjectTension(ctx context.Context, input model.UpdateProjectTensionInput) (*model.UpdateProjectTensionPayload, error)
-	DeleteProjectTension(ctx context.Context, filter model.ProjectTensionFilter) (*model.DeleteProjectTensionPayload, error)
-	AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput, upsert *bool) (*model.AddProjectColumnPayload, error)
+	AddProjectColumn(ctx context.Context, input []*model.AddProjectColumnInput) (*model.AddProjectColumnPayload, error)
 	UpdateProjectColumn(ctx context.Context, input model.UpdateProjectColumnInput) (*model.UpdateProjectColumnPayload, error)
 	DeleteProjectColumn(ctx context.Context, filter model.ProjectColumnFilter) (*model.DeleteProjectColumnPayload, error)
-	AddOrgaAgg(ctx context.Context, input []*model.AddOrgaAggInput) (*model.AddOrgaAggPayload, error)
-	UpdateOrgaAgg(ctx context.Context, input model.UpdateOrgaAggInput) (*model.UpdateOrgaAggPayload, error)
-	DeleteOrgaAgg(ctx context.Context, filter model.OrgaAggFilter) (*model.DeleteOrgaAggPayload, error)
+	AddProjectCard(ctx context.Context, input []*model.AddProjectCardInput) (*model.AddProjectCardPayload, error)
+	UpdateProjectCard(ctx context.Context, input model.UpdateProjectCardInput) (*model.UpdateProjectCardPayload, error)
+	DeleteProjectCard(ctx context.Context, filter model.ProjectCardFilter) (*model.DeleteProjectCardPayload, error)
+	AddProjectField(ctx context.Context, input []*model.AddProjectFieldInput) (*model.AddProjectFieldPayload, error)
+	UpdateProjectField(ctx context.Context, input model.UpdateProjectFieldInput) (*model.UpdateProjectFieldPayload, error)
+	DeleteProjectField(ctx context.Context, filter model.ProjectFieldFilter) (*model.DeleteProjectFieldPayload, error)
+	AddProjectFieldValue(ctx context.Context, input []*model.AddProjectFieldValueInput) (*model.AddProjectFieldValuePayload, error)
+	UpdateProjectFieldValue(ctx context.Context, input model.UpdateProjectFieldValueInput) (*model.UpdateProjectFieldValuePayload, error)
+	DeleteProjectFieldValue(ctx context.Context, filter model.ProjectFieldValueFilter) (*model.DeleteProjectFieldValuePayload, error)
 	UpdatePost(ctx context.Context, input model.UpdatePostInput) (*model.UpdatePostPayload, error)
 	DeletePost(ctx context.Context, filter model.PostFilter) (*model.DeletePostPayload, error)
+	AddProjectDraft(ctx context.Context, input []*model.AddProjectDraftInput) (*model.AddProjectDraftPayload, error)
+	UpdateProjectDraft(ctx context.Context, input model.UpdateProjectDraftInput) (*model.UpdateProjectDraftPayload, error)
+	DeleteProjectDraft(ctx context.Context, filter model.ProjectDraftFilter) (*model.DeleteProjectDraftPayload, error)
 	AddTension(ctx context.Context, input []*model.AddTensionInput) (*model.AddTensionPayload, error)
 	UpdateTension(ctx context.Context, input model.UpdateTensionInput) (*model.UpdateTensionPayload, error)
 	DeleteTension(ctx context.Context, filter model.TensionFilter) (*model.DeleteTensionPayload, error)
@@ -109,17 +115,22 @@ type QueryResolver interface {
 	GetProject(ctx context.Context, id string) (*model.Project, error)
 	QueryProject(ctx context.Context, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) ([]*model.Project, error)
 	AggregateProject(ctx context.Context, filter *model.ProjectFilter) (*model.ProjectAggregateResult, error)
-	GetProjectTension(ctx context.Context, id string) (*model.ProjectTension, error)
-	QueryProjectTension(ctx context.Context, filter *model.ProjectTensionFilter, order *model.ProjectTensionOrder, first *int, offset *int) ([]*model.ProjectTension, error)
-	AggregateProjectTension(ctx context.Context, filter *model.ProjectTensionFilter) (*model.ProjectTensionAggregateResult, error)
-	GetProjectColumn(ctx context.Context, id *string, name *string) (*model.ProjectColumn, error)
+	GetProjectColumn(ctx context.Context, id string) (*model.ProjectColumn, error)
 	QueryProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter, order *model.ProjectColumnOrder, first *int, offset *int) ([]*model.ProjectColumn, error)
 	AggregateProjectColumn(ctx context.Context, filter *model.ProjectColumnFilter) (*model.ProjectColumnAggregateResult, error)
-	QueryOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter, order *model.OrgaAggOrder, first *int, offset *int) ([]*model.OrgaAgg, error)
-	AggregateOrgaAgg(ctx context.Context, filter *model.OrgaAggFilter) (*model.OrgaAggAggregateResult, error)
+	GetProjectCard(ctx context.Context, id string) (*model.ProjectCard, error)
+	QueryProjectCard(ctx context.Context, filter *model.ProjectCardFilter, order *model.ProjectCardOrder, first *int, offset *int) ([]*model.ProjectCard, error)
+	AggregateProjectCard(ctx context.Context, filter *model.ProjectCardFilter) (*model.ProjectCardAggregateResult, error)
+	QueryProjectField(ctx context.Context, filter *model.ProjectFieldFilter, first *int, offset *int) ([]*model.ProjectField, error)
+	AggregateProjectField(ctx context.Context, filter *model.ProjectFieldFilter) (*model.ProjectFieldAggregateResult, error)
+	QueryProjectFieldValue(ctx context.Context, filter *model.ProjectFieldValueFilter, order *model.ProjectFieldValueOrder, first *int, offset *int) ([]*model.ProjectFieldValue, error)
+	AggregateProjectFieldValue(ctx context.Context, filter *model.ProjectFieldValueFilter) (*model.ProjectFieldValueAggregateResult, error)
 	GetPost(ctx context.Context, id string) (*model.Post, error)
 	QueryPost(ctx context.Context, filter *model.PostFilter, order *model.PostOrder, first *int, offset *int) ([]*model.Post, error)
 	AggregatePost(ctx context.Context, filter *model.PostFilter) (*model.PostAggregateResult, error)
+	GetProjectDraft(ctx context.Context, id string) (*model.ProjectDraft, error)
+	QueryProjectDraft(ctx context.Context, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) ([]*model.ProjectDraft, error)
+	AggregateProjectDraft(ctx context.Context, filter *model.ProjectDraftFilter) (*model.ProjectDraftAggregateResult, error)
 	GetTension(ctx context.Context, id string) (*model.Tension, error)
 	QueryTension(ctx context.Context, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) ([]*model.Tension, error)
 	AggregateTension(ctx context.Context, filter *model.TensionFilter) (*model.TensionAggregateResult, error)
@@ -1224,22 +1235,22 @@ func (ec *executionContext) field_AddNotifPayload_notif_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_AddOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_AddPendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
+	var arg0 *model.PendingUserFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOPendingUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.OrgaAggOrder
+	var arg1 *model.PendingUserOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOPendingUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1266,22 +1277,22 @@ func (ec *executionContext) field_AddOrgaAggPayload_orgaAgg_args(ctx context.Con
 	return args, nil
 }
 
-func (ec *executionContext) field_AddPendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_AddProjectCardPayload_projectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.PendingUserFilter
+	var arg0 *model.ProjectCardFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOPendingUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.PendingUserOrder
+	var arg1 *model.ProjectCardOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOPendingUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1350,22 +1361,22 @@ func (ec *executionContext) field_AddProjectColumnPayload_projectColumn_args(ctx
 	return args, nil
 }
 
-func (ec *executionContext) field_AddProjectPayload_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_AddProjectDraftPayload_projectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectFilter
+	var arg0 *model.ProjectDraftFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectOrder
+	var arg1 *model.ProjectDraftOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1392,22 +1403,97 @@ func (ec *executionContext) field_AddProjectPayload_project_args(ctx context.Con
 	return args, nil
 }
 
-func (ec *executionContext) field_AddProjectTensionPayload_projectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_AddProjectFieldPayload_projectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectFieldFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectTensionOrder
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_AddProjectFieldValuePayload_projectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectFieldValueOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_AddProjectPayload_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2580,48 +2666,6 @@ func (ec *executionContext) field_DeleteNotifPayload_notif_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_DeleteOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.OrgaAggOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
 func (ec *executionContext) field_DeletePendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2706,6 +2750,48 @@ func (ec *executionContext) field_DeletePostPayload_post_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteProjectCardPayload_projectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectCardOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteProjectColumnPayload_projectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2748,22 +2834,22 @@ func (ec *executionContext) field_DeleteProjectColumnPayload_projectColumn_args(
 	return args, nil
 }
 
-func (ec *executionContext) field_DeleteProjectPayload_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_DeleteProjectDraftPayload_projectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectFilter
+	var arg0 *model.ProjectDraftFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectOrder
+	var arg1 *model.ProjectDraftOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2790,22 +2876,97 @@ func (ec *executionContext) field_DeleteProjectPayload_project_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_DeleteProjectTensionPayload_projectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_DeleteProjectFieldPayload_projectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectFieldFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectTensionOrder
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteProjectFieldValuePayload_projectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectFieldValueOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_DeleteProjectPayload_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3519,21 +3680,6 @@ func (ec *executionContext) field_Mutation_addNotif_args(ctx context.Context, ra
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_addOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []*model.AddOrgaAggInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddOrgaAggInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_addPendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3558,37 +3704,124 @@ func (ec *executionContext) field_Mutation_addPendingUser_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addProjectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddProjectCardInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddProjectCardInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectCardInput == nil {
+				return nil, errors.New("directive hook_addProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_addProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddProjectCardInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddProjectCardInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 []*model.AddProjectColumnInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddProjectColumnInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectColumnInputᚄ(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddProjectColumnInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectColumnInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectColumnInput == nil {
+				return nil, errors.New("directive hook_addProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_addProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddProjectColumnInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddProjectColumnInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addProjectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddProjectDraftInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddProjectDraftInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectDraftInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectDraftInput == nil {
+				return nil, errors.New("directive hook_addProjectDraftInput is not implemented")
+			}
+			return ec.directives.Hook_addProjectDraftInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddProjectDraftInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddProjectDraftInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addProjectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddProjectFieldValueInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddProjectFieldValueInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldValueInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["input"] = arg0
-	var arg1 *bool
-	if tmp, ok := rawArgs["upsert"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
-		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["upsert"] = arg1
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_addProjectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_addProjectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*model.AddProjectTensionInput
+	var arg0 []*model.AddProjectFieldInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddProjectTensionInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectTensionInputᚄ(ctx, tmp)
+		arg0, err = ec.unmarshalNAddProjectFieldInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4056,21 +4289,6 @@ func (ec *executionContext) field_Mutation_deleteNotif_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNOrgaAggFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_deletePendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4101,13 +4319,103 @@ func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteProjectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNProjectCardFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectCardInput == nil {
+				return nil, errors.New("directive hook_deleteProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ProjectCardFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.ProjectCardFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectColumnFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNProjectColumnFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectColumnInput == nil {
+				return nil, errors.New("directive hook_deleteProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ProjectColumnFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.ProjectColumnFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteProjectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ProjectDraftFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNProjectDraftFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectDraftInput == nil {
+				return nil, errors.New("directive hook_deleteProjectDraftInput is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectDraftInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.ProjectDraftFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.ProjectDraftFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteProjectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNProjectFieldValueFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4116,13 +4424,13 @@ func (ec *executionContext) field_Mutation_deleteProjectColumn_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteProjectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteProjectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.ProjectTensionFilter
+	var arg0 model.ProjectFieldFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectTensionFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectFieldFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4551,21 +4859,6 @@ func (ec *executionContext) field_Mutation_updateNotif_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.UpdateOrgaAggInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateOrgaAggInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updatePendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4596,13 +4889,103 @@ func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateProjectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateProjectCardInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateProjectCardInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectCardInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectCardInput == nil {
+				return nil, errors.New("directive hook_updateProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_updateProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateProjectCardInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateProjectCardInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.UpdateProjectColumnInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateProjectColumnInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectColumnInput(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateProjectColumnInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectColumnInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectColumnInput == nil {
+				return nil, errors.New("directive hook_updateProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_updateProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateProjectColumnInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateProjectColumnInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProjectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateProjectDraftInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateProjectDraftInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectDraftInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectDraftInput == nil {
+				return nil, errors.New("directive hook_updateProjectDraftInput is not implemented")
+			}
+			return ec.directives.Hook_updateProjectDraftInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateProjectDraftInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateProjectDraftInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProjectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateProjectFieldValueInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateProjectFieldValueInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldValueInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4611,13 +4994,13 @@ func (ec *executionContext) field_Mutation_updateProjectColumn_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateProjectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateProjectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.UpdateProjectTensionInput
+	var arg0 model.UpdateProjectFieldInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateProjectTensionInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectTensionInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateProjectFieldInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5109,21 +5492,6 @@ func (ec *executionContext) field_Node_labels_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
-func (ec *executionContext) field_Node_orga_agg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Node_parent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5322,21 +5690,6 @@ func (ec *executionContext) field_Node_roles_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["offset"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_Node_second_link_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.UserFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
 	return args, nil
 }
 
@@ -5643,13 +5996,13 @@ func (ec *executionContext) field_Post_createdBy_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_ProjectColumn_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProjectCard_card_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectFilter
+	var arg0 *model.CardKindFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOCardKindFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5658,13 +6011,13 @@ func (ec *executionContext) field_ProjectColumn_project_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_ProjectColumn_tensionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProjectCard_pc_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5673,22 +6026,37 @@ func (ec *executionContext) field_ProjectColumn_tensionsAggregate_args(ctx conte
 	return args, nil
 }
 
-func (ec *executionContext) field_ProjectColumn_tensions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProjectCard_valuesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectFieldValueFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectTensionOrder
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectCard_values_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectFieldValueOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5715,7 +6083,208 @@ func (ec *executionContext) field_ProjectColumn_tensions_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_ProjectTension_pc_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProjectColumn_cardsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectColumn_cards_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectCardOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectColumn_draftsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectDraftFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectColumn_drafts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectDraftFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectDraftOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectColumn_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectColumn_tensionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectColumn_tensions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectDraft_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectDraft_project_status_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.ProjectColumnFilter
@@ -5730,18 +6299,75 @@ func (ec *executionContext) field_ProjectTension_pc_args(ctx context.Context, ra
 	return args, nil
 }
 
-func (ec *executionContext) field_ProjectTension_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ProjectFieldValue_field_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.TensionFilter
+	var arg0 *model.ProjectFieldFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectField_valuesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectField_values_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectFieldValueOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -5799,6 +6425,69 @@ func (ec *executionContext) field_Project_columns_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Project_createdBy_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Project_fieldsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Project_fields_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -6096,21 +6785,6 @@ func (ec *executionContext) field_Query_aggregateNotif_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_aggregateOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_aggregatePendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -6141,6 +6815,21 @@ func (ec *executionContext) field_Query_aggregatePost_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateProjectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -6156,13 +6845,43 @@ func (ec *executionContext) field_Query_aggregateProjectColumn_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_aggregateProjectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_aggregateProjectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectDraftFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_aggregateProjectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_aggregateProjectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6492,31 +7211,37 @@ func (ec *executionContext) field_Query_getPost_args(ctx context.Context, rawArg
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getProjectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["id"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg1
+	args["id"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getProjectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getProjectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -7185,48 +7910,6 @@ func (ec *executionContext) field_Query_queryNotif_args(ctx context.Context, raw
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_queryOrgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.OrgaAggOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_queryPendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7311,15 +7994,91 @@ func (ec *executionContext) field_Query_queryPost_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryProjectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryProjectCardInput == nil {
+				return nil, errors.New("directive hook_queryProjectCardInput is not implemented")
+			}
+			return ec.directives.Hook_queryProjectCardInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ProjectCardFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectCardFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectCardOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_queryProjectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryProjectColumnInput == nil {
+				return nil, errors.New("directive hook_queryProjectColumnInput is not implemented")
+			}
+			return ec.directives.Hook_queryProjectColumnInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ProjectColumnFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
@@ -7353,22 +8112,39 @@ func (ec *executionContext) field_Query_queryProjectColumn_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_queryProjectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_queryProjectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectDraftFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryProjectDraftInput == nil {
+				return nil, errors.New("directive hook_queryProjectDraftInput is not implemented")
+			}
+			return ec.directives.Hook_queryProjectDraftInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.ProjectDraftFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectDraftFilter`, tmp))
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectTensionOrder
+	var arg1 *model.ProjectDraftOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7392,6 +8168,81 @@ func (ec *executionContext) field_Query_queryProjectTension_args(ctx context.Con
 		}
 	}
 	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryProjectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectFieldValueOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryProjectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -8421,13 +9272,13 @@ func (ec *executionContext) field_Tension_mentions_args(ctx context.Context, raw
 	return args, nil
 }
 
-func (ec *executionContext) field_Tension_projectsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Tension_project_statusesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -8436,22 +9287,22 @@ func (ec *executionContext) field_Tension_projectsAggregate_args(ctx context.Con
 	return args, nil
 }
 
-func (ec *executionContext) field_Tension_projects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Tension_project_statuses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectColumnFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectTensionOrder
+	var arg1 *model.ProjectColumnOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectColumnOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -9012,48 +9863,6 @@ func (ec *executionContext) field_UpdateNotifPayload_notif_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_UpdateOrgaAggPayload_orgaAgg_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.OrgaAggFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.OrgaAggOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOOrgaAggOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
-	return args, nil
-}
-
 func (ec *executionContext) field_UpdatePendingUserPayload_pendingUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -9138,6 +9947,48 @@ func (ec *executionContext) field_UpdatePostPayload_post_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateProjectCardPayload_projectCard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectCardFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectCardOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateProjectColumnPayload_projectColumn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -9180,22 +10031,22 @@ func (ec *executionContext) field_UpdateProjectColumnPayload_projectColumn_args(
 	return args, nil
 }
 
-func (ec *executionContext) field_UpdateProjectPayload_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_UpdateProjectDraftPayload_projectDraft_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectFilter
+	var arg0 *model.ProjectDraftFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectOrder
+	var arg1 *model.ProjectDraftOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -9222,22 +10073,97 @@ func (ec *executionContext) field_UpdateProjectPayload_project_args(ctx context.
 	return args, nil
 }
 
-func (ec *executionContext) field_UpdateProjectTensionPayload_projectTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_UpdateProjectFieldPayload_projectField_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ProjectTensionFilter
+	var arg0 *model.ProjectFieldFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["filter"] = arg0
-	var arg1 *model.ProjectTensionOrder
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdateProjectFieldValuePayload_projectFieldValue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFieldValueFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectFieldValueOrder
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, tmp)
+		arg1, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdateProjectPayload_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ProjectFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ProjectOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -9603,63 +10529,6 @@ func (ec *executionContext) field_UserEvent_user_args(ctx context.Context, rawAr
 		}
 	}
 	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_User_backed_rolesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_User_backed_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NodeFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 *model.NodeOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
 	return args, nil
 }
 
@@ -11164,8 +12033,6 @@ func (ec *executionContext) fieldContext_AddNodeFragmentPayload_nodeFragment(ctx
 				return ec.fieldContext_NodeFragment_type_(ctx, field)
 			case "first_link":
 				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
 			case "role_type":
@@ -11325,12 +12192,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -11514,99 +12377,6 @@ func (ec *executionContext) fieldContext_AddNotifPayload_numUids(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _AddOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField, obj *model.AddOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AddOrgaAggPayload_orgaAgg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OrgaAgg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.OrgaAgg)
-	fc.Result = res
-	return ec.marshalOOrgaAgg2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AddOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AddOrgaAggPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "n_members":
-				return ec.fieldContext_OrgaAgg_n_members(ctx, field)
-			case "n_guests":
-				return ec.fieldContext_OrgaAgg_n_guests(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAgg", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_AddOrgaAggPayload_orgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AddOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AddOrgaAggPayload_numUids(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AddOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AddOrgaAggPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _AddPendingUserPayload_pendingUser(ctx context.Context, field graphql.CollectedField, obj *model.AddPendingUserPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AddPendingUserPayload_pendingUser(ctx, field)
 	if err != nil {
@@ -11716,6 +12486,107 @@ func (ec *executionContext) fieldContext_AddPendingUserPayload_numUids(ctx conte
 	return fc, nil
 }
 
+func (ec *executionContext) _AddProjectCardPayload_projectCard(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectCardPayload_projectCard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectCard, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectCard)
+	fc.Result = res
+	return ec.marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectCardPayload_projectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProjectCard_id(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectCard_pos(ctx, field)
+			case "card":
+				return ec.fieldContext_ProjectCard_card(ctx, field)
+			case "pc":
+				return ec.fieldContext_ProjectCard_pc(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectCard_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddProjectCardPayload_projectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddProjectCardPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectCardPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectCardPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AddProjectColumnPayload_projectColumn(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectColumnPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AddProjectColumnPayload_projectColumn(ctx, field)
 	if err != nil {
@@ -11753,16 +12624,28 @@ func (ec *executionContext) fieldContext_AddProjectColumnPayload_projectColumn(c
 				return ec.fieldContext_ProjectColumn_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
 				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
 			case "project":
 				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
 			case "tensionsAggregate":
 				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
@@ -11819,6 +12702,301 @@ func (ec *executionContext) fieldContext_AddProjectColumnPayload_numUids(ctx con
 	return fc, nil
 }
 
+func (ec *executionContext) _AddProjectDraftPayload_projectDraft(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectDraftPayload_projectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectDraft, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectDraft)
+	fc.Result = res
+	return ec.marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectDraftPayload_projectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ProjectDraft_title(ctx, field)
+			case "message":
+				return ec.fieldContext_ProjectDraft_message(ctx, field)
+			case "project_status":
+				return ec.fieldContext_ProjectDraft_project_status(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectDraft_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_ProjectDraft_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraft", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddProjectDraftPayload_projectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddProjectDraftPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectDraftPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectDraftPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddProjectFieldPayload_projectField(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectFieldPayload_projectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectField, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectField)
+	fc.Result = res
+	return ec.marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectFieldPayload_projectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field_type":
+				return ec.fieldContext_ProjectField_field_type(ctx, field)
+			case "isVisible":
+				return ec.fieldContext_ProjectField_isVisible(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectField_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectField", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddProjectFieldPayload_projectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddProjectFieldPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectFieldPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectFieldPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddProjectFieldValuePayload_projectFieldValue(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectFieldValuePayload_projectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectFieldValue, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectFieldValue)
+	fc.Result = res
+	return ec.marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectFieldValuePayload_projectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field":
+				return ec.fieldContext_ProjectFieldValue_field(ctx, field)
+			case "value":
+				return ec.fieldContext_ProjectFieldValue_value(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddProjectFieldValuePayload_projectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddProjectFieldValuePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddProjectFieldValuePayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddProjectFieldValuePayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AddProjectPayload_project(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AddProjectPayload_project(ctx, field)
 	if err != nil {
@@ -11854,6 +13032,12 @@ func (ec *executionContext) fieldContext_AddProjectPayload_project(ctx context.C
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -11864,14 +13048,20 @@ func (ec *executionContext) fieldContext_AddProjectPayload_project(ctx context.C
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -11922,103 +13112,6 @@ func (ec *executionContext) _AddProjectPayload_numUids(ctx context.Context, fiel
 func (ec *executionContext) fieldContext_AddProjectPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AddProjectPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AddProjectTensionPayload_projectTension(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AddProjectTensionPayload_projectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ProjectTension, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ProjectTension)
-	fc.Result = res
-	return ec.marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AddProjectTensionPayload_projectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AddProjectTensionPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
-			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
-			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_AddProjectTensionPayload_projectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AddProjectTensionPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AddProjectTensionPayload_numUids(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AddProjectTensionPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AddProjectTensionPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -12304,12 +13397,10 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -12336,8 +13427,8 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -12562,8 +13653,6 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -12584,8 +13673,6 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -12928,12 +14015,10 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -12960,8 +14045,8 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -13150,8 +14235,6 @@ func (ec *executionContext) fieldContext_Blob_node(ctx context.Context, field gr
 				return ec.fieldContext_NodeFragment_type_(ctx, field)
 			case "first_link":
 				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
 			case "role_type":
@@ -13327,8 +14410,6 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -13349,8 +14430,6 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -14205,8 +15284,6 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -14227,8 +15304,6 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -14776,12 +15851,10 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -14808,8 +15881,8 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -15149,8 +16222,6 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -15171,8 +16242,6 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -15508,8 +16577,6 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -15530,8 +16597,6 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -17604,8 +18669,6 @@ func (ec *executionContext) fieldContext_DeleteNodeFragmentPayload_nodeFragment(
 				return ec.fieldContext_NodeFragment_type_(ctx, field)
 			case "first_link":
 				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
 			case "role_type":
@@ -17803,12 +18866,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -18058,137 +19117,6 @@ func (ec *executionContext) _DeleteNotifPayload_numUids(ctx context.Context, fie
 func (ec *executionContext) fieldContext_DeleteNotifPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteNotifPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteOrgaAggPayload_orgaAgg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OrgaAgg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.OrgaAgg)
-	fc.Result = res
-	return ec.marshalOOrgaAgg2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteOrgaAggPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "n_members":
-				return ec.fieldContext_OrgaAgg_n_members(ctx, field)
-			case "n_guests":
-				return ec.fieldContext_OrgaAgg_n_guests(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAgg", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_DeleteOrgaAggPayload_orgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteOrgaAggPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteOrgaAggPayload_msg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Msg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteOrgaAggPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteOrgaAggPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteOrgaAggPayload_numUids(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteOrgaAggPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -18483,6 +19411,145 @@ func (ec *executionContext) fieldContext_DeletePostPayload_numUids(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteProjectCardPayload_projectCard(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectCardPayload_projectCard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectCard, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectCard)
+	fc.Result = res
+	return ec.marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectCardPayload_projectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProjectCard_id(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectCard_pos(ctx, field)
+			case "card":
+				return ec.fieldContext_ProjectCard_card(ctx, field)
+			case "pc":
+				return ec.fieldContext_ProjectCard_pc(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectCard_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteProjectCardPayload_projectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectCardPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectCardPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectCardPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectCardPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectCardPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectCardPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteProjectColumnPayload_projectColumn(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectColumnPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteProjectColumnPayload_projectColumn(ctx, field)
 	if err != nil {
@@ -18520,16 +19587,28 @@ func (ec *executionContext) fieldContext_DeleteProjectColumnPayload_projectColum
 				return ec.fieldContext_ProjectColumn_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
 				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
 			case "project":
 				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
 			case "tensionsAggregate":
 				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
@@ -18624,6 +19703,415 @@ func (ec *executionContext) fieldContext_DeleteProjectColumnPayload_numUids(ctx 
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteProjectDraftPayload_projectDraft(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectDraftPayload_projectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectDraft, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectDraft)
+	fc.Result = res
+	return ec.marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectDraftPayload_projectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ProjectDraft_title(ctx, field)
+			case "message":
+				return ec.fieldContext_ProjectDraft_message(ctx, field)
+			case "project_status":
+				return ec.fieldContext_ProjectDraft_project_status(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectDraft_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_ProjectDraft_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraft", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteProjectDraftPayload_projectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectDraftPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectDraftPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectDraftPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectDraftPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectDraftPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectDraftPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectFieldPayload_projectField(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectFieldPayload_projectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectField, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectField)
+	fc.Result = res
+	return ec.marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectFieldPayload_projectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field_type":
+				return ec.fieldContext_ProjectField_field_type(ctx, field)
+			case "isVisible":
+				return ec.fieldContext_ProjectField_isVisible(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectField_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectField", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteProjectFieldPayload_projectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectFieldPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectFieldPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectFieldPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectFieldPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectFieldPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectFieldPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectFieldValuePayload_projectFieldValue(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectFieldValuePayload_projectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectFieldValue, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectFieldValue)
+	fc.Result = res
+	return ec.marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectFieldValuePayload_projectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field":
+				return ec.fieldContext_ProjectFieldValue_field(ctx, field)
+			case "value":
+				return ec.fieldContext_ProjectFieldValue_value(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteProjectFieldValuePayload_projectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectFieldValuePayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectFieldValuePayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectFieldValuePayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProjectFieldValuePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteProjectFieldValuePayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteProjectFieldValuePayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteProjectPayload_project(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteProjectPayload_project(ctx, field)
 	if err != nil {
@@ -18659,6 +20147,12 @@ func (ec *executionContext) fieldContext_DeleteProjectPayload_project(ctx contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -18669,14 +20163,20 @@ func (ec *executionContext) fieldContext_DeleteProjectPayload_project(ctx contex
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -18765,141 +20265,6 @@ func (ec *executionContext) _DeleteProjectPayload_numUids(ctx context.Context, f
 func (ec *executionContext) fieldContext_DeleteProjectPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteProjectPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteProjectTensionPayload_projectTension(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteProjectTensionPayload_projectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ProjectTension, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ProjectTension)
-	fc.Result = res
-	return ec.marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteProjectTensionPayload_projectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteProjectTensionPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
-			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
-			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_DeleteProjectTensionPayload_projectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteProjectTensionPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteProjectTensionPayload_msg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Msg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteProjectTensionPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteProjectTensionPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteProjectTensionPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteProjectTensionPayload_numUids(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DeleteProjectTensionPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteProjectTensionPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -19261,12 +20626,10 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -19293,8 +20656,8 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -19595,8 +20958,6 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -19617,8 +20978,6 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -20075,12 +21434,10 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -20107,8 +21464,8 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -20233,12 +21590,10 @@ func (ec *executionContext) fieldContext_Event_mentioned(ctx context.Context, fi
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -20265,8 +21620,8 @@ func (ec *executionContext) fieldContext_Event_mentioned(ctx context.Context, fi
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -20474,8 +21829,6 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -20496,8 +21849,6 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -22240,12 +23591,10 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -22272,8 +23621,8 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -22389,12 +23738,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -22502,14 +23847,6 @@ func (ec *executionContext) fieldContext_Label_tensionsAggregate(ctx context.Con
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -24724,173 +26061,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_addProjectTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addProjectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddProjectTension(rctx, fc.Args["input"].([]*model.AddProjectTensionInput))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.AddProjectTensionPayload)
-	fc.Result = res
-	return ec.marshalOAddProjectTensionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectTensionPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_addProjectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "projectTension":
-				return ec.fieldContext_AddProjectTensionPayload_projectTension(ctx, field)
-			case "numUids":
-				return ec.fieldContext_AddProjectTensionPayload_numUids(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AddProjectTensionPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addProjectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateProjectTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateProjectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProjectTension(rctx, fc.Args["input"].(model.UpdateProjectTensionInput))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.UpdateProjectTensionPayload)
-	fc.Result = res
-	return ec.marshalOUpdateProjectTensionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectTensionPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateProjectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "projectTension":
-				return ec.fieldContext_UpdateProjectTensionPayload_projectTension(ctx, field)
-			case "numUids":
-				return ec.fieldContext_UpdateProjectTensionPayload_numUids(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdateProjectTensionPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateProjectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteProjectTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteProjectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteProjectTension(rctx, fc.Args["filter"].(model.ProjectTensionFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.DeleteProjectTensionPayload)
-	fc.Result = res
-	return ec.marshalODeleteProjectTensionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectTensionPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteProjectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "projectTension":
-				return ec.fieldContext_DeleteProjectTensionPayload_projectTension(ctx, field)
-			case "msg":
-				return ec.fieldContext_DeleteProjectTensionPayload_msg(ctx, field)
-			case "numUids":
-				return ec.fieldContext_DeleteProjectTensionPayload_numUids(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteProjectTensionPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteProjectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_addProjectColumn(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_addProjectColumn(ctx, field)
 	if err != nil {
@@ -24904,8 +26074,28 @@ func (ec *executionContext) _Mutation_addProjectColumn(ctx context.Context, fiel
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddProjectColumn(rctx, fc.Args["input"].([]*model.AddProjectColumnInput), fc.Args["upsert"].(*bool))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddProjectColumn(rctx, fc.Args["input"].([]*model.AddProjectColumnInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectColumn == nil {
+				return nil, errors.New("directive hook_addProjectColumn is not implemented")
+			}
+			return ec.directives.Hook_addProjectColumn(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddProjectColumnPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddProjectColumnPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -24959,8 +26149,28 @@ func (ec *executionContext) _Mutation_updateProjectColumn(ctx context.Context, f
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProjectColumn(rctx, fc.Args["input"].(model.UpdateProjectColumnInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateProjectColumn(rctx, fc.Args["input"].(model.UpdateProjectColumnInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectColumn == nil {
+				return nil, errors.New("directive hook_updateProjectColumn is not implemented")
+			}
+			return ec.directives.Hook_updateProjectColumn(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateProjectColumnPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateProjectColumnPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -25014,8 +26224,28 @@ func (ec *executionContext) _Mutation_deleteProjectColumn(ctx context.Context, f
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteProjectColumn(rctx, fc.Args["filter"].(model.ProjectColumnFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteProjectColumn(rctx, fc.Args["filter"].(model.ProjectColumnFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectColumn == nil {
+				return nil, errors.New("directive hook_deleteProjectColumn is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectColumn(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteProjectColumnPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteProjectColumnPayload`, tmp)
 	})
 
 	if resTmp == nil {
@@ -25058,8 +26288,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteProjectColumn(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_addOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addOrgaAgg(ctx, field)
+func (ec *executionContext) _Mutation_addProjectCard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addProjectCard(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -25071,19 +26301,39 @@ func (ec *executionContext) _Mutation_addOrgaAgg(ctx context.Context, field grap
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddOrgaAgg(rctx, fc.Args["input"].([]*model.AddOrgaAggInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddProjectCard(rctx, fc.Args["input"].([]*model.AddProjectCardInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectCard == nil {
+				return nil, errors.New("directive hook_addProjectCard is not implemented")
+			}
+			return ec.directives.Hook_addProjectCard(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddProjectCardPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddProjectCardPayload`, tmp)
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.AddOrgaAggPayload)
+	res := resTmp.(*model.AddProjectCardPayload)
 	fc.Result = res
-	return ec.marshalOAddOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggPayload(ctx, field.Selections, res)
+	return ec.marshalOAddProjectCardPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_addOrgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_addProjectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -25091,12 +26341,12 @@ func (ec *executionContext) fieldContext_Mutation_addOrgaAgg(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "orgaAgg":
-				return ec.fieldContext_AddOrgaAggPayload_orgaAgg(ctx, field)
+			case "projectCard":
+				return ec.fieldContext_AddProjectCardPayload_projectCard(ctx, field)
 			case "numUids":
-				return ec.fieldContext_AddOrgaAggPayload_numUids(ctx, field)
+				return ec.fieldContext_AddProjectCardPayload_numUids(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type AddOrgaAggPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type AddProjectCardPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -25106,15 +26356,15 @@ func (ec *executionContext) fieldContext_Mutation_addOrgaAgg(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addOrgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_addProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateOrgaAgg(ctx, field)
+func (ec *executionContext) _Mutation_updateProjectCard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateProjectCard(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -25126,19 +26376,39 @@ func (ec *executionContext) _Mutation_updateOrgaAgg(ctx context.Context, field g
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateOrgaAgg(rctx, fc.Args["input"].(model.UpdateOrgaAggInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateProjectCard(rctx, fc.Args["input"].(model.UpdateProjectCardInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectCard == nil {
+				return nil, errors.New("directive hook_updateProjectCard is not implemented")
+			}
+			return ec.directives.Hook_updateProjectCard(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateProjectCardPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateProjectCardPayload`, tmp)
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UpdateOrgaAggPayload)
+	res := resTmp.(*model.UpdateProjectCardPayload)
 	fc.Result = res
-	return ec.marshalOUpdateOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggPayload(ctx, field.Selections, res)
+	return ec.marshalOUpdateProjectCardPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectCardPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_updateOrgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateProjectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -25146,12 +26416,12 @@ func (ec *executionContext) fieldContext_Mutation_updateOrgaAgg(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "orgaAgg":
-				return ec.fieldContext_UpdateOrgaAggPayload_orgaAgg(ctx, field)
+			case "projectCard":
+				return ec.fieldContext_UpdateProjectCardPayload_projectCard(ctx, field)
 			case "numUids":
-				return ec.fieldContext_UpdateOrgaAggPayload_numUids(ctx, field)
+				return ec.fieldContext_UpdateProjectCardPayload_numUids(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdateOrgaAggPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdateProjectCardPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -25161,15 +26431,15 @@ func (ec *executionContext) fieldContext_Mutation_updateOrgaAgg(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateOrgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteOrgaAgg(ctx, field)
+func (ec *executionContext) _Mutation_deleteProjectCard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteProjectCard(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -25181,19 +26451,39 @@ func (ec *executionContext) _Mutation_deleteOrgaAgg(ctx context.Context, field g
 		}
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteOrgaAgg(rctx, fc.Args["filter"].(model.OrgaAggFilter))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteProjectCard(rctx, fc.Args["filter"].(model.ProjectCardFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectCard == nil {
+				return nil, errors.New("directive hook_deleteProjectCard is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectCard(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteProjectCardPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteProjectCardPayload`, tmp)
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteOrgaAggPayload)
+	res := resTmp.(*model.DeleteProjectCardPayload)
 	fc.Result = res
-	return ec.marshalODeleteOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteOrgaAggPayload(ctx, field.Selections, res)
+	return ec.marshalODeleteProjectCardPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectCardPayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteOrgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteProjectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -25201,14 +26491,14 @@ func (ec *executionContext) fieldContext_Mutation_deleteOrgaAgg(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "orgaAgg":
-				return ec.fieldContext_DeleteOrgaAggPayload_orgaAgg(ctx, field)
+			case "projectCard":
+				return ec.fieldContext_DeleteProjectCardPayload_projectCard(ctx, field)
 			case "msg":
-				return ec.fieldContext_DeleteOrgaAggPayload_msg(ctx, field)
+				return ec.fieldContext_DeleteProjectCardPayload_msg(ctx, field)
 			case "numUids":
-				return ec.fieldContext_DeleteOrgaAggPayload_numUids(ctx, field)
+				return ec.fieldContext_DeleteProjectCardPayload_numUids(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteOrgaAggPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type DeleteProjectCardPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -25218,7 +26508,341 @@ func (ec *executionContext) fieldContext_Mutation_deleteOrgaAgg(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteOrgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addProjectField(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addProjectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddProjectField(rctx, fc.Args["input"].([]*model.AddProjectFieldInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddProjectFieldPayload)
+	fc.Result = res
+	return ec.marshalOAddProjectFieldPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addProjectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectField":
+				return ec.fieldContext_AddProjectFieldPayload_projectField(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddProjectFieldPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddProjectFieldPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateProjectField(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateProjectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProjectField(rctx, fc.Args["input"].(model.UpdateProjectFieldInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateProjectFieldPayload)
+	fc.Result = res
+	return ec.marshalOUpdateProjectFieldPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateProjectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectField":
+				return ec.fieldContext_UpdateProjectFieldPayload_projectField(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateProjectFieldPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateProjectFieldPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteProjectField(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteProjectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteProjectField(rctx, fc.Args["filter"].(model.ProjectFieldFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteProjectFieldPayload)
+	fc.Result = res
+	return ec.marshalODeleteProjectFieldPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectFieldPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteProjectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectField":
+				return ec.fieldContext_DeleteProjectFieldPayload_projectField(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteProjectFieldPayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteProjectFieldPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteProjectFieldPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addProjectFieldValue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addProjectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddProjectFieldValue(rctx, fc.Args["input"].([]*model.AddProjectFieldValueInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddProjectFieldValuePayload)
+	fc.Result = res
+	return ec.marshalOAddProjectFieldValuePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldValuePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addProjectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectFieldValue":
+				return ec.fieldContext_AddProjectFieldValuePayload_projectFieldValue(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddProjectFieldValuePayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddProjectFieldValuePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateProjectFieldValue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateProjectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProjectFieldValue(rctx, fc.Args["input"].(model.UpdateProjectFieldValueInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateProjectFieldValuePayload)
+	fc.Result = res
+	return ec.marshalOUpdateProjectFieldValuePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldValuePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateProjectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectFieldValue":
+				return ec.fieldContext_UpdateProjectFieldValuePayload_projectFieldValue(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateProjectFieldValuePayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateProjectFieldValuePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteProjectFieldValue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteProjectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteProjectFieldValue(rctx, fc.Args["filter"].(model.ProjectFieldValueFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteProjectFieldValuePayload)
+	fc.Result = res
+	return ec.marshalODeleteProjectFieldValuePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectFieldValuePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteProjectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectFieldValue":
+				return ec.fieldContext_DeleteProjectFieldValuePayload_projectFieldValue(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteProjectFieldValuePayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteProjectFieldValuePayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteProjectFieldValuePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -25331,6 +26955,233 @@ func (ec *executionContext) fieldContext_Mutation_deletePost(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addProjectDraft(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addProjectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddProjectDraft(rctx, fc.Args["input"].([]*model.AddProjectDraftInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addProjectDraft == nil {
+				return nil, errors.New("directive hook_addProjectDraft is not implemented")
+			}
+			return ec.directives.Hook_addProjectDraft(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddProjectDraftPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddProjectDraftPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddProjectDraftPayload)
+	fc.Result = res
+	return ec.marshalOAddProjectDraftPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectDraftPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addProjectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectDraft":
+				return ec.fieldContext_AddProjectDraftPayload_projectDraft(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddProjectDraftPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddProjectDraftPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateProjectDraft(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateProjectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateProjectDraft(rctx, fc.Args["input"].(model.UpdateProjectDraftInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateProjectDraft == nil {
+				return nil, errors.New("directive hook_updateProjectDraft is not implemented")
+			}
+			return ec.directives.Hook_updateProjectDraft(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateProjectDraftPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateProjectDraftPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateProjectDraftPayload)
+	fc.Result = res
+	return ec.marshalOUpdateProjectDraftPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectDraftPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateProjectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectDraft":
+				return ec.fieldContext_UpdateProjectDraftPayload_projectDraft(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateProjectDraftPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateProjectDraftPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteProjectDraft(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteProjectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteProjectDraft(rctx, fc.Args["filter"].(model.ProjectDraftFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteProjectDraft == nil {
+				return nil, errors.New("directive hook_deleteProjectDraft is not implemented")
+			}
+			return ec.directives.Hook_deleteProjectDraft(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteProjectDraftPayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteProjectDraftPayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteProjectDraftPayload)
+	fc.Result = res
+	return ec.marshalODeleteProjectDraftPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectDraftPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteProjectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "projectDraft":
+				return ec.fieldContext_DeleteProjectDraftPayload_projectDraft(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteProjectDraftPayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteProjectDraftPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteProjectDraftPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -28148,8 +29999,6 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -28170,8 +30019,6 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -28689,12 +30536,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -28841,12 +30684,10 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -28873,8 +30714,8 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -28958,12 +30799,10 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -28990,8 +30829,8 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -29357,8 +31196,6 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -29379,8 +31216,6 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -29506,12 +31341,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -29729,6 +31560,12 @@ func (ec *executionContext) fieldContext_Node_projects(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -29739,14 +31576,20 @@ func (ec *executionContext) fieldContext_Node_projects(ctx context.Context, fiel
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -29834,12 +31677,10 @@ func (ec *executionContext) fieldContext_Node_pinned(ctx context.Context, field 
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -29866,8 +31707,8 @@ func (ec *executionContext) fieldContext_Node_pinned(ctx context.Context, field 
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -30104,8 +31945,6 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -30126,8 +31965,6 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -30150,127 +31987,6 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_first_link_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_second_link(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_second_link(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SecondLink, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_second_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "lastAck":
-				return ec.fieldContext_User_lastAck(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
-			case "bio":
-				return ec.fieldContext_User_bio(ctx, field)
-			case "location":
-				return ec.fieldContext_User_location(ctx, field)
-			case "utc":
-				return ec.fieldContext_User_utc(ctx, field)
-			case "links":
-				return ec.fieldContext_User_links(ctx, field)
-			case "skills":
-				return ec.fieldContext_User_skills(ctx, field)
-			case "notifyByEmail":
-				return ec.fieldContext_User_notifyByEmail(ctx, field)
-			case "lang":
-				return ec.fieldContext_User_lang(ctx, field)
-			case "subscriptions":
-				return ec.fieldContext_User_subscriptions(ctx, field)
-			case "watching":
-				return ec.fieldContext_User_watching(ctx, field)
-			case "rights":
-				return ec.fieldContext_User_rights(ctx, field)
-			case "roles":
-				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
-			case "tensions_created":
-				return ec.fieldContext_User_tensions_created(ctx, field)
-			case "tensions_assigned":
-				return ec.fieldContext_User_tensions_assigned(ctx, field)
-			case "contracts":
-				return ec.fieldContext_User_contracts(ctx, field)
-			case "reactions":
-				return ec.fieldContext_User_reactions(ctx, field)
-			case "events":
-				return ec.fieldContext_User_events(ctx, field)
-			case "markAllAsRead":
-				return ec.fieldContext_User_markAllAsRead(ctx, field)
-			case "event_count":
-				return ec.fieldContext_User_event_count(ctx, field)
-			case "subscriptionsAggregate":
-				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
-			case "watchingAggregate":
-				return ec.fieldContext_User_watchingAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
-			case "tensions_createdAggregate":
-				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
-			case "tensions_assignedAggregate":
-				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
-			case "contractsAggregate":
-				return ec.fieldContext_User_contractsAggregate(ctx, field)
-			case "reactionsAggregate":
-				return ec.fieldContext_User_reactionsAggregate(ctx, field)
-			case "eventsAggregate":
-				return ec.fieldContext_User_eventsAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_second_link_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -30340,89 +32056,6 @@ func (ec *executionContext) fieldContext_Node_contracts(ctx context.Context, fie
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_contracts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_orga_agg(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_orga_agg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return obj.OrgaAgg, nil
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			f, err := ec.unmarshalNString2string(ctx, "getOrgaAgg")
-			if err != nil {
-				return nil, err
-			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.Meta == nil {
-				return nil, errors.New("directive meta is not implemented")
-			}
-			return ec.directives.Meta(ctx, obj, directive0, f, k)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.OrgaAgg); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.OrgaAgg`, tmp)
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.OrgaAgg)
-	fc.Result = res
-	return ec.marshalOOrgaAgg2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_orga_agg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "n_members":
-				return ec.fieldContext_OrgaAgg_n_members(ctx, field)
-			case "n_guests":
-				return ec.fieldContext_OrgaAgg_n_guests(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAgg", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_orga_agg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -30595,14 +32228,6 @@ func (ec *executionContext) fieldContext_Node_tensions_outAggregate(ctx context.
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -30688,14 +32313,6 @@ func (ec *executionContext) fieldContext_Node_tensions_inAggregate(ctx context.C
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -31069,6 +32686,14 @@ func (ec *executionContext) fieldContext_Node_projectsAggregate(ctx context.Cont
 			switch field.Name {
 			case "count":
 				return ec.fieldContext_ProjectAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_ProjectAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_ProjectAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_ProjectAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_ProjectAggregateResult_updatedAtMax(ctx, field)
 			case "rootnameidMin":
 				return ec.fieldContext_ProjectAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
@@ -31174,14 +32799,6 @@ func (ec *executionContext) fieldContext_Node_pinnedAggregate(ctx context.Contex
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -32470,44 +34087,6 @@ func (ec *executionContext) fieldContext_NodeFragment_first_link(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _NodeFragment_second_link(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeFragment_second_link(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SecondLink, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeFragment_second_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeFragment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _NodeFragment_role_ext(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_NodeFragment_role_ext(ctx, field)
 	if err != nil {
@@ -32964,82 +34543,6 @@ func (ec *executionContext) fieldContext_NodeFragmentAggregateResult_first_linkM
 	return fc, nil
 }
 
-func (ec *executionContext) _NodeFragmentAggregateResult_second_linkMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragmentAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeFragmentAggregateResult_second_linkMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SecondLinkMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeFragmentAggregateResult_second_linkMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeFragmentAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _NodeFragmentAggregateResult_second_linkMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragmentAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_NodeFragmentAggregateResult_second_linkMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SecondLinkMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_NodeFragmentAggregateResult_second_linkMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "NodeFragmentAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _NodeFragmentAggregateResult_role_extMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeFragmentAggregateResult) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_NodeFragmentAggregateResult_role_extMin(ctx, field)
 	if err != nil {
@@ -33257,12 +34760,10 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -33289,8 +34790,8 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -33551,8 +35052,6 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -33573,8 +35072,6 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -34057,424 +35554,6 @@ func (ec *executionContext) fieldContext_NotifAggregateResult_linkMax(ctx contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAgg_n_members(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAgg) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAgg_n_members(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NMembers, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAgg_n_members(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAgg",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAgg_n_guests(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAgg) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAgg_n_guests(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NGuests, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAgg_n_guests(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAgg",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_count(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_membersMin(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_membersMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NMembersMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_membersMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_membersMax(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_membersMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NMembersMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_membersMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_membersSum(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_membersSum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NMembersSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_membersSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_membersAvg(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_membersAvg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NMembersAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_membersAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_guestsMin(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_guestsMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_guestsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_guestsMax(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_guestsMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_guestsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_guestsSum(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_guestsSum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_guestsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OrgaAggAggregateResult_n_guestsAvg(ctx context.Context, field graphql.CollectedField, obj *model.OrgaAggAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OrgaAggAggregateResult_n_guestsAvg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NGuestsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OrgaAggAggregateResult_n_guestsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OrgaAggAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -35818,8 +36897,6 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -35840,8 +36917,6 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -36294,6 +37369,208 @@ func (ec *executionContext) fieldContext_Project_id(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_createdBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "lastAck":
+				return ec.fieldContext_User_lastAck(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "bio":
+				return ec.fieldContext_User_bio(ctx, field)
+			case "location":
+				return ec.fieldContext_User_location(ctx, field)
+			case "utc":
+				return ec.fieldContext_User_utc(ctx, field)
+			case "links":
+				return ec.fieldContext_User_links(ctx, field)
+			case "skills":
+				return ec.fieldContext_User_skills(ctx, field)
+			case "notifyByEmail":
+				return ec.fieldContext_User_notifyByEmail(ctx, field)
+			case "lang":
+				return ec.fieldContext_User_lang(ctx, field)
+			case "subscriptions":
+				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
+			case "rights":
+				return ec.fieldContext_User_rights(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "tensions_created":
+				return ec.fieldContext_User_tensions_created(ctx, field)
+			case "tensions_assigned":
+				return ec.fieldContext_User_tensions_assigned(ctx, field)
+			case "contracts":
+				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
+			case "events":
+				return ec.fieldContext_User_events(ctx, field)
+			case "markAllAsRead":
+				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
+			case "subscriptionsAggregate":
+				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_User_rolesAggregate(ctx, field)
+			case "tensions_createdAggregate":
+				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
+			case "tensions_assignedAggregate":
+				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
+			case "eventsAggregate":
+				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Project_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Project_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Project_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Project_rootnameid(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Project_rootnameid(ctx, field)
 	if err != nil {
@@ -36496,6 +37773,47 @@ func (ec *executionContext) fieldContext_Project_description(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_status(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ProjectStatus)
+	fc.Result = res
+	return ec.marshalNProjectStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ProjectStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Project_columns(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Project_columns(ctx, field)
 	if err != nil {
@@ -36533,16 +37851,28 @@ func (ec *executionContext) fieldContext_Project_columns(ctx context.Context, fi
 				return ec.fieldContext_ProjectColumn_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
 				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
 			case "project":
 				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
 			case "tensionsAggregate":
 				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
@@ -36555,6 +37885,65 @@ func (ec *executionContext) fieldContext_Project_columns(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_columns_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Project_fields(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_fields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Fields, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectField)
+	fc.Result = res
+	return ec.marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_fields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field_type":
+				return ec.fieldContext_ProjectField_field_type(ctx, field)
+			case "isVisible":
+				return ec.fieldContext_ProjectField_isVisible(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectField_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectField", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Project_fields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -36658,12 +38047,8 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -36801,12 +38186,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -36886,10 +38267,14 @@ func (ec *executionContext) fieldContext_Project_columnsAggregate(ctx context.Co
 				return ec.fieldContext_ProjectColumnAggregateResult_nameMin(ctx, field)
 			case "nameMax":
 				return ec.fieldContext_ProjectColumnAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_ProjectColumnAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_ProjectColumnAggregateResult_aboutMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_descriptionMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_colorMax(ctx, field)
 			case "posMin":
 				return ec.fieldContext_ProjectColumnAggregateResult_posMin(ctx, field)
 			case "posMax":
@@ -36910,6 +38295,59 @@ func (ec *executionContext) fieldContext_Project_columnsAggregate(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_columnsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Project_fieldsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_fieldsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectFieldAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectFieldAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_fieldsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectFieldAggregateResult_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Project_fieldsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -37127,6 +38565,158 @@ func (ec *executionContext) fieldContext_ProjectAggregateResult_count(ctx contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAggregateResult_createdAtMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAggregateResult_createdAtMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAggregateResult_updatedAtMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAggregateResult_updatedAtMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAggregateResult_updatedAtMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAggregateResult_updatedAtMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAggregateResult_updatedAtMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAggregateResult_updatedAtMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
 		},
 	}
 	return fc, nil
@@ -37512,6 +39102,532 @@ func (ec *executionContext) fieldContext_ProjectAggregateResult_descriptionMax(c
 	return fc, nil
 }
 
+func (ec *executionContext) _ProjectCard_id(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCard_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCard_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCard_pos(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCard_pos(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pos, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCard_pos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCard_card(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCard_card(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Card, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.CardKind)
+	fc.Result = res
+	return ec.marshalNCardKind2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKind(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCard_card(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CardKind does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectCard_card_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCard_pc(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCard_pc(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pc, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectColumn)
+	fc.Result = res
+	return ec.marshalNProjectColumn2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumn(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCard_pc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProjectColumn_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProjectColumn_name(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectColumn_pos(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
+			case "project":
+				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectCard_pc_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCard_values(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCard_values(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Values, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectFieldValue)
+	fc.Result = res
+	return ec.marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCard_values(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field":
+				return ec.fieldContext_ProjectFieldValue_field(ctx, field)
+			case "value":
+				return ec.fieldContext_ProjectFieldValue_value(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectCard_values_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCard_valuesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValuesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectFieldValueAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectFieldValueAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCard_valuesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_count(ctx, field)
+			case "valueMin":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_valueMin(ctx, field)
+			case "valueMax":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_valueMax(ctx, field)
+			case "posMin":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posMin(ctx, field)
+			case "posMax":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posMax(ctx, field)
+			case "posSum":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posSum(ctx, field)
+			case "posAvg":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValueAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectCard_valuesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCardAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCardAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCardAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCardAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCardAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCardAggregateResult_posMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCardAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCardAggregateResult_posMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PosMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCardAggregateResult_posMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCardAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCardAggregateResult_posMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCardAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCardAggregateResult_posMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PosMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCardAggregateResult_posMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCardAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCardAggregateResult_posSum(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCardAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCardAggregateResult_posSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PosSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCardAggregateResult_posSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCardAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectCardAggregateResult_posAvg(ctx context.Context, field graphql.CollectedField, obj *model.ProjectCardAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectCardAggregateResult_posAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PosAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectCardAggregateResult_posAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectCardAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProjectColumn_id(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProjectColumn_id(ctx, field)
 	if err != nil {
@@ -37594,8 +39710,8 @@ func (ec *executionContext) fieldContext_ProjectColumn_name(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectColumn_about(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectColumn_about(ctx, field)
+func (ec *executionContext) _ProjectColumn_description(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -37608,7 +39724,7 @@ func (ec *executionContext) _ProjectColumn_about(ctx context.Context, field grap
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.About, nil
+		return obj.Description, nil
 	})
 
 	if resTmp == nil {
@@ -37619,7 +39735,45 @@ func (ec *executionContext) _ProjectColumn_about(ctx context.Context, field grap
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectColumn_about(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectColumn_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumn",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumn_color(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_color(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Color, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumn_color(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ProjectColumn",
 		Field:      field,
@@ -37673,8 +39827,8 @@ func (ec *executionContext) fieldContext_ProjectColumn_pos(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectColumn_tensions(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectColumn_tensions(ctx, field)
+func (ec *executionContext) _ProjectColumn_col_type(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_col_type(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -37687,18 +39841,59 @@ func (ec *executionContext) _ProjectColumn_tensions(ctx context.Context, field g
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Tensions, nil
+		return obj.ColType, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ProjectColumnType)
+	fc.Result = res
+	return ec.marshalNProjectColumnType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumn_col_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumn",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ProjectColumnType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumn_cards(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_cards(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cards, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.ProjectTension)
+	res := resTmp.([]*model.ProjectCard)
 	fc.Result = res
-	return ec.marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionᚄ(ctx, field.Selections, res)
+	return ec.marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectColumn_tensions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectColumn_cards(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ProjectColumn",
 		Field:      field,
@@ -37707,15 +39902,19 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensions(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
+				return ec.fieldContext_ProjectCard_id(ctx, field)
 			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
+				return ec.fieldContext_ProjectCard_pos(ctx, field)
+			case "card":
+				return ec.fieldContext_ProjectCard_card(ctx, field)
 			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
+				return ec.fieldContext_ProjectCard_pc(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectCard_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCard", field.Name)
 		},
 	}
 	defer func() {
@@ -37725,7 +39924,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensions(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ProjectColumn_tensions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_ProjectColumn_cards_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -37770,6 +39969,12 @@ func (ec *executionContext) fieldContext_ProjectColumn_project(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -37780,14 +39985,20 @@ func (ec *executionContext) fieldContext_ProjectColumn_project(ctx context.Conte
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -37804,6 +40015,247 @@ func (ec *executionContext) fieldContext_ProjectColumn_project(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumn_tensions(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_tensions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tensions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumn_tensions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumn",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "emitter":
+				return ec.fieldContext_Tension_emitter(ctx, field)
+			case "emitterid":
+				return ec.fieldContext_Tension_emitterid(ctx, field)
+			case "receiver":
+				return ec.fieldContext_Tension_receiver(ctx, field)
+			case "receiverid":
+				return ec.fieldContext_Tension_receiverid(ctx, field)
+			case "title":
+				return ec.fieldContext_Tension_title(ctx, field)
+			case "type_":
+				return ec.fieldContext_Tension_type_(ctx, field)
+			case "status":
+				return ec.fieldContext_Tension_status(ctx, field)
+			case "action":
+				return ec.fieldContext_Tension_action(ctx, field)
+			case "assignees":
+				return ec.fieldContext_Tension_assignees(ctx, field)
+			case "labels":
+				return ec.fieldContext_Tension_labels(ctx, field)
+			case "comments":
+				return ec.fieldContext_Tension_comments(ctx, field)
+			case "blobs":
+				return ec.fieldContext_Tension_blobs(ctx, field)
+			case "history":
+				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Tension_contracts(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_Tension_subscribers(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
+			case "n_comments":
+				return ec.fieldContext_Tension_n_comments(ctx, field)
+			case "id":
+				return ec.fieldContext_Tension_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Tension_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Tension_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Tension_updatedAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Tension_message(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_Tension_assigneesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Tension_labelsAggregate(ctx, field)
+			case "commentsAggregate":
+				return ec.fieldContext_Tension_commentsAggregate(ctx, field)
+			case "blobsAggregate":
+				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
+			case "historyAggregate":
+				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
+			case "subscribersAggregate":
+				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectColumn_tensions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumn_drafts(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_drafts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Drafts, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectDraft)
+	fc.Result = res
+	return ec.marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumn_drafts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumn",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ProjectDraft_title(ctx, field)
+			case "message":
+				return ec.fieldContext_ProjectDraft_message(ctx, field)
+			case "project_status":
+				return ec.fieldContext_ProjectDraft_project_status(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectDraft_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_ProjectDraft_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraft", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectColumn_drafts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumn_cardsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CardsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectCardAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectCardAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumn_cardsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumn",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectCardAggregateResult_count(ctx, field)
+			case "posMin":
+				return ec.fieldContext_ProjectCardAggregateResult_posMin(ctx, field)
+			case "posMax":
+				return ec.fieldContext_ProjectCardAggregateResult_posMax(ctx, field)
+			case "posSum":
+				return ec.fieldContext_ProjectCardAggregateResult_posSum(ctx, field)
+			case "posAvg":
+				return ec.fieldContext_ProjectCardAggregateResult_posAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCardAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectColumn_cardsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -37830,9 +40282,9 @@ func (ec *executionContext) _ProjectColumn_tensionsAggregate(ctx context.Context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProjectTensionAggregateResult)
+	res := resTmp.(*model.TensionAggregateResult)
 	fc.Result = res
-	return ec.marshalOProjectTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionAggregateResult(ctx, field.Selections, res)
+	return ec.marshalOTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectColumn_tensionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -37844,17 +40296,41 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensionsAggregate(ctx con
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "count":
-				return ec.fieldContext_ProjectTensionAggregateResult_count(ctx, field)
-			case "posMin":
-				return ec.fieldContext_ProjectTensionAggregateResult_posMin(ctx, field)
-			case "posMax":
-				return ec.fieldContext_ProjectTensionAggregateResult_posMax(ctx, field)
-			case "posSum":
-				return ec.fieldContext_ProjectTensionAggregateResult_posSum(ctx, field)
-			case "posAvg":
-				return ec.fieldContext_ProjectTensionAggregateResult_posAvg(ctx, field)
+				return ec.fieldContext_TensionAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_TensionAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_TensionAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_TensionAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_TensionAggregateResult_updatedAtMax(ctx, field)
+			case "messageMin":
+				return ec.fieldContext_TensionAggregateResult_messageMin(ctx, field)
+			case "messageMax":
+				return ec.fieldContext_TensionAggregateResult_messageMax(ctx, field)
+			case "emitteridMin":
+				return ec.fieldContext_TensionAggregateResult_emitteridMin(ctx, field)
+			case "emitteridMax":
+				return ec.fieldContext_TensionAggregateResult_emitteridMax(ctx, field)
+			case "receiveridMin":
+				return ec.fieldContext_TensionAggregateResult_receiveridMin(ctx, field)
+			case "receiveridMax":
+				return ec.fieldContext_TensionAggregateResult_receiveridMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
+			case "n_commentsMin":
+				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
+			case "n_commentsMax":
+				return ec.fieldContext_TensionAggregateResult_n_commentsMax(ctx, field)
+			case "n_commentsSum":
+				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
+			case "n_commentsAvg":
+				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTensionAggregateResult", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
 	}
 	defer func() {
@@ -37865,6 +40341,75 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensionsAggregate(ctx con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_tensionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumn_draftsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumn) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DraftsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectDraftAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectDraftAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumn_draftsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumn",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectDraftAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_updatedAtMax(ctx, field)
+			case "messageMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_messageMin(ctx, field)
+			case "messageMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_messageMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_titleMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraftAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectColumn_draftsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -37985,8 +40530,8 @@ func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_nameMax(ct
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectColumnAggregateResult_aboutMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumnAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectColumnAggregateResult_aboutMin(ctx, field)
+func (ec *executionContext) _ProjectColumnAggregateResult_descriptionMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumnAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumnAggregateResult_descriptionMin(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -37999,7 +40544,7 @@ func (ec *executionContext) _ProjectColumnAggregateResult_aboutMin(ctx context.C
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AboutMin, nil
+		return obj.DescriptionMin, nil
 	})
 
 	if resTmp == nil {
@@ -38010,7 +40555,7 @@ func (ec *executionContext) _ProjectColumnAggregateResult_aboutMin(ctx context.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_aboutMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_descriptionMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ProjectColumnAggregateResult",
 		Field:      field,
@@ -38023,8 +40568,8 @@ func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_aboutMin(c
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectColumnAggregateResult_aboutMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumnAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectColumnAggregateResult_aboutMax(ctx, field)
+func (ec *executionContext) _ProjectColumnAggregateResult_descriptionMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumnAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumnAggregateResult_descriptionMax(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38037,7 +40582,7 @@ func (ec *executionContext) _ProjectColumnAggregateResult_aboutMax(ctx context.C
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AboutMax, nil
+		return obj.DescriptionMax, nil
 	})
 
 	if resTmp == nil {
@@ -38048,7 +40593,83 @@ func (ec *executionContext) _ProjectColumnAggregateResult_aboutMax(ctx context.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_aboutMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_descriptionMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumnAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumnAggregateResult_colorMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumnAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumnAggregateResult_colorMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ColorMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_colorMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectColumnAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectColumnAggregateResult_colorMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectColumnAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectColumnAggregateResult_colorMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ColorMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_colorMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ProjectColumnAggregateResult",
 		Field:      field,
@@ -38213,8 +40834,167 @@ func (ec *executionContext) fieldContext_ProjectColumnAggregateResult_posAvg(ctx
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTension_id(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTension_id(ctx, field)
+func (ec *executionContext) _ProjectDraft_title(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraft_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraft",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraft_message(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraft_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraft",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraft_project_status(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_project_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectStatus, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectColumn)
+	fc.Result = res
+	return ec.marshalNProjectColumn2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumn(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraft_project_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraft",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProjectColumn_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProjectColumn_name(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectColumn_pos(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
+			case "project":
+				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectDraft_project_status_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraft_id(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38241,9 +41021,9 @@ func (ec *executionContext) _ProjectTension_id(ctx context.Context, field graphq
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTension_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectDraft_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTension",
+		Object:     "ProjectDraft",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -38254,8 +41034,8 @@ func (ec *executionContext) fieldContext_ProjectTension_id(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTension_tension(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTension_tension(ctx, field)
+func (ec *executionContext) _ProjectDraft_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38268,7 +41048,7 @@ func (ec *executionContext) _ProjectTension_tension(ctx context.Context, field g
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Tension, nil
+		return obj.CreatedBy, nil
 	})
 
 	if resTmp == nil {
@@ -38277,196 +41057,87 @@ func (ec *executionContext) _ProjectTension_tension(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Tension)
+	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTension_tension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectDraft_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTension",
+		Object:     "ProjectDraft",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "emitter":
-				return ec.fieldContext_Tension_emitter(ctx, field)
-			case "emitterid":
-				return ec.fieldContext_Tension_emitterid(ctx, field)
-			case "receiver":
-				return ec.fieldContext_Tension_receiver(ctx, field)
-			case "receiverid":
-				return ec.fieldContext_Tension_receiverid(ctx, field)
-			case "title":
-				return ec.fieldContext_Tension_title(ctx, field)
-			case "type_":
-				return ec.fieldContext_Tension_type_(ctx, field)
-			case "status":
-				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
-			case "assignees":
-				return ec.fieldContext_Tension_assignees(ctx, field)
-			case "labels":
-				return ec.fieldContext_Tension_labels(ctx, field)
-			case "comments":
-				return ec.fieldContext_Tension_comments(ctx, field)
-			case "blobs":
-				return ec.fieldContext_Tension_blobs(ctx, field)
-			case "history":
-				return ec.fieldContext_Tension_history(ctx, field)
-			case "mentions":
-				return ec.fieldContext_Tension_mentions(ctx, field)
-			case "contracts":
-				return ec.fieldContext_Tension_contracts(ctx, field)
-			case "subscribers":
-				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
-			case "n_comments":
-				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
-				return ec.fieldContext_Tension_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Tension_createdBy(ctx, field)
+				return ec.fieldContext_User_id(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_Tension_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Tension_updatedAt(ctx, field)
-			case "message":
-				return ec.fieldContext_Tension_message(ctx, field)
-			case "assigneesAggregate":
-				return ec.fieldContext_Tension_assigneesAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Tension_labelsAggregate(ctx, field)
-			case "commentsAggregate":
-				return ec.fieldContext_Tension_commentsAggregate(ctx, field)
-			case "blobsAggregate":
-				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
-			case "historyAggregate":
-				return ec.fieldContext_Tension_historyAggregate(ctx, field)
-			case "mentionsAggregate":
-				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
-			case "contractsAggregate":
-				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
-			case "subscribersAggregate":
-				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ProjectTension_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectTension_pos(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTension_pos(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Pos, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectTension_pos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectTension",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectTension_pc(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTension_pc(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Pc, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.ProjectColumn)
-	fc.Result = res
-	return ec.marshalNProjectColumn2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumn(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectTension_pc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectTension",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProjectColumn_id(ctx, field)
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "lastAck":
+				return ec.fieldContext_User_lastAck(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
 			case "name":
-				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
-			case "pos":
-				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
-			case "project":
-				return ec.fieldContext_ProjectColumn_project(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "bio":
+				return ec.fieldContext_User_bio(ctx, field)
+			case "location":
+				return ec.fieldContext_User_location(ctx, field)
+			case "utc":
+				return ec.fieldContext_User_utc(ctx, field)
+			case "links":
+				return ec.fieldContext_User_links(ctx, field)
+			case "skills":
+				return ec.fieldContext_User_skills(ctx, field)
+			case "notifyByEmail":
+				return ec.fieldContext_User_notifyByEmail(ctx, field)
+			case "lang":
+				return ec.fieldContext_User_lang(ctx, field)
+			case "subscriptions":
+				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
+			case "rights":
+				return ec.fieldContext_User_rights(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "tensions_created":
+				return ec.fieldContext_User_tensions_created(ctx, field)
+			case "tensions_assigned":
+				return ec.fieldContext_User_tensions_assigned(ctx, field)
+			case "contracts":
+				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
+			case "events":
+				return ec.fieldContext_User_events(ctx, field)
+			case "markAllAsRead":
+				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
+			case "subscriptionsAggregate":
+				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_User_rolesAggregate(ctx, field)
+			case "tensions_createdAggregate":
+				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
+			case "tensions_assignedAggregate":
+				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
+			case "eventsAggregate":
+				return ec.fieldContext_User_eventsAggregate(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	defer func() {
@@ -38476,15 +41147,94 @@ func (ec *executionContext) fieldContext_ProjectTension_pc(ctx context.Context, 
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ProjectTension_pc_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_ProjectDraft_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTensionAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTensionAggregateResult_count(ctx, field)
+func (ec *executionContext) _ProjectDraft_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraft_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraft",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraft_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraft) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraft_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraft",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_count(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38508,9 +41258,9 @@ func (ec *executionContext) _ProjectTensionAggregateResult_count(ctx context.Con
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTensionAggregateResult",
+		Object:     "ProjectDraftAggregateResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -38521,8 +41271,809 @@ func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_count(ctx
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTensionAggregateResult_posMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTensionAggregateResult_posMin(ctx, field)
+func (ec *executionContext) _ProjectDraftAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_createdAtMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_createdAtMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_createdAtMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_createdAtMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_updatedAtMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_updatedAtMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_updatedAtMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_updatedAtMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_updatedAtMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAtMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_updatedAtMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_messageMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_messageMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MessageMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_messageMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_messageMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_messageMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MessageMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_messageMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_titleMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_titleMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TitleMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_titleMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectDraftAggregateResult_titleMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectDraftAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectDraftAggregateResult_titleMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TitleMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectDraftAggregateResult_titleMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectDraftAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectField_field_type(ctx context.Context, field graphql.CollectedField, obj *model.ProjectField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectField_field_type(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldType, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ProjectFieldType)
+	fc.Result = res
+	return ec.marshalNProjectFieldType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectField_field_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectField",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ProjectFieldType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectField_isVisible(ctx context.Context, field graphql.CollectedField, obj *model.ProjectField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectField_isVisible(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsVisible, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectField_isVisible(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectField",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectField_values(ctx context.Context, field graphql.CollectedField, obj *model.ProjectField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectField_values(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Values, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectFieldValue)
+	fc.Result = res
+	return ec.marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectField_values(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectField",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field":
+				return ec.fieldContext_ProjectFieldValue_field(ctx, field)
+			case "value":
+				return ec.fieldContext_ProjectFieldValue_value(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectField_values_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectField_valuesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.ProjectField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValuesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectFieldValueAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectFieldValueAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectField_valuesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectField",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_count(ctx, field)
+			case "valueMin":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_valueMin(ctx, field)
+			case "valueMax":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_valueMax(ctx, field)
+			case "posMin":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posMin(ctx, field)
+			case "posMax":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posMax(ctx, field)
+			case "posSum":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posSum(ctx, field)
+			case "posAvg":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValueAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectField_valuesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValue_field(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValue) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValue_field(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Field, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectField)
+	fc.Result = res
+	return ec.marshalNProjectField2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldValue_field(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldValue",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field_type":
+				return ec.fieldContext_ProjectField_field_type(ctx, field)
+			case "isVisible":
+				return ec.fieldContext_ProjectField_isVisible(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectField_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectField", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectFieldValue_field_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValue_value(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValue) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValue_value(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldValue_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldValue",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValue_pos(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValue) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pos, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldValue_pos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldValue",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValueAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldValueAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValueAggregateResult_valueMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_valueMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValueMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_valueMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldValueAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValueAggregateResult_valueMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_valueMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValueMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_valueMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectFieldValueAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectFieldValueAggregateResult_posMin(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_posMin(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38546,9 +42097,9 @@ func (ec *executionContext) _ProjectTensionAggregateResult_posMin(ctx context.Co
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_posMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTensionAggregateResult",
+		Object:     "ProjectFieldValueAggregateResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -38559,8 +42110,8 @@ func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posMin(ct
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTensionAggregateResult_posMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTensionAggregateResult_posMax(ctx, field)
+func (ec *executionContext) _ProjectFieldValueAggregateResult_posMax(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_posMax(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38584,9 +42135,9 @@ func (ec *executionContext) _ProjectTensionAggregateResult_posMax(ctx context.Co
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_posMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTensionAggregateResult",
+		Object:     "ProjectFieldValueAggregateResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -38597,8 +42148,8 @@ func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posMax(ct
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTensionAggregateResult_posSum(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTensionAggregateResult_posSum(ctx, field)
+func (ec *executionContext) _ProjectFieldValueAggregateResult_posSum(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_posSum(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38622,9 +42173,9 @@ func (ec *executionContext) _ProjectTensionAggregateResult_posSum(ctx context.Co
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_posSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTensionAggregateResult",
+		Object:     "ProjectFieldValueAggregateResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -38635,8 +42186,8 @@ func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posSum(ct
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectTensionAggregateResult_posAvg(ctx context.Context, field graphql.CollectedField, obj *model.ProjectTensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectTensionAggregateResult_posAvg(ctx, field)
+func (ec *executionContext) _ProjectFieldValueAggregateResult_posAvg(ctx context.Context, field graphql.CollectedField, obj *model.ProjectFieldValueAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectFieldValueAggregateResult_posAvg(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -38660,9 +42211,9 @@ func (ec *executionContext) _ProjectTensionAggregateResult_posAvg(ctx context.Co
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectTensionAggregateResult_posAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_posAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectTensionAggregateResult",
+		Object:     "ProjectFieldValueAggregateResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -38770,12 +42321,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -38913,12 +42460,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -39101,8 +42644,6 @@ func (ec *executionContext) fieldContext_Query_getNodeFragment(ctx context.Conte
 				return ec.fieldContext_NodeFragment_type_(ctx, field)
 			case "first_link":
 				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
 			case "role_type":
@@ -39180,8 +42721,6 @@ func (ec *executionContext) fieldContext_Query_queryNodeFragment(ctx context.Con
 				return ec.fieldContext_NodeFragment_type_(ctx, field)
 			case "first_link":
 				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
 			case "role_type":
@@ -39257,10 +42796,6 @@ func (ec *executionContext) fieldContext_Query_aggregateNodeFragment(ctx context
 				return ec.fieldContext_NodeFragmentAggregateResult_first_linkMin(ctx, field)
 			case "first_linkMax":
 				return ec.fieldContext_NodeFragmentAggregateResult_first_linkMax(ctx, field)
-			case "second_linkMin":
-				return ec.fieldContext_NodeFragmentAggregateResult_second_linkMin(ctx, field)
-			case "second_linkMax":
-				return ec.fieldContext_NodeFragmentAggregateResult_second_linkMax(ctx, field)
 			case "role_extMin":
 				return ec.fieldContext_NodeFragmentAggregateResult_role_extMin(ctx, field)
 			case "role_extMax":
@@ -39935,6 +43470,12 @@ func (ec *executionContext) fieldContext_Query_getProject(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -39945,14 +43486,20 @@ func (ec *executionContext) fieldContext_Query_getProject(ctx context.Context, f
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -40010,6 +43557,12 @@ func (ec *executionContext) fieldContext_Query_queryProject(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -40020,14 +43573,20 @@ func (ec *executionContext) fieldContext_Query_queryProject(ctx context.Context,
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -40085,6 +43644,14 @@ func (ec *executionContext) fieldContext_Query_aggregateProject(ctx context.Cont
 			switch field.Name {
 			case "count":
 				return ec.fieldContext_ProjectAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_ProjectAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_ProjectAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_ProjectAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_ProjectAggregateResult_updatedAtMax(ctx, field)
 			case "rootnameidMin":
 				return ec.fieldContext_ProjectAggregateResult_rootnameidMin(ctx, field)
 			case "rootnameidMax":
@@ -40123,185 +43690,6 @@ func (ec *executionContext) fieldContext_Query_aggregateProject(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getProjectTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getProjectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetProjectTension(rctx, fc.Args["id"].(string))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ProjectTension)
-	fc.Result = res
-	return ec.marshalOProjectTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getProjectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
-			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
-			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getProjectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_queryProjectTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_queryProjectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryProjectTension(rctx, fc.Args["filter"].(*model.ProjectTensionFilter), fc.Args["order"].(*model.ProjectTensionOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ProjectTension)
-	fc.Result = res
-	return ec.marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_queryProjectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
-			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
-			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_queryProjectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_aggregateProjectTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_aggregateProjectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateProjectTension(rctx, fc.Args["filter"].(*model.ProjectTensionFilter))
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ProjectTensionAggregateResult)
-	fc.Result = res
-	return ec.marshalOProjectTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_aggregateProjectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_ProjectTensionAggregateResult_count(ctx, field)
-			case "posMin":
-				return ec.fieldContext_ProjectTensionAggregateResult_posMin(ctx, field)
-			case "posMax":
-				return ec.fieldContext_ProjectTensionAggregateResult_posMax(ctx, field)
-			case "posSum":
-				return ec.fieldContext_ProjectTensionAggregateResult_posSum(ctx, field)
-			case "posAvg":
-				return ec.fieldContext_ProjectTensionAggregateResult_posAvg(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTensionAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_aggregateProjectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_getProjectColumn(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getProjectColumn(ctx, field)
 	if err != nil {
@@ -40316,7 +43704,7 @@ func (ec *executionContext) _Query_getProjectColumn(ctx context.Context, field g
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetProjectColumn(rctx, fc.Args["id"].(*string), fc.Args["name"].(*string))
+		return ec.resolvers.Query().GetProjectColumn(rctx, fc.Args["id"].(string))
 	})
 
 	if resTmp == nil {
@@ -40339,16 +43727,28 @@ func (ec *executionContext) fieldContext_Query_getProjectColumn(ctx context.Cont
 				return ec.fieldContext_ProjectColumn_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
 				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
 			case "project":
 				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
 			case "tensionsAggregate":
 				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
@@ -40404,16 +43804,28 @@ func (ec *executionContext) fieldContext_Query_queryProjectColumn(ctx context.Co
 				return ec.fieldContext_ProjectColumn_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
 				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
 			case "project":
 				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
 			case "tensionsAggregate":
 				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
@@ -40471,10 +43883,14 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectColumn(ctx contex
 				return ec.fieldContext_ProjectColumnAggregateResult_nameMin(ctx, field)
 			case "nameMax":
 				return ec.fieldContext_ProjectColumnAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_ProjectColumnAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_ProjectColumnAggregateResult_aboutMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_descriptionMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_colorMax(ctx, field)
 			case "posMin":
 				return ec.fieldContext_ProjectColumnAggregateResult_posMin(ctx, field)
 			case "posMax":
@@ -40501,8 +43917,8 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectColumn(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_queryOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_queryOrgaAgg(ctx, field)
+func (ec *executionContext) _Query_getProjectCard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getProjectCard(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -40515,18 +43931,18 @@ func (ec *executionContext) _Query_queryOrgaAgg(ctx context.Context, field graph
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryOrgaAgg(rctx, fc.Args["filter"].(*model.OrgaAggFilter), fc.Args["order"].(*model.OrgaAggOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+		return ec.resolvers.Query().GetProjectCard(rctx, fc.Args["id"].(string))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.OrgaAgg)
+	res := resTmp.(*model.ProjectCard)
 	fc.Result = res
-	return ec.marshalOOrgaAgg2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
+	return ec.marshalOProjectCard2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_queryOrgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_getProjectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -40534,12 +43950,20 @@ func (ec *executionContext) fieldContext_Query_queryOrgaAgg(ctx context.Context,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "n_members":
-				return ec.fieldContext_OrgaAgg_n_members(ctx, field)
-			case "n_guests":
-				return ec.fieldContext_OrgaAgg_n_guests(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectCard_id(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectCard_pos(ctx, field)
+			case "card":
+				return ec.fieldContext_ProjectCard_card(ctx, field)
+			case "pc":
+				return ec.fieldContext_ProjectCard_pc(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectCard_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAgg", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCard", field.Name)
 		},
 	}
 	defer func() {
@@ -40549,15 +43973,15 @@ func (ec *executionContext) fieldContext_Query_queryOrgaAgg(ctx context.Context,
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_queryOrgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_getProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_aggregateOrgaAgg(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_aggregateOrgaAgg(ctx, field)
+func (ec *executionContext) _Query_queryProjectCard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryProjectCard(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -40570,18 +43994,81 @@ func (ec *executionContext) _Query_aggregateOrgaAgg(ctx context.Context, field g
 	}()
 	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AggregateOrgaAgg(rctx, fc.Args["filter"].(*model.OrgaAggFilter))
+		return ec.resolvers.Query().QueryProjectCard(rctx, fc.Args["filter"].(*model.ProjectCardFilter), fc.Args["order"].(*model.ProjectCardOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.OrgaAggAggregateResult)
+	res := resTmp.([]*model.ProjectCard)
 	fc.Result = res
-	return ec.marshalOOrgaAggAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggAggregateResult(ctx, field.Selections, res)
+	return ec.marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_aggregateOrgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_queryProjectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProjectCard_id(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectCard_pos(ctx, field)
+			case "card":
+				return ec.fieldContext_ProjectCard_card(ctx, field)
+			case "pc":
+				return ec.fieldContext_ProjectCard_pc(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectCard_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateProjectCard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateProjectCard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateProjectCard(rctx, fc.Args["filter"].(*model.ProjectCardFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectCardAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectCardAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateProjectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -40590,25 +44077,17 @@ func (ec *executionContext) fieldContext_Query_aggregateOrgaAgg(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "count":
-				return ec.fieldContext_OrgaAggAggregateResult_count(ctx, field)
-			case "n_membersMin":
-				return ec.fieldContext_OrgaAggAggregateResult_n_membersMin(ctx, field)
-			case "n_membersMax":
-				return ec.fieldContext_OrgaAggAggregateResult_n_membersMax(ctx, field)
-			case "n_membersSum":
-				return ec.fieldContext_OrgaAggAggregateResult_n_membersSum(ctx, field)
-			case "n_membersAvg":
-				return ec.fieldContext_OrgaAggAggregateResult_n_membersAvg(ctx, field)
-			case "n_guestsMin":
-				return ec.fieldContext_OrgaAggAggregateResult_n_guestsMin(ctx, field)
-			case "n_guestsMax":
-				return ec.fieldContext_OrgaAggAggregateResult_n_guestsMax(ctx, field)
-			case "n_guestsSum":
-				return ec.fieldContext_OrgaAggAggregateResult_n_guestsSum(ctx, field)
-			case "n_guestsAvg":
-				return ec.fieldContext_OrgaAggAggregateResult_n_guestsAvg(ctx, field)
+				return ec.fieldContext_ProjectCardAggregateResult_count(ctx, field)
+			case "posMin":
+				return ec.fieldContext_ProjectCardAggregateResult_posMin(ctx, field)
+			case "posMax":
+				return ec.fieldContext_ProjectCardAggregateResult_posMax(ctx, field)
+			case "posSum":
+				return ec.fieldContext_ProjectCardAggregateResult_posSum(ctx, field)
+			case "posAvg":
+				return ec.fieldContext_ProjectCardAggregateResult_posAvg(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAggAggregateResult", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCardAggregateResult", field.Name)
 		},
 	}
 	defer func() {
@@ -40618,7 +44097,241 @@ func (ec *executionContext) fieldContext_Query_aggregateOrgaAgg(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_aggregateOrgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_aggregateProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryProjectField(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryProjectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryProjectField(rctx, fc.Args["filter"].(*model.ProjectFieldFilter), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectField)
+	fc.Result = res
+	return ec.marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryProjectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field_type":
+				return ec.fieldContext_ProjectField_field_type(ctx, field)
+			case "isVisible":
+				return ec.fieldContext_ProjectField_isVisible(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectField_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectField", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateProjectField(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateProjectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateProjectField(rctx, fc.Args["filter"].(*model.ProjectFieldFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectFieldAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectFieldAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateProjectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectFieldAggregateResult_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryProjectFieldValue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryProjectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryProjectFieldValue(rctx, fc.Args["filter"].(*model.ProjectFieldValueFilter), fc.Args["order"].(*model.ProjectFieldValueOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectFieldValue)
+	fc.Result = res
+	return ec.marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryProjectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field":
+				return ec.fieldContext_ProjectFieldValue_field(ctx, field)
+			case "value":
+				return ec.fieldContext_ProjectFieldValue_value(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateProjectFieldValue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateProjectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateProjectFieldValue(rctx, fc.Args["filter"].(*model.ProjectFieldValueFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectFieldValueAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectFieldValueAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateProjectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_count(ctx, field)
+			case "valueMin":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_valueMin(ctx, field)
+			case "valueMax":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_valueMax(ctx, field)
+			case "posMin":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posMin(ctx, field)
+			case "posMax":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posMax(ctx, field)
+			case "posSum":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posSum(ctx, field)
+			case "posAvg":
+				return ec.fieldContext_ProjectFieldValueAggregateResult_posAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValueAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -40812,6 +44525,205 @@ func (ec *executionContext) fieldContext_Query_aggregatePost(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getProjectDraft(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getProjectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetProjectDraft(rctx, fc.Args["id"].(string))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectDraft)
+	fc.Result = res
+	return ec.marshalOProjectDraft2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getProjectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ProjectDraft_title(ctx, field)
+			case "message":
+				return ec.fieldContext_ProjectDraft_message(ctx, field)
+			case "project_status":
+				return ec.fieldContext_ProjectDraft_project_status(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectDraft_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_ProjectDraft_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraft", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryProjectDraft(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryProjectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryProjectDraft(rctx, fc.Args["filter"].(*model.ProjectDraftFilter), fc.Args["order"].(*model.ProjectDraftOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectDraft)
+	fc.Result = res
+	return ec.marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryProjectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ProjectDraft_title(ctx, field)
+			case "message":
+				return ec.fieldContext_ProjectDraft_message(ctx, field)
+			case "project_status":
+				return ec.fieldContext_ProjectDraft_project_status(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectDraft_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_ProjectDraft_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraft", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateProjectDraft(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateProjectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateProjectDraft(rctx, fc.Args["filter"].(*model.ProjectDraftFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProjectDraftAggregateResult)
+	fc.Result = res
+	return ec.marshalOProjectDraftAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateProjectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ProjectDraftAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_updatedAtMax(ctx, field)
+			case "messageMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_messageMin(ctx, field)
+			case "messageMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_messageMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_ProjectDraftAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_ProjectDraftAggregateResult_titleMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraftAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getTension(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getTension(ctx, field)
 	if err != nil {
@@ -40877,12 +44789,10 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -40909,8 +44819,8 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -40994,12 +44904,10 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -41026,8 +44934,8 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -41113,14 +45021,6 @@ func (ec *executionContext) fieldContext_Query_aggregateTension(ctx context.Cont
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -42608,8 +46508,6 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -42630,8 +46528,6 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -42729,8 +46625,6 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -42751,8 +46645,6 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -44018,8 +47910,6 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -44040,8 +47930,6 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -44843,12 +48731,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -44986,12 +48870,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -45652,12 +49532,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -45839,12 +49715,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -46156,8 +50028,6 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -46178,8 +50048,6 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -46717,8 +50585,6 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -46739,8 +50605,6 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -46769,8 +50633,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Tension_projects(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tension_projects(ctx, field)
+func (ec *executionContext) _Tension_project_statuses(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tension_project_statuses(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -46783,18 +50647,18 @@ func (ec *executionContext) _Tension_projects(ctx context.Context, field graphql
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Projects, nil
+		return obj.ProjectStatuses, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.ProjectTension)
+	res := resTmp.([]*model.ProjectColumn)
 	fc.Result = res
-	return ec.marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionᚄ(ctx, field.Selections, res)
+	return ec.marshalOProjectColumn2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Tension_projects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Tension_project_statuses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Tension",
 		Field:      field,
@@ -46803,15 +50667,33 @@ func (ec *executionContext) fieldContext_Tension_projects(ctx context.Context, f
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
+				return ec.fieldContext_ProjectColumn_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProjectColumn_name(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
-			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
+				return ec.fieldContext_ProjectColumn_pos(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
+			case "project":
+				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
 	}
 	defer func() {
@@ -46821,7 +50703,7 @@ func (ec *executionContext) fieldContext_Tension_projects(ctx context.Context, f
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Tension_projects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Tension_project_statuses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -46854,44 +50736,6 @@ func (ec *executionContext) _Tension_n_comments(ctx context.Context, field graph
 }
 
 func (ec *executionContext) fieldContext_Tension_n_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tension",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Tension_n_open_contracts(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tension_n_open_contracts(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContracts, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Tension_n_open_contracts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Tension",
 		Field:      field,
@@ -47017,8 +50861,6 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -47039,8 +50881,6 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -47802,8 +51642,8 @@ func (ec *executionContext) fieldContext_Tension_subscribersAggregate(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Tension_projectsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tension_projectsAggregate(ctx, field)
+func (ec *executionContext) _Tension_project_statusesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -47816,18 +51656,18 @@ func (ec *executionContext) _Tension_projectsAggregate(ctx context.Context, fiel
 	}()
 	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ProjectsAggregate, nil
+		return obj.ProjectStatusesAggregate, nil
 	})
 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProjectTensionAggregateResult)
+	res := resTmp.(*model.ProjectColumnAggregateResult)
 	fc.Result = res
-	return ec.marshalOProjectTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionAggregateResult(ctx, field.Selections, res)
+	return ec.marshalOProjectColumnAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnAggregateResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Tension_projectsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Tension_project_statusesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Tension",
 		Field:      field,
@@ -47836,17 +51676,29 @@ func (ec *executionContext) fieldContext_Tension_projectsAggregate(ctx context.C
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "count":
-				return ec.fieldContext_ProjectTensionAggregateResult_count(ctx, field)
+				return ec.fieldContext_ProjectColumnAggregateResult_count(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_nameMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_descriptionMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_ProjectColumnAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_ProjectColumnAggregateResult_colorMax(ctx, field)
 			case "posMin":
-				return ec.fieldContext_ProjectTensionAggregateResult_posMin(ctx, field)
+				return ec.fieldContext_ProjectColumnAggregateResult_posMin(ctx, field)
 			case "posMax":
-				return ec.fieldContext_ProjectTensionAggregateResult_posMax(ctx, field)
+				return ec.fieldContext_ProjectColumnAggregateResult_posMax(ctx, field)
 			case "posSum":
-				return ec.fieldContext_ProjectTensionAggregateResult_posSum(ctx, field)
+				return ec.fieldContext_ProjectColumnAggregateResult_posSum(ctx, field)
 			case "posAvg":
-				return ec.fieldContext_ProjectTensionAggregateResult_posAvg(ctx, field)
+				return ec.fieldContext_ProjectColumnAggregateResult_posAvg(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTensionAggregateResult", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProjectColumnAggregateResult", field.Name)
 		},
 	}
 	defer func() {
@@ -47856,7 +51708,7 @@ func (ec *executionContext) fieldContext_Tension_projectsAggregate(ctx context.C
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Tension_projectsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Tension_project_statusesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -48497,158 +52349,6 @@ func (ec *executionContext) _TensionAggregateResult_n_commentsAvg(ctx context.Co
 }
 
 func (ec *executionContext) fieldContext_TensionAggregateResult_n_commentsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsSum, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TensionAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TensionAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField, obj *model.TensionAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NOpenContractsAvg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TensionAggregateResult",
 		Field:      field,
@@ -49562,8 +53262,6 @@ func (ec *executionContext) fieldContext_UpdateNodeFragmentPayload_nodeFragment(
 				return ec.fieldContext_NodeFragment_type_(ctx, field)
 			case "first_link":
 				return ec.fieldContext_NodeFragment_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_NodeFragment_second_link(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_NodeFragment_role_ext(ctx, field)
 			case "role_type":
@@ -49723,12 +53421,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -49902,99 +53596,6 @@ func (ec *executionContext) _UpdateNotifPayload_numUids(ctx context.Context, fie
 func (ec *executionContext) fieldContext_UpdateNotifPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UpdateNotifPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UpdateOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField, obj *model.UpdateOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UpdateOrgaAggPayload_orgaAgg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OrgaAgg, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.OrgaAgg)
-	fc.Result = res
-	return ec.marshalOOrgaAgg2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UpdateOrgaAggPayload_orgaAgg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UpdateOrgaAggPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "n_members":
-				return ec.fieldContext_OrgaAgg_n_members(ctx, field)
-			case "n_guests":
-				return ec.fieldContext_OrgaAgg_n_guests(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type OrgaAgg", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_UpdateOrgaAggPayload_orgaAgg_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UpdateOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateOrgaAggPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UpdateOrgaAggPayload_numUids(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UpdateOrgaAggPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UpdateOrgaAggPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -50213,6 +53814,107 @@ func (ec *executionContext) fieldContext_UpdatePostPayload_numUids(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateProjectCardPayload_projectCard(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectCardPayload_projectCard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectCard, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectCard)
+	fc.Result = res
+	return ec.marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectCardPayload_projectCard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProjectCard_id(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectCard_pos(ctx, field)
+			case "card":
+				return ec.fieldContext_ProjectCard_card(ctx, field)
+			case "pc":
+				return ec.fieldContext_ProjectCard_pc(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectCard_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectCard_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectCard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateProjectCardPayload_projectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProjectCardPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectCardPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectCardPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectCardPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectCardPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateProjectColumnPayload_projectColumn(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectColumnPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateProjectColumnPayload_projectColumn(ctx, field)
 	if err != nil {
@@ -50250,16 +53952,28 @@ func (ec *executionContext) fieldContext_UpdateProjectColumnPayload_projectColum
 				return ec.fieldContext_ProjectColumn_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ProjectColumn_name(ctx, field)
-			case "about":
-				return ec.fieldContext_ProjectColumn_about(ctx, field)
+			case "description":
+				return ec.fieldContext_ProjectColumn_description(ctx, field)
+			case "color":
+				return ec.fieldContext_ProjectColumn_color(ctx, field)
 			case "pos":
 				return ec.fieldContext_ProjectColumn_pos(ctx, field)
-			case "tensions":
-				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "col_type":
+				return ec.fieldContext_ProjectColumn_col_type(ctx, field)
+			case "cards":
+				return ec.fieldContext_ProjectColumn_cards(ctx, field)
 			case "project":
 				return ec.fieldContext_ProjectColumn_project(ctx, field)
+			case "tensions":
+				return ec.fieldContext_ProjectColumn_tensions(ctx, field)
+			case "drafts":
+				return ec.fieldContext_ProjectColumn_drafts(ctx, field)
+			case "cardsAggregate":
+				return ec.fieldContext_ProjectColumn_cardsAggregate(ctx, field)
 			case "tensionsAggregate":
 				return ec.fieldContext_ProjectColumn_tensionsAggregate(ctx, field)
+			case "draftsAggregate":
+				return ec.fieldContext_ProjectColumn_draftsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProjectColumn", field.Name)
 		},
@@ -50316,6 +54030,301 @@ func (ec *executionContext) fieldContext_UpdateProjectColumnPayload_numUids(ctx 
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateProjectDraftPayload_projectDraft(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectDraftPayload_projectDraft(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectDraft, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectDraft)
+	fc.Result = res
+	return ec.marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectDraftPayload_projectDraft(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ProjectDraft_title(ctx, field)
+			case "message":
+				return ec.fieldContext_ProjectDraft_message(ctx, field)
+			case "project_status":
+				return ec.fieldContext_ProjectDraft_project_status(ctx, field)
+			case "id":
+				return ec.fieldContext_ProjectDraft_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_ProjectDraft_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ProjectDraft_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ProjectDraft_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectDraft", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateProjectDraftPayload_projectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProjectDraftPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectDraftPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectDraftPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectDraftPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectDraftPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProjectFieldPayload_projectField(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectFieldPayload_projectField(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectField, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectField)
+	fc.Result = res
+	return ec.marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectFieldPayload_projectField(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field_type":
+				return ec.fieldContext_ProjectField_field_type(ctx, field)
+			case "isVisible":
+				return ec.fieldContext_ProjectField_isVisible(ctx, field)
+			case "values":
+				return ec.fieldContext_ProjectField_values(ctx, field)
+			case "valuesAggregate":
+				return ec.fieldContext_ProjectField_valuesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectField", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateProjectFieldPayload_projectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProjectFieldPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectFieldPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectFieldPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectFieldPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectFieldPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProjectFieldValuePayload_projectFieldValue(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectFieldValuePayload_projectFieldValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProjectFieldValue, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProjectFieldValue)
+	fc.Result = res
+	return ec.marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectFieldValuePayload_projectFieldValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "field":
+				return ec.fieldContext_ProjectFieldValue_field(ctx, field)
+			case "value":
+				return ec.fieldContext_ProjectFieldValue_value(ctx, field)
+			case "pos":
+				return ec.fieldContext_ProjectFieldValue_pos(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectFieldValue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateProjectFieldValuePayload_projectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProjectFieldValuePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectFieldValuePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateProjectFieldValuePayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateProjectFieldValuePayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProjectFieldValuePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateProjectPayload_project(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateProjectPayload_project(ctx, field)
 	if err != nil {
@@ -50351,6 +54360,12 @@ func (ec *executionContext) fieldContext_UpdateProjectPayload_project(ctx contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Project_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Project_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Project_updatedAt(ctx, field)
 			case "rootnameid":
 				return ec.fieldContext_Project_rootnameid(ctx, field)
 			case "parentnameid":
@@ -50361,14 +54376,20 @@ func (ec *executionContext) fieldContext_UpdateProjectPayload_project(ctx contex
 				return ec.fieldContext_Project_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Project_description(ctx, field)
+			case "status":
+				return ec.fieldContext_Project_status(ctx, field)
 			case "columns":
 				return ec.fieldContext_Project_columns(ctx, field)
+			case "fields":
+				return ec.fieldContext_Project_fields(ctx, field)
 			case "leaders":
 				return ec.fieldContext_Project_leaders(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
+			case "fieldsAggregate":
+				return ec.fieldContext_Project_fieldsAggregate(ctx, field)
 			case "leadersAggregate":
 				return ec.fieldContext_Project_leadersAggregate(ctx, field)
 			case "nodesAggregate":
@@ -50419,103 +54440,6 @@ func (ec *executionContext) _UpdateProjectPayload_numUids(ctx context.Context, f
 func (ec *executionContext) fieldContext_UpdateProjectPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UpdateProjectPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UpdateProjectTensionPayload_projectTension(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UpdateProjectTensionPayload_projectTension(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ProjectTension, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ProjectTension)
-	fc.Result = res
-	return ec.marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UpdateProjectTensionPayload_projectTension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UpdateProjectTensionPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProjectTension_id(ctx, field)
-			case "tension":
-				return ec.fieldContext_ProjectTension_tension(ctx, field)
-			case "pos":
-				return ec.fieldContext_ProjectTension_pos(ctx, field)
-			case "pc":
-				return ec.fieldContext_ProjectTension_pc(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectTension", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_UpdateProjectTensionPayload_projectTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UpdateProjectTensionPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProjectTensionPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UpdateProjectTensionPayload_numUids(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NumUids, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UpdateProjectTensionPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UpdateProjectTensionPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -50801,12 +54725,10 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -50833,8 +54755,8 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -51059,8 +54981,6 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -51081,8 +55001,6 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -52038,12 +55956,10 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -52070,8 +55986,8 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -52207,12 +56123,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -52416,12 +56328,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -52456,149 +56364,6 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _User_backed_roles(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_backed_roles(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BackedRoles, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Node)
-	fc.Result = res
-	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_backed_roles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Node_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Node_createdBy(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Node_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "nameid":
-				return ec.fieldContext_Node_nameid(ctx, field)
-			case "rootnameid":
-				return ec.fieldContext_Node_rootnameid(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
-			case "isRoot":
-				return ec.fieldContext_Node_isRoot(ctx, field)
-			case "parent":
-				return ec.fieldContext_Node_parent(ctx, field)
-			case "type_":
-				return ec.fieldContext_Node_type_(ctx, field)
-			case "tensions_out":
-				return ec.fieldContext_Node_tensions_out(ctx, field)
-			case "tensions_in":
-				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "visibility":
-				return ec.fieldContext_Node_visibility(ctx, field)
-			case "mode":
-				return ec.fieldContext_Node_mode(ctx, field)
-			case "rights":
-				return ec.fieldContext_Node_rights(ctx, field)
-			case "isArchived":
-				return ec.fieldContext_Node_isArchived(ctx, field)
-			case "isPersonal":
-				return ec.fieldContext_Node_isPersonal(ctx, field)
-			case "userCanJoin":
-				return ec.fieldContext_Node_userCanJoin(ctx, field)
-			case "guestCanCreateTension":
-				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
-			case "watchers":
-				return ec.fieldContext_Node_watchers(ctx, field)
-			case "children":
-				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
-			case "projects":
-				return ec.fieldContext_Node_projects(ctx, field)
-			case "pinned":
-				return ec.fieldContext_Node_pinned(ctx, field)
-			case "role_ext":
-				return ec.fieldContext_Node_role_ext(ctx, field)
-			case "role_type":
-				return ec.fieldContext_Node_role_type(ctx, field)
-			case "color":
-				return ec.fieldContext_Node_color(ctx, field)
-			case "first_link":
-				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
-			case "contracts":
-				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
-			case "events_history":
-				return ec.fieldContext_Node_events_history(ctx, field)
-			case "tensions_outAggregate":
-				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
-			case "tensions_inAggregate":
-				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
-			case "watchersAggregate":
-				return ec.fieldContext_Node_watchersAggregate(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Node_projectsAggregate(ctx, field)
-			case "pinnedAggregate":
-				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
-			case "contractsAggregate":
-				return ec.fieldContext_Node_contractsAggregate(ctx, field)
-			case "events_historyAggregate":
-				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_User_backed_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -52690,12 +56455,10 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -52722,8 +56485,8 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -52827,12 +56590,10 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 				return ec.fieldContext_Tension_contracts(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_Tension_subscribers(ctx, field)
-			case "projects":
-				return ec.fieldContext_Tension_projects(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
 			case "n_comments":
 				return ec.fieldContext_Tension_n_comments(ctx, field)
-			case "n_open_contracts":
-				return ec.fieldContext_Tension_n_open_contracts(ctx, field)
 			case "id":
 				return ec.fieldContext_Tension_id(ctx, field)
 			case "createdBy":
@@ -52859,8 +56620,8 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
 			case "subscribersAggregate":
 				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Tension_projectsAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
 		},
@@ -53322,14 +57083,6 @@ func (ec *executionContext) fieldContext_User_subscriptionsAggregate(ctx context
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -53526,95 +57279,6 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _User_backed_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_backed_rolesAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BackedRolesAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeAggregateResult)
-	fc.Result = res
-	return ec.marshalONodeAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_backed_rolesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_NodeAggregateResult_count(ctx, field)
-			case "createdAtMin":
-				return ec.fieldContext_NodeAggregateResult_createdAtMin(ctx, field)
-			case "createdAtMax":
-				return ec.fieldContext_NodeAggregateResult_createdAtMax(ctx, field)
-			case "updatedAtMin":
-				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
-			case "updatedAtMax":
-				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameidMin":
-				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
-			case "nameidMax":
-				return ec.fieldContext_NodeAggregateResult_nameidMax(ctx, field)
-			case "rootnameidMin":
-				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
-			case "rootnameidMax":
-				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_NodeAggregateResult_aboutMax(ctx, field)
-			case "rightsMin":
-				return ec.fieldContext_NodeAggregateResult_rightsMin(ctx, field)
-			case "rightsMax":
-				return ec.fieldContext_NodeAggregateResult_rightsMax(ctx, field)
-			case "rightsSum":
-				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
-			case "rightsAvg":
-				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
-			case "colorMin":
-				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
-			case "colorMax":
-				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_User_backed_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _User_tensions_createdAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 	if err != nil {
@@ -53682,14 +57346,6 @@ func (ec *executionContext) fieldContext_User_tensions_createdAggregate(ctx cont
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -53775,14 +57431,6 @@ func (ec *executionContext) fieldContext_User_tensions_assignedAggregate(ctx con
 				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
 			case "n_commentsAvg":
 				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			case "n_open_contractsMin":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMin(ctx, field)
-			case "n_open_contractsMax":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsMax(ctx, field)
-			case "n_open_contractsSum":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsSum(ctx, field)
-			case "n_open_contractsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_open_contractsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
 		},
@@ -54989,8 +58637,6 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -55011,8 +58657,6 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -56027,12 +59671,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_color(ctx, field)
 			case "first_link":
 				return ec.fieldContext_Node_first_link(ctx, field)
-			case "second_link":
-				return ec.fieldContext_Node_second_link(ctx, field)
 			case "contracts":
 				return ec.fieldContext_Node_contracts(ctx, field)
-			case "orga_agg":
-				return ec.fieldContext_Node_orga_agg(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "tensions_outAggregate":
@@ -56227,8 +59867,6 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_rights(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "backed_roles":
-				return ec.fieldContext_User_backed_roles(ctx, field)
 			case "tensions_created":
 				return ec.fieldContext_User_tensions_created(ctx, field)
 			case "tensions_assigned":
@@ -56249,8 +59887,6 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_watchingAggregate(ctx, field)
 			case "rolesAggregate":
 				return ec.fieldContext_User_rolesAggregate(ctx, field)
-			case "backed_rolesAggregate":
-				return ec.fieldContext_User_backed_rolesAggregate(ctx, field)
 			case "tensions_createdAggregate":
 				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
 			case "tensions_assignedAggregate":
@@ -56768,9 +60404,27 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -56808,9 +60462,33 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
 			var err error
@@ -56914,9 +60592,27 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -56998,9 +60694,27 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -57038,9 +60752,33 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contractid":
 			var err error
@@ -57294,9 +61032,27 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -57334,9 +61090,33 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
 			var err error
@@ -57657,7 +61437,7 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "role_ext", "role_type", "color"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -57804,14 +61584,6 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "second_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
-			it.SecondLink, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "role_ext":
 			var err error
 
@@ -57849,7 +61621,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -58126,27 +61898,11 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "second_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
-			it.SecondLink, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "contracts":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "orga_agg":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
-			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58190,9 +61946,27 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -58230,9 +62004,33 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension_":
 			var err error
@@ -58255,42 +62053,6 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
 			it.Link, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputAddOrgaAggInput(ctx context.Context, obj interface{}) (model.AddOrgaAggInput, error) {
-	var it model.AddOrgaAggInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"n_members", "n_guests"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "n_members":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_members"))
-			it.NMembers, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_guests":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
-			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58420,6 +62182,102 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddProjectCardInput(ctx context.Context, obj interface{}) (model.AddProjectCardInput, error) {
+	var it model.AddProjectCardInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"pos", "card", "pc", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "pos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
+			it.Pos, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "card":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CardKindRef); ok {
+				it.Card = data
+			} else if tmp == nil {
+				it.Card = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CardKindRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "pc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectColumnRef); ok {
+				it.Pc = data
+			} else if tmp == nil {
+				it.Pc = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Context, obj interface{}) (model.AddProjectColumnInput, error) {
 	var it model.AddProjectColumnInput
 	asMap := map[string]interface{}{}
@@ -58427,7 +62285,7 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "about", "pos", "tensions", "project"}
+	fieldsInOrder := [...]string{"name", "description", "color", "pos", "col_type", "cards", "project", "tensions", "drafts"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -58442,11 +62300,43 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
-		case "about":
+		case "description":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58458,11 +62348,19 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
-		case "tensions":
+		case "col_type":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
-			it.Tensions, err = ec.unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
+			it.ColType, err = ec.unmarshalNProjectColumnType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cards":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cards"))
+			it.Cards, err = ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58470,7 +62368,243 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-			it.Project, err = ec.unmarshalNProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectRef); ok {
+				it.Project = data
+			} else if tmp == nil {
+				it.Project = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "tensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
+			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "drafts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drafts"))
+			it.Drafts, err = ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddProjectDraftInput(ctx context.Context, obj interface{}) (model.AddProjectDraftInput, error) {
+	var it model.AddProjectDraftInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "title", "project_status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "project_status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_status"))
+			it.ProjectStatus, err = ec.unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddProjectFieldInput(ctx context.Context, obj interface{}) (model.AddProjectFieldInput, error) {
+	var it model.AddProjectFieldInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field_type", "isVisible", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field_type"))
+			it.FieldType, err = ec.unmarshalNProjectFieldType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isVisible":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isVisible"))
+			it.IsVisible, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddProjectFieldValueInput(ctx context.Context, obj interface{}) (model.AddProjectFieldValueInput, error) {
+	var it model.AddProjectFieldValueInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field", "value", "pos"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			it.Field, err = ec.unmarshalNProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "value":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			it.Value, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
+			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58487,13 +62621,37 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "parentnameid", "nameid", "name", "description", "columns", "leaders", "nodes"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "leaders", "nodes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			it.UpdatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "rootnameid":
 			var err error
 
@@ -58568,15 +62726,83 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+			}
+
+			tmp, err := directive2(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalNProjectStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58585,6 +62811,14 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("columns"))
 			it.Columns, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "fields":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
+			it.Fields, err = ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -58657,72 +62891,6 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputAddProjectTensionInput(ctx context.Context, obj interface{}) (model.AddProjectTensionInput, error) {
-	var it model.AddProjectTensionInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"tension", "pos", "pc"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "tension":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.TensionRef); ok {
-				it.Tension = data
-			} else if tmp == nil {
-				it.Tension = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "pos":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
-			it.Pc, err = ec.unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
-			if err != nil {
-				return it, err
 			}
 		}
 	}
@@ -59019,7 +63187,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_comments", "n_open_contracts"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -59038,9 +63206,27 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -59078,9 +63264,33 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emitter":
 			var err error
@@ -59418,49 +63628,19 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "projects":
+		case "project_statuses":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_add == nil {
-					return nil, errors.New("directive x_add is not implemented")
-				}
-				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_statuses"))
+			it.ProjectStatuses, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.ProjectTensionRef); ok {
-				it.Projects = data
-			} else if tmp == nil {
-				it.Projects = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "n_comments":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_comments"))
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -59551,7 +63731,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -59820,36 +64000,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "backed_roles":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("backed_roles"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_add == nil {
-					return nil, errors.New("directive x_add is not implemented")
-				}
-				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.BackedRoles = data
-			} else if tmp == nil {
-				it.BackedRoles = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "tensions_created":
 			var err error
 
@@ -60072,9 +64222,27 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.CreatedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -60112,9 +64280,33 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "voteid":
 			var err error
@@ -60496,10 +64688,18 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -60704,9 +64904,29 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -60744,9 +64964,33 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
 			var err error
@@ -60851,6 +65095,86 @@ func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
 			it.In, err = ec.unmarshalOBlobType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCardKindFilter(ctx context.Context, obj interface{}) (model.CardKindFilter, error) {
+	var it model.CardKindFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"memberTypes", "tensionFilter", "projectDraftFilter"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "memberTypes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberTypes"))
+			it.MemberTypes, err = ec.unmarshalOCardKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tensionFilter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensionFilter"))
+			it.TensionFilter, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "projectDraftFilter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectDraftFilter"))
+			it.ProjectDraftFilter, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCardKindRef(ctx context.Context, obj interface{}) (model.CardKindRef, error) {
+	var it model.CardKindRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"tensionRef", "projectDraftRef"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "tensionRef":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensionRef"))
+			it.TensionRef, err = ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "projectDraftRef":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectDraftRef"))
+			it.ProjectDraftRef, err = ec.unmarshalOProjectDraftRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -61080,25 +65404,9 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Message = data
-			} else if tmp == nil {
-				it.Message = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "reactions":
 			var err error
@@ -61166,9 +65474,29 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -61206,25 +65534,9 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Message = data
-			} else if tmp == nil {
-				it.Message = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "reactions":
 			var err error
@@ -61530,10 +65842,18 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -61848,9 +66168,29 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -61888,9 +66228,33 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contractid":
 			var err error
@@ -63106,10 +67470,18 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -63290,9 +67662,29 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -63330,9 +67722,33 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
 			var err error
@@ -64164,25 +68580,9 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Color = data
-			} else if tmp == nil {
-				it.Color = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "tensions":
 			var err error
@@ -64378,25 +68778,9 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Color = data
-			} else if tmp == nil {
-				it.Color = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "tensions":
 			var err error
@@ -64600,97 +68984,33 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Purpose = data
-			} else if tmp == nil {
-				it.Purpose = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "responsabilities":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responsabilities"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Responsabilities = data
-			} else if tmp == nil {
-				it.Responsabilities = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "domains":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("domains"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Domains = data
-			} else if tmp == nil {
-				it.Domains = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "policies":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policies"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Policies = data
-			} else if tmp == nil {
-				it.Policies = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		}
 	}
@@ -64724,97 +69044,33 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Purpose = data
-			} else if tmp == nil {
-				it.Purpose = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "responsabilities":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responsabilities"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Responsabilities = data
-			} else if tmp == nil {
-				it.Responsabilities = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "domains":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("domains"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Domains = data
-			} else if tmp == nil {
-				it.Domains = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "policies":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policies"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Policies = data
-			} else if tmp == nil {
-				it.Policies = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		}
 	}
@@ -64936,7 +69192,7 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			it.Name, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -65161,7 +69417,7 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	fieldsInOrder := [...]string{"nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "role_ext", "role_type", "color"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65260,51 +69516,17 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.MandateRef); ok {
-				it.Mandate = data
-			} else if tmp == nil {
-				it.Mandate = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.MandateRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "skills":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]string); ok {
-				it.Skills = data
-			} else if tmp == nil {
-				it.Skills = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "visibility":
 			var err error
@@ -65408,30 +69630,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "second_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.SecondLink = data
-			} else if tmp == nil {
-				it.SecondLink = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "role_ext":
 			var err error
 
@@ -65519,7 +69717,7 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "second_link", "role_ext", "role_type", "color"}
+	fieldsInOrder := [...]string{"id", "nameid", "name", "about", "mandate", "skills", "visibility", "mode", "type_", "first_link", "role_ext", "role_type", "color"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65630,51 +69828,17 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.MandateRef); ok {
-				it.Mandate = data
-			} else if tmp == nil {
-				it.Mandate = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.MandateRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "skills":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]string); ok {
-				it.Skills = data
-			} else if tmp == nil {
-				it.Skills = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "visibility":
 			var err error
@@ -65705,14 +69869,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
 			it.FirstLink, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "second_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
-			it.SecondLink, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -65833,7 +69989,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -66594,32 +70750,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "second_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.UserRef); ok {
-				it.SecondLink = data
-			} else if tmp == nil {
-				it.SecondLink = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "contracts":
 			var err error
 
@@ -66644,32 +70774,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.Contracts = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.VoteRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "orga_agg":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.OrgaAggRef); ok {
-				it.OrgaAgg = data
-			} else if tmp == nil {
-				it.OrgaAgg = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.OrgaAggRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "events_history":
@@ -66711,7 +70815,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "second_link", "contracts", "orga_agg", "events_history"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -66996,27 +71100,11 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "second_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("second_link"))
-			it.SecondLink, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "contracts":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "orga_agg":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orga_agg"))
-			it.OrgaAgg, err = ec.unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -67328,10 +71416,18 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -67462,9 +71558,29 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -67502,9 +71618,33 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension_":
 			var err error
@@ -67527,206 +71667,6 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
 			it.Link, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputOrgaAggFilter(ctx context.Context, obj interface{}) (model.OrgaAggFilter, error) {
-	var it model.OrgaAggFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"has", "and", "or", "not"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "has":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOOrgaAggHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "and":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOOrgaAggFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "or":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOOrgaAggFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "not":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputOrgaAggOrder(ctx context.Context, obj interface{}) (model.OrgaAggOrder, error) {
-	var it model.OrgaAggOrder
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"asc", "desc", "then"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "asc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOOrgaAggOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "desc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOOrgaAggOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "then":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOOrgaAggOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputOrgaAggPatch(ctx context.Context, obj interface{}) (model.OrgaAggPatch, error) {
-	var it model.OrgaAggPatch
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"n_members", "n_guests"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "n_members":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_members"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.NMembers = data
-			} else if tmp == nil {
-				it.NMembers = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "n_guests":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.NGuests = data
-			} else if tmp == nil {
-				it.NGuests = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputOrgaAggRef(ctx context.Context, obj interface{}) (model.OrgaAggRef, error) {
-	var it model.OrgaAggRef
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"n_members", "n_guests"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "n_members":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_members"))
-			it.NMembers, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_guests":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_guests"))
-			it.NGuests, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -68676,14 +72616,14 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectColumnFilter(ctx context.Context, obj interface{}) (model.ProjectColumnFilter, error) {
-	var it model.ProjectColumnFilter
+func (ec *executionContext) unmarshalInputProjectCardFilter(ctx context.Context, obj interface{}) (model.ProjectCardFilter, error) {
+	var it model.ProjectCardFilter
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -68698,11 +72638,333 @@ func (ec *executionContext) unmarshalInputProjectColumnFilter(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
-		case "name":
+		case "has":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOProjectCardHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectCardOrder(ctx context.Context, obj interface{}) (model.ProjectCardOrder, error) {
+	var it model.ProjectCardOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectCardPatch(ctx context.Context, obj interface{}) (model.ProjectCardPatch, error) {
+	var it model.ProjectCardPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"pos", "card", "pc", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "pos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
+			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "card":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CardKindRef); ok {
+				it.Card = data
+			} else if tmp == nil {
+				it.Card = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CardKindRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "pc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectColumnRef); ok {
+				it.Pc = data
+			} else if tmp == nil {
+				it.Pc = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ProjectFieldValueRef); ok {
+				it.Values = data
+			} else if tmp == nil {
+				it.Values = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectFieldValueRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectCardRef(ctx context.Context, obj interface{}) (model.ProjectCardRef, error) {
+	var it model.ProjectCardRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "pos", "card", "pc", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
+			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "card":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CardKindRef); ok {
+				it.Card = data
+			} else if tmp == nil {
+				it.Card = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CardKindRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "pc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectColumnRef); ok {
+				it.Pc = data
+			} else if tmp == nil {
+				it.Pc = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectColumnFilter(ctx context.Context, obj interface{}) (model.ProjectColumnFilter, error) {
+	var it model.ProjectColumnFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "col_type", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "col_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
+			it.ColType, err = ec.unmarshalOProjectColumnType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -68795,17 +73057,1089 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"about", "pos", "tensions", "project"}
+	fieldsInOrder := [...]string{"name", "description", "color", "pos", "col_type", "cards", "project", "tensions", "drafts"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "about":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
+			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "col_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
+			it.ColType, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cards":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cards"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ProjectCardRef); ok {
+				it.Cards = data
+			} else if tmp == nil {
+				it.Cards = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectCardRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "project":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectRef); ok {
+				it.Project = data
+			} else if tmp == nil {
+				it.Project = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "tensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.Tensions = data
+			} else if tmp == nil {
+				it.Tensions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "drafts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drafts"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ProjectDraftRef); ok {
+				it.Drafts = data
+			} else if tmp == nil {
+				it.Drafts = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectDraftRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, obj interface{}) (model.ProjectColumnRef, error) {
+	var it model.ProjectColumnRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "description", "color", "pos", "col_type", "cards", "project", "tensions", "drafts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "color":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
+			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "col_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
+			it.ColType, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cards":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cards"))
+			it.Cards, err = ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "project":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectRef); ok {
+				it.Project = data
+			} else if tmp == nil {
+				it.Project = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "tensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
+			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "drafts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drafts"))
+			it.Drafts, err = ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectColumnType_hash(ctx context.Context, obj interface{}) (model.ProjectColumnTypeHash, error) {
+	var it model.ProjectColumnTypeHash
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"eq", "in"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
+			it.In, err = ec.unmarshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectDraftFilter(ctx context.Context, obj interface{}) (model.ProjectDraftFilter, error) {
+	var it model.ProjectDraftFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOProjectDraftHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectDraftOrder(ctx context.Context, obj interface{}) (model.ProjectDraftOrder, error) {
+	var it model.ProjectDraftOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectDraftPatch(ctx context.Context, obj interface{}) (model.ProjectDraftPatch, error) {
+	var it model.ProjectDraftPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "title", "project_status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.CreatedBy = data
+			} else if tmp == nil {
+				it.CreatedBy = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "project_status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_status"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectColumnRef); ok {
+				it.ProjectStatus = data
+			} else if tmp == nil {
+				it.ProjectStatus = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectDraftRef(ctx context.Context, obj interface{}) (model.ProjectDraftRef, error) {
+	var it model.ProjectDraftRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "title", "project_status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "message":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "project_status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_status"))
+			it.ProjectStatus, err = ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectFieldFilter(ctx context.Context, obj interface{}) (model.ProjectFieldFilter, error) {
+	var it model.ProjectFieldFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOProjectFieldHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectFieldPatch(ctx context.Context, obj interface{}) (model.ProjectFieldPatch, error) {
+	var it model.ProjectFieldPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field_type", "isVisible", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field_type"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectFieldType); ok {
+				it.FieldType = data
+			} else if tmp == nil {
+				it.FieldType = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectFieldType`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "isVisible":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isVisible"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsVisible = data
+			} else if tmp == nil {
+				it.IsVisible = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ProjectFieldValueRef); ok {
+				it.Values = data
+			} else if tmp == nil {
+				it.Values = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectFieldValueRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectFieldRef(ctx context.Context, obj interface{}) (model.ProjectFieldRef, error) {
+	var it model.ProjectFieldRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field_type", "isVisible", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field_type"))
+			it.FieldType, err = ec.unmarshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isVisible":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isVisible"))
+			it.IsVisible, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectFieldValueFilter(ctx context.Context, obj interface{}) (model.ProjectFieldValueFilter, error) {
+	var it model.ProjectFieldValueFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "has":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			it.Has, err = ec.unmarshalOProjectFieldValueHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectFieldValueOrder(ctx context.Context, obj interface{}) (model.ProjectFieldValueOrder, error) {
+	var it model.ProjectFieldValueOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			it.Asc, err = ec.unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "then":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			it.Then, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectFieldValuePatch(ctx context.Context, obj interface{}) (model.ProjectFieldValuePatch, error) {
+	var it model.ProjectFieldValuePatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"field", "value", "pos"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "field":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.ProjectFieldRef); ok {
+				it.Field = data
+			} else if tmp == nil {
+				it.Field = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectFieldRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "value":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_patch_ro == nil {
@@ -68819,9 +74153,9 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(*string); ok {
-				it.About = data
+				it.Value = data
 			} else if tmp == nil {
-				it.About = nil
+				it.Value = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -68850,99 +74184,39 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.ProjectTensionRef); ok {
-				it.Tensions = data
-			} else if tmp == nil {
-				it.Tensions = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "project":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.ProjectRef); ok {
-				it.Project = data
-			} else if tmp == nil {
-				it.Project = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, obj interface{}) (model.ProjectColumnRef, error) {
-	var it model.ProjectColumnRef
+func (ec *executionContext) unmarshalInputProjectFieldValueRef(ctx context.Context, obj interface{}) (model.ProjectFieldValueRef, error) {
+	var it model.ProjectFieldValueRef
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "about", "pos", "tensions", "project"}
+	fieldsInOrder := [...]string{"field", "value", "pos"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "id":
+		case "field":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			it.Field, err = ec.unmarshalOProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "name":
+		case "value":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "about":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			it.Value, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -68951,22 +74225,6 @@ func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
 			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "tensions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
-			it.Tensions, err = ec.unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "project":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-			it.Project, err = ec.unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -68983,7 +74241,7 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "parentnameid", "nameid", "name", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "createdAt", "rootnameid", "parentnameid", "nameid", "name", "status", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -68995,6 +74253,14 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -69048,7 +74314,15 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			it.Name, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOProjectStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatusHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -69141,13 +74415,87 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "parentnameid", "nameid", "name", "description", "columns", "leaders", "nodes"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "leaders", "nodes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.CreatedBy = data
+			} else if tmp == nil {
+				it.CreatedBy = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.UpdatedAt = data
+			} else if tmp == nil {
+				it.UpdatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "rootnameid":
 			var err error
 
@@ -69258,13 +74606,35 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
 			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -69282,10 +74652,18 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
 			}
 
 			tmp, err := directive1(ctx)
@@ -69300,12 +74678,28 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "columns":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("columns"))
+			it.Columns, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "fields":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+				return ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_patch_ro == nil {
@@ -69318,12 +74712,12 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.([]*model.ProjectColumnRef); ok {
-				it.Columns = data
+			if data, ok := tmp.([]*model.ProjectFieldRef); ok {
+				it.Fields = data
 			} else if tmp == nil {
-				it.Columns = nil
+				it.Fields = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectFieldRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "leaders":
@@ -69409,7 +74803,7 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "parentnameid", "nameid", "name", "description", "columns", "leaders", "nodes"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "leaders", "nodes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -69421,6 +74815,30 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -69500,9 +74918,47 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 100)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+			}
+
+			tmp, err := directive2(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Name = data
+			} else if tmp == nil {
+				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
 			var err error
@@ -69510,10 +74966,18 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "maxLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 280)
+				if err != nil {
+					return nil, err
+				}
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
 			}
 
 			tmp, err := directive1(ctx)
@@ -69528,11 +74992,27 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "columns":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("columns"))
 			it.Columns, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "fields":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
+			it.Fields, err = ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -69612,291 +75092,33 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectTensionFilter(ctx context.Context, obj interface{}) (model.ProjectTensionFilter, error) {
-	var it model.ProjectTensionFilter
+func (ec *executionContext) unmarshalInputProjectStatus_hash(ctx context.Context, obj interface{}) (model.ProjectStatusHash, error) {
+	var it model.ProjectStatusHash
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"eq", "in"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "id":
+		case "eq":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "has":
+		case "in":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectTensionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "and":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "or":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "not":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputProjectTensionOrder(ctx context.Context, obj interface{}) (model.ProjectTensionOrder, error) {
-	var it model.ProjectTensionOrder
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"asc", "desc", "then"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "asc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOProjectTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "desc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOProjectTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrderable(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "then":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputProjectTensionPatch(ctx context.Context, obj interface{}) (model.ProjectTensionPatch, error) {
-	var it model.ProjectTensionPatch
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"tension", "pos", "pc"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "tension":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.TensionRef); ok {
-				it.Tension = data
-			} else if tmp == nil {
-				it.Tension = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "pos":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.Pos = data
-			} else if tmp == nil {
-				it.Pos = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "pc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.ProjectColumnRef); ok {
-				it.Pc = data
-			} else if tmp == nil {
-				it.Pc = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputProjectTensionRef(ctx context.Context, obj interface{}) (model.ProjectTensionRef, error) {
-	var it model.ProjectTensionRef
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id", "tension", "pos", "pc"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "tension":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.TensionRef); ok {
-				it.Tension = data
-			} else if tmp == nil {
-				it.Tension = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "pos":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.Pos = data
-			} else if tmp == nil {
-				it.Pos = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "pc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
-			it.Pc, err = ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
+			it.In, err = ec.unmarshalOProjectStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -70490,77 +75712,25 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.RoleType); ok {
-				it.RoleType = data
-			} else if tmp == nil {
-				it.RoleType = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.RoleType`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "color":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Color = data
-			} else if tmp == nil {
-				it.Color = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "mandate":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.MandateRef); ok {
-				it.Mandate = data
-			} else if tmp == nil {
-				it.Mandate = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.MandateRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "roles":
 			var err error
@@ -70756,77 +75926,25 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.RoleType); ok {
-				it.RoleType = data
-			} else if tmp == nil {
-				it.RoleType = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.RoleType`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "color":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Color = data
-			} else if tmp == nil {
-				it.Color = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "mandate":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.MandateRef); ok {
-				it.Mandate = data
-			} else if tmp == nil {
-				it.Mandate = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.MandateRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "roles":
 			var err error
@@ -71483,7 +76601,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_comments", "n_open_contracts"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -71578,10 +76696,18 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -71982,27 +77108,9 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.History, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.EventRef); ok {
-				it.History = data
-			} else if tmp == nil {
-				it.History = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "mentions":
 			var err error
@@ -72082,12 +77190,12 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "projects":
+		case "project_statuses":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_statuses"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx, v)
+				return ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_patch_ro == nil {
@@ -72100,12 +77208,12 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.([]*model.ProjectTensionRef); ok {
-				it.Projects = data
+			if data, ok := tmp.([]*model.ProjectColumnRef); ok {
+				it.ProjectStatuses = data
 			} else if tmp == nil {
-				it.Projects = nil
+				it.ProjectStatuses = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectColumnRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "n_comments":
@@ -72132,30 +77240,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*int); ok {
-				it.NOpenContracts = data
-			} else if tmp == nil {
-				it.NOpenContracts = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -72169,7 +77253,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "projects", "n_comments", "n_open_contracts"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72196,9 +77280,29 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -72236,9 +77340,33 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emitter":
 			var err error
@@ -72506,27 +77634,9 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.History, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.EventRef); ok {
-				it.History = data
-			} else if tmp == nil {
-				it.History = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "mentions":
 			var err error
@@ -72596,49 +77706,19 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "projects":
+		case "project_statuses":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_add == nil {
-					return nil, errors.New("directive x_add is not implemented")
-				}
-				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_statuses"))
+			it.ProjectStatuses, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.ProjectTensionRef); ok {
-				it.Projects = data
-			} else if tmp == nil {
-				it.Projects = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectTensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "n_comments":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_comments"))
 			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "n_open_contracts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_open_contracts"))
-			it.NOpenContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -73204,50 +78284,6 @@ func (ec *executionContext) unmarshalInputUpdateNotifInput(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateOrgaAggInput(ctx context.Context, obj interface{}) (model.UpdateOrgaAggInput, error) {
-	var it model.UpdateOrgaAggInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"filter", "set", "remove"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "filter":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "set":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOOrgaAggPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOOrgaAggPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputUpdatePendingUserInput(ctx context.Context, obj interface{}) (model.UpdatePendingUserInput, error) {
 	var it model.UpdatePendingUserInput
 	asMap := map[string]interface{}{}
@@ -73336,6 +78372,50 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateProjectCardInput(ctx context.Context, obj interface{}) (model.UpdateProjectCardInput, error) {
+	var it model.UpdateProjectCardInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateProjectColumnInput(ctx context.Context, obj interface{}) (model.UpdateProjectColumnInput, error) {
 	var it model.UpdateProjectColumnInput
 	asMap := map[string]interface{}{}
@@ -73380,6 +78460,138 @@ func (ec *executionContext) unmarshalInputUpdateProjectColumnInput(ctx context.C
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateProjectDraftInput(ctx context.Context, obj interface{}) (model.UpdateProjectDraftInput, error) {
+	var it model.UpdateProjectDraftInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateProjectFieldInput(ctx context.Context, obj interface{}) (model.UpdateProjectFieldInput, error) {
+	var it model.UpdateProjectFieldInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateProjectFieldValueInput(ctx context.Context, obj interface{}) (model.UpdateProjectFieldValueInput, error) {
+	var it model.UpdateProjectFieldValueInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "set":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			it.Set, err = ec.unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			it.Remove, err = ec.unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context, obj interface{}) (model.UpdateProjectInput, error) {
 	var it model.UpdateProjectInput
 	asMap := map[string]interface{}{}
@@ -73415,50 +78627,6 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
 			it.Remove, err = ec.unmarshalOProjectPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateProjectTensionInput(ctx context.Context, obj interface{}) (model.UpdateProjectTensionInput, error) {
-	var it model.UpdateProjectTensionInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"filter", "set", "remove"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "filter":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "set":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionPatch(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "remove":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -73938,25 +79106,9 @@ func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*bool); ok {
-				it.IsRead = data
-			} else if tmp == nil {
-				it.IsRead = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "user":
 			var err error
@@ -74050,25 +79202,9 @@ func (ec *executionContext) unmarshalInputUserEventRef(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*bool); ok {
-				it.IsRead = data
-			} else if tmp == nil {
-				it.IsRead = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "user":
 			var err error
@@ -74140,31 +79276,9 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				a, err := ec.unmarshalNString2string(ctx, "lower")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.W_add == nil {
-					return nil, errors.New("directive w_add is not implemented")
-				}
-				return ec.directives.W_add(ctx, obj, directive0, a)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Username, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.StringHashFilterStringRegExpFilter); ok {
-				it.Username = data
-			} else if tmp == nil {
-				it.Username = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.StringHashFilterStringRegExpFilter`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "name":
 			var err error
@@ -74178,31 +79292,9 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				a, err := ec.unmarshalNString2string(ctx, "lower")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.W_add == nil {
-					return nil, errors.New("directive w_add is not implemented")
-				}
-				return ec.directives.W_add(ctx, obj, directive0, a)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Email, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.StringHashFilter); ok {
-				it.Email = data
-			} else if tmp == nil {
-				it.Email = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.StringHashFilter`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "has":
 			var err error
@@ -74293,7 +79385,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -74704,32 +79796,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "backed_roles":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("backed_roles"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.BackedRoles = data
-			} else if tmp == nil {
-				it.BackedRoles = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "tensions_created":
 			var err error
 
@@ -74812,53 +79878,17 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.ReactionRef); ok {
-				it.Reactions = data
-			} else if tmp == nil {
-				it.Reactions = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ReactionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "events":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.UserEventRef); ok {
-				it.Events = data
-			} else if tmp == nil {
-				it.Events = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserEventRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "markAllAsRead":
 			var err error
@@ -74879,14 +79909,8 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				}
 				return ec.directives.W_meta_patch(ctx, obj, directive0, f, k)
 			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, nil, nil, nil, nil)
-			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -74937,7 +79961,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "backed_roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -75350,36 +80374,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "backed_roles":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("backed_roles"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_add == nil {
-					return nil, errors.New("directive x_add is not implemented")
-				}
-				return ec.directives.X_add(ctx, obj, directive0, r, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.BackedRoles = data
-			} else if tmp == nil {
-				it.BackedRoles = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "tensions_created":
 			var err error
 
@@ -75474,53 +80468,17 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.ReactionRef); ok {
-				it.Reactions = data
-			} else if tmp == nil {
-				it.Reactions = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ReactionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "events":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, nil, nil, nil, nil)
-			}
-
-			tmp, err := directive1(ctx)
+			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.UserEventRef); ok {
-				it.Events = data
-			} else if tmp == nil {
-				it.Events = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserEventRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
+				return it, err
 			}
 		case "markAllAsRead":
 			var err error
@@ -75541,14 +80499,8 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				}
 				return ec.directives.W_meta_patch(ctx, obj, directive0, f, k)
 			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, nil, nil, nil, nil)
-			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -76134,10 +81086,18 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
 				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
 			}
 
 			tmp, err := directive1(ctx)
@@ -76268,9 +81228,29 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				a, err := ec.unmarshalNString2string(ctx, "now")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.W_add == nil {
+					return nil, errors.New("directive w_add is not implemented")
+				}
+				return ec.directives.W_add(ctx, obj, directive0, a)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.CreatedAt = data
+			} else if tmp == nil {
+				it.CreatedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
 			var err error
@@ -76308,9 +81288,33 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "isOwner")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "createdBy")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
 			if err != nil {
-				return it, err
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Message = data
+			} else if tmp == nil {
+				it.Message = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "voteid":
 			var err error
@@ -76425,6 +81429,29 @@ func (ec *executionContext) unmarshalInputWithinFilter(ctx context.Context, obj 
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
+
+func (ec *executionContext) _CardKind(ctx context.Context, sel ast.SelectionSet, obj model.CardKind) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case model.Tension:
+		return ec._Tension(ctx, sel, &obj)
+	case *model.Tension:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Tension(ctx, sel, obj)
+	case model.ProjectDraft:
+		return ec._ProjectDraft(ctx, sel, &obj)
+	case *model.ProjectDraft:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectDraft(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
 
 func (ec *executionContext) _EventKind(ctx context.Context, sel ast.SelectionSet, obj model.EventKind) graphql.Marshaler {
 	switch obj := (obj).(type) {
@@ -76779,35 +81806,6 @@ func (ec *executionContext) _AddNotifPayload(ctx context.Context, sel ast.Select
 	return out
 }
 
-var addOrgaAggPayloadImplementors = []string{"AddOrgaAggPayload"}
-
-func (ec *executionContext) _AddOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddOrgaAggPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addOrgaAggPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddOrgaAggPayload")
-		case "orgaAgg":
-
-			out.Values[i] = ec._AddOrgaAggPayload_orgaAgg(ctx, field, obj)
-
-		case "numUids":
-
-			out.Values[i] = ec._AddOrgaAggPayload_numUids(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var addPendingUserPayloadImplementors = []string{"AddPendingUserPayload"}
 
 func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddPendingUserPayload) graphql.Marshaler {
@@ -76825,6 +81823,35 @@ func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.
 		case "numUids":
 
 			out.Values[i] = ec._AddPendingUserPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addProjectCardPayloadImplementors = []string{"AddProjectCardPayload"}
+
+func (ec *executionContext) _AddProjectCardPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectCardPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectCardPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddProjectCardPayload")
+		case "projectCard":
+
+			out.Values[i] = ec._AddProjectCardPayload_projectCard(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._AddProjectCardPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -76866,6 +81893,93 @@ func (ec *executionContext) _AddProjectColumnPayload(ctx context.Context, sel as
 	return out
 }
 
+var addProjectDraftPayloadImplementors = []string{"AddProjectDraftPayload"}
+
+func (ec *executionContext) _AddProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectDraftPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectDraftPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddProjectDraftPayload")
+		case "projectDraft":
+
+			out.Values[i] = ec._AddProjectDraftPayload_projectDraft(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._AddProjectDraftPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addProjectFieldPayloadImplementors = []string{"AddProjectFieldPayload"}
+
+func (ec *executionContext) _AddProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectFieldPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectFieldPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddProjectFieldPayload")
+		case "projectField":
+
+			out.Values[i] = ec._AddProjectFieldPayload_projectField(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._AddProjectFieldPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var addProjectFieldValuePayloadImplementors = []string{"AddProjectFieldValuePayload"}
+
+func (ec *executionContext) _AddProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectFieldValuePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectFieldValuePayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddProjectFieldValuePayload")
+		case "projectFieldValue":
+
+			out.Values[i] = ec._AddProjectFieldValuePayload_projectFieldValue(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._AddProjectFieldValuePayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var addProjectPayloadImplementors = []string{"AddProjectPayload"}
 
 func (ec *executionContext) _AddProjectPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectPayload) graphql.Marshaler {
@@ -76883,35 +81997,6 @@ func (ec *executionContext) _AddProjectPayload(ctx context.Context, sel ast.Sele
 		case "numUids":
 
 			out.Values[i] = ec._AddProjectPayload_numUids(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var addProjectTensionPayloadImplementors = []string{"AddProjectTensionPayload"}
-
-func (ec *executionContext) _AddProjectTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectTensionPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectTensionPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AddProjectTensionPayload")
-		case "projectTension":
-
-			out.Values[i] = ec._AddProjectTensionPayload_projectTension(ctx, field, obj)
-
-		case "numUids":
-
-			out.Values[i] = ec._AddProjectTensionPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -77946,39 +83031,6 @@ func (ec *executionContext) _DeleteNotifPayload(ctx context.Context, sel ast.Sel
 	return out
 }
 
-var deleteOrgaAggPayloadImplementors = []string{"DeleteOrgaAggPayload"}
-
-func (ec *executionContext) _DeleteOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteOrgaAggPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteOrgaAggPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteOrgaAggPayload")
-		case "orgaAgg":
-
-			out.Values[i] = ec._DeleteOrgaAggPayload_orgaAgg(ctx, field, obj)
-
-		case "msg":
-
-			out.Values[i] = ec._DeleteOrgaAggPayload_msg(ctx, field, obj)
-
-		case "numUids":
-
-			out.Values[i] = ec._DeleteOrgaAggPayload_numUids(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var deletePendingUserPayloadImplementors = []string{"DeletePendingUserPayload"}
 
 func (ec *executionContext) _DeletePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePendingUserPayload) graphql.Marshaler {
@@ -78045,6 +83097,39 @@ func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var deleteProjectCardPayloadImplementors = []string{"DeleteProjectCardPayload"}
+
+func (ec *executionContext) _DeleteProjectCardPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectCardPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectCardPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteProjectCardPayload")
+		case "projectCard":
+
+			out.Values[i] = ec._DeleteProjectCardPayload_projectCard(ctx, field, obj)
+
+		case "msg":
+
+			out.Values[i] = ec._DeleteProjectCardPayload_msg(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._DeleteProjectCardPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteProjectColumnPayloadImplementors = []string{"DeleteProjectColumnPayload"}
 
 func (ec *executionContext) _DeleteProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectColumnPayload) graphql.Marshaler {
@@ -78078,6 +83163,105 @@ func (ec *executionContext) _DeleteProjectColumnPayload(ctx context.Context, sel
 	return out
 }
 
+var deleteProjectDraftPayloadImplementors = []string{"DeleteProjectDraftPayload"}
+
+func (ec *executionContext) _DeleteProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectDraftPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectDraftPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteProjectDraftPayload")
+		case "projectDraft":
+
+			out.Values[i] = ec._DeleteProjectDraftPayload_projectDraft(ctx, field, obj)
+
+		case "msg":
+
+			out.Values[i] = ec._DeleteProjectDraftPayload_msg(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._DeleteProjectDraftPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteProjectFieldPayloadImplementors = []string{"DeleteProjectFieldPayload"}
+
+func (ec *executionContext) _DeleteProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectFieldPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectFieldPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteProjectFieldPayload")
+		case "projectField":
+
+			out.Values[i] = ec._DeleteProjectFieldPayload_projectField(ctx, field, obj)
+
+		case "msg":
+
+			out.Values[i] = ec._DeleteProjectFieldPayload_msg(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._DeleteProjectFieldPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteProjectFieldValuePayloadImplementors = []string{"DeleteProjectFieldValuePayload"}
+
+func (ec *executionContext) _DeleteProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectFieldValuePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectFieldValuePayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteProjectFieldValuePayload")
+		case "projectFieldValue":
+
+			out.Values[i] = ec._DeleteProjectFieldValuePayload_projectFieldValue(ctx, field, obj)
+
+		case "msg":
+
+			out.Values[i] = ec._DeleteProjectFieldValuePayload_msg(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._DeleteProjectFieldValuePayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deleteProjectPayloadImplementors = []string{"DeleteProjectPayload"}
 
 func (ec *executionContext) _DeleteProjectPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectPayload) graphql.Marshaler {
@@ -78099,39 +83283,6 @@ func (ec *executionContext) _DeleteProjectPayload(ctx context.Context, sel ast.S
 		case "numUids":
 
 			out.Values[i] = ec._DeleteProjectPayload_numUids(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var deleteProjectTensionPayloadImplementors = []string{"DeleteProjectTensionPayload"}
-
-func (ec *executionContext) _DeleteProjectTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectTensionPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectTensionPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteProjectTensionPayload")
-		case "projectTension":
-
-			out.Values[i] = ec._DeleteProjectTensionPayload_projectTension(ctx, field, obj)
-
-		case "msg":
-
-			out.Values[i] = ec._DeleteProjectTensionPayload_msg(ctx, field, obj)
-
-		case "numUids":
-
-			out.Values[i] = ec._DeleteProjectTensionPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -79081,24 +84232,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_deleteProject(ctx, field)
 			})
 
-		case "addProjectTension":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addProjectTension(ctx, field)
-			})
-
-		case "updateProjectTension":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateProjectTension(ctx, field)
-			})
-
-		case "deleteProjectTension":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteProjectTension(ctx, field)
-			})
-
 		case "addProjectColumn":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -79117,22 +84250,58 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_deleteProjectColumn(ctx, field)
 			})
 
-		case "addOrgaAgg":
+		case "addProjectCard":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addOrgaAgg(ctx, field)
+				return ec._Mutation_addProjectCard(ctx, field)
 			})
 
-		case "updateOrgaAgg":
+		case "updateProjectCard":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateOrgaAgg(ctx, field)
+				return ec._Mutation_updateProjectCard(ctx, field)
 			})
 
-		case "deleteOrgaAgg":
+		case "deleteProjectCard":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteOrgaAgg(ctx, field)
+				return ec._Mutation_deleteProjectCard(ctx, field)
+			})
+
+		case "addProjectField":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addProjectField(ctx, field)
+			})
+
+		case "updateProjectField":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateProjectField(ctx, field)
+			})
+
+		case "deleteProjectField":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteProjectField(ctx, field)
+			})
+
+		case "addProjectFieldValue":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addProjectFieldValue(ctx, field)
+			})
+
+		case "updateProjectFieldValue":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateProjectFieldValue(ctx, field)
+			})
+
+		case "deleteProjectFieldValue":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteProjectFieldValue(ctx, field)
 			})
 
 		case "updatePost":
@@ -79145,6 +84314,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePost(ctx, field)
+			})
+
+		case "addProjectDraft":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addProjectDraft(ctx, field)
+			})
+
+		case "updateProjectDraft":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateProjectDraft(ctx, field)
+			})
+
+		case "deleteProjectDraft":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteProjectDraft(ctx, field)
 			})
 
 		case "addTension":
@@ -79584,17 +84771,9 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_first_link(ctx, field, obj)
 
-		case "second_link":
-
-			out.Values[i] = ec._Node_second_link(ctx, field, obj)
-
 		case "contracts":
 
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
-
-		case "orga_agg":
-
-			out.Values[i] = ec._Node_orga_agg(ctx, field, obj)
 
 		case "events_history":
 
@@ -79801,10 +84980,6 @@ func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.Selection
 
 			out.Values[i] = ec._NodeFragment_first_link(ctx, field, obj)
 
-		case "second_link":
-
-			out.Values[i] = ec._NodeFragment_second_link(ctx, field, obj)
-
 		case "role_ext":
 
 			out.Values[i] = ec._NodeFragment_role_ext(ctx, field, obj)
@@ -79873,14 +85048,6 @@ func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, se
 		case "first_linkMax":
 
 			out.Values[i] = ec._NodeFragmentAggregateResult_first_linkMax(ctx, field, obj)
-
-		case "second_linkMin":
-
-			out.Values[i] = ec._NodeFragmentAggregateResult_second_linkMin(ctx, field, obj)
-
-		case "second_linkMax":
-
-			out.Values[i] = ec._NodeFragmentAggregateResult_second_linkMax(ctx, field, obj)
 
 		case "role_extMin":
 
@@ -80016,92 +85183,6 @@ func (ec *executionContext) _NotifAggregateResult(ctx context.Context, sel ast.S
 		case "linkMax":
 
 			out.Values[i] = ec._NotifAggregateResult_linkMax(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var orgaAggImplementors = []string{"OrgaAgg"}
-
-func (ec *executionContext) _OrgaAgg(ctx context.Context, sel ast.SelectionSet, obj *model.OrgaAgg) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, orgaAggImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("OrgaAgg")
-		case "n_members":
-
-			out.Values[i] = ec._OrgaAgg_n_members(ctx, field, obj)
-
-		case "n_guests":
-
-			out.Values[i] = ec._OrgaAgg_n_guests(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var orgaAggAggregateResultImplementors = []string{"OrgaAggAggregateResult"}
-
-func (ec *executionContext) _OrgaAggAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.OrgaAggAggregateResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, orgaAggAggregateResultImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("OrgaAggAggregateResult")
-		case "count":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_count(ctx, field, obj)
-
-		case "n_membersMin":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersMin(ctx, field, obj)
-
-		case "n_membersMax":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersMax(ctx, field, obj)
-
-		case "n_membersSum":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersSum(ctx, field, obj)
-
-		case "n_membersAvg":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_membersAvg(ctx, field, obj)
-
-		case "n_guestsMin":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsMin(ctx, field, obj)
-
-		case "n_guestsMax":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsMax(ctx, field, obj)
-
-		case "n_guestsSum":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsSum(ctx, field, obj)
-
-		case "n_guestsAvg":
-
-			out.Values[i] = ec._OrgaAggAggregateResult_n_guestsAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -80464,6 +85545,27 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdBy":
+
+			out.Values[i] = ec._Project_createdBy(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+
+			out.Values[i] = ec._Project_createdAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+
+			out.Values[i] = ec._Project_updatedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "rootnameid":
 
 			out.Values[i] = ec._Project_rootnameid(ctx, field, obj)
@@ -80496,9 +85598,20 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Project_description(ctx, field, obj)
 
+		case "status":
+
+			out.Values[i] = ec._Project_status(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "columns":
 
 			out.Values[i] = ec._Project_columns(ctx, field, obj)
+
+		case "fields":
+
+			out.Values[i] = ec._Project_fields(ctx, field, obj)
 
 		case "leaders":
 
@@ -80511,6 +85624,10 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 		case "columnsAggregate":
 
 			out.Values[i] = ec._Project_columnsAggregate(ctx, field, obj)
+
+		case "fieldsAggregate":
+
+			out.Values[i] = ec._Project_fieldsAggregate(ctx, field, obj)
 
 		case "leadersAggregate":
 
@@ -80544,6 +85661,22 @@ func (ec *executionContext) _ProjectAggregateResult(ctx context.Context, sel ast
 		case "count":
 
 			out.Values[i] = ec._ProjectAggregateResult_count(ctx, field, obj)
+
+		case "createdAtMin":
+
+			out.Values[i] = ec._ProjectAggregateResult_createdAtMin(ctx, field, obj)
+
+		case "createdAtMax":
+
+			out.Values[i] = ec._ProjectAggregateResult_createdAtMax(ctx, field, obj)
+
+		case "updatedAtMin":
+
+			out.Values[i] = ec._ProjectAggregateResult_updatedAtMin(ctx, field, obj)
+
+		case "updatedAtMax":
+
+			out.Values[i] = ec._ProjectAggregateResult_updatedAtMax(ctx, field, obj)
 
 		case "rootnameidMin":
 
@@ -80596,6 +85729,104 @@ func (ec *executionContext) _ProjectAggregateResult(ctx context.Context, sel ast
 	return out
 }
 
+var projectCardImplementors = []string{"ProjectCard"}
+
+func (ec *executionContext) _ProjectCard(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectCard) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectCardImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectCard")
+		case "id":
+
+			out.Values[i] = ec._ProjectCard_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pos":
+
+			out.Values[i] = ec._ProjectCard_pos(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "card":
+
+			out.Values[i] = ec._ProjectCard_card(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pc":
+
+			out.Values[i] = ec._ProjectCard_pc(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "values":
+
+			out.Values[i] = ec._ProjectCard_values(ctx, field, obj)
+
+		case "valuesAggregate":
+
+			out.Values[i] = ec._ProjectCard_valuesAggregate(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectCardAggregateResultImplementors = []string{"ProjectCardAggregateResult"}
+
+func (ec *executionContext) _ProjectCardAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectCardAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectCardAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectCardAggregateResult")
+		case "count":
+
+			out.Values[i] = ec._ProjectCardAggregateResult_count(ctx, field, obj)
+
+		case "posMin":
+
+			out.Values[i] = ec._ProjectCardAggregateResult_posMin(ctx, field, obj)
+
+		case "posMax":
+
+			out.Values[i] = ec._ProjectCardAggregateResult_posMax(ctx, field, obj)
+
+		case "posSum":
+
+			out.Values[i] = ec._ProjectCardAggregateResult_posSum(ctx, field, obj)
+
+		case "posAvg":
+
+			out.Values[i] = ec._ProjectCardAggregateResult_posAvg(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var projectColumnImplementors = []string{"ProjectColumn"}
 
 func (ec *executionContext) _ProjectColumn(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectColumn) graphql.Marshaler {
@@ -80620,9 +85851,13 @@ func (ec *executionContext) _ProjectColumn(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "about":
+		case "description":
 
-			out.Values[i] = ec._ProjectColumn_about(ctx, field, obj)
+			out.Values[i] = ec._ProjectColumn_description(ctx, field, obj)
+
+		case "color":
+
+			out.Values[i] = ec._ProjectColumn_color(ctx, field, obj)
 
 		case "pos":
 
@@ -80631,9 +85866,16 @@ func (ec *executionContext) _ProjectColumn(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "tensions":
+		case "col_type":
 
-			out.Values[i] = ec._ProjectColumn_tensions(ctx, field, obj)
+			out.Values[i] = ec._ProjectColumn_col_type(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cards":
+
+			out.Values[i] = ec._ProjectColumn_cards(ctx, field, obj)
 
 		case "project":
 
@@ -80642,9 +85884,25 @@ func (ec *executionContext) _ProjectColumn(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "tensions":
+
+			out.Values[i] = ec._ProjectColumn_tensions(ctx, field, obj)
+
+		case "drafts":
+
+			out.Values[i] = ec._ProjectColumn_drafts(ctx, field, obj)
+
+		case "cardsAggregate":
+
+			out.Values[i] = ec._ProjectColumn_cardsAggregate(ctx, field, obj)
+
 		case "tensionsAggregate":
 
 			out.Values[i] = ec._ProjectColumn_tensionsAggregate(ctx, field, obj)
+
+		case "draftsAggregate":
+
+			out.Values[i] = ec._ProjectColumn_draftsAggregate(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -80679,13 +85937,21 @@ func (ec *executionContext) _ProjectColumnAggregateResult(ctx context.Context, s
 
 			out.Values[i] = ec._ProjectColumnAggregateResult_nameMax(ctx, field, obj)
 
-		case "aboutMin":
+		case "descriptionMin":
 
-			out.Values[i] = ec._ProjectColumnAggregateResult_aboutMin(ctx, field, obj)
+			out.Values[i] = ec._ProjectColumnAggregateResult_descriptionMin(ctx, field, obj)
 
-		case "aboutMax":
+		case "descriptionMax":
 
-			out.Values[i] = ec._ProjectColumnAggregateResult_aboutMax(ctx, field, obj)
+			out.Values[i] = ec._ProjectColumnAggregateResult_descriptionMax(ctx, field, obj)
+
+		case "colorMin":
+
+			out.Values[i] = ec._ProjectColumnAggregateResult_colorMin(ctx, field, obj)
+
+		case "colorMax":
+
+			out.Values[i] = ec._ProjectColumnAggregateResult_colorMax(ctx, field, obj)
 
 		case "posMin":
 
@@ -80714,44 +85980,59 @@ func (ec *executionContext) _ProjectColumnAggregateResult(ctx context.Context, s
 	return out
 }
 
-var projectTensionImplementors = []string{"ProjectTension"}
+var projectDraftImplementors = []string{"ProjectDraft", "CardKind"}
 
-func (ec *executionContext) _ProjectTension(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectTension) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectTensionImplementors)
+func (ec *executionContext) _ProjectDraft(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectDraft) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectDraftImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectTension")
+			out.Values[i] = graphql.MarshalString("ProjectDraft")
+		case "title":
+
+			out.Values[i] = ec._ProjectDraft_title(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+
+			out.Values[i] = ec._ProjectDraft_message(ctx, field, obj)
+
+		case "project_status":
+
+			out.Values[i] = ec._ProjectDraft_project_status(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "id":
 
-			out.Values[i] = ec._ProjectTension_id(ctx, field, obj)
+			out.Values[i] = ec._ProjectDraft_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "tension":
+		case "createdBy":
 
-			out.Values[i] = ec._ProjectTension_tension(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "pos":
-
-			out.Values[i] = ec._ProjectTension_pos(ctx, field, obj)
+			out.Values[i] = ec._ProjectDraft_createdBy(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "pc":
+		case "createdAt":
 
-			out.Values[i] = ec._ProjectTension_pc(ctx, field, obj)
+			out.Values[i] = ec._ProjectDraft_createdAt(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updatedAt":
+
+			out.Values[i] = ec._ProjectDraft_updatedAt(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -80763,35 +86044,207 @@ func (ec *executionContext) _ProjectTension(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var projectTensionAggregateResultImplementors = []string{"ProjectTensionAggregateResult"}
+var projectDraftAggregateResultImplementors = []string{"ProjectDraftAggregateResult"}
 
-func (ec *executionContext) _ProjectTensionAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectTensionAggregateResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectTensionAggregateResultImplementors)
+func (ec *executionContext) _ProjectDraftAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectDraftAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectDraftAggregateResultImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectTensionAggregateResult")
+			out.Values[i] = graphql.MarshalString("ProjectDraftAggregateResult")
 		case "count":
 
-			out.Values[i] = ec._ProjectTensionAggregateResult_count(ctx, field, obj)
+			out.Values[i] = ec._ProjectDraftAggregateResult_count(ctx, field, obj)
+
+		case "createdAtMin":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_createdAtMin(ctx, field, obj)
+
+		case "createdAtMax":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_createdAtMax(ctx, field, obj)
+
+		case "updatedAtMin":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_updatedAtMin(ctx, field, obj)
+
+		case "updatedAtMax":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_updatedAtMax(ctx, field, obj)
+
+		case "messageMin":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_messageMin(ctx, field, obj)
+
+		case "messageMax":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_messageMax(ctx, field, obj)
+
+		case "titleMin":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_titleMin(ctx, field, obj)
+
+		case "titleMax":
+
+			out.Values[i] = ec._ProjectDraftAggregateResult_titleMax(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFieldImplementors = []string{"ProjectField"}
+
+func (ec *executionContext) _ProjectField(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectField) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectField")
+		case "field_type":
+
+			out.Values[i] = ec._ProjectField_field_type(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isVisible":
+
+			out.Values[i] = ec._ProjectField_isVisible(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "values":
+
+			out.Values[i] = ec._ProjectField_values(ctx, field, obj)
+
+		case "valuesAggregate":
+
+			out.Values[i] = ec._ProjectField_valuesAggregate(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFieldAggregateResultImplementors = []string{"ProjectFieldAggregateResult"}
+
+func (ec *executionContext) _ProjectFieldAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectFieldAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFieldAggregateResult")
+		case "count":
+
+			out.Values[i] = ec._ProjectFieldAggregateResult_count(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFieldValueImplementors = []string{"ProjectFieldValue"}
+
+func (ec *executionContext) _ProjectFieldValue(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectFieldValue) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldValueImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFieldValue")
+		case "field":
+
+			out.Values[i] = ec._ProjectFieldValue_field(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "value":
+
+			out.Values[i] = ec._ProjectFieldValue_value(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pos":
+
+			out.Values[i] = ec._ProjectFieldValue_pos(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFieldValueAggregateResultImplementors = []string{"ProjectFieldValueAggregateResult"}
+
+func (ec *executionContext) _ProjectFieldValueAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectFieldValueAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldValueAggregateResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFieldValueAggregateResult")
+		case "count":
+
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_count(ctx, field, obj)
+
+		case "valueMin":
+
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_valueMin(ctx, field, obj)
+
+		case "valueMax":
+
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_valueMax(ctx, field, obj)
 
 		case "posMin":
 
-			out.Values[i] = ec._ProjectTensionAggregateResult_posMin(ctx, field, obj)
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_posMin(ctx, field, obj)
 
 		case "posMax":
 
-			out.Values[i] = ec._ProjectTensionAggregateResult_posMax(ctx, field, obj)
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_posMax(ctx, field, obj)
 
 		case "posSum":
 
-			out.Values[i] = ec._ProjectTensionAggregateResult_posSum(ctx, field, obj)
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_posSum(ctx, field, obj)
 
 		case "posAvg":
 
-			out.Values[i] = ec._ProjectTensionAggregateResult_posAvg(ctx, field, obj)
+			out.Values[i] = ec._ProjectFieldValueAggregateResult_posAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -81183,66 +86636,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "getProjectTension":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getProjectTension(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
-		case "queryProjectTension":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_queryProjectTension(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
-		case "aggregateProjectTension":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_aggregateProjectTension(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
 		case "getProjectColumn":
 			field := field
 
@@ -81303,7 +86696,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "queryOrgaAgg":
+		case "getProjectCard":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -81312,7 +86705,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_queryOrgaAgg(ctx, field)
+				res = ec._Query_getProjectCard(ctx, field)
 				return res
 			}
 
@@ -81323,7 +86716,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "aggregateOrgaAgg":
+		case "queryProjectCard":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -81332,7 +86725,107 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_aggregateOrgaAgg(ctx, field)
+				res = ec._Query_queryProjectCard(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateProjectCard":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateProjectCard(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "queryProjectField":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryProjectField(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateProjectField":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateProjectField(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "queryProjectFieldValue":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryProjectFieldValue(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateProjectFieldValue":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateProjectFieldValue(ctx, field)
 				return res
 			}
 
@@ -81393,6 +86886,66 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_aggregatePost(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getProjectDraft":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getProjectDraft(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "queryProjectDraft":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryProjectDraft(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "aggregateProjectDraft":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateProjectDraft(ctx, field)
 				return res
 			}
 
@@ -82445,7 +87998,7 @@ func (ec *executionContext) _RoleExtAggregateResult(ctx context.Context, sel ast
 	return out
 }
 
-var tensionImplementors = []string{"Tension"}
+var tensionImplementors = []string{"Tension", "CardKind"}
 
 func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, obj *model.Tension) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tensionImplementors)
@@ -82540,17 +88093,13 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Tension_subscribers(ctx, field, obj)
 
-		case "projects":
+		case "project_statuses":
 
-			out.Values[i] = ec._Tension_projects(ctx, field, obj)
+			out.Values[i] = ec._Tension_project_statuses(ctx, field, obj)
 
 		case "n_comments":
 
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
-
-		case "n_open_contracts":
-
-			out.Values[i] = ec._Tension_n_open_contracts(ctx, field, obj)
 
 		case "id":
 
@@ -82613,9 +88162,9 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Tension_subscribersAggregate(ctx, field, obj)
 
-		case "projectsAggregate":
+		case "project_statusesAggregate":
 
-			out.Values[i] = ec._Tension_projectsAggregate(ctx, field, obj)
+			out.Values[i] = ec._Tension_project_statusesAggregate(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -82705,22 +88254,6 @@ func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast
 		case "n_commentsAvg":
 
 			out.Values[i] = ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
-
-		case "n_open_contractsMin":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMin(ctx, field, obj)
-
-		case "n_open_contractsMax":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsMax(ctx, field, obj)
-
-		case "n_open_contractsSum":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsSum(ctx, field, obj)
-
-		case "n_open_contractsAvg":
-
-			out.Values[i] = ec._TensionAggregateResult_n_open_contractsAvg(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -83052,35 +88585,6 @@ func (ec *executionContext) _UpdateNotifPayload(ctx context.Context, sel ast.Sel
 	return out
 }
 
-var updateOrgaAggPayloadImplementors = []string{"UpdateOrgaAggPayload"}
-
-func (ec *executionContext) _UpdateOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateOrgaAggPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, updateOrgaAggPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateOrgaAggPayload")
-		case "orgaAgg":
-
-			out.Values[i] = ec._UpdateOrgaAggPayload_orgaAgg(ctx, field, obj)
-
-		case "numUids":
-
-			out.Values[i] = ec._UpdateOrgaAggPayload_numUids(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var updatePendingUserPayloadImplementors = []string{"UpdatePendingUserPayload"}
 
 func (ec *executionContext) _UpdatePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdatePendingUserPayload) graphql.Marshaler {
@@ -83139,6 +88643,35 @@ func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var updateProjectCardPayloadImplementors = []string{"UpdateProjectCardPayload"}
+
+func (ec *executionContext) _UpdateProjectCardPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectCardPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectCardPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateProjectCardPayload")
+		case "projectCard":
+
+			out.Values[i] = ec._UpdateProjectCardPayload_projectCard(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._UpdateProjectCardPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var updateProjectColumnPayloadImplementors = []string{"UpdateProjectColumnPayload"}
 
 func (ec *executionContext) _UpdateProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectColumnPayload) graphql.Marshaler {
@@ -83168,6 +88701,93 @@ func (ec *executionContext) _UpdateProjectColumnPayload(ctx context.Context, sel
 	return out
 }
 
+var updateProjectDraftPayloadImplementors = []string{"UpdateProjectDraftPayload"}
+
+func (ec *executionContext) _UpdateProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectDraftPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectDraftPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateProjectDraftPayload")
+		case "projectDraft":
+
+			out.Values[i] = ec._UpdateProjectDraftPayload_projectDraft(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._UpdateProjectDraftPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateProjectFieldPayloadImplementors = []string{"UpdateProjectFieldPayload"}
+
+func (ec *executionContext) _UpdateProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectFieldPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectFieldPayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateProjectFieldPayload")
+		case "projectField":
+
+			out.Values[i] = ec._UpdateProjectFieldPayload_projectField(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._UpdateProjectFieldPayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateProjectFieldValuePayloadImplementors = []string{"UpdateProjectFieldValuePayload"}
+
+func (ec *executionContext) _UpdateProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectFieldValuePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectFieldValuePayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateProjectFieldValuePayload")
+		case "projectFieldValue":
+
+			out.Values[i] = ec._UpdateProjectFieldValuePayload_projectFieldValue(ctx, field, obj)
+
+		case "numUids":
+
+			out.Values[i] = ec._UpdateProjectFieldValuePayload_numUids(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var updateProjectPayloadImplementors = []string{"UpdateProjectPayload"}
 
 func (ec *executionContext) _UpdateProjectPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectPayload) graphql.Marshaler {
@@ -83185,35 +88805,6 @@ func (ec *executionContext) _UpdateProjectPayload(ctx context.Context, sel ast.S
 		case "numUids":
 
 			out.Values[i] = ec._UpdateProjectPayload_numUids(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var updateProjectTensionPayloadImplementors = []string{"UpdateProjectTensionPayload"}
-
-func (ec *executionContext) _UpdateProjectTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectTensionPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectTensionPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateProjectTensionPayload")
-		case "projectTension":
-
-			out.Values[i] = ec._UpdateProjectTensionPayload_projectTension(ctx, field, obj)
-
-		case "numUids":
-
-			out.Values[i] = ec._UpdateProjectTensionPayload_numUids(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -83538,10 +89129,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._User_roles(ctx, field, obj)
 
-		case "backed_roles":
-
-			out.Values[i] = ec._User_backed_roles(ctx, field, obj)
-
 		case "tensions_created":
 
 			out.Values[i] = ec._User_tensions_created(ctx, field, obj)
@@ -83581,10 +89168,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "rolesAggregate":
 
 			out.Values[i] = ec._User_rolesAggregate(ctx, field, obj)
-
-		case "backed_rolesAggregate":
-
-			out.Values[i] = ec._User_backed_rolesAggregate(ctx, field, obj)
 
 		case "tensions_createdAggregate":
 
@@ -84309,28 +89892,6 @@ func (ec *executionContext) unmarshalNAddNotifInput2ᚖfractaleᚋfractal6ᚗgo�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInputᚄ(ctx context.Context, v interface{}) ([]*model.AddOrgaAggInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.AddOrgaAggInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAddOrgaAggInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddOrgaAggInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggInput(ctx context.Context, v interface{}) (*model.AddOrgaAggInput, error) {
-	res, err := ec.unmarshalInputAddOrgaAggInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNAddPendingUserInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInputᚄ(ctx context.Context, v interface{}) ([]*model.AddPendingUserInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -84350,6 +89911,28 @@ func (ec *executionContext) unmarshalNAddPendingUserInput2ᚕᚖfractaleᚋfract
 
 func (ec *executionContext) unmarshalNAddPendingUserInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserInput(ctx context.Context, v interface{}) (*model.AddPendingUserInput, error) {
 	res, err := ec.unmarshalInputAddPendingUserInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddProjectCardInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardInputᚄ(ctx context.Context, v interface{}) ([]*model.AddProjectCardInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddProjectCardInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddProjectCardInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddProjectCardInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardInput(ctx context.Context, v interface{}) (*model.AddProjectCardInput, error) {
+	res, err := ec.unmarshalInputAddProjectCardInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -84375,6 +89958,72 @@ func (ec *executionContext) unmarshalNAddProjectColumnInput2ᚖfractaleᚋfracta
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddProjectDraftInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectDraftInputᚄ(ctx context.Context, v interface{}) ([]*model.AddProjectDraftInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddProjectDraftInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddProjectDraftInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectDraftInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddProjectDraftInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectDraftInput(ctx context.Context, v interface{}) (*model.AddProjectDraftInput, error) {
+	res, err := ec.unmarshalInputAddProjectDraftInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddProjectFieldInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldInputᚄ(ctx context.Context, v interface{}) ([]*model.AddProjectFieldInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddProjectFieldInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddProjectFieldInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddProjectFieldInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldInput(ctx context.Context, v interface{}) (*model.AddProjectFieldInput, error) {
+	res, err := ec.unmarshalInputAddProjectFieldInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddProjectFieldValueInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldValueInputᚄ(ctx context.Context, v interface{}) ([]*model.AddProjectFieldValueInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddProjectFieldValueInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddProjectFieldValueInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldValueInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddProjectFieldValueInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldValueInput(ctx context.Context, v interface{}) (*model.AddProjectFieldValueInput, error) {
+	res, err := ec.unmarshalInputAddProjectFieldValueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddProjectInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectInputᚄ(ctx context.Context, v interface{}) ([]*model.AddProjectInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -84394,28 +90043,6 @@ func (ec *executionContext) unmarshalNAddProjectInput2ᚕᚖfractaleᚋfractal6�
 
 func (ec *executionContext) unmarshalNAddProjectInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectInput(ctx context.Context, v interface{}) (*model.AddProjectInput, error) {
 	res, err := ec.unmarshalInputAddProjectInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNAddProjectTensionInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectTensionInputᚄ(ctx context.Context, v interface{}) ([]*model.AddProjectTensionInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.AddProjectTensionInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAddProjectTensionInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectTensionInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddProjectTensionInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectTensionInput(ctx context.Context, v interface{}) (*model.AddProjectTensionInput, error) {
-	res, err := ec.unmarshalInputAddProjectTensionInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -84605,6 +90232,31 @@ func (ec *executionContext) unmarshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraph�
 }
 
 func (ec *executionContext) marshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, sel ast.SelectionSet, v model.BlobType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNCardKind2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKind(ctx context.Context, sel ast.SelectionSet, v model.CardKind) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CardKind(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx context.Context, v interface{}) (*model.CardKindRef, error) {
+	res, err := ec.unmarshalInputCardKindRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCardKindType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindType(ctx context.Context, v interface{}) (model.CardKindType, error) {
+	var res model.CardKindType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCardKindType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindType(ctx context.Context, sel ast.SelectionSet, v model.CardKindType) graphql.Marshaler {
 	return v
 }
 
@@ -84933,16 +90585,6 @@ func (ec *executionContext) unmarshalNNotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNOrgaAggFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (model.OrgaAggFilter, error) {
-	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (*model.OrgaAggFilter, error) {
-	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNPendingUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx context.Context, sel ast.SelectionSet, v *model.PendingUser) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -85216,6 +90858,31 @@ func (ec *executionContext) marshalNProject2ᚖfractaleᚋfractal6ᚗgoᚋgraph�
 	return ec._Project(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNProjectCard2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx context.Context, sel ast.SelectionSet, v *model.ProjectCard) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectCard(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProjectCardFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx context.Context, v interface{}) (model.ProjectCardFilter, error) {
+	res, err := ec.unmarshalInputProjectCardFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx context.Context, v interface{}) (*model.ProjectCardFilter, error) {
+	res, err := ec.unmarshalInputProjectCardFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectCardRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRef(ctx context.Context, v interface{}) (*model.ProjectCardRef, error) {
+	res, err := ec.unmarshalInputProjectCardRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNProjectColumn2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumn(ctx context.Context, sel ast.SelectionSet, v *model.ProjectColumn) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -85241,6 +90908,101 @@ func (ec *executionContext) unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNProjectColumnType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, v interface{}) (model.ProjectColumnType, error) {
+	var res model.ProjectColumnType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProjectColumnType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, sel ast.SelectionSet, v model.ProjectColumnType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNProjectDraft2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx context.Context, sel ast.SelectionSet, v *model.ProjectDraft) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectDraft(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProjectDraftFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx context.Context, v interface{}) (model.ProjectDraftFilter, error) {
+	res, err := ec.unmarshalInputProjectDraftFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx context.Context, v interface{}) (*model.ProjectDraftFilter, error) {
+	res, err := ec.unmarshalInputProjectDraftFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectDraftRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRef(ctx context.Context, v interface{}) (*model.ProjectDraftRef, error) {
+	res, err := ec.unmarshalInputProjectDraftRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProjectField2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx context.Context, sel ast.SelectionSet, v *model.ProjectField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectField(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx context.Context, v interface{}) (model.ProjectFieldFilter, error) {
+	res, err := ec.unmarshalInputProjectFieldFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx context.Context, v interface{}) (*model.ProjectFieldFilter, error) {
+	res, err := ec.unmarshalInputProjectFieldFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx context.Context, v interface{}) (*model.ProjectFieldRef, error) {
+	res, err := ec.unmarshalInputProjectFieldRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx context.Context, v interface{}) (model.ProjectFieldType, error) {
+	var res model.ProjectFieldType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProjectFieldType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx context.Context, sel ast.SelectionSet, v model.ProjectFieldType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNProjectFieldValue2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldValue) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectFieldValue(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldValueFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx context.Context, v interface{}) (model.ProjectFieldValueFilter, error) {
+	res, err := ec.unmarshalInputProjectFieldValueFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx context.Context, v interface{}) (*model.ProjectFieldValueFilter, error) {
+	res, err := ec.unmarshalInputProjectFieldValueFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNProjectFieldValueRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRef(ctx context.Context, v interface{}) (*model.ProjectFieldValueRef, error) {
+	res, err := ec.unmarshalInputProjectFieldValueRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNProjectFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx context.Context, v interface{}) (model.ProjectFilter, error) {
 	res, err := ec.unmarshalInputProjectFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -85256,29 +91018,14 @@ func (ec *executionContext) unmarshalNProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProjectTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx context.Context, sel ast.SelectionSet, v *model.ProjectTension) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProjectTension(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNProjectTensionFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx context.Context, v interface{}) (model.ProjectTensionFilter, error) {
-	res, err := ec.unmarshalInputProjectTensionFilter(ctx, v)
+func (ec *executionContext) unmarshalNProjectStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx context.Context, v interface{}) (model.ProjectStatus, error) {
+	var res model.ProjectStatus
+	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx context.Context, v interface{}) (*model.ProjectTensionFilter, error) {
-	res, err := ec.unmarshalInputProjectTensionFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNProjectTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRef(ctx context.Context, v interface{}) (*model.ProjectTensionRef, error) {
-	res, err := ec.unmarshalInputProjectTensionRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+func (ec *executionContext) marshalNProjectStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx context.Context, sel ast.SelectionSet, v model.ProjectStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNReaction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx context.Context, sel ast.SelectionSet, v *model.Reaction) graphql.Marshaler {
@@ -85451,11 +91198,6 @@ func (ec *executionContext) unmarshalNUpdateNotifInput2fractaleᚋfractal6ᚗgo�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateOrgaAggInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggInput(ctx context.Context, v interface{}) (model.UpdateOrgaAggInput, error) {
-	res, err := ec.unmarshalInputUpdateOrgaAggInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNUpdatePendingUserInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePendingUserInput(ctx context.Context, v interface{}) (model.UpdatePendingUserInput, error) {
 	res, err := ec.unmarshalInputUpdatePendingUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -85466,18 +91208,33 @@ func (ec *executionContext) unmarshalNUpdatePostInput2fractaleᚋfractal6ᚗgo�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateProjectCardInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectCardInput(ctx context.Context, v interface{}) (model.UpdateProjectCardInput, error) {
+	res, err := ec.unmarshalInputUpdateProjectCardInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateProjectColumnInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectColumnInput(ctx context.Context, v interface{}) (model.UpdateProjectColumnInput, error) {
 	res, err := ec.unmarshalInputUpdateProjectColumnInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateProjectInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectInput(ctx context.Context, v interface{}) (model.UpdateProjectInput, error) {
-	res, err := ec.unmarshalInputUpdateProjectInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateProjectDraftInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectDraftInput(ctx context.Context, v interface{}) (model.UpdateProjectDraftInput, error) {
+	res, err := ec.unmarshalInputUpdateProjectDraftInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateProjectTensionInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectTensionInput(ctx context.Context, v interface{}) (model.UpdateProjectTensionInput, error) {
-	res, err := ec.unmarshalInputUpdateProjectTensionInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateProjectFieldInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldInput(ctx context.Context, v interface{}) (model.UpdateProjectFieldInput, error) {
+	res, err := ec.unmarshalInputUpdateProjectFieldInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateProjectFieldValueInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldValueInput(ctx context.Context, v interface{}) (model.UpdateProjectFieldValueInput, error) {
+	res, err := ec.unmarshalInputUpdateProjectFieldValueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateProjectInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectInput(ctx context.Context, v interface{}) (model.UpdateProjectInput, error) {
+	res, err := ec.unmarshalInputUpdateProjectInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -85764,18 +91521,18 @@ func (ec *executionContext) marshalOAddNotifPayload2ᚖfractaleᚋfractal6ᚗgo�
 	return ec._AddNotifPayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOAddOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddOrgaAggPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._AddOrgaAggPayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOAddPendingUserPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddPendingUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddPendingUserPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._AddPendingUserPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddProjectCardPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectCardPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectCardPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddProjectCardPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddProjectColumnPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectColumnPayload) graphql.Marshaler {
@@ -85785,18 +91542,32 @@ func (ec *executionContext) marshalOAddProjectColumnPayload2ᚖfractaleᚋfracta
 	return ec._AddProjectColumnPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOAddProjectDraftPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectDraftPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddProjectDraftPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddProjectFieldPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectFieldPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddProjectFieldPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddProjectFieldValuePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectFieldValuePayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddProjectFieldValuePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOAddProjectPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._AddProjectPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOAddProjectTensionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddProjectTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddProjectTensionPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._AddProjectTensionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddReactionPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddReactionPayload) graphql.Marshaler {
@@ -86226,6 +91997,89 @@ func (ec *executionContext) unmarshalOBlobType_hash2ᚖfractaleᚋfractal6ᚗgo�
 	}
 	res, err := ec.unmarshalInputBlobType_hash(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCardKindFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindFilter(ctx context.Context, v interface{}) (*model.CardKindFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCardKindFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx context.Context, v interface{}) (*model.CardKindRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCardKindRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCardKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindTypeᚄ(ctx context.Context, v interface{}) ([]model.CardKindType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]model.CardKindType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCardKindType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOCardKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CardKindType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCardKindType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOComment2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
@@ -87089,13 +92943,6 @@ func (ec *executionContext) marshalODeleteNotifPayload2ᚖfractaleᚋfractal6ᚗ
 	return ec._DeleteNotifPayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalODeleteOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteOrgaAggPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._DeleteOrgaAggPayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalODeletePendingUserPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeletePendingUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeletePendingUserPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -87110,6 +92957,13 @@ func (ec *executionContext) marshalODeletePostPayload2ᚖfractaleᚋfractal6ᚗg
 	return ec._DeletePostPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalODeleteProjectCardPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectCardPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectCardPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteProjectCardPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalODeleteProjectColumnPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectColumnPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -87117,18 +92971,32 @@ func (ec *executionContext) marshalODeleteProjectColumnPayload2ᚖfractaleᚋfra
 	return ec._DeleteProjectColumnPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalODeleteProjectDraftPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectDraftPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteProjectDraftPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteProjectFieldPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectFieldPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteProjectFieldPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteProjectFieldValuePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectFieldValuePayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteProjectFieldValuePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalODeleteProjectPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._DeleteProjectPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalODeleteProjectTensionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteProjectTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProjectTensionPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._DeleteProjectTensionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteReactionPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteReactionPayload) graphql.Marshaler {
@@ -89581,206 +95449,6 @@ func (ec *executionContext) unmarshalONotifRef2ᚖfractaleᚋfractal6ᚗgoᚋgra
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOOrgaAgg2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx context.Context, sel ast.SelectionSet, v []*model.OrgaAgg) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOOrgaAgg2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOOrgaAgg2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAgg(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAgg) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._OrgaAgg(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOOrgaAggAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAggAggregateResult) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._OrgaAggAggregateResult(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOOrgaAggFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) ([]*model.OrgaAggFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.OrgaAggFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalOOrgaAggFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggFilter(ctx context.Context, v interface{}) (*model.OrgaAggFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOrgaAggFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOOrgaAggHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, v interface{}) ([]*model.OrgaAggHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.OrgaAggHasFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOOrgaAggHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOOrgaAggHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.OrgaAggHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOOrgaAggHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) unmarshalOOrgaAggHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, v interface{}) (*model.OrgaAggHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.OrgaAggHasFilter)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOOrgaAggHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAggHasFilter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOOrgaAggOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrder(ctx context.Context, v interface{}) (*model.OrgaAggOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOrgaAggOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOOrgaAggOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx context.Context, v interface{}) (*model.OrgaAggOrderable, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.OrgaAggOrderable)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOOrgaAggOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggOrderable(ctx context.Context, sel ast.SelectionSet, v *model.OrgaAggOrderable) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOOrgaAggPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggPatch(ctx context.Context, v interface{}) (*model.OrgaAggPatch, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOrgaAggPatch(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOOrgaAggRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐOrgaAggRef(ctx context.Context, v interface{}) (*model.OrgaAggRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOrgaAggRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalOPendingUser2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUser(ctx context.Context, sel ast.SelectionSet, v []*model.PendingUser) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -90350,6 +96018,265 @@ func (ec *executionContext) marshalOProjectAggregateResult2ᚖfractaleᚋfractal
 	return ec._ProjectAggregateResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectCard) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectCard2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectCard2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectCard) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProjectCard2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectCard2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCard(ctx context.Context, sel ast.SelectionSet, v *model.ProjectCard) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectCard(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProjectCardAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ProjectCardAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectCardAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx context.Context, v interface{}) ([]*model.ProjectCardFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectCardFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx context.Context, v interface{}) (*model.ProjectCardFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectCardFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectCardHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx context.Context, v interface{}) ([]*model.ProjectCardHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectCardHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectCardHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectCardHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectCardHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectCardHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOProjectCardHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx context.Context, v interface{}) (*model.ProjectCardHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectCardHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectCardHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ProjectCardHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx context.Context, v interface{}) (*model.ProjectCardOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectCardOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx context.Context, v interface{}) (*model.ProjectCardOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectCardOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx context.Context, sel ast.SelectionSet, v *model.ProjectCardOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx context.Context, v interface{}) (*model.ProjectCardPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectCardPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx context.Context, v interface{}) ([]*model.ProjectCardRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectCardRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNProjectCardRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalOProjectColumn2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumn(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectColumn) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -90617,6 +96544,876 @@ func (ec *executionContext) unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, v interface{}) ([]*model.ProjectColumnType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectColumnType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectColumnType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, v interface{}) (*model.ProjectColumnType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectColumnType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx context.Context, sel ast.SelectionSet, v *model.ProjectColumnType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectColumnType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnTypeHash(ctx context.Context, v interface{}) (*model.ProjectColumnTypeHash, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectColumnType_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectDraft) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectDraft2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectDraft2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectDraft) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProjectDraft2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectDraft2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraft(ctx context.Context, sel ast.SelectionSet, v *model.ProjectDraft) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectDraft(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProjectDraftAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ProjectDraftAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectDraftAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx context.Context, v interface{}) ([]*model.ProjectDraftFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectDraftFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx context.Context, v interface{}) (*model.ProjectDraftFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectDraftFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectDraftHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx context.Context, v interface{}) ([]*model.ProjectDraftHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectDraftHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectDraftHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectDraftHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectDraftHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectDraftHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOProjectDraftHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx context.Context, v interface{}) (*model.ProjectDraftHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectDraftHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectDraftHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ProjectDraftHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx context.Context, v interface{}) (*model.ProjectDraftOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectDraftOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx context.Context, v interface{}) (*model.ProjectDraftOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectDraftOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx context.Context, sel ast.SelectionSet, v *model.ProjectDraftOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx context.Context, v interface{}) (*model.ProjectDraftPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectDraftPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx context.Context, v interface{}) ([]*model.ProjectDraftRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectDraftRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNProjectDraftRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOProjectDraftRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRef(ctx context.Context, v interface{}) (*model.ProjectDraftRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectDraftRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectField2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectField2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProjectField2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectField2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectField(ctx context.Context, sel ast.SelectionSet, v *model.ProjectField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectField(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProjectFieldAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectFieldAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx context.Context, v interface{}) ([]*model.ProjectFieldFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectFieldFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx context.Context, v interface{}) (*model.ProjectFieldFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectFieldFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx context.Context, v interface{}) ([]*model.ProjectFieldHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectFieldHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectFieldHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectFieldHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectFieldHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectFieldHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOProjectFieldHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx context.Context, v interface{}) (*model.ProjectFieldHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectFieldHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectFieldHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx context.Context, v interface{}) (*model.ProjectFieldPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectFieldPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx context.Context, v interface{}) ([]*model.ProjectFieldRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectFieldRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx context.Context, v interface{}) (*model.ProjectFieldRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectFieldRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx context.Context, v interface{}) (*model.ProjectFieldType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectFieldType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectFieldValue) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectFieldValue2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectFieldValue2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectFieldValue) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProjectFieldValue2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProjectFieldValue2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValue(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldValue) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectFieldValue(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProjectFieldValueAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldValueAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProjectFieldValueAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx context.Context, v interface{}) ([]*model.ProjectFieldValueFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectFieldValueFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx context.Context, v interface{}) (*model.ProjectFieldValueFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectFieldValueFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx context.Context, v interface{}) ([]*model.ProjectFieldValueHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectFieldValueHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOProjectFieldValueHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectFieldValueHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectFieldValueHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOProjectFieldValueHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx context.Context, v interface{}) (*model.ProjectFieldValueHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectFieldValueHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectFieldValueHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldValueHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx context.Context, v interface{}) (*model.ProjectFieldValueOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectFieldValueOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx context.Context, v interface{}) (*model.ProjectFieldValueOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ProjectFieldValueOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx context.Context, sel ast.SelectionSet, v *model.ProjectFieldValueOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx context.Context, v interface{}) (*model.ProjectFieldValuePatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectFieldValuePatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx context.Context, v interface{}) ([]*model.ProjectFieldValueRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ProjectFieldValueRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNProjectFieldValueRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalOProjectFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx context.Context, v interface{}) ([]*model.ProjectFilter, error) {
 	if v == nil {
 		return nil, nil
@@ -90782,109 +97579,7 @@ func (ec *executionContext) unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectTension) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOProjectTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOProjectTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectTension) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNProjectTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalOProjectTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTension(ctx context.Context, sel ast.SelectionSet, v *model.ProjectTension) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ProjectTension(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOProjectTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ProjectTensionAggregateResult) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ProjectTensionAggregateResult(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOProjectTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx context.Context, v interface{}) ([]*model.ProjectTensionFilter, error) {
+func (ec *executionContext) unmarshalOProjectStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx context.Context, v interface{}) ([]*model.ProjectStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -90893,10 +97588,10 @@ func (ec *executionContext) unmarshalOProjectTensionFilter2ᚕᚖfractaleᚋfrac
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]*model.ProjectTensionFilter, len(vSlice))
+	res := make([]*model.ProjectStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx, vSlice[i])
+		res[i], err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -90904,35 +97599,7 @@ func (ec *executionContext) unmarshalOProjectTensionFilter2ᚕᚖfractaleᚋfrac
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOProjectTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionFilter(ctx context.Context, v interface{}) (*model.ProjectTensionFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputProjectTensionFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOProjectTensionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx context.Context, v interface{}) ([]*model.ProjectTensionHasFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.ProjectTensionHasFilter, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOProjectTensionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOProjectTensionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectTensionHasFilter) graphql.Marshaler {
+func (ec *executionContext) marshalOProjectStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx context.Context, sel ast.SelectionSet, v []*model.ProjectStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -90959,7 +97626,7 @@ func (ec *executionContext) marshalOProjectTensionHasFilter2ᚕᚖfractaleᚋfra
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOProjectTensionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx, sel, v[i])
+			ret[i] = ec.marshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -90973,72 +97640,28 @@ func (ec *executionContext) marshalOProjectTensionHasFilter2ᚕᚖfractaleᚋfra
 	return ret
 }
 
-func (ec *executionContext) unmarshalOProjectTensionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx context.Context, v interface{}) (*model.ProjectTensionHasFilter, error) {
+func (ec *executionContext) unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx context.Context, v interface{}) (*model.ProjectStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var res = new(model.ProjectTensionHasFilter)
+	var res = new(model.ProjectStatus)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOProjectTensionHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ProjectTensionHasFilter) graphql.Marshaler {
+func (ec *executionContext) marshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProjectStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOProjectTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrder(ctx context.Context, v interface{}) (*model.ProjectTensionOrder, error) {
+func (ec *executionContext) unmarshalOProjectStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatusHash(ctx context.Context, v interface{}) (*model.ProjectStatusHash, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputProjectTensionOrder(ctx, v)
+	res, err := ec.unmarshalInputProjectStatus_hash(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOProjectTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrderable(ctx context.Context, v interface{}) (*model.ProjectTensionOrderable, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.ProjectTensionOrderable)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOProjectTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionOrderable(ctx context.Context, sel ast.SelectionSet, v *model.ProjectTensionOrderable) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOProjectTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionPatch(ctx context.Context, v interface{}) (*model.ProjectTensionPatch, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputProjectTensionPatch(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOProjectTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRefᚄ(ctx context.Context, v interface{}) ([]*model.ProjectTensionRef, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.ProjectTensionRef, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNProjectTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectTensionRef(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) marshalOReaction2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReaction(ctx context.Context, sel ast.SelectionSet, v []*model.Reaction) graphql.Marshaler {
@@ -92390,13 +99013,6 @@ func (ec *executionContext) marshalOUpdateNotifPayload2ᚖfractaleᚋfractal6ᚗ
 	return ec._UpdateNotifPayload(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOUpdateOrgaAggPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateOrgaAggPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateOrgaAggPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._UpdateOrgaAggPayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOUpdatePendingUserPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdatePendingUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdatePendingUserPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -92411,6 +99027,13 @@ func (ec *executionContext) marshalOUpdatePostPayload2ᚖfractaleᚋfractal6ᚗg
 	return ec._UpdatePostPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOUpdateProjectCardPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectCardPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectCardPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateProjectCardPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOUpdateProjectColumnPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectColumnPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -92418,18 +99041,32 @@ func (ec *executionContext) marshalOUpdateProjectColumnPayload2ᚖfractaleᚋfra
 	return ec._UpdateProjectColumnPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOUpdateProjectDraftPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectDraftPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateProjectDraftPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateProjectFieldPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectFieldPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateProjectFieldPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateProjectFieldValuePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectFieldValuePayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateProjectFieldValuePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOUpdateProjectPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectPayload) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._UpdateProjectPayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOUpdateProjectTensionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateProjectTensionPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProjectTensionPayload) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._UpdateProjectTensionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateReactionPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateReactionPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateReactionPayload) graphql.Marshaler {

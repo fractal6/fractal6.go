@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -23,18 +23,21 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strings"
 	"github.com/99designs/gqlgen/graphql"
+	"strings"
+
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/tools"
 )
 
 var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (interface{}, error)
 
 func init() {
 
-    FieldTransformFunc = map[string]func(context.Context, graphql.Resolver) (interface{}, error){
-        "lower": lower,
-    }
+	FieldTransformFunc = map[string]func(context.Context, graphql.Resolver) (interface{}, error){
+		"lower": lower,
+		"now":   now,
+	}
 
 }
 
@@ -48,44 +51,56 @@ func init() {
 //}
 
 func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
-    data, err := next(ctx)
-    switch d := data.(type) {
-    case *string:
-        v := strings.ToLower(*d)
-        return &v, err
-    case string:
-        v := strings.ToLower(d)
-        return v, err
-    case *model.StringExactFilter:
-        v := *d
-        if v.Eq != nil {
-            s := strings.ToLower(*v.Eq)
-            v.Eq = &s
-        }
-        return &v, err
-    case *model.StringHashFilter:
-        v := *d
-        if v.Eq != nil {
-            s := strings.ToLower(*v.Eq)
-            v.Eq = &s
-        }
-        return &v, err
-    case *model.StringHashFilterStringRegExpFilter:
-        v := *d
-        if v.Eq != nil {
-            s := strings.ToLower(*v.Eq)
-            v.Eq = &s
-        }
-        return &v, err
-    case *model.StringHashFilterStringTermFilter:
-        v := *d
-        if v.Eq != nil {
-            s := strings.ToLower(*v.Eq)
-            v.Eq = &s
-        }
-        return &v, err
-    }
-    field := *graphql.GetPathContext(ctx).Field
-    return nil, fmt.Errorf("Type unknwown for field %s", field)
+	data, err := next(ctx)
+	switch d := data.(type) {
+	case *string:
+		v := strings.ToLower(*d)
+		return &v, err
+	case string:
+		v := strings.ToLower(d)
+		return v, err
+	case *model.StringExactFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	case *model.StringHashFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	case *model.StringHashFilterStringRegExpFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	case *model.StringHashFilterStringTermFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	}
+	field := *graphql.GetPathContext(ctx).Field
+	return nil, fmt.Errorf("Type unknwown for field %s", field)
 }
 
+func now(ctx context.Context, next graphql.Resolver) (interface{}, error) {
+	data, err := next(ctx)
+	now := tools.Now()
+	switch data.(type) {
+	case *string:
+		return &now, err
+	case string:
+		return now, err
+	}
+	field := *graphql.GetPathContext(ctx).Field
+	return nil, fmt.Errorf("Type unknwown for field %s", field)
+}

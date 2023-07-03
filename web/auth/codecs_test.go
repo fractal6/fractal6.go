@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,118 +21,117 @@
 package auth
 
 import (
-    "reflect"
-    "testing"
-    //"os"
+	"reflect"
+	"testing"
+	//"os"
 )
 
 func init() {
-    // Necessary to work with with Viper relative path and go test
-    //os.Chdir("../")
-    // ...doesn"t work, please run
-    //    go test ./web/auth/codecs* -v
+	// Necessary to work with with Viper relative path and go test
+	//os.Chdir("../")
+	// ...doesn"t work, please run
+	//    go test ./web/auth/codecs* -v
 }
 
 func TestValidateNameid(t *testing.T) {
-    testcases := []struct{
-        input string
-        want bool
-    }{
-        {"test", true},
-        {"test#test", true},
-        {"test#ok", true},
-        {"test#ok#ok", true},
-        {"test##ok", true},
-        {"test##ok-ok", true},
-        {"test#ok#ok#ok", true}, // watchout
-        {"", false},
-        {"ok", false},
-        {"test@", false},
-        {"ko#test", false},
-        {"test#", false},
-        {"test##", false},
-        {"#test", false},
-        {"test#o", false},
-        {"test##ok@", false},
+	testcases := []struct {
+		input string
+		want  bool
+	}{
+		{"test", true},
+		{"test#test", true},
+		{"test#ok", true},
+		{"test#ok#ok", true},
+		{"test##ok", true},
+		{"test##ok-ok", true},
+		{"test#ok#ok#ok", true}, // watchout
+		{"", false},
+		{"ok", false},
+		{"test@", false},
+		{"ko#test", false},
+		{"test#", false},
+		{"test##", false},
+		{"#test", false},
+		{"test#o", false},
+		{"test##ok@", false},
 	}
 
-    for _, test := range testcases {
-        var got bool = true
-        err := ValidateNameid(test.input, "test")
-        if err != nil {
-            //t.Errorf(err.Error())
-            got = false
-        }
+	for _, test := range testcases {
+		var got bool = true
+		err := ValidateNameid(test.input, "test")
+		if err != nil {
+			//t.Errorf(err.Error())
+			got = false
+		}
 
-        if !reflect.DeepEqual(got, test.want) {
-            t.Errorf("For p = %s, want %v. Got %v",
-            test.input, test.want, got)
-        }
-    }
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("For p = %s, want %v. Got %v",
+				test.input, test.want, got)
+		}
+	}
 }
 
 func TestValidateUsername(t *testing.T) {
-    testcases := []struct{
-        input string
-        want bool
-    }{
-        {"test", true},
-        {"tEst0123", true},
-        {"test.ok", true},
-        {"test-ok", true},
-        {"test_ok", true},
-        {"te", false},
-        {"test-", false},
-        {"test.", false},
-        {"test_", false},
+	testcases := []struct {
+		input string
+		want  bool
+	}{
+		{"test", true},
+		{"tEst0123", true},
+		{"test.ok", true},
+		{"test-ok", true},
+		{"test_ok", true},
+		{"te", false},
+		{"test-", false},
+		{"test.", false},
+		{"test_", false},
 	}
 
-    for _, test := range testcases {
-        var got bool = true
-        err := ValidateUsername(test.input)
-        if err != nil {
-            //t.Errorf(err.Error())
-            got = false
-        }
+	for _, test := range testcases {
+		var got bool = true
+		err := ValidateUsername(test.input)
+		if err != nil {
+			//t.Errorf(err.Error())
+			got = false
+		}
 
-        if !reflect.DeepEqual(got, test.want) {
-            t.Errorf("For p = %s, want %v. Got %v",
-            test.input, test.want, got)
-        }
-    }
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("For p = %s, want %v. Got %v",
+				test.input, test.want, got)
+		}
+	}
 }
 
 func TestValidateEmail(t *testing.T) {
-    testcases := []struct{
-        input string
-        want bool
-    }{
-        {"m@m.m", true},
-        {"0@0.0", true},
-        {"me@me.me", true},
-        {"me0@m0.m0", true},
-        {"me.me@me.me.m0", true},
-        {"me_me@me_me.m0", true},
-        {"me_m-e.@me_me.m0", true},
-        {"m@.m", false},
-        {"@.m", false},
-        {"@me", false},
-        {"me@", false},
-        {"meme", false},
+	testcases := []struct {
+		input string
+		want  bool
+	}{
+		{"m@m.m", true},
+		{"0@0.0", true},
+		{"me@me.me", true},
+		{"me0@m0.m0", true},
+		{"me.me@me.me.m0", true},
+		{"me_me@me_me.m0", true},
+		{"me_m-e.@me_me.m0", true},
+		{"m@.m", false},
+		{"@.m", false},
+		{"@me", false},
+		{"me@", false},
+		{"meme", false},
 	}
 
-    for _, test := range testcases {
-        var got bool = true
-        err := ValidateEmail(test.input)
-        if err != nil {
-            //t.Errorf(err.Error())
-            got = false
-        }
+	for _, test := range testcases {
+		var got bool = true
+		err := ValidateEmail(test.input)
+		if err != nil {
+			//t.Errorf(err.Error())
+			got = false
+		}
 
-        if !reflect.DeepEqual(got, test.want) {
-            t.Errorf("For p = %s, want %v. Got %v",
-            test.input, test.want, got)
-        }
-    }
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("For p = %s, want %v. Got %v",
+				test.input, test.want, got)
+		}
+	}
 }
-

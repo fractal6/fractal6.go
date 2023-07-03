@@ -1,0 +1,55 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize members
+    { rule: """query ($ROOTIDS: [String]) {
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }""" }
+    ## Authorize user that have authority in nodes
+    #{ rule: """query ($ROOTIDS: [String], $USERNAME: String!) {
+    #    queryProject(filter: {rootnameid: {in: $ROOTIDS}}) {
+    #      nodes {
+    #        children(filter: {role_type: {in: [Coordinator]}}) {
+    #          first_link(filter: {username: {eq: $USERNAME}}) { username }
+    #        }
+    #      }
+    #    }
+    #}""" },
+    #{ and : [ # Authorize members if artefact is unlinked
+    #  # -- Members
+    #  { rule: """query ($ROOTIDS: [String]) {
+    #      queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    #  }""" },
+    #  # -- no nodes
+    #  { not: { rule: """query ($ROOTIDS: [String]) {
+    #      queryProject(filter: {rootnameid: {in: $ROOTIDS}}) {
+    #        nodes { id }
+    #      }
+    #  }""" }}
+    #]},
+    #{ and : [ # Coordo in parent if no coordo in children level 0
+    #  # -- Coordo in parent
+    #  { rule: """query ($ROOTIDS: [String], $USERNAME: String!) {
+    #      queryProject(filter: {rootnameid: {in: $ROOTIDS}}) {
+    #        nodes {
+    #          parent {
+    #            children(filter: {role_type: {in: [Coordinator]}}) {
+    #              first_link(filter: {username: {eq: $USERNAME}}) { username }
+    #            }
+    #          }
+    #        }
+    #      }
+    #  }""" },
+    #  # -- No coordo in level 0
+    #  { not: { rule: """query($ROOTIDS: [String]) {
+    #      queryProject(filter: {rootnameid: {in: $ROOTIDS}}) {
+    #        nodes {
+    #          children(filter: {role_type: {in: [Coordinator, Owner]}}) {
+    #            first_link { username }
+    #          }
+    #        }
+    #      }
+    #  }""" }}
+    #]}
+  ]
+}

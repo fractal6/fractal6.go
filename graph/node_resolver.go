@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -22,15 +22,14 @@ package graph
 
 import (
 	"context"
-    "reflect"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
+	"fractale/fractal6.go/web/auth"
 )
 
 ////////////////////////////////////////////////
@@ -44,16 +43,20 @@ import (
 ////////////////////////////////////////////////
 
 type AddArtefactInput struct {
-    Name        *string             `json:"name"`
-    Color       *string             `json:"color"`
-	Rootnameid  string              `json:"rootnameid,omitempty"`
-	Nodes       []*model.NodeRef    `json:"nodes,omitempty"`
+	Name       *string          `json:"name"`
+	Color      *string          `json:"color"`
+	Rootnameid string           `json:"rootnameid,omitempty"`
+	Nodes      []*model.NodeRef `json:"nodes,omitempty"`
 }
 
 type FilterArtefactInput struct {
-	ID         []string                                `json:"id,omitempty"`
-	Rootnameid *model.StringHashFilter                 `json:"rootnameid,omitempty"`
-	Name       *model.StringHashFilterStringTermFilter `json:"name,omitempty"`
+	ID         []string                `json:"id,omitempty"`
+	Rootnameid *model.StringHashFilter `json:"rootnameid,omitempty"`
+	// For Project Only
+	Parentnameid *model.StringHashFilter `json:"parentnameid,omitempty"`
+	Nameid       *model.StringHashFilter `json:"nameid,omitempty"`
+	// --
+	Name *model.StringHashFilterStringTermFilter `json:"name,omitempty"`
 }
 
 type UpdateArtefactInput struct {
@@ -62,139 +65,197 @@ type UpdateArtefactInput struct {
 	Remove *AddArtefactInput    `json:"remove,omitempty"`
 }
 
-
-// Add "Artefeact" - Must be Coordo
+// Add "Artefact"
 func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    var ok bool =  false
-    // Get User context
-    ctx, uctx, err := auth.GetUserContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
+	// Authorization
+	// - Check that rootnameid comply with Nodes
+	// - nodes is required
+	// - Check that user satisfy strict condition (coordo roles on node linked)
 
-    // Validate input
-    var inputs []*AddArtefactInput
-    inputs_, _ := InterfaceSlice(graphql.GetResolverContext(ctx).Args["input"])
-    for _, s:= range inputs_ {
-        temp := AddArtefactInput{}
-        StructMap(s, &temp)
-        inputs = append(inputs, &temp)
-    }
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
 
-    // Authorization
-    // - Check that user satisfy strict condition (coordo roles on node linked)
-    // - Check that rootnameid comply with Nodes
-    mode := model.NodeModeCoordinated
-    for _, input := range inputs {
-        if len(input.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
-        node := input.Nodes[0]
-        rootnameid, _ := codec.Nid2rootid(*node.Nameid)
-        if rootnameid != input.Rootnameid { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid does not match.")) }
-        ok, err = auth.HasCoordoAuth(uctx, *node.Nameid, &mode)
-        if err != nil { return nil, LogErr("Internal error", err) }
-        if !ok {
-            return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
-        }
-    }
-    if ok { return next(ctx) }
-    return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+	// Validate input
+	var inputs []AddArtefactInput
+	ExtractInputs(ctx, &inputs)
+	for _, input := range inputs {
+		if len(input.Nodes) == 0 {
+			return nil, LogErr("Access denied", fmt.Errorf("A node must be given."))
+		}
+		node := input.Nodes[0]
+		rootnameid, _ := codec.Nid2rootid(*node.Nameid)
+		if rootnameid != input.Rootnameid {
+			return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid does not match."))
+		}
+		// Authorization with regards to the given nodes.
+		if err = auth.CheckNodesAuth(uctx, input.Nodes, true); err != nil {
+			return nil, err
+		}
+	}
+
+	// Forward Query
+	return next(ctx)
 }
 
 // Update "Artefact" - Must be coordo
 func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-    var ok bool =  false
-    // Get User context
-    ctx, uctx, err := auth.GetUserContext(ctx)
-    if err != nil { return nil, LogErr("Access denied", err) }
+	// Pre-processing:
+	// - Auth
+	// - get values prior mutattions
 
-    // Validate input
-    var input UpdateArtefactInput
-    StructMap(graphql.GetResolverContext(ctx).Args["input"], &input)
+	// Protected Object has more restrivive conditions to be updated.
+	// @TODO: Clarify how the ressources access policy for artefacts object (that can belongs to multiple nodes)
+	// Ex: { Leaders: (mandate acess, tension access), Coordinators: (artefact access, tension access) }?
+	protecteds := []string{"Label", "RoleExt"}
+	isProtected := false
+	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+	for _, obj := range protecteds {
+		if typeName == obj {
+			isProtected = true
+			break
+		}
+	}
 
-    var typeName string
-    var rootnameid string
-    var nodes []*model.NodeRef
-    if input.Set != nil {
-        if len(input.Set.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
-        nodes = append(nodes, input.Set.Nodes[0])
-        rootnameid, _ = codec.Nid2rootid(*nodes[0].Nameid)
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
 
-        // (@FUTURE contract) Lock update if artefact belongs to multiple nodes
-        n_nodes := 0
-        _, typeName, _, err = queryTypeFromGraphqlContext(ctx)
-        if err != nil { return nil, LogErr("UpdateNodeArtefact", err) }
-        if len(input.Filter.ID) > 0 {
-            n_nodes = db.GetDB().Count(input.Filter.ID[0], typeName +".nodes")
-        } else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
-            if rootnameid != *input.Filter.Rootnameid.Eq { return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid do not match.")) }
-            n_nodes = db.GetDB().Count2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes")
-        } else {
-            return nil, LogErr("Access denied", fmt.Errorf("invalid filter to query node artefact."))
-        }
+	// Validate input
+	var input UpdateArtefactInput
+	ExtractInput(ctx, &input)
 
-        if n_nodes > 1 && *nodes[0].Nameid != rootnameid  {
-            // Instanciate an empty empty object of the same type than input.Set
-            t := reflect.TypeOf(input.Set).Elem()
-            a := reflect.New(t).Elem().Interface()
-            b := *input.Set
-            b.Nodes = nil
-            // Ignore if the update it is just appending the data to new node (not actually modifing it)
-            if !reflect.DeepEqual(a, b) {
-                return nil, LogErr("Access denied", fmt.Errorf("This object belongs to more than one node, edition is locked. Edition is only possible at the root circle level."))
-            }
-        }
-    }
-    if input.Remove != nil {
-        // @DEBUG: only allow nodes to be removed...
-        if len(input.Remove.Nodes) == 0 { return nil, LogErr("Access denied", fmt.Errorf("A node must be given.")) }
-        nodes = append(nodes, input.Remove.Nodes[0])
-    }
+	// Get nodes in order to perform @auth rules against it
+	nodes := []model.NodeRef{}
+	nodesGiven := []*model.NodeRef{}
+	var x interface{}
+	if len(input.Filter.ID) > 0 { // Updates with UID
+		x, err = db.GetDB().GetSubFieldById(input.Filter.ID[0], typeName+".nodes", "Node.nameid")
+	} else { // Update from hash names
+		if typeName == "Project" && input.Filter.Parentnameid.Eq != nil && input.Filter.Nameid.Eq != nil {
+			// Project like artefacts
+			x, err = db.GetDB().GetSubFieldByEq2(typeName+".nameid", *input.Filter.Nameid.Eq, typeName+".parentnameid", *input.Filter.Parentnameid.Eq, typeName+".nodes", "Node.nameid")
+		} else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
+			// Other Artefacts update from hash names
+			x, err = db.GetDB().GetSubFieldByEq2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes", "Node.nameid")
+		} else {
+			return nil, LogErr("Access denied", fmt.Errorf("invalid filter to update node artefact."))
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	if x != nil {
+		for _, n := range x.([]interface{}) {
+			nameid := n.(string)
+			nodes = append(nodes, model.NodeRef{Nameid: &nameid})
+		}
+	} else {
+		// Allow if the artefact is not yet linked
+	}
+	// Get given nodes
+	if input.Set != nil {
+		nodesGiven = append(nodesGiven, input.Set.Nodes...)
+	}
+	if input.Remove != nil {
+		// @auth debug: Only allow nodes to be removed...
+		if len(input.Remove.Nodes) == 0 {
+			return nil, LogErr("Access denied", fmt.Errorf("A node must be given."))
+		}
+		nodesGiven = append(nodesGiven, input.Remove.Nodes...)
+	}
 
-    // Authorization
-    // Check that user satisfy strict condition (coordo roles on node linked)
-    mode := model.NodeModeCoordinated
-    for _, node := range nodes {
-        ok, err = auth.HasCoordoAuth(uctx, *node.Nameid, &mode)
-        if err != nil { return nil, LogErr("Internal error", err) }
-        if !ok {
-            return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
-        }
-    }
-    if !ok {
-        return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
-    }
+	// Authorization with regards to nodes attributes.
+	if err = auth.CheckNodesAuth(uctx, nodes, false); err != nil {
+		return nil, err
+	}
 
-    // Update the Label event in tension history as data id hardocoded on new/old value.
-    // @debug/perf: run this asynchronously
-    if typeName == "Label" && input.Set != nil && len(input.Filter.ID) > 0 {
-        old := struct { Name, Color string }{}
-        new := struct { Name, Color string }{}
-        // Old value -- Color is embeded in the event new/old value
-        old_, err := db.GetDB().GetFieldById(input.Filter.ID[0], "Label.name Label.color")
-        if err != nil { return nil, LogErr("Internal error", err) }
-        StructMap(old_, &old)
+	// Authorization with regards to the given nodes.
+	if err = auth.CheckNodesAuth(uctx, nodesGiven, true); err != nil {
+		return nil, err
+	}
 
-        // New value
-        new_name :=  input.Set.Name
-        new_color := input.Set.Color
-        if new_name == nil {
-            new.Name = old.Name
-        } else {
-           new.Name = *new_name
-        }
-        if new_color == nil {
-            new.Color = old.Color
-        } else {
-           new.Color = *new_color
-        }
+	// If an artefact is protected and is linked to multiple nodes,
+	// Only allow updates if user has auth in the node with the shortest path.
+	if input.Set != nil && isProtected && len(nodes) > 1 {
+		mode := model.NodeModeCoordinated
+		rootnameid, _ := codec.Nid2rootid(*nodes[0].Nameid)
+		best_node := ""
+		best_weight := -1.0
+		for _, n := range nodes {
+			nameid := *n.Nameid
+			w, err := db.GetDB().GetShortestPath(rootnameid, nameid)
+			if err != nil {
+				return nil, err
+			}
+			if w < best_weight || best_weight < 0 {
+				best_weight = w
+				best_node = nameid
+			}
+		}
+		// Check auth on the higher circle
+		ok, err := auth.HasCoordoAuth(uctx, best_node, &mode)
+		if err != nil {
+			return nil, LogErr("Internal error", err)
+		} else if !ok {
+			return nil, LogErr("Access denied", fmt.Errorf("you need the be a coordinator of the highest circle that use this ressource to update it."))
+		}
 
-        // Rewrite
-        _, err = db.GetDB().Meta("rewriteLabelEvents", map[string]string{
-            "rootnameid": rootnameid,
-            "old_name": old.Name + "§" + old.Color,
-            "new_name": new.Name + "§" + new.Color,
-        })
-        if err != nil { return nil, LogErr("Internal error", err) }
-    }
+	}
 
-    return next(ctx)
+	// Get value prior mutation
+	isRelabeling := typeName == "Label" && len(input.Filter.ID) > 0 && input.Set != nil && (input.Set.Name != nil || input.Set.Color != nil)
+	old := struct{ Name, Color, Rootnameid string }{}
+	if isRelabeling {
+		// Old value -- Color is embeded in the event new/old value
+		old_, err := db.GetDB().GetFieldById(input.Filter.ID[0], "Label.name Label.color Label.rootnameid")
+		if err != nil {
+			return nil, LogErr("Internal error", err)
+		}
+		StructMap(old_, &old)
+	}
+
+	// Forward Query
+	data, err := next(ctx)
+	if err != nil {
+		return data, err
+	}
+
+	// Post-processing:
+	// - Rename unlink labels
+
+	// Update the Label event in tension history as data is hardcoded on new/old value.
+	// @debug/perf: run this asynchronously and after next()
+	if isRelabeling {
+		new := struct{ Name, Color string }{}
+		// New value
+		new_name := input.Set.Name
+		new_color := input.Set.Color
+		if new_name == nil {
+			new.Name = old.Name
+		} else {
+			new.Name = *new_name
+		}
+		if new_color == nil {
+			new.Color = old.Color
+		} else {
+			new.Color = *new_color
+		}
+
+		// Rewrite
+		_, err = db.GetDB().Meta("rewriteLabelEvents", map[string]string{
+			"rootnameid": old.Rootnameid,
+			"old_name":   old.Name + "§" + old.Color,
+			"new_name":   new.Name + "§" + new.Color,
+		})
+		if err != nil {
+			return data, LogErr("Internal error", err)
+		}
+	}
+
+	return data, err
 }
-

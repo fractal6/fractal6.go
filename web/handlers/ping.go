@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,12 +21,11 @@
 package handlers
 
 import (
-    "net/http"
+	"net/http"
 )
 
 // Ping is simple keep-alive/ping handler
 func Ping(w http.ResponseWriter, r *http.Request) {
-    //user := r.Context().Value("user").(string)
-    w.Write([]byte("OK"))
+	//user := r.Context().Value("user").(string)
+	w.Write([]byte("OK"))
 }
-

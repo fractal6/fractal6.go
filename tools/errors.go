@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,19 +21,19 @@
 package tools
 
 import (
-    "fmt"
-    "log"
-    "runtime"
+	"fmt"
+	"log"
+	"runtime"
 )
 
 func LogErr(reason string, err error) error {
-    // Get trace information
-    pc := make([]uintptr, 10)  // at least 1 entry needed
-    runtime.Callers(2, pc) // Skip 2 levels to get the caller
-    f := runtime.FuncForPC(pc[0])
-    fname := f.Name()
-    //file, line := f.FileLine(pc[0])
+	// Get trace information
+	pc := make([]uintptr, 10) // at least 1 entry needed
+	runtime.Callers(2, pc)    // Skip 2 levels to get the caller
+	f := runtime.FuncForPC(pc[0])
+	fname := f.Name()
+	//file, line := f.FileLine(pc[0])
 
-    log.Printf("[@%s] %s: %s", fname, reason, err.Error())
-    return fmt.Errorf("%s: %s", reason, err.Error())
+	log.Printf("[@%s] %s: %s", fname, reason, err.Error())
+	return fmt.Errorf("%s: %s", reason, err.Error())
 }

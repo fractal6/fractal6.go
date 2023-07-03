@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,12 +21,12 @@
 package handlers
 
 import (
-    "net/http"
-    "github.com/prometheus/client_golang/prometheus"
-    "github.com/prometheus/client_golang/prometheus/promhttp"
-    "fractale/fractal6.go/db"
-)
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
 
+	"fractale/fractal6.go/db"
+)
 
 var (
 	userCount = prometheus.NewGauge(prometheus.GaugeOpts{
@@ -71,8 +71,8 @@ var (
 )
 
 func InstruHandler() http.Handler {
-    // Create Handler from scratch
-    r := prometheus.NewRegistry()
+	// Create Handler from scratch
+	r := prometheus.NewRegistry()
 
 	// Metrics have to be registered to be exposed:
 	r.MustRegister(userCount)
@@ -84,48 +84,46 @@ func InstruHandler() http.Handler {
 	r.MustRegister(archiveCount)
 	r.MustRegister(labelCount)
 
-    // More metrics
-    //MustRegister(
-    //    promcollectors.NewProcessCollector(promcollectors.ProcessCollectorOpts{}),
-    //    promcollectors.NewGoCollector(),
-    //)
+	// More metrics
+	//MustRegister(
+	//    promcollectors.NewProcessCollector(promcollectors.ProcessCollectorOpts{}),
+	//    promcollectors.NewGoCollector(),
+	//)
 
-    return promhttp.HandlerFor(r, promhttp.HandlerOpts{})
+	return promhttp.HandlerFor(r, promhttp.HandlerOpts{})
 }
-
 
 func InstrumentationMeasures() {
 	var count int
 	var count1 int
 	var count2 int
 
-    count = db.GetDB().CountHas("User.username")
+	count = db.GetDB().CountHas("User.username")
 	userCount.Set(float64(count))
 
-    count = db.GetDB().CountHas2("Tension.title", "Tension.status", "Open")
+	count = db.GetDB().CountHas2("Tension.title", "Tension.status", "Open")
 	openTensionCount.Set(float64(count))
 
-    count = db.GetDB().CountHas2("Tension.title", "Tension.status", "Closed")
+	count = db.GetDB().CountHas2("Tension.title", "Tension.status", "Closed")
 	closeTensionCount.Set(float64(count))
 
-    // orga
-    count = db.GetDB().Count2("Node.isRoot", "true" , "Node.type_", "Circle", "uid")
+	// orga
+	count = db.GetDB().Count2("Node.isRoot", "true", "Node.type_", "Circle", "uid")
 	orgaCount.Set(float64(count))
 
-    // circle
-    count = db.GetDB().Count2("Node.isRoot", "false" , "Node.type_", "Circle", "uid")
+	// circle
+	count = db.GetDB().Count2("Node.isRoot", "false", "Node.type_", "Circle", "uid")
 	circleCount.Set(float64(count))
 
-    // role (coordinator or peer)
-    count1 = db.GetDB().Count2("Node.role_type", "Coordinator" , "Node.type_", "Role", "uid")
-    count2 = db.GetDB().Count2("Node.role_type", "Peer" , "Node.type_", "Role", "uid")
-	roleCount.Set(float64(count1+count2))
+	// role (coordinator or peer)
+	count1 = db.GetDB().Count2("Node.role_type", "Coordinator", "Node.type_", "Role", "uid")
+	count2 = db.GetDB().Count2("Node.role_type", "Peer", "Node.type_", "Role", "uid")
+	roleCount.Set(float64(count1 + count2))
 
-    // archived node
-    count = db.GetDB().Count2("Node.isArchived", "true" , "Node.isRoot", "false", "uid")
+	// archived node
+	count = db.GetDB().Count2("Node.isArchived", "true", "Node.isRoot", "false", "uid")
 	archiveCount.Set(float64(count))
 
-    count = db.GetDB().CountHas("Label.name")
+	count = db.GetDB().CountHas("Label.name")
 	labelCount.Set(float64(count))
 }
-

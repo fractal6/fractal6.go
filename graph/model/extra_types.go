@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,29 +21,30 @@
 package model
 
 import (
-    "log"
-    "strconv"
-    "strings"
+	"log"
+	"strconv"
+	"strings"
 )
 
+// Type boolean unmarshal string (true or false) to a bool like value.
 type Boolean bool
 
 func (bit *Boolean) UnmarshalJSON(data []byte) error {
-    asString := strings.Trim(string(data), "\"")
-    res, err := strconv.ParseBool(asString)
-    if err != nil {
-        log.Printf("Boolean unmarshal error: invalid input %s; %s", asString, err.Error())
-        *bit = false
-    }
-    if res {
-        *bit = true
-    } else {
-        *bit = false
-    }
-    return nil
+	asString := strings.Trim(string(data), "\"")
+	res, err := strconv.ParseBool(asString)
+	if err != nil {
+		log.Printf("Boolean unmarshal error: invalid input %s; %s", asString, err.Error())
+		*bit = false
+	}
+	if res {
+		*bit = true
+	} else {
+		*bit = false
+	}
+	return nil
 }
 
 func (bit Boolean) ToBoolPtr() *bool {
-    a := bool(bit)
-    return &a
+	a := bool(bit)
+	return &a
 }

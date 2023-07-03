@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2022 Fractale Co
+ * Copyright (C) 2023 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,71 +21,71 @@
 package model
 
 import (
-    "reflect"
-    "testing"
 	"encoding/json"
+	"reflect"
+	"testing"
 )
 
 func TestUserCreds(t *testing.T) {
-    testcases := []struct{
-        input string
-        want UserCreds
-    }{
-        {"{}", UserCreds{}},
-        {`{"username":"coucou"}`, UserCreds{Username:"coucou"}},
-        {`{"username":"coucou", "subscribe":true}`, UserCreds{Username:"coucou", Subscribe: true}},
-        {`{"username":"coucou", "subscribe":false}`, UserCreds{Username:"coucou", Subscribe: false}},
-        {`{"username":"coucou", "subscribe":"true"}`, UserCreds{Username:"coucou", Subscribe: true}},
-        {`{"username":"coucou", "subscribe":"false"}`, UserCreds{Username:"coucou", Subscribe: false}},
-        {`{"username":"coucou", "subscribe":"1"}`, UserCreds{Username:"coucou", Subscribe: true}},
-        {`{"username":"coucou", "subscribe":"0"}`, UserCreds{Username:"coucou", Subscribe: false}},
-        {`{"username":"coucou", "subscribe":1}`, UserCreds{Username:"coucou", Subscribe: true}},
-        {`{"username":"coucou", "subscribe":0}`, UserCreds{Username:"coucou", Subscribe: false}},
-        {`{"username":"coucou", "subscribe":"other"}`, UserCreds{Username:"coucou", Subscribe: false}},
+	testcases := []struct {
+		input string
+		want  UserCreds
+	}{
+		{"{}", UserCreds{}},
+		{`{"username":"coucou"}`, UserCreds{Username: "coucou"}},
+		{`{"username":"coucou", "subscribe":true}`, UserCreds{Username: "coucou", Subscribe: true}},
+		{`{"username":"coucou", "subscribe":false}`, UserCreds{Username: "coucou", Subscribe: false}},
+		{`{"username":"coucou", "subscribe":"true"}`, UserCreds{Username: "coucou", Subscribe: true}},
+		{`{"username":"coucou", "subscribe":"false"}`, UserCreds{Username: "coucou", Subscribe: false}},
+		{`{"username":"coucou", "subscribe":"1"}`, UserCreds{Username: "coucou", Subscribe: true}},
+		{`{"username":"coucou", "subscribe":"0"}`, UserCreds{Username: "coucou", Subscribe: false}},
+		{`{"username":"coucou", "subscribe":1}`, UserCreds{Username: "coucou", Subscribe: true}},
+		{`{"username":"coucou", "subscribe":0}`, UserCreds{Username: "coucou", Subscribe: false}},
+		{`{"username":"coucou", "subscribe":"other"}`, UserCreds{Username: "coucou", Subscribe: false}},
 	}
 
-    for _, test := range testcases {
-        //t.Logf("testcase %d", i)
-        //b, _ := json.Marshal(test.input)
-        b := []byte(test.input)
+	for _, test := range testcases {
+		//t.Logf("testcase %d", i)
+		//b, _ := json.Marshal(test.input)
+		b := []byte(test.input)
 
-        var got UserCreds
-        err := json.Unmarshal(b, &got)
-        if err != nil {
-            t.Errorf(err.Error())
-        }
+		var got UserCreds
+		err := json.Unmarshal(b, &got)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
 
-        if !reflect.DeepEqual(got, test.want) {
-            t.Errorf("For p = %s, want %v. Got %v",
-            test.input, test.want, got)
-        }
-    }
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("For p = %s, want %v. Got %v",
+				test.input, test.want, got)
+		}
+	}
 }
 
 func TestUserCredsMap(t *testing.T) {
-    type Pending struct{
-        Username string
-        Email string
-        Password string
-        UpdatedAt *string
-        Subscribe  bool
-    }
-
-    testcases := []struct{
-        input Pending
-        want UserCreds
-    }{
-        {Pending{Username:"coucou"}, UserCreds{Username:"coucou"}},
-        {Pending{Username:"coucou", Subscribe: true}, UserCreds{Username:"coucou", Subscribe:true}},
-        {Pending{Username:"coucou", Subscribe: false}, UserCreds{Username:"coucou", Subscribe:false}},
+	type Pending struct {
+		Username  string
+		Email     string
+		Password  string
+		UpdatedAt *string
+		Subscribe bool
 	}
 
-    for _, test := range testcases {
-        var got UserCreds
-        StructMap(test.input, &got)
-        if !reflect.DeepEqual(got, test.want) {
-            t.Errorf("For p = %v, want %v. Got %v",
-            test.input, test.want, got)
-        }
-    }
+	testcases := []struct {
+		input Pending
+		want  UserCreds
+	}{
+		{Pending{Username: "coucou"}, UserCreds{Username: "coucou"}},
+		{Pending{Username: "coucou", Subscribe: true}, UserCreds{Username: "coucou", Subscribe: true}},
+		{Pending{Username: "coucou", Subscribe: false}, UserCreds{Username: "coucou", Subscribe: false}},
+	}
+
+	for _, test := range testcases {
+		var got UserCreds
+		StructMap(test.input, &got)
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("For p = %v, want %v. Got %v",
+				test.input, test.want, got)
+		}
+	}
 }

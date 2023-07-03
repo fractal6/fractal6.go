@@ -17,6 +17,24 @@ directive @hook_updateProjectInput on ARGUMENT_DEFINITION
 directive @hook_updateProject on FIELD_DEFINITION
 directive @hook_deleteProjectInput on ARGUMENT_DEFINITION
 directive @hook_deleteProject on FIELD_DEFINITION
+directive @hook_addProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_addProjectColumn on FIELD_DEFINITION
+directive @hook_updateProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_updateProjectColumn on FIELD_DEFINITION
+directive @hook_deleteProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_deleteProjectColumn on FIELD_DEFINITION
+directive @hook_addProjectCardInput on ARGUMENT_DEFINITION
+directive @hook_addProjectCard on FIELD_DEFINITION
+directive @hook_updateProjectCardInput on ARGUMENT_DEFINITION
+directive @hook_updateProjectCard on FIELD_DEFINITION
+directive @hook_deleteProjectCardInput on ARGUMENT_DEFINITION
+directive @hook_deleteProjectCard on FIELD_DEFINITION
+directive @hook_addProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_addProjectDraft on FIELD_DEFINITION
+directive @hook_updateProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_updateProjectDraft on FIELD_DEFINITION
+directive @hook_deleteProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_deleteProjectDraft on FIELD_DEFINITION
 directive @hook_addTensionInput on ARGUMENT_DEFINITION
 directive @hook_addTension on FIELD_DEFINITION
 directive @hook_updateTensionInput on ARGUMENT_DEFINITION
@@ -59,6 +77,12 @@ directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_getProjectInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectInput on ARGUMENT_DEFINITION
+directive @hook_getProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_queryProjectColumnInput on ARGUMENT_DEFINITION
+directive @hook_getProjectCardInput on ARGUMENT_DEFINITION
+directive @hook_queryProjectCardInput on ARGUMENT_DEFINITION
+directive @hook_getProjectDraftInput on ARGUMENT_DEFINITION
+directive @hook_queryProjectDraftInput on ARGUMENT_DEFINITION
 directive @hook_getTensionInput on ARGUMENT_DEFINITION
 directive @hook_queryTensionInput on ARGUMENT_DEFINITION
 directive @hook_getCommentInput on ARGUMENT_DEFINITION
@@ -140,9 +164,7 @@ type Node {
   role_type: RoleType
   color: String
   first_link(filter: UserFilter): User
-  second_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  orga_agg(filter: OrgaAggFilter): OrgaAgg @meta(f:"getOrgaAgg", k:"nameid")
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -168,7 +190,6 @@ type NodeFragment {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -212,41 +233,79 @@ type RoleExt {
 
 type Project {
   id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   rootnameid: String!
   parentnameid: String!
   nameid: String!
   name: String!
   description: String
+  status: ProjectStatus!
   columns(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn!]
+  fields(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField!]
   leaders(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
   columnsAggregate(filter: ProjectColumnFilter): ProjectColumnAggregateResult
+  fieldsAggregate(filter: ProjectFieldFilter): ProjectFieldAggregateResult
   leadersAggregate(filter: NodeFilter): NodeAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
-}
-
-type ProjectTension {
-  id: ID!
-  tension(filter: TensionFilter): Tension!
-  pos: Int!
-  pc(filter: ProjectColumnFilter): ProjectColumn!
 }
 
 type ProjectColumn {
   id: ID!
   name: String!
-  about: String
+  description: String
+  color: String
   pos: Int!
-  tensions(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
+  col_type: ProjectColumnType!
+  cards(filter: ProjectCardFilter, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard!]
   project(filter: ProjectFilter): Project!
+  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  drafts(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft!]
 
-  tensionsAggregate(filter: ProjectTensionFilter): ProjectTensionAggregateResult
+  cardsAggregate(filter: ProjectCardFilter): ProjectCardAggregateResult
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
+  draftsAggregate(filter: ProjectDraftFilter): ProjectDraftAggregateResult
 }
 
-type OrgaAgg {
-  n_members: Int
-  n_guests: Int
+type ProjectCard {
+  id: ID!
+  pos: Int!
+  card(filter: CardKindFilter): CardKind!
+  pc(filter: ProjectColumnFilter): ProjectColumn!
+  values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
+
+  valuesAggregate(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
+}
+
+type ProjectField {
+  field_type: ProjectFieldType!
+  isVisible: Boolean!
+  values(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue!]
+
+  valuesAggregate(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
+}
+
+type ProjectFieldValue {
+  field(filter: ProjectFieldFilter): ProjectField!
+  value: String!
+  pos: Int
+}
+
+union CardKind= Tension| ProjectDraft
+
+enum ProjectColumnType {
+  NormalColumn
+  NoStatusColumn
+}
+
+enum ProjectFieldType {
+  INT
+  STRING
+  DATE
+  SINGLE_SELECT
 }
 
 type Post {
@@ -255,6 +314,16 @@ type Post {
   createdAt: DateTime!
   updatedAt: DateTime
   message: String
+}
+
+type ProjectDraft {
+  title: String!
+  message: String
+  project_status(filter: ProjectColumnFilter): ProjectColumn!
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  updatedAt: DateTime
 }
 
 type Tension {
@@ -274,9 +343,8 @@ type Tension {
   mentions(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   subscribers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
-  projects(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension!]
+  project_statuses(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn!]
   n_comments: Int
-  n_open_contracts: Int
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -291,7 +359,7 @@ type Tension {
   mentionsAggregate(filter: EventFilter): EventAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
   subscribersAggregate(filter: UserFilter): UserAggregateResult
-  projectsAggregate(filter: ProjectTensionFilter): ProjectTensionAggregateResult
+  project_statusesAggregate(filter: ProjectColumnFilter): ProjectColumnAggregateResult
 }
 
 type Comment {
@@ -401,7 +469,6 @@ type User {
   watching(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!] @private
   rights(filter: UserRightsFilter): UserRights!
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  backed_roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   tensions_created(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   tensions_assigned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!] @private
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!] @private
@@ -413,7 +480,6 @@ type User {
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
   rolesAggregate(filter: NodeFilter): NodeAggregateResult
-  backed_rolesAggregate(filter: NodeFilter): NodeAggregateResult
   tensions_createdAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_assignedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
@@ -588,6 +654,11 @@ enum BlobType {
 
 }
 
+enum ProjectStatus {
+  Open
+  Closed
+}
+
 enum ContractStatus {
   Open
   Closed
@@ -623,41 +694,41 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 input AddBlobInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef! @x_add(r:"ref")
   blob_type: BlobType!
   pushedFlag: DateTime
@@ -673,7 +744,7 @@ type AddBlobPayload {
 
 input AddCommentInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!]
@@ -686,9 +757,9 @@ type AddCommentPayload {
 
 input AddContractInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   contractid: String!
   tension: TensionRef! @x_add(r:"ref")
   status: ContractStatus!
@@ -731,9 +802,9 @@ type AddEventFragmentPayload {
 
 input AddEventInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef! @x_add(r:"ref")
   event_type: TensionEvent!
   mentioned: TensionRef @x_add(r:"ref")
@@ -782,7 +853,6 @@ input AddNodeFragmentInput {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -825,9 +895,7 @@ input AddNodeInput {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -838,9 +906,9 @@ type AddNodePayload {
 
 input AddNotifInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension_: TensionRef
   contract: ContractRef
   link: String
@@ -848,16 +916,6 @@ input AddNotifInput {
 
 type AddNotifPayload {
   notif(filter: NotifFilter, order: NotifOrder, first: Int, offset: Int): [Notif]
-  numUids: Int
-}
-
-input AddOrgaAggInput {
-  n_members: Int
-  n_guests: Int
-}
-
-type AddOrgaAggPayload {
-  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
   numUids: Int
 }
 
@@ -877,12 +935,28 @@ type AddPendingUserPayload {
   numUids: Int
 }
 
+input AddProjectCardInput {
+  pos: Int!
+  card: CardKindRef! @x_alter(r:"ref")
+  pc: ProjectColumnRef! @x_alter(r:"ref")
+  values: [ProjectFieldValueRef!]
+}
+
+type AddProjectCardPayload {
+  projectCard(filter: ProjectCardFilter, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard]
+  numUids: Int
+}
+
 input AddProjectColumnInput {
   name: String!
-  about: String
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String
   pos: Int!
-  tensions: [ProjectTensionRef!]
-  project: ProjectRef!
+  col_type: ProjectColumnType!
+  cards: [ProjectCardRef!]
+  project: ProjectRef! @x_alter(r:"ref")
+  tensions: [TensionRef!]
+  drafts: [ProjectDraftRef!]
 }
 
 type AddProjectColumnPayload {
@@ -890,30 +964,60 @@ type AddProjectColumnPayload {
   numUids: Int
 }
 
+input AddProjectDraftInput {
+  createdBy: UserRef!
+  createdAt: DateTime! @w_add(a:"now")
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  title: String!
+  project_status: ProjectColumnRef!
+}
+
+type AddProjectDraftPayload {
+  projectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  numUids: Int
+}
+
+input AddProjectFieldInput {
+  field_type: ProjectFieldType!
+  isVisible: Boolean!
+  values: [ProjectFieldValueRef!]
+}
+
+type AddProjectFieldPayload {
+  projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  numUids: Int
+}
+
+input AddProjectFieldValueInput {
+  field: ProjectFieldRef!
+  value: String!
+  pos: Int
+}
+
+type AddProjectFieldValuePayload {
+  projectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
+  numUids: Int
+}
+
 input AddProjectInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   rootnameid: String!
   parentnameid: String!
   nameid: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String!
-  description: String
+  name: String! @x_alter(r:"minLen", n:1) @x_alter(r:"maxLen", n:100)
+  description: String @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus!
   columns: [ProjectColumnRef!]
+  fields: [ProjectFieldRef!]
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddProjectPayload {
   project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
-  numUids: Int
-}
-
-input AddProjectTensionInput {
-  tension: TensionRef! @x_alter(r:"ref")
-  pos: Int!
-  pc: ProjectColumnRef!
-}
-
-type AddProjectTensionPayload {
-  projectTension(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension]
   numUids: Int
 }
 
@@ -947,9 +1051,9 @@ type AddRoleExtPayload {
 
 input AddTensionInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   emitter: NodeRef!
   emitterid: String!
   receiver: NodeRef!
@@ -966,9 +1070,8 @@ input AddTensionInput {
   mentions: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!] @x_add(r:"ref")
-  projects: [ProjectTensionRef!] @x_add(r:"ref")
+  project_statuses: [ProjectColumnRef!]
   n_comments: Int
-  n_open_contracts: Int
 }
 
 type AddTensionPayload {
@@ -1006,7 +1109,6 @@ input AddUserInput {
   watching: [NodeRef!] @x_alter(r:"ref")
   rights: UserRightsRef!
   roles: [NodeRef!] @x_add(r:"ref")
-  backed_roles: [NodeRef!] @x_add(r:"ref")
   tensions_created: [TensionRef!] @x_add(r:"ref")
   tensions_assigned: [TensionRef!] @x_add(r:"ref")
   contracts: [ContractRef!] @x_add(r:"ref")
@@ -1037,9 +1139,9 @@ type AddUserRightsPayload {
 
 input AddVoteInput {
   createdBy: UserRef!
-  createdAt: DateTime!
+  createdAt: DateTime! @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   voteid: String!
   contract: ContractRef! @x_add(r:"ref")
   node: NodeRef! @x_add(r:"ref")
@@ -1119,7 +1221,7 @@ input BlobPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_patch_ro
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_patch_ro
   blob_type: BlobType @x_patch_ro
   pushedFlag: DateTime @x_patch_ro
@@ -1131,9 +1233,9 @@ input BlobPatch {
 input BlobRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_add(r:"ref")
   blob_type: BlobType
   pushedFlag: DateTime
@@ -1145,6 +1247,22 @@ input BlobRef {
 input BlobType_hash {
   eq: BlobType
   in: [BlobType]
+}
+
+input CardKindFilter {
+  memberTypes: [CardKindType!]
+  tensionFilter: TensionFilter
+  projectDraftFilter: ProjectDraftFilter
+}
+
+input CardKindRef {
+  tensionRef: TensionRef
+  projectDraftRef: ProjectDraftRef
+}
+
+enum CardKindType {
+  Tension
+  ProjectDraft
 }
 
 type CommentAggregateResult {
@@ -1191,16 +1309,16 @@ input CommentPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_alter
+  message: String
   reactions: [ReactionRef!] @x_patch_ro
 }
 
 input CommentRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_alter
+  message: String
   reactions: [ReactionRef!]
 }
 
@@ -1273,7 +1391,7 @@ input ContractPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_patch_ro
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_patch_ro
   status: ContractStatus @x_patch_ro
   contract_type: ContractType @x_patch_ro
@@ -1289,9 +1407,9 @@ input ContractPatch {
 input ContractRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   contractid: String
   tension: TensionRef @x_add(r:"ref")
   status: ContractStatus
@@ -1410,12 +1528,6 @@ type DeleteNotifPayload {
   numUids: Int
 }
 
-type DeleteOrgaAggPayload {
-  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  msg: String
-  numUids: Int
-}
-
 type DeletePendingUserPayload {
   pendingUser(filter: PendingUserFilter, order: PendingUserOrder, first: Int, offset: Int): [PendingUser]
   msg: String
@@ -1428,20 +1540,38 @@ type DeletePostPayload {
   numUids: Int
 }
 
+type DeleteProjectCardPayload {
+  projectCard(filter: ProjectCardFilter, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard]
+  msg: String
+  numUids: Int
+}
+
 type DeleteProjectColumnPayload {
   projectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
   msg: String
   numUids: Int
 }
 
-type DeleteProjectPayload {
-  project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
+type DeleteProjectDraftPayload {
+  projectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
   msg: String
   numUids: Int
 }
 
-type DeleteProjectTensionPayload {
-  projectTension(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension]
+type DeleteProjectFieldPayload {
+  projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  msg: String
+  numUids: Int
+}
+
+type DeleteProjectFieldValuePayload {
+  projectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
+  msg: String
+  numUids: Int
+}
+
+type DeleteProjectPayload {
+  project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
   msg: String
   numUids: Int
 }
@@ -1686,7 +1816,7 @@ input EventPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_patch_ro
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_patch_ro
   event_type: TensionEvent @x_patch_ro
   mentioned: TensionRef @x_patch_ro
@@ -1697,9 +1827,9 @@ input EventPatch {
 input EventRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_add(r:"ref")
   event_type: TensionEvent
   mentioned: TensionRef @x_add(r:"ref")
@@ -1828,7 +1958,7 @@ input LabelPatch {
   rootnameid: String @x_patch_ro
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
   description: String @x_alter(r:"maxLen", n:280)
-  color: String @x_alter
+  color: String
   tensions: [TensionRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -1838,7 +1968,7 @@ input LabelRef {
   rootnameid: String
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
   description: String @x_alter(r:"maxLen", n:280)
-  color: String @x_alter
+  color: String
   tensions: [TensionRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -1885,18 +2015,18 @@ enum MandateOrderable {
 }
 
 input MandatePatch {
-  purpose: String @x_alter
-  responsabilities: String @x_alter
-  domains: String @x_alter
-  policies: String @x_alter
+  purpose: String
+  responsabilities: String
+  domains: String
+  policies: String
 }
 
 input MandateRef {
   id: ID
-  purpose: String @x_alter
-  responsabilities: String @x_alter
-  domains: String @x_alter
-  policies: String @x_alter
+  purpose: String
+  responsabilities: String
+  domains: String
+  policies: String
 }
 
 enum Mode {
@@ -1931,17 +2061,23 @@ type Mutation {
   addProject(input: [AddProjectInput!]! @hook_addProjectInput): AddProjectPayload @hook_addProject
   updateProject(input: UpdateProjectInput! @hook_updateProjectInput): UpdateProjectPayload @hook_updateProject
   deleteProject(filter: ProjectFilter! @hook_deleteProjectInput): DeleteProjectPayload @hook_deleteProject
-  addProjectTension(input: [AddProjectTensionInput!]!): AddProjectTensionPayload
-  updateProjectTension(input: UpdateProjectTensionInput!): UpdateProjectTensionPayload
-  deleteProjectTension(filter: ProjectTensionFilter!): DeleteProjectTensionPayload
-  addProjectColumn(input: [AddProjectColumnInput!]!, upsert: Boolean): AddProjectColumnPayload
-  updateProjectColumn(input: UpdateProjectColumnInput!): UpdateProjectColumnPayload
-  deleteProjectColumn(filter: ProjectColumnFilter!): DeleteProjectColumnPayload
-  addOrgaAgg(input: [AddOrgaAggInput!]!): AddOrgaAggPayload
-  updateOrgaAgg(input: UpdateOrgaAggInput!): UpdateOrgaAggPayload
-  deleteOrgaAgg(filter: OrgaAggFilter!): DeleteOrgaAggPayload
+  addProjectColumn(input: [AddProjectColumnInput!]! @hook_addProjectColumnInput): AddProjectColumnPayload @hook_addProjectColumn
+  updateProjectColumn(input: UpdateProjectColumnInput! @hook_updateProjectColumnInput): UpdateProjectColumnPayload @hook_updateProjectColumn
+  deleteProjectColumn(filter: ProjectColumnFilter! @hook_deleteProjectColumnInput): DeleteProjectColumnPayload @hook_deleteProjectColumn
+  addProjectCard(input: [AddProjectCardInput!]! @hook_addProjectCardInput): AddProjectCardPayload @hook_addProjectCard
+  updateProjectCard(input: UpdateProjectCardInput! @hook_updateProjectCardInput): UpdateProjectCardPayload @hook_updateProjectCard
+  deleteProjectCard(filter: ProjectCardFilter! @hook_deleteProjectCardInput): DeleteProjectCardPayload @hook_deleteProjectCard
+  addProjectField(input: [AddProjectFieldInput!]!): AddProjectFieldPayload
+  updateProjectField(input: UpdateProjectFieldInput!): UpdateProjectFieldPayload
+  deleteProjectField(filter: ProjectFieldFilter!): DeleteProjectFieldPayload
+  addProjectFieldValue(input: [AddProjectFieldValueInput!]!): AddProjectFieldValuePayload
+  updateProjectFieldValue(input: UpdateProjectFieldValueInput!): UpdateProjectFieldValuePayload
+  deleteProjectFieldValue(filter: ProjectFieldValueFilter!): DeleteProjectFieldValuePayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(filter: PostFilter!): DeletePostPayload
+  addProjectDraft(input: [AddProjectDraftInput!]! @hook_addProjectDraftInput): AddProjectDraftPayload @hook_addProjectDraft
+  updateProjectDraft(input: UpdateProjectDraftInput! @hook_updateProjectDraftInput): UpdateProjectDraftPayload @hook_updateProjectDraft
+  deleteProjectDraft(filter: ProjectDraftFilter! @hook_deleteProjectDraftInput): DeleteProjectDraftPayload @hook_deleteProjectDraft
   addTension(input: [AddTensionInput!]! @hook_addTensionInput): AddTensionPayload @hook_addTension
   updateTension(input: UpdateTensionInput! @hook_updateTensionInput): UpdateTensionPayload @hook_updateTension
   deleteTension(filter: TensionFilter! @hook_deleteTensionInput): DeleteTensionPayload @hook_deleteTension
@@ -2018,7 +2154,7 @@ input NodeFilter {
   createdAt: DateTimeFilter
   nameid: StringHashFilter_StringRegExpFilter
   rootnameid: StringHashFilter_StringRegExpFilter
-  name: StringTermFilter
+  name: StringFullTextFilter
   about: StringFullTextFilter
   skills: StringTermFilter
   isRoot: Boolean
@@ -2044,8 +2180,6 @@ type NodeFragmentAggregateResult {
   aboutMax: String
   first_linkMin: String
   first_linkMax: String
-  second_linkMin: String
-  second_linkMax: String
   role_extMin: String
   role_extMax: String
   colorMin: String
@@ -2070,7 +2204,6 @@ enum NodeFragmentHasFilter {
   mode
   type_
   first_link
-  second_link
   role_ext
   role_type
   color
@@ -2087,7 +2220,6 @@ enum NodeFragmentOrderable {
   name
   about
   first_link
-  second_link
   role_ext
   color
 }
@@ -2096,13 +2228,12 @@ input NodeFragmentPatch {
   nameid: String @x_patch_ro
   name: String @x_alter(r:"minLen", n:1)
   about: String @x_alter(r:"maxLen", n:280)
-  mandate: MandateRef @x_alter
-  skills: [String!] @x_alter
+  mandate: MandateRef
+  skills: [String!]
   visibility: NodeVisibility @x_patch_ro
   mode: NodeMode @x_patch_ro
   type_: NodeType @x_patch_ro
   first_link: String @x_patch_ro
-  second_link: String @x_patch_ro
   role_ext: String @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
@@ -2113,13 +2244,12 @@ input NodeFragmentRef {
   nameid: String @w_add(a:"lower")
   name: String @x_alter(r:"minLen", n:1)
   about: String @x_alter(r:"maxLen", n:280)
-  mandate: MandateRef @x_alter
-  skills: [String!] @x_alter
+  mandate: MandateRef
+  skills: [String!]
   visibility: NodeVisibility
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -2157,9 +2287,7 @@ enum NodeHasFilter {
   role_type
   color
   first_link
-  second_link
   contracts
-  orga_agg
   events_history
 }
 
@@ -2216,9 +2344,7 @@ input NodePatch {
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
   first_link: UserRef @x_patch_ro
-  second_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
-  orga_agg: OrgaAggRef @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
 }
 
@@ -2255,9 +2381,7 @@ input NodeRef {
   role_type: RoleType
   color: String
   first_link: UserRef
-  second_link: UserRef
   contracts: [VoteRef!]
-  orga_agg: OrgaAggRef
   events_history: [EventRef!]
 }
 
@@ -2320,7 +2444,7 @@ input NotifPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_patch_ro
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension_: TensionRef @x_patch_ro
   contract: ContractRef @x_patch_ro
   link: String @x_patch_ro
@@ -2329,57 +2453,12 @@ input NotifPatch {
 input NotifRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   tension_: TensionRef
   contract: ContractRef
   link: String
-}
-
-type OrgaAggAggregateResult {
-  count: Int
-  n_membersMin: Int
-  n_membersMax: Int
-  n_membersSum: Int
-  n_membersAvg: Float
-  n_guestsMin: Int
-  n_guestsMax: Int
-  n_guestsSum: Int
-  n_guestsAvg: Float
-}
-
-input OrgaAggFilter {
-  has: [OrgaAggHasFilter]
-  and: [OrgaAggFilter]
-  or: [OrgaAggFilter]
-  not: OrgaAggFilter
-}
-
-enum OrgaAggHasFilter {
-  n_members
-  n_guests
-}
-
-input OrgaAggOrder {
-  asc: OrgaAggOrderable
-  desc: OrgaAggOrderable
-  then: OrgaAggOrder
-}
-
-enum OrgaAggOrderable {
-  n_members
-  n_guests
-}
-
-input OrgaAggPatch {
-  n_members: Int @x_patch_ro
-  n_guests: Int @x_patch_ro
-}
-
-input OrgaAggRef {
-  n_members: Int
-  n_guests: Int
 }
 
 type PendingUserAggregateResult {
@@ -2547,6 +2626,10 @@ input PostRef {
 
 type ProjectAggregateResult {
   count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
   rootnameidMin: String
   rootnameidMax: String
   parentnameidMin: String
@@ -2559,12 +2642,62 @@ type ProjectAggregateResult {
   descriptionMax: String
 }
 
+type ProjectCardAggregateResult {
+  count: Int
+  posMin: Int
+  posMax: Int
+  posSum: Int
+  posAvg: Float
+}
+
+input ProjectCardFilter {
+  id: [ID!]
+  has: [ProjectCardHasFilter]
+  and: [ProjectCardFilter]
+  or: [ProjectCardFilter]
+  not: ProjectCardFilter
+}
+
+enum ProjectCardHasFilter {
+  pos
+  card
+  pc
+  values
+}
+
+input ProjectCardOrder {
+  asc: ProjectCardOrderable
+  desc: ProjectCardOrderable
+  then: ProjectCardOrder
+}
+
+enum ProjectCardOrderable {
+  pos
+}
+
+input ProjectCardPatch {
+  pos: Int
+  card: CardKindRef @x_alter(r:"ref")
+  pc: ProjectColumnRef @x_alter(r:"ref")
+  values: [ProjectFieldValueRef!] @x_patch_ro
+}
+
+input ProjectCardRef {
+  id: ID
+  pos: Int
+  card: CardKindRef @x_alter(r:"ref")
+  pc: ProjectColumnRef @x_alter(r:"ref")
+  values: [ProjectFieldValueRef!]
+}
+
 type ProjectColumnAggregateResult {
   count: Int
   nameMin: String
   nameMax: String
-  aboutMin: String
-  aboutMax: String
+  descriptionMin: String
+  descriptionMax: String
+  colorMin: String
+  colorMax: String
   posMin: Int
   posMax: Int
   posSum: Int
@@ -2573,7 +2706,7 @@ type ProjectColumnAggregateResult {
 
 input ProjectColumnFilter {
   id: [ID!]
-  name: StringHashFilter
+  col_type: ProjectColumnType_hash
   has: [ProjectColumnHasFilter]
   and: [ProjectColumnFilter]
   or: [ProjectColumnFilter]
@@ -2582,10 +2715,14 @@ input ProjectColumnFilter {
 
 enum ProjectColumnHasFilter {
   name
-  about
+  description
+  color
   pos
-  tensions
+  col_type
+  cards
   project
+  tensions
+  drafts
 }
 
 input ProjectColumnOrder {
@@ -2596,32 +2733,187 @@ input ProjectColumnOrder {
 
 enum ProjectColumnOrderable {
   name
-  about
+  description
+  color
   pos
 }
 
 input ProjectColumnPatch {
-  about: String @x_patch_ro
-  pos: Int @x_patch_ro
-  tensions: [ProjectTensionRef!] @x_patch_ro
-  project: ProjectRef @x_patch_ro
+  name: String
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String
+  pos: Int
+  col_type: ProjectColumnType
+  cards: [ProjectCardRef!] @x_patch_ro
+  project: ProjectRef @x_alter(r:"ref")
+  tensions: [TensionRef!] @x_patch_ro
+  drafts: [ProjectDraftRef!] @x_patch_ro
 }
 
 input ProjectColumnRef {
   id: ID
   name: String
-  about: String
+  description: String @x_alter(r:"maxLen", n:280)
+  color: String
   pos: Int
-  tensions: [ProjectTensionRef!]
-  project: ProjectRef
+  col_type: ProjectColumnType
+  cards: [ProjectCardRef!]
+  project: ProjectRef @x_alter(r:"ref")
+  tensions: [TensionRef!]
+  drafts: [ProjectDraftRef!]
+}
+
+input ProjectColumnType_hash {
+  eq: ProjectColumnType
+  in: [ProjectColumnType]
+}
+
+type ProjectDraftAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  updatedAtMin: DateTime
+  updatedAtMax: DateTime
+  messageMin: String
+  messageMax: String
+  titleMin: String
+  titleMax: String
+}
+
+input ProjectDraftFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  message: StringFullTextFilter
+  has: [ProjectDraftHasFilter]
+  and: [ProjectDraftFilter]
+  or: [ProjectDraftFilter]
+  not: ProjectDraftFilter
+}
+
+enum ProjectDraftHasFilter {
+  createdBy
+  createdAt
+  updatedAt
+  message
+  title
+  project_status
+}
+
+input ProjectDraftOrder {
+  asc: ProjectDraftOrderable
+  desc: ProjectDraftOrderable
+  then: ProjectDraftOrder
+}
+
+enum ProjectDraftOrderable {
+  createdAt
+  updatedAt
+  message
+  title
+}
+
+input ProjectDraftPatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  title: String
+  project_status: ProjectColumnRef @x_patch_ro
+}
+
+input ProjectDraftRef {
+  id: ID
+  createdBy: UserRef
+  createdAt: DateTime @w_add(a:"now")
+  updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
+  message: String
+  title: String
+  project_status: ProjectColumnRef
+}
+
+type ProjectFieldAggregateResult {
+  count: Int
+}
+
+input ProjectFieldFilter {
+  has: [ProjectFieldHasFilter]
+  and: [ProjectFieldFilter]
+  or: [ProjectFieldFilter]
+  not: ProjectFieldFilter
+}
+
+enum ProjectFieldHasFilter {
+  field_type
+  isVisible
+  values
+}
+
+input ProjectFieldPatch {
+  field_type: ProjectFieldType @x_patch_ro
+  isVisible: Boolean @x_patch_ro
+  values: [ProjectFieldValueRef!] @x_patch_ro
+}
+
+input ProjectFieldRef {
+  field_type: ProjectFieldType
+  isVisible: Boolean
+  values: [ProjectFieldValueRef!]
+}
+
+type ProjectFieldValueAggregateResult {
+  count: Int
+  valueMin: String
+  valueMax: String
+  posMin: Int
+  posMax: Int
+  posSum: Int
+  posAvg: Float
+}
+
+input ProjectFieldValueFilter {
+  has: [ProjectFieldValueHasFilter]
+  and: [ProjectFieldValueFilter]
+  or: [ProjectFieldValueFilter]
+  not: ProjectFieldValueFilter
+}
+
+enum ProjectFieldValueHasFilter {
+  field
+  value
+  pos
+}
+
+input ProjectFieldValueOrder {
+  asc: ProjectFieldValueOrderable
+  desc: ProjectFieldValueOrderable
+  then: ProjectFieldValueOrder
+}
+
+enum ProjectFieldValueOrderable {
+  value
+  pos
+}
+
+input ProjectFieldValuePatch {
+  field: ProjectFieldRef @x_patch_ro
+  value: String @x_patch_ro
+  pos: Int @x_patch_ro
+}
+
+input ProjectFieldValueRef {
+  field: ProjectFieldRef
+  value: String
+  pos: Int
 }
 
 input ProjectFilter {
   id: [ID!]
+  createdAt: DateTimeFilter
   rootnameid: StringHashFilter
   parentnameid: StringHashFilter
   nameid: StringHashFilter @w_alter(a:"lower")
-  name: StringTermFilter
+  name: StringFullTextFilter
+  status: ProjectStatus_hash
   has: [ProjectHasFilter]
   and: [ProjectFilter]
   or: [ProjectFilter]
@@ -2629,12 +2921,17 @@ input ProjectFilter {
 }
 
 enum ProjectHasFilter {
+  createdBy
+  createdAt
+  updatedAt
   rootnameid
   parentnameid
   nameid
   name
   description
+  status
   columns
+  fields
   leaders
   nodes
 }
@@ -2646,6 +2943,8 @@ input ProjectOrder {
 }
 
 enum ProjectOrderable {
+  createdAt
+  updatedAt
   rootnameid
   parentnameid
   nameid
@@ -2654,71 +2953,41 @@ enum ProjectOrderable {
 }
 
 input ProjectPatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  updatedAt: DateTime @x_patch_ro
   rootnameid: String @x_patch_ro
   parentnameid: String @x_patch_ro
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String @x_patch_ro
-  description: String @x_alter
-  columns: [ProjectColumnRef!] @x_patch_ro
+  name: String @x_alter(r:"minLen", n:1) @x_alter(r:"maxLen", n:100)
+  description: String @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus
+  columns: [ProjectColumnRef!]
+  fields: [ProjectFieldRef!] @x_patch_ro
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input ProjectRef {
   id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  updatedAt: DateTime
   rootnameid: String
   parentnameid: String
   nameid: String @w_alter(a:"lower") @x_alter(r:"unique", f:"parentnameid") @x_alter(r:"minLen", n:1)
-  name: String
-  description: String @x_alter
+  name: String @x_alter(r:"minLen", n:1) @x_alter(r:"maxLen", n:100)
+  description: String @x_alter(r:"maxLen", n:280)
+  status: ProjectStatus
   columns: [ProjectColumnRef!]
+  fields: [ProjectFieldRef!]
   leaders: [NodeRef!] @x_alter(r:"ref")
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
-type ProjectTensionAggregateResult {
-  count: Int
-  posMin: Int
-  posMax: Int
-  posSum: Int
-  posAvg: Float
-}
-
-input ProjectTensionFilter {
-  id: [ID!]
-  has: [ProjectTensionHasFilter]
-  and: [ProjectTensionFilter]
-  or: [ProjectTensionFilter]
-  not: ProjectTensionFilter
-}
-
-enum ProjectTensionHasFilter {
-  tension
-  pos
-  pc
-}
-
-input ProjectTensionOrder {
-  asc: ProjectTensionOrderable
-  desc: ProjectTensionOrderable
-  then: ProjectTensionOrder
-}
-
-enum ProjectTensionOrderable {
-  pos
-}
-
-input ProjectTensionPatch {
-  tension: TensionRef @x_alter(r:"ref")
-  pos: Int @x_alter
-  pc: ProjectColumnRef @x_patch_ro
-}
-
-input ProjectTensionRef {
-  id: ID
-  tension: TensionRef @x_alter(r:"ref")
-  pos: Int @x_alter
-  pc: ProjectColumnRef
+input ProjectStatus_hash {
+  eq: ProjectStatus
+  in: [ProjectStatus]
 }
 
 type Query {
@@ -2740,17 +3009,22 @@ type Query {
   getProject(id: ID!): Project
   queryProject(filter: ProjectFilter @hook_queryProjectInput, order: ProjectOrder, first: Int, offset: Int): [Project]
   aggregateProject(filter: ProjectFilter): ProjectAggregateResult
-  getProjectTension(id: ID!): ProjectTension
-  queryProjectTension(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension]
-  aggregateProjectTension(filter: ProjectTensionFilter): ProjectTensionAggregateResult
-  getProjectColumn(id: ID, name: String): ProjectColumn
-  queryProjectColumn(filter: ProjectColumnFilter, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
+  getProjectColumn(id: ID!): ProjectColumn
+  queryProjectColumn(filter: ProjectColumnFilter @hook_queryProjectColumnInput, order: ProjectColumnOrder, first: Int, offset: Int): [ProjectColumn]
   aggregateProjectColumn(filter: ProjectColumnFilter): ProjectColumnAggregateResult
-  queryOrgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  aggregateOrgaAgg(filter: OrgaAggFilter): OrgaAggAggregateResult
+  getProjectCard(id: ID!): ProjectCard
+  queryProjectCard(filter: ProjectCardFilter @hook_queryProjectCardInput, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard]
+  aggregateProjectCard(filter: ProjectCardFilter): ProjectCardAggregateResult
+  queryProjectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  aggregateProjectField(filter: ProjectFieldFilter): ProjectFieldAggregateResult
+  queryProjectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
+  aggregateProjectFieldValue(filter: ProjectFieldValueFilter): ProjectFieldValueAggregateResult
   getPost(id: ID!): Post
   queryPost(filter: PostFilter, order: PostOrder, first: Int, offset: Int): [Post]
   aggregatePost(filter: PostFilter): PostAggregateResult
+  getProjectDraft(id: ID!): ProjectDraft
+  queryProjectDraft(filter: ProjectDraftFilter @hook_queryProjectDraftInput, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  aggregateProjectDraft(filter: ProjectDraftFilter): ProjectDraftAggregateResult
   getTension(id: ID!): Tension
   queryTension(filter: TensionFilter @hook_queryTensionInput, order: TensionOrder, first: Int, offset: Int): [Tension]
   aggregateTension(filter: TensionFilter): TensionAggregateResult
@@ -2893,9 +3167,9 @@ input RoleExtPatch {
   rootnameid: String @x_patch_ro
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
   about: String @x_alter(r:"maxLen", n:280)
-  role_type: RoleType @x_alter
-  color: String @x_alter
-  mandate: MandateRef @x_alter
+  role_type: RoleType
+  color: String
+  mandate: MandateRef
   roles: [NodeRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -2905,9 +3179,9 @@ input RoleExtRef {
   rootnameid: String
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
   about: String @x_alter(r:"maxLen", n:280)
-  role_type: RoleType @x_alter
-  color: String @x_alter
-  mandate: MandateRef @x_alter
+  role_type: RoleType
+  color: String
+  mandate: MandateRef
   roles: [NodeRef!] @x_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
@@ -2982,10 +3256,6 @@ type TensionAggregateResult {
   n_commentsMax: Int
   n_commentsSum: Int
   n_commentsAvg: Float
-  n_open_contractsMin: Int
-  n_open_contractsMax: Int
-  n_open_contractsSum: Int
-  n_open_contractsAvg: Float
 }
 
 input TensionEvent_hash {
@@ -3029,9 +3299,8 @@ enum TensionHasFilter {
   mentions
   contracts
   subscribers
-  projects
+  project_statuses
   n_comments
-  n_open_contracts
 }
 
 input TensionOrder {
@@ -3048,14 +3317,13 @@ enum TensionOrderable {
   receiverid
   title
   n_comments
-  n_open_contracts
 }
 
 input TensionPatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_patch_ro
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   emitter: NodeRef @x_patch_ro
   emitterid: String @x_patch_ro
   receiver: NodeRef @x_patch_ro
@@ -3068,21 +3336,20 @@ input TensionPatch {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
-  history: [EventRef!] @x_alter
+  history: [EventRef!]
   mentions: [EventRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
   subscribers: [UserRef!] @x_patch_ro
-  projects: [ProjectTensionRef!] @x_patch_ro
+  project_statuses: [ProjectColumnRef!] @x_patch_ro
   n_comments: Int @x_patch_ro
-  n_open_contracts: Int @x_patch_ro
 }
 
 input TensionRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   emitter: NodeRef
   emitterid: String
   receiver: NodeRef
@@ -3095,13 +3362,12 @@ input TensionRef {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
-  history: [EventRef!] @x_alter
+  history: [EventRef!]
   mentions: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")
   subscribers: [UserRef!] @x_add(r:"ref")
-  projects: [ProjectTensionRef!] @x_add(r:"ref")
+  project_statuses: [ProjectColumnRef!]
   n_comments: Int
-  n_open_contracts: Int
 }
 
 input TensionStatus_hash {
@@ -3235,17 +3501,6 @@ type UpdateNotifPayload {
   numUids: Int
 }
 
-input UpdateOrgaAggInput {
-  filter: OrgaAggFilter!
-  set: OrgaAggPatch
-  remove: OrgaAggPatch
-}
-
-type UpdateOrgaAggPayload {
-  orgaAgg(filter: OrgaAggFilter, order: OrgaAggOrder, first: Int, offset: Int): [OrgaAgg]
-  numUids: Int
-}
-
 input UpdatePendingUserInput {
   filter: PendingUserFilter!
   set: PendingUserPatch
@@ -3268,6 +3523,17 @@ type UpdatePostPayload {
   numUids: Int
 }
 
+input UpdateProjectCardInput {
+  filter: ProjectCardFilter!
+  set: ProjectCardPatch
+  remove: ProjectCardPatch
+}
+
+type UpdateProjectCardPayload {
+  projectCard(filter: ProjectCardFilter, order: ProjectCardOrder, first: Int, offset: Int): [ProjectCard]
+  numUids: Int
+}
+
 input UpdateProjectColumnInput {
   filter: ProjectColumnFilter!
   set: ProjectColumnPatch
@@ -3279,6 +3545,39 @@ type UpdateProjectColumnPayload {
   numUids: Int
 }
 
+input UpdateProjectDraftInput {
+  filter: ProjectDraftFilter!
+  set: ProjectDraftPatch
+  remove: ProjectDraftPatch
+}
+
+type UpdateProjectDraftPayload {
+  projectDraft(filter: ProjectDraftFilter, order: ProjectDraftOrder, first: Int, offset: Int): [ProjectDraft]
+  numUids: Int
+}
+
+input UpdateProjectFieldInput {
+  filter: ProjectFieldFilter!
+  set: ProjectFieldPatch
+  remove: ProjectFieldPatch
+}
+
+type UpdateProjectFieldPayload {
+  projectField(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField]
+  numUids: Int
+}
+
+input UpdateProjectFieldValueInput {
+  filter: ProjectFieldValueFilter!
+  set: ProjectFieldValuePatch
+  remove: ProjectFieldValuePatch
+}
+
+type UpdateProjectFieldValuePayload {
+  projectFieldValue(filter: ProjectFieldValueFilter, order: ProjectFieldValueOrder, first: Int, offset: Int): [ProjectFieldValue]
+  numUids: Int
+}
+
 input UpdateProjectInput {
   filter: ProjectFilter!
   set: ProjectPatch
@@ -3287,17 +3586,6 @@ input UpdateProjectInput {
 
 type UpdateProjectPayload {
   project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
-  numUids: Int
-}
-
-input UpdateProjectTensionInput {
-  filter: ProjectTensionFilter!
-  set: ProjectTensionPatch
-  remove: ProjectTensionPatch
-}
-
-type UpdateProjectTensionPayload {
-  projectTension(filter: ProjectTensionFilter, order: ProjectTensionOrder, first: Int, offset: Int): [ProjectTension]
   numUids: Int
 }
 
@@ -3437,7 +3725,7 @@ enum UserEventOrderable {
 
 input UserEventPatch {
   createdAt: DateTime @x_patch_ro
-  isRead: Boolean @x_alter
+  isRead: Boolean
   user: UserRef @x_patch_ro
   event: [EventKindRef!] @x_patch_ro
 }
@@ -3445,16 +3733,16 @@ input UserEventPatch {
 input UserEventRef {
   id: ID
   createdAt: DateTime
-  isRead: Boolean @x_alter
+  isRead: Boolean
   user: UserRef
   event: [EventKindRef!] @x_add(r:"ref")
 }
 
 input UserFilter {
   id: [ID!]
-  username: StringHashFilter_StringRegExpFilter @w_add(a:"lower")
+  username: StringHashFilter_StringRegExpFilter
   name: StringRegExpFilter
-  email: StringHashFilter @w_add(a:"lower")
+  email: StringHashFilter
   has: [UserHasFilter]
   and: [UserFilter]
   or: [UserFilter]
@@ -3479,7 +3767,6 @@ enum UserHasFilter {
   watching
   rights
   roles
-  backed_roles
   tensions_created
   tensions_assigned
   contracts
@@ -3524,13 +3811,12 @@ input UserPatch {
   watching: [NodeRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef @x_patch_ro
   roles: [NodeRef!] @x_patch_ro
-  backed_roles: [NodeRef!] @x_patch_ro
   tensions_created: [TensionRef!] @x_patch_ro
   tensions_assigned: [TensionRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
-  reactions: [ReactionRef!] @x_alter
-  events: [UserEventRef!] @x_alter
-  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
+  reactions: [ReactionRef!]
+  events: [UserEventRef!]
+  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef @x_patch_ro
 }
 
@@ -3553,13 +3839,12 @@ input UserRef {
   watching: [NodeRef!] @x_patch @x_alter(r:"ref")
   rights: UserRightsRef
   roles: [NodeRef!] @x_add(r:"ref")
-  backed_roles: [NodeRef!] @x_add(r:"ref")
   tensions_created: [TensionRef!] @x_add(r:"ref")
   tensions_assigned: [TensionRef!] @x_add(r:"ref")
   contracts: [ContractRef!] @x_add(r:"ref")
-  reactions: [ReactionRef!] @x_alter
-  events: [UserEventRef!] @x_alter
-  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter
+  reactions: [ReactionRef!]
+  events: [UserEventRef!]
+  markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef
 }
 
@@ -3671,7 +3956,7 @@ input VotePatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String @x_patch_ro
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   contract: ContractRef @x_patch_ro
   node: NodeRef @x_patch_ro
   data: [Int!] @x_patch_ro
@@ -3680,9 +3965,9 @@ input VotePatch {
 input VoteRef {
   id: ID
   createdBy: UserRef
-  createdAt: DateTime
+  createdAt: DateTime @w_add(a:"now")
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
-  message: String
+  message: String @x_alter(r:"isOwner", f:"createdBy")
   voteid: String
   contract: ContractRef @x_add(r:"ref")
   node: NodeRef @x_add(r:"ref")

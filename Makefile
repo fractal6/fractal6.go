@@ -6,7 +6,7 @@ BINARY := f6
 #DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
 DGRAPH_RELEASE := v22.0.2
-CLIENT_RELEASE := 0.7.9
+CLIENT_RELEASE := 0.8
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
@@ -17,7 +17,7 @@ RELEASE_DIR := releases/$(BRANCH_NAME)/$(RELEASE_VERSION)
 LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
 
 
-.PHONY: build prod vendor schema
+.PHONY: build prod vendor
 default: build
 
 
@@ -45,37 +45,24 @@ vendor:
 
 test:
 	go test ./...
+	go test ./web/auth/... -v
 
 #
 # Generate Graphql code and schema
 #
 
-genall: dgraph schema generate
-gen: schema generate
+genall: dgraph_schema gqlgen_schema generate
 
-dgraph: # Do alter Dgraph
-	# Requirements:
-	# npm install -g get-graphql-schema
-	# Alternative: npm install -g graphqurl
-	cd ../fractal6-schema
+dgraph_schema:
+	cd schema
 	make dgraph_in
-	cd -
-	mkdir -p schema/
-	cp ../fractal6-schema/gen_dgraph_in/schema.graphql schema/dgraph_schema.graphql
-	# Update Dgraph
-	curl -X POST http://localhost:8080/admin/schema --data-binary "@schema/dgraph_schema.graphql" | jq
-	# Used by the `schema` rule, to generate the gqlgen input schema
-	get-graphql-schema http://localhost:8080/graphql > schema/dgraph_out.graphql
-	# Alternative: gq http://localhost:8080/graphql -H "Content-Type: application/json" --introspect > schema/dgraph_out.graphql
-	# Used by gqlgen_in rule
-	cp schema/dgraph_out.graphql ../fractal6-schema/gen_dgraph_out/schema.graphql
+	make dgraph
 
-schema: # Do not alter Dgraph, just merge schemas...
-	cd ../fractal6-schema
+gqlgen_schema:
+	cd schema
+	make dgraph_out
 	make gqlgen_in
-	cd -
-	mkdir -p schema/
-	cp ../fractal6-schema/gen/schema.graphql schema/
+	make clean
 
 generate:
 	@# Generate gqlgen output
@@ -84,7 +71,7 @@ generate:
 	# @deprecated: has been implemented in https://github.com/99designs/gqlgen/pull/2488
 	#	sed -i "s/\(func.*\)(\([^,]*\),\([^,]*\))/\1(data \2, errors\3)/" graph/schema.resolvers.go
 
-	# @deprecated: At the time gqlgen didn't handl omitempty correctly;
+	# @deprecated: At the time gqlgen didn't handle omitempty correctly;
 	# We add "omitempty" for each generate type's literal except for Bool and Int to prevent
 	# loosing data (when literal are set to false/0 values) when marshalling.
 	#	sed -i '/\W\(bool\|int\)\W/I!s/`\w* *json:"\([^`]*\)"`/`json:"\1,omitempty"`/' graph/model/models_gen.go
@@ -92,7 +79,6 @@ generate:
 
 #
 # Publish builds for prod releases
-#
 #
 
 publish_prod: build_release_prod
@@ -243,6 +229,9 @@ certs:
 	openssl rsa -in private.pem -pubout -out public.pem
 	# Copy public key for the Dgraph authorization in the schema
 	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 |  xclip -selection clipboard;
+
+cloc:
+	cloc --fullpath  --exclude-dir vendor --not-match-d graph/generated --exclude-list-file graph/model/models_gen.go .
 
 tags:
 	ctags --exclude=.git  --exclude="public/*" --exclude="releases/*" -R -f .tags

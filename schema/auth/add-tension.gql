@@ -1,0 +1,19 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize users that own the emitter role
+    { rule: """query ($USERNAME: String!) {
+        queryTension {
+          emitter {
+            first_link(filter: {username: {eq: $USERNAME}}) { username }
+          }
+        }
+    }""" },
+    # Authorize Bot emitter
+    { rule: """query {
+        queryTension {
+          emitter(filter: {role_type: {eq: Bot}}) { id }
+        }
+    }""" }
+  ]
+}

@@ -1,0 +1,15 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize public data
+    { rule: """query {
+        queryProject {
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }""" },
+    # Authorize members
+    { rule: """query ($ROOTIDS: [String]) {
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }""" }
+  ]
+}

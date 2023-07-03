@@ -72,7 +72,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   nameid: String! @search(by:[hash, regexp]) @id
   rootnameid: String! @search(by:[hash, regexp])
   source: Blob
-  name: String! @search(by:[term])
+  name: String! @search(by:[fulltext])
   about: String @search(by:[fulltext])
   skills: [String!] @search(by:[term])
   isRoot: Boolean! @search
@@ -97,9 +97,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   role_type: RoleType @search
   color: String
   first_link: User
-  second_link: User
   contracts: [Vote!] @hasInverse(field: node)
-  orga_agg: OrgaAgg
   events_history: [Event!]
 }
 
@@ -114,7 +112,6 @@ type NodeFragment {
   mode: NodeMode
   type_: NodeType
   first_link: String
-  second_link: String
   role_ext: String
   role_type: RoleType
   color: String
@@ -138,6 +135,16 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
 }]
+}, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
 }) {
   id: ID!
   rootnameid: String! @search(by:[hash])
@@ -154,6 +161,16 @@ type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
           nodes(filter: {visibility: {eq: Public}}) { id }
         }
     }"""
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query ($ROOTIDS: [String]) {
         queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
@@ -180,37 +197,78 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
 }]
+}, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
 }) {
   id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  updatedAt: DateTime!
   rootnameid: String! @search(by:[hash])
   parentnameid: String! @search(by:[hash])
   nameid: String! @search(by:[hash])
-  name: String! @search(by:[term])
+  name: String! @search(by:[fulltext])
   description: String
+  status: ProjectStatus! @search
   columns: [ProjectColumn!] @hasInverse(field: project)
+  fields: [ProjectField!]
   leaders: [Node!]
   nodes: [Node!] @hasInverse(field: projects)
 }
 
-type ProjectTension {
-  id: ID!
-  tension: Tension!
-  pos: Int!
-  pc: ProjectColumn!
-}
-
 type ProjectColumn {
   id: ID!
-  name: String! @id
-  about: String
+  name: String!
+  description: String
+  color: String
   pos: Int!
-  tensions: [ProjectTension!] @hasInverse(field: pc)
+  col_type: ProjectColumnType! @search
+  cards: [ProjectCard!] @hasInverse(field: pc)
   project: Project!
+  tensions: [Tension!] @hasInverse(field: project_statuses)
+  drafts: [ProjectDraft!] @hasInverse(field: project_status)
 }
 
-type OrgaAgg {
-  n_members: Int
-  n_guests: Int
+type ProjectCard {
+  id: ID!
+  pos: Int!
+  card: CardKind!
+  pc: ProjectColumn!
+  values: [ProjectFieldValue!]
+}
+
+type ProjectField {
+  field_type: ProjectFieldType!
+  isVisible: Boolean!
+  values: [ProjectFieldValue!] @hasInverse(field: field)
+}
+
+type ProjectFieldValue {
+  field: ProjectField!
+  value: String!
+  pos: Int
+}
+
+union CardKind= Tension| ProjectDraft
+
+enum ProjectColumnType {
+  NormalColumn
+  NoStatusColumn
+}
+
+enum ProjectFieldType {
+  INT
+  STRING
+  DATE
+  SINGLE_SELECT
 }
 
 interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -226,6 +284,11 @@ interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   createdAt: DateTime! @search
   updatedAt: DateTime
   message: String @search(by:[fulltext])
+}
+
+type ProjectDraft implements Post {
+  title: String!
+  project_status: ProjectColumn!
 }
 
 type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -292,9 +355,8 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   mentions: [Event!] @hasInverse(field: mentioned)
   contracts: [Contract!] @hasInverse(field: tension)
   subscribers: [User!] @hasInverse(field: subscriptions)
-  projects: [ProjectTension!] @hasInverse(field: tension)
+  project_statuses: [ProjectColumn!]
   n_comments: Int
-  n_open_contracts: Int
 }
 
 type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -437,7 +499,6 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   watching: [Node!] @hasInverse(field: watchers)
   rights: UserRights!
   roles: [Node!] @hasInverse(field: first_link)
-  backed_roles: [Node!] @hasInverse(field: second_link)
   tensions_created: [Tension!] @hasInverse(field: createdBy)
   tensions_assigned: [Tension!] @hasInverse(field: assignees)
   contracts: [Contract!] @hasInverse(field: candidates)
@@ -619,6 +680,11 @@ enum BlobType {
 
   OnDoc
 
+}
+
+enum ProjectStatus {
+  Open
+  Closed
 }
 
 enum ContractStatus {

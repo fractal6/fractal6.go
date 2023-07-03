@@ -1,0 +1,7 @@
+{ # Authorize author
+  rule: """query ($USERNAME: String!) {
+      queryReaction {
+        user(filter: {username: {eq: $USERNAME}}) { username }
+      }
+    }"""
+}
