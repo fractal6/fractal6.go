@@ -966,8 +966,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 	// * [x] Unlink his roles
 	// * [x] Delete his membership
 	// * [x] Delete his reactions
+	// * [x] Delete his watched organizations
 	// * [x] Remove his contracts (candidates)
-	// * [x] Delete his UserEvents (subDelte Notif!)
+	// * [x] Delete his UserEvents (subDelete Notif!)
 	"deleteUser": QueryMut{
 		Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
@@ -977,7 +978,10 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 roles as User.roles @filter(not eq(Node.role_type, ["Guest", "Member", "Owner", "Retired", "Pending"])) {
                     Node.source { Blob.node { frag as NodeFragment.first_link }}
                 }
-                reactions as User.reactions
+                reactions as User.reactions {
+                    comments as Reaction.comment
+                }
+                watched as User.watching
                 contracts as User.contracts
                 ue as User.events {
                     notifs as UserEvent.event @filter(type(Notif))
@@ -1009,7 +1013,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(roles) <Node.first_link> * .
         uid(membership) * * .
         uid(frag) <NodeFragment.first_link> * .
+        uid(comments) <Comment.reactions> uid(reactions) .
         uid(reactions) * * .
+        uid(watched) <Node.watchers> uid(u) .
         uid(contracts) <Contract.candidates> uid(u) .
         uid(notifs) * * .
         uid(ue) * * .
