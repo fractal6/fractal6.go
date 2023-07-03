@@ -8,6 +8,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ...
 
+
+## [0.8]
+
+### New
+- [schema] add Project data structure.
+- [schema] externalize and decompose auth rules in schema/.
+- [schema] merge fractale schemas in schema/.
+- [api] add Project, ProjectColumn, ProjectCard and ProjectDraft resolvers.
+- [api] add Gamma dql generic query function + add some generics functions.
+- [route] add the password update route.
+- [cli] add deluser command.
+
+### Changed
+- update License
+- refactor: node resolver.
+
+### Fixed
+- Automatically watch organisation when joining it
+- Prevent node to be moved in a role + fix user organisation removed notification
+- Delete some reverse node when deleting users that was missing.
+
+
 ## [0.7.9]
 
 - build: make schema compatible with dgraph v22
