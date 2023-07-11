@@ -64,6 +64,10 @@ gqlgen_schema:
 	make gqlgen_in
 	make clean
 
+update_schema:
+	cd schema
+	make dgraph
+
 generate:
 	@# Generate gqlgen output
 	go generate ./...
