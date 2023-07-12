@@ -25,6 +25,7 @@ import (
 	"fmt"
 	re "regexp"
 	"strings"
+	"unicode"
 )
 
 func FormatError(err error, loc string) error {
@@ -56,6 +57,13 @@ var (
             "location": "username"
         }]
     }`)
+	ErrUpperCaseUsername = errors.New(`{
+        "errors":[{
+            "message":"Username must be in lower case.",
+            "location": "username"
+        }]
+    }`)
+
 	ErrBadNameidFormat = errors.New(`{
         "errors":[{
             "message":"Please enter a valid name.",
@@ -210,6 +218,11 @@ func ValidateUsername(u string) error {
 		return ErrBadUsernameFormat
 	}
 
+	// Only lower characters
+	if !containsLowerCaseAlphaOnly(u) {
+		return ErrUpperCaseUsername
+	}
+
 	for _, l := range []byte{u[0], u[len(u)-1]} {
 		if l == '.' || l == '-' || l == '_' {
 			return ErrBadUsernameFormat
@@ -311,4 +324,15 @@ func ValidateSimplePassword(p string) error {
 
 func matchReg(s string, regexp *re.Regexp) bool {
 	return regexp.MatchString(s)
+}
+
+func containsLowerCaseAlphaOnly(s string) bool {
+	for _, char := range s {
+		if unicode.IsLetter(char) {
+			if !unicode.IsLower(char) {
+				return false
+			}
+		}
+	}
+	return true
 }
