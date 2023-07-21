@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/home/admin/src/fractal6-db
-ExecStart=/usr/bin/bash -c 'bin/dgraph zero --config config-zero.yml'
+ExecStart=/bin/bash -c 'bin/dgraph zero --config config-zero.yml'
 LimitNOFILE=65536
 Restart=on-failure
 StandardOutput=journal
