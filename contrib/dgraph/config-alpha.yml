@@ -6,14 +6,13 @@ wal: _data/w
 tmp: _data/tmp
 
 cache:
-  # 4096
   size-mb: 1024
-  percentage: 50,30,20
+  percentage: 10,65,25
 
 graphql:
   # Use to fetch schema during generation.
   introspection: true
-  debug: true
+  debug: false
   extensions: false
   poll-interval: 10s
 

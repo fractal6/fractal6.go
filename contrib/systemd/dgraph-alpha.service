@@ -6,7 +6,7 @@ Requires=dgraph-zero.service
 
 [Service]
 Type=simple
-WorkingDirectory=/home/admin/src/fractal6-db
+WorkingDirectory=/home/admin/src/db
 ExecStart=/bin/bash -c 'bin/dgraph alpha --config config-alpha.yml'
 LimitNOFILE=65536
 Restart=on-failure
