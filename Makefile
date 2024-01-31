@@ -234,7 +234,7 @@ certs:
 	# Copy public key for the Dgraph authorization in the schema
 	# cat public.pem | sed 's/$/\\\n/' | tr -d "\n" | head -c -2 |  xclip -selection clipboard;
 
-cloc:
+count_lines:
 	# Lines count
 	cloc --fullpath  --exclude-dir vendor --not-match-d graph/generated --exclude-list-file graph/model/models_gen.go .
 
