@@ -305,7 +305,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 	if notif.Contract.ContractType == model.ContractTypeAnyCoordoDual &&
 		notif.Contract.Event.EventType == model.TensionEventMoved && notif.Contract.Event.New != nil {
 		// The contract is created inside the tension or the node to be moved.
-		// But we also need to notidy users in the target circle.
+		// But we also need to notify users in the target circle.
 		targetid := *notif.Contract.Event.New
 		x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", targetid, "Node.source", "Blob.tension", "uid")
 		if err != nil {
@@ -439,7 +439,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 		PushEventNotifications(model.EventNotif{Uctx: notif.Uctx, Tid: notif.Tid, History: []*model.EventRef{&event}})
 
 		// Add a user notif to the candidate user with link to the accepted contract
-		// has it won't be notify automatically (not subscrided to the tension yet).
+		// as it won't be notified automatically (not subscribed to the tension yet).
 		if *event.EventType == model.TensionEventUserJoined {
 			for _, c := range notif.Contract.Candidates {
 				isRead := false

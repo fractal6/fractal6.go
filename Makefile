@@ -44,6 +44,7 @@ vendor:
 	go mod vendor
 
 test:
+	#go clean -testcache
 	go test ./...
 	go test ./web/auth/... -v
 

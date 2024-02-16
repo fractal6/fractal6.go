@@ -21,9 +21,9 @@
 package auth
 
 import (
+	//"os"
 	"reflect"
 	"testing"
-	//"os"
 )
 
 func init() {
@@ -77,10 +77,11 @@ func TestValidateUsername(t *testing.T) {
 		want  bool
 	}{
 		{"test", true},
-		{"tEst0123", true},
+		{"test0123", true},
 		{"test.ok", true},
 		{"test-ok", true},
 		{"test_ok", true},
+		{"tEst0123", false},
 		{"te", false},
 		{"test-", false},
 		{"test.", false},
