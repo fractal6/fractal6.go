@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ...
 
+## [0.8.2]
+
+
+### Fixed
+- fix/api: test that username are lowercase
+- fix/api: returns assignees with fetchTensionAll
+- fix/cli: token command should  honor the username if given.
+- fix some tests
+
+### Changed
+- contrib path
+- upgrade dependencies.
+
 
 ## [0.8]
 
